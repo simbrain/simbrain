@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
@@ -13,12 +14,15 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  * @author Sharai
  *
  */
-public class CreatureInstance {
+public class Creature {
 	
 	/**
 	 * The name of the creature.
 	 */
 	private String name;
+	
+	/** Back reference to parent simulation. */
+	private final CreaturesSim parentSim;
 
 	/**
 	 * The brain belonging to this creature.
@@ -29,9 +33,18 @@ public class CreatureInstance {
 	 * The odor world agent belonging to this creature.
 	 */
 	private RotatingEntity agent;
+	
+	/** Reference to drives lobe. */
+	private NeuronGroup drives;
 
-	public CreatureInstance(String name, NetBuilder net, RotatingEntity agent) {
-		this.name = name;
+	
+	/** How quickly to approach or avoid objects. */
+    float baseMovementStepSize = .001f;
+
+
+	public Creature(CreaturesSim sim, String name, NetBuilder net, RotatingEntity agent) {
+		this.parentSim = sim;
+	    this.name = name;
 		
 		this.brain = new CreaturesBrain(net);
 		initDefaultBrain();
@@ -45,6 +58,10 @@ public class CreatureInstance {
 	 */
 	public void update() {
 		brain.getNetwork().update();
+		double hungerActivation = drives.getNeuronByLabel("Hunger").getActivation();
+		if(hungerActivation > 0) {
+	        this.approachObject(parentSim.cheese, hungerActivation);		    
+		}
 	}
 	
 	/**
@@ -55,13 +72,15 @@ public class CreatureInstance {
 		agent.setSmellSource(new SmellSource(new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 255.0}));
 	}
 
+	
+	
 	/**
 	 * Build a brain network from a template.
 	 */
 	private void initDefaultBrain() {
 
 		// Init non-mutable lobes #1-5
-		NeuronGroup drives = brain.buildDriveLobe();
+		drives = brain.buildDriveLobe();
 //		NeuronGroup stimulus = brain.buildStimulusLobe();
 //		NeuronGroup verbs = brain.buildVerbLobe();
 //		brain.buildNounLobe();
@@ -84,6 +103,23 @@ public class CreatureInstance {
 //		// Init Lobe #0: Perception
 //		brain.buildPerceptionLobe(new NeuronGroup[] {drives, verbs, senses, attention});
 
+	}
+	
+	public void approachBehavior() {
+	    // Find the nearest object and approach
+	    // Could other conditions as needed
+	}
+		
+	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
+	    double stepSize = baseMovementStepSize * motionAmount;
+        double deltaX = agent.getCenterX()
+                + stepSize * (targetObject.getCenterX() - agent.getCenterX());
+        double deltaY = agent.getCenterY()
+                + stepSize * (targetObject.getCenterY() - agent.getCenterY());
+//        double deltaHeading = agent.getHeading()
+//                + stepSize * (targetObject.getCenterY() - agent.getCenterY());
+        agent.setCenterLocation((float) deltaX, (float) deltaY);
+	    
 	}
 
 }

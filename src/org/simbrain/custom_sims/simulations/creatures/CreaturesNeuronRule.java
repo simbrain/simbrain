@@ -67,7 +67,7 @@ public class CreaturesNeuronRule extends LinearRule {
 
 	@Override
 	public void update(Neuron neuron) {
-		System.out.println("Updating neuron: " + neuron.getLabel());
+		//System.out.println("Updating neuron: " + neuron.getLabel());
 
 		// Get input and modulate it with inputGain.
 		double input = inputType.getInput(neuron);
@@ -90,17 +90,17 @@ public class CreaturesNeuronRule extends LinearRule {
 		if (!override) {
 			if (stateValue > nominalThreshold) {
 				neuron.setBuffer(stateValue);
-				System.out.print("State value was " + stateValue + ", ");
+				//System.out.print("State value was " + stateValue + ", ");
 				stateValue -= nominalThreshold;
-				System.out.println("now it's " + stateValue + "!");
+				//System.out.println("now it's " + stateValue + "!");
 			} else {
 				neuron.setBuffer(0);
 				// TODO: Find an algorithm that better replicates how leakage
 				// rate in Creatures
 				// works, such that 0 = Instant, 255 = 52 years.
-				System.out.print("State value was " + stateValue + ", ");
+				//System.out.print("State value was " + stateValue + ", ");
 				stateValue = restState + (stateValue * (leakageRate / getUpperBound()));
-				System.out.println("now it's " + stateValue + "!");
+				//System.out.println("now it's " + stateValue + "!");
 			}
 
 		}

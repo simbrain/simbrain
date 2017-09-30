@@ -20,10 +20,8 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-
-//TODO: Not sure this is the best name.  Use it a while then decide.
-//  Maybe change to NetHelper.     Or NetworkBuilder
 
 /**
  * A wrapper for a NetworkComponent that makes it easy to add stuff to a
@@ -45,6 +43,9 @@ public class NetBuilder {
         this.network = networkComponent.getNetwork();
     }
 
+    /**
+     * Add a neuron at a specified location.
+     */
     public Neuron addNeuron(int x, int y) {
         Neuron neuron = new Neuron(network, "LinearRule");
         neuron.setLocation(x, y);
@@ -52,6 +53,9 @@ public class NetBuilder {
         return neuron;
     }
 
+    /**
+     * Add neurons at a specified location with a specified layout.
+     */
     public void addNeurons(int x, int y, int numNeurons, String layoutName,
             String type) {
 
@@ -115,9 +119,8 @@ public class NetBuilder {
         return synapse;
     }
 
-    
-    //TODO
-    public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
+    public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule,
+            double value) {
         Synapse synapse = new Synapse(source, target, rule);
         synapse.setStrength(value);
         source.getNetwork().addSynapse(synapse);
@@ -149,52 +152,27 @@ public class NetBuilder {
         return sg;
     }
 
-    // TODO: Consolidate with method below
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons,
             String layoutName, NeuronUpdateRule rule) {
+
         NeuronGroup ng;
+        ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons);
+        ng.setNeuronType(rule);
 
-        ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons, rule);
-        //ng.setNeuronType(rule); //TODO: Why won't this work?
+        layoutNeuronGroup(ng, x, y, layoutName);
         network.addGroup(ng);
-
-        // Lay out neurons
-        if (layoutName.toLowerCase().contains("line")) {
-            if (layoutName.equalsIgnoreCase("vertical line")) {
-                LineLayout lineLayout = new LineLayout(x, y, 50,
-                        LineOrientation.VERTICAL);
-                ng.setLayout(lineLayout);
-            } else {
-                LineLayout lineLayout = new LineLayout(x, y, 50,
-                        LineOrientation.HORIZONTAL);
-                ng.setLayout(lineLayout);
-            }
-        } else if (layoutName.equalsIgnoreCase("grid")) {
-            GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE,
-                    (int) Math.sqrt(numNeurons));
-            ng.setLayout(gridLayout);
-        }
-        ng.applyLayout();
         return ng;
 
     }
 
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons,
             String layoutName, String type) {
+        return addNeuronGroup(x, y, numNeurons, layoutName, new LinearRule());
+    }
 
-        NeuronGroup ng;
+    private void layoutNeuronGroup(NeuronGroup ng, double x, double y,
+            String layoutName) {
 
-        // TODO: Fishy...
-        if (type.equalsIgnoreCase("wta")) {
-            ng = new WinnerTakeAll(network, numNeurons);
-            ng.setLocation(x, y);
-        } else {
-            ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons);
-            ng.setNeuronType(type);
-        }
-        network.addGroup(ng);
-
-        // Lay out neurons
         if (layoutName.toLowerCase().contains("line")) {
             if (layoutName.equalsIgnoreCase("vertical line")) {
                 LineLayout lineLayout = new LineLayout(x, y, 50,
@@ -207,15 +185,18 @@ public class NetBuilder {
             }
         } else if (layoutName.equalsIgnoreCase("grid")) {
             GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE,
-                    (int) Math.sqrt(numNeurons));
+                    (int) Math.sqrt(ng.size()));
             ng.setLayout(gridLayout);
         }
         ng.applyLayout();
-        return ng;
+
     }
 
     public WinnerTakeAll addWTAGroup(double x, double y, int numNeurons) {
-        return (WinnerTakeAll) addNeuronGroup(x, y, numNeurons, "line", "wta");
+        WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
+        wta.setLocation(x, y);
+        layoutNeuronGroup(wta, x, y, "line");
+        return wta;
     }
 
     public Group addSubnetwork(double x, double y, int numNeurons,

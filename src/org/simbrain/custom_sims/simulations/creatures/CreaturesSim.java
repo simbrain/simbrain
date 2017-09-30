@@ -1,23 +1,15 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateActionAdapter;
-import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.environment.SmellSource;
+import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updater.UpdateActionAdapter;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * A simulation of an A-Life agent based off of the Creatures entertainment
@@ -28,14 +20,17 @@ import org.simbrain.util.environment.SmellSource;
  * @author Sharai
  *
  */
-public class Creatures extends RegisteredSimulation {
+public class CreaturesSim extends RegisteredSimulation {
 
 	/**
 	 * A list of creatures. Good for updating and maintaining multiple creatures.
 	 */
-	private List<CreatureInstance> creatureList = new ArrayList<CreatureInstance>();
+	private List<Creature> creatureList = new ArrayList<Creature>();
 
 	private OdorWorldBuilder world;
+	
+	// TODO: Temp!
+	public OdorWorldEntity cheese;
 
 	@Override
 	public void run() {
@@ -48,11 +43,13 @@ public class Creatures extends RegisteredSimulation {
 
 		// Create odor world
 		world = sim.addOdorWorld(1052, 0, 600, 600, "World");
+		cheese = world.addEntity(200, 200, "Swiss.gif");
 
 		// Create starting creature.
-		CreatureInstance ron = createCreature(451, 0, 600, 600, "Ron");
+		Creature ron = createCreature(451, 0, 600, 600, "Ron");
 
 		// Create update action
+		// TODO: Possibly clear all update actions and then custom populate
 		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
 			@Override
 			public void invoke() {
@@ -69,7 +66,7 @@ public class Creatures extends RegisteredSimulation {
 	// updated (as we do now), or should we update each agent right after their
 	// brain does?
 	void updateCreaturesSim() {
-		for (CreatureInstance c : creatureList) {
+		for (Creature c : creatureList) {
 			c.update();
 		}
 
@@ -91,10 +88,12 @@ public class Creatures extends RegisteredSimulation {
 	 *            Name of creature.
 	 * @return A new creature.
 	 */
-	public CreatureInstance createCreature(int x, int y, int width, int height, String name) {
+	public Creature createCreature(int x, int y, int width, int height, String name) {
 		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
-		return new CreatureInstance(name, net, agent);
+		Creature creature = new Creature(this, name, net, agent);
+        creatureList.add(creature);
+        return creature;
 	}
 
 	/**
@@ -102,11 +101,11 @@ public class Creatures extends RegisteredSimulation {
 	 *
 	 * @param desktop
 	 */
-	public Creatures(SimbrainDesktop desktop) {
+	public CreaturesSim(SimbrainDesktop desktop) {
 		super(desktop);
 	}
 
-	public Creatures() {
+	public CreaturesSim() {
 		super();
 	}
 
@@ -114,8 +113,8 @@ public class Creatures extends RegisteredSimulation {
 	 * Runs the constructor for the simulation.
 	 */
 	@Override
-	public Creatures instantiate(SimbrainDesktop desktop) {
-		return new Creatures(desktop);
+	public CreaturesSim instantiate(SimbrainDesktop desktop) {
+		return new CreaturesSim(desktop);
 	}
 
 	// Accessor methods below this point
@@ -124,7 +123,7 @@ public class Creatures extends RegisteredSimulation {
 		return "Creatures";
 	}
 
-	public List<CreatureInstance> getCreatureList() {
+	public List<Creature> getCreatureList() {
 		return creatureList;
 	}
 

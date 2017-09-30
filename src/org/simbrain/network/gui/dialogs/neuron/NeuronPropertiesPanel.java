@@ -123,8 +123,8 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Construct the panel without specifying whether to display id (that is done
-     * automatically).
+     * Construct the panel without specifying whether to display id (that is
+     * done automatically).
      */
     private NeuronPropertiesPanel(final List<Neuron> neuronList,
         final Window parent, final boolean displayUpdateRuleProperties) {

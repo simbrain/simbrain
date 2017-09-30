@@ -155,23 +155,20 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         RULE_MAP.put(new IACRule().getName(), new IACRulePanel());
         RULE_MAP.put(new IntegrateAndFireRule().getName(),
                 new IntegrateAndFireRulePanel());
-        RULE_MAP.put(new IzhikevichRule().getName(),
-                new IzhikevichRulePanel());
+        RULE_MAP.put(new IzhikevichRule().getName(), new IzhikevichRulePanel());
         RULE_MAP.put(new LinearRule().getName(), new LinearRulePanel());
         RULE_MAP.put(new MorrisLecarRule().getName(),
                 new MorrisLecarRulePanel());
         RULE_MAP.put(new NakaRushtonRule().getName(),
                 new NakaRushtonRulePanel());
-        RULE_MAP.put(new ProductRule().getName(),
-                new ProductRulePanel());
+        RULE_MAP.put(new ProductRule().getName(), new ProductRulePanel());
         RULE_MAP.put(new ContinuousSigmoidalRule().getName(),
                 new ContinuousSigmoidalRulePanel());
         RULE_MAP.put(new SigmoidalRule().getName(),
                 new DiscreteSigmoidalRulePanel());
         RULE_MAP.put(new SpikingThresholdRule().getName(),
                 new SpikingThresholdRulePanel());
-        RULE_MAP.put(new ThreeValueRule().getName(),
-                new ThreeValueRulePanel());
+        RULE_MAP.put(new ThreeValueRule().getName(), new ThreeValueRulePanel());
     }
 
     /**
@@ -253,12 +250,19 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
             neuronRulePanel = new EmptyRulePanel();
         } else {
-            String neuronName = neuronList.get(0).getUpdateRule()
-                    .getName();
+            String neuronName = neuronList.get(0).getUpdateRule().getName();
             neuronRulePanel = ruleMap.get(neuronName);
+            // TODO: Better handling of custom neuron case
+            if (neuronRulePanel == null) {
+                neuronRulePanel = new EmptyRulePanel();
+                cbNeuronType.addItem(neuronName);
+                cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
+                cbNeuronType.setEnabled(false);
+            } else {
+                cbNeuronType.setSelectedItem(neuronName);                
+            }
             neuronRulePanel.setReplacingUpdateRules(false);
             neuronRulePanel.fillFieldValues(Neuron.getRuleList(neuronList));
-            cbNeuronType.setSelectedItem(neuronName);
         }
     }
 

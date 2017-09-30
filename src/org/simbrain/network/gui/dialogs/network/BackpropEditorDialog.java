@@ -39,7 +39,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * (BackpropTrainer2), and the old one. Once that's stabilized this code can
      * be removed.
      */
-    private boolean useExperimentalTrainer = true;
+    private boolean useExperimentalTrainer = false;
     private IterableTrainer currentTrainer;
 
     /**

@@ -150,6 +150,8 @@ public class AgentTrails extends RegisteredSimulation {
             // TODO: I'm not happy with this. Change!
             @Override
             public void invoke() {
+                //TODO: Below a hack since setting tolerance in run() fails.
+                plot.getProjectionModel().getProjector().setTolerance(.01);
                 actionNet.update();
                 sensoryNet.update();
                 predictionNet.update();

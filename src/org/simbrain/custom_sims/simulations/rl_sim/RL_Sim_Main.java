@@ -576,7 +576,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Reward Learning Simulation";
+        return "RL Vehicles";
     }
 
     @Override

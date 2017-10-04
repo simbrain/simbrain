@@ -48,7 +48,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
 
     /** Training set. */
     private final TrainingSet trainingSet = new TrainingSet();
-
+    
     /**
      * Construct an SOM Network.
      *
@@ -63,12 +63,14 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
+        this.addNeuronGroup(som);
+        som.applyLayout();
+
         inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
         inputLayer.setLayoutBasedOnSize();
         if (net == null) {
             return;
         }
-        this.addNeuronGroup(som);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
@@ -76,6 +78,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
         this.connectNeuronGroups(inputLayer, som);
+        
         layoutNetwork();
     }
 

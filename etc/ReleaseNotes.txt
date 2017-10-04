@@ -1,3 +1,18 @@
+Release Notes for Simbrain 3.03
+
+
+- Improved clamping. Select nodes and / or synapses and click Shift-F.  Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
+- Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.
+Shift-drag > Command/Contrl-Drag`
+- Duplicate key (Command/Control-D) added.
+- Neuron Group shortcut: g
+- Improved Lasso selection of self-connections and weights generally
+- Improved coloring for wand on PC
+- Extending internationalization fix to synapse groups
+- New Simulation Framework, to supplement scripting. Custom simulations are now made using Eclipise.  See org.simbrain.simulation in the source.
+- Misc. bug fixes (e.g. control-w no longer closes windows without asking whether they should be saved; odor worlds no longer retain coupling values when closed, etc.). 
+- Misc. documentation improvements, e.g. in integrate and fire.
+
 Release Notes for Simbrain 3.02
 
 - Some changes to the user interface.   Removing toggle auto-zoom command.   Repositioning and toggling auto-zoom are now done by single or double-clicking the same button.

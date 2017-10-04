@@ -228,9 +228,10 @@ public class WorkspaceUpdater {
      * @param numIterations the number of iterations to update
      */
     public void iterate(final CountDownLatch latch, final int numIterations) {
+    	run = true;
         workspaceUpdateExecutor.submit(() -> {
             notifyWorkspaceUpdateStarted();
-            for (int i = 0; i < numIterations; i++) {
+            for (int i = 0; i < numIterations && run; i++) {
                 synchManager.queueTasks();
                 try {
                     doUpdate();
@@ -240,6 +241,7 @@ public class WorkspaceUpdater {
                 synchManager.releaseTasks();
                 synchManager.runTasks();
             }
+            run = false;
             latch.countDown();
             notifyWorkspaceUpdateCompleted();
         });

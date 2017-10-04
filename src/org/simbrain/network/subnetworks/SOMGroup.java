@@ -108,10 +108,12 @@ public class SOMGroup extends NeuronGroup {
             addNeuron(new Neuron(getParentNetwork(), new LinearRule()));
         }
         setLabel("SOM");
+        this.setLayout(DEFAULT_LAYOUT);
     }
 
     /**
-     * Copy constructor
+     * Copy constructor.
+     *
      * @param newRoot
      * @param oldNet
      */
@@ -233,7 +235,7 @@ public class SOMGroup extends NeuronGroup {
         }
 
         // Update alpha and neighborhood size
-        alpha = (alpha - alphaDecayRate * alpha);
+        alpha -= alpha * alphaDecayRate;
         if (neighborhoodSize - neighborhoodDecayAmount > 0) {
             neighborhoodSize -= neighborhoodDecayAmount;
         } else {
@@ -393,12 +395,13 @@ public class SOMGroup extends NeuronGroup {
     }
 
     /**
-     * Set the initial value for alpha. Resets SOM if new.
+     * Set the initial value for alpha (learning rate).
      *
      * @param initAlpha initial alpha
      */
     public void setInitAlpha(final double initAlpha) {
         this.initAlpha = initAlpha;
+        alpha = initAlpha;
     }
 
     /**

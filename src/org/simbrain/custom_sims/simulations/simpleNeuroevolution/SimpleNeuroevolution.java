@@ -223,8 +223,10 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     		Collections.swap(attriubte, globalRand.nextInt(netSize), globalRand.nextInt(netSize));
     	}
     	
-    	for(int i = 0; i < eliminationRate; i++) {
-    		
+    	
+    	int eliminationCount = netSize * eliminationRate / 100;
+    	for(int i = 0; i < eliminationCount; i++) {
+    		deleteWorkspacePair(performance.get(i).getNetIndex());
     	}
     	
     }

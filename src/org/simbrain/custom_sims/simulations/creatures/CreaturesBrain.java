@@ -7,8 +7,13 @@ import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Workspace;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -23,24 +28,42 @@ public class CreaturesBrain {
 	 * List of lobes.
 	 */
 	private List<NeuronGroup> lobes = new ArrayList();
-	
+
 	/**
-	 * The NetBuilder object this wraps around.
+	 * Reference to the NetBuilder object this wraps around.
 	 */
 	private NetBuilder builder;
-	
+
 	/**
 	 * The amount of space to spread between neurons.
 	 */
 	private double gridSpace = 50;
 
 	/**
+	 * Reference to network component
+	 */
+	private NetworkComponent netComponent;
+
+	/**
+	 * Reference to the list of couplings the perception lobe consumes.
+	 */
+	private List<Coupling<?>> perceptCouplings;
+	
+	/**
+	 * Reference to parent sim
+	 */
+	
+	private final CreaturesSim parentSim;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param component
 	 */
-	public CreaturesBrain(NetworkComponent component) {
+	public CreaturesBrain(NetworkComponent component, CreaturesSim parentSim) {
+		this.netComponent = component;
 		this.builder = new NetBuilder(component);
+		this.parentSim = parentSim;
 	}
 
 	/**
@@ -48,8 +71,10 @@ public class CreaturesBrain {
 	 *
 	 * @param netBuilder
 	 */
-	public CreaturesBrain(NetBuilder netBuilder) {
+	public CreaturesBrain(NetBuilder netBuilder, CreaturesSim parentSim) {
 		this.builder = netBuilder;
+		this.netComponent = netBuilder.getNetworkComponent();
+		this.parentSim = parentSim;
 	}
 
 	// Helper methods
@@ -87,7 +112,7 @@ public class CreaturesBrain {
 	public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
 		return createLobe(x, y, numNeurons, layoutName, lobeName, new CreaturesNeuronRule());
 	}
-	
+
 	/**
 	 * Names a neuron.
 	 *
@@ -108,11 +133,18 @@ public class CreaturesBrain {
 	 * @param startPasteIndex
 	 */
 	public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo, int startPasteIndex) {
+
+		// Check to see if the lobe labels can be copied first
 		if (lobeToCopy.size() <= lobeToPasteTo.size() - startPasteIndex) {
-			for (int i = startPasteIndex; i < lobeToCopy.size(); i++) {
-				lobeToPasteTo.getNeuronList().get(i).setLabel(lobeToCopy.getNeuronList().get(i).getLabel());
+			for (int i = startPasteIndex, j = 0; j < lobeToCopy.size(); i++, j++) {
+
+				// Get the label of neuron j of lobeToCopy, and paste it into lobeToPasteTo's
+				// neuron i's label.
+				lobeToPasteTo.getNeuronList().get(i).setLabel(lobeToCopy.getNeuronList().get(j).getLabel());
 			}
 		} else {
+
+			// Give an error message if there is a problem with lobeToCopy's size.
 			System.out.print("copyToLabels error: Lobe " + lobeToCopy.getLabel() + " is too big to copy to Lobe "
 					+ lobeToPasteTo.getLabel() + " starting at index " + startPasteIndex);
 		}
@@ -120,6 +152,41 @@ public class CreaturesBrain {
 
 	public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo) {
 		copyLabels(lobeToCopy, lobeToPasteTo, 0);
+	}
+
+	/**
+	 * A method for coupling the activation of nodes from one lobe to the activation
+	 * of the nodes of another lobe
+	 * 
+	 * @param producerLobe
+	 * @param consumerLobe
+	 * @param index
+	 * @param list
+	 */
+	private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling<?>> list) {
+		// Check to see if the sizes are in safe parameters
+		if (producerLobe.size() <= consumerLobe.size() - index) {
+			for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
+
+				// Make the producer from neuron j of producerLobe
+				PotentialProducer producer = netComponent.createPotentialProducer(producerLobe.getNeuronList().get(j),
+						"getActivation", double.class);
+
+				// Make the consumer from neuron i of consumerLobe
+				PotentialConsumer consumer = netComponent.createPotentialConsumer(consumerLobe.getNeuronList().get(i),
+						"forceSetActivation", double.class);
+
+				// Create the coupling and add it to the list
+				Coupling coupling = new Coupling(producer, consumer);
+				list.add(coupling);
+				parentSim.getSim().addCoupling(coupling);
+			}
+		} else {
+
+			// Give this error if there is a problem with producerLobe's size
+			System.out.print("coupleLobes error: Lobe " + producerLobe.getLabel() + " is too big to couple to Lobe "
+					+ consumerLobe.getLabel() + " starting at index " + index);
+		}
 	}
 
 	/**
@@ -132,6 +199,25 @@ public class CreaturesBrain {
 		GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
 		lobe.setLayout(gridLayout);
 		lobe.applyLayout();
+	}
+
+	/**
+	 * 
+	 * @param sourceLobe
+	 * @param targetLobe
+	 * @param groupName
+	 * @return
+	 */
+	public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
+		// TODO: Modify this method to take in a CreaturesSynapseRule, and maybe have it
+		// generate a customized ConnectNeurons object to use.
+
+		// Temporary method call
+		SynapseGroup synapseGroup = builder.addSynapseGroup(sourceLobe, targetLobe);
+
+		synapseGroup.setLabel(groupName);
+
+		return synapseGroup;
 	}
 
 	// Methods for building specific pre-fabricated non-mutable lobes
@@ -249,6 +335,13 @@ public class CreaturesBrain {
 			indexPointer += l.size();
 		}
 
+		// Couple the perception lobe with producer lobes
+		perceptCouplings = new ArrayList<>();
+		indexPointer = 0;
+		for (NeuronGroup l : lobes) {
+			coupleLobes(l, perception, indexPointer, perceptCouplings);
+		}
+
 		return perception;
 	}
 
@@ -264,6 +357,10 @@ public class CreaturesBrain {
 
 	public NetBuilder getBuilder() {
 		return builder;
+	}
+
+	public List<Coupling<?>> getPerceptCouplings() {
+		return perceptCouplings;
 	}
 
 	/**

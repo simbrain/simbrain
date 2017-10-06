@@ -6,6 +6,7 @@ import java.util.List;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -93,6 +94,8 @@ public class CreaturesSim extends RegisteredSimulation {
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
 		Creature creature = new Creature(this, name, net, agent);
         creatureList.add(creature);
+        //agent.setHeading(90);
+        
         return creature;
 	}
 
@@ -125,6 +128,10 @@ public class CreaturesSim extends RegisteredSimulation {
 
 	public List<Creature> getCreatureList() {
 		return creatureList;
+	}
+	
+	public Simulation getSim() {
+		return sim;
 	}
 
 }

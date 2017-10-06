@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
@@ -20,6 +21,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -30,32 +32,42 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 public class SimpleNeuroevolution extends RegisteredSimulation {
 
 	long seed = 0;
+	Random globalRand;
 	int borderSize = 5;	// TODO: Find out the real panel size
 	int imageSize = 32;
 	int netSize = 25;
-	int inputSize = 9;
+	int inputSize = 3;
 	int outputSize = 3;
 	int inputX = 0;
 	int inputY = 0;
 	int outputX = 500;
 	int outputY = 200;	// TODO: use relative
+	int sensoryDimension = 3;
+	int eliminationRate = 50;
 	
+	boolean run = false;
 	boolean autoMutationControl = true;
 	double mutationRate = 5;
 	double minMutationRate = 0.1;
 	double maxMutationRate = 10;
 	double newSynapseMutationRate = 1;
 	double newNeuronMutationRate = 1;
+	double accidentRate = 1;
 	
-	List<NetBuilder> net = Collections.synchronizedList(new ArrayList<>());
-	List<Long> netSeed = Collections.synchronizedList(new ArrayList<>());
-	List<NeuronGroup> input = Collections.synchronizedList(new ArrayList<>());
-	List<ArrayList<Neuron>> hidden = Collections.synchronizedList(new ArrayList<>());
-	List<NeuronGroup> output = Collections.synchronizedList(new ArrayList<>());
-	List<OdorWorldBuilder> world = Collections.synchronizedList(new ArrayList<>());
-	List<RotatingEntity> mouse = Collections.synchronizedList(new ArrayList<>());
-	List<OdorWorldEntity> cheese = Collections.synchronizedList(new ArrayList<>());
-	List<OdorWorldEntity> poison = Collections.synchronizedList(new ArrayList<>());
+	int generation = 0;
+	List<NetBuilder> net = new ArrayList<>();
+	List<Long> netSeed = new ArrayList<>();
+	List<ArrayList<NeuronGroup>> input = new ArrayList<>();
+	List<ArrayList<Neuron>>inputFlat = new ArrayList<>();
+	List<ArrayList<Neuron>> hidden = new ArrayList<>();
+	List<NeuronGroup> output = new ArrayList<>();
+	List<ArrayList<Neuron>> sourceNeuron = new ArrayList<>();
+	List<ArrayList<Neuron>> targetNeuron = new ArrayList<>();
+	List<OdorWorldBuilder> world = new ArrayList<>();
+	List<RotatingEntity> mouse = new ArrayList<>();
+	List<OdorWorldEntity> cheese = new ArrayList<>();
+	List<OdorWorldEntity> poison = new ArrayList<>();
+	List<NetworkAttribute> attriubte = new ArrayList<>();
 	ControlPanel cp, dp;
 	
 	boolean componentMinimized = false;
@@ -116,44 +128,159 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		int netLayOutColumnPx = (frameWidth - cpWidth) / netLayOutColumn;
 		int netLayOutRowPx    = frameHeight / netLayOutRow;
 		
-		for(int i = 0, currentX = cpWidth, currentY = 0, index = 0; i < netLayOutRow; i++) {
-			currentY = netLayOutRowPx * i;
-			
-			for(int j = 0; j < netLayOutColumn && index + 1 < netSize; j++) {
-				index = i * netLayOutColumn + j;
-				currentX = cpWidth + netLayOutColumnPx * j;
-				int width = netLayOutColumnPx / 2;
-				int height = netLayOutRowPx;
-								
-				addNetwork(index, currentX, currentY, width, height);
+		SwingUtilities.invokeLater(() -> {
+			for(int i = 0, currentX = cpWidth, currentY = 0, index = 0; i < netLayOutRow; i++) {
+				currentY = netLayOutRowPx * i;
 				
-				addWorld(index, (currentX + width), currentY, width, height);
+				for(int j = 0; j < netLayOutColumn && index + 1 < netSize; j++) {
+					index = i * netLayOutColumn + j;
+					currentX = cpWidth + netLayOutColumnPx * j;
+					int width = netLayOutColumnPx / 2;
+					int height = netLayOutRowPx;
+									
+					addNetwork(index, currentX, currentY, width, height);
+					
+					addWorld(index, (currentX + width), currentY, width, height);
+					
+				}
 				
-//				setUpCoupling(index);
 			}
-			
-		}
+				
+		});
+		
+		SwingUtilities.invokeLater(() -> {
+			for(int i = 0; i < net.size(); i++) {
+				setUpCoupling(i);
+			}
+		});
 		
 	}
 	
+	private void deleteWorkspacePair(int netIdex) {
+		NetBuilder netToDelete = net.get(netIdex);
+		OdorWorldBuilder worldToDelete = world.get(netIdex);
+		sim.getWorkspace().removeWorkspaceComponent(netToDelete.getNetworkComponent());
+		sim.getWorkspace().removeWorkspaceComponent(worldToDelete.getOdorWorldComponent());
+		net.remove(netIdex);
+		netSeed.remove(netIdex);
+		input.remove(netIdex);
+		inputFlat.remove(netIdex);
+		hidden.remove(netIdex);
+		output.remove(netIdex);
+		sourceNeuron.remove(netIdex);
+		targetNeuron.remove(netIdex);
+		world.remove(netIdex);
+		mouse.remove(netIdex);
+		cheese.remove(netIdex);
+		poison.remove(netIdex);
+		attriubte.remove(netIdex);
+	}
+	
+	
+	// TODO: Configurable distance
+	// TODO: Use event
+    private void updateFitnessScore() {
+    	for(int i = 0; i < net.size(); i++) {
+            int cheeseDistance = (int) SimbrainMath.distance(
+                    mouse.get(i).getCenterLocation(), cheese.get(i).getCenterLocation());
+            if (cheeseDistance < 16) {
+                attriubte.get(i).addFitness();
+                randomizeEntityLocation(i, 400, 400, cheese.get(i));
+            }
+    	}
+    }
+    
+    private double finalizeFitnessScore(int netIndex) {
+        int cheeseDistance = (int) SimbrainMath.distance(
+                mouse.get(netIndex).getCenterLocation(), cheese.get(netIndex).getCenterLocation());
+        double delta = (128 - cheeseDistance) / 128;
+        attriubte.get(netIndex).addFitness(delta);
+        return attriubte.get(netIndex).getFitnessScore();
+    }
+    
+    private ArrayList<NetworkAttribute> sortFitness() {
+    	ArrayList<NetworkAttribute> acp = new ArrayList<>(attriubte);
+    	Collections.sort(acp, new FitnessComparator());
+		return acp;
+    }
+    
+    private void randomizeEntityLocation(int netIndex, int width, int height, OdorWorldEntity e) {
+    	int x, y;
+    	long thisSeed = netSeed.get(netIndex);
+		Random rand = new Random(thisSeed);
+		x = rand.nextInt(width);
+		y = rand.nextInt(height);
+    	e.setLocation(x + (imageSize / 2), y + (imageSize / 2));
+    	netSeed.set(netIndex, rand.nextLong());
+    }
+	
+    private void eliminateNetwork() {
+    	
+    	ArrayList<NetworkAttribute> performance = sortFitness();
+    	int accidentCount = 1 + (int) ((accidentRate/100) * netSize);
+    	
+    	for(int i = 0; i < accidentCount; i++) {
+    		Collections.swap(attriubte, globalRand.nextInt(netSize), globalRand.nextInt(netSize));
+    	}
+    	
+    	for(int i = 0; i < eliminationRate; i++) {
+    		
+    	}
+    	
+    }
+    
 	private void addNetwork(int netIndex, int x, int y, int width, int height) {
 		Random rand = new Random(seed + netIndex);
 		long thisSeed = rand.nextLong();
 		netSeed.add(thisSeed);
 		
-		net.add(sim.addNetwork(x, y, width, height, "N" + netIndex));
+		ArrayList<Neuron> thisSourceNeuronList = new ArrayList<>();
+		sourceNeuron.add(thisSourceNeuronList);
+		ArrayList<Neuron> thisTargetNeuronList = new ArrayList<>();
+		targetNeuron.add(thisTargetNeuronList);
+		ArrayList<NeuronGroup> thisInput = new ArrayList<>();
+		input.add(thisInput);
+		ArrayList<Neuron> thisInputFlat = new ArrayList<>();
+		inputFlat.add(thisInputFlat);
+		int prefixDigit = (int)(Math.log10(netSize)+1);
+		int prefix = (int) ((generation + 1) * Math.pow(10, prefixDigit));
+		attriubte.add(new NetworkAttribute(prefix + netIndex, netIndex));
+		net.add(sim.addNetwork(x, y, width, height, "N" + attriubte.get(netIndex).getNetID()));
 		
-		NeuronGroup newInput = net.get(netIndex).addNeuronGroup(inputX, inputY, inputSize);
-		newInput.setLayout(new LineLayout(40, LineLayout.LineOrientation.VERTICAL));
-		newInput.setLabel("Input");
-		newInput.applyLayout();
-		input.add(newInput);
+		for(int i = 0; i < sensoryDimension; i++) {
+			NeuronGroup newInput = net.get(netIndex).addNeuronGroup(inputX, inputY + (i * 150), inputSize);
+			newInput.setLayout(new LineLayout(40, LineLayout.LineOrientation.VERTICAL));
+			newInput.setLabel("Input" + i);
+			newInput.applyLayout();
+			thisInput.add(newInput);
+			for(Neuron n : newInput.getNeuronList()) {
+				thisSourceNeuronList.add(n);
+				thisInputFlat.add(n);
+			}
+			
+		}
+		
+		NeuronGroup newInput = net.get(netIndex).addNeuronGroup(inputX, inputY + (sensoryDimension * 150), 1);
+		newInput.setLabel("Always on");
+		thisInput.add(newInput);
+		for(Neuron n : newInput.getNeuronList()) {
+			n.setActivation(10);
+			n.setClamped(true);
+			thisSourceNeuronList.add(n);
+			thisInputFlat.add(n);
+		}
 		
 		NeuronGroup newOutput = net.get(netIndex).addNeuronGroup(outputX, outputY, outputSize);
 		newOutput.setLayout(new LineLayout(40, LineLayout.LineOrientation.VERTICAL));
 		newOutput.setLabel("Output");
 		newOutput.applyLayout();
 		output.add(newOutput);
+		for(Neuron n : newOutput.getNeuronList()) {
+			n.setUpperBound(10);
+			n.setLowerBound(0);
+			thisTargetNeuronList.add(n);
+		}
+		
 		
 		hidden.add(new ArrayList<>());
 	}
@@ -203,8 +330,14 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 //		}
 		
 		int sensoorSize = mouse.get(netIndex).getSensors().size();
-		
 		// TODO: Couple sensor to input.
+		mouse.get(netIndex).getSensors().get(1).getId();
+		
+		sim.couple((SmellSensor) mouse.get(netIndex).getSensors().get(0), input.get(netIndex).get(0));
+		sim.couple((SmellSensor) mouse.get(netIndex).getSensors().get(1), input.get(netIndex).get(1));
+		sim.couple((SmellSensor) mouse.get(netIndex).getSensors().get(2), input.get(netIndex).get(2));
+//		sim.couple((SmellSensor) mouse.get(netIndex).getSensors().get(0), 0, inputFlat.get(netIndex).get(0));
+		
 		
 		sim.couple(output.get(netIndex).getNeuron(0), mouse.get(netIndex).getEffectors().get(0));
 		sim.couple(output.get(netIndex).getNeuron(1), mouse.get(netIndex).getEffectors().get(1));
@@ -317,15 +450,22 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		});
 		
 		cp.addButton("Run", () -> {
-			sim.iterate(100);
-			for(int i = 0; i < net.size(); i++) {
-				mutateNetwork(i);
+			run = true;
+			while(run) {
+				for(int i = 0; i < 1000 && run; i++) {
+					sim.iterate();
+					updateFitnessScore();
+				}
+				for(int i = 0; i < net.size(); i++) {
+					mutateNetwork(i);
+				}
 			}
-			sim.getWorkspace().stop();
+//			sim.getWorkspace().stop();
 		});
 		
 		cp.addButton("Stop", () -> {
-			sim.getWorkspace().stop();
+			run = false;
+//			sim.getWorkspace().stop();
 		});
 		
 		currentMutationRateTF.setEnabled(!autoMutationControl);
@@ -384,6 +524,12 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 			}
 			componentMinimized = !componentMinimized;
 		});
+		
+		dp.addButton("Print Fitness", () -> {
+			for(int i = 0; i < attriubte.size(); i++) {
+				System.out.println(attriubte.get(i).getFitnessScore());
+			}
+		});
 	}
 	
 	public void mutateNetwork(int netIndex) {
@@ -416,7 +562,6 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 			double range = (Math.abs(upperBound) + Math.abs(lowerBound));
 			
 			double delta = ((rand.nextDouble() * range) + lowerBound) * (mutationRate / 100);
-			
 			double oldStrength = s.getStrength();
 			double newStrength = oldStrength + delta;
 			
@@ -435,39 +580,23 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		long thisSeed = netSeed.get(netIndex);
 		Random rand = new Random(thisSeed);
 		
-		int inputSize = input.get(netIndex).getNeuronList().size();
-		int outputSize = output.get(netIndex).getNeuronList().size();
 		
-		int sourceCount = input.get(netIndex).getNeuronList().size()
-				+ hidden.get(netIndex).size();
-		int targetCount = output.get(netIndex).getNeuronList().size()
-				+ hidden.get(netIndex).size();
+		int sourceCount = sourceNeuron.get(netIndex).size();
+		int targetCount = targetNeuron.get(netIndex).size();
 		
 		int sourceIndex = rand.nextInt(sourceCount);
 		int targetIndex = rand.nextInt(targetCount);
-		Neuron sourceNeuron;
-		Neuron targetNeuron;
+		Neuron source = sourceNeuron.get(netIndex).get(sourceIndex);
+		Neuron target = targetNeuron.get(netIndex).get(targetIndex);
 		
-		if(sourceIndex < inputSize) {
-			
-			sourceNeuron = input.get(netIndex).getNeuron(sourceIndex);
-		} else {
-			sourceNeuron = hidden.get(netIndex).get(sourceIndex - inputSize);
-		}
-		
-		if(targetIndex < outputSize) {
-			targetNeuron = output.get(netIndex).getNeuron(targetIndex);
-		} else {
-			targetNeuron = hidden.get(netIndex).get(targetIndex - outputSize);
-		}
 		
 		// TODO: use a configurable bound (remember to replace (range / 2)
 		int range = 2;
 		
 		double strength = (rand.nextDouble() * range) - (range / 2);
 		
-		if(sourceNeuron != targetNeuron) {
-			net.get(netIndex).connect(sourceNeuron, targetNeuron, strength);
+		if(source != target) {
+			net.get(netIndex).connect(source, target, strength);
 		}
 		
 		netSeed.set(netIndex, rand.nextLong());
@@ -501,11 +630,13 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		hidden.get(netIndex).add(newNeuron);
 		
 		net.get(netIndex).getNetwork().removeSynapse(replacingSynapse);
-		System.out.println(netIndex);
 		
 		// TODO: fix potential strength out of bound
 		net.get(netIndex).connect(source, newNeuron, replacingSynapseStrength + leftDelta);
 		net.get(netIndex).connect(newNeuron, target, replacingSynapseStrength + rightDelta);
+		
+		sourceNeuron.get(netIndex).add(newNeuron);
+		targetNeuron.get(netIndex).add(newNeuron);
 		
 		netSeed.set(netIndex, rand.nextLong());
 	}
@@ -523,6 +654,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
         seed = System.nanoTime();
         Random rand = new Random(seed);
         seed = rand.nextLong();
+        globalRand = new Random(seed);
         System.out.println(seed);
         
         setUpControlPanel();

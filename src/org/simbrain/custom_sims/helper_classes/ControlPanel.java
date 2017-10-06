@@ -94,7 +94,10 @@ public class ControlPanel extends JPanel {
         });
         this.addItem(buttonText, button);
         pack();
+<<<<<<< HEAD
         
+=======
+>>>>>>> refs/remotes/simbrain/master
         return button;
     }
 

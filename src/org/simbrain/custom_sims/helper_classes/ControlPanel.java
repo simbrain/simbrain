@@ -73,9 +73,10 @@ public class ControlPanel extends JPanel {
      *
      * @param buttonText name for the button itself
      * @param task the task to run when the button is pressed
+     * @return 
      */
-    public void addButton(String buttonText, Runnable task) {
-        addButton("", buttonText, task);
+    public JButton addButton(String buttonText, Runnable task) {
+        return addButton("", buttonText, task);
     }
 
     /**
@@ -85,7 +86,7 @@ public class ControlPanel extends JPanel {
      * @param buttonLabel text in the panel to the left of the button
      * @param task the task to run when the button is pressed
      */
-    public void addButton(String buttonText, String buttonLabel,
+    public JButton addButton(String buttonText, String buttonLabel,
             Runnable task) {
         JButton button = new JButton(buttonLabel);
         button.addActionListener(e -> {
@@ -93,6 +94,7 @@ public class ControlPanel extends JPanel {
         });
         this.addItem(buttonText, button);
         pack();
+        return button;
     }
 
     /**

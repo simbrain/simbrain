@@ -24,8 +24,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 
 /**
- * A wrapper for a NetworkComponent that makes it easy to add stuff to a
- * network.
+ * A wrapper for a network and networkcomponent that makes it easy to add stuff
+ * to a network.
  */
 public class NetBuilder {
 

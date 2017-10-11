@@ -7,6 +7,7 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -40,14 +41,15 @@ public class CreaturesSim extends RegisteredSimulation {
 		sim.getWorkspace().clearWorkspace();
 
 		// Add doc viewer
-		sim.addDocViewer(0, 0, 450, 600, "Doc", "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
+		//sim.addDocViewer(0, 0, 450, 600, "Doc", "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
 
 		// Create odor world
-		world = sim.addOdorWorld(1052, 0, 600, 600, "World");
+		world = sim.addOdorWorld(601,10,456,597, "World");
 		cheese = world.addEntity(200, 200, "Swiss.gif");
+		cheese.setSmellSource(new SmellSource(new double[]{255,0,0,0,0}));
 
 		// Create starting creature.
-		Creature ron = createCreature(451, 0, 600, 600, "Ron");
+		Creature ron = createCreature(0,0,833,629, "Ron");
 
 		// Create update action
 		// TODO: Possibly clear all update actions and then custom populate

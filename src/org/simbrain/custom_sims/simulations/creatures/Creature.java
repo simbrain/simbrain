@@ -6,8 +6,10 @@ import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
@@ -102,6 +104,9 @@ public class Creature {
 	private void initAgent() {
 		agent.setName(name);
 		agent.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
+		agent.addSensor(new Hearing(agent, "Cheese", 10));
+		//TODO: Below is what the npc needs
+		//agent.addEffector(new Speech(agent, "Cheese", .2));
 	}
 
 	/**
@@ -124,7 +129,7 @@ public class Creature {
 		// Coupling some decision lobe cells to agent effectors
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
-		parentSim.getSim().couple(decisions.getNeuronByLabel("Foward"), agent.getEffector("Go-straight"));
+		parentSim.getSim().couple(decisions.getNeuronByLabel("Forward"), agent.getEffector("Go-straight"));
 		// TODO: Is there a way to couple the "Backward" node to the Go-straight
 		// effector in such a way that the inverse of the Backward node's activation is
 		// what the Go-straight effector gets?

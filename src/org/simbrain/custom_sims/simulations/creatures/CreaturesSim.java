@@ -1,7 +1,9 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -38,6 +40,11 @@ public class CreaturesSim extends RegisteredSimulation {
 	public OdorWorldEntity poison;
 	public OdorWorldEntity hazard;
 	public OdorWorldEntity flower;
+	
+	//TODO: Is the best place to put this?   Rename / cleanup as needed
+	List<String> nounList = Arrays.asList("Cheese", "Fish");
+    float talkProb = .05f;
+    Random talkRandomizer = new Random();
 
 	@Override
 	public void run() {
@@ -51,6 +58,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
 		// Create odor world
 		world = sim.addOdorWorld(601, 10, 456, 597, "World");
+		world.getWorld().setObjectsBlockMovement(false);
 
 		// Create static odor world entities
 		toy = world.addEntity(395, 590, "Bell.gif");
@@ -73,6 +81,8 @@ public class CreaturesSim extends RegisteredSimulation {
 
 		// Create starting creature.
 		Creature ron = createCreature(0, 0, 833, 629, "Ron");
+		
+		// Create a "non-player character' that talks randomly
 
 		// Create update action
 		// TODO: Possibly clear all update actions and then custom populate
@@ -95,9 +105,21 @@ public class CreaturesSim extends RegisteredSimulation {
 		for (Creature c : creatureList) {
 			c.update();
 		}
+		
+		updateNPC();		
 
 		world.getOdorWorldComponent().update();
 	}
+
+    /**
+     * Update the "non-player character".
+     */
+    private void updateNPC() {
+        if (Math.random() < talkProb) {
+            //TODO: Make this be the npc talking using its speech effector
+            System.out.println(nounList.get(talkRandomizer.nextInt(nounList.size())));
+        }
+    }
 
 	/**
 	 * Creates a new creature.
@@ -115,7 +137,15 @@ public class CreaturesSim extends RegisteredSimulation {
 	 * @return A new creature.
 	 */
 	public Creature createCreature(int x, int y, int width, int height, String name) {
-		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
+
+	    
+	    NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
+		
+	    //TODO: Below not working quite right because the network has not finished
+	    // being created when the next two calls are made
+	    net.getNetworkPanel(sim).setAutoZoomMode(false);
+        //net.getNetworkPanel(sim).zoomToFitPage(true); 
+
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
 		Creature creature = new Creature(this, name, net, agent);
 		creatureList.add(creature);

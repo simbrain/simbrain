@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
@@ -986,6 +987,18 @@ public class Network {
         }
 
         return ret;
+    }
+    
+    /**
+     * Returns a copy of this network based on its xml rep.
+     *
+     * @return the copied network.
+     */
+    public Network copy() {
+        preSaveInit();
+        String xml_rep = Network.getXStream().toXML(this);
+        postSaveReInit();
+        return (Network) Network.getXStream().fromXML(xml_rep);
     }
 
     /**

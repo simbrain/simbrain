@@ -313,6 +313,7 @@ public class OdorWorld {
         float dy = entity.getVelocityY();
         float oldY = entity.getY();
         float newY = oldY + dy * time;
+        // TODO: Fire event
 
         // Very simple motion
         if (dx != 0) {

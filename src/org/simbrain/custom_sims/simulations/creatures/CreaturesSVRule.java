@@ -11,7 +11,18 @@ public class CreaturesSVRule {
     // to
     // split the operator opcodes from the variable opcodes?
     public static enum OpCode {
-        end, Zero, One, SixtyFour, TwoHundredTwentyFive, chem0, chem1, chem2, chem3, state, output, thres, type0, type1, anded0, anded1, input, conduct, suscept, STW, LTW, Strength, TRUE, PLUS, MINUS, TIMES, INCR, DECR
+        end, Zero, One, SixtyFour, TwoHundredTwentyFive, 
+        chem0, chem1, chem2, chem3, 
+        state, 
+        output, 
+        thres, 
+        type0, type1, 
+        anded0, anded1, 
+        input, 
+        conduct, suscept, 
+        STW, LTW, 
+        Strength, 
+        TRUE, PLUS, MINUS, TIMES, INCR, DECR
     };
 
 }

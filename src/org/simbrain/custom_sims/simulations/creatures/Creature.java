@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Each CreatureInstance represents one particular creature in the simulation,
@@ -56,9 +58,6 @@ public class Creature {
 	/** Reference to perception lobe. */
 	private NeuronGroup perception;
 
-	/** Reference to couplings consumed by the perception lobe. */
-	private List<Coupling<?>> perceptCouplings;
-
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.001f;
 
@@ -66,27 +65,34 @@ public class Creature {
 		this.parentSim = sim;
 		this.name = name;
 
+		this.agent = agent;
+		initAgent();
+
 		this.brain = new CreaturesBrain(net, sim);
 		initDefaultBrain();
 
-		this.agent = agent;
-		initAgent();
+		initCouplings();
 	}
 
 	/**
 	 * Update the various components of the creature.
 	 */
 	public void update() {
-		// TODO: These coupling doesn't seem to be working right now. Need to test this.
-		parentSim.getSim().getWorkspace().getCouplingManager().updateCouplings(perceptCouplings);
+		// TODO: These coupling doesn't seem to be working right now. Need to
+		// test this.
+		// parentSim.getSim().getWorkspace().getCouplingManager()
+		// .updateCouplings(perceptCouplings);
 		brain.getNetwork().update();
 
 		double hungerActivation = drives.getNeuronByLabel("Hunger").getActivation();
 		if (hungerActivation > 0) {
-			// TODO: Set amount value to something that will get higher than 1 only at
-			// extreme values (such as 255). We don't slow down to a crawl to get something
+			// TODO: Set amount value to something that will get higher than 1
+			// only at
+			// extreme values (such as 255). We don't slow down to a crawl to
+			// get something
 			// we only want something a little bit, but we will run if there's a
-			// dire need. Alternatively, we can have the base movement step size change
+			// dire need. Alternatively, we can have the base movement step size
+			// change
 			// instead? Or do this calculation in method?
 			this.approachObject(parentSim.cheese, 1);
 		}
@@ -97,7 +103,10 @@ public class Creature {
 	 */
 	private void initAgent() {
 		agent.setName(name);
-		agent.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 255.0 }));
+		agent.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
+		agent.addSensor(new Hearing(agent, "Cheese", 10));
+		//TODO: Below is what the npc needs
+		//agent.addEffector(new Speech(agent, "Cheese", .2));
 	}
 
 	/**
@@ -116,6 +125,14 @@ public class Creature {
 		// TODO: Make this a WTA lobe.
 		NeuronGroup decisions = brain.createLobe(2510, 440, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
+
+		// Coupling some decision lobe cells to agent effectors
+		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
+		parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
+		parentSim.getSim().couple(decisions.getNeuronByLabel("Forward"), agent.getEffector("Go-straight"));
+		// TODO: Is there a way to couple the "Backward" node to the Go-straight
+		// effector in such a way that the inverse of the Backward node's activation is
+		// what the Go-straight effector gets?
 
 		// Init Lobe #7: Attention
 		// TODO: Make this a WTA lobe.
@@ -165,19 +182,36 @@ public class Creature {
 
 		// Init Concepts to Decisions Dendrite Pathways
 		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 0");
-		// TODO: BUG: This second synapse group sometimes has a graphical glitch (Arrow
-		// points to space).
+		// TODO: BUG: This second synapse group sometimes has a graphical glitch
+		// (Arrow points to space).
 		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 1");
 
 		// Init Lobe #0: Perception
 		perception = brain.buildPerceptionLobe(new NeuronGroup[] { drives, verbs, senses, attention });
 
-		// Grabs the object for the reference perceptCouplings
-		perceptCouplings = brain.getPerceptCouplings();
-
 		// Init Perception to Concept Dendrite Pathway
 		brain.createSynapseGroup(perception, concepts, "#0 to #8, Type 0");
 
+	}
+
+	/**
+	 * Creates all essential couplings for the agent between various agent
+	 * components.
+	 */
+	public void initCouplings() {
+
+		// Make couplings from agent sensor to stimulus lobe
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 0, stimulus.getNeuronByLabel("Toy"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 1, stimulus.getNeuronByLabel("Fish"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 2,
+				stimulus.getNeuronByLabel("Cheese"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 3,
+				stimulus.getNeuronByLabel("Poison"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 4,
+				stimulus.getNeuronByLabel("Hazard"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 5,
+				stimulus.getNeuronByLabel("Flower"));
+		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 6, stimulus.getNeuronByLabel("Mouse"));
 	}
 
 	public void approachBehavior() {
@@ -186,11 +220,13 @@ public class Creature {
 	}
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
-		// Get the rise and run of the direct line between the agent and the object.
+		// Get the rise and run of the direct line between the agent and the
+		// object.
 		double run = targetObject.getCenterX() - agent.getCenterX();
 		double rise = targetObject.getCenterY() - agent.getCenterY();
 
-		// Calculate the slope of the direct line between the agent and the object.
+		// Calculate the slope of the direct line between the agent and the
+		// object.
 		double slope = rise / run;
 
 		// Calculate the angle we need to face from the slope of the line.

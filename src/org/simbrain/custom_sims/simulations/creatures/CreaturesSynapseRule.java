@@ -47,7 +47,7 @@ public class CreaturesSynapseRule extends StaticSynapseRule {
     private double relaxSusceptibility;
 
     /**
-     * The rate at which STW relaxes back to the LTW
+     * The rate at which STW relaxes back to the LTW.
      */
     private double relaxSTW;
 

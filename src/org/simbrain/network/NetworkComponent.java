@@ -438,6 +438,17 @@ public final class NetworkComponent extends WorkspaceComponent {
         Network.getXStream().toXML(network, output);
         network.postSaveReInit();
     }
+    
+    /**
+     * Returns a copy of this NetworkComponent.
+     *
+     * @return the new network component
+     */
+    public NetworkComponent copy() {
+        NetworkComponent ret = new NetworkComponent(
+                "Copy of " + network.getName(), network.copy());
+        return ret;
+    }
 
     /**
      * Returns the root network.

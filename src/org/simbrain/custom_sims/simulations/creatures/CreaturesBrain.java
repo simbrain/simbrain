@@ -40,19 +40,13 @@ public class CreaturesBrain {
 	private double gridSpace = 50;
 
 	/**
-	 * Reference to network component
+	 * Reference to network component.
 	 */
 	private NetworkComponent netComponent;
 
 	/**
-	 * Reference to the list of couplings the perception lobe consumes.
+	 * Reference to parent sim.
 	 */
-	private List<Coupling<?>> perceptCouplings;
-	
-	/**
-	 * Reference to parent sim
-	 */
-	
 	private final CreaturesSim parentSim;
 
 	/**
@@ -255,6 +249,8 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 5, "Flower");
 		nameNeuron(lobe, 6, "Mouse");
 
+		lobe.setClamped(true);
+
 		return lobe;
 	}
 
@@ -300,7 +296,7 @@ public class CreaturesBrain {
 		setLobeColumns(lobe, 7);
 
 		nameNeuron(lobe, 0, "Attacked");
-		nameNeuron(lobe, 1, "Playing");
+		nameNeuron(lobe, 1, "Played with");
 		nameNeuron(lobe, 2, "User Talked");
 		nameNeuron(lobe, 3, "Mouse Talked");
 		nameNeuron(lobe, 4, "It Approaches");
@@ -336,11 +332,12 @@ public class CreaturesBrain {
 		}
 
 		// Couple the perception lobe with producer lobes
-		perceptCouplings = new ArrayList<>();
-		indexPointer = 0;
-		for (NeuronGroup l : lobes) {
-			coupleLobes(l, perception, indexPointer, perceptCouplings);
-		}
+		// TODO: Redo what was below as needed, but using synapses or synapse groups
+		// perceptCouplings = new ArrayList<>();
+		// indexPointer = 0;
+		// for (NeuronGroup l : lobes) {
+		// coupleLobes(l, perception, indexPointer, perceptCouplings);
+		// }
 
 		return perception;
 	}
@@ -357,10 +354,6 @@ public class CreaturesBrain {
 
 	public NetBuilder getBuilder() {
 		return builder;
-	}
-
-	public List<Coupling<?>> getPerceptCouplings() {
-		return perceptCouplings;
 	}
 
 	/**

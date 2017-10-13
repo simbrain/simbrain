@@ -14,9 +14,11 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -24,8 +26,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 
 /**
- * A wrapper for a NetworkComponent that makes it easy to add stuff to a
- * network.
+ * A wrapper for a network and networkcomponent that makes it easy to add stuff
+ * to a network.
  */
 public class NetBuilder {
 
@@ -218,6 +220,18 @@ public class NetBuilder {
         return network;
     }
 
+    /**
+     * Return a copy of the network panel associated with this network.
+     *
+     * @param sim the simulation that has the reference to the desktop component
+     * @return the network panel associated with this network
+     */
+    public NetworkPanel getNetworkPanel(Simulation sim) {
+        return ((NetworkDesktopComponent) sim.getDesktop()
+                .getDesktopComponent(networkComponent)).getNetworkPanel();
+
+    }
+    
     /**
      * @return the networkComponent
      */

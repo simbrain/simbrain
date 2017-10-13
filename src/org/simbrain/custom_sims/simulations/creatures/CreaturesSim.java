@@ -30,9 +30,14 @@ public class CreaturesSim extends RegisteredSimulation {
 	private List<Creature> creatureList = new ArrayList<Creature>();
 
 	private OdorWorldBuilder world;
-	
+
 	// TODO: Temp!
+	public OdorWorldEntity toy;
+	public OdorWorldEntity fish;
 	public OdorWorldEntity cheese;
+	public OdorWorldEntity poison;
+	public OdorWorldEntity hazard;
+	public OdorWorldEntity flower;
 
 	@Override
 	public void run() {
@@ -41,15 +46,33 @@ public class CreaturesSim extends RegisteredSimulation {
 		sim.getWorkspace().clearWorkspace();
 
 		// Add doc viewer
-		//sim.addDocViewer(0, 0, 450, 600, "Doc", "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
+		// sim.addDocViewer(0, 0, 450, 600, "Doc",
+		// "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
 
 		// Create odor world
-		world = sim.addOdorWorld(601,10,456,597, "World");
+		world = sim.addOdorWorld(601, 10, 456, 597, "World");
+
+		// Create static odor world entities
+		toy = world.addEntity(395, 590, "Bell.gif");
+		toy.setSmellSource(new SmellSource(new double[] { 5, 0, 0, 0, 0, 0, 0 }));
+
+		fish = world.addEntity(140, 165, "Fish.gif");
+		fish.setSmellSource(new SmellSource(new double[] { 0, 5, 0, 0, 0, 0, 0 }));
+
 		cheese = world.addEntity(200, 200, "Swiss.gif");
-		cheese.setSmellSource(new SmellSource(new double[]{255,0,0,0,0}));
+		cheese.setSmellSource(new SmellSource(new double[] { 0, 0, 5, 0, 0, 0, 0 }));
+
+		poison = world.addEntity(320, 20, "Poison.gif");
+		poison.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 5, 0, 0, 0 }));
+
+		hazard = world.addEntity(25, 200, "Candle.png");
+		hazard.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 0, 5, 0, 0 }));
+
+		flower = world.addEntity(200, 100, "Pansy.gif");
+		flower.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 0, 0, 5, 0 }));
 
 		// Create starting creature.
-		Creature ron = createCreature(0,0,833,629, "Ron");
+		Creature ron = createCreature(0, 0, 833, 629, "Ron");
 
 		// Create update action
 		// TODO: Possibly clear all update actions and then custom populate
@@ -95,10 +118,10 @@ public class CreaturesSim extends RegisteredSimulation {
 		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
 		Creature creature = new Creature(this, name, net, agent);
-        creatureList.add(creature);
-        //agent.setHeading(90);
-        
-        return creature;
+		creatureList.add(creature);
+		// agent.setHeading(90);
+
+		return creature;
 	}
 
 	/**
@@ -131,7 +154,7 @@ public class CreaturesSim extends RegisteredSimulation {
 	public List<Creature> getCreatureList() {
 		return creatureList;
 	}
-	
+
 	public Simulation getSim() {
 		return sim;
 	}

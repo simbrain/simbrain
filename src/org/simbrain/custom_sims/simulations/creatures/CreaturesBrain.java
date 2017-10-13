@@ -248,7 +248,7 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 4, "Hazard");
 		nameNeuron(lobe, 5, "Flower");
 		nameNeuron(lobe, 6, "Mouse");
-		
+
 		lobe.setClamped(true);
 
 		return lobe;
@@ -296,7 +296,7 @@ public class CreaturesBrain {
 		setLobeColumns(lobe, 7);
 
 		nameNeuron(lobe, 0, "Attacked");
-		nameNeuron(lobe, 1, "Playing");
+		nameNeuron(lobe, 1, "Played with");
 		nameNeuron(lobe, 2, "User Talked");
 		nameNeuron(lobe, 3, "Mouse Talked");
 		nameNeuron(lobe, 4, "It Approaches");
@@ -333,11 +333,11 @@ public class CreaturesBrain {
 
 		// Couple the perception lobe with producer lobes
 		// TODO: Redo what was below as needed, but using synapses or synapse groups
-//		perceptCouplings = new ArrayList<>();
-//		indexPointer = 0;
-//		for (NeuronGroup l : lobes) {
-//			coupleLobes(l, perception, indexPointer, perceptCouplings);
-//		}
+		// perceptCouplings = new ArrayList<>();
+		// indexPointer = 0;
+		// for (NeuronGroup l : lobes) {
+		// coupleLobes(l, perception, indexPointer, perceptCouplings);
+		// }
 
 		return perception;
 	}

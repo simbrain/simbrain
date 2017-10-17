@@ -35,7 +35,7 @@ import org.simbrain.util.Utils;
 /**
  * A panel for setting the values of a convolved jump and decay spike responder.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class ConvolvedJumpAndDecayPanel extends AbstractSpikeResponsePanel {

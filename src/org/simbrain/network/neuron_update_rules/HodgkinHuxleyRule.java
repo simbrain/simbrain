@@ -127,7 +127,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
 
     }
     
-    // Initializer quickly hacked from old init. Zach this is in your hands to fix! :)
+    // Initializer quickly hacked from old init. Zoë this is in your hands to fix! :)
      {
         cm = 1.0;
         double v = -70; // Arbitrary starting voltage

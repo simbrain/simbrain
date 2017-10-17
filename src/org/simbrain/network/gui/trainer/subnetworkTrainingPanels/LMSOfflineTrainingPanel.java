@@ -36,7 +36,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * primary access point for training neural networks using offline least mean
  * squares.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {

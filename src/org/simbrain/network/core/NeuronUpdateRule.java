@@ -37,7 +37,7 @@ public abstract class NeuronUpdateRule {
      * function of a "spike" represented as a Dirac delta function) weighted
      * sums.
      *
-     * @author Zach Tosi
+     * @author Zoë Tosi
      */
     public static enum InputType {
         WEIGHTED {

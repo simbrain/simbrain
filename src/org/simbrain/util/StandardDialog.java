@@ -51,7 +51,7 @@ import org.simbrain.util.genericframe.GenericJDialog;
  * @author David Fraser
  * @author Michael Harris
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class StandardDialog extends GenericJDialog {
 

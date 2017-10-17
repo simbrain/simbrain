@@ -44,7 +44,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
  * and visualization purposes, as well as to more closely follow Elman's
  * original design.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public final class SimpleRecurrentNetwork extends Subnetwork implements

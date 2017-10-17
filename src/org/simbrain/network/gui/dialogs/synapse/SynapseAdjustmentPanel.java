@@ -54,7 +54,7 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * synapses, also allow to preview and keep values in numerical array and THEN
  * change synapse strengths.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  *
  */
@@ -637,7 +637,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
     /**
      *
-     * @author zach
+     * @author Zoë
      *
      */
     public final class StatisticsBlock {

@@ -33,7 +33,7 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * objects which require higher level noise generators. Used to give each neuron
  * being edited the <b>same</b> Randomizer object as an optimization.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class NoiseGeneratorPanel extends RandomizerPanel {

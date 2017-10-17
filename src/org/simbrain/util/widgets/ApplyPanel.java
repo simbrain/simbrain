@@ -29,7 +29,7 @@ import javax.swing.JPanel;
  * press ok in the parent dialog). Implements {@link EditablePanel}, since the
  * apply can fail.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
 public class ApplyPanel extends JPanel implements EditablePanel {

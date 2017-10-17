@@ -33,7 +33,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * membrane potential in response to successive spikes.
  * See Toboul &#38; Brette 2005.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class AdExIFRule extends SpikingNeuronUpdateRule implements
@@ -122,6 +122,10 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 
 	@Override
 	public void update(Neuron neuron) {
+		if (v_mem >= v_Peak) {
+			v_mem = v_Reset;
+			neuron.forceSetActivation(v_Reset);
+		}
 	    // Retrieve integration time constant in case it has changed...
         final double dt = neuron.getNetwork().getTimeStep();
 //        final double ref = neuron.getNetwork().getTimeType()
@@ -173,7 +177,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 
 		// Spike?
 		if (v_mem >= v_Peak) {
-			v_mem = v_Reset;
+			v_mem = v_Peak;
 			w = w + (b * CURRENT_CONVERTER);
 			if (!refractory) {
 			    neuron.setSpkBuffer(true);

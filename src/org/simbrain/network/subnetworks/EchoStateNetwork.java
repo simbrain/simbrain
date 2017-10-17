@@ -49,7 +49,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Builds an Echo-State Network with options for all valid weight
  * configurations.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class EchoStateNetwork extends Subnetwork {
 

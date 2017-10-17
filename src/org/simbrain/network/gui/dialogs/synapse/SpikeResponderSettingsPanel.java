@@ -264,7 +264,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      *
-     * @author zach
+     * @author Zoë
      *
      */
     private class EmptySpikeResponsePanel extends AbstractSpikeResponsePanel {

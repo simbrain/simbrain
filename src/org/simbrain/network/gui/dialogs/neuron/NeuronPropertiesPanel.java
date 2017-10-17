@@ -42,7 +42,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * Called both from neuron dialog and from other dialogs that use it, e.g. the
  * add neurons (plural) dialog, and neuron group dialogs.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")

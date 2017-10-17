@@ -28,7 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
  * be retrieved
  * @param <V> the type of the retrieved parameter
  *  
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public interface ParameterGetter <O, V> {
 	

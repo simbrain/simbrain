@@ -25,7 +25,7 @@ import org.jblas.MatrixFunctions;
  * Static squashing function methods.
  *
  * @author Scott Hotton
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class SquashingFunctions {

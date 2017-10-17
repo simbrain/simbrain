@@ -28,7 +28,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * 
  * Also see Haeusler and Mass, 2007.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class CortexSimple extends RegisteredSimulation {

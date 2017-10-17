@@ -41,7 +41,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
  * override update and duplicate (for copy / paste) and cloning generally.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class Neuron {

@@ -36,7 +36,7 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  * 
  * TODO: Make synapse group use more of these functions.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class ConnectionUtilities {
 
@@ -470,7 +470,7 @@ public class ConnectionUtilities {
      * supports a generic setter, which can be used to create any given setter
      * which can then be applied across multiple synapses.
      * 
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      * @param <T>
      */
@@ -490,7 +490,7 @@ public class ConnectionUtilities {
      * but the interface is meant to be used as a generic getter which can be
      * applied over a list of synapses.
      * 
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      * @param <T>
      */

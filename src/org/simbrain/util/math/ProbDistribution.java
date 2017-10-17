@@ -36,7 +36,7 @@ import umontreal.iro.lecuyer.rng.RandomStream;
 
 public enum ProbDistribution {
     
-    // Zach has ideas about a refactor. Could use an interface or abstract
+    // Zoë has ideas about a refactor. Could use an interface or abstract
     // classes or array backings,
 
     EXPONENTIAL {

@@ -27,7 +27,7 @@ import org.simbrain.util.math.ProbDistribution;
  * parameters should ever be negative since they represent absolute values and
  * the sign of the output is wholly determined by the polarity.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class PolarizedRandomizer extends Randomizer {

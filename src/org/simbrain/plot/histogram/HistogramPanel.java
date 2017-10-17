@@ -54,7 +54,7 @@ import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSerie
  * graphically, but only logically supports the altering of data series, relying
  * on other classes for graphical representations of such.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class HistogramPanel extends JPanel {

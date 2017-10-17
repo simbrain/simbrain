@@ -33,7 +33,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * function based update rules containing methods and variables common to
  * both.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements

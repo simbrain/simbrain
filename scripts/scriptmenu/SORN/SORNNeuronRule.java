@@ -8,7 +8,7 @@ import org.simbrain.util.math.*;
  * An implementation of the specific type of threshold neuron used in Lazar,
  * Pipa, & Triesch (2009).
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class SORNNeuronRule extends SpikingThresholdRule implements

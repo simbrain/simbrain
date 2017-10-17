@@ -25,7 +25,7 @@ import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 
 /**
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")

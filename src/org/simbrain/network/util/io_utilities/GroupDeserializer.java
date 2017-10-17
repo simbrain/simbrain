@@ -35,7 +35,7 @@ import org.simbrain.network.groups.SynapseGroup;
  * A class for storing static methods for custom deserialization of custom
  * serializations of group objects in Simbrain.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class GroupDeserializer {

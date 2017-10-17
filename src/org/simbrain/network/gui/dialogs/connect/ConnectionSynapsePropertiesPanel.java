@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * activated/adjusted, designed with segregation of inhibitory and excitatory
  * weights in mind.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")

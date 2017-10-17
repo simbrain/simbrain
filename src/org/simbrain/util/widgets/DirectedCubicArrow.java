@@ -30,7 +30,7 @@ import org.simbrain.network.gui.nodes.NeuronGroupNode.Port;
 
 /**
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")
@@ -311,7 +311,7 @@ public class DirectedCubicArrow extends PNode {
     //     * enough time...
     //     *
     //     *
-    //     * @author zach
+    //     * @author Zoë
     //     *
     //     */
     //    private class DirectedArrowShape extends Polygon {

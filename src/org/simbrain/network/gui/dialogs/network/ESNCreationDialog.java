@@ -75,7 +75,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * TODO: Include initial scaling factors of terms. TODO: Consider using
  * simplified continuous time ESN where only leak is important
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")
@@ -570,7 +570,7 @@ public class ESNCreationDialog extends StandardDialog {
      * which only specify a population and constrain the update rule to be
      * sigmoidal. Here as a convenience.
      *
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      */
     private static class NeuronLayerPanel extends JPanel {

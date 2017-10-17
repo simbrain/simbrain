@@ -23,7 +23,7 @@ import org.simbrain.network.groups.Group;
  * Trainer.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public interface Trainable {

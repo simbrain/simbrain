@@ -25,7 +25,7 @@ import java.util.concurrent.BrokenBarrierException;
  * for flagging the tasks with whether or not it is used to make consumers
  * wait or poison (kill) consumer threads.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public interface Task {

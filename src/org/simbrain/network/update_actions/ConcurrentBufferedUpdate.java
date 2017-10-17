@@ -62,7 +62,7 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  *         A class which performs a parallelized update of an entire network.
  *         Any given thread which is updating a neuron is also responsible for
@@ -429,7 +429,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * memory leaks in the form of LinkedList nodes and with the express purpose
      * of making synchronization points easier to implement.
      * 
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      */
     public class CyclicTaskQueue {

@@ -31,7 +31,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * TODO: Possibly rename to "DiscreteSigmoidalRule" (after xstream is improved
  * to allow better backwards compat)
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunction {

@@ -41,7 +41,7 @@ public class Hearing extends Sensor {
     /**
      * Whether this is activated.
      */
-    private boolean activated;
+    private boolean activated = false;
 
     /**
      * If amount to pass out if this sensor is activated.
@@ -61,13 +61,21 @@ public class Hearing extends Sensor {
         this.outputAmount = outputAmount;
     }
 
+    //TODO: Clean up / Make this settable
+    private int time = 0;
+    private int lingerTime = 10;
+    
     @Override
     public void update() {
-        activated = false;
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
                 activated = true;
+                time = lingerTime;
             }
+        }
+        time--;
+        if (!(time > 0)) {
+            activated = false;
         }
     }
 

@@ -161,6 +161,10 @@ public class CreaturesNeuronRule extends LinearRule {
     public void setStateValue(double num) {
         this.stateValue = num;
     }
+    
+    public void incrementStateValue(double num) {
+    	this.stateValue += num;
+    }
 
     public double getStateValue() {
         return stateValue;

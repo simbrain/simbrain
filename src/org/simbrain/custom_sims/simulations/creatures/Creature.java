@@ -3,7 +3,10 @@ package org.simbrain.custom_sims.simulations.creatures;
 import java.util.List;
 
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.world.odorworld.effectors.Speech;
@@ -58,6 +61,13 @@ public class Creature {
 	/** Reference to perception lobe. */
 	private NeuronGroup perception;
 
+	/** Reference to decisions lobe. */
+	private NeuronGroup decisions;
+	// private WinnerTakeAll decisions;
+
+	/** Reference to attention lobe. */
+	private NeuronGroup attention;
+
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.001f;
 
@@ -78,23 +88,11 @@ public class Creature {
 	 * Update the various components of the creature.
 	 */
 	public void update() {
-		// TODO: These coupling doesn't seem to be working right now. Need to
-		// test this.
-		// parentSim.getSim().getWorkspace().getCouplingManager()
-		// .updateCouplings(perceptCouplings);
 		brain.getNetwork().update();
 
-		double hungerActivation = drives.getNeuronByLabel("Hunger").getActivation();
-		if (hungerActivation > 0) {
-			// TODO: Set amount value to something that will get higher than 1
-			// only at
-			// extreme values (such as 255). We don't slow down to a crawl to
-			// get something
-			// we only want something a little bit, but we will run if there's a
-			// dire need. Alternatively, we can have the base movement step size
-			// change
-			// instead? Or do this calculation in method?
-			this.approachObject(parentSim.cheese, 1);
+		double approachActivation = decisions.getNeuronByLabel("Approach").getActivation();
+		if (approachActivation > 0) {
+			approachBehavior(approachActivation);
 		}
 	}
 
@@ -103,10 +101,30 @@ public class Creature {
 	 */
 	private void initAgent() {
 		agent.setName(name);
+		agent.setId("Mouse");
 		agent.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
+
+		// Add hearing sensors
+		agent.addSensor(new Hearing(agent, "Toy", 10));
+		agent.addSensor(new Hearing(agent, "Fish", 10));
 		agent.addSensor(new Hearing(agent, "Cheese", 10));
-		//TODO: Below is what the npc needs
-		//agent.addEffector(new Speech(agent, "Cheese", .2));
+		agent.addSensor(new Hearing(agent, "Poison", 10));
+		agent.addSensor(new Hearing(agent, "Hazard", 10));
+		agent.addSensor(new Hearing(agent, "Flower", 10));
+		agent.addSensor(new Hearing(agent, "Mouse", 10));
+		agent.addSensor(new Hearing(agent, "Wait", 10));
+		agent.addSensor(new Hearing(agent, "Left", 10));
+		agent.addSensor(new Hearing(agent, "Right", 10));
+		agent.addSensor(new Hearing(agent, "Forward", 10));
+		agent.addSensor(new Hearing(agent, "Backward", 10));
+		agent.addSensor(new Hearing(agent, "Sleep", 10));
+		agent.addSensor(new Hearing(agent, "Approach", 10));
+		agent.addSensor(new Hearing(agent, "Ingest", 10));
+		agent.addSensor(new Hearing(agent, "Look", 10));
+		agent.addSensor(new Hearing(agent, "Smell", 10));
+		agent.addSensor(new Hearing(agent, "Attack", 10));
+		agent.addSensor(new Hearing(agent, "Play", 10));
+		agent.addSensor(new Hearing(agent, "Mate", 10));
 	}
 
 	/**
@@ -123,8 +141,13 @@ public class Creature {
 
 		// Init Lobe #6: Decisions
 		// TODO: Make this a WTA lobe.
-		NeuronGroup decisions = brain.createLobe(2510, 440, verbs.size(), "vertical line", "Lobe #6: Decisions");
+		decisions = brain.createLobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
+		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
+		
+		//TODO: TEST CASE -- Remove when done
+		decisions.getNeuronByLabel("Approach").setClamped(true);
+		decisions.getNeuronByLabel("Approach").forceSetActivation(10.0);
 
 		// Coupling some decision lobe cells to agent effectors
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
@@ -136,8 +159,13 @@ public class Creature {
 
 		// Init Lobe #7: Attention
 		// TODO: Make this a WTA lobe.
-		NeuronGroup attention = brain.createLobe(2090, 1260, stimulus.size(), "vertical line", "Lobe #7: Attention");
+		attention = brain.createLobe(440.55, 872.98, stimulus.size(), "vertical line", "Lobe #7: Attention");
 		brain.copyLabels(stimulus, attention);
+		
+		// TODO: TEST CASE -- Remove when done
+		Neuron testCase = attention.getNeuronByLabel("Cheese");
+		testCase.setClamped(true);
+		testCase.forceSetActivation(10.0);
 
 		// Init Attention System Dendrite Pathways
 		/*
@@ -177,8 +205,8 @@ public class Creature {
 				new CreaturesSynapseRule(), 1);
 
 		// Init Lobe #8: Concepts
-		NeuronGroup concepts = brain.createLobe(460, 95, 640, "grid", "Lobe #8: Concepts");
-		brain.setLobeColumns(concepts, 40);
+		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
+		brain.setLobeColumns(concepts, 20);
 
 		// Init Concepts to Decisions Dendrite Pathways
 		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 0");
@@ -200,7 +228,7 @@ public class Creature {
 	 */
 	public void initCouplings() {
 
-		// Make couplings from agent sensor to stimulus lobe
+		// Couplings from center smell sensor to stimulus lobe
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 0, stimulus.getNeuronByLabel("Toy"));
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 1, stimulus.getNeuronByLabel("Fish"));
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 2,
@@ -212,25 +240,57 @@ public class Creature {
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 5,
 				stimulus.getNeuronByLabel("Flower"));
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 6, stimulus.getNeuronByLabel("Mouse"));
+		
+		// Couplings from hearing sensors to noun lobe
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Toy\""), nouns.getNeuronByLabel("Toy"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Cheese\""), nouns.getNeuronByLabel("Cheese"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Fish\""), nouns.getNeuronByLabel("Fish"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Poison\""), nouns.getNeuronByLabel("Poison"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Hazard\""), nouns.getNeuronByLabel("Hazard"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Flower\""), nouns.getNeuronByLabel("Flower"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mouse\""), nouns.getNeuronByLabel("Mouse"));
+
+		// Couplings from hearing sensors to verb lobe
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Wait\""), verbs.getNeuronByLabel("Wait"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Left\""), verbs.getNeuronByLabel("Left"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Right\""), verbs.getNeuronByLabel("Right"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Forward\""), verbs.getNeuronByLabel("Forward"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Backward\""), verbs.getNeuronByLabel("Backward"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Sleep\""), verbs.getNeuronByLabel("Sleep"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Approach\""), verbs.getNeuronByLabel("Approach"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Ingest\""), verbs.getNeuronByLabel("Ingest"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Look\""), verbs.getNeuronByLabel("Look"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Smell\""), verbs.getNeuronByLabel("Smell"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Attack\""), verbs.getNeuronByLabel("Attack"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Play\""), verbs.getNeuronByLabel("Play"));
+		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
 	}
 
-	public void approachBehavior() {
-		// Find the nearest object and approach
-		// Could other conditions as needed
+	public void approachBehavior(double strength) {
+		// Find an object in the world that fits the most active category
+		// TODO: Change this to discriminate between multiple objects of the same
+		// category, such that the closest object is picked.
+		// The replaceAll method must be called here to remove a whitespace added at the
+		// end when getMostActiveNeuron returns.
+		String objOfAttentionName = attention.getMostActiveNeuron().replaceAll("\\s", "");
+		OdorWorldEntity objOfAttention = agent.getParentWorld().getEntity(objOfAttentionName);
+
+		// Follow that object
+		approachObject(objOfAttention, strength);
 	}
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 		// Get the rise and run of the direct line between the agent and the
 		// object.
-		double run = targetObject.getCenterX() - agent.getCenterX();
-		double rise = targetObject.getCenterY() - agent.getCenterY();
+		// double run = targetObject.getCenterX() - agent.getCenterX();
+		// double rise = targetObject.getCenterY() - agent.getCenterY();
 
 		// Calculate the slope of the direct line between the agent and the
 		// object.
-		double slope = rise / run;
+		// double slope = rise / run;
 
 		// Calculate the angle we need to face from the slope of the line.
-		double targetAngle = Math.atan(slope);
+		// double targetAngle = Math.atan(slope);
 
 		// Figure out how far to move.
 		double stepSize = baseMovementStepSize * motionAmount;

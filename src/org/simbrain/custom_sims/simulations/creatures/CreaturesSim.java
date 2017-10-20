@@ -99,7 +99,7 @@ public class CreaturesSim extends RegisteredSimulation {
 		Creature ron = createCreature(0, 0, 833, 629, "Ron");
 
 		// Create a 'non-player character' that talks randomly
-		npc = world.addAgent(400, 400, "Mouse");
+		npc = world.addAgent(350, 250, "Mouse");
 		npc.setName("Mouse");
 		npc.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
 
@@ -186,7 +186,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
 		// TODO: Below not working quite right because the network has not finished
 		// being created when the next two calls are made
-		net.getNetworkPanel(sim).setAutoZoomMode(false);
+		//net.getNetworkPanel(sim).setAutoZoomMode(false);
 		// net.getNetworkPanel(sim).zoomToFitPage(true);
 
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");

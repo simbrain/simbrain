@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.DecayRule;
 
 /**
  * 
@@ -15,7 +15,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 // here to a custom spike responder?) Might not be necessary if we can get
 // linear neurons to retain a below-threshold activation value without
 // firing.
-public class CreaturesNeuronRule extends LinearRule {
+public class CreaturesNeuronRule extends DecayRule {
 
     // TODO: Wire this up
     /** Reference to parent lobe. */
@@ -65,50 +65,54 @@ public class CreaturesNeuronRule extends LinearRule {
         // it back later or adapt everything to a smaller value like this
         setUpperBound(10);
         setLowerBound(0);
+//        this.setAddNoise(true);
     }
 
     @Override
     public void update(Neuron neuron) {
-        // System.out.println("Updating neuron: " + neuron.getLabel());
+//        // System.out.println("Updating neuron: " + neuron.getLabel());
+//
+//        // Get input and modulate it with inputGain.
+//        double input = inputType.getInput(neuron);
+//        // TODO: Find an algorithm that can modulate input with inputGain. (In
+//        // the default genome in Creatures, input gain is always set at max
+//        // (255),
+//        // except for the decisions lobe (#6), which is set at 128)
+//
+//        // SVRule stuff goes here.
+//
+//        // Placeholder until SVRule stuff is implemented
+//        stateValue += input;
+//
+//        // Clip values
+//        if (isClipped()) {
+//            stateValue = super.clip(stateValue);
+//        }
+//
+//        // Update the neuron if override is not enabled
+//        if (!override) {
+//            if (stateValue > nominalThreshold) {
+//                neuron.setBuffer(stateValue);
+//                // System.out.print("State value was " + stateValue + ", ");
+//                stateValue -= nominalThreshold;
+//                // System.out.println("now it's " + stateValue + "!");
+//            } else {
+//                neuron.setBuffer(0);
+//                // TODO: Find an algorithm that better replicates how leakage
+//                // rate in Creatures
+//                // works, such that 0 = Instant, 255 = 52 years.
+//                // System.out.print("State value was " + stateValue + ", ");
+//                stateValue = restState
+//                        + (stateValue * (leakageRate / getUpperBound()));
+//                // System.out.println("now it's " + stateValue + "!");
+//            }
+//
+//        }
 
-        // Get input and modulate it with inputGain.
-        double input = inputType.getInput(neuron);
-        // TODO: Find an algorithm that can modulate input with inputGain. (In
-        // the default genome in Creatures, input gain is always set at max
-        // (255),
-        // except for the decisions lobe (#6), which is set at 128)
-
-        // SVRule stuff goes here.
-
-        // Placeholder until SVRule stuff is implemented
-        stateValue += input;
-
-        // Clip values
-        if (isClipped()) {
-            stateValue = super.clip(stateValue);
-        }
-
-        // Update the neuron if override is not enabled
-        if (!override) {
-            if (stateValue > nominalThreshold) {
-                neuron.setBuffer(stateValue);
-                // System.out.print("State value was " + stateValue + ", ");
-                stateValue -= nominalThreshold;
-                // System.out.println("now it's " + stateValue + "!");
-            } else {
-                neuron.setBuffer(0);
-                // TODO: Find an algorithm that better replicates how leakage
-                // rate in Creatures
-                // works, such that 0 = Instant, 255 = 52 years.
-                // System.out.print("State value was " + stateValue + ", ");
-                stateValue = restState
-                        + (stateValue * (leakageRate / getUpperBound()));
-                // System.out.println("now it's " + stateValue + "!");
-            }
-
-        }
-
-        // super.update(neuron);
+        
+         super.update(neuron);
+         
+         
     }
 
     @Override

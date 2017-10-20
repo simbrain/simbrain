@@ -69,7 +69,7 @@ public class Creature {
 	private NeuronGroup attention;
 
 	/** How quickly to approach or avoid objects. */
-	float baseMovementStepSize = 0.001f;
+	float baseMovementStepSize = 0.01f;
 
 	public Creature(CreaturesSim sim, String name, NetBuilder net, RotatingEntity agent) {
 		this.parentSim = sim;
@@ -145,10 +145,6 @@ public class Creature {
 		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
 		
-		//TODO: TEST CASE -- Remove when done
-		decisions.getNeuronByLabel("Approach").setClamped(true);
-		decisions.getNeuronByLabel("Approach").forceSetActivation(10.0);
-
 		// Coupling some decision lobe cells to agent effectors
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
@@ -162,11 +158,6 @@ public class Creature {
 		attention = brain.createLobe(440.55, 872.98, stimulus.size(), "vertical line", "Lobe #7: Attention");
 		brain.copyLabels(stimulus, attention);
 		
-		// TODO: TEST CASE -- Remove when done
-		Neuron testCase = attention.getNeuronByLabel("Cheese");
-		testCase.setClamped(true);
-		testCase.forceSetActivation(10.0);
-
 		// Init Attention System Dendrite Pathways
 		/*
 		 * TODO: Connecting neurons w/ OneToOne is not hooking up the right neurons
@@ -280,27 +271,22 @@ public class Creature {
 	}
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
-		// Get the rise and run of the direct line between the agent and the
-		// object.
-		// double run = targetObject.getCenterX() - agent.getCenterX();
-		// double rise = targetObject.getCenterY() - agent.getCenterY();
 
-		// Calculate the slope of the direct line between the agent and the
-		// object.
-		// double slope = rise / run;
-
-		// Calculate the angle we need to face from the slope of the line.
-		// double targetAngle = Math.atan(slope);
+		// Calculate the target heading for the agent
+        double delta_x = agent.getCenterX() - targetObject.getCenterX();
+        double delta_y = agent.getCenterY() - targetObject.getCenterY();
+        double targetHeading = Math.toDegrees(Math.atan(delta_y / delta_x));
 
 		// Figure out how far to move.
 		double stepSize = baseMovementStepSize * motionAmount;
 
-		double deltaX = agent.getCenterX() + stepSize * (targetObject.getCenterX() - agent.getCenterX());
-		double deltaY = agent.getCenterY() + stepSize * (targetObject.getCenterY() - agent.getCenterY());
-		// double deltaHeading = agent.getHeading()
-		// + stepSize * (targetObject.getCenterY() - agent.getCenterY());
+		double newX = agent.getCenterX() + stepSize * (targetObject.getCenterX() - agent.getCenterX());
+		double newY = agent.getCenterY() + stepSize * (targetObject.getCenterY() - agent.getCenterY());
+        double newHeading = agent.getHeading() 
+                + stepSize * (targetHeading - agent.getHeading());
 
-		agent.setCenterLocation((float) deltaX, (float) deltaY);
+		agent.setCenterLocation((float) newX, (float) newY);
+		agent.setHeading(newHeading);
 
 	}
 }

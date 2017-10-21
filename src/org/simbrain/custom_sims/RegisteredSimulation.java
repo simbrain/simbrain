@@ -33,7 +33,10 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
+import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import com.sun.org.apache.regexp.internal.RE;
 
 /**
  * Super class for all custom simulations. Also has code to manage custom
@@ -70,6 +73,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new CortexSimple());
         REGISTERED_SIMS.add(new CreaturesSim());
         REGISTERED_SIMS.add(new MpfsSOM());
+        REGISTERED_SIMS.add(new SimpleNeuroevolution());
 
         // Alphabetize
         REGISTERED_SIMS

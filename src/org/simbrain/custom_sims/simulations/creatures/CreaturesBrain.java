@@ -27,377 +27,403 @@ import org.simbrain.world.odorworld.effectors.Effector;
  */
 public class CreaturesBrain {
 
-	/**
-	 * List of lobes.
-	 */
-	private List<NeuronGroup> lobes = new ArrayList();
+    /**
+     * List of lobes.
+     */
+    private List<NeuronGroup> lobes = new ArrayList();
 
-	/**
-	 * Reference to the NetBuilder object this wraps around.
-	 */
-	private NetBuilder builder;
+    /**
+     * Reference to the NetBuilder object this wraps around.
+     */
+    private NetBuilder builder;
 
-	/**
-	 * The amount of space to spread between neurons.
-	 */
-	private double gridSpace = 50;
+    /**
+     * The amount of space to spread between neurons.
+     */
+    private double gridSpace = 50;
 
-	/**
-	 * Reference to network component.
-	 */
-	private NetworkComponent netComponent;
+    /**
+     * Reference to network component.
+     */
+    private NetworkComponent netComponent;
 
-	/**
-	 * Reference to parent sim.
-	 */
-	private final CreaturesSim parentSim;
+    /**
+     * Reference to parent sim.
+     */
+    private final CreaturesSim parentSim;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param component
-	 */
-	public CreaturesBrain(NetworkComponent component, CreaturesSim parentSim) {
-		this.netComponent = component;
-		this.builder = new NetBuilder(component);
-		this.parentSim = parentSim;
-	}
+    /**
+     * Constructor.
+     *
+     * @param component
+     */
+    public CreaturesBrain(NetworkComponent component, CreaturesSim parentSim) {
+        this.netComponent = component;
+        this.builder = new NetBuilder(component);
+        this.parentSim = parentSim;
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param netBuilder
-	 */
-	public CreaturesBrain(NetBuilder netBuilder, CreaturesSim parentSim) {
-		this.builder = netBuilder;
-		this.netComponent = netBuilder.getNetworkComponent();
-		this.parentSim = parentSim;
-	}
+    /**
+     * Constructor.
+     *
+     * @param netBuilder
+     */
+    public CreaturesBrain(NetBuilder netBuilder, CreaturesSim parentSim) {
+        this.builder = netBuilder;
+        this.netComponent = netBuilder.getNetworkComponent();
+        this.parentSim = parentSim;
+    }
 
-	// Helper methods
+    // Helper methods
 
-	/**
-	 * Creates a new lobe.
-	 *
-	 * @param x
-	 * @param y
-	 * @param numNeurons
-	 * @param layoutName
-	 *            Valid input includes "line", "vertical line", and "grid".
-	 * @param lobeName
-	 * @param neuronRule
-	 *            (optional)
-	 * @return
-	 */
-	public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName,
-			CreaturesNeuronRule neuronRule) {
-		NeuronGroup lobe = builder.addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
-		lobe.setLabel(lobeName);
-		lobes.add(lobe);
-		return lobe;
-	}
+    /**
+     * Creates a new lobe.
+     *
+     * @param x
+     * @param y
+     * @param numNeurons
+     * @param layoutName Valid input includes "line", "vertical line", and
+     *            "grid".
+     * @param lobeName
+     * @param neuronRule (optional)
+     * @return
+     */
+    public NeuronGroup createLobe(double x, double y, int numNeurons,
+            String layoutName, String lobeName,
+            CreaturesNeuronRule neuronRule) {
+        NeuronGroup lobe = builder.addNeuronGroup(x, y, numNeurons, layoutName,
+                neuronRule);
+        lobe.setLabel(lobeName);
+        lobes.add(lobe);
+        return lobe;
+    }
 
-	/**
-	 *
-	 * @param x
-	 * @param y
-	 * @param numNeurons
-	 * @param layoutName
-	 * @param lobeName
-	 * @return
-	 */
-	public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
-		return createLobe(x, y, numNeurons, layoutName, lobeName, new CreaturesNeuronRule());
-	}
+    /**
+     *
+     * @param x
+     * @param y
+     * @param numNeurons
+     * @param layoutName
+     * @param lobeName
+     * @return
+     */
+    public NeuronGroup createLobe(double x, double y, int numNeurons,
+            String layoutName, String lobeName) {
+        return createLobe(x, y, numNeurons, layoutName, lobeName,
+                new CreaturesNeuronRule());
+    }
 
-	/**
-	 * Creates a WTA lobe
-	 * 
-	 * @param x
-	 * @param y
-	 * @param numNeurons
-	 * @param layoutName
-	 * @param lobeName
-	 * @return
-	 */
-	public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
-		WinnerTakeAll lobe = builder.addWTAGroup(x, y, numNeurons);
-		lobe.setLabel(lobeName);
-		lobe.setNeuronType(new CreaturesNeuronRule());
-		// TODO: Either make the below method public, or copy & paste it to this class,
-		// or call this method in the builder's addWTAGroup method
-		// builder.layoutNeuronGroup(lobe, x, y, layoutName);
+    /**
+     * Creates a WTA lobe
+     * 
+     * @param x
+     * @param y
+     * @param numNeurons
+     * @param layoutName
+     * @param lobeName
+     * @return
+     */
+    public WinnerTakeAll createWTALobe(double x, double y, int numNeurons,
+            String layoutName, String lobeName) {
+        WinnerTakeAll lobe = builder.addWTAGroup(x, y, numNeurons);
+        lobe.setLabel(lobeName);
+        lobe.setNeuronType(new CreaturesNeuronRule());
+        // TODO: Either make the below method public, or copy & paste it to this
+        // class,
+        // or call this method in the builder's addWTAGroup method
+        // builder.layoutNeuronGroup(lobe, x, y, layoutName);
 
-		lobes.add(lobe);
-		return lobe;
-	}
+        lobes.add(lobe);
+        return lobe;
+    }
 
-	/**
-	 * Names a neuron.
-	 *
-	 * @param lobe
-	 * @param neuronIndex
-	 * @param name
-	 */
-	public void nameNeuron(NeuronGroup lobe, int neuronIndex, String name) {
-		lobe.getNeuronList().get(neuronIndex).setLabel(name);
-	}
+    /**
+     * Names a neuron.
+     *
+     * @param lobe
+     * @param neuronIndex
+     * @param name
+     */
+    public void nameNeuron(NeuronGroup lobe, int neuronIndex, String name) {
+        lobe.getNeuronList().get(neuronIndex).setLabel(name);
+    }
 
-	/**
-	 * Copies neuron labels from one neuron group to another if they are the same
-	 * size.
-	 *
-	 * @param lobeToCopy
-	 * @param lobeToPasteTo
-	 * @param startPasteIndex
-	 */
-	public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo, int startPasteIndex) {
+    /**
+     * Copies neuron labels from one neuron group to another if they are the
+     * same size.
+     *
+     * @param lobeToCopy
+     * @param lobeToPasteTo
+     * @param startPasteIndex
+     */
+    public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo,
+            int startPasteIndex) {
 
-		// Check to see if the lobe labels can be copied first
-		if (lobeToCopy.size() <= lobeToPasteTo.size() - startPasteIndex) {
-			for (int i = startPasteIndex, j = 0; j < lobeToCopy.size(); i++, j++) {
+        // Check to see if the lobe labels can be copied first
+        if (lobeToCopy.size() <= lobeToPasteTo.size() - startPasteIndex) {
+            for (int i = startPasteIndex, j = 0; j < lobeToCopy
+                    .size(); i++, j++) {
 
-				// Get the label of neuron j of lobeToCopy, and paste it into lobeToPasteTo's
-				// neuron i's label.
-				lobeToPasteTo.getNeuronList().get(i).setLabel(lobeToCopy.getNeuronList().get(j).getLabel());
-			}
-		} else {
+                // Get the label of neuron j of lobeToCopy, and paste it into
+                // lobeToPasteTo's
+                // neuron i's label.
+                lobeToPasteTo.getNeuronList().get(i)
+                        .setLabel(lobeToCopy.getNeuronList().get(j).getLabel());
+            }
+        } else {
 
-			// Give an error message if there is a problem with lobeToCopy's size.
-			System.out.print("copyToLabels error: Lobe " + lobeToCopy.getLabel() + " is too big to copy to Lobe "
-					+ lobeToPasteTo.getLabel() + " starting at index " + startPasteIndex);
-		}
-	}
+            // Give an error message if there is a problem with lobeToCopy's
+            // size.
+            System.out.print("copyToLabels error: Lobe " + lobeToCopy.getLabel()
+                    + " is too big to copy to Lobe " + lobeToPasteTo.getLabel()
+                    + " starting at index " + startPasteIndex);
+        }
+    }
 
-	public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo) {
-		copyLabels(lobeToCopy, lobeToPasteTo, 0);
-	}
+    public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo) {
+        copyLabels(lobeToCopy, lobeToPasteTo, 0);
+    }
 
-	/**
-	 * A method for coupling the activation of nodes from one lobe to the activation
-	 * of the nodes of another lobe
-	 * 
-	 * @param producerLobe
-	 * @param consumerLobe
-	 * @param index
-	 * @param list
-	 */
-	private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling<?>> list) {
-		// Check to see if the sizes are in safe parameters
-		if (producerLobe.size() <= consumerLobe.size() - index) {
-			for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
+    /**
+     * A method for coupling the activation of nodes from one lobe to the
+     * activation of the nodes of another lobe.
+     * 
+     * @param producerLobe
+     * @param consumerLobe
+     * @param index
+     * @param list
+     */
+    private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe,
+            int index, List<Coupling<?>> list) {
+        // Check to see if the sizes are in safe parameters
+        if (producerLobe.size() <= consumerLobe.size() - index) {
+            for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
 
-				// Make the producer from neuron j of producerLobe
-				PotentialProducer producer = netComponent.createPotentialProducer(producerLobe.getNeuronList().get(j),
-						"getActivation", double.class);
+                // Make the producer from neuron j of producerLobe
+                PotentialProducer producer = netComponent
+                        .createPotentialProducer(
+                                producerLobe.getNeuronList().get(j),
+                                "getActivation", double.class);
 
-				// Make the consumer from neuron i of consumerLobe
-				PotentialConsumer consumer = netComponent.createPotentialConsumer(consumerLobe.getNeuronList().get(i),
-						"forceSetActivation", double.class);
+                // Make the consumer from neuron i of consumerLobe
+                PotentialConsumer consumer = netComponent
+                        .createPotentialConsumer(
+                                consumerLobe.getNeuronList().get(i),
+                                "forceSetActivation", double.class);
 
-				// Create the coupling and add it to the list
-				Coupling coupling = new Coupling(producer, consumer);
-				list.add(coupling);
-				parentSim.getSim().addCoupling(coupling);
-			}
-		} else {
+                // Create the coupling and add it to the list
+                Coupling coupling = new Coupling(producer, consumer);
+                list.add(coupling);
+                parentSim.getSim().addCoupling(coupling);
+            }
+        } else {
 
-			// Give this error if there is a problem with producerLobe's size
-			System.out.print("coupleLobes error: Lobe " + producerLobe.getLabel() + " is too big to couple to Lobe "
-					+ consumerLobe.getLabel() + " starting at index " + index);
-		}
-	}
+            // Give this error if there is a problem with producerLobe's size
+            System.out.print("coupleLobes error: Lobe "
+                    + producerLobe.getLabel() + " is too big to couple to Lobe "
+                    + consumerLobe.getLabel() + " starting at index " + index);
+        }
+    }
 
-	/**
-	 * Manually gives a grid layout with a set number of columns to a certain lobe.
-	 *
-	 * @param lobe
-	 * @param numColumns
-	 */
-	public void setLobeColumns(NeuronGroup lobe, int numColumns) {
-		GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
-		lobe.setLayout(gridLayout);
-		lobe.applyLayout();
-	}
+    /**
+     * Manually gives a grid layout with a set number of columns to a certain
+     * lobe.
+     *
+     * @param lobe
+     * @param numColumns
+     */
+    public void setLobeColumns(NeuronGroup lobe, int numColumns) {
+        GridLayout gridLayout = new GridLayout(gridSpace, gridSpace,
+                numColumns);
+        lobe.setLayout(gridLayout);
+        lobe.applyLayout();
+    }
 
-	/**
-	 * 
-	 * @param sourceLobe
-	 * @param targetLobe
-	 * @param groupName
-	 * @return
-	 */
-	public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
-		// TODO: Modify this method to take in a CreaturesSynapseRule, and maybe have it
-		// generate a customized ConnectNeurons object to use.
+    /**
+     * 
+     * @param sourceLobe
+     * @param targetLobe
+     * @param groupName
+     * @return
+     */
+    public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe,
+            NeuronGroup targetLobe, String groupName) {
+        // TODO: Modify this method to take in a CreaturesSynapseRule, and maybe
+        // have it
+        // generate a customized ConnectNeurons object to use.
 
-		// Temporary method call
-		SynapseGroup synapseGroup = builder.addSynapseGroup(sourceLobe, targetLobe);
+        // Temporary method call
+        SynapseGroup synapseGroup = builder.addSynapseGroup(sourceLobe,
+                targetLobe);
 
-		synapseGroup.setLabel(groupName);
+        synapseGroup.setLabel(groupName);
 
-		return synapseGroup;
-	}
+        return synapseGroup;
+    }
 
-	// Methods for building specific pre-fabricated non-mutable lobes
+    // Methods for building specific pre-fabricated non-mutable lobes
 
-	public NeuronGroup buildDriveLobe() {
-		NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Lobe #1: Drives");
-		setLobeColumns(lobe, 6);
+    public NeuronGroup buildDriveLobe() {
+        NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Lobe #1: Drives");
+        setLobeColumns(lobe, 6);
 
-		nameNeuron(lobe, 0, "Pain");
-		nameNeuron(lobe, 1, "Comfort");
-		nameNeuron(lobe, 2, "Hunger");
-		nameNeuron(lobe, 3, "Temperature");
-		nameNeuron(lobe, 4, "Fatigue");
-		nameNeuron(lobe, 5, "Drowsiness");
-		nameNeuron(lobe, 6, "Lonliness");
-		nameNeuron(lobe, 7, "Crowdedness");
-		nameNeuron(lobe, 8, "Fear");
-		nameNeuron(lobe, 9, "Boredom");
-		nameNeuron(lobe, 10, "Anger");
-		nameNeuron(lobe, 11, "Arousal");
+        nameNeuron(lobe, 0, "Pain");
+        nameNeuron(lobe, 1, "Comfort");
+        nameNeuron(lobe, 2, "Hunger");
+        nameNeuron(lobe, 3, "Temperature");
+        nameNeuron(lobe, 4, "Fatigue");
+        nameNeuron(lobe, 5, "Drowsiness");
+        nameNeuron(lobe, 6, "Lonliness");
+        nameNeuron(lobe, 7, "Crowdedness");
+        nameNeuron(lobe, 8, "Fear");
+        nameNeuron(lobe, 9, "Boredom");
+        nameNeuron(lobe, 10, "Anger");
+        nameNeuron(lobe, 11, "Arousal");
 
-		lobe.setClamped(true);
+        lobe.setClamped(true);
 
-		return lobe;
-	}
+        return lobe;
+    }
 
-	// TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork
-	// or make our own?)
-	public NeuronGroup buildStimulusLobe() {
-		NeuronGroup lobe = createLobe(0, 877.70, 7, "line", "Lobe #2: Stimulus Source");
+    // TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork
+    // or make our own?)
+    public NeuronGroup buildStimulusLobe() {
+        NeuronGroup lobe = createLobe(0, 877.70, 7, "line",
+                "Lobe #2: Stimulus Source");
 
-		nameNeuron(lobe, 0, "Toy");
-		nameNeuron(lobe, 1, "Fish");
-		nameNeuron(lobe, 2, "Cheese");
-		nameNeuron(lobe, 3, "Poison");
-		nameNeuron(lobe, 4, "Hazard");
-		nameNeuron(lobe, 5, "Flower");
-		nameNeuron(lobe, 6, "Mouse");
+        nameNeuron(lobe, 0, "Toy");
+        nameNeuron(lobe, 1, "Fish");
+        nameNeuron(lobe, 2, "Cheese");
+        nameNeuron(lobe, 3, "Poison");
+        nameNeuron(lobe, 4, "Hazard");
+        nameNeuron(lobe, 5, "Flower");
+        nameNeuron(lobe, 6, "Mouse");
 
-		lobe.setClamped(true);
+        lobe.setClamped(true); //TODO: REmove these calls?
 
-		return lobe;
-	}
+        return lobe;
+    }
 
-	// TODO: Make this a WTA lobe.
-	public NeuronGroup buildVerbLobe() {
-		NeuronGroup lobe = createLobe(0, 182.37, 13, "grid", "Lobe #3: Verbs");
-		setLobeColumns(lobe, 7);
+    // TODO: Make this a WTA lobe.
+    public NeuronGroup buildVerbLobe() {
+        NeuronGroup lobe = createLobe(0, 182.37, 13, "grid", "Lobe #3: Verbs");
+        setLobeColumns(lobe, 7);
 
-		nameNeuron(lobe, 0, "Wait");
-		nameNeuron(lobe, 1, "Left");
-		nameNeuron(lobe, 2, "Right");
-		nameNeuron(lobe, 3, "Forward");
-		nameNeuron(lobe, 4, "Backward");
-		nameNeuron(lobe, 5, "Sleep");
-		nameNeuron(lobe, 6, "Approach");
-		nameNeuron(lobe, 7, "Ingest");
-		nameNeuron(lobe, 8, "Look");
-		nameNeuron(lobe, 9, "Smell");
-		nameNeuron(lobe, 10, "Attack");
-		nameNeuron(lobe, 11, "Play");
-		nameNeuron(lobe, 12, "Mate");
+        nameNeuron(lobe, 0, "Wait");
+        nameNeuron(lobe, 1, "Left");
+        nameNeuron(lobe, 2, "Right");
+        nameNeuron(lobe, 3, "Forward");
+        nameNeuron(lobe, 4, "Backward");
+        nameNeuron(lobe, 5, "Sleep");
+        nameNeuron(lobe, 6, "Approach");
+        nameNeuron(lobe, 7, "Ingest");
+        nameNeuron(lobe, 8, "Look");
+        nameNeuron(lobe, 9, "Smell");
+        nameNeuron(lobe, 10, "Attack");
+        nameNeuron(lobe, 11, "Play");
+        nameNeuron(lobe, 12, "Mate");
 
-		lobe.setClamped(true);
+        lobe.setClamped(true);
 
-		return lobe;
-	}
+        return lobe;
+    }
 
-	// TODO: Make this a WTA lobe.
-	public NeuronGroup buildNounLobe() {
-		NeuronGroup lobe = createLobe(0, 1171.13, 7, "line", "Lobe #4: Nouns");
+    // TODO: Make this a WTA lobe.
+    public NeuronGroup buildNounLobe() {
+        NeuronGroup lobe = createLobe(0, 1171.13, 7, "line", "Lobe #4: Nouns");
 
-		nameNeuron(lobe, 0, "Toy");
-		nameNeuron(lobe, 1, "Fish");
-		nameNeuron(lobe, 2, "Cheese");
-		nameNeuron(lobe, 3, "Poison");
-		nameNeuron(lobe, 4, "Hazard");
-		nameNeuron(lobe, 5, "Flower");
-		nameNeuron(lobe, 6, "Mouse");
+        nameNeuron(lobe, 0, "Toy");
+        nameNeuron(lobe, 1, "Fish");
+        nameNeuron(lobe, 2, "Cheese");
+        nameNeuron(lobe, 3, "Poison");
+        nameNeuron(lobe, 4, "Hazard");
+        nameNeuron(lobe, 5, "Flower");
+        nameNeuron(lobe, 6, "Mouse");
 
-		lobe.setClamped(true);
+        lobe.setClamped(true);
 
-		return lobe;
-	}
+        return lobe;
+    }
 
-	public NeuronGroup buildSensesLobe() {
-		NeuronGroup lobe = createLobe(0, 379.61, 14, "grid", "Lobe #5: General Senses");
-		setLobeColumns(lobe, 7);
+    public NeuronGroup buildSensesLobe() {
+        NeuronGroup lobe = createLobe(0, 379.61, 14, "grid",
+                "Lobe #5: General Senses");
+        setLobeColumns(lobe, 7);
 
-		nameNeuron(lobe, 0, "Attacked");
-		nameNeuron(lobe, 1, "Played with");
-		nameNeuron(lobe, 2, "User Talked");
-		nameNeuron(lobe, 3, "Mouse Talked");
-		nameNeuron(lobe, 4, "It Approaches");
-		nameNeuron(lobe, 5, "It is Near");
-		nameNeuron(lobe, 6, "It Retreats");
-		nameNeuron(lobe, 7, "Is Object");
-		nameNeuron(lobe, 8, "Is Mouse");
-		nameNeuron(lobe, 9, "Is Parent");
-		nameNeuron(lobe, 10, "Is Sibling");
-		nameNeuron(lobe, 11, "Is Child");
-		nameNeuron(lobe, 12, "Opposite Sex");
-		nameNeuron(lobe, 13, "Audible Event");
+        nameNeuron(lobe, 0, "Attacked");
+        nameNeuron(lobe, 1, "Played with");
+        nameNeuron(lobe, 2, "User Talked");
+        nameNeuron(lobe, 3, "Mouse Talked");
+        nameNeuron(lobe, 4, "It Approaches");
+        nameNeuron(lobe, 5, "It is Near");
+        nameNeuron(lobe, 6, "It Retreats");
+        nameNeuron(lobe, 7, "Is Object");
+        nameNeuron(lobe, 8, "Is Mouse");
+        nameNeuron(lobe, 9, "Is Parent");
+        nameNeuron(lobe, 10, "Is Sibling");
+        nameNeuron(lobe, 11, "Is Child");
+        nameNeuron(lobe, 12, "Opposite Sex");
+        nameNeuron(lobe, 13, "Audible Event");
 
-		lobe.setClamped(true);
+        lobe.setClamped(true);
 
-		return lobe;
-	}
+        return lobe;
+    }
 
-	public NeuronGroup buildPerceptionLobe(NeuronGroup[] lobes) {
-		// Get the sum of all neurons in all incoming lobes.
-		int totalSize = 0;
-		for (NeuronGroup l : lobes) {
-			totalSize += l.size();
-		}
+    public NeuronGroup buildPerceptionLobe(NeuronGroup[] lobes) {
+        // Get the sum of all neurons in all incoming lobes.
+        int totalSize = 0;
+        for (NeuronGroup l : lobes) {
+            totalSize += l.size();
+        }
 
-		// Build that lobe!
-		NeuronGroup perception = createLobe(474.88, 54.71, totalSize, "grid", "Lobe #0: Perception");
-		setLobeColumns(perception, 7);
+        // Build that lobe!
+        NeuronGroup perception = createLobe(474.88, 54.71, totalSize, "grid",
+                "Lobe #0: Perception");
+        setLobeColumns(perception, 7);
 
-		// Label and connect neurons
-		int indexPointer = 0;
-		for (NeuronGroup l : lobes) {
-			// Label
-			copyLabels(l, perception, indexPointer);
+        // Label and connect neurons
+        int indexPointer = 0;
+        for (NeuronGroup l : lobes) {
+            // Label
+            copyLabels(l, perception, indexPointer);
 
-			// Connect
-			for (Neuron n : l.getNeuronList()) {
-				builder.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
-			}
+            // Connect
+            for (Neuron n : l.getNeuronList()) {
+                builder.connect(n, perception.getNeuronByLabel(n.getLabel()),
+                        new CreaturesSynapseRule(), 1);
+            }
 
-			// Increment pointer for the next loop
-			indexPointer += l.size();
-		}
+            // Increment pointer for the next loop
+            indexPointer += l.size();
+        }
 
-		return perception;
-	}
+        return perception;
+    }
 
-	// Accessor methods below this point
+    // Accessor methods below this point
 
-	public Network getNetwork() {
-		return builder.getNetwork();
-	}
+    public Network getNetwork() {
+        return builder.getNetwork();
+    }
 
-	public List<NeuronGroup> getLobeList() {
-		return lobes;
-	}
+    public List<NeuronGroup> getLobeList() {
+        return lobes;
+    }
 
-	public NetBuilder getBuilder() {
-		return builder;
-	}
+    public NetBuilder getBuilder() {
+        return builder;
+    }
 
-	/**
-	 * Returns the label of a neuron of a given lobe.
-	 *
-	 * @param lobe
-	 * @param neuronIndex
-	 * @return String
-	 */
-	public String getNeuronLabel(NeuronGroup lobe, int neuronIndex) {
-		return lobe.getNeuronList().get(neuronIndex).getLabel();
-	}
+    /**
+     * Returns the label of a neuron of a given lobe.
+     *
+     * @param lobe
+     * @param neuronIndex
+     * @return String
+     */
+    public String getNeuronLabel(NeuronGroup lobe, int neuronIndex) {
+        return lobe.getNeuronList().get(neuronIndex).getLabel();
+    }
 
 }

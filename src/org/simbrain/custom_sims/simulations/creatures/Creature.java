@@ -1,15 +1,8 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import java.util.List;
-
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
@@ -144,6 +137,8 @@ public class Creature {
 		decisions = brain.createLobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
+		//decisions.setClamped(true);
+		//decisions.getNeuronByLabel("Approach").forceSetActivation(10.0);
 		
 		// Coupling some decision lobe cells to agent effectors
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
@@ -157,7 +152,9 @@ public class Creature {
 		// TODO: Make this a WTA lobe.
 		attention = brain.createLobe(440.55, 872.98, stimulus.size(), "vertical line", "Lobe #7: Attention");
 		brain.copyLabels(stimulus, attention);
-		
+		//attention.setClamped(true);
+        //attention.getNeuronByLabel("Cheese").forceSetActivation(10);
+        
 		// Init Attention System Dendrite Pathways
 		/*
 		 * TODO: Connecting neurons w/ OneToOne is not hooking up the right neurons
@@ -179,6 +176,7 @@ public class Creature {
 				new CreaturesSynapseRule(), 1);
 		brain.getBuilder().connect(stimulus.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
+		
 		// NOUNS-TO-ATTENTION
 		brain.getBuilder().connect(nouns.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
 				new CreaturesSynapseRule(), 1);
@@ -194,7 +192,7 @@ public class Creature {
 				new CreaturesSynapseRule(), 1);
 		brain.getBuilder().connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
-
+		
 		// Init Lobe #8: Concepts
 		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
 		brain.setLobeColumns(concepts, 20);
@@ -273,20 +271,20 @@ public class Creature {
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 
 		// Calculate the target heading for the agent
-        double delta_x = agent.getCenterX() - targetObject.getCenterX();
-        double delta_y = agent.getCenterY() - targetObject.getCenterY();
-        double targetHeading = Math.toDegrees(Math.atan(delta_y / delta_x));
 
-		// Figure out how far to move.
+        double delta_x = agent.getCenterX() - targetObject.getCenterX() + .01;
+        double delta_y = agent.getCenterY() - targetObject.getCenterY() + .01;
+        double targetHeading = Math.toDegrees(Math.atan(delta_y / delta_x)) + 180;
+        
+        //System.out.println(targetHeading + "," + agent.getHeading());
+
+		// Update position and heading
 		double stepSize = baseMovementStepSize * motionAmount;
-
 		double newX = agent.getCenterX() + stepSize * (targetObject.getCenterX() - agent.getCenterX());
 		double newY = agent.getCenterY() + stepSize * (targetObject.getCenterY() - agent.getCenterY());
-        double newHeading = agent.getHeading() 
-                + stepSize * (targetHeading - agent.getHeading());
-
+        //double newHeading = agent.getHeading() + 2 * stepSize * (-targetHeading - agent.getHeading());
 		agent.setCenterLocation((float) newX, (float) newY);
-		agent.setHeading(newHeading);
+		agent.setHeading(-targetHeading);
 
 	}
 }

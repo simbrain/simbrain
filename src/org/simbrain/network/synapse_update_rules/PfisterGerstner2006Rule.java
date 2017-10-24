@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.gui.UserParameter;
 
 
 /**
@@ -31,54 +32,44 @@ import org.simbrain.network.core.SynapseUpdateRule;
  * 
  * @author Oliver J. Coleman
  */
-public class PfisterGerstner2006Rule extends SynapseUpdateRule {
-	/**
-	 * Decay rate for r1 trace, as a multiplier.
-	 */
-    protected double tauPlusDecayMult = 1/16.8;
+public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Cloneable {
+	@UserParameter(label="Tau+", description="Decay rate for r1 trace", minimumValue=1, maximumValue=100, defaultValue="16.8", order=0)
+    protected double tauPlus = 16.8;
 
-	/**
-	 * Decay rate for r2 trace, as a multiplier.
-	 */
-    protected double tauXDecayMult = 1/1.0;
+	@UserParameter(label="Tau x", description="Decay rate for r2 trace", minimumValue=1, maximumValue=100, defaultValue="1.0", order=1)
+    protected double tauX = 1.0;
 
-	/**
-	 * Decay rate for o1 trace, as a multiplier.
-	 */
-    protected double tauNegDecayMult = 1/33.7;
+	@UserParameter(label="Tau-", description="Decay rate for o1 trace", minimumValue=1, maximumValue=100, defaultValue="33.7", order=2)
+    protected double tauNeg = 33.7;
 
-	/**
-	 * Decay rate for o2 trace, as a multiplier.
-	 */
-    protected double tauYDecayMult = 1/48.0;
+	@UserParameter(label="Tau y", description="Decay rate for o2 trace", minimumValue=1, maximumValue=100, defaultValue="48.0", order=3)
+    protected double tauY = 48.0;
 
-	/**
-	 * Amplitude of the weight change for a pre-post spike pair.
-	 */
-    protected double a2N = 0.003;
-
-	/**
-	 * Amplitude of the weight change for a post-pre spike pair.
-	 */
+	@UserParameter(label="A2+", description="Amplitude of the weight change for a pre-post spike pair.", minimumValue=0, maximumValue=0.1, defaultValue="0.003", order=4)
     protected double a2P = 0.0046;
 
-	/**
-	 * Amplitude of the triplet term for potentiation.
-	 */
-    protected double a3N = 0;
+	@UserParameter(label="A2-", description="Amplitude of the weight change for a post-pre spike pair.", minimumValue=0, maximumValue=0.1, defaultValue="0.003", order=5)
+    protected double a2N = 0.003;
 
-	/**
-	 * Amplitude of the triplet term for depression.
-	 */
+	@UserParameter(label="A3+", description="Amplitude of the triplet term for potentiation.", minimumValue=0, maximumValue=0.1, defaultValue="0.0091", order=6)
     protected double a3P = 0.0091;
     
-    
+	@UserParameter(label="A3-", description="Amplitude of the triplet term for depression.", minimumValue=0, maximumValue=0.1, defaultValue="0.0", order=7)
+    protected double a3N = 0;
+	
+	
     // Spike traces.
 	private double r1, r2, o1, o2;
-
+	// Cached multipliers for trace decays.
+	private double tauPlusMult, tauXMult, tauNegMult, tauYMult;
+    
 	
     @Override
     public void init(Synapse synapse) {
+    	tauPlusMult = 1 / tauPlus;
+        tauXMult = 1 / tauX;
+        tauNegMult = 1 / tauNeg;
+        tauYMult = 1 / tauY;
     }
 
     
@@ -90,16 +81,12 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
     
     @Override
     public SynapseUpdateRule deepCopy() {
-        PfisterGerstner2006Rule duplicateSynapse = new PfisterGerstner2006Rule();
-        duplicateSynapse.tauPlusDecayMult = this.tauPlusDecayMult;
-        duplicateSynapse.tauXDecayMult = this.tauXDecayMult;
-        duplicateSynapse.tauNegDecayMult = this.tauNegDecayMult;
-        duplicateSynapse.tauYDecayMult = this.tauYDecayMult;
-        duplicateSynapse.a2N = this.a2N;
-        duplicateSynapse.a2P = this.a2P;
-        duplicateSynapse.a3N = this.a3N;
-        duplicateSynapse.a3P = this.a3P;
-        return duplicateSynapse;
+    	// We're only using primitive fields so clone() works.
+    	try {
+			return (PfisterGerstner2006Rule) this.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
     }
     
     
@@ -120,16 +107,16 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
 			r2 = 1;
 		}
 		else {
-			r1 -= r1 * tauPlusDecayMult * timeStep;
-			r2 -= r2 * tauXDecayMult * timeStep;
+			r1 -= r1 * tauPlusMult * timeStep;
+			r2 -= r2 * tauXMult * timeStep;
 		}
 		if (postSpiked) {
 			o1 = 1;
 			o2 = 1;
 		}
 		else {
-			o1 -= o1 * tauNegDecayMult * timeStep;
-			o2 -= o2 * tauYDecayMult * timeStep;
+			o1 -= o1 * tauNegMult * timeStep;
+			o2 -= o2 * tauYMult * timeStep;
 		}
 		
 		// Update efficacy if a pre or post spike occurred.
@@ -147,15 +134,15 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
 	 * @return Decay rate for r1 trace.
 	 */
 	public double getTauPlusDecay() {
-		return 1 / tauPlusDecayMult;
+		return 1 / tauPlusMult;
 	}
 
 
 	/**
-	 * @param tauPlusDecay Decay rate for r1 trace.
+	 * @param tauPlus Decay rate for r1 trace.
 	 */
-	public void setTauPlusDecay(double tauPlusDecay) {
-		this.tauPlusDecayMult = 1 / tauPlusDecay;
+	public void setTauPlusDecay(double tauPlus) {
+		this.tauPlusMult = 1 / tauPlus;
 	}
 
 
@@ -163,15 +150,15 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
 	 * @return Decay rate for r2 trace.
 	 */
 	public double getTauXDecay() {
-		return 1 / tauXDecayMult;
+		return 1 / tauXMult;
 	}
 
 
 	/**
-	 * @param tauXDecay Decay rate for r2 trace.
+	 * @param tauX Decay rate for r2 trace.
 	 */
-	public void setTauXDecay(double tauXDecay) {
-		this.tauXDecayMult = 1 / tauXDecay;
+	public void setTauXDecay(double tauX) {
+		this.tauXMult = 1 / tauX;
 	}
 
 
@@ -179,15 +166,15 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
 	 * @return Decay rate for o1 trace.
 	 */
 	public double getTauNegDecay() {
-		return 1 / tauNegDecayMult;
+		return 1 / tauNegMult;
 	}
 
 
 	/**
-	 * @param tauNegDecay Decay rate for o1 trace.
+	 * @param tauNeg Decay rate for o1 trace.
 	 */
-	public void setTauNegDecay(double tauNegDecay) {
-		this.tauNegDecayMult = 1 / tauNegDecay;
+	public void setTauNegDecay(double tauNeg) {
+		this.tauNegMult = 1 / tauNeg;
 	}
 
 
@@ -195,15 +182,15 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule {
 	 * @return Decay rate for o2 trace.
 	 */
 	public double getTauYDecay() {
-		return 1 / tauYDecayMult;
+		return 1 / tauYMult;
 	}
 
 
 	/**
-	 * @param tauYDecay Decay rate for o2 trace.
+	 * @param tauY Decay rate for o2 trace.
 	 */
-	public void setTauYDecay(double tauYDecay) {
-		this.tauYDecayMult = 1 / tauYDecay;
+	public void setTauYDecay(double tauY) {
+		this.tauYMult = 1 / tauY;
 	}
 
 

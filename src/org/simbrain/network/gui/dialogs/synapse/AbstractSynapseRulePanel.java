@@ -41,10 +41,12 @@ import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.network.synapse_update_rules.OjaRule;
+import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
+import org.simbrain.network.synapse_update_rules.TestAnnotatedRule;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -73,11 +75,15 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
         RULE_MAP.put(new HebbianThresholdRule().getName(),
             new HebbianThresholdRulePanel());
         RULE_MAP.put(new OjaRule().getName(), new OjaRulePanel());
+        RULE_MAP.put(new PfisterGerstner2006Rule().getName(),
+            new SynapseRuleUserParamPanel(new PfisterGerstner2006Rule()));
         //RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
         //    new ShortTermPlasticityRulePanel());
         RULE_MAP.put(new STDPRule().getName(), new STDPRulePanel());
         RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
             new SubtractiveNormalizationRulePanel());
+        RULE_MAP.put(new TestAnnotatedRule().getName(),
+            new SynapseRuleUserParamPanel(new TestAnnotatedRule()));
     }
 
     /**

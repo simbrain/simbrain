@@ -69,7 +69,8 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
         RULE_MAP.put(new StaticSynapseRule().getName(),
             new StaticSynapsePanel());
         RULE_MAP
-            .put(new HebbianRule().getName(), new HebbianRulePanel());
+            .put(new HebbianRule().getName(),
+                    new SynapseRuleUserParamPanel(new HebbianRule()));
         RULE_MAP.put(new HebbianCPCARule().getName(),
             new HebbianCPCARulePanel());
         RULE_MAP.put(new HebbianThresholdRule().getName(),

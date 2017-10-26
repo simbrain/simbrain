@@ -27,8 +27,9 @@ import java.lang.annotation.Target;
 import org.simbrain.util.math.ProbDistribution;
 
 /**
- * Annotation for user-configurable parameter fields that provides for specifying meta-data such as label, description,
- * and validation criteria. This information may be used by dialog builders to construct input fields.
+ * Annotation for user-configurable parameter fields that provides for
+ * specifying meta-data such as label, description, and validation criteria.
+ * This information may be used by dialog builders to construct input fields.
  * 
  * @author O. J. Coleman
  */
@@ -36,60 +37,59 @@ import org.simbrain.util.math.ProbDistribution;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserParameter {
-	/**
-	 * Label for the parameter.
-	 */
-	String label();
+    /**
+     * Label for the parameter.
+     */
+    String label();
 
-	/**
-	 * Description for the parameter.
-	 */
-	String description() default "";
+    /**
+     * Description for the parameter.
+     */
+    String description() default "";
 
-	/**
-	 * Whether the parameter is optional. Note that if a defaultValue is 
-	 * specified then this will be used even if optional is set.
-	 */
-	boolean optional() default false;
+    /**
+     * Whether the parameter is optional. Note that if a defaultValue is
+     * specified then this will be used even if optional is set.
+     */
+    boolean optional() default false;
 
-	/**
-	 * A default value for the parameter.
-	 */
-	String defaultValue() default "";
+    /**
+     * A default value for the parameter.
+     */
+    String defaultValue() default "";
 
-	/**
-	 * For numeric types, a minimum value, inclusive. Optional.
-	 */
-	double minimumValue() default Double.NaN;
+    /**
+     * For numeric types, a minimum value, inclusive. Optional.
+     */
+    double minimumValue() default Double.NaN;
 
-	/**
-	 * For numeric types, a maximum value, inclusive. Optional.
-	 */
-	double maximumValue() default Double.NaN;
+    /**
+     * For numeric types, a maximum value, inclusive. Optional.
+     */
+    double maximumValue() default Double.NaN;
 
-	/**
-	 * Regular expression to validate (String) values against. This is only 
-	 * applied to parameters that are provided as strings. Optional.
-	 */
-	String regexValidation() default "";
+    /**
+     * Regular expression to validate (String) values against. This is only
+     * applied to parameters that are provided as strings. Optional.
+     */
+    String regexValidation() default "";
 
-	/**
-	 * The probability distribution to use when generating random values for 
-	 * this parameter. Optional. 
-	 * NOT IMPLEMENTED YET.
-	 */
-	ProbDistribution probDistribution() default ProbDistribution.UNIFORM;
+    /**
+     * The probability distribution to use when generating random values for
+     * this parameter. Optional. NOT IMPLEMENTED YET.
+     */
+    ProbDistribution probDistribution() default ProbDistribution.UNIFORM;
 
-	/**
-	 * The standard deviation to use when generating random values for this 
-	 * parameter. Optional. NOT IMPLEMENTED YET.
-	 */
-	double probStdDev() default 1.0;
+    /**
+     * The standard deviation to use when generating random values for this
+     * parameter. Optional. NOT IMPLEMENTED YET.
+     */
+    double probStdDev() default 1.0;
 
-	/**
-	 * Used to determine the order of parameters when displayed to a user. 
-	 * Optional. If two parameters have the same order value then they will 
-	 * be ordered according to the field name.
-	 */
-	int order() default 0;
+    /**
+     * Used to determine the order of parameters when displayed to a user.
+     * Optional. If two parameters have the same order value then they will be
+     * ordered according to the field name.
+     */
+    int order() default 0;
 }

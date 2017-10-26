@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.gui.UserParameter;
 
 /**
  * <b>Hebbian</b> implements a standard Hebbian learning rule.
@@ -30,6 +31,8 @@ public class HebbianRule extends SynapseUpdateRule {
     public static final double DEFAULT_LEARNING_RATE = .1;
 
     /** Learning rate. */
+    @UserParameter(label = "Learning rate", description = "Learnign rate for Hebb rule", 
+            minimumValue = -10, maximumValue = 10, defaultValue = ".01", order = 1)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     @Override

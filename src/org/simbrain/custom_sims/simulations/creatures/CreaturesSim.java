@@ -70,8 +70,9 @@ public class CreaturesSim extends RegisteredSimulation {
 		// Make Eve a deaf lion
 		// Was not here before last pull
 		eve.setAgentSkin("Lion");
-		eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
-		eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
+		// TODO: Possibly create a way "disabling" lobes
+		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
+		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
 
 		// Let's test some painkillers on Eve too, why not?
 		// Was not here before last pull

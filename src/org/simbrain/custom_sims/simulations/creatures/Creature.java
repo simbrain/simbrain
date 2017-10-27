@@ -74,6 +74,9 @@ public class Creature {
 
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.01f;
+	
+	/** Reference to commonly used neurons. */
+	private Neuron painNeuron;
 
 	public Creature(CreaturesSim sim, String name, NetBuilder net, RotatingEntity agent) {
 		this.parentSim = sim;
@@ -86,6 +89,9 @@ public class Creature {
 		initDefaultBrain();
 
 		this.biochem = new CreaturesBiochem();
+		
+		// Set reference
+		painNeuron = drives.getNeuronByLabel("Pain");
 
 		initCouplings();
 	}
@@ -107,6 +113,8 @@ public class Creature {
 		}
 
 		biochem.update();
+		
+		painNeuron.forceSetActivation(biochem.getChemByName("Pain").getAmount());
 	}
 
 	/**
@@ -281,7 +289,7 @@ public class Creature {
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
 
 		// Couplings from biochemistry to the brain
-		couple(biochem.getChemByName("Pain"), drives.getNeuronByLabel("Pain"));
+		//couple(biochem.getChemByName("Pain"), drives.getNeuronByLabel("Pain"));
 	}
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
@@ -311,6 +319,11 @@ public class Creature {
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 
+        if(targetObject == null) {
+            System.err.println("Null pointer on target object");
+            return;
+        } 
+	    
 		// Calculate the target heading for the agent
 		double delta_x = agent.getCenterX() - targetObject.getCenterX();
 		double delta_y = agent.getCenterY() - targetObject.getCenterY();
@@ -338,10 +351,15 @@ public class Creature {
 
 		// Get the noun to speak, and the effector that goes with it
 		String noun = attention.getMostActiveNeuron().replaceAll("\\s", "");
-		Speech effector = (Speech) agent.getEffector("Say: \"" + noun + "\"");
+		String effectorName = "Say: \"" + noun + "\"";
+		Speech effector = (Speech) agent.getEffector(effectorName);
 
 		// If the speak activation is above 1, the agent will say the noun.
-		effector.setAmount(speakActivation);
+		if (effector != null) {
+	        effector.setAmount(speakActivation);		    
+		} else {
+		    System.err.println("Could not find effector:" + effectorName);
+		}
 	}
 
 	public String getName() {

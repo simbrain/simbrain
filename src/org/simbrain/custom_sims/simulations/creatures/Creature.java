@@ -271,20 +271,22 @@ public class Creature {
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 
 		// Calculate the target heading for the agent
-
-        double delta_x = agent.getCenterX() - targetObject.getCenterX() + .01;
-        double delta_y = agent.getCenterY() - targetObject.getCenterY() + .01;
-        double targetHeading = Math.toDegrees(Math.atan(delta_y / delta_x)) + 180;
+        double delta_x = agent.getCenterX() - targetObject.getCenterX();
+        double delta_y = agent.getCenterY() - targetObject.getCenterY();
+        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
+        targetHeading = ((targetHeading < 0) ? targetHeading + 360
+                : targetHeading);
         
         //System.out.println(targetHeading + "," + agent.getHeading());
 
 		// Update position and heading
+        // TODO :Heading update feels unnatural. Maybe use braitenberg method instead, or else improve this
 		double stepSize = baseMovementStepSize * motionAmount;
-		double newX = agent.getCenterX() + stepSize * (targetObject.getCenterX() - agent.getCenterX());
-		double newY = agent.getCenterY() + stepSize * (targetObject.getCenterY() - agent.getCenterY());
-        //double newHeading = agent.getHeading() + 2 * stepSize * (-targetHeading - agent.getHeading());
+		double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
+		double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
+        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
 		agent.setCenterLocation((float) newX, (float) newY);
-		agent.setHeading(-targetHeading);
+		agent.setHeading(newHeading); 
 
 	}
 }

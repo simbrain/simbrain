@@ -1,8 +1,14 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
@@ -27,7 +33,7 @@ public class Creature {
 	private final CreaturesSim parentSim;
 
 	/**
-	 * The brain belonging to this creature.
+	 * The creature's brain.
 	 */
 	private CreaturesBrain brain;
 
@@ -35,6 +41,11 @@ public class Creature {
 	 * The odor world agent belonging to this creature.
 	 */
 	private RotatingEntity agent;
+
+	/**
+	 * The creature's biochemistry.
+	 */
+	private CreaturesBiochem biochem;
 
 	/** Reference to drive lobe. */
 	private NeuronGroup drives;
@@ -74,6 +85,8 @@ public class Creature {
 		this.brain = new CreaturesBrain(net, sim);
 		initDefaultBrain();
 
+		this.biochem = new CreaturesBiochem();
+
 		initCouplings();
 	}
 
@@ -87,6 +100,13 @@ public class Creature {
 		if (approachActivation > 0) {
 			approachBehavior(approachActivation);
 		}
+
+		double speakActivation = decisions.getNeuronByLabel("Speak").getActivation();
+		if (speakActivation > 0) {
+			speakBehavior(speakActivation);
+		}
+
+		biochem.update();
 	}
 
 	/**
@@ -118,6 +138,15 @@ public class Creature {
 		agent.addSensor(new Hearing(agent, "Attack", 10));
 		agent.addSensor(new Hearing(agent, "Play", 10));
 		agent.addSensor(new Hearing(agent, "Mate", 10));
+
+		// Add speech effectors
+		agent.addEffector(new Speech(agent, "Toy", 1));
+		agent.addEffector(new Speech(agent, "Fish", 1));
+		agent.addEffector(new Speech(agent, "Cheese", 1));
+		agent.addEffector(new Speech(agent, "Poison", 1));
+		agent.addEffector(new Speech(agent, "Hazard", 1));
+		agent.addEffector(new Speech(agent, "Flower", 1));
+		agent.addEffector(new Speech(agent, "Mouse", 1));
 	}
 
 	/**
@@ -134,12 +163,11 @@ public class Creature {
 
 		// Init Lobe #6: Decisions
 		// TODO: Make this a WTA lobe.
-		decisions = brain.createLobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
-		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical line", "Lobe #6: Decisions");
+		decisions = brain.createLobe(538.67, 922.84, verbs.size(), "vertical line", "Decisions Lobe");
+		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical
+		// line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
-		//decisions.setClamped(true);
-		//decisions.getNeuronByLabel("Approach").forceSetActivation(10.0);
-		
+
 		// Coupling some decision lobe cells to agent effectors
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
 		parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
@@ -150,11 +178,9 @@ public class Creature {
 
 		// Init Lobe #7: Attention
 		// TODO: Make this a WTA lobe.
-		attention = brain.createLobe(440.55, 872.98, stimulus.size(), "vertical line", "Lobe #7: Attention");
+		attention = brain.createLobe(440.55, 872.98, stimulus.size(), "vertical line", "Attention Lobe");
 		brain.copyLabels(stimulus, attention);
-		//attention.setClamped(true);
-        //attention.getNeuronByLabel("Cheese").forceSetActivation(10);
-        
+
 		// Init Attention System Dendrite Pathways
 		/*
 		 * TODO: Connecting neurons w/ OneToOne is not hooking up the right neurons
@@ -176,7 +202,7 @@ public class Creature {
 				new CreaturesSynapseRule(), 1);
 		brain.getBuilder().connect(stimulus.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
-		
+
 		// NOUNS-TO-ATTENTION
 		brain.getBuilder().connect(nouns.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
 				new CreaturesSynapseRule(), 1);
@@ -192,7 +218,7 @@ public class Creature {
 				new CreaturesSynapseRule(), 1);
 		brain.getBuilder().connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
-		
+
 		// Init Lobe #8: Concepts
 		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
 		brain.setLobeColumns(concepts, 20);
@@ -229,7 +255,7 @@ public class Creature {
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 5,
 				stimulus.getNeuronByLabel("Flower"));
 		parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 6, stimulus.getNeuronByLabel("Mouse"));
-		
+
 		// Couplings from hearing sensors to noun lobe
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Toy\""), nouns.getNeuronByLabel("Toy"));
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Cheese\""), nouns.getNeuronByLabel("Cheese"));
@@ -253,6 +279,21 @@ public class Creature {
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Attack\""), verbs.getNeuronByLabel("Attack"));
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Play\""), verbs.getNeuronByLabel("Play"));
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
+
+		// Couplings from biochemistry to the brain
+		couple(biochem.getChemByName("Pain"), drives.getNeuronByLabel("Pain"));
+	}
+
+	private void couple(CreaturesChem chem, Neuron neuron) {
+		NetworkComponent nc = brain.getBuilder().getNetworkComponent();
+
+		// Hopefully borrowing nc's attribute manager for the producer won't cause
+		// problems later...
+		PotentialProducer chemicalAmount = nc.getAttributeManager().createPotentialProducer(chem, "getAmount",
+				double.class);
+		PotentialConsumer chemReceptor = nc.getNeuronConsumer(nc, neuron, "forceSetActivation");
+
+		parentSim.getSim().addCoupling(new Coupling(chemicalAmount, chemReceptor));
 	}
 
 	public void approachBehavior(double strength) {
@@ -271,22 +312,75 @@ public class Creature {
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 
 		// Calculate the target heading for the agent
-        double delta_x = agent.getCenterX() - targetObject.getCenterX();
-        double delta_y = agent.getCenterY() - targetObject.getCenterY();
-        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
-        targetHeading = ((targetHeading < 0) ? targetHeading + 360
-                : targetHeading);
-        
-        //System.out.println(targetHeading + "," + agent.getHeading());
+		double delta_x = agent.getCenterX() - targetObject.getCenterX();
+		double delta_y = agent.getCenterY() - targetObject.getCenterY();
+		double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
+		targetHeading = ((targetHeading < 0) ? targetHeading + 360 : targetHeading);
+
+		// System.out.println(targetHeading + "," + agent.getHeading());
 
 		// Update position and heading
-        // TODO :Heading update feels unnatural. Maybe use braitenberg method instead, or else improve this
+		// TODO :Heading update feels unnatural. Maybe use braitenberg method instead,
+		// or else improve this
 		double stepSize = baseMovementStepSize * motionAmount;
 		double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
 		double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
-        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
+		double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
 		agent.setCenterLocation((float) newX, (float) newY);
-		agent.setHeading(newHeading); 
+		agent.setHeading(newHeading);
 
 	}
+
+	public void speakBehavior(double speakActivation) {
+		// TODO: Make the agent also speak the name of the decision neuron with either
+		// the second highest activation (after the speak neuron itself) OR the decision
+		// neuron with the highest activation in the next simulation iteration
+
+		// Get the noun to speak, and the effector that goes with it
+		String noun = attention.getMostActiveNeuron().replaceAll("\\s", "");
+		Speech effector = (Speech) agent.getEffector("Say: \"" + noun + "\"");
+
+		// If the speak activation is above 1, the agent will say the noun.
+		effector.setAmount(speakActivation);
+	}
+
+	public String getName() {
+		return (name);
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public CreaturesBrain getBrain() {
+		return (brain);
+	}
+
+	public RotatingEntity getAgent() {
+		return (agent);
+	}
+
+	// Was not here before last pull
+	public void setAgentLocation(float x, float y) {
+		agent.setCenterLocation(x, y);
+	}
+
+	// Was not here before last pull
+	public void setAgentSkin(String type) {
+		agent.setEntityType(type);
+	}
+
+	// Was not here before last pull
+	public void deleteLobe(NeuronGroup lobe) {
+		lobe.delete();
+	}
+
+	// Was not here before last pull
+	public void injectChem(String name, double dose) {
+		biochem.getChemByName(name).incrementAmount(dose);
+
+		// Needles hurt!
+		biochem.getChemByName("Pain").incrementAmount(1);
+	}
+
 }

@@ -27,226 +27,224 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class CreaturesSim extends RegisteredSimulation {
 
-    /**
-     * A list of creatures. Good for updating and maintaining multiple
-     * creatures.
-     */
-    private List<Creature> creatureList = new ArrayList<Creature>();
+	/**
+	 * A list of creatures. Good for updating and maintaining multiple creatures.
+	 */
+	private List<Creature> creatureList = new ArrayList<Creature>();
 
-    private OdorWorldBuilder world;
+	private OdorWorldBuilder world;
 
-    // TODO: Make this more flexible, editable, etc.
-    public OdorWorldEntity toy;
-    public OdorWorldEntity fish;
-    public OdorWorldEntity cheese;
-    public OdorWorldEntity poison;
-    public OdorWorldEntity hazard;
-    public OdorWorldEntity flower;
+	// TODO: Make this more flexible, editable, etc.
+	public OdorWorldEntity toy;
+	public OdorWorldEntity fish;
+	public OdorWorldEntity cheese;
+	public OdorWorldEntity poison;
+	public OdorWorldEntity hazard;
+	public OdorWorldEntity flower;
 
-    // TODO: Is the best place to put this? Rename / cleanup as needed
-    List<String> talkList = Arrays.asList("Toy", "Fish", "Cheese", "Poison",
-            "Hazard", "Flower", "Mouse", "Wait", "Left", "Right", "Forward",
-            "Backward", "Sleep", "Approach", "Ingest", "Look", "Smell",
-            "Attack", "Play", "Mate");
-    float talkProb = .05f;
-    Random talkRandomizer = new Random();
-    RotatingEntity npc;
+	// TODO: Is the best place to put this? Rename / cleanup as needed
+	List<String> talkList = Arrays.asList("Wait", "Left", "Right", "Forward", "Backward", "Sleep", "Approach", "Ingest",
+			"Look", "Smell", "Attack", "Play", "Mate", "Speak");
+	float talkProb = .05f;
+	Random talkRandomizer = new Random();
+	RotatingEntity npc;
 
-    @Override
-    public void run() {
+	@Override
+	public void run() {
 
-        // Clear workspace
-        sim.getWorkspace().clearWorkspace();
+		// Clear workspace
+		sim.getWorkspace().clearWorkspace();
 
-        // Add doc viewer
-        // sim.addDocViewer(0, 0, 450, 600, "Doc",
-        // "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
+		// Add doc viewer
+		// sim.addDocViewer(0, 0, 450, 600, "Doc",
+		// "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
 
-        setUpWorld();
+		setUpWorld();
 
-        // Create starting creatures
-        Creature ron = createCreature(0, 0, 833, 629, "Ron");
-        // Creature eve = createCreature(0, 0, 233, 629, "Eve");
+		// Create starting creatures
+		Creature ron = createCreature(0, 0, 833, 629, "Ron");
+		Creature eve = createCreature(0, 0, 233, 629, "Eve");
+		// Was not here before last pull
+		eve.setAgentLocation(25, 25);
 
-        setUpNPC();
+		// Make Eve a deaf lion
+		// Was not here before last pull
+		eve.setAgentSkin("Lion");
+		eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
+		eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
 
-        // Create update action
-        sim.getWorkspace().addUpdateAction(
-                new UpdateActionAdapter("Update Creatures Sim") {
-                    @Override
-                    public void invoke() {
-                        updateCreaturesSim();
-                    }
-                });
+		// Let's test some painkillers on Eve too, why not?
+		// Was not here before last pull
+		eve.injectChem("Pain", 8);
+		eve.injectChem("Endorphin", 10);
 
-    }
+		setUpNPC();
 
-    private void setUpNPC() {
-        // Create a 'non-player character' that talks randomly
-        npc = world.addAgent(350, 250, "Mouse");
-        npc.setName("Mouse");
-        npc.setSmellSource(new SmellSource(
-                new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
+		// Create update action
+		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
+			@Override
+			public void invoke() {
+				updateCreaturesSim();
+			}
+		});
 
-        // Give npc speech effectors
-        npc.addEffector(new Speech(npc, "Toy", 1));
-        npc.addEffector(new Speech(npc, "Fish", 1));
-        npc.addEffector(new Speech(npc, "Cheese", 1));
-        npc.addEffector(new Speech(npc, "Poison", 1));
-        npc.addEffector(new Speech(npc, "Hazard", 1));
-        npc.addEffector(new Speech(npc, "Flower", 1));
-        npc.addEffector(new Speech(npc, "Mouse", 1));
-        npc.addEffector(new Speech(npc, "Wait", 1));
-        npc.addEffector(new Speech(npc, "Left", 1));
-        npc.addEffector(new Speech(npc, "Right", 1));
-        npc.addEffector(new Speech(npc, "Forward", 1));
-        npc.addEffector(new Speech(npc, "Backward", 1));
-        npc.addEffector(new Speech(npc, "Sleep", 1));
-        npc.addEffector(new Speech(npc, "Approach", 1));
-        npc.addEffector(new Speech(npc, "Ingest", 1));
-        npc.addEffector(new Speech(npc, "Look", 1));
-        npc.addEffector(new Speech(npc, "Smell", 1));
-        npc.addEffector(new Speech(npc, "Attack", 1));
-        npc.addEffector(new Speech(npc, "Play", 1));
-        npc.addEffector(new Speech(npc, "Mate", 1));
-    }
+	}
 
-    private void setUpWorld() {
-        // Create odor world
-        world = sim.addOdorWorld(601, 0, 456, 597, "World");
-        world.getWorld().setObjectsBlockMovement(false);
+	private void setUpNPC() {
+		// Create a 'non-player character' that talks randomly
+		npc = world.addAgent(350, 250, "Mouse");
+		npc.setName("Mouse");
+		npc.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
 
-        // Create static odor world entities
-        toy = world.addEntity(395, 590, "Bell.gif");
-        toy.setName("Bell");
-        toy.setId("Toy");
-        toy.setSmellSource(
-                new SmellSource(new double[] { 5, 0, 0, 0, 0, 0, 0 }));
+		// Give npc speech effectors
+		npc.addEffector(new Speech(npc, "Wait", 1));
+		npc.addEffector(new Speech(npc, "Left", 1));
+		npc.addEffector(new Speech(npc, "Right", 1));
+		npc.addEffector(new Speech(npc, "Forward", 1));
+		npc.addEffector(new Speech(npc, "Backward", 1));
+		npc.addEffector(new Speech(npc, "Sleep", 1));
+		npc.addEffector(new Speech(npc, "Approach", 1));
+		npc.addEffector(new Speech(npc, "Ingest", 1));
+		npc.addEffector(new Speech(npc, "Look", 1));
+		npc.addEffector(new Speech(npc, "Smell", 1));
+		npc.addEffector(new Speech(npc, "Attack", 1));
+		npc.addEffector(new Speech(npc, "Play", 1));
+		npc.addEffector(new Speech(npc, "Mate", 1));
+		npc.addEffector(new Speech(npc, "Speak", 1));
+	}
 
-        fish = world.addEntity(140, 165, "Fish.gif");
-        fish.setName("Fish");
-        fish.setId("Fish");
-        fish.setSmellSource(
-                new SmellSource(new double[] { 0, 5, 0, 0, 0, 0, 0 }));
+	private void setUpWorld() {
+		// Create odor world
+		world = sim.addOdorWorld(601, 0, 456, 597, "World");
+		world.getWorld().setObjectsBlockMovement(false);
 
-        cheese = world.addEntity(200, 200, "Swiss.gif");
-        cheese.setName("Fish");
-        cheese.setId("Cheese");
-        cheese.setSmellSource(
-                new SmellSource(new double[] { 0, 0, 5, 0, 0, 0, 0 }));
+		// Create static odor world entities
+		toy = world.addEntity(395, 590, "Bell.gif");
+		toy.setName("Bell");
+		toy.setId("Toy");
+		toy.setSmellSource(new SmellSource(new double[] { 5, 0, 0, 0, 0, 0, 0 }));
 
-        poison = world.addEntity(320, 20, "Poison.gif");
-        poison.setName("Poison");
-        poison.setId("Poison");
-        poison.setSmellSource(
-                new SmellSource(new double[] { 0, 0, 0, 5, 0, 0, 0 }));
+		fish = world.addEntity(140, 165, "Fish.gif");
+		fish.setName("Fish");
+		fish.setId("Fish");
+		fish.setSmellSource(new SmellSource(new double[] { 0, 5, 0, 0, 0, 0, 0 }));
 
-        hazard = world.addEntity(25, 200, "Candle.png");
-        hazard.setName("Candle");
-        hazard.setId("Hazard");
-        hazard.setSmellSource(
-                new SmellSource(new double[] { 0, 0, 0, 0, 5, 0, 0 }));
+		cheese = world.addEntity(200, 200, "Swiss.gif");
+		cheese.setName("Fish");
+		cheese.setId("Cheese");
+		cheese.setSmellSource(new SmellSource(new double[] { 0, 0, 5, 0, 0, 0, 0 }));
 
-        flower = world.addEntity(200, 100, "Pansy.gif");
-        flower.setName("Pansy");
-        flower.setId("Flower");
-        flower.setSmellSource(
-                new SmellSource(new double[] { 0, 0, 0, 0, 0, 5, 0 }));
-    }
+		poison = world.addEntity(320, 20, "Poison.gif");
+		poison.setName("Poison");
+		poison.setId("Poison");
+		poison.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 5, 0, 0, 0 }));
 
-    /**
-     * Update function for the Creatures simulation.
-     */
-    // TODO: Should we have each world agent update after everyone's brains are
-    // updated (as we do now), or should we update each agent right after their
-    // brain does?
-    void updateCreaturesSim() {
-        for (Creature c : creatureList) {
-            c.update();
-        }
+		hazard = world.addEntity(25, 200, "Candle.png");
+		hazard.setName("Candle");
+		hazard.setId("Hazard");
+		hazard.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 0, 5, 0, 0 }));
 
-        updateNPC();
+		flower = world.addEntity(200, 100, "Pansy.gif");
+		flower.setName("Pansy");
+		flower.setId("Flower");
+		flower.setSmellSource(new SmellSource(new double[] { 0, 0, 0, 0, 0, 5, 0 }));
+	}
 
-        world.getOdorWorldComponent().update();
-    }
+	/**
+	 * Update function for the Creatures simulation.
+	 */
+	// TODO: Should we have each world agent update after everyone's brains are
+	// updated (as we do now), or should we update each agent right after their
+	// brain does?
+	void updateCreaturesSim() {
+		for (Creature c : creatureList) {
+			c.update();
+		}
 
-    /**
-     * Update the "non-player character".
-     */
-    private void updateNPC() {
-        if (Math.random() < talkProb) {
-            // TODO: The speech bubble disappears too quickly when running the
-            // simulation
-            // without going step-by-step. How can we make it linger?
-            Speech effector = (Speech) npc.getEffector("Say: \""
-                    + talkList.get(talkRandomizer.nextInt(talkList.size()))
-                    + "\"");
-            effector.setAmount(10);
-        }
-    }
+		updateNPC();
 
-    /**
-     * Creates a new creature.
-     *
-     * @param x X position of brain network.
-     * @param y Y position of brain network.
-     * @param width Width of brain network.
-     * @param height Height of brain network.
-     * @param name Name of creature.
-     * @return A new creature.
-     */
-    public Creature createCreature(int x, int y, int width, int height,
-            String name) {
+		world.getOdorWorldComponent().update();
+	}
 
-        NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
+	/**
+	 * Update the "non-player character".
+	 */
+	private void updateNPC() {
+		if (Math.random() < talkProb) {
+			// TODO: The speech bubble disappears too quickly when running the
+			// simulation
+			// without going step-by-step. How can we make it linger?
+			Speech effector = (Speech) npc
+					.getEffector("Say: \"" + talkList.get(talkRandomizer.nextInt(talkList.size())) + "\"");
+			effector.setAmount(10);
+		}
+	}
 
-        // TODO: Below not working quite right because the network has not
-        // finished
-        // being created when the next two calls are made
-        // net.getNetworkPanel(sim).setAutoZoomMode(false);
-        // net.getNetworkPanel(sim).zoomToFitPage(true);
+	/**
+	 * Creates a new creature.
+	 *
+	 * @param x
+	 *            X position of brain network.
+	 * @param y
+	 *            Y position of brain network.
+	 * @param width
+	 *            Width of brain network.
+	 * @param height
+	 *            Height of brain network.
+	 * @param name
+	 *            Name of creature.
+	 * @return A new creature.
+	 */
+	public Creature createCreature(int x, int y, int width, int height, String name) {
 
-        RotatingEntity agent = world.addAgent(250, 250, "Mouse");
-        Creature creature = new Creature(this, name, net, agent);
-        creatureList.add(creature);
-        // agent.setHeading(90);
+		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
 
-        return creature;
-    }
+		// TODO: Below not working quite right because the network has not
+		// finished
+		// being created when the next two calls are made
+		// net.getNetworkPanel(sim).setAutoZoomMode(false);
+		// net.getNetworkPanel(sim).zoomToFitPage(true);
 
-    /**
-     * Constructor.
-     *
-     * @param desktop
-     */
-    public CreaturesSim(SimbrainDesktop desktop) {
-        super(desktop);
-    }
+		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
+		Creature creature = new Creature(this, name, net, agent);
+		creatureList.add(creature);
 
-    public CreaturesSim() {
-        super();
-    }
+		return creature;
+	}
 
-    /**
-     * Runs the constructor for the simulation.
-     */
-    @Override
-    public CreaturesSim instantiate(SimbrainDesktop desktop) {
-        return new CreaturesSim(desktop);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param desktop
+	 */
+	public CreaturesSim(SimbrainDesktop desktop) {
+		super(desktop);
+	}
 
-    // Accessor methods below this point
-    @Override
-    public String getName() {
-        return "Creatures";
-    }
+	public CreaturesSim() {
+		super();
+	}
 
-    public List<Creature> getCreatureList() {
-        return creatureList;
-    }
+	/**
+	 * Runs the constructor for the simulation.
+	 */
+	@Override
+	public CreaturesSim instantiate(SimbrainDesktop desktop) {
+		return new CreaturesSim(desktop);
+	}
 
-    public Simulation getSim() {
-        return sim;
-    }
+	// Accessor methods below this point
+	@Override
+	public String getName() {
+		return "Creatures";
+	}
+
+	public List<Creature> getCreatureList() {
+		return creatureList;
+	}
+
+	public Simulation getSim() {
+		return sim;
+	}
 
 }

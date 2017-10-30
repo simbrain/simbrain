@@ -29,7 +29,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  * TODO: Add custom tooltip
  */

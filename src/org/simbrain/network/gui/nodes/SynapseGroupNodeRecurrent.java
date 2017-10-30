@@ -33,7 +33,7 @@ import org.simbrain.network.gui.NetworkPanel;
  * Creates a simple synapse group node that represents a recurrent synapse
  * group.
  *
- * @author zach
+ * @author Zoë
  *
  */
 @SuppressWarnings("serial")

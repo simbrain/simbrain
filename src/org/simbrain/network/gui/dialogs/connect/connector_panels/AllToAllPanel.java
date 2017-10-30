@@ -36,7 +36,7 @@ import org.simbrain.util.Utils;
 /**
  * The <b>AllToAllPanel</b> is panel for editing all to all connections.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")

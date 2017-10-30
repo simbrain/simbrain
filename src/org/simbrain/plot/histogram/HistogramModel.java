@@ -26,7 +26,7 @@ import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSerie
  * arrays, one array per histogram. The histograms are represented by different
  * colors in HistogramPanel. The JFreeChart dataset is also stored here.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  *
  */

@@ -24,7 +24,7 @@ import org.simbrain.util.Utils;
 /**
  * Connect every source neuron to every target neuron.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class AllToAll implements ConnectNeurons {

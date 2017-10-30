@@ -51,7 +51,7 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  *
  * A group of synapses. Must connect a source and target neuron group.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class SynapseGroup extends Group {

@@ -23,7 +23,7 @@ import org.simbrain.network.core.Network;
  *
  * An interface so that subclasses of groups can be copied accurately.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  * @param <T>
  */

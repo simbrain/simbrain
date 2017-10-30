@@ -41,7 +41,7 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  * A class for storing static methods for custom serialization of group objects
  * in Simbrain.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class GroupSerializer {
@@ -50,7 +50,7 @@ public class GroupSerializer {
      * A flag for how decimal values should be serialized and methods for
      * converting doubles or doubles as long bits appropriately.
      * 
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      */
     public enum Precision {

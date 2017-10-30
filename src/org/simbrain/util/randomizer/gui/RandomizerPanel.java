@@ -46,7 +46,7 @@ import org.simbrain.util.widgets.YesNoNull;
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
  * object.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class RandomizerPanel extends JPanel {

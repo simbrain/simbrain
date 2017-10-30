@@ -54,7 +54,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * Control panel (buttons etc.) for least mean squares offline trainers. Used in
  * conjunction with a trainingset panel in the LMSOfflineTrainingPanel.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")

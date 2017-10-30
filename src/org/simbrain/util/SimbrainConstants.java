@@ -25,7 +25,7 @@ import java.util.Locale;
  *
  * A class solely for storing constants used throughout simbrain.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class SimbrainConstants {

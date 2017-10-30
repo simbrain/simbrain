@@ -41,7 +41,7 @@ import org.jfree.util.PublicCloneable;
  * @see SimpleHistogramDataset
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
@@ -474,7 +474,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /**
      * A histogram data series associated with a color.
      *
-     * @author zach
+     * @author Zoë
      *
      */
     public static class ColoredDataSeries {

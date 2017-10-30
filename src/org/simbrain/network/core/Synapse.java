@@ -37,7 +37,7 @@ import org.simbrain.util.Utils;
  * connected neurons.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class Synapse {

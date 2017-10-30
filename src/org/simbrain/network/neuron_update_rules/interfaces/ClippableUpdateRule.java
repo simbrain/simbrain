@@ -20,7 +20,7 @@ package org.simbrain.network.neuron_update_rules.interfaces;
  * BoundedUpdateRules, like sigmoidal, are not Clippable, since they have
  * intrinsic bounds).
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public interface ClippableUpdateRule {

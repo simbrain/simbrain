@@ -26,7 +26,7 @@ import org.simbrain.network.util.OrientationComparator;
  * Connect each source neuron to a single target.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class OneToOne implements ConnectNeurons {
 

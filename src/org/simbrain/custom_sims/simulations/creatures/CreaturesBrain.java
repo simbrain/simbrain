@@ -6,6 +6,7 @@ import java.util.List;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
@@ -14,6 +15,8 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.effectors.Effector;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -108,6 +111,29 @@ public class CreaturesBrain {
 	}
 
 	/**
+	 * Creates a WTA lobe
+	 * 
+	 * @param x
+	 * @param y
+	 * @param numNeurons
+	 * @param layoutName
+	 * @param lobeName
+	 * @return
+	 */
+	public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
+		WinnerTakeAll lobe = builder.addWTAGroup(x, y, numNeurons);
+		lobe.setLabel(lobeName);
+		lobe.setNeuronType(new CreaturesNeuronRule());
+		// TODO: Either make the below method public, or copy & paste it to this
+		// class,
+		// or call this method in the builder's addWTAGroup method
+		// builder.layoutNeuronGroup(lobe, x, y, layoutName);
+
+		lobes.add(lobe);
+		return lobe;
+	}
+
+	/**
 	 * Names a neuron.
 	 *
 	 * @param lobe
@@ -132,13 +158,15 @@ public class CreaturesBrain {
 		if (lobeToCopy.size() <= lobeToPasteTo.size() - startPasteIndex) {
 			for (int i = startPasteIndex, j = 0; j < lobeToCopy.size(); i++, j++) {
 
-				// Get the label of neuron j of lobeToCopy, and paste it into lobeToPasteTo's
+				// Get the label of neuron j of lobeToCopy, and paste it into
+				// lobeToPasteTo's
 				// neuron i's label.
 				lobeToPasteTo.getNeuronList().get(i).setLabel(lobeToCopy.getNeuronList().get(j).getLabel());
 			}
 		} else {
 
-			// Give an error message if there is a problem with lobeToCopy's size.
+			// Give an error message if there is a problem with lobeToCopy's
+			// size.
 			System.out.print("copyToLabels error: Lobe " + lobeToCopy.getLabel() + " is too big to copy to Lobe "
 					+ lobeToPasteTo.getLabel() + " starting at index " + startPasteIndex);
 		}
@@ -150,7 +178,7 @@ public class CreaturesBrain {
 
 	/**
 	 * A method for coupling the activation of nodes from one lobe to the activation
-	 * of the nodes of another lobe
+	 * of the nodes of another lobe.
 	 * 
 	 * @param producerLobe
 	 * @param consumerLobe
@@ -203,7 +231,8 @@ public class CreaturesBrain {
 	 * @return
 	 */
 	public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
-		// TODO: Modify this method to take in a CreaturesSynapseRule, and maybe have it
+		// TODO: Modify this method to take in a CreaturesSynapseRule, and maybe
+		// have it
 		// generate a customized ConnectNeurons object to use.
 
 		// Temporary method call
@@ -217,7 +246,7 @@ public class CreaturesBrain {
 	// Methods for building specific pre-fabricated non-mutable lobes
 
 	public NeuronGroup buildDriveLobe() {
-		NeuronGroup lobe = createLobe(1580, 1300, 12, "grid", "Lobe #1: Drives");
+		NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Drive Lobe");
 		setLobeColumns(lobe, 6);
 
 		nameNeuron(lobe, 0, "Pain");
@@ -233,13 +262,15 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 10, "Anger");
 		nameNeuron(lobe, 11, "Arousal");
 
+		lobe.setClamped(true);
+
 		return lobe;
 	}
 
 	// TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork
 	// or make our own?)
 	public NeuronGroup buildStimulusLobe() {
-		NeuronGroup lobe = createLobe(610, 995, 7, "line", "Lobe #2: Stimulus Source");
+		NeuronGroup lobe = createLobe(0, 877.70, 7, "line", "Stimulus Source Lobe");
 
 		nameNeuron(lobe, 0, "Toy");
 		nameNeuron(lobe, 1, "Fish");
@@ -249,14 +280,14 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 5, "Flower");
 		nameNeuron(lobe, 6, "Mouse");
 
-		lobe.setClamped(true);
+		lobe.setClamped(true); // TODO: REmove these calls?
 
 		return lobe;
 	}
 
 	// TODO: Make this a WTA lobe.
 	public NeuronGroup buildVerbLobe() {
-		NeuronGroup lobe = createLobe(1715, 1000, 13, "grid", "Lobe #3: Verbs");
+		NeuronGroup lobe = createLobe(0, 182.37, 14, "grid", "Verb Lobe");
 		setLobeColumns(lobe, 7);
 
 		nameNeuron(lobe, 0, "Wait");
@@ -272,13 +303,16 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 10, "Attack");
 		nameNeuron(lobe, 11, "Play");
 		nameNeuron(lobe, 12, "Mate");
+		nameNeuron(lobe, 13, "Speak");
+
+		lobe.setClamped(true);
 
 		return lobe;
 	}
 
 	// TODO: Make this a WTA lobe.
 	public NeuronGroup buildNounLobe() {
-		NeuronGroup lobe = createLobe(910, -40, 7, "line", "Lobe #4: Nouns");
+		NeuronGroup lobe = createLobe(0, 1171.13, 7, "line", "Noun Lobe");
 
 		nameNeuron(lobe, 0, "Toy");
 		nameNeuron(lobe, 1, "Fish");
@@ -288,11 +322,13 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 5, "Flower");
 		nameNeuron(lobe, 6, "Mouse");
 
+		lobe.setClamped(true);
+
 		return lobe;
 	}
 
 	public NeuronGroup buildSensesLobe() {
-		NeuronGroup lobe = createLobe(1490, 1550, 14, "grid", "Lobe #5: General Senses");
+		NeuronGroup lobe = createLobe(0, 379.61, 14, "grid", "General Senses Lobe");
 		setLobeColumns(lobe, 7);
 
 		nameNeuron(lobe, 0, "Attacked");
@@ -310,6 +346,8 @@ public class CreaturesBrain {
 		nameNeuron(lobe, 12, "Opposite Sex");
 		nameNeuron(lobe, 13, "Audible Event");
 
+		lobe.setClamped(true);
+
 		return lobe;
 	}
 
@@ -321,23 +359,23 @@ public class CreaturesBrain {
 		}
 
 		// Build that lobe!
-		NeuronGroup perception = createLobe(65, 440, totalSize, "grid", "Lobe #0: Perception");
+		NeuronGroup perception = createLobe(474.88, 54.71, totalSize, "grid", "Perception Lobe");
 		setLobeColumns(perception, 7);
 
-		// Label neurons
+		// Label and connect neurons
 		int indexPointer = 0;
 		for (NeuronGroup l : lobes) {
+			// Label
 			copyLabels(l, perception, indexPointer);
+
+			// Connect
+			for (Neuron n : l.getNeuronList()) {
+				builder.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
+			}
+
+			// Increment pointer for the next loop
 			indexPointer += l.size();
 		}
-
-		// Couple the perception lobe with producer lobes
-		// TODO: Redo what was below as needed, but using synapses or synapse groups
-		// perceptCouplings = new ArrayList<>();
-		// indexPointer = 0;
-		// for (NeuronGroup l : lobes) {
-		// coupleLobes(l, perception, indexPointer, perceptCouplings);
-		// }
 
 		return perception;
 	}
@@ -365,6 +403,23 @@ public class CreaturesBrain {
 	 */
 	public String getNeuronLabel(NeuronGroup lobe, int neuronIndex) {
 		return lobe.getNeuronList().get(neuronIndex).getLabel();
+	}
+
+	/**
+	 * Returns a lobe with a given label.
+	 * 
+	 * @param label
+	 * @return
+	 */
+	// Was not here before last pull
+	public NeuronGroup getLobeByLabel(String label) {
+		for (NeuronGroup lobe : lobes) {
+			if (lobe.getLabel().equalsIgnoreCase(label)) {
+				return lobe;
+			}
+		}
+
+		return null;
 	}
 
 }

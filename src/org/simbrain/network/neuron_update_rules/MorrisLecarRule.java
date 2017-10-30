@@ -2,7 +2,7 @@ package org.simbrain.network.neuron_update_rules;
 
 /**
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;

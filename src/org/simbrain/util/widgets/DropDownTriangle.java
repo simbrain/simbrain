@@ -44,7 +44,7 @@ import org.simbrain.resource.ResourceManager;
  * 
  * Good example of use: GeneralNeuronPropertiesPanel around line 243
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
@@ -239,7 +239,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      *
-     * @author zach
+     * @author Zoë
      *
      */
     private class ClickableTriangle extends JPanel {

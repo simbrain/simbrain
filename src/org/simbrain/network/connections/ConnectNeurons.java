@@ -24,7 +24,7 @@ import org.simbrain.network.groups.SynapseGroup;
  * Implementing classes create connections (collections of synapses) between
  * groups of neurons.  Acts as a marker interface for TODO.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public interface ConnectNeurons {
 

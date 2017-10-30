@@ -56,7 +56,7 @@ import org.simbrain.util.math.SimbrainMath;
  * A panel for adjusting the polarity and weights of a synapse group as well as
  * its weight randomizers, and displaying the results in a histogram.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  *
  */
@@ -430,7 +430,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      *
      * A panel for displaying basic statistics about the synapse group
      *
-     * @author Zach Tosi
+     * @author Zoë Tosi
      *
      */
     public class Stats extends JPanel {

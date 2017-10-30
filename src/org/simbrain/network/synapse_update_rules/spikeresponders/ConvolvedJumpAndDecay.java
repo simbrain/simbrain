@@ -4,7 +4,7 @@ import org.simbrain.network.core.Synapse;
 
 /**
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class ConvolvedJumpAndDecay extends SpikeResponder {

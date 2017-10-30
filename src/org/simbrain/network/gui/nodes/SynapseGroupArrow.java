@@ -28,7 +28,7 @@ import org.simbrain.network.groups.SynapseGroup;
  * An interface that any synapse group node which uses a curved arrow (not an
  * arc) should implement.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public interface SynapseGroupArrow {

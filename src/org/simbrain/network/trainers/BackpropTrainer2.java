@@ -39,7 +39,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * 50-50 co-authors
  * 
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class BackpropTrainer2 extends IterableTrainer {
 

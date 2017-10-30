@@ -27,7 +27,7 @@ import org.simbrain.network.core.Network.TimeType;
  * spiked.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {

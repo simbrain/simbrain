@@ -34,7 +34,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  * PNode representation of a group of synapses, where the synapses themselves
  * are not visible.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")

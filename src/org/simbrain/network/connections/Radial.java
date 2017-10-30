@@ -58,7 +58,7 @@ import org.simbrain.util.math.ProbDistribution;
  * have it make the most connections possible given the exponential
  * distribution.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class Radial extends Sparse {

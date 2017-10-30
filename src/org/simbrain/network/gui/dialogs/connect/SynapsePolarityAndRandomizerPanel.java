@@ -60,7 +60,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * Display preferences for regarding the ratio of excitatory to inhibitory
  * connections.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  *
  */
@@ -635,7 +635,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      *
      *
-     * @author Zach Tosi
+     * @author Zoë Tosi
      */
     public class EditableRandomizerPanel extends JPanel {
 

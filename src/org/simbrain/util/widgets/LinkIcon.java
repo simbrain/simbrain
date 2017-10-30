@@ -17,7 +17,7 @@ import org.simbrain.resource.ResourceManager;
  * lock and back to a locked lock when clicked again.
  *
  *
- * @author zach
+ * @author Zoë
  *
  */
 public class LinkIcon extends JPanel implements MouseListener {

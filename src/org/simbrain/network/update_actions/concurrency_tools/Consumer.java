@@ -26,7 +26,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate.CyclicTaskQu
  * The underlying runnable consumer assigned to a thread, which consumes network
  * update tasks i.e. executes them.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class Consumer implements Runnable {

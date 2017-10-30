@@ -43,7 +43,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  * represents and contains two separate synapse groups which make it
  * "bidirectional".
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")

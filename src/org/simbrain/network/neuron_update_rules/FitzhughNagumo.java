@@ -75,16 +75,19 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
         double timeStep = neuron.getNetwork().getTimeStep();
 //        final boolean refractory = getLastSpikeTime() + refractoryPeriod
 //                >= neuron.getNetwork().getTime();
-        final double activation = neuron.getActivation();
+       // final double activation = neuron.getActivation();
         double inputs = 0;
         inputs = inputType.getInput(neuron);
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
         inputs += iBg;
+        v = neuron.getActivation();
         w += (timeStep * (a*(b*v+0.7-(c*w))));
 
-        v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
+        v += timeStep * (v - (v*v*v)/3 - w + inputs);
+        
+       // v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
         // You want this
         if (v >= threshold) {
             neuron.setSpkBuffer(true);

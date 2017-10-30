@@ -41,7 +41,7 @@ import org.simbrain.util.widgets.YesNoNull;
 /**
  * A panel representing a given probability distribution.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class ProbDistPanel {

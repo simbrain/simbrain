@@ -24,7 +24,7 @@ import org.simbrain.util.math.ProbDistribution;
  * <b>Randomizer</b> produces numbers drawn from a probability distribution
  * according to a set of user-specified parameters.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class Randomizer {

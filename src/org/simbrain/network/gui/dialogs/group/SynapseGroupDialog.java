@@ -54,7 +54,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * Dialog for editing synapse groups.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
 public final class SynapseGroupDialog extends StandardDialog {

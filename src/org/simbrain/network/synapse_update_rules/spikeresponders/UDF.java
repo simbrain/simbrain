@@ -28,7 +28,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * stop gap implementation. UDF isn't really a spike responder, as it determines
  * the jump-height of a convolved jump and decay spike responder.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class UDF extends JumpAndDecay {

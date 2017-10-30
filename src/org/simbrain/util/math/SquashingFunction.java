@@ -25,7 +25,7 @@ import org.jblas.DoubleMatrix;
  * squashing functions, their inverses, and their derivatives.
  *
  * @author Scott Hotton
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public enum SquashingFunction {

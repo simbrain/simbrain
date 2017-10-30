@@ -90,7 +90,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * Holds the combo box for selecting an update rule, and a panel (which extends
  * abstractneuronrulepanel) for editing that rules properties.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")

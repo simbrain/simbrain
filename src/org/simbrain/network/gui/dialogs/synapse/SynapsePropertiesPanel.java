@@ -37,7 +37,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * being applied to the others.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 

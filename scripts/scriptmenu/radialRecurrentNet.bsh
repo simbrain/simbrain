@@ -19,7 +19,7 @@ import org.simbrain.workspace.*;
 
 /**
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  * Creates a network of recurrently connected Izhikevich neurons (Regular
  * Spiking by default). Neurons are placed in a 2D lattice and connections

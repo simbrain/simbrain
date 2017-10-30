@@ -60,7 +60,7 @@ import org.simbrain.util.math.SimbrainMath;
  * outlined objects (neuron nodes) as children. Compare {@link SubnetworkNode}.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
 public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeListener {

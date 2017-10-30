@@ -29,7 +29,7 @@ import org.simbrain.util.math.ProbDistribution;
  * allows for specialization of synapses, and fits very well with experimental
  * data concerning synaptic efficacy.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class LogSTDPRule extends STDPRule {

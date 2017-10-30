@@ -62,7 +62,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * displaying how many efferents per source neuron there would be if efferents
  * are equalized. All of these are kept in sync.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 @SuppressWarnings("serial")

@@ -22,7 +22,7 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  * 
  * A task that updates neurons according to their update rules, then updates
  * all afferent synapses to that neuron. Neuron's activations are not set

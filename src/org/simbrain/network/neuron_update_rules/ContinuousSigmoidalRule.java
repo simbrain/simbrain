@@ -28,7 +28,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * ouputs for a neuron whose activation is numerically integrated continuously
  * over time.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  *
  */

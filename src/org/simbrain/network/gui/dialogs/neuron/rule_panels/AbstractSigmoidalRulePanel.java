@@ -33,7 +33,7 @@ import org.simbrain.util.widgets.YesNoNull;
  * A rule panel containing all the variables and methods which would be shared
  * between rules panels for discrete and continuous time sigmoidal rule panels.
  * 
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public abstract class AbstractSigmoidalRulePanel

@@ -9,7 +9,7 @@ import org.jblas.DoubleMatrix;
  * apply the parent rule to an array, and to apply the derivative of the parent
  * rule to an array are supplied. Useful for backprop.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public interface TransferFunction {

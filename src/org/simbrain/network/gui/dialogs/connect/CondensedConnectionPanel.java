@@ -42,7 +42,7 @@ import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectio
  * For the very common case where a variable density, variable polarity,
  * random synapse group is desired.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class CondensedConnectionPanel {

@@ -24,7 +24,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * An interface which should be implemented by any neuron update rule that uses
  * a randomizer to provide noise.
  *
- * @author zach
+ * @author Zoë
  *
  */
 public interface NoisyUpdateRule {

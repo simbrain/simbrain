@@ -35,7 +35,7 @@ import umontreal.iro.lecuyer.randvar.BinomialGen;
  * connection density, taking no other major factors into account insofar as
  * selecting which neurons should be connected goes.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  */
 public class Sparse implements ConnectNeurons {
 

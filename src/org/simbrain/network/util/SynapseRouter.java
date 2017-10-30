@@ -27,7 +27,7 @@
 // * Object which routes synapses to synapse groups, based on what neuron groups
 // * the synapses are connected to.
 // *
-// * @author Zach Tosi
+// * @author Zoë Tosi
 // * @author Jeff Yoshimi
 // */
 //public class SynapseRouter {

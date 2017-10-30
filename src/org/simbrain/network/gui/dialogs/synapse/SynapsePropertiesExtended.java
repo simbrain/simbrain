@@ -40,7 +40,7 @@ import org.simbrain.util.widgets.YesNoNull;
  * rule.
  *
  * @author Jeff Yoshimi
- * @author Zach Tosi
+ * @author Zoë Tosi
  *
  */
 public class SynapsePropertiesExtended extends JPanel {

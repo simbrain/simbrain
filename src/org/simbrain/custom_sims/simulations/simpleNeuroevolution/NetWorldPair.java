@@ -27,7 +27,7 @@ public class NetWorldPair {
 	List<Integer> outputIndex = new ArrayList<>();
 	List<Integer> sourceNeuronIndex = new ArrayList<>();
 	List<Integer> targetNeuronIndex = new ArrayList<>();
-	List<SynapseIndex> synapseIndex = new ArrayList<>();
+	List synapseIndex = new ArrayList<>();
 	
 	List<NeuronGroup> input = new ArrayList<>();
 	List<Neuron>inputFlat = new ArrayList<>();

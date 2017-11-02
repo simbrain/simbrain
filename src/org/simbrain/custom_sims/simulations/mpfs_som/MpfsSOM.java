@@ -193,9 +193,9 @@ public class MpfsSOM extends RegisteredSimulation {
                 if ((val < .1) && (val > -.1)) {
                     node.setCustomStrokeColor(Color.ORANGE);
                 } else if (val > .01) {
-                    node.setCustomStrokeColor(Color.blue);
-                } else {
                     node.setCustomStrokeColor(Color.red);
+                } else {
+                    node.setCustomStrokeColor(Color.blue);
                 }
 
             }

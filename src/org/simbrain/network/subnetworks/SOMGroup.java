@@ -80,6 +80,9 @@ public class SOMGroup extends NeuronGroup {
     /** Number of neurons. */
     private int numNeurons = 16;
 
+    /** Reference to winning neuron. */
+    Neuron winner;
+
     /** The number of epochs run in a given batch. */
     private int batchSize = DEFAULT_BATCH_SIZE;
 
@@ -207,7 +210,7 @@ public class SOMGroup extends NeuronGroup {
         // Determine Winner and update neurons: The SOM Neuron with the lowest
         // distance between  its weight vector and the input neurons's weight
         // vector.
-        Neuron winner = calculateWinner();
+        winner = calculateWinner();
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron n = getNeuronList().get(i);
             if (n == winner) {
@@ -432,4 +435,11 @@ public class SOMGroup extends NeuronGroup {
         this.numNeurons = numNeurons;
     }
 
+    /**
+     * @return the winner
+     */
+    public Neuron getWinner() {
+        return winner;
+    }
+    
 }

@@ -3364,4 +3364,16 @@ public class NetworkPanel extends JPanel {
         this.updateComplete.set(updateComplete ? 0 : 3);
     }
 
+    // Maybe just return objectNodeMap...
+    /**
+     * Returns the neuron node corresponding to a neuron, or null
+     * if there is no match.
+     *
+     * @param neuron neuron to check for
+     * @return corresponding neuron node
+     */
+    public NeuronNode getNode(Neuron neuron) {
+        return ((NeuronNode) objectNodeMap.get(neuron));
+    }
+
 }

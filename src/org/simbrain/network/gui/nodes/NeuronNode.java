@@ -48,11 +48,13 @@ import org.simbrain.util.Utils;
  * network model.
  */
 @SuppressWarnings("serial")
-public class NeuronNode extends ScreenElement implements PropertyChangeListener {
+public class NeuronNode extends ScreenElement
+        implements PropertyChangeListener {
 
     /** The logical neuron this screen element represents. */
     protected Neuron neuron;
 
+    /** Default text visibility threshold. */
     private static final double TEXT_VISIBILITY_THRESHOLD = 0.5;
 
     /** Diameter of neuron. */
@@ -63,16 +65,18 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** Main shape. */
     private PPath mainShape;
-    
+
     /** Circle shape for representing neurons. */
     private PPath circle = PPath.createEllipse(0 - DIAMETER / 2,
             0 - DIAMETER / 2, DIAMETER, DIAMETER);
-    
+
     /** Square shape for representing activity generators. */
     private PPath square = PPath.createRectangle(0 - DIAMETER / 2,
             0 - DIAMETER / 2, DIAMETER, DIAMETER);
 
-    /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
+    /**
+     * A list of SynapseNodes connected to this NeuronNode; used for updating.
+     */
     private HashSet<SynapseNode> connectedSynapses = new HashSet<SynapseNode>();
 
     /** Number text inside neuron. */
@@ -87,14 +91,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Background for label text, so that background objects don't show up. */
     private PNode labelBackground = new PNode();
 
-    // This flag removed r3166 10/14. Causes problems and original purpose
-    // unclear. Leaving it in for now, but consider for deletion. Also see
-    // NetworkPanel response to neuronMoved events and SelectionEventHandler.
-    // private boolean isMoving = false;
-    
     /** Heavy stroke for clamped nodes. */
     private static final BasicStroke CLAMPED_STROKE = new BasicStroke(2f);
-    
+
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
@@ -104,7 +103,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     // TODO: These should be replaced with actual scaling of the text object.
 
     /** Neuron font bold. */
-    public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
+    public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD,
+            11);
 
     /** Neuron font small. */
     public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN,
@@ -128,6 +128,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private boolean currentTextVisibility;
 
+    /** If true then a custom color is being used for stroke. */
+    private boolean customStrokeColor = false;
+
     /**
      * Create a new neuron node.
      *
@@ -146,14 +149,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void init() {
 
-        if(neuron.getUpdateRule() instanceof ActivityGenerator) {
-            mainShape = square;           
+        if (neuron.getUpdateRule() instanceof ActivityGenerator) {
+            mainShape = square;
         } else {
             mainShape = circle;
         }
-        
+
         addChild(mainShape);
-        
+
         priorityText.setFont(PRIORITY_FONT);
         labelBackground.setPaint(this.getNetworkPanel().getBackground());
         labelBackground.setBounds(labelText.getBounds());
@@ -177,19 +180,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /**
      * Update the neuron view based on the model neuron.
      *
-     * This should not be called on every update but only when
-     * the neuron is changed.  
+     * This should not be called on every update but only when the neuron is
+     * changed.
      */
     public void update() {
         updateColor();
         updateText();
         updateClampStatus();
     }
-    
+
     /**
      * Update the stroke of a node based on whether it is clamped or not.
      */
     public void updateClampStatus() {
+        if (customStrokeColor) {
+            return;
+        }
         if (neuron.isClamped()) {
             circle.setStroke(CLAMPED_STROKE);
         } else {
@@ -206,7 +212,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             return;
         }
         // Todo: a bit of a performance drain.
-        
+
         double act = neuron.getActivation();
         activationText.setScale(1);
         setActivationTextPosition();
@@ -220,7 +226,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             activationText.setText("NaN");
             activationText.scale(.7);
             activationText.translate(-4, 3);
-        } else if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and 1
+        } else if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and
+                                                                // 1
             activationText.setFont(NEURON_FONT_BOLD);
             String text = Utils.round(act, 1);
             if (text.startsWith("0.")) {
@@ -313,11 +320,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
-        if (neuron.isSpike()) {
-            mainShape.setStrokePaint(spikingColor);
-            mainShape.setPaint(spikingColor);
-        } else {
-            mainShape.setStrokePaint(SynapseNode.getLineColor());
+        if (!customStrokeColor) {
+            if (neuron.isSpike()) {
+                mainShape.setStrokePaint(spikingColor);
+                mainShape.setPaint(spikingColor);
+            } else {
+                mainShape.setStrokePaint(SynapseNode.getLineColor());
+            }
         }
     }
 
@@ -329,13 +338,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             return;
         }
         // Set label text
-        if ((!neuron.getLabel().equalsIgnoreCase(""))
-                || (!neuron.getLabel().equalsIgnoreCase(
-                        SimbrainConstants.NULL_STRING))) {
+        if ((!neuron.getLabel().equalsIgnoreCase("")) || (!neuron.getLabel()
+                .equalsIgnoreCase(SimbrainConstants.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(mainShape.getX() - labelText.getWidth() / 2
-                    + DIAMETER / 2, mainShape.getY() - DIAMETER / 2 - 1);
+            labelText.setOffset(
+                    mainShape.getX() - labelText.getWidth() / 2 + DIAMETER / 2,
+                    mainShape.getY() - DIAMETER / 2 - 1);
             labelBackground.setBounds(labelText.getFullBounds());
 
             // update bounds to include text
@@ -401,25 +410,28 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (priorityText == null || !currentTextVisibility) {
             return;
         }
-        priorityText.setOffset(mainShape.getBounds().getCenterX(), mainShape
-                .getBounds().getCenterY() + DIAMETER - 10);
+        priorityText.setOffset(mainShape.getBounds().getCenterX(),
+                mainShape.getBounds().getCenterY() + DIAMETER - 10);
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return screen element selectable
      */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return screen element show a selection handle
      */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return able to drag screen element
      */
     public boolean isDraggable() {
@@ -599,27 +611,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
     }
 
-    /** @see ScreenElement */
+    @Override
     public void resetColors() {
-        mainShape.setStrokePaint(SynapseNode.getLineColor());
+        if (!customStrokeColor) {
+            mainShape.setStrokePaint(SynapseNode.getLineColor());            
+        }
         // TODO: Check if change only?
         labelBackground.setPaint(NetworkPanel.getBackgroundColor());
         updateColor();
     }
-
-    // /**
-    // * @return Returns the isMoving.
-    // */
-    // public boolean isMoving() {
-    // return isMoving;
-    // }
-    // /**
-    // * @param isMoving
-    // * The isMoving to set.
-    // */
-    // public void setMoving(final boolean isMoving) {
-    // this.isMoving = isMoving;
-    // }
 
     @Override
     public void setGrouped(final boolean isGrouped) {
@@ -669,6 +669,29 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     public static void setSpikingColor(Color spikingColor) {
         NeuronNode.spikingColor = spikingColor;
+    }
+
+    /**
+     * Set a custom color for the circle stroke (not the fill). 
+     * 
+     * @param color Color to use
+     */
+    public void setCustomStrokeColor(Color color) {
+        // TODO:Perhaps at some point make it possible to define
+        // custom extension of neuron node with custom color schemes
+        // This feature hasn't been used much so if it is to stay
+        // in the main code it might need some refinement.
+        customStrokeColor = true;
+        circle.setStrokePaint(color);
+        // Custom colors more visible with the clamped stroke
+        circle.setStroke(CLAMPED_STROKE);
+    }
+
+    /**
+     * @param customColor the customColor to set
+     */
+    public void setUsingCustomStrokeColor(boolean customColor) {
+        this.customStrokeColor = customColor;
     }
 
 }

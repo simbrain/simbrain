@@ -74,7 +74,7 @@ public class Creature {
 
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.01f;
-	
+
 	/** Reference to commonly used neurons. */
 	private Neuron painNeuron;
 
@@ -89,11 +89,14 @@ public class Creature {
 		initDefaultBrain();
 
 		this.biochem = new CreaturesBiochem();
-		
+
 		// Set reference
 		painNeuron = drives.getNeuronByLabel("Pain");
 
 		initCouplings();
+
+		// TEMP
+		initChemDashboard();
 	}
 
 	/**
@@ -113,7 +116,7 @@ public class Creature {
 		}
 
 		biochem.update();
-		
+
 		painNeuron.forceSetActivation(biochem.getChemByName("Pain").getAmount());
 	}
 
@@ -289,7 +292,18 @@ public class Creature {
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
 
 		// Couplings from biochemistry to the brain
-		//couple(biochem.getChemByName("Pain"), drives.getNeuronByLabel("Pain"));
+		couple(biochem.getChemByIndex(1), painNeuron);
+		couple(biochem.getChemByIndex(2), drives.getNeuronByLabel("Comfort"));
+		couple(biochem.getChemByIndex(3), drives.getNeuronByLabel("Hunger"));
+		couple(biochem.getChemByIndex(4), drives.getNeuronByLabel("Temperature"));
+		couple(biochem.getChemByIndex(5), drives.getNeuronByLabel("Fatigue"));
+		couple(biochem.getChemByIndex(6), drives.getNeuronByLabel("Drowsiness"));
+		couple(biochem.getChemByIndex(7), drives.getNeuronByLabel("Lonliness"));
+		couple(biochem.getChemByIndex(8), drives.getNeuronByLabel("Crowdedness"));
+		couple(biochem.getChemByIndex(9), drives.getNeuronByLabel("Fear"));
+		couple(biochem.getChemByIndex(10), drives.getNeuronByLabel("Boredom"));
+		couple(biochem.getChemByIndex(11), drives.getNeuronByLabel("Anger"));
+		couple(biochem.getChemByIndex(12), drives.getNeuronByLabel("Arousal"));
 	}
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
@@ -319,11 +333,11 @@ public class Creature {
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
 
-        if(targetObject == null) {
-            System.err.println("Null pointer on target object");
-            return;
-        } 
-	    
+		if (targetObject == null) {
+			System.err.println("Null pointer on target object");
+			return;
+		}
+
 		// Calculate the target heading for the agent
 		double delta_x = agent.getCenterX() - targetObject.getCenterX();
 		double delta_y = agent.getCenterY() - targetObject.getCenterY();
@@ -356,10 +370,32 @@ public class Creature {
 
 		// If the speak activation is above 1, the agent will say the noun.
 		if (effector != null) {
-	        effector.setAmount(speakActivation);		    
+			effector.setAmount(speakActivation);
 		} else {
-		    System.err.println("Could not find effector:" + effectorName);
+			System.err.println("Could not find effector:" + effectorName);
 		}
+	}
+
+	// TODO
+	public void sleepBehavior() {
+	}
+
+	public void ingestBehavior() {
+	}
+
+	public void lookBehavior() {
+	}
+
+	public void smellBehavior() {
+	}
+
+	public void attackBehavior() {
+	}
+
+	public void playBehavior() {
+	}
+
+	public void mateBehavior() {
 	}
 
 	public String getName() {
@@ -399,6 +435,16 @@ public class Creature {
 
 		// Needles hurt!
 		biochem.getChemByName("Pain").incrementAmount(1);
+	}
+
+	// TEMP
+	public void initChemDashboard() {
+		NeuronGroup dash = brain.createLobe(900, 900, 2, "grid", "Chem Dashboard");
+		dash.getNeuron(0).setLabel("Pain--");
+		dash.getNeuron(1).setLabel("Reward");
+
+		couple(biochem.getChemById("Pain--"), dash.getNeuron(0));
+		couple(biochem.getChemByName("Reward"), dash.getNeuron(1));
 	}
 
 }

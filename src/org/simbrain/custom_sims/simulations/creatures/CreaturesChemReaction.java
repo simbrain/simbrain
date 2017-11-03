@@ -44,21 +44,21 @@ public class CreaturesChemReaction {
 
 	public void update() {
 		if (checkAmounts()) {
-			System.out.println("Starting reaction!\n");
+//			System.out.println("Starting reaction!\n");
 
-			System.out.println(reactant1.getName() + " Before: " + reactant1.getAmount());
+//			System.out.println(reactant1.getName() + " Before: " + reactant1.getAmount());
 			reactant1.incrementAmount(-(rRatio1 * reactionRate));
-			System.out.println(reactant1.getName() + " After: " + reactant1.getAmount());
-			System.out.println(reactant2.getName() + " Before: " + reactant2.getAmount());
+//			System.out.println(reactant1.getName() + " After: " + reactant1.getAmount());
+//			System.out.println(reactant2.getName() + " Before: " + reactant2.getAmount());
 			reactant2.incrementAmount(-(rRatio2 * reactionRate));
-			System.out.println(reactant2.getName() + " After: " + reactant2.getAmount());
+//			System.out.println(reactant2.getName() + " After: " + reactant2.getAmount());
 
-			System.out.println(product1.getName() + " Before: " + product1.getAmount());
+//			System.out.println(product1.getName() + " Before: " + product1.getAmount());
 			product1.incrementAmount(pRatio1 * reactionRate);
-			System.out.println(product1.getName() + " After: " + product1.getAmount());
-			System.out.println(product2.getName() + " Before: " + product2.getAmount());
+//			System.out.println(product1.getName() + " After: " + product1.getAmount());
+//			System.out.println(product2.getName() + " Before: " + product2.getAmount());
 			product2.incrementAmount(pRatio2 * reactionRate);
-			System.out.println(product2.getName() + " After: " + product2.getAmount());
+//			System.out.println(product2.getName() + " After: " + product2.getAmount());
 		}
 	}
 

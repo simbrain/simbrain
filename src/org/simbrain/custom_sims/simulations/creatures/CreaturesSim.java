@@ -64,18 +64,15 @@ public class CreaturesSim extends RegisteredSimulation {
 		// Create starting creatures
 		Creature ron = createCreature(0, 0, 833, 629, "Ron");
 		Creature eve = createCreature(0, 0, 233, 629, "Eve");
-		// Was not here before last pull
 		eve.setAgentLocation(25, 25);
 
 		// Make Eve a deaf lion
-		// Was not here before last pull
 		eve.setAgentSkin("Lion");
 		// TODO: Possibly create a way "disabling" lobes
 		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
 		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
 
 		// Let's test some painkillers on Eve too, why not?
-		// Was not here before last pull
 		eve.injectChem("Pain", 8);
 		eve.injectChem("Endorphin", 10);
 

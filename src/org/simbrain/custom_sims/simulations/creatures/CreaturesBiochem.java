@@ -23,8 +23,34 @@ public class CreaturesBiochem {
 		// Add chemicals
 		// Reference: https://creatures.wiki/C1_Chemical_List
 		CreaturesChem NONE = createNewChem("NONE", 0, 0);
-		CreaturesChem pain = createNewChem("Pain", 0, 2);
+		CreaturesChem pain = createNewChem("Pain", 0, 2.2);
+		CreaturesChem comfort = createNewChem("Comfort", 0, 3.45); // Equivalent to NFP
+		CreaturesChem hunger = createNewChem("Hunger", 0, 5.65);
+		CreaturesChem temperature = createNewChem("Temperature", 0, 3.76); // Equivalent to Hotness/Coldness
+		CreaturesChem fatigue = createNewChem("Fatigue", 0, 9.73); // Equivalent to Tiredness
+		CreaturesChem drowsiness = createNewChem("Drowsiness", 0, 10); // Equivalent to Sleepiness
+		CreaturesChem lonliness = createNewChem("Lonliness", 0, 2.82);
+		CreaturesChem crowdedness = createNewChem("Crowdedness", 0, 2.51);
+		CreaturesChem fear = createNewChem("Fear", 0, 3.14);
+		CreaturesChem boredom = createNewChem("Boredom", 0, 9.73);
+		CreaturesChem anger = createNewChem("Anger", 0, 2.82);
+		CreaturesChem arousal = createNewChem("Arousal", 0, 4.10); // Equivalent to SexDrive
+		
+//		CreaturesChem painIncrease = createNewChem("Pain++", 0, 2.51);
+//		CreaturesChem comfortIncrease = createNewChem("Comfort++", 0, 2.51);
+//		CreaturesChem hungerIncrease = createNewChem("Hunger++", 0, 2.51);
+//		CreaturesChem tempIncrease = createNewChem("Heat", "Temperature++", 0, 2.51);
+//		CreaturesChem fatigueIncrease = createNewChem("Fatigue++", 0, 2.51);
+//		CreaturesChem drowsinessIncrease = createNewChem("Drowsiness++", 0, 2.51);
+//		CreaturesChem lonlinessIncrease = createNewChem("Lonliness++", 0, 2.51);
+//		CreaturesChem crowdednessIncrease = createNewChem("Crowdedness++", 0, 2.51);
+//		CreaturesChem fearIncrease = createNewChem("Fear++", 0, 2.51);
+//		CreaturesChem boredomIncrease = createNewChem("Boredom++", 0, 2.51);
+//		CreaturesChem angerIncrease = createNewChem("Anger++", 0, 2.51);
+//		CreaturesChem arousalIncrease = createNewChem("Arousal++", 0, 2.51);
+		
 		CreaturesChem endorphin = createNewChem("Endorphin", "Pain--", 0, 3);
+		
 		CreaturesChem reward = createNewChem("Reward", 0, 10);
 
 		// Add reactions
@@ -105,6 +131,10 @@ public class CreaturesBiochem {
 			}
 		}
 		return null;
+	}
+	
+	public CreaturesChem getChemByIndex(int index) {
+		return chemList.get(index);
 	}
 
 }

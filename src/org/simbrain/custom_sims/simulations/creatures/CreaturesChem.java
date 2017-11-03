@@ -49,11 +49,11 @@ public class CreaturesChem {
 
 	public void decay() {
 		// TODO: Make this equation work more closely with how it works in Creatures
-		System.out.println("\n" + name + " is decaying!");
-		System.out.println(name + " Before: " + amount);
+//		System.out.println("\n" + name + " is decaying!");
+//		System.out.println(name + " Before: " + amount);
 		double newAmount = this.amount * (this.halfLife / 10);
 		this.amount = Math.max(0, newAmount);
-		System.out.println(name + " After: " + amount);
+//		System.out.println(name + " After: " + amount);
 	}
 
 }

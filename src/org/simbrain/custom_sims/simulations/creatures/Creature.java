@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -78,7 +78,7 @@ public class Creature {
 	/** Reference to commonly used neurons. */
 	private Neuron painNeuron;
 
-	public Creature(CreaturesSim sim, String name, NetBuilder net, RotatingEntity agent) {
+	public Creature(CreaturesSim sim, String name, NetworkWrapper net, RotatingEntity agent) {
 		this.parentSim = sim;
 		this.name = name;
 
@@ -199,35 +199,35 @@ public class Creature {
 		 * synapse group in the future.
 		 */
 		// STIMULUS-TO-ATTENTION
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Fish"), attention.getNeuronByLabel("Fish"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Fish"), attention.getNeuronByLabel("Fish"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Cheese"), attention.getNeuronByLabel("Cheese"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Cheese"), attention.getNeuronByLabel("Cheese"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Poison"), attention.getNeuronByLabel("Poison"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Poison"), attention.getNeuronByLabel("Poison"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Hazard"), attention.getNeuronByLabel("Hazard"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Hazard"), attention.getNeuronByLabel("Hazard"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Flower"), attention.getNeuronByLabel("Flower"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Flower"), attention.getNeuronByLabel("Flower"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(stimulus.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
+		brain.getNetworkWrapper().connect(stimulus.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
 
 		// NOUNS-TO-ATTENTION
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Toy"), attention.getNeuronByLabel("Toy"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Fish"), attention.getNeuronByLabel("Fish"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Fish"), attention.getNeuronByLabel("Fish"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Cheese"), attention.getNeuronByLabel("Cheese"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Cheese"), attention.getNeuronByLabel("Cheese"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Poison"), attention.getNeuronByLabel("Poison"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Poison"), attention.getNeuronByLabel("Poison"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Hazard"), attention.getNeuronByLabel("Hazard"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Hazard"), attention.getNeuronByLabel("Hazard"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Flower"), attention.getNeuronByLabel("Flower"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Flower"), attention.getNeuronByLabel("Flower"),
 				new CreaturesSynapseRule(), 1);
-		brain.getBuilder().connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
+		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
 
 		// Init Lobe #8: Concepts
@@ -307,7 +307,7 @@ public class Creature {
 	}
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
-		NetworkComponent nc = brain.getBuilder().getNetworkComponent();
+		NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
 
 		// Hopefully borrowing nc's attribute manager for the producer won't cause
 		// problems later...

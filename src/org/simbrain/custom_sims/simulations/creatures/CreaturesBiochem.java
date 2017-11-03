@@ -17,7 +17,7 @@ public class CreaturesBiochem {
 	}
 
 	/**
-	 * Creates the biochemistry from a default template
+	 * Creates the biochemistry from a default template.
 	 */
 	private void initDefault() {
 		// Add chemicals

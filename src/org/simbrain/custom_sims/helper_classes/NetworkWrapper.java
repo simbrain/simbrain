@@ -59,6 +59,7 @@ public class NetworkWrapper {
     }
     
     // BELOW FROM THE ORIGINAL NET BUILDER CLASS //
+
     /**
      * Add a neuron at a specified location.
      */

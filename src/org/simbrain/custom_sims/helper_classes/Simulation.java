@@ -97,6 +97,30 @@ public class Simulation {
 		netMap.put(networkComponent.getNetwork(), networkComponent);
 		return new NetBuilder(networkComponent);
 	}
+	
+	/**
+	 * Add an existing network and return a network builder.
+	 *
+	 * @param x
+	 *            x location on screen
+	 * @param y
+	 *            y location on screen
+	 * @param width
+	 *            width of component
+	 * @param height
+	 *            height of component
+	 * @param name
+	 *            title to display at top of panel
+	 * @param nc
+	 *            network component to add
+	 * @return the component the network builder
+	 */
+	public NetBuilder addNetwork(int x, int y, int width, int height, NetworkComponent nc) {
+		workspace.addWorkspaceComponent(nc);
+		desktop.getDesktopComponent(nc).getParentFrame().setBounds(x, y, width, height);
+		netMap.put(nc.getNetwork(), nc);
+		return new NetBuilder(nc);
+	}
 
 	/**
 	 * Add a doc viewer component.

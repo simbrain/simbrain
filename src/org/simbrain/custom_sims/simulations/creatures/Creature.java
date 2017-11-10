@@ -319,16 +319,26 @@ public class Creature {
 	}
 
 	public void approachBehavior(double strength) {
-		// Find an object in the world that fits the most active category
-		// TODO: Change this to discriminate between multiple objects of the same
-		// category, such that the closest object is picked.
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// Follow that object
+		approachObject(objOfAttention, strength);
+	}
+
+	/**
+	 * Find an object in the world that fits the most active category
+	 * 
+	 * @return
+	 */
+	// TODO: Change this to discriminate between multiple objects of the same
+	// category, such that the closest object is picked.
+	private OdorWorldEntity findObjectOfAttention() {
 		// The replaceAll method must be called here to remove a whitespace added at the
 		// end when getMostActiveNeuron returns.
 		String objOfAttentionName = attention.getMostActiveNeuron().replaceAll("\\s", "");
 		OdorWorldEntity objOfAttention = agent.getParentWorld().getEntity(objOfAttentionName);
 
-		// Follow that object
-		approachObject(objOfAttention, strength);
+		return objOfAttention;
 	}
 
 	public void approachObject(OdorWorldEntity targetObject, double motionAmount) {
@@ -378,21 +388,74 @@ public class Creature {
 
 	// TODO
 	public void sleepBehavior() {
+		/*
+		 * This behavior needs to do 2 things: <ul> <li>1. Paralyze the creature
+		 * temporarily, such that it won't be able to do anything even if their brain is
+		 * thinking of it.</li> <li>2. Send some sort of "sleeping" signal to any
+		 * chemical emitters or stimulus genes that need it.</li> </ul>
+		 * 
+		 * We could probably get both done at once by just having some boolean isAsleep
+		 * variable on the Creature level
+		 */
 	}
 
 	public void ingestBehavior() {
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// TODO: Perform a check (using center smell sensor) to make sure the object is
+		// close enough to eat. If true, then:
+		// ingestObject(objOfAttention)
+	}
+
+	public void ingestObject(OdorWorldEntity targetObject) {
+		// Based off the object's name, ID, or smell, add some concoction of chemicals
+		// to the creature's biochemistry (if applicable).
+		// TODO: Implement this once sufficent biochemistry is implemented
 	}
 
 	public void lookBehavior() {
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// Based off the object's name, ID, or smell, add some concoction of chemicals
+		// to the creature's biochemistry (if applicable).
+		// TODO: Implement this once sufficent biochemistry is implemented
 	}
 
 	public void smellBehavior() {
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// Based off the object's name, ID, or smell, add some concoction of chemicals
+		// to the creature's biochemistry (if applicable). Use the strength of the smell
+		// to determine the dosage.
+		// TODO: Implement this once sufficent biochemistry is implemented
 	}
 
 	public void attackBehavior() {
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// TODO: Perform a check (using center smell sensor) to make sure the object is
+		// close enough to attack. If true, then:
+		// attackObject(objOfAttention);
+	}
+
+	public void attackObject(OdorWorldEntity targetObject) {
+		// If the attacked object is not another creature, don't do anything (unless
+		// it's a hazard or tough objects like a candle or bell, in which case add some
+		// pain and other related chemicals)
+		// If the attacked object IS a creature, then we'll need to add the relevenat
+		// chemicals and stimulus to the target creature.
 	}
 
 	public void playBehavior() {
+		OdorWorldEntity objOfAttention = findObjectOfAttention();
+
+		// TODO: Perform a check (using center smell sensor) to make sure the object is
+		// close enough to play with. If true, then:
+		// playObject(objOfAttention);
+	}
+	
+	public void playObject(OdorWorldEntity targetObject) {
+		
 	}
 
 	public void mateBehavior() {

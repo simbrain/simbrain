@@ -246,6 +246,125 @@ public class Creature {
 		// Init Perception to Concept Dendrite Pathway
 		brain.createSynapseGroup(perception, concepts, "#0 to #8, Type 0");
 
+		// TODO: TEMP -- Remove this when unneeded.
+		tempCircuits();
+
+	}
+
+	private void tempCircuits() {
+		double n = 1.0; // For setting a "default" positive or negative value
+		double h = 5.0; // For setting a high positive or negative value, for wherever we want a very strong association
+
+		// Pain
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Wait"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Sleep"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Approach"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Attack"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Play"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Speak"),
+				new CreaturesSynapseRule(), n);
+
+		// (Need for) Comfort
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Wait"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Sleep"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Ingest"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Look"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Smell"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Attack"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Play"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Speak"),
+				new CreaturesSynapseRule(), n);
+
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Sleep"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Approach"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Ingest"),
+				new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Smell"),
+				new CreaturesSynapseRule(), n);
+
+		// Temperature
+		/*
+		 * Temp would supposedly work such that too high would be too hot and too low
+		 * would be too cold, but that's not quite feasible as we've set this. Maybe we
+		 * should split this drive into hotness/coldness like it is in Creatures?
+		 */
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Temperature"),
+				decisions.getNeuronByLabel("Wait"), new CreaturesSynapseRule(), -1);
+
+		// Fatigue
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Wait"),
+				new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Left"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Right"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Forward"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"),
+				decisions.getNeuronByLabel("Backward"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Sleep"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"),
+				decisions.getNeuronByLabel("Approach"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Attack"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Play"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Mate"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Fatigue"), decisions.getNeuronByLabel("Speak"),
+				new CreaturesSynapseRule(), -n);
+
+		// Drowsiness
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"), decisions.getNeuronByLabel("Wait"),
+				new CreaturesSynapseRule(), n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"), decisions.getNeuronByLabel("Left"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Right"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Forward"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Backward"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Sleep"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Approach"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Ingest"), new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"), decisions.getNeuronByLabel("Look"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Attack"), new CreaturesSynapseRule(), -h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"), decisions.getNeuronByLabel("Play"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"), decisions.getNeuronByLabel("Mate"),
+				new CreaturesSynapseRule(), -n);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
+				decisions.getNeuronByLabel("Speak"), new CreaturesSynapseRule(), -n);
+
+		// TODO: Started running out of steam here. Maybe fill in the rest of this
+		// later?
+
+		// Mouse
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Mouse"), decisions.getNeuronByLabel("Speak"),
+				new CreaturesSynapseRule(), n);
+
+		// brain.getNetworkWrapper().connect(perception.getNeuronByLabel(label), decisions.getNeuronByLabel(label), new CreaturesSynapseRule(), value);
 	}
 
 	/**
@@ -453,9 +572,9 @@ public class Creature {
 		// close enough to play with. If true, then:
 		// playObject(objOfAttention);
 	}
-	
+
 	public void playObject(OdorWorldEntity targetObject) {
-		
+
 	}
 
 	public void mateBehavior() {

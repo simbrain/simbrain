@@ -70,7 +70,7 @@ public class CreaturesChemReaction {
 			return true;
 		}
 
-		System.out.println("Not enough reactants");
+//		System.out.println("Not enough reactants");
 		return false;
 	}
 

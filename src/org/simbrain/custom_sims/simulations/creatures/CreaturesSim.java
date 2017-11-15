@@ -66,15 +66,13 @@ public class CreaturesSim extends RegisteredSimulation {
 		Creature eve = createCreature(0, 0, 233, 629, "Eve");
 		eve.setAgentLocation(25, 25);
 
-		// Make Eve a deaf lion
+		// Make Eve a lion
 		eve.setAgentSkin("Lion");
-		// TODO: Possibly create a way "disabling" lobes
-		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
-		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
 
-		// Let's test some painkillers on Eve too, why not?
-		eve.injectChem("Pain", 8);
-		eve.injectChem("Endorphin", 10);
+		// Make Eve lethargic to start with, as a test of temporary direct
+		// perception-to-decisions circuitry. At the moment she will slowly become
+		// un-tired as the chemical decays.
+		eve.injectChem("Fatigue", 10);
 
 		setUpNPC();
 

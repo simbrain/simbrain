@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This object maintains a fixed set of chemicals, reactions, emitters, and
+ * receptors. Over time the levels of the chemicals is changing. When this is
+ * updated the chemicals are updated, and all the reactions are updated.
+ * Updating a reaction checks for an appropriate amount of the "input" chemicals
+ * to it, and then if there is enough products or outputs are created which
+ * change the levels of the chemicals
+ *
+ */
 public class CreaturesBiochem {
 
 	/** List of chemicals */

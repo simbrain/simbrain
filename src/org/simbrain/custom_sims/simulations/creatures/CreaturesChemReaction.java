@@ -1,5 +1,9 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
+/**
+ * 
+ *
+ */
 public class CreaturesChemReaction {
 
 	/** The reactants */

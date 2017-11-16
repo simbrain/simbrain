@@ -2,6 +2,11 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.network.groups.NeuronGroup;
 
+/**
+ * Emits chemicals "inside" the creature, depending on environmental factors.  
+ * When they "emit" they increase the value of one of the chemicals in CreaturesBiochem
+ * They are inside the CreaturesBiochem object where they are set up by genes.... 
+ */
 public class CreaturesChemEmitter {
 	
 	private boolean organIsBrain;

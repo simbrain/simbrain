@@ -30,6 +30,9 @@ import org.simbrain.network.subnetworks.WinnerTakeAll;
  * to a network.
  */
 public class NetBuilder {
+    
+    // Consider keeping this as a set of static methods. Example
+    // NeuronGroup test = NetBuilder.addNeuronGroup(Network network, ....);
 
     private final NetworkComponent networkComponent;
 

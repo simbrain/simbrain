@@ -30,6 +30,8 @@ import org.simbrain.network.subnetworks.WinnerTakeAll;
  * A wrapper for a network with access to GUI network.
  */
 public class NetworkWrapper {
+    
+    // Consider adding static methods for adding neurons, neuron groups, etc.
 
     private final NetworkDesktopComponent desktopComponent;
     

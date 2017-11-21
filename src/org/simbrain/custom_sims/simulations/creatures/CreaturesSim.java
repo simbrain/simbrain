@@ -88,8 +88,8 @@ public class CreaturesSim extends RegisteredSimulation {
 
 	private void setUpNPC() {
 		// Create a 'non-player character' that talks randomly
-		npc = world.addAgent(350, 250, "Mouse");
-		npc.setName("Mouse");
+		npc = world.addAgent(350, 250, "Cow");
+		npc.setName("Cow");
 		npc.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
 
 		// Give npc speech effectors

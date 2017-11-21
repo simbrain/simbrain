@@ -36,11 +36,6 @@ public class CreaturesBrain {
 	private NetworkWrapper netWrapper;
 
 	/**
-	 * The amount of space to spread between neurons.
-	 */
-	private double gridSpace = 50;
-
-	/**
 	 * Reference to network component.
 	 */
     private NetworkComponent netComponent;
@@ -219,7 +214,7 @@ public class CreaturesBrain {
 	 * @param lobe
 	 * @param numColumns
 	 */
-	public void setLobeColumns(NeuronGroup lobe, int numColumns) {
+	public void setLobeColumns(NeuronGroup lobe, int numColumns, double gridSpace) {
 		GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
 		lobe.setLayout(gridLayout);
 		lobe.applyLayout();
@@ -249,7 +244,7 @@ public class CreaturesBrain {
 
 	public NeuronGroup buildDriveLobe() {
 		NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Drive Lobe");
-		setLobeColumns(lobe, 6);
+		setLobeColumns(lobe, 6, 65);
 
 		nameNeuron(lobe, 0, "Pain");
 		nameNeuron(lobe, 1, "Comfort");
@@ -290,7 +285,7 @@ public class CreaturesBrain {
 	// TODO: Make this a WTA lobe.
 	public NeuronGroup buildVerbLobe() {
 		NeuronGroup lobe = createLobe(0, 182.37, 14, "grid", "Verb Lobe");
-		setLobeColumns(lobe, 7);
+		setLobeColumns(lobe, 7, 65);
 
 		nameNeuron(lobe, 0, "Wait");
 		nameNeuron(lobe, 1, "Left");
@@ -331,7 +326,7 @@ public class CreaturesBrain {
 
 	public NeuronGroup buildSensesLobe() {
 		NeuronGroup lobe = createLobe(0, 379.61, 14, "grid", "General Senses Lobe");
-		setLobeColumns(lobe, 7);
+		setLobeColumns(lobe, 7, 70);
 
 		nameNeuron(lobe, 0, "Attacked");
 		nameNeuron(lobe, 1, "Played with");
@@ -362,7 +357,7 @@ public class CreaturesBrain {
 
 		// Build that lobe!
 		NeuronGroup perception = createLobe(474.88, 54.71, totalSize, "grid", "Perception Lobe");
-		setLobeColumns(perception, 7);
+		setLobeColumns(perception, 7, 70);
 
 		// Label and connect neurons
 		int indexPointer = 0;

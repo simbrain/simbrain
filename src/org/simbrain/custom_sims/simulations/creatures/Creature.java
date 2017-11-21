@@ -75,9 +75,6 @@ public class Creature {
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.01f;
 
-	/** Reference to commonly used neurons. */
-	private Neuron painNeuron;
-
 	public Creature(CreaturesSim sim, String name, NetworkWrapper net, RotatingEntity agent) {
 		this.parentSim = sim;
 		this.name = name;
@@ -89,9 +86,6 @@ public class Creature {
 		initDefaultBrain();
 
 		this.biochem = new CreaturesBiochem();
-
-		// Set reference
-		painNeuron = drives.getNeuronByLabel("Pain");
 
 		initCouplings();
 
@@ -116,8 +110,6 @@ public class Creature {
 		}
 
 		biochem.update();
-
-		painNeuron.forceSetActivation(biochem.getChemByName("Pain").getAmount());
 	}
 
 	/**
@@ -230,21 +222,21 @@ public class Creature {
 		brain.getNetworkWrapper().connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"),
 				new CreaturesSynapseRule(), 1);
 
-		// Init Lobe #8: Concepts
-		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
-		brain.setLobeColumns(concepts, 20);
-
-		// Init Concepts to Decisions Dendrite Pathways
-		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 0");
-		// TODO: BUG: This second synapse group sometimes has a graphical glitch
-		// (Arrow points to space).
-		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 1");
+//		// Init Lobe #8: Concepts
+//		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
+//		brain.setLobeColumns(concepts, 20);
+//
+//		// Init Concepts to Decisions Dendrite Pathways
+//		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 0");
+//		// TODO: BUG: This second synapse group sometimes has a graphical glitch
+//		// (Arrow points to space).
+//		brain.createSynapseGroup(concepts, decisions, "#8 to #6, Type 1");
 
 		// Init Lobe #0: Perception
 		perception = brain.buildPerceptionLobe(new NeuronGroup[] { drives, verbs, senses, attention });
 
-		// Init Perception to Concept Dendrite Pathway
-		brain.createSynapseGroup(perception, concepts, "#0 to #8, Type 0");
+//		// Init Perception to Concept Dendrite Pathway
+//		brain.createSynapseGroup(perception, concepts, "#0 to #8, Type 0");
 
 		// TODO: TEMP -- Remove this when unneeded.
 		tempCircuits();
@@ -252,8 +244,8 @@ public class Creature {
 	}
 
 	private void tempCircuits() {
-		double n = 1.0; // For setting a "default" positive or negative value
-		double h = 5.0; // For setting a high positive or negative value, for wherever we want a very strong association
+		double n = 0.5; // For setting a "default" positive or negative value
+		double h = 1.0; // For setting a high positive or negative value, for wherever we want a very strong association
 
 		// Pain
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Pain"), decisions.getNeuronByLabel("Wait"),
@@ -287,6 +279,7 @@ public class Creature {
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Comfort"), decisions.getNeuronByLabel("Speak"),
 				new CreaturesSynapseRule(), n);
 
+		// Hunger
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Sleep"),
 				new CreaturesSynapseRule(), -n);
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Hunger"), decisions.getNeuronByLabel("Approach"),
@@ -357,12 +350,24 @@ public class Creature {
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Drowsiness"),
 				decisions.getNeuronByLabel("Speak"), new CreaturesSynapseRule(), -n);
 
-		// TODO: Started running out of steam here. Maybe fill in the rest of this
-		// later?
-
 		// Mouse
 		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Mouse"), decisions.getNeuronByLabel("Speak"),
 				new CreaturesSynapseRule(), n);
+		
+		// Verbs
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Wait"), decisions.getNeuronByLabel("Wait"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Left"), decisions.getNeuronByLabel("Left"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Right"), decisions.getNeuronByLabel("Right"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Forward"), decisions.getNeuronByLabel("Forward"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Backward"), decisions.getNeuronByLabel("Backward"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Sleep"), decisions.getNeuronByLabel("Sleep"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Approach"), decisions.getNeuronByLabel("Approach"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Ingest"), decisions.getNeuronByLabel("Ingest"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Look"), decisions.getNeuronByLabel("Look"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Smell"), decisions.getNeuronByLabel("Smell"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Attack"), decisions.getNeuronByLabel("Attack"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Play"), decisions.getNeuronByLabel("Play"), new CreaturesSynapseRule(), h);
+		brain.getNetworkWrapper().connect(perception.getNeuronByLabel("Mate"), decisions.getNeuronByLabel("Mate"), new CreaturesSynapseRule(), h);
 
 		// brain.getNetworkWrapper().connect(perception.getNeuronByLabel(label), decisions.getNeuronByLabel(label), new CreaturesSynapseRule(), value);
 	}
@@ -411,7 +416,7 @@ public class Creature {
 		parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
 
 		// Couplings from biochemistry to the brain
-		couple(biochem.getChemByIndex(1), painNeuron);
+		couple(biochem.getChemByIndex(1), drives.getNeuronByLabel("Pain"));
 		couple(biochem.getChemByIndex(2), drives.getNeuronByLabel("Comfort"));
 		couple(biochem.getChemByIndex(3), drives.getNeuronByLabel("Hunger"));
 		couple(biochem.getChemByIndex(4), drives.getNeuronByLabel("Temperature"));
@@ -622,10 +627,10 @@ public class Creature {
 	// TEMP
 	public void initChemDashboard() {
 		NeuronGroup dash = brain.createLobe(900, 900, 2, "grid", "Chem Dashboard");
-		dash.getNeuron(0).setLabel("Pain--");
+		dash.getNeuron(0).setLabel("Endorphin");
 		dash.getNeuron(1).setLabel("Reward");
 
-		couple(biochem.getChemById("Pain--"), dash.getNeuron(0));
+		couple(biochem.getChemByName("Endorphin"), dash.getNeuron(0));
 		couple(biochem.getChemByName("Reward"), dash.getNeuron(1));
 	}
 

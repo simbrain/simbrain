@@ -12,41 +12,67 @@ import org.simbrain.network.groups.NeuronGroup;
  * 
  * The receptor monitors a certain chemical, and when that chemical passes a set
  * threshold the effect set by the receptor triggers (depending on whether it's
- * digital or analog). The nominal value determines what the default value used
- * for the locus will be when the chemical doesn't pass the threshold (only used
- * for particular loci). Gain is used either as a scaling factor or further
- * defines the value sent to the locus, depending on whether the receptor is
- * analog or digital. The flag "Output REDUCES with increased stimulation" is
- * hopefully self explanatory.
+ * digital or analog).
  * 
  * {@link http://double.nz/creatures/genetics/receptor.htm}
  */
 public class CreaturesChemReceptor {
 
-    private boolean organIsBrain;
+	/**
+	 * Determines if the receptor changes a property somewhere in the creature's
+	 * brain (if true) or elsewhere in the creature (if false)
+	 */
+	private boolean organIsBrain;
 
-    private NeuronGroup tissue;
+	/** The brain lobe to target. Only relevant if organIsBrain is set to true */
+	private NeuronGroup tissue;
 
-    // Put a reference to the locus here (once we know how to implement that)
+	// Put a reference to the locus here (once we know how to implement that)
 
-    private CreaturesChem chemical;
+	/** Reference to the chemical checked */
+	private CreaturesChem chemical;
 
-    private double threshold;
+	/**
+	 * The threshold the receptor must pass before it can fire. Works differently
+	 * depending on whether the receptor is analogue or digital
+	 */
+	private double threshold;
 
-    private double nominal;
+	/**
+	 * The nominal value determines what the default value used for the locus will
+	 * be when the chemical doesn't pass the threshold (only used for particular
+	 * loci)
+	 */
+	private double nominal;
 
-    private double gain;
+	/**
+	 * Gain is used either as a scaling factor or further defines the value sent to
+	 * the locus, depending on whether the receptor is analog or digital.
+	 */
+	private double gain;
 
-    private boolean outputReduces;
+	/**
+	 * A flag for "Output REDUCES with increased stimulation". Hopefully self
+	 * explanatory.
+	 */
+	private boolean outputReduces;
 
-    private boolean isDigital;
+	/**
+	 * This flag determines whether the receptor is analogue (false) or digital
+	 * (true). Changing this setting will change how various aspects of the receptor
+	 * works, such as how the "value" of the receptor is calculated.
+	 */
+	private boolean isDigital;
 
-    private double value;
+	/**
+	 * The value the locus will be changed by. Calculated based on various factors
+	 */
+	private double value;
 
-    // Formula for output value in an analog receptor: (R = -1 if outputReduces
-    // is true, R = 1 otherwise)
-    // Nominal + (((ChemicalAmount - Threshold) * Gain/255) * R)
+	// Formula for output value in an analog receptor: (R = -1 if outputReduces
+	// is true, R = 1 otherwise)
+	// Nominal + (((ChemicalAmount - Threshold) * Gain/255) * R)
 
-    // Formula for output value in a digital receptor:
-    // Nominal + ((ChemicalAmount > Threshold ? Gain : 0) * R)
+	// Formula for output value in a digital receptor:
+	// Nominal + ((ChemicalAmount > Threshold ? Gain : 0) * R)
 }

@@ -46,6 +46,9 @@ public class Creature {
 	 * The creature's biochemistry.
 	 */
 	private CreaturesBiochem biochem;
+	
+	/** The genetic information associated with this creature. */
+    private CreaturesGenome genome;
 
 	/** Reference to drive lobe. */
 	private NeuronGroup drives;
@@ -71,9 +74,11 @@ public class Creature {
 
 	/** Reference to attention lobe. */
 	private NeuronGroup attention;
-
+	
 	/** How quickly to approach or avoid objects. */
 	float baseMovementStepSize = 0.01f;
+	
+	//TODO: Add gender
 
 	public Creature(CreaturesSim sim, String name, NetworkWrapper net, RotatingEntity agent) {
 		this.parentSim = sim;
@@ -86,6 +91,13 @@ public class Creature {
 		initDefaultBrain();
 
 		this.biochem = new CreaturesBiochem();
+		this.genome = new CreaturesGenome();
+		
+		// Temp code to illustrate how you might use genetics
+		System.out.println(genome.getGene("AnimalType"));
+		if(genome.getGene("AnimalType").getAllele().equals("cow")) {
+		    System.out.println("It's a cow!");
+		}
 
 		initCouplings();
 

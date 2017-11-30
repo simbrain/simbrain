@@ -77,6 +77,9 @@ public class CreaturesBiochem {
 	/** Updates the Biochemistry */
 	public void update() {
 		for (CreaturesChemReaction reaction : this.getReactionList()) {
+			if (tempLogFlag) {
+				System.out.println("Updating this reaction: " + reaction.toString());
+			}
 			reaction.update();
 		}
 

@@ -58,27 +58,37 @@ public class CreaturesChemReaction {
 	}
 
 	/** Update function */
-	// TODO: Move these print statements to CreaturesBiochem, where they could be
-	// used in conjunction with the temp log flag
 	public void update() {
 		if (checkAmounts()) {
-			// System.out.println("Starting reaction!\n");
 
-			// System.out.println(reactant1.getName() + " Before: " +
-			// reactant1.getAmount());
+			double react1Old = reactant1.getAmount();
+			double react2Old = reactant2.getAmount();
+			double prod1Old = product1.getAmount();
+			double prod2Old = product2.getAmount();
+
 			reactant1.incrementAmount(-(rRatio1 * reactionRate));
-			// System.out.println(reactant1.getName() + " After: " + reactant1.getAmount());
-			// System.out.println(reactant2.getName() + " Before: " +
-			// reactant2.getAmount());
 			reactant2.incrementAmount(-(rRatio2 * reactionRate));
-			// System.out.println(reactant2.getName() + " After: " + reactant2.getAmount());
-
-			// System.out.println(product1.getName() + " Before: " + product1.getAmount());
 			product1.incrementAmount(pRatio1 * reactionRate);
-			// System.out.println(product1.getName() + " After: " + product1.getAmount());
-			// System.out.println(product2.getName() + " Before: " + product2.getAmount());
 			product2.incrementAmount(pRatio2 * reactionRate);
-			// System.out.println(product2.getName() + " After: " + product2.getAmount());
+
+			if (CreaturesBiochem.tempLogFlag) {
+				if (!reactant1.getId().equals("NONE")) {
+					System.out.println(
+							reactant1.getName() + " dropped from " + react1Old + " to " + reactant1.getAmount());
+				}
+				if (!reactant2.getId().equals("NONE")) {
+					System.out.println(
+							reactant2.getName() + " dropped from " + react2Old + " to " + reactant2.getAmount());
+				}
+				if (!product1.getId().equals("NONE")) {
+					System.out.println(product1.getName() + " rose from " + prod1Old + " to " + product1.getAmount());
+				}
+				if (!product2.getId().equals("NONE")) {
+					System.out.println(product2.getName() + " rose from " + prod2Old + " to " + product2.getAmount());
+				}
+			}
+		} else if (CreaturesBiochem.tempLogFlag) {
+			System.out.println("No reaction occured.");
 		}
 	}
 
@@ -97,6 +107,36 @@ public class CreaturesChemReaction {
 
 		// System.out.println("Not enough reactants");
 		return false;
+	}
+
+	public String toString() {
+		String retString = "";
+
+		// First half of string
+		if (!reactant1.getId().equals("NONE") && !reactant2.getId().equals("NONE")) {
+			retString += rRatio1 + "*" + reactant1.getName() + " + " + rRatio2 + "*" + reactant2.getName();
+		} else if (!reactant1.getId().equals("NONE")) {
+			retString += rRatio1 + "*" + reactant1.getName();
+		} else if (!reactant2.getId().equals("NONE")) {
+			retString += rRatio2 + "*" + reactant2.getName();
+		} else {
+			return "Not a valid chemical reaction";
+		}
+
+		retString += " => ";
+
+		// Second half of string
+		if (!product1.getId().equals("NONE") && !product2.getId().equals("NONE")) {
+			retString += pRatio1 + "*" + product1.getName() + " + " + pRatio2 + "*" + product2.getName();
+		} else if (!product1.getId().equals("NONE")) {
+			retString += pRatio1 + "*" + product1.getName();
+		} else if (!product2.getId().equals("NONE")) {
+			retString += pRatio2 + "*" + product2.getName();
+		} else {
+			retString += "NONE";
+		}
+
+		return retString;
 	}
 
 }

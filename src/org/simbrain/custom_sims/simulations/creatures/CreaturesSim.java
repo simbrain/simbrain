@@ -69,10 +69,9 @@ public class CreaturesSim extends RegisteredSimulation {
 		// Make Eve a lion
 		eve.setAgentSkin("Lion");
 
-		// Make Eve lethargic to start with, as a test of temporary direct
-		// perception-to-decisions circuitry. At the moment she will slowly become
-		// un-tired as the chemical decays.
-		eve.injectChem("Fatigue", 10);
+		// Testing chem reaction update log
+		eve.injectChem("Pain", 8);
+		eve.injectChem("Endorphin", 10);
 
 		setUpNPC();
 

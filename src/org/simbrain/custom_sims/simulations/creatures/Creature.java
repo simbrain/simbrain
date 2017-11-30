@@ -178,7 +178,7 @@ public class Creature {
 
 		// Init Lobe #6: Decisions
 		// TODO: Make this a WTA lobe.
-		decisions = brain.createLobe(538.67, 922.84, verbs.size(), "vertical line", "Decisions Lobe");
+		decisions = brain.createLobe(615.21, 1002.02, verbs.size(), "line", "Decisions Lobe");
 		// decisions = brain.createWTALobe(538.67, 922.84, verbs.size(), "vertical
 		// line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
@@ -638,7 +638,7 @@ public class Creature {
 
 	// TEMP
 	public void initChemDashboard() {
-		NeuronGroup dash = brain.createLobe(900, 900, 2, "grid", "Chem Dashboard");
+		NeuronGroup dash = brain.createLobe(558.45, 1122.53, 2, "grid", "Chem Dashboard");
 		dash.getNeuron(0).setLabel("Endorphin");
 		dash.getNeuron(1).setLabel("Reward");
 

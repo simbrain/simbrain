@@ -45,6 +45,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 
 	
 	List<NetBuilder> net = new ArrayList<>();
+	List<NetWorldPair> nwp = new ArrayList<>();
 	
 
 	List<OdorWorldBuilder> world = new ArrayList<>();
@@ -134,8 +135,10 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     private double finalizeFitnessScore(int netIndex) {
         int cheeseDistance = (int) SimbrainMath.distance(
                 mouse.get(netIndex).getCenterLocation(), cheese.get(netIndex).getCenterLocation());
-        double delta = (128 - cheeseDistance) / 128;
-        attribute.get(netIndex).addFitness(delta);
+        double delta = (double)(128 - cheeseDistance) / 128;
+        if(delta > 0) {
+            attribute.get(netIndex).addFitness(delta);
+        }
         return attribute.get(netIndex).getFitnessScore();
     }
     
@@ -158,6 +161,10 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 	
     private void newGeneration() {
     	SwingUtilities.invokeLater(() -> {
+    		for(int i = 0; i < net.size(); i++) {
+    			finalizeFitnessScore(i);
+    			System.out.println("Fitness " + i + ": " + attribute.get(i).getFitnessScore());
+    		}
     		EvolveNet.increaseGeneration();
 	    	ArrayList<NetWorldPairAttribute> performance = sortFitness();
 	    	// TODO: may be ceil?
@@ -191,16 +198,24 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 	    		deleteWorkspacePair(currentNetIndex);
 //	    		ArrayList<?> newItem = 
 //	    				CopyPaste.getCopy(net.get(currentNetIndex).getNetwork(), allStuff);
-	    		initializeNetwork(currentNetIndex, net.get(parentIndex).getNetworkComponent(), x, y, w, h);
+//	    		initializeNetwork(currentNetIndex, net.get(parentIndex).getNetworkComponent(), x, y, w, h); // cannot understand
+	    		EvolveNet parentNet = (EvolveNet)(net.get(parentIndex).getNetworkComponent().getNetwork()).copy();
+	    		initializeNetwork(currentNetIndex, parentNet, x, y, w, h);
 //	    		((EvolveNet) net.get(currentNetIndex).getNetwork()).init();
 //	    		((EvolveNet) net.get(currentNetIndex).getNetwork()).copy();
 	    		addWorld(currentNetIndex, (x + w), y, w, h);
-	    		
+//	    		setUpCoupling(i);
+//	    		System.out.println("Coupling set for " + i);
 	    	}
 	    	
 	    	
 	    	for(int i = 0; i < eliminationCount; i++) {
 	    		setUpCoupling(i);
+	    		System.out.println("Coupling set for " + net.get(i).getNetworkComponent().getName());
+	    	}
+	    	
+	    	for(int i = 0; i < net.size(); i++) {
+	    		attribute.get(i).resetFitness();
 	    	}
     	
     	});
@@ -208,6 +223,12 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     
     private void initializeNetwork(int netIndex, int x, int y, int width, int height) {
 		EvolveNet newNet = new EvolveNet();
+		NetworkComponent newNC = new NetworkComponent("Place Holder", newNet);
+		
+		initializeNetwork(netIndex, newNC, x, y, width, height);
+    }
+    
+    private void initializeNetwork(int netIndex, EvolveNet newNet, int x, int y, int width, int height) {
 		NetworkComponent newNC = new NetworkComponent("Place Holder", newNet);
 		
 		initializeNetwork(netIndex, newNC, x, y, width, height);
@@ -221,9 +242,9 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		int prefixDigit = (int)(Math.log10(EvolveNet.netSize)+1);
 		int prefix = (int) ((EvolveNet.generation + 1) * Math.pow(10, prefixDigit));
 		
-		System.out.println(net.size());
+		System.out.println("NetSize: " + net.size());
 		if(netIndex < net.size()) {
-			System.out.println("set");
+			System.out.println("set " + netIndex);
 			
 			attribute.set(netIndex, new NetWorldPairAttribute(prefix + netIndex, netIndex, x, y, width, height));
 
@@ -250,35 +271,55 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 			world.set(worldIndex, sim.addOdorWorld(
 					x, y, width, height, "W" + attribute.get(worldIndex).getNetID()
 			));
+			OdorWorldBuilder currentWorld = world.get(worldIndex);
+			currentWorld.getWorld().setObjectsBlockMovement(false);
+			int worldHeight = currentWorld.getWorld().getHeight();
+			int worldWidth  = currentWorld.getWorld().getWidth();
+//			int worldHeight = 133; // TODO: use real value
+//			int worldWidth  = 164;
+			cheese.set(worldIndex, currentWorld.addEntity(
+					worldWidth / 6 * 5 - (imageSize/2),
+					worldHeight / 3 - (imageSize/2),
+					"Swiss.gif",
+	                new double[] { 1, 0.1, 0.2 }));
+			
+			poison.set(worldIndex, currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize/2),
+					worldHeight / 3 * 2 - (imageSize/2),
+					"Poison.gif",
+	                new double[] { 0.2, 0, 1 }));
+			
+			mouse.set(worldIndex, currentWorld.addAgent(worldWidth / 6 - (imageSize/2),
+					worldHeight / 2 - (imageSize/2), "Mouse"));
+			// Print world size for debug
+			System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
 		} else {
 			world.add(sim.addOdorWorld(
 					x, y, width, height, "W" + attribute.get(worldIndex).getNetID()
 			));
+			OdorWorldBuilder currentWorld = world.get(worldIndex);
+			currentWorld.getWorld().setObjectsBlockMovement(false);
+			int worldHeight = currentWorld.getWorld().getHeight();
+			int worldWidth  = currentWorld.getWorld().getWidth();
+//			int worldHeight = 133; // TODO: use real value
+//			int worldWidth  = 164;
+			// TODO: Make configurable
+			cheese.add(currentWorld.addEntity(
+					worldWidth / 6 * 5 - (imageSize/2),
+					worldHeight / 3 - (imageSize/2),
+					"Swiss.gif",
+	                new double[] { 1, 0.1, 0.2 }));
+			
+			poison.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize/2),
+					worldHeight / 3 * 2 - (imageSize/2),
+					"Poison.gif",
+	                new double[] { 0.2, 0, 1 }));
+			
+			mouse.add(currentWorld.addAgent(worldWidth / 6 - (imageSize/2),
+					worldHeight / 2 - (imageSize/2), "Mouse"));
+			// Print world size for debug
+			System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
 		}
-		OdorWorldBuilder currentWorld = world.get(worldIndex);
-		currentWorld.getWorld().setObjectsBlockMovement(false);
-		int worldHeight = currentWorld.getWorld().getHeight();
-		int worldWidth  = currentWorld.getWorld().getWidth();
-//		int worldHeight = 133; // TODO: use real value
-//		int worldWidth  = 164;
 		
-		// Print world size for debug
-		System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
-		
-		// TODO: Make configurable
-		cheese.add(currentWorld.addEntity(
-				worldWidth / 6 * 5 - (imageSize/2),
-				worldHeight / 3 - (imageSize/2),
-				"Swiss.gif",
-                new double[] { 1, 0.1, 0.2 }));
-		
-		poison.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize/2),
-				worldHeight / 3 * 2 - (imageSize/2),
-				"Poison.gif",
-                new double[] { 0.2, 0, 1 }));
-		
-		mouse.add(currentWorld.addAgent(worldWidth / 6 - (imageSize/2),
-				worldHeight / 2 - (imageSize/2), "Mouse"));
 	}
 	
 	
@@ -296,21 +337,21 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 //			sim.couple((SmellSensor) mouse.get(netIndex).getSensor("Smell-Right"), k,
 //	                input.get(netIndex).getNeuron(k));
 //		}
-		
 		int sensoorSize = mouse.get(netIndex).getSensors().size();
 		// TODO: Couple sensor to input.
 		mouse.get(netIndex).getSensors().get(1).getId();
+
 		
 		sim.couple(
-				(SmellSensor) mouse.get(netIndex).getSensors().get(0),
-				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(0)
+				(SmellSensor) mouse.get(netIndex).getSensor("Smell-Left"),
+				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(0)	// should be called inputGrou[p
 				);
 		sim.couple(
-				(SmellSensor) mouse.get(netIndex).getSensors().get(1),
+				(SmellSensor) mouse.get(netIndex).getSensor("Smell-Center"),
 				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(1)
 				);
 		sim.couple(
-				(SmellSensor) mouse.get(netIndex).getSensors().get(2),
+				(SmellSensor) mouse.get(netIndex).getSensor("Smell-Right"),
 				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(2)
 				);
 //		sim.couple((SmellSensor) mouse.get(netIndex).getSensors().get(0), 0, inputFlat.get(netIndex).get(0));
@@ -338,7 +379,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 			if(net.size() != 0) {
 				result = JOptionPane.showConfirmDialog(
 					    null,
-					    "Current networks will be deleted. Are you sure?",	// TODO: implement delete
+					    "Current networks will be deleted. Are you sure?",	// TODO: implement delete, reset generation
 					    "Warning",
 					    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			}
@@ -440,15 +481,16 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		cp.addButton("Run", () -> {
 			run = true;
 			while(run) {
-				for(int i = 0; i < 1000 && run; i++) {
+				for(int i = 0; i < 500; i++) {
 					sim.iterate();
 					updateFitnessScore();
 				}
-				
+				newGeneration();
 				// TODO: Apply to new network only. Move to newGeneration()
 				for(int i = 0; i < net.size(); i++) {
 					((EvolveNet) net.get(i).getNetwork()).mutateNetwork();
 				}
+
 			}
 //			sim.getWorkspace().stop();
 		});
@@ -516,8 +558,10 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		});
 		
 		dp.addButton("Print Fitness", () -> {
+			System.out.println("Fitness Score: ");
 			for(int i = 0; i < attribute.size(); i++) {
-				System.out.println(attribute.get(i).getFitnessScore());
+				NetWorldPairAttribute a = attribute.get(i);
+				System.out.println("\t" + net.get(i).getNetworkComponent().getName() + ": " + a.getFitnessScore());
 			}
 		});
 		

@@ -216,6 +216,13 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 	    	
 	    	for(int i = 0; i < net.size(); i++) {
 	    		attribute.get(i).resetFitness();
+				try {
+					sim.getDesktop().getDesktopComponent(net.get(i).getNetworkComponent()).getParentFrame().setIcon(componentMinimized);
+					sim.getDesktop().getDesktopComponent(world.get(i).getOdorWorldComponent()).getParentFrame().setIcon(componentMinimized);
+				} catch (PropertyVetoException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	    	}
     	
     	});
@@ -344,7 +351,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 		
 		sim.couple(
 				(SmellSensor) mouse.get(netIndex).getSensor("Smell-Left"),
-				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(0)	// should be called inputGrou[p
+				((EvolveNet)(net.get(netIndex).getNetwork())).getInput(0)	// should be called inputGroup
 				);
 		sim.couple(
 				(SmellSensor) mouse.get(netIndex).getSensor("Smell-Center"),

@@ -55,6 +55,8 @@ import org.simbrain.util.widgets.YesNoNull;
 public abstract class AbstractNeuronRulePanel extends JPanel {
 
     /** List of editor objects associated with this type of neuron. */
+    // stream operations on these do most of the work...
+    // has references to neuron update objects
     private List<Editor> editorList = new ArrayList<Editor>();
     
     /**

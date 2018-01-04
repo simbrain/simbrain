@@ -22,10 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.Consumible;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,7 +38,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     private final TimeSeriesModel model;
 
     /** Time Series consumer type. */
-    private AttributeType timeSeriesConsumerType;
+//    private AttributeType timeSeriesConsumerType;
 
     /**
      * Create new time series plot component.
@@ -84,28 +85,28 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
-                double.class, true);
-        addConsumerType(timeSeriesConsumerType);
+//        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
+//                double.class, true);
+//        addConsumerType(timeSeriesConsumerType);
     }
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (timeSeriesConsumerType.isVisible()) {
-            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-                String description = timeSeriesConsumerType
-                        .getSimpleDescription("Time Series " + (i + 1));
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(this, "setValue",
-                                new Class[] { double.class, Integer.class },
-                                new Object[] { i });
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-        }
-        return returnList;
-    }
+//    @Override
+//    public List<PotentialConsumer> getPotentialConsumers() {
+//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+//        if (timeSeriesConsumerType.isVisible()) {
+//            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+//                String description = timeSeriesConsumerType
+//                        .getSimpleDescription("Time Series " + (i + 1));
+//                PotentialConsumer consumer = getAttributeManager()
+//                        .createPotentialConsumer(this, "setValue",
+//                                new Class[] { double.class, Integer.class },
+//                                new Object[] { i });
+//                consumer.setCustomDescription(description);
+//                returnList.add(consumer);
+//            }
+//        }
+//        return returnList;
+//    }
 
     /**
      * Add chart listener to model.
@@ -118,14 +119,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                firePotentialAttributesChanged();
+//                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                firePotentialAttributesChanged();
+//                firePotentialAttributesChanged();
             }
 
             /**
@@ -213,10 +214,17 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param value the current "y-axis" value for the time series
      * @param index which time series curve to set.
      */
+    @Consumible(indexListMethod = "getSeries")
     public void setValue(final double value, final Integer index) {
         // TODO: Throw exception if index out of current bounds
         model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
                 .getTime(), value);
+    }
+
+    //TODO.  Rename.
+    public List<Integer> getSeries() {
+        return IntStream.range(1, model.getDataset().getSeries().size()).boxed()
+                .collect(Collectors.toList());
     }
 
 }

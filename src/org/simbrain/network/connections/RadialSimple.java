@@ -145,7 +145,7 @@ public class RadialSimple implements ConnectNeurons {
      */
     private List<Neuron> getNeuronsInRadius(Neuron source, double radius) {
         ArrayList<Neuron> ret = new ArrayList<Neuron>();
-        for (Neuron neuron : network.getNeuronList()) {
+        for (Neuron neuron : sourceNeurons) {
             if (network.getEuclideanDist(source, neuron) < radius) {
                 ret.add(neuron);
             }

@@ -145,7 +145,8 @@ public class AttributeType {
      */
     public void setVisible(boolean visible) {
         this.visible = visible;
-        parentComponent.fireAttributeTypeVisibilityChanged(this);
+        //TODO
+       // parentComponent.fireAttributeTypeVisibilityChanged(this);
     }
 
     /**

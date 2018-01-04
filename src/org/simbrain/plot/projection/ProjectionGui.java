@@ -629,7 +629,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                         .getProjector().getDimensions());
                 int dims = Integer.parseInt(dimsString); //todo; Catch exception
                 getWorkspaceComponent().getProjectionModel().init(dims);
-                getWorkspaceComponent().initializeConsumers();
             }
 
         });

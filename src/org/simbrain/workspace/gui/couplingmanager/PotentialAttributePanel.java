@@ -24,21 +24,22 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.simbrain.workspace.Attribute2;
 import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.CouplingManager;
-import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -46,9 +47,11 @@ import org.simbrain.workspace.WorkspaceListener;
 /**
  * Displays a panel with a JComboBox, which the user uses to select a component,
  * and a JList of attributes for that component.
+ *
+ * TODO: Rename to AttributePanel?
  */
-public class PotentialAttributePanel extends JPanel implements ActionListener,
-        MouseListener {
+public class PotentialAttributePanel extends JPanel
+        implements ActionListener, MouseListener {
 
     /** Parent frame. */
     private JFrame parentFrame = new JFrame();
@@ -62,7 +65,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
     /** List model. */
     private DefaultListModel model;
 
-    // TODO: Get rid of this...
+    // TODO: Renames
     public enum ProducerOrConsumer {
         Producing, Consuming
     };
@@ -70,13 +73,14 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
     private ProducerOrConsumer producerOrConsumer;
 
     /** Panel for setting visibility of attribute types. */
-    private AttributeTypePanel attributeTypePanel;
+    // private AttributeTypePanel attributeTypePanel;
 
     /** List of network couplings. */
     private JList attributeTypes = new JList();
 
     /**
      * Creates a new attribute list panel.
+     *
      * @param workspace reference to workspace
      * @param attributeType
      */
@@ -101,10 +105,10 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
         // Scroll pane
         JScrollPane listScroll = new JScrollPane(attributeList);
-        listScroll
-                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll
-                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(listScroll, BorderLayout.CENTER);
 
         // Bottom panel
@@ -113,13 +117,13 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 
-                if (attributeTypePanel != null) {
-                    JDialog dialog = new JDialog(parentFrame);
-                    dialog.setContentPane(attributeTypePanel);
-                    dialog.pack();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                }
+                // if (attributeTypePanel != null) {
+                // JDialog dialog = new JDialog(parentFrame);
+                // dialog.setContentPane(attributeTypePanel);
+                // dialog.pack();
+                // dialog.setLocationRelativeTo(null);
+                // dialog.setVisible(true);
+                // }
             }
         });
         bottomPanel.add(button);
@@ -130,7 +134,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             addAttributeListener(component);
         }
         // Initialize frame
-        //parentFrame.setContentPane(this);
+        // parentFrame.setContentPane(this);
     }
 
     /**
@@ -144,11 +148,12 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
             public void attributeTypeVisibilityChanged(AttributeType type) {
                 if (isSelectedComponent(component)) {
-                    if (component == type.getParentComponent()) { // Not sure if
-                                                                  // this is
-                                                                  // needed
-                        refresh(component);
-                    }
+                    // if (component == type.getParentComponent()) { // Not sure
+                    // if
+                    // // this is
+                    // // needed
+                    refresh(component);
+                    // }
                 }
             }
 
@@ -198,26 +203,39 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
      */
     private void refresh(final WorkspaceComponent component) {
 
-        // attributeTypes.setListData(new
-        // Vector(component.getAttributeTypes()));
-        attributeTypePanel = new AttributeTypePanel(component,
-                producerOrConsumer);
-
-        // Set Attribute list
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (PotentialAttribute potentialProducer : component
-                        .getPotentialProducers()) {
-                    model.addElement(potentialProducer);
+                for (Producer2<?> producer : component.getProducers()) {
+                    model.addElement(producer);
                 }
-            } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-                for (PotentialAttribute potentialConsumer : component
-                        .getPotentialConsumers()) {
-                    model.addElement(potentialConsumer);
+            } else {
+                for (Consumer2<?> consumer : component.getConsumers()) {
+                    model.addElement(consumer);
                 }
             }
         }
+
+        // attributeTypes.setListData(new
+        // Vector(component.getAttributeTypes()));
+        // attributeTypePanel = new AttributeTypePanel(component,
+        // producerOrConsumer);
+
+        // Set Attribute list
+        // if (component != null) {
+        // model.clear();
+        // if (producerOrConsumer == ProducerOrConsumer.Producing) {
+        // for (PotentialAttribute potentialProducer : component
+        // .getAnnotatedProducers()) {
+        // model.addElement(potentialProducer);
+        // }
+        // } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
+        // for (PotentialAttribute potentialConsumer : component
+        // .getAnnotatedConsumers()) {
+        // model.addElement(potentialConsumer);
+        // }
+        // }
+        // }
     }
 
     /**
@@ -232,19 +250,17 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
      *
      * @return list of selected attributes.
      */
-    public ArrayList<?> getSelectedAttributes() {
-
-        // TODO: Redo
+    public List getSelectedAttributes() {
         if (producerOrConsumer == ProducerOrConsumer.Producing) {
-            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
-            for (Object object : attributeList.getSelectedValues()) {
-                ret.add((PotentialAttribute) object);
+            List<Producer2<?>> ret = new ArrayList<>();
+            for (Object object : attributeList.getSelectedValuesList()) {
+                ret.add((Producer2<?>) object);
             }
             return ret;
         } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
-            for (Object object : attributeList.getSelectedValues()) {
-                ret.add((PotentialAttribute) object);
+            List<Consumer2<?>> ret = new ArrayList<>();
+            for (Object object : attributeList.getSelectedValuesList()) {
+                ret.add((Consumer2<?>) object);
             }
             return ret;
         }
@@ -280,19 +296,20 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
          * @param cellHasFocus
          * @return
          */
-        public java.awt.Component getListCellRendererComponent(
-                final JList list, final Object object, final int index,
-                final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
-                    .getListCellRendererComponent(list, object, index,
-                            isSelected, cellHasFocus);
-            PotentialAttribute id = (PotentialAttribute) object;
-
+        public java.awt.Component getListCellRendererComponent(final JList list,
+                final Object object, final int index, final boolean isSelected,
+                final boolean cellHasFocus) {
+            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(
+                    list, object, index, isSelected, cellHasFocus);
+            // TODO
+            // PotentialAttribute id = (PotentialAttribute) object;
             // Set text color based on data type
-            renderer.setForeground(CouplingManager.getColor(id.getDataType()));
-
-            renderer.setText(id.getDescription() + "<"
-                    + CouplingManager.getTypeDescriptor(id.getDataType()) + ">");
+            Attribute2 atttribute = (Attribute2) object;
+            renderer.setForeground(
+                    DesktopCouplingManager.getColor(atttribute.getType()));
+            //
+            // renderer.setText(id.getDescription() + "<"
+            // + CouplingManager.getTypeDescriptor(id.getDataType()) + ">");
             return renderer;
         }
 
@@ -301,8 +318,8 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
     /**
      * A JComboBox which listens to the workspace and updates accordingly.
      */
-    private class ComponentDropDownBox extends JComboBox implements
-            WorkspaceListener {
+    private class ComponentDropDownBox extends JComboBox
+            implements WorkspaceListener {
 
         /** Reference to workspace. */
         private Workspace workspace;
@@ -317,14 +334,15 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             }
             if (this.getModel().getSize() > 0) {
                 this.setSelectedIndex(0);
-                PotentialAttributePanel.this.refresh((WorkspaceComponent) this
-                        .getItemAt(0));
+                PotentialAttributePanel.this
+                        .refresh((WorkspaceComponent) this.getItemAt(0));
             }
             workspace.addListener(this);
         }
 
         /**
          * {@inheritDoc}
+         *
          * @return
          */
         public boolean clearWorkspace() {

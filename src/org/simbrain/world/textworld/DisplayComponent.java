@@ -20,11 +20,7 @@ package org.simbrain.world.textworld;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.textworld.TextWorld.TextItem;
 
@@ -67,19 +63,20 @@ public class DisplayComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        addConsumerType(new AttributeType(this, "DisplayClosestWord",
-                double[].class, true));
-        addConsumerType(new AttributeType(this, "DisplayString", String.class,
-                false));
-        addConsumerType(new AttributeType(this, "DisplayWord", double.class,
-                true));
+        this.rootObject = world;
+//        addConsumerType(new AttributeType(this, "DisplayClosestWord",
+//                double[].class, true));
+//        addConsumerType(new AttributeType(this, "DisplayString", String.class,
+//                false));
+//        addConsumerType(new AttributeType(this, "DisplayWord", double.class,
+//                true));
         world.addListener(new TextListener() {
 
             public void textChanged() {
             }
 
             public void dictionaryChanged() {
-                DisplayComponent.this.firePotentialAttributesChanged();
+//                DisplayComponent.this.firePotentialAttributesChanged();
             }
 
             public void positionChanged() {
@@ -94,41 +91,41 @@ public class DisplayComponent extends WorkspaceComponent {
         });
     }
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        for (AttributeType type : getVisibleConsumerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
-                for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
-                    String description = "Display string " + (i + 1);
-                    PotentialConsumer consumer = getStringConsumer();
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
-                }
-            }
-            if (type.getTypeName().equalsIgnoreCase("DisplayWord")) {
-                for (String word : world.getTokenDictionary()) {
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(
-                                    world,
-                                    "addTextIfAboveThreshold",
-                                    new Class<?>[] { double.class, String.class },
-                                    new Object[] { word });
-                    consumer.setCustomDescription(word);
-                    returnList.add(consumer);
-                }
-            }
-            if (type.getTypeName().equalsIgnoreCase("DisplayClosestWord")) {
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(world, "displayClosestWord",
-                                double[].class);
-                consumer.setCustomDescription("Display closest word");
-                returnList.add(consumer);
-
-            }
-        }
-        return returnList;
-    }
+//    @Override
+//    public List<PotentialConsumer> getPotentialConsumers() {
+//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+//        for (AttributeType type : getVisibleConsumerTypes()) {
+//            if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
+//                for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
+//                    String description = "String reader " + (i + 1);
+//                    PotentialConsumer consumer = getStringConsumer();
+//                    consumer.setCustomDescription(description);
+//                    returnList.add(consumer);
+//                }
+//            }
+//            if (type.getTypeName().equalsIgnoreCase("DisplayWord")) {
+//                for (String word : world.getTokenDictionary()) {
+//                    PotentialConsumer consumer = getAttributeManager()
+//                            .createPotentialConsumer(
+//                                    world,
+//                                    "addTextIfAboveThreshold",
+//                                    new Class<?>[] { double.class, String.class },
+//                                    new Object[] { word });
+//                    consumer.setCustomDescription(word);
+//                    returnList.add(consumer);
+//                }
+//            }
+//            if (type.getTypeName().equalsIgnoreCase("DisplayClosestWord")) {
+//                PotentialConsumer consumer = getAttributeManager()
+//                        .createPotentialConsumer(world, "displayClosestWord",
+//                                double[].class);
+//                consumer.setCustomDescription("Vector reader");
+//                returnList.add(consumer);
+//
+//            }
+//        }
+//        return returnList;
+//    }
 
     /**
      * {@inheritDoc}
@@ -183,9 +180,9 @@ public class DisplayComponent extends WorkspaceComponent {
      *
      * @return the string consumer.
      */
-    public PotentialConsumer getStringConsumer() {
-        return this.getAttributeManager().createPotentialConsumer(world,
-                "addText", String.class);
-    }
+//    public PotentialConsumer getStringConsumer() {
+//        return this.getAttributeManager().createPotentialConsumer(world,
+//                "addText", String.class);
+//    }
 
 }

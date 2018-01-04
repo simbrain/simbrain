@@ -20,11 +20,9 @@ package org.simbrain.world.textworld;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -63,72 +61,67 @@ public class ReaderComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        addProducerType(
-                new AttributeType(this, "TokenVectors", double[].class, true));
-        addProducerType(
-                new AttributeType(this, "TokenScalars", double.class, true));
-        addProducerType(
-                new AttributeType(this, "Letters", double.class, false));
-        addProducerType(
-                new AttributeType(this, "TokenReader", String.class, true));
+        this.rootObject = world;
+//        addProducerType(new AttributeType(this, "TokenVectors", double[].class,
+//                true));
+//        addProducerType(new AttributeType(this, "TokenScalars", double.class, true));
+//        addProducerType(new AttributeType(this, "Letters", double.class, false));
     }
 
     @Override
-    public List<PotentialProducer> getPotentialProducers() {
-        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-        for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("TokenVectors")) {
-                PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(world, "getCurrentVector",
-                                double[].class);
-                producer.setCustomDescription("Get current vector");
-                returnList.add(producer);
-
-            }
-            if (type.getTypeName().equalsIgnoreCase("Letters")) {
-                char letter;
-                for (letter = 'a'; letter <= 'z'; letter++) {
-                    PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(world, "getMatchingScalar",
-                                    double.class, new Class[] { String.class },
-                                    new Object[] {
-                                            Character.toString(letter) });
-                    producer.setCustomDescription("Letter " + letter);
-                    returnList.add(producer);
-                }
-            }
-            if (type.getTypeName().equalsIgnoreCase("TokenScalars")) {
-                for (String token : world.getTokenDictionary()) {
-                    PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(world, "getMatchingScalar",
-                                    double.class, new Class[] { String.class },
-                                    new Object[] { token });
-                    producer.setCustomDescription("Word " + token);
-                    returnList.add(producer);
-                }
-            }
-            if (type.getTypeName().equalsIgnoreCase("TokenReader")) {
-                PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(world, "getCurrentText", String.class);
-                producer.setCustomDescription("Get current text");
-                returnList.add(producer);
-            }
-        }
-        return returnList;
+    public List<Producer2<?>> getProducers() {
+        return getProducers(world);
     }
+
+//    @Override
+//    public List<PotentialProducer> getPotentialProducers() {
+//        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+//        for (AttributeType type : getVisibleProducerTypes()) {
+//            if (type.getTypeName().equalsIgnoreCase("TokenVectors")) {
+//                PotentialProducer producer = getAttributeManager()
+//                        .createPotentialProducer(world, "getCurrentVector",
+//                                double[].class);
+//                returnList.add(producer);
+//
+//            }
+//            if (type.getTypeName().equalsIgnoreCase("Letters")) {
+//                char letter;
+//                for (letter = 'a'; letter <= 'z'; letter++) {
+//                    PotentialProducer producer = getAttributeManager()
+//                            .createPotentialProducer(world,
+//                                    "getMatchingScalar", double.class,
+//                                    new Class[] { String.class },
+//                                    new Object[] { Character.toString(letter)});
+//                    producer.setCustomDescription("Letter " + letter);
+//                    returnList.add(producer);
+//                }
+//            }
+//            if (type.getTypeName().equalsIgnoreCase("TokenScalars")) {
+//                for(String token : world.getTokenDictionary()) {
+//                    PotentialProducer producer = getAttributeManager()
+//                            .createPotentialProducer(world,
+//                                    "getMatchingScalar", double.class,
+//                                    new Class[] { String.class },
+//                                    new Object[] { token });
+//                    producer.setCustomDescription("Word " + token);
+//                    returnList.add(producer);
+//                }
+//            }
+//        }
+//        return returnList;
+//    }
 
     /**
      * {@inheritDoc}
-     * 
      * @param input
      * @param name
      * @param format
-     * @return
+     * @return 
      */
     public static ReaderComponent open(InputStream input, String name,
             String format) {
-        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream()
-                .fromXML(input);
+        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(
+                input);
         return new ReaderComponent(name, newWorld);
     }
 

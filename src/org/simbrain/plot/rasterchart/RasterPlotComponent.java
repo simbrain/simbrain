@@ -20,12 +20,9 @@ package org.simbrain.plot.rasterchart;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.Consumible;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,7 +34,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     private final RasterModel model;
 
     /** Raster Plot consumer type. */
-    private AttributeType rasterPlotConsumerType;
+//    private AttributeType rasterPlotConsumerType;
 
     /**
      * Create new raster plot component.
@@ -84,28 +81,28 @@ public class RasterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        rasterPlotConsumerType = new AttributeType(this, "Series", "setValue",
-                double.class, true);
-        addConsumerType(rasterPlotConsumerType);
+//        rasterPlotConsumerType = new AttributeType(this, "Series", "setValue",
+//                double.class, true);
+//        addConsumerType(rasterPlotConsumerType);
     }
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (rasterPlotConsumerType.isVisible()) {
-            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-                String description = rasterPlotConsumerType
-                        .getSimpleDescription("Raster Series " + (i + 1));
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(this, "setValues",
-                                new Class[] { double[].class, Integer.class },
-                                new Object[] { i });
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-        }
-        return returnList;
-    }
+//    @Override
+//    public List<PotentialConsumer> getPotentialConsumers() {
+//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+//        if (rasterPlotConsumerType.isVisible()) {
+//            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+//                String description = rasterPlotConsumerType
+//                        .getSimpleDescription("Raster Series " + (i + 1));
+//                PotentialConsumer consumer = getAttributeManager()
+//                        .createPotentialConsumer(this, "setValues",
+//                                new Class[] { double[].class, Integer.class },
+//                                new Object[] { i });
+//                consumer.setCustomDescription(description);
+//                returnList.add(consumer);
+//            }
+//        }
+//        return returnList;
+//    }
 
     /**
      * Add chart listener to model.
@@ -118,14 +115,14 @@ public class RasterPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                firePotentialAttributesChanged();
+//                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                firePotentialAttributesChanged();
+//                firePotentialAttributesChanged();
             }
 
             /**
@@ -218,6 +215,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
             model.addData(index, RasterPlotComponent.this.getWorkspace()
                 .getTime(), values[i]);
         }
+    }
+
+    @Consumible
+    public void setValues(final double[] values) {
+        setValues(values, 0);
     }
 
 }

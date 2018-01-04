@@ -32,7 +32,7 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class WorkspaceComponentDeserializer {
 
-    /** A map of keys to their components. */
+    /** A map used to retrieve workspace components given their uris. */
     private final Map<String, WorkspaceComponent> componentKeys = new HashMap<String, WorkspaceComponent>();
 
     /**

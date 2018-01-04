@@ -23,21 +23,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.Speech;
-import org.simbrain.world.odorworld.effectors.StraightMovement;
-import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.TileSensor;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -50,26 +41,28 @@ public class OdorWorldComponent extends WorkspaceComponent {
     private OdorWorld world = new OdorWorld();
 
     /** Attribute types. */
-    AttributeType xLocationType = (new AttributeType(this, "Location", "X",
-            double.class, false));
-    AttributeType yLocationType = (new AttributeType(this, "Location", "Y",
-            double.class, false));
-    AttributeType turningType = (new AttributeType(this, "Turning",
-            double.class, true));
-    AttributeType straightMovementType = (new AttributeType(this, "Straight",
-            double.class, true));
-    AttributeType absoluteMovementType = (new AttributeType(this,
-            "Absolute-movement", double.class, false));
-    AttributeType smellSensorScalars = (new AttributeType(this, "Smell Scalar",
-            double.class, true));
-    AttributeType smellSensorVectors = (new AttributeType(this, "Smell Vector",
-            double[].class, true));
-    AttributeType tileSensorType = (new AttributeType(this, "Tile",
-            double.class, true));
-    AttributeType speechEffectorType = (new AttributeType(this, "Speech",
-            double.class, true));
-    AttributeType hearingSensorType = (new AttributeType(this, "Hearing",
-            double.class, true));
+    // AttributeType xLocationType = (new AttributeType(this, "Location", "X",
+    // double.class, false));
+    // AttributeType yLocationType = (new AttributeType(this, "Location", "Y",
+    // double.class, false));
+    // AttributeType turningType = (new AttributeType(this, "Turning",
+    // double.class, true));
+    // AttributeType straightMovementType = (new AttributeType(this, "Straight",
+    // double.class, true));
+    // AttributeType absoluteMovementType = (new AttributeType(this,
+    // "Absolute-movement", double.class, false));
+    // AttributeType smellSensorScalars = (new AttributeType(this, "Smell
+    // Scalar",
+    // double.class, true));
+    // AttributeType smellSensorVectors = (new AttributeType(this, "Smell
+    // Vector",
+    // double[].class, true));
+    // AttributeType tileSensorType = (new AttributeType(this, "Tile",
+    // double.class, true));
+    // AttributeType speechEffectorType = (new AttributeType(this, "Speech",
+    // double.class, true));
+    // AttributeType hearingSensorType = (new AttributeType(this, "Hearing",
+    // double.class, true));
 
     /**
      * Default constructor.
@@ -80,6 +73,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         super(name);
         initializeAttributes();
         addListener();
+        rootObject = world;
     }
 
     /**
@@ -93,6 +87,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         this.world = world;
         initializeAttributes();
         addListener();
+        rootObject = world;
     }
 
     /**
@@ -100,223 +95,222 @@ public class OdorWorldComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
 
-        addConsumerType(xLocationType);
-        addConsumerType(yLocationType);
-        addConsumerType(turningType);
-        addConsumerType(straightMovementType);
-        addConsumerType(absoluteMovementType);
-        addConsumerType(speechEffectorType);
-
-        addProducerType(xLocationType);
-        addProducerType(yLocationType);
-        addProducerType(smellSensorScalars);
-        addProducerType(smellSensorVectors);
-        addProducerType(tileSensorType);
-        addProducerType(hearingSensorType);
+        // addConsumerType(xLocationType);
+        // addConsumerType(yLocationType);
+        // addConsumerType(turningType);
+        // addConsumerType(straightMovementType);
+        // addConsumerType(absoluteMovementType);
+        // addConsumerType(speechEffectorType);
+        //
+        // addProducerType(xLocationType);
+        // addProducerType(yLocationType);
+        // addProducerType(smellSensorScalars);
+        // addProducerType(smellSensorVectors);
+        // addProducerType(tileSensorType);
+        // addProducerType(hearingSensorType);
     }
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-
-        for (OdorWorldEntity entity : world.getObjectList()) {
-
-            // X, Y Locations
-            if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":X";
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(entity, "setX", double.class);
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-            if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":Y";
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(entity, "setY", double.class);
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-
-            // Absolute movement
-            if (absoluteMovementType.isVisible()) {
-
-                String description = entity.getName() + ":goNorth";
-                PotentialConsumer goNorth = getAttributeManager()
-                        .createPotentialConsumer(entity, "moveNorth",
-                                double.class);
-                goNorth.setCustomDescription(description);
-                returnList.add(goNorth);
-
-                description = entity.getName() + ":goSouth";
-                PotentialConsumer goSouth = getAttributeManager()
-                        .createPotentialConsumer(entity, "moveSouth",
-                                double.class);
-                goSouth.setCustomDescription(description);
-                returnList.add(goSouth);
-
-                description = entity.getName() + ":goEast";
-                PotentialConsumer goEast = getAttributeManager()
-                        .createPotentialConsumer(entity, "moveEast",
-                                double.class);
-                goEast.setCustomDescription(description);
-                returnList.add(goEast);
-
-                description = entity.getName() + ":goWest";
-                PotentialConsumer goWest = getAttributeManager()
-                        .createPotentialConsumer(entity, "moveWest",
-                                double.class);
-                goWest.setCustomDescription(description);
-                returnList.add(goWest);
-            }
-
-            // Turning and Going Straight
-            if (entity instanceof RotatingEntity) {
-                for (Effector effector : entity.getEffectors()) {
-                    if (effector instanceof StraightMovement) {
-                        if (straightMovementType.isVisible()) {
-                            String description = entity.getName()
-                                    + ":goStraight";
-                            PotentialConsumer consumer = getAttributeManager()
-                                    .createPotentialConsumer(effector,
-                                            "setAmount", double.class);
-                            consumer.setCustomDescription(description);
-                            returnList.add(consumer);
-                        }
-                    } else if (effector instanceof Turning) {
-                        if (turningType.isVisible()) {
-                            double direction = ((Turning) effector)
-                                    .getDirection();
-                            if (direction == Turning.LEFT) {
-                                String description = entity.getName()
-                                        + ":turnLeft";
-                                PotentialConsumer consumer = getAttributeManager()
-                                        .createPotentialConsumer(effector,
-                                                "setAmount", double.class);
-                                consumer.setCustomDescription(description);
-                                returnList.add(consumer);
-                            } else if (direction == Turning.RIGHT) {
-                                String description = entity.getName()
-                                        + ":turnRight";
-                                PotentialConsumer consumer = getAttributeManager()
-                                        .createPotentialConsumer(effector,
-                                                "setAmount", double.class);
-                                consumer.setCustomDescription(description);
-                                returnList.add(consumer);
-                            }
-                        }
-                    } else if (effector instanceof Speech) {
-                        if (speechEffectorType.isVisible()) {
-                            String description = entity.getName()
-                                    + ((Speech) effector).getLabel();
-                            PotentialConsumer consumer = getAttributeManager()
-                                    .createPotentialConsumer(effector,
-                                            "setAmount", double.class);
-                            consumer.setCustomDescription(description);
-                            returnList.add(consumer);
-                        }
-                    }
-
-                }
-
-            }
-        }
-        return returnList;
-    }
-
-    @Override
-    public List<PotentialProducer> getPotentialProducers() {
-
-        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-
-        for (OdorWorldEntity entity : world.getObjectList()) {
-
-            // X, Y Location of entities
-            if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":X";
-                PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(entity, "getX", double.class);
-                producer.setCustomDescription(description);
-                returnList.add(producer);
-            }
-            if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":Y";
-                PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(entity, "getY", double.class);
-                producer.setCustomDescription(description);
-                returnList.add(producer);
-            }
-
-            // Smell scalar sensors
-            if (smellSensorScalars.isVisible()) {
-                for (Sensor sensor : entity.getSensors()) {
-                    if (sensor instanceof SmellSensor) {
-                        SmellSensor smell = (SmellSensor) sensor;
-                        for (int i = 0; i < smell
-                                .getCurrentValue().length; i++) {
-                            String description = entity.getName() + ":"
-                                    + sensor.getLabel() + "-" + (i + 1);
-                            PotentialProducer producer = getAttributeManager()
-                                    .createPotentialProducer(smell,
-                                            "getCurrentValue", double.class,
-                                            new Class[] { int.class },
-                                            new Object[] { i });
-                            producer.setCustomDescription(description);
-                            returnList.add(producer);
-                        }
-                        // TODO: A way of indicating sensor location (relative
-                        // location in polar coordinates)
-                    }
-                }
-            }
-            if (smellSensorVectors.isVisible()) {
-                for (Sensor sensor : entity.getSensors()) {
-                    if (sensor instanceof SmellSensor) {
-                        SmellSensor smell = (SmellSensor) sensor;
-                        if (sensor instanceof SmellSensor) {
-                            PotentialProducer producer = getAttributeManager()
-                                    .createPotentialProducer(smell,
-                                            "getCurrentValue", double[].class);
-                            producer.setCustomDescription(
-                                    entity.getName() + ":" + sensor.getLabel());
-                            returnList.add(producer);
-                        }
-                    }
-                }
-            }
-
-            // Hearing Sensor
-            if (hearingSensorType.isVisible()) {
-                for (Sensor sensor : entity.getSensors()) {
-                    if (sensor instanceof Hearing) {
-                        String description = entity.getName()
-                                + ((Hearing) sensor).getLabel();
-                        PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(sensor, "getValue",
-                                        double.class);
-                        producer.setCustomDescription(description);
-                        returnList.add(producer);
-                    }
-                }
-            }
-
-            // Tile sensor
-            if (tileSensorType.isVisible()) {
-                for (Sensor sensor : entity.getSensors()) {
-                    if (sensor instanceof TileSensor) {
-                        String description = entity.getName() + ":"
-                                + ((TileSensor) sensor).getLabel();
-                        PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(sensor, "getValue",
-                                        double.class);
-                        producer.setCustomDescription(description);
-                        returnList.add(producer);
-                    }
-                }
-            }
-        }
-        return returnList;
-    }
+    // @Override
+    // public List<PotentialConsumer> getPotentialConsumers() {
+    //
+    // List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    //
+    // for (OdorWorldEntity entity : world.getObjectList()) {
+    //
+    // // X, Y Locations
+    // if (xLocationType.isVisible()) {
+    // String description = entity.getName() + ":X";
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(entity, "setX", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // }
+    // if (yLocationType.isVisible()) {
+    // String description = entity.getName() + ":Y";
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(entity, "setY", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // }
+    //
+    // // Absolute movement
+    // if (absoluteMovementType.isVisible()) {
+    //
+    // String description = entity.getName() + ":goNorth";
+    // PotentialConsumer goNorth = getAttributeManager()
+    // .createPotentialConsumer(entity, "moveNorth",
+    // double.class);
+    // goNorth.setCustomDescription(description);
+    // returnList.add(goNorth);
+    //
+    // description = entity.getName() + ":goSouth";
+    // PotentialConsumer goSouth = getAttributeManager()
+    // .createPotentialConsumer(entity, "moveSouth",
+    // double.class);
+    // goSouth.setCustomDescription(description);
+    // returnList.add(goSouth);
+    //
+    // description = entity.getName() + ":goEast";
+    // PotentialConsumer goEast = getAttributeManager()
+    // .createPotentialConsumer(entity, "moveEast",
+    // double.class);
+    // goEast.setCustomDescription(description);
+    // returnList.add(goEast);
+    //
+    // description = entity.getName() + ":goWest";
+    // PotentialConsumer goWest = getAttributeManager()
+    // .createPotentialConsumer(entity, "moveWest",
+    // double.class);
+    // goWest.setCustomDescription(description);
+    // returnList.add(goWest);
+    // }
+    //
+    // // Turning and Going Straight
+    // if (entity instanceof RotatingEntity) {
+    // for (Effector effector : entity.getEffectors()) {
+    // if (effector instanceof StraightMovement) {
+    // if (straightMovementType.isVisible()) {
+    // String description = entity.getName()
+    // + ":goStraight";
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(effector,
+    // "setAmount", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // }
+    // } else if (effector instanceof Turning) {
+    // if (turningType.isVisible()) {
+    // double direction = ((Turning) effector)
+    // .getDirection();
+    // if (direction == Turning.LEFT) {
+    // String description = entity.getName()
+    // + ":turnLeft";
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(effector,
+    // "setAmount", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // } else if (direction == Turning.RIGHT) {
+    // String description = entity.getName()
+    // + ":turnRight";
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(effector,
+    // "setAmount", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // }
+    // }
+    // } else if (effector instanceof Speech) {
+    // if (speechEffectorType.isVisible()) {
+    // String description = entity.getName()
+    // + ((Speech) effector).getLabel();
+    // PotentialConsumer consumer = getAttributeManager()
+    // .createPotentialConsumer(effector,
+    // "setAmount", double.class);
+    // consumer.setCustomDescription(description);
+    // returnList.add(consumer);
+    // }
+    // }
+    //
+    // }
+    //
+    // }
+    // }
+    // return returnList;
+    // }
+    //
+    // @Override
+    // public List<PotentialProducer> getPotentialProducers() {
+    //
+    // List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+    //
+    // for (OdorWorldEntity entity : world.getObjectList()) {
+    //
+    // // X, Y Location of entities
+    // if (xLocationType.isVisible()) {
+    // String description = entity.getName() + ":X";
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(entity, "getX", double.class);
+    // producer.setCustomDescription(description);
+    // returnList.add(producer);
+    // }
+    // if (yLocationType.isVisible()) {
+    // String description = entity.getName() + ":Y";
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(entity, "getY", double.class);
+    // producer.setCustomDescription(description);
+    // returnList.add(producer);
+    // }
+    //
+    // // Smell scalar sensors
+    // if (smellSensorScalars.isVisible()) {
+    // for (Sensor sensor : entity.getSensors()) {
+    // if (sensor instanceof SmellSensor) {
+    // SmellSensor smell = (SmellSensor) sensor;
+    // for (int i = 0; i < smell.getCurrentValue().length; i++) {
+    // String description = entity.getName() + ":"
+    // + sensor.getLabel() + "-" + (i + 1);
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(smell,
+    // "getCurrentValue", double.class,
+    // new Class[] { int.class },
+    // new Object[] { i });
+    // producer.setCustomDescription(description);
+    // returnList.add(producer);
+    // }
+    // // TODO: A way of indicating sensor location (relative
+    // // location in polar coordinates)
+    // }
+    // }
+    // }
+    // if (smellSensorVectors.isVisible()) {
+    // for (Sensor sensor : entity.getSensors()) {
+    // if (sensor instanceof SmellSensor) {
+    // SmellSensor smell = (SmellSensor) sensor;
+    // if (sensor instanceof SmellSensor) {
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(smell,
+    // "getCurrentValue", double[].class);
+    // producer.setCustomDescription(entity.getName()
+    // + ":" + sensor.getLabel());
+    // returnList.add(producer);
+    // }
+    // }
+    // }
+    // }
+    //
+    // // Hearing Sensor
+    // if (hearingSensorType.isVisible()) {
+    // for (Sensor sensor : entity.getSensors()) {
+    // if (sensor instanceof Hearing) {
+    // String description = entity.getName()
+    // + ((Hearing) sensor).getLabel();
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(sensor, "getValue",
+    // double.class);
+    // producer.setCustomDescription(description);
+    // returnList.add(producer);
+    // }
+    // }
+    // }
+    //
+    // // Tile sensor
+    // if (tileSensorType.isVisible()) {
+    // for (Sensor sensor : entity.getSensors()) {
+    // if (sensor instanceof TileSensor) {
+    // String description = entity.getName() + ":"
+    // + ((TileSensor) sensor).getLabel();
+    // PotentialProducer producer = getAttributeManager()
+    // .createPotentialProducer(sensor, "getValue",
+    // double.class);
+    // producer.setCustomDescription(description);
+    // returnList.add(producer);
+    // }
+    // }
+    // }
+    // }
+    // return returnList;
+    // }
 
     /**
      * Initialize this component.
@@ -330,35 +324,35 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             public void effectorAdded(final Effector effector) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                // firePotentialAttributesChanged();
             }
 
             public void effectorRemoved(final Effector effector) {
                 setChangedSinceLastSave(true);
-                fireAttributeObjectRemoved(effector);
-                firePotentialAttributesChanged();
+                // fireAttributeObjectRemoved(effector);
+                // firePotentialAttributesChanged();
             }
 
             public void entityAdded(final OdorWorldEntity entity) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                // firePotentialAttributesChanged();
             }
 
             public void entityRemoved(final OdorWorldEntity entity) {
                 setChangedSinceLastSave(true);
-                fireAttributeObjectRemoved(entity);
-                firePotentialAttributesChanged();
+                // fireAttributeObjectRemoved(entity);
+                // firePotentialAttributesChanged();
             }
 
             public void sensorAdded(final Sensor sensor) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                // firePotentialAttributesChanged();
             }
 
             public void sensorRemoved(Sensor sensor) {
                 setChangedSinceLastSave(true);
-                fireAttributeObjectRemoved(sensor);
-                firePotentialAttributesChanged();
+                // fireAttributeObjectRemoved(sensor);
+                // firePotentialAttributesChanged();
             }
 
             public void entityChanged(OdorWorldEntity entity) {
@@ -391,9 +385,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
         return OdorWorld.getXStream().toXML(world);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         OdorWorld.getXStream().toXML(world, output);
@@ -461,10 +452,24 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void couplingRemoved(Coupling<?> coupling) {
-        Object consumerObject = coupling.getConsumer().getBaseObject();
-        if (consumerObject instanceof Effector) {
-            ((Effector) consumerObject).clear();
+    public List<Producer2<?>> getProducers() {
+        List<Producer2<?>> retList = new ArrayList();
+        for (OdorWorldEntity entity : world.getObjectList()) {
+            retList.addAll(super.getProducers(entity));
+            retList.addAll(super.getProducersFromList(entity.getSensors()));
+            retList.addAll(super.getProducersFromList(entity.getEffectors()));
         }
+        return retList;
+    }
+
+    @Override
+    public List<Consumer2<?>> getConsumers() {
+        List<Consumer2<?>> retList = new ArrayList();
+        for (OdorWorldEntity entity : world.getObjectList()) {
+            retList.addAll(super.getConsumers(entity));
+            retList.addAll(super.getConsumersFromList(entity.getSensors()));
+            retList.addAll(super.getConsumersFromList(entity.getEffectors()));
+        }
+        return retList;
     }
 }

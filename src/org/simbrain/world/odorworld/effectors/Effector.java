@@ -103,13 +103,10 @@ public abstract class Effector {
     public void setLabel(String label) {
         this.label = label;
     }
-
-    /**
-     * Override if "resetting" the effector should clear any values.
-     * Called when removing a coupling to this effector, so that the last set
-     * value does not persist.
-     */
-    public void clear() {
+    
+    //TODO
+    public String getMixedId() {
+        return this.getParent().getId() + ":" + this.getId();
     }
 
 }

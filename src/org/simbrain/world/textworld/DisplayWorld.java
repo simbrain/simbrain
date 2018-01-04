@@ -18,13 +18,15 @@
  */
 package org.simbrain.world.textworld;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
+import org.simbrain.workspace.Consumible;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.thoughtworks.xstream.XStream;
 
 /**
  * <b>DisplayWorld</b> intuitively models "speaking", though it can also be
@@ -111,6 +113,7 @@ public class DisplayWorld extends TextWorld {
      *
      * @param key the vector to use to search the dictionary.
      */
+    @Consumible
     public void displayClosestWord(double[] key) {
         this.addText(getClosestWord(key) + " ");
     }
@@ -178,7 +181,7 @@ public class DisplayWorld extends TextWorld {
         }
     }
 
-    /**di
+    /**
      * @return the displayThreshold
      */
     public double getDisplayThreshold() {

@@ -19,19 +19,32 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
-import java.awt.EventQueue;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.workspace.Consumible;
 
 import com.thoughtworks.xstream.XStream;
 
 /**
  * Data for a JFreeChart pie chart.
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BarChartModel extends ChartModel {
 
     /** JFreeChart dataset for bar charts. */
+    @XmlJavaTypeAdapter(ChartDataAdapter.class)
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
     /** Initial number of data sources. */
@@ -88,6 +101,7 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Adds a new column to the dataset.
+     *
      * @param index
      */
     public void addColumn(final int index) {
@@ -129,20 +143,6 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Set value of a specified bar.
-     *
-     * @param value value of bar
-     * @param index which bar value to set
-     */
-    public void setValue(final double value, final Integer index) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                getDataset().setValue(value, new Integer(1), index);
-            }
-        });
-    }
-
-    /**
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
@@ -160,8 +160,8 @@ public class BarChartModel extends ChartModel {
         System.out.println("------------ Debug model ------------");
         for (int i = 0; i < dataset.getRowCount(); i++) {
             for (int j = 0; j < dataset.getColumnCount(); j++) {
-                System.out.println("<" + i + "," + j + "> "
-                        + dataset.getValue(i, j));
+                System.out.println(
+                        "<" + i + "," + j + "> " + dataset.getValue(i, j));
             }
         }
         System.out.println("--------------------------------------");
@@ -242,9 +242,55 @@ public class BarChartModel extends ChartModel {
      *
      * @param input the values for the bars as an array
      */
+    @Consumible
     public void setBars(double[] input) {
         for (int i = 0; i < input.length; i++) {
             getDataset().setValue((Number) input[i], new Integer(1), i);
+        }
+    }
+
+    //TODO
+    public List<Integer> getBarIndices() {
+        return IntStream.range(0, dataset.getColumnCount()).boxed()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Set value of a specified bar.
+     *
+     * @param value value of bar
+     * @param index which bar value to set
+     */
+    @Consumible(indexListMethod="getBarIndices")
+    public void setValue(final double value, final Integer index) {
+        getDataset().setValue(value, new Integer(1), index);
+    }
+
+    static class ChartDataAdapter
+            extends XmlAdapter<Number[][], DefaultCategoryDataset> {
+
+        @Override
+        public DefaultCategoryDataset unmarshal(Number[][] v) throws Exception {
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            for (int i = 0; i < v.length; i++) {
+                for (int j = 0; j < v[0].length; j++) {
+                    dataset.addValue(v[i][j], i, j);
+                }
+            }
+            return dataset;
+        }
+
+        @Override
+        public Number[][] marshal(DefaultCategoryDataset dataset)
+                throws Exception {
+            Number[][] ret = new Number[dataset.getRowCount()][dataset
+                    .getColumnCount()];
+            for (int i = 0; i < dataset.getRowCount(); i++) {
+                for (int j = 0; j < dataset.getColumnCount(); j++) {
+                    ret[i][j] = dataset.getValue(i, j);
+                }
+            }
+            return ret;
         }
     }
 

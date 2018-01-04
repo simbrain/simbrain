@@ -18,14 +18,13 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.textworld.TextListener.TextAdapter;
 
 import com.thoughtworks.xstream.XStream;
@@ -165,11 +164,26 @@ public final class ReaderWorld extends TextWorld {
      *
      * @return the vector corresponding to the currently parsed token.
      */
+    @Producible
     public double[] getCurrentVector() {
         if (getCurrentItem() == null) {
             return new double[vectorLength];
         } else {
-            return this.getMatchingVector(this.getCurrentItem().getText());
+            return getMatchingVector(getCurrentItem().getText());
+        }
+    }
+
+    /**
+     * Returns a standard java string containing the character or characters
+     * selected by the reader world.
+     * @return the current string
+     */
+    @Producible
+    public String getCurrentString() {
+        if (getCurrentItem() == null) {
+            return "";
+        } else {
+            return getCurrentItem().getText();
         }
     }
 

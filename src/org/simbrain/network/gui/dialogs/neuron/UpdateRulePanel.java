@@ -150,8 +150,8 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         RULE_MAP.put(new DecayRule().getName(), new DecayRulePanel());
         RULE_MAP.put(new FitzhughNagumo().getName(),
                 new FitzhughNagumoRulePanel());
-        RULE_MAP.put(new HodgkinHuxleyRule().getName(),
-                new HodgkinHuxleyRulePanel());
+//        RULE_MAP.put(new HodgkinHuxleyRule().getName(),
+//                new HodgkinHuxleyRulePanel());
         RULE_MAP.put(new IACRule().getName(), new IACRulePanel());
         RULE_MAP.put(new IntegrateAndFireRule().getName(),
                 new IntegrateAndFireRulePanel());

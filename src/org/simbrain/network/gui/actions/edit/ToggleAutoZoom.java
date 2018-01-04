@@ -28,12 +28,11 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Toggle auto zoom mode on double click, fit objects to screen on 
- * single click.
+ * Toggle auto zoom mode on double click, fit objects to screen on single click.
  */
 public final class ToggleAutoZoom extends JToggleButton {
 
-    //TODO: Possibly misplaced in this action package, but oh well...
+    // TODO: Possibly misplaced in this action package, but oh well...
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -57,13 +56,7 @@ public final class ToggleAutoZoom extends JToggleButton {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int numClicks = e.getClickCount();
-                // Do an immediate refocus
-                if (numClicks == 1) {
-                    networkPanel.zoomToFitPage(true);
-                }
-                // Toggle the mode
-                if (numClicks == 2) {
+                if (e.getClickCount() == 2) {
                     networkPanel
                             .setAutoZoomMode(!networkPanel.getAutoZoomMode());
                     setButtonBorder();

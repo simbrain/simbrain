@@ -5,9 +5,10 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Coupling2;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.MismatchedAttributesException;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -447,11 +448,14 @@ public class Creature {
 
 		// Hopefully borrowing nc's attribute manager for the producer won't cause
 		// problems later...
-		PotentialProducer chemicalAmount = nc.getAttributeManager().createPotentialProducer(chem, "getAmount",
-				double.class);
-		PotentialConsumer chemReceptor = nc.getNeuronConsumer(nc, neuron, "forceSetActivation");
+		Producer2 chemicalAmount = nc.getProducer(chem, "getAmount");
+		Consumer2 chemReceptor = nc.getConsumer(neuron, "forceSetActivation");
 
-		parentSim.getSim().addCoupling(new Coupling(chemicalAmount, chemReceptor));
+		try {
+			parentSim.getSim().addCoupling(new Coupling2(chemicalAmount, chemReceptor));
+		} catch (MismatchedAttributesException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void approachBehavior(double strength) {

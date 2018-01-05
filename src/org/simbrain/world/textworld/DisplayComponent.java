@@ -31,7 +31,7 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
 public class DisplayComponent extends WorkspaceComponent {
 
     /** Instance of world of type DisplayWorld. */
-    private final DisplayWorld world;
+    private DisplayWorld world;
 
     /** Default number of string reader attributes to add. */
     private int DEFAULT_NUM_STRING_READERS = 10;
@@ -63,7 +63,7 @@ public class DisplayComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        this.rootObject = world;
+        this.world = world;
 //        addConsumerType(new AttributeType(this, "DisplayClosestWord",
 //                double[].class, true));
 //        addConsumerType(new AttributeType(this, "DisplayString", String.class,

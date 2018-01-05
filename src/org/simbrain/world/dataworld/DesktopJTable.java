@@ -23,8 +23,8 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.gui.CouplingMenuConsumer;
 import org.simbrain.workspace.gui.CouplingMenuProducer;
 
@@ -56,31 +56,26 @@ public class DesktopJTable extends SimbrainJTable {
      * @return The context menu.
      */
     protected JPopupMenu buildPopupMenu() {
-
         JPopupMenu ret = super.buildPopupMenu();
-        ret.addSeparator();
-        String producerDescription = component.getProducingColumnType()
-                .getDescription("Column " + getSelectedColumn());
-        PotentialProducer producer = component.getAttributeManager()
-                .createPotentialProducer(
-                        component.getObjectFromKey("producerList:"
-                                + getSelectedColumn()),
-                        component.getProducingColumnType());
-        producer.setCustomDescription(producerDescription);
-        JMenu producerMenu = new CouplingMenuProducer("Send coupling to",
-                component.getWorkspace(), producer);
-        ret.add(producerMenu);
-        String consumerDescription = component.getConsumingColumnType()
-                .getDescription("Column " + getSelectedColumn());
-        PotentialConsumer consumer = component.getAttributeManager()
-                .createPotentialConsumer(
-                        component.getObjectFromKey("consumerList:"
-                                + getSelectedColumn()),
-                        component.getConsumingColumnType());
-        consumer.setCustomDescription(consumerDescription);
-        JMenu consumerMenu = new CouplingMenuConsumer("Receive coupling from",
-                component.getWorkspace(), consumer);
-        ret.add(consumerMenu);
+//        ret.addSeparator();
+//        String producerDescription = component.getProducingColumnType()
+//                .getDescription("Column " + getSelectedColumn());
+//        Producer2 producer = component.getAttributeManager().createPotentialProducer(
+//                        component.getObjectFromKey("producerList:" + getSelectedColumn()),
+//                        component.getProducingColumnType());
+//        producer.setDescription(producerDescription);
+//        JMenu producerMenu = new CouplingMenuProducer("Send coupling to",
+//                component.getWorkspace(), producer);
+//        ret.add(producerMenu);
+//        String consumerDescription = component.getConsumingColumnType()
+//                .getDescription("Column " + getSelectedColumn());
+//        Consumer2 consumer = component.getAttributeManager().createPotentialConsumer(
+//                        component.getObjectFromKey("consumerList:" + getSelectedColumn()),
+//                        component.getConsumingColumnType());
+//        consumer.setDescription(consumerDescription);
+//        JMenu consumerMenu = new CouplingMenuConsumer("Receive coupling from",
+//                component.getWorkspace(), consumer);
+//        ret.add(consumerMenu);
         return ret;
     }
 }

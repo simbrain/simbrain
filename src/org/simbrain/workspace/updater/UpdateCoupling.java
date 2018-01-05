@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Coupling2;
 
 /**
  * Updates a coupling
@@ -28,14 +28,14 @@ import org.simbrain.workspace.Coupling;
 public class UpdateCoupling implements UpdateAction {
 
     /** of couplings to update. */
-    private final Coupling<?> coupling;
+    private final Coupling2<?> coupling;
 
     /**
      * Construct the action.
      *
      * @param coupling coupling to update
      */
-    public UpdateCoupling(Coupling<?> coupling) {
+    public UpdateCoupling(Coupling2<?> coupling) {
         this.coupling = coupling;
     }
 
@@ -43,7 +43,6 @@ public class UpdateCoupling implements UpdateAction {
      * {@inheritDoc}
      */
     public void invoke() {
-        coupling.setBuffer();
         coupling.update();
     }
 
@@ -54,11 +53,7 @@ public class UpdateCoupling implements UpdateAction {
         if (coupling == null) {
             return "Invalid action";
         } else {
-            return "Update coupling ("
-                    + coupling.getProducer().getParentComponent().getName()
-                    + ">"
-                    + coupling.getConsumer().getParentComponent().getName()
-                    + ")";
+            return "Update coupling (" + coupling.getConsumer() + ">" + coupling.getProducer() + ")";
         }
     }
 
@@ -74,7 +69,7 @@ public class UpdateCoupling implements UpdateAction {
     /**
      * @return the coupling
      */
-    public Coupling<?> getCoupling() {
+    public Coupling2<?> getCoupling() {
         return coupling;
     }
 

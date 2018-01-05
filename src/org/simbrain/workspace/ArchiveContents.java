@@ -116,13 +116,12 @@ class ArchiveContents {
         }
         // Get a coupling id, if this is coupling action
         if (action instanceof UpdateCoupling) {
-            Coupling<?> coupling = ((UpdateCoupling) action).getCoupling();
+            Coupling2<?> coupling = ((UpdateCoupling) action).getCoupling();
             if (coupling != null) {
                 coupling_id = coupling.getId();
             } else {
-                System.err
-                        .println("Invalid coupling action found while saving:"
-                                + action.getDescription());
+                System.err.println("Invalid coupling action found while saving:"
+                        + action.getDescription());
             }
         }
 
@@ -228,9 +227,9 @@ class ArchiveContents {
         } else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
-                Coupling<?> coupling = workspace.getCoupling(id);
+                Coupling2<?> coupling = workspace.getCoupling(id);
                 retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { Coupling.class })
+                        .getConstructor(new Class[] { Coupling2.class })
                         .newInstance(coupling);
 
             } catch (Exception e) {
@@ -247,7 +246,7 @@ class ArchiveContents {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    ArchivedCoupling addCoupling(final Coupling<?> coupling) {
+    ArchivedCoupling addCoupling(final Coupling2<?> coupling) {
         ArchivedCoupling c = new ArchivedCoupling(this, coupling);
         archivedCouplings.add(c);
         return c;
@@ -469,12 +468,10 @@ class ArchiveContents {
          * @param coupling The coupling this instance represents.
          */
         ArchivedCoupling(final ArchiveContents parent,
-                final org.simbrain.workspace.Coupling<?> coupling) {
+                final org.simbrain.workspace.Coupling2<?> coupling) {
 
-            this.archivedProducer = new ArchivedAttribute(parent,
-                    coupling.getProducer());
-            this.archivedConsumer = new ArchivedAttribute(parent,
-                    coupling.getConsumer());
+            this.archivedProducer = new ArchivedAttribute(parent, coupling.getProducer());
+            this.archivedConsumer = new ArchivedAttribute(parent, coupling.getConsumer());
         }
 
         /**
@@ -502,25 +499,12 @@ class ArchiveContents {
     public static final class ArchivedAttribute {
 
         /** The uri for the parent component of this attribute. */
-        private final String parentComponentRef;
+        private String parentComponentRef;
 
-        /** The key that the component uses to identify the base object. */
-        private final String baseObjectKey;
+        /** The attribute id. */
+        private String attributeId;
 
-        /** The key that the component uses to identify the method name. */
-        private final String methodBaseName;
-
-        /** Key for data type. */
-        private final Class<?> dataType;
-
-        /** Argument data types. */
-        private Class<?>[] argumentDataTypes;
-
-        /** Argument values. */
-        private Object[] argumentValues;
-
-        /** Description. */
-        private final String description;
+        public ArchivedAttribute() {}
 
         /**
          * Creates a new instance.
@@ -528,26 +512,9 @@ class ArchiveContents {
          * @param parent The parent archive.
          * @param attribute The attribute this instance represents.
          */
-        ArchivedAttribute(final ArchiveContents parent,
-                final Attribute attribute) {
-
-            WorkspaceComponent comp = attribute.getParentComponent();
-            this.parentComponentRef = parent.componentUris.get(comp);
-            this.baseObjectKey = comp.getKeyFromObject(attribute
-                    .getBaseObject());
-            this.methodBaseName = attribute.getMethodName();
-            this.argumentDataTypes = attribute.getArgumentDataTypes();
-            this.argumentValues = attribute.getArgumentValues();
-            this.dataType = attribute.getDataType();
-            this.description = attribute.getDescription();
-
-        }
-
-        /**
-         * @return the parentComponentRef
-         */
-        public String getParentRef() {
-            return parentComponentRef;
+        ArchivedAttribute(ArchiveContents parent, Attribute2 attribute) {
+            this.parentComponentRef = parent.componentUris.get(attribute.parentComponent);
+            this.attributeId = attribute.getId();
         }
 
         /**
@@ -558,45 +525,10 @@ class ArchiveContents {
         }
 
         /**
-         * @return the baseObjectKey
+         * @return the attribute id
          */
-        public String getBaseObjectKey() {
-            return baseObjectKey;
-        }
-
-        /**
-         * @return the methodBaseName
-         */
-        public String getMethodBaseName() {
-            return methodBaseName;
-        }
-
-        /**
-         * @return the dataType
-         */
-        public Class<?> getDataType() {
-            return dataType;
-        }
-
-        /**
-         * @return the description
-         */
-        public String getDescription() {
-            return description;
-        }
-
-        /**
-         * @return the argumentDataTypes
-         */
-        public Class<?>[] getArgumentDataTypes() {
-            return argumentDataTypes;
-        }
-
-        /**
-         * @return the argumentValues
-         */
-        public Object[] getArgumentValues() {
-            return argumentValues;
+        public String getAttributeId() {
+            return attributeId;
         }
     }
 

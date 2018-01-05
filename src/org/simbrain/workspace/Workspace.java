@@ -48,7 +48,7 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
  * workspaces on different machines together). A workspace can be visualized via
  * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  *
- * @see org.simbrain.workspace.Coupling
+ * @see org.simbrain.workspace.Coupling2
  *
  *      TODO: Check everything that has been commented out
  */
@@ -216,26 +216,10 @@ public class Workspace {
                 Coupling2 coupling = new Coupling2(producer,
                         consumerIterator.next());
                 couplings.add(coupling);
+                fireCouplingAdded(coupling);
                 continue;
             }
         }
-
-        this.fireCouplingsAdded();
-
-        // Iterator<PotentialConsumer> consumerIterator =
-        // consumerKeys.iterator();
-        //
-        // for (PotentialProducer producerID : producerKeys) {
-        // if (consumerIterator.hasNext()) {
-        // Producer<?> producer = producerID.createProducer();
-        // Consumer<?> consumer = consumerIterator.next().createConsumer();
-        // Coupling<?> coupling = new Coupling(producer, consumer);
-        // try {
-        // getCouplingManager().addCoupling(coupling);
-        // } catch (UmatchedAttributesException e) {
-        // throw e;
-        // }
-
     }
 
     /**
@@ -737,18 +721,6 @@ public class Workspace {
         }
     }
 
-    private void fireCouplingsAdded() {
-        for (CouplingListener listeners : couplingListeners) {
-            listeners.couplingsAdded();
-        }
-    }
-
-    private void fireCouplingsRemoved() {
-        for (CouplingListener listeners : couplingListeners) {
-            listeners.couplingsRemoved();
-        }
-    }
-
     /**
      * Coupling removed.
      *
@@ -769,7 +741,8 @@ public class Workspace {
 
     public void removeCouplings(List<Coupling2<?>> couplings) {
         this.couplings.removeAll(couplings);
-        this.fireCouplingsRemoved();
+        // What to do here?
+        //this.fireCouplingsRemoved();
     }
 
     //TODO: If not used by the time update actions are re-implemented, remove

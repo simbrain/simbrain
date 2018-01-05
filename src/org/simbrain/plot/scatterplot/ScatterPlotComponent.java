@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.Consumer2;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -104,25 +104,24 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    public List<Consumer2<?>> getConsumers() {
+        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
         for (ScatterPlotSetter setter : setterList) {
             if (xAttributeType.isVisible()) {
-                String xDesc = xAttributeType.getSimpleDescription("Point "
-                        + (setter.getIndex() + 1) + "[X]");
-                PotentialConsumer xConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, xAttributeType);
-                xConsumer.setCustomDescription(xDesc);
-                returnList.add(xConsumer);
+//                String xDesc = xAttributeType.getSimpleDescription("Point "
+//                        + (setter.getIndex() + 1) + "[X]");
+//                Consumer2<?> xConsumer = getAttributeManager()
+//                        .createPotentialConsumer(setter, xAttributeType);
+//                xConsumer.setDescription(xDesc);
+//                returnList.add(xConsumer);
             }
             if (yAttributeType.isVisible()) {
-                String yDesc = yAttributeType.getSimpleDescription("Point "
-                        + (setter.getIndex() + 1) + "[Y]");
-                PotentialConsumer yConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, yAttributeType);
-                yConsumer.setCustomDescription(yDesc);
-                returnList.add(yConsumer);
+//                String yDesc = yAttributeType.getSimpleDescription("Point "
+//                        + (setter.getIndex() + 1) + "[Y]");
+//                Consumer2<?> yConsumer = getAttributeManager()
+//                        .createPotentialConsumer(setter, yAttributeType);
+//                yConsumer.setDescription(yDesc);
+//                returnList.add(yConsumer);
             }
         }
         return returnList;

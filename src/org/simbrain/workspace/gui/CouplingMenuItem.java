@@ -23,10 +23,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.*;
 
 /**
  * A menu item corresponding to a potential coupling. When the menuitem is
@@ -40,13 +37,13 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private final PotentialProducer potentialProducer;
+    private Producer2 producer;
 
     /** Reference to consuming attribute. */
-    private final PotentialConsumer potentialConsumer;
+    private Consumer2 consumer;
 
     /** The workspace this object belongs to. */
-    private final Workspace workspace;
+    private Workspace workspace;
 
     /**
      * Creates a new instance.
@@ -56,18 +53,11 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * @param producer The producer for the coupling.
      * @param consumer The consumer for the coupling.
      */
-    @SuppressWarnings("unchecked")
-    public CouplingMenuItem(final Workspace workspace,
-            final String description, final PotentialProducer producer,
-            final PotentialConsumer consumer) {
-        super(description, workspace.getCouplingManager()
-                .containseEquivalentCoupling(
-                        new Coupling(producer.createProducer(), consumer
-                                .createConsumer())));
+    public CouplingMenuItem(Workspace workspace, String description, Producer2 producer, Consumer2 consumer) {
+        super(description);
         this.workspace = workspace;
-        this.potentialProducer = producer;
-        this.potentialConsumer = consumer;
-
+        this.producer = producer;
+        this.consumer = consumer;
         addActionListener(listener);
     }
 
@@ -76,17 +66,16 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * when there is no coupling one is created. If it is selected, then the
      * coupling is removed.
      */
-    @SuppressWarnings("unchecked")
     private final ActionListener listener = new ActionListener() {
-        public void actionPerformed(final ActionEvent e) {
+        public void actionPerformed(final ActionEvent evt) {
             if (getState()) {
-                workspace.addCoupling(new Coupling(potentialProducer
-                        .createProducer(), potentialConsumer.createConsumer()));
-                setSelected(true);
+                try {
+                    workspace.addCoupling(new Coupling2(producer, consumer));
+                    setSelected(true);
+                } catch (MismatchedAttributesException ex) {
+                    ex.printStackTrace();
+                }
             } else {
-                workspace.getCouplingManager().removeMatchingCoupling(
-                        new Coupling(potentialProducer.createProducer(),
-                                potentialConsumer.createConsumer()));
                 setSelected(false);
             }
         }

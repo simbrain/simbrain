@@ -20,6 +20,7 @@ package org.simbrain.workspace;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,9 +81,6 @@ public abstract class WorkspaceComponent {
      */
     private File currentFile;
 
-    /** Manage creation of attributes on this component. */
-    private final AttributeManager attributeManager;
-
     /**
      * If set to true, serialize this component before others. Possibly replace
      * with priority system later.
@@ -96,7 +94,6 @@ public abstract class WorkspaceComponent {
     {
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
         attributeListeners = new HashSet<AttributeListener>();
-        attributeManager = new AttributeManager(this);
     }
 
     /**
@@ -158,26 +155,6 @@ public abstract class WorkspaceComponent {
      */
     public void update() {
         /* no default implementation */
-    }
-
-    /**
-     * Return the potential consumers associated with this component. Subclasses
-     * should override this to make their consumers available.
-     *
-     * @return the consumer list.
-     */
-    public List<PotentialConsumer> getPotentialConsumers() {
-        return Collections.EMPTY_LIST;
-    }
-
-    /**
-     * Return the potential producers associated with this component. Subclasses
-     * should override this to make their producers available.
-     *
-     * @return the producer list.
-     */
-    public List<PotentialProducer> getPotentialProducers() {
-        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -445,7 +422,7 @@ public abstract class WorkspaceComponent {
      *
      * @param coupling The coupling that has been removed.
      */
-    public void couplingRemoved(final Coupling<?> coupling) {
+    public void couplingRemoved(final Coupling2<?> coupling) {
         // No implementation.
     }
 
@@ -454,7 +431,7 @@ public abstract class WorkspaceComponent {
      *
      * @param coupling The coupling that is being added
      */
-    public void couplingAdded(Coupling<?> coupling) {
+    public void couplingAdded(Coupling2<?> coupling) {
         // Override is this function is needed in a component type
     }
 
@@ -591,13 +568,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * @return the attributeManager
-     */
-    public AttributeManager getAttributeManager() {
-        return attributeManager;
-    }
-
-    /**
      * @return the serializePriority
      */
     protected int getSerializePriority() {
@@ -609,20 +579,6 @@ public abstract class WorkspaceComponent {
      */
     protected void setSerializePriority(int serializePriority) {
         this.serializePriority = serializePriority;
-    }
-    
-    // Convenience methods which forward to attribute manager.
-    //  A small bit of merging from 3.1 refactor
-    public PotentialConsumer createPotentialConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        return attributeManager.createPotentialConsumer(baseObject, methodName,
-                dataType);
-    }
-
-    public PotentialProducer createPotentialProducer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        return attributeManager.createPotentialProducer(baseObject, methodName,
-                dataType);
     }
 
     /**
@@ -641,4 +597,104 @@ public abstract class WorkspaceComponent {
     public void stop() {
     }
 
+    public List<Producer2<?>> getProducers() {
+        return getProducers(this);
+    }
+
+    public List<Consumer2<?>> getConsumers() {
+        return getConsumers(this);
+    }
+
+    public final List<Producer2<?>> getProducersFromList(List list) {
+        List<Producer2<?>> returnList = new ArrayList<>();
+        for (Object object : list) {
+            returnList.addAll(getProducers(object));
+        }
+        return returnList;
+    }
+
+    public final List<Consumer2<?>> getConsumersFromList(List list) {
+        List<Consumer2<?>> returnList = new ArrayList<>();
+        for (Object object : list) {
+            returnList.addAll(getConsumers(object));
+        }
+        return returnList;
+    }
+
+    // TODO: Rename to getProduersOnObject... to clarify it's a service / helper
+    public final List<Producer2<?>> getProducers(Object object) {
+        List<Producer2<?>> returnList = new ArrayList<>();
+        for (Method method : object.getClass().getMethods()) {
+            Producible annotation = method.getAnnotation(Producible.class);
+            if (annotation != null) {
+                // A custom keyed annotation is being used
+                if (!annotation.indexListMethod().isEmpty()) {
+                    try {
+                        Method indexListMethod = object.getClass()
+                                .getMethod(annotation.indexListMethod(), null);
+                        List keys = (List) indexListMethod.invoke(object, null);
+                        for (Object key: keys) {
+                            Producer2<?> consumer = new Producer2(this, object, method);
+                            consumer.key = key;
+                            returnList.add(consumer);
+                        }
+                    } catch (Exception e) {
+                        // TODO: Use multicatch
+                        e.printStackTrace();
+                    }
+                }  else {
+                    // Annotation has no key
+                    Producer2<?> producer = new Producer2(this, object, method);
+                    //setCustomDescription(producer);
+                    returnList.add(producer);
+                }
+             }
+         }
+         return returnList;
+     }
+
+    public final List<Consumer2<?>> getConsumers(Object object) {
+        List<Consumer2<?>> returnList = new ArrayList<>();
+        for (Method method : object.getClass().getMethods()) {
+            // TODO: Docs; When this works do it for producers
+            // Key case
+            Consumible annotation = method.getAnnotation(Consumible.class);
+            if (annotation != null) {
+                // A custom keyed annotation is being used
+                if (!annotation.indexListMethod().isEmpty()) {
+                    try {
+                        Method indexListMethod = object.getClass()
+                                .getMethod(annotation.indexListMethod(), null);
+                        List keys = (List) indexListMethod.invoke(object, null);
+                        for (Object key: keys) {
+                            Consumer2<?> consumer = new Consumer2(this, object, method);
+                            consumer.key = key;
+                            returnList.add(consumer);
+                        }
+                    } catch (Exception e) {
+                        // TODO: Use multicatch
+                        e.printStackTrace();
+                    }
+                } else {
+                    // Annotation has no key
+                    Consumer2<?> consumer = new Consumer2(this, object, method);
+                    //setCustomDescription(consumer);
+                    returnList.add(consumer);
+                }
+            }
+        }
+        return returnList;
+    }
+
+    public Consumer2<?> getConsumer(Object object, String methodName) {
+        return getConsumers(object).stream().filter(
+                c -> c.getMethod().getName().equalsIgnoreCase(methodName))
+                     .findFirst().get();
+    }
+
+    public Producer2<?> getProducer(Object object, String methodName) {
+        return getProducers(object).stream().filter(
+                p -> p.getMethod().getName().equalsIgnoreCase(methodName))
+                     .findFirst().get();
+    }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.Consumer2;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -162,17 +162,17 @@ public class HistogramComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    public List<Consumer2<?>> getConsumers() {
+        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
         if (histogramConsumer.isVisible()) {
             for (int i = 0; i < model.getData().size(); i++) {
-                String description = "Histogram " + (i + 1);
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(model, "addData",
-                                new Class[] { double[].class, Integer.class },
-                                new Object[] { i });
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
+//                String description = "Histogram " + (i + 1);
+//                Consumer2<?> consumer = getAttributeManager()
+//                        .createPotentialConsumer(model, "addData",
+//                                new Class[] { double[].class, Integer.class },
+//                                new Object[] { i });
+//                consumer.setDescription(description);
+//                returnList.add(consumer);
             }
         }
         return returnList;

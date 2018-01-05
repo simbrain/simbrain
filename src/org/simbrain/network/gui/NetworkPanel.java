@@ -188,9 +188,6 @@ public class NetworkPanel extends JPanel {
     /** The model neural-Network object. */
     private Network network;
 
-    /** The Network hierarchy panel. */
-    private NetworkHierarchyPanel networkHierarchyPanel;
-
     /** Main splitter pane: network in middle, hierarchy on left. */
     private JSplitPane splitPane;
 
@@ -327,9 +324,6 @@ public class NetworkPanel extends JPanel {
 
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
-
-    /** Local thread flag for manually starting and stopping the network. */
-    private AtomicBoolean isRunning = new AtomicBoolean();
 
     /** Toolbar panel. */
     private JPanel toolbars;
@@ -784,7 +778,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Update visible state of group nodes.
      *
-     * @param group the group to update
+     * @param groups the group to update
      */
     private void updateGroupNodes(Collection<Group> groups) {
         // System.out.println("In update group node. Updating group " + group);
@@ -994,7 +988,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Add GUI representation of specified model synapse to network panel.
      *
-     * @param the synapse to add
+     * @param synapse the synapse to add
      */
     private void addSynapse(final Synapse synapse) {
         if (objectNodeMap.get(synapse) != null) {
@@ -2796,25 +2790,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Set the visibility of the hiearchy panel.
-     *
-     * @param showIt whether it should be visible or not
-     */
-    public void setHierarchyPanelVisible(boolean showIt) {
-        this.showNetworkHierarchyPanel = showIt;
-        actionManager.getShowNetworkHierarchyPanel()
-                .setState(showNetworkHierarchyPanel);
-        if (!showNetworkHierarchyPanel) {
-            splitPane.setLeftComponent(null);
-            splitPane.setDividerSize(0);
-        } else {
-            splitPane.setLeftComponent(networkHierarchyPanel);
-            splitPane.setDividerSize(4);
-        }
-        networkHierarchyPanel.setVisible(showNetworkHierarchyPanel);
-    }
-
-    /**
      * @return the prioritiesVisible
      */
     public boolean getPrioritiesVisible() {
@@ -3085,14 +3060,14 @@ public class NetworkPanel extends JPanel {
      * @return the isRunning
      */
     public boolean isRunning() {
-        return isRunning.get();
+        return network.isRunning();
     }
 
     /**
-     * @param isRunning the isRunning to set
+     * @param value the isRunning to set
      */
-    public void setRunning(boolean isRunning) {
-        this.isRunning.set(isRunning);
+    public void setRunning(boolean value) {
+        network.setRunning(value);
     }
 
     /**

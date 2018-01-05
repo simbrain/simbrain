@@ -29,13 +29,13 @@ public interface CouplingListener {
      *
      * @param coupling the new coupling
      */
-    public void couplingAdded(Coupling<?> coupling);
+    public void couplingAdded(Coupling2<?> coupling);
 
     /**
      * Called when a coupling is removed.
      *
      * @param coupling the coupling that is being removed
      */
-    public void couplingRemoved(Coupling<?> coupling);
+    public void couplingRemoved(Coupling2<?> coupling);
 
 }

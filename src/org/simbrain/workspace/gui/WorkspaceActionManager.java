@@ -78,9 +78,6 @@ public class WorkspaceActionManager {
     /** New text world action. */
     private final Action newDisplayWorldAction;
 
-    /** New vision world action. */
-    private final Action newVisionWorldAction;
-
     /** New device interaction world action. */
     private final Action newDeviceInteractionWorldAction;
 
@@ -209,7 +206,6 @@ public class WorkspaceActionManager {
         newGameWorldAction = new NewGameWorldAction(workspace);
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
-        newVisionWorldAction = new NewVisionWorldAction(workspace);
         newDeviceInteractionWorldAction = new NewDeviceInteractionWorldAction(workspace);
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
@@ -254,28 +250,36 @@ public class WorkspaceActionManager {
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] { openDataWorldAction,
-                openOdorWorldAction });
+        return Arrays.asList(new Action[] {
+                openDataWorldAction,
+                openOdorWorldAction
+        });
     }
 
     /**
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] { newDataWorldAction,
-                newOdorWorldAction, newDisplayWorldAction,
-                newReaderWorldAction,
-                // newThreeDeeWorldAction,
-                newVisionWorldAction });
+        return Arrays.asList(new Action[] {
+                newDataWorldAction,
+                newOdorWorldAction,
+                newDisplayWorldAction,
+                newReaderWorldAction
+        });
     }
 
     /**
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] { newBarChartAction,
-                newHistogramAction, newPieChartAction, newProjectionPlotAction,
-                newRasterPlotAction, newTimeSeriesAction });
+        return Arrays.asList(new Action[] {
+                newBarChartAction,
+                newHistogramAction,
+                newPieChartAction,
+                newProjectionPlotAction,
+                newRasterPlotAction,
+                newTimeSeriesAction
+        });
     }
 
     /**
@@ -389,13 +393,6 @@ public class WorkspaceActionManager {
      */
     public Action getNewOdorWorldAction() {
         return newOdorWorldAction;
-    }
-
-    /**
-     * @return the newVisionWorldAction.
-     */
-    public Action getNewVisionWorldAction() {
-        return newVisionWorldAction;
     }
 
     /**

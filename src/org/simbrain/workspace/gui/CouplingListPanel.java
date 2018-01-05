@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,9 +37,9 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Coupling2;
 import org.simbrain.workspace.CouplingListener;
-import org.simbrain.workspace.CouplingManager;
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 /**
  * Displays a list of the current couplings in the network.
@@ -54,10 +54,10 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
     private JFrame couplingFrame = new JFrame();
 
     /** Simbrain desktop reference. */
-    private final SimbrainDesktop desktop;
+    private SimbrainDesktop desktop;
 
     /** List of couplings. */
-    private Vector<Coupling<?>> couplingList = new Vector<Coupling<?>>();
+    private List<Coupling2<?>> couplingList = new ArrayList<Coupling2<?>>();
 
     /** Action which deletes current couplings. */
     Action deleteCouplingsAction = new AbstractAction() {
@@ -79,8 +79,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            desktop.getWorkspace().getCouplingManager()
-                    .removeCouplings(getSelectedCouplings());
+            desktop.getWorkspace().removeCouplings(getSelectedCouplings());
         }
     };
 
@@ -91,9 +90,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * @param desktop Reference to simbrain desktop
      * @param couplingList list of couplings to be shown in window
      */
-    public CouplingListPanel(final SimbrainDesktop desktop,
-            final Vector<Coupling<?>> couplingList) {
-
+    public CouplingListPanel(SimbrainDesktop desktop, List<Coupling2<?>> couplingList) {
         super(new BorderLayout());
 
         // Reference to the simbrain desktop
@@ -103,15 +100,13 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         // Listens for frame closing for removal of listener.
         couplingFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(final WindowEvent w) {
-                desktop.getWorkspace().getCouplingManager()
-                        .removeCouplingListener(CouplingListPanel.this);
+                desktop.getWorkspace().removeCouplingListener(CouplingListPanel.this);
             }
         });
-        desktop.getWorkspace().getCouplingManager().addCouplingListener(this);
+        desktop.getWorkspace().addCouplingListener(this);
 
         // Populates the coupling list with data.
-        couplings.setListData(this.couplingList);
-
+        couplings.setListData(this.couplingList.toArray());
         couplings.setCellRenderer(new CouplingCellRenderer());
 
         // Scroll pane for showing lists larger than viewing window and setting
@@ -137,9 +132,8 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * Updates the list of couplings when new couplings are made.
      */
     private void couplingsUpdated() {
-        couplingList = new Vector(desktop.getWorkspace().getCouplingManager()
-                .getCouplings());
-        couplings.setListData(couplingList);
+        couplingList = new ArrayList(desktop.getWorkspace().getCouplings());
+        couplings.setListData(couplingList.toArray());
     }
 
     /**
@@ -147,10 +141,10 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      *
      * @return selected consumers.
      */
-    private ArrayList<Coupling<?>> getSelectedCouplings() {
-        ArrayList<Coupling<?>> ret = new ArrayList<Coupling<?>>();
+    private ArrayList<Coupling2<?>> getSelectedCouplings() {
+        ArrayList<Coupling2<?>> ret = new ArrayList<Coupling2<?>>();
         for (Object object : couplings.getSelectedValues()) {
-            ret.add((Coupling<?>) object);
+            ret.add((Coupling2<?>) object);
         }
         return ret;
     }
@@ -158,14 +152,14 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
     /**
      * {@inheritDoc}
      */
-    public void couplingAdded(Coupling coupling) {
+    public void couplingAdded(Coupling2 coupling) {
         couplingsUpdated();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void couplingRemoved(Coupling coupling) {
+    public void couplingRemoved(Coupling2 coupling) {
         couplingsUpdated();
     }
 
@@ -189,11 +183,10 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
-            Coupling<?> coupling = (Coupling<?>) object;
+            Coupling2<?> coupling = (Coupling2<?>) object;
 
             // Set text color based on data type
-            renderer.setForeground(CouplingManager.getColor(coupling
-                    .getDataType()));
+            renderer.setForeground(DesktopCouplingManager.getColor(coupling.getType()));
             return renderer;
         }
 

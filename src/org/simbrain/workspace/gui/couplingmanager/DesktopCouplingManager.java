@@ -19,6 +19,7 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -26,8 +27,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,8 +42,8 @@ import javax.swing.border.Border;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
@@ -122,8 +124,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         cancelButton.addActionListener(this);
         bottomPanel.add(cancelButton);
 
-        JComponent couplingList = new CouplingListPanel(desktop, new Vector(
-                desktop.getWorkspace().getCouplingManager().getCouplings()));
+        JComponent couplingList = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
         couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 
         // Main Panel
@@ -170,10 +171,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * Add couplings using the selected method.
      */
     private void addCouplings() {
-
-        List<PotentialProducer> potentialProducers = (List<PotentialProducer>) producingAttributes
+        List<Producer2<?>> potentialProducers = (List<Producer2<?>>) producingAttributes
                 .getSelectedAttributes();
-        List<PotentialConsumer> potentialConsumers = (List<PotentialConsumer>) consumingAttributes
+        List<Consumer2<?>> potentialConsumers = (List<Consumer2<?>>) consumingAttributes
                 .getSelectedAttributes();
 
         if ((potentialProducers.size() == 0)
@@ -186,20 +186,35 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         }
 
         try {
-            if (((String) couplingMethodComboBox.getSelectedItem())
-                    .equalsIgnoreCase("One to one")) {
-                desktop.getWorkspace().coupleOneToOne(potentialProducers,
-                        potentialConsumers);
-            } else if (((String) couplingMethodComboBox.getSelectedItem())
-                    .equalsIgnoreCase("One to many")) {
-                desktop.getWorkspace().coupleOneToMany(potentialProducers,
-                        potentialConsumers);
-            }
+            desktop.getWorkspace().coupleOneToOne(potentialProducers, potentialConsumers);
+//            if (((String) couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
+//                desktop.getWorkspace().coupleOneToOne(potentialProducers, potentialConsumers);
+//            } else if (((String) couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
+//                desktop.getWorkspace().coupleOneToMany(potentialProducers, potentialConsumers);
+//            }
         } catch (MismatchedAttributesException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(),
                     "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
 
         }
+    }
+
+    /**
+     * Associates attribute and coupling data types (classes) with colors used
+     * in displaying attributes and couplings.
+     *
+     * @param dataType the data type to associate with a color
+     * @return the color associated with a data type
+     */
+    public static Color getColor(Type dataType) {
+        if (dataType == double.class) {
+            return Color.black;
+        } else if (dataType == double[].class) {
+            return Color.green.darker().darker();
+        } else if (dataType == String.class) {
+            return Color.blue.brighter();
+        }
+        return Color.black;
     }
 
 }

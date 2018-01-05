@@ -92,10 +92,10 @@ public class WorkspaceSerializer {
         serializeComponents(serializer, archive, zipStream);
 
         // Serialize couplings
-        for (Coupling<?> coupling : workspace.getCouplingManager()
-                .getCouplings()) {
-            archive.addCoupling(coupling);
-        }
+//        for (Coupling2<?> coupling : workspace.getCouplingManager()
+//                .getCouplings()) {
+//            archive.addCoupling(coupling);
+//        }
 
         // Serialize update actions
         for (UpdateAction action : workspace.getUpdater().getUpdateManager()
@@ -233,59 +233,59 @@ public class WorkspaceSerializer {
         }
 
         // Add Couplings
-        if (contents.getArchivedCouplings() != null) {
-            for (ArchiveContents.ArchivedCoupling couplingRef : contents
-                    .getArchivedCouplings()) {
-                if (exclude.contains(couplingRef.getArchivedProducer()
-                        .getParentRef())
-                        || exclude.contains(couplingRef.getArchivedProducer()
-                                .getParentRef())) {
-                    continue;
-                }
-
-                // Get workspace components from references
-                WorkspaceComponent sourceComponent = componentDeserializer
-                        .getComponent(couplingRef.getArchivedProducer()
-                                .getParentRef());
-                WorkspaceComponent targetComponent = componentDeserializer
-                        .getComponent(couplingRef.getArchivedConsumer()
-                                .getParentRef());
-
-                // Get attributes from references
-                Producer<?> producer = sourceComponent
-                        .getAttributeManager()
-                        .createProducer(
-                                sourceComponent.getObjectFromKey(couplingRef
-                                        .getArchivedProducer()
-                                        .getBaseObjectKey()),
-                                couplingRef.getArchivedProducer()
-                                        .getMethodBaseName(),
-                                couplingRef.getArchivedProducer().getDataType(),
-                                couplingRef.getArchivedProducer()
-                                        .getArgumentDataTypes(),
-                                couplingRef.getArchivedProducer()
-                                        .getArgumentValues(),
-                                couplingRef.getArchivedProducer()
-                                        .getDescription());
-
-                Class[] argDataTypes = couplingRef.getArchivedConsumer()
-                        .getArgumentDataTypes();
-                Consumer<?> consumer = targetComponent.getAttributeManager()
-                        .createConsumer(
-                                targetComponent.getObjectFromKey(couplingRef
-                                        .getArchivedConsumer()
-                                        .getBaseObjectKey()),
-                                couplingRef.getArchivedConsumer()
-                                        .getMethodBaseName(),
-                                argDataTypes,
-                                couplingRef.getArchivedConsumer()
-                                        .getArgumentValues(),
-                                couplingRef.getArchivedConsumer()
-                                        .getDescription());
-                workspace.addCoupling(new Coupling(producer, consumer));
-
-            }
-        }
+//        if (contents.getArchivedCouplings() != null) {
+//            for (ArchiveContents.ArchivedCoupling couplingRef : contents
+//                    .getArchivedCouplings()) {
+//                if (exclude.contains(couplingRef.getArchivedProducer()
+//                        .getParentRef())
+//                        || exclude.contains(couplingRef.getArchivedProducer()
+//                                .getParentRef())) {
+//                    continue;
+//                }
+//
+//                // Get workspace components from references
+//                WorkspaceComponent sourceComponent = componentDeserializer
+//                        .getComponent(couplingRef.getArchivedProducer()
+//                                .getParentRef());
+//                WorkspaceComponent targetComponent = componentDeserializer
+//                        .getComponent(couplingRef.getArchivedConsumer()
+//                                .getParentRef());
+//
+//                // Get attributes from references
+//                Producer<?> producer = sourceComponent
+//                        .getAttributeManager()
+//                        .createProducer(
+//                                sourceComponent.getObjectFromKey(couplingRef
+//                                        .getArchivedProducer()
+//                                        .getBaseObjectKey()),
+//                                couplingRef.getArchivedProducer()
+//                                        .getMethodBaseName(),
+//                                couplingRef.getArchivedProducer().getDataType(),
+//                                couplingRef.getArchivedProducer()
+//                                        .getArgumentDataTypes(),
+//                                couplingRef.getArchivedProducer()
+//                                        .getArgumentValues(),
+//                                couplingRef.getArchivedProducer()
+//                                        .getDescription());
+//
+//                Class[] argDataTypes = couplingRef.getArchivedConsumer()
+//                        .getArgumentDataTypes();
+//                Consumer<?> consumer = targetComponent.getAttributeManager()
+//                        .createConsumer(
+//                                targetComponent.getObjectFromKey(couplingRef
+//                                        .getArchivedConsumer()
+//                                        .getBaseObjectKey()),
+//                                couplingRef.getArchivedConsumer()
+//                                        .getMethodBaseName(),
+//                                argDataTypes,
+//                                couplingRef.getArchivedConsumer()
+//                                        .getArgumentValues(),
+//                                couplingRef.getArchivedConsumer()
+//                                        .getDescription());
+//                workspace.addCoupling(new Coupling(producer, consumer));
+//
+//            }
+//        }
 
         // Add update actions
         workspace.getUpdater().getUpdateManager().clear();

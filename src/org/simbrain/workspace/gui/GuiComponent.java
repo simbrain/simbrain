@@ -144,7 +144,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
         closing();
         workspaceComponent.close();
-        getDesktop().unregisterComponent(this);        
     }
 
     /**

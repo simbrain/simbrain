@@ -38,7 +38,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 public class OdorWorldComponent extends WorkspaceComponent {
 
     /** Reference to model world. */
-    private OdorWorld world = new OdorWorld();
+    private OdorWorld world;
 
     /** Attribute types. */
     // AttributeType xLocationType = (new AttributeType(this, "Location", "X",
@@ -73,7 +73,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         super(name);
         initializeAttributes();
         addListener();
-        rootObject = world;
+        world = new OdorWorld();
     }
 
     /**
@@ -87,7 +87,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         this.world = world;
         initializeAttributes();
         addListener();
-        rootObject = world;
+        this.world = world;
     }
 
     /**

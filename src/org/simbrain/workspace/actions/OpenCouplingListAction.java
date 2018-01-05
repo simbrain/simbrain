@@ -59,11 +59,11 @@ public final class OpenCouplingListAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Coupling List");
-        JComponent cl = new CouplingListPanel(desktop, new Vector(desktop
-                .getWorkspace().getCouplingManager().getCouplings()));
+        //JComponent cl = new CouplingListPanel(desktop, new Vector(
+        //        desktop.getWorkspace().getCouplingManager().getCouplings()));
         // JComponent cl = new AttributePanel(desktop);
         MyGlassPane pane = new MyGlassPane();
-        frame.setContentPane(cl);
+        //frame.setContentPane(cl);
         frame.setGlassPane(pane);
         frame.pack();
         pane.repaint();

@@ -32,7 +32,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class ReaderComponent extends WorkspaceComponent {
 
     /** Instance of world of type TextWorld. */
-    private final ReaderWorld world;
+    private ReaderWorld world;
 
     /**
      * Creates a new frame of type TextWorld.
@@ -61,7 +61,7 @@ public class ReaderComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        this.rootObject = world;
+        this.world = world;
 //        addProducerType(new AttributeType(this, "TokenVectors", double[].class,
 //                true));
 //        addProducerType(new AttributeType(this, "TokenScalars", double.class, true));

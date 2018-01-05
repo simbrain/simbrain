@@ -1,7 +1,7 @@
 package org.simbrain.world.deviceinteraction;
 
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.Consumer2;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -61,19 +61,14 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    public List<Consumer2<?>> getConsumers() {
+        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
         for (AttributeType type : getVisibleConsumerTypes()) {
 
             if (type.getTypeName().equalsIgnoreCase(KEYBOARD_DEVICE_INTERACTION_WORLD)) {
                 for (Character character : world.getTokenDictionary()) {
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(
-                                    world,
-                                    "keyPress",
-                                    new Class<?>[] {double.class, Character.class},
-                                    new Object[] {character});
-                    consumer.setCustomDescription(String.valueOf(character));
+                    Consumer2 consumer = getConsumer(world, "keyPress");
+                    consumer.setDescription(String.valueOf(character));
                     returnList.add(consumer);
                 }
             }

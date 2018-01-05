@@ -28,6 +28,21 @@ import javax.swing.ImageIcon;
  * the rest of the program.
  */
 public class ResourceManager {
+    private static int smallIconSize = 18;
+
+    /**
+     * @return Returns the size in pixels to which small icons will be scaled.
+     */
+    public static int getSmallIconSize() {
+        return smallIconSize;
+    }
+
+    /**
+     * @param value Assigns the size in pixels to which small icons will be scaled.
+     */
+    public static void setSmallIconSize(int value) {
+        smallIconSize = value;
+    }
 
     /**
      * Retrieve an ImageIcon based on its file name.
@@ -37,12 +52,23 @@ public class ResourceManager {
      * @return the ImageIcon which can be used with Swing components, etc
      */
     public static ImageIcon getImageIcon(final String name) {
-        ImageIcon imageIcon;
-        URL url;
+        // TODO: Replace usage of this method with get<SIZE>Icon and create a user
+        // preference for changing the sizes.
+        URL url = ResourceManager.class.getResource(name);
+        return new ImageIcon(url);
+    }
 
-        url = ResourceManager.class.getResource(name);
-        imageIcon = new ImageIcon(url);
-
+    /**
+     * Load an ImageIcon from the resources directory and scale it if necessary.
+     * @param name The name of the icon to load within the resources directory.
+     * @return Returns a scaled ImageIcon.
+     */
+    public static ImageIcon getSmallIcon(final String name) {
+        URL url = ResourceManager.class.getResource(name);
+        ImageIcon imageIcon = new ImageIcon(url);
+        Image image = imageIcon.getImage().getScaledInstance(
+                smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
+        imageIcon.setImage(image);
         return imageIcon;
     }
 
@@ -54,12 +80,8 @@ public class ResourceManager {
      * @return the Image which can be used with Swing components, etc
      */
     public static Image getImage(final String name) {
-        URL url;
-
-        url = ResourceManager.class.getResource(name);
-
+        URL url = ResourceManager.class.getResource(name);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
-
         return toolKit.getImage(url);
     }
 }

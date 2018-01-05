@@ -60,7 +60,6 @@ import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.network.IterateNetworkAction;
 import org.simbrain.network.gui.actions.network.RunNetworkAction;
-import org.simbrain.network.gui.actions.network.ShowNetworkHierarchyPanel;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.network.gui.actions.network.StopNetworkAction;
@@ -220,9 +219,6 @@ public final class NetworkActionManager {
     /** Whether neuron priorities should be shown or not. */
     private final JCheckBoxMenuItem showPrioritiesAction;
 
-    /** Whether network hierarchy inspector should be shown or not. */
-    private final JCheckBoxMenuItem showNetworkHierarchyAction;
-
     /** Select all incoming synapses. */
     private final Action selectIncomingWeightsAction;
 
@@ -319,8 +315,6 @@ public final class NetworkActionManager {
                 networkPanel));
         showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(
                 networkPanel));
-        showNetworkHierarchyAction = new JCheckBoxMenuItem(
-                new ShowNetworkHierarchyPanel(networkPanel));
 
         setAutoZoomAction = new ToggleAutoZoom(networkPanel);
 
@@ -871,13 +865,6 @@ public final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getShowPrioritiesAction() {
         return showPrioritiesAction;
-    }
-
-    /**
-     * @return the showNetworkHierarchyAction
-     */
-    public JCheckBoxMenuItem getShowNetworkHierarchyPanel() {
-        return showNetworkHierarchyAction;
     }
 
     /**

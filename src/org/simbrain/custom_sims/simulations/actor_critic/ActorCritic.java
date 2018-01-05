@@ -19,10 +19,10 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Coupling2;
 import org.simbrain.workspace.MismatchedAttributesException;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -90,8 +90,8 @@ public class ActorCritic extends RegisteredSimulation {
     BasicEntity cheese; // TODO: Change to goal or generify like RL_Sim?
 
     /** Couplings. */
-    List<Coupling<?>> effectorCouplings = new ArrayList<>();
-    List<Coupling<?>> sensorCouplings = new ArrayList<>();
+    List<Coupling2<?>> effectorCouplings = new ArrayList<>();
+    List<Coupling2<?>> sensorCouplings = new ArrayList<>();
 
     /** Neural net variables. */
     Network network;
@@ -184,15 +184,13 @@ public class ActorCritic extends RegisteredSimulation {
             public void invoke() {
 
                 // Update net > movement couplings
-                sim.getWorkspace().getCouplingManager()
-                        .updateCouplings(effectorCouplings);
+                sim.getWorkspace().updateCouplings(effectorCouplings);
 
                 // Update world
                 ob.getOdorWorldComponent().update();
 
                 // Update world > tile neurons and plot couplings
-                sim.getWorkspace().getCouplingManager()
-                        .updateCouplings(sensorCouplings);
+                sim.getWorkspace().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
                 net.getNetworkComponent().update();
@@ -232,7 +230,7 @@ public class ActorCritic extends RegisteredSimulation {
         NetworkComponent nc = net.getNetworkComponent();
 
         tileNeurons = new ArrayList<Neuron>();
-        sensorCouplings = new ArrayList<Coupling<?>>();
+        sensorCouplings = new ArrayList<Coupling2<?>>();
         for (int i = 0; i < tileSets; i++) {
             for (int j = 0; j < numTiles; j++) {
                 for (int k = 0; k < numTiles; k++) {
@@ -253,20 +251,14 @@ public class ActorCritic extends RegisteredSimulation {
                     tileNeuron.setY(initTilesY + y);
                     network.addNeuron(tileNeuron);
 
-                    PotentialProducer tileProducer = oc.getAttributeManager()
-                            .createPotentialProducer(sensor, "getValue",
-                                    double.class);
-                    tileProducer.setCustomDescription(sensor.getLabel());
-                    PotentialConsumer neuronConsumer = nc.getAttributeManager()
-                            .createPotentialConsumer(tileNeuron,
-                                    "setActivation", double.class);
-                    neuronConsumer.setCustomDescription(tileNeuron.getId());
-                    Coupling<?> tileCoupling = new Coupling(tileProducer,
-                            neuronConsumer);
-                    sensorCouplings.add(tileCoupling);
+                    Producer2 tileProducer = oc.getProducer(sensor, "getValue");
+                    tileProducer.setDescription(sensor.getLabel());
+                    Consumer2 neuronConsumer = nc.getConsumer(tileNeuron, "setActivation");
+                    neuronConsumer.setDescription(tileNeuron.getId());
                     try {
-                        sim.getWorkspace().getCouplingManager()
-                                .addCoupling(tileCoupling);
+                        Coupling2<?> tileCoupling = new Coupling2(tileProducer, neuronConsumer);
+                        sensorCouplings.add(tileCoupling);
+                        sim.getWorkspace().addCoupling(tileCoupling);
                     } catch (MismatchedAttributesException e) {
                         e.printStackTrace();
                     }
@@ -300,59 +292,64 @@ public class ActorCritic extends RegisteredSimulation {
 
         // Absolute movement couplings
         outputs.getNeuronList().get(0).setLabel("North");
-        PotentialProducer northProducer = nc.createPotentialProducer(
-                outputs.getNeuronList().get(0), "getActivation", double.class);
-        PotentialConsumer northMovement = oc.createPotentialConsumer(mouse,
-                "moveNorth", double.class);
-        // northMovement.setCustomDescription("North");
-        Coupling northCoupling = new Coupling(northProducer, northMovement);
-        effectorCouplings.add(northCoupling);
-        sim.addCoupling(northCoupling);
+        Producer2 northProducer = nc.getProducer(outputs.getNeuronList().get(0), "getActivation");
+        Consumer2 northMovement = oc.getConsumer(mouse, "moveNorth");
+        northMovement.setDescription("North");
+        try {
+            Coupling2 northCoupling = new Coupling2(northProducer, northMovement);
+            effectorCouplings.add(northCoupling);
+            sim.addCoupling(northCoupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
+        }
 
         outputs.getNeuronList().get(1).setLabel("South");
-        PotentialProducer southProducer = nc.createPotentialProducer(
-                outputs.getNeuronList().get(1), "getActivation", double.class);
-        PotentialConsumer southMovement = oc.createPotentialConsumer(mouse,
-                "moveSouth", double.class);
-        // southMovement.setCustomDescription("South");
-        Coupling southCoupling = new Coupling(southProducer, southMovement);
-        effectorCouplings.add(southCoupling);
-        sim.addCoupling(southCoupling);
+        Producer2 southProducer = nc.getProducer(outputs.getNeuronList().get(1), "getActivation");
+        Consumer2 southMovement = oc.getConsumer(mouse, "moveSouth");
+        southMovement.setDescription("South");
+        try {
+            Coupling2 southCoupling = new Coupling2(southProducer, southMovement);
+            effectorCouplings.add(southCoupling);
+            sim.addCoupling(southCoupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
+        }
 
         outputs.getNeuronList().get(2).setLabel("East");
-        PotentialProducer eastProducer = nc.createPotentialProducer(
-                outputs.getNeuronList().get(2), "getActivation", double.class);
-        PotentialConsumer eastMovement = oc.createPotentialConsumer(mouse,
-                "moveEast", double.class);
-        // eastMovement.setCustomDescription("East");
-        Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
-        effectorCouplings.add(eastCoupling);
-        sim.addCoupling(eastCoupling);
+        Producer2 eastProducer = nc.getProducer(outputs.getNeuronList().get(2), "getActivation");
+        Consumer2 eastMovement = oc.getConsumer(mouse, "moveEast");
+        eastMovement.setDescription("East");
+        try {
+            Coupling2 eastCoupling = new Coupling2(eastProducer, eastMovement);
+            effectorCouplings.add(eastCoupling);
+            sim.addCoupling(eastCoupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
+        }
 
         outputs.getNeuronList().get(3).setLabel("West");
-        PotentialProducer westProducer = nc.createPotentialProducer(
-                outputs.getNeuronList().get(3), "getActivation", double.class);
-        PotentialConsumer westMovement = oc.createPotentialConsumer(mouse,
-                "moveWest", double.class);
-        // westMovement.setCustomDescription("West");
-        Coupling westCoupling = new Coupling(westProducer, westMovement);
-        effectorCouplings.add(westCoupling);
-        sim.addCoupling(westCoupling);
+        Producer2 westProducer = nc.getProducer(outputs.getNeuronList().get(3), "getActivation");
+        Consumer2 westMovement = oc.getConsumer(mouse, "moveWest");
+        westMovement.setDescription("West");
+        try {
+            Coupling2 westCoupling = new Coupling2(westProducer, westMovement);
+            effectorCouplings.add(westCoupling);
+            sim.addCoupling(westCoupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
+        }
 
         // Add reward smell coupling
-        PotentialProducer smell = oc.getAttributeManager()
-                .createPotentialProducer(
-                        world.getSensor(mouse.getId(), "Sensor_2"),
-                        "getCurrentValue", double.class,
-                        new Class[] { int.class }, new Object[] { 0 });
-        smell.setCustomDescription("Reward");
-        // smell.setCustomDescription("Reward");
-        PotentialConsumer rewardConsumer = nc.createPotentialConsumer(reward,
-                "forceSetActivation", double.class);
-        // reward.setCustomDescription("Reward neuron");
-        Coupling rewardCoupling = new Coupling(smell, rewardConsumer);
-        sensorCouplings.add(rewardCoupling);
-        sim.addCoupling(rewardCoupling);
+        Producer2 smell = oc.getProducer(world.getSensor(mouse.getId(), "Sensor_2"), "getCurrentValue");
+        smell.setDescription("Reward");
+        Consumer2 rewardConsumer = nc.getConsumer(reward, "forceSetActivation");
+        try {
+            Coupling2 rewardCoupling = new Coupling2(smell, rewardConsumer);
+            sensorCouplings.add(rewardCoupling);
+            sim.addCoupling(rewardCoupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -361,11 +358,11 @@ public class ActorCritic extends RegisteredSimulation {
     private void setUpPlot(NetBuilder net) {
         // Create a time series plot
         plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
-        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(), reward,
+        Coupling2 rewardCoupling = sim.couple(net.getNetworkComponent(), reward,
                 plot.getTimeSeriesComponent(), 0);
-        Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError,
+        Coupling2 tdCoupling = sim.couple(net.getNetworkComponent(), tdError,
                 plot.getTimeSeriesComponent(), 1);
-        Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value,
+        Coupling2 valueCoupling = sim.couple(net.getNetworkComponent(), value,
                 plot.getTimeSeriesComponent(), 2);
         plot.getTimeSeriesModel().setAutoRange(false);
         plot.getTimeSeriesModel().setRangeUpperBound(2);

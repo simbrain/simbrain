@@ -296,9 +296,8 @@ public class ActorCritic extends RegisteredSimulation {
         Consumer2 northMovement = oc.getConsumer(mouse, "moveNorth");
         northMovement.setDescription("North");
         try {
-            Coupling2 northCoupling = new Coupling2(northProducer, northMovement);
+            Coupling2 northCoupling = sim.createCoupling(northProducer, northMovement);
             effectorCouplings.add(northCoupling);
-            sim.addCoupling(northCoupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }
@@ -308,9 +307,8 @@ public class ActorCritic extends RegisteredSimulation {
         Consumer2 southMovement = oc.getConsumer(mouse, "moveSouth");
         southMovement.setDescription("South");
         try {
-            Coupling2 southCoupling = new Coupling2(southProducer, southMovement);
+            Coupling2 southCoupling = sim.createCoupling(southProducer, southMovement);
             effectorCouplings.add(southCoupling);
-            sim.addCoupling(southCoupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }
@@ -320,9 +318,8 @@ public class ActorCritic extends RegisteredSimulation {
         Consumer2 eastMovement = oc.getConsumer(mouse, "moveEast");
         eastMovement.setDescription("East");
         try {
-            Coupling2 eastCoupling = new Coupling2(eastProducer, eastMovement);
+            Coupling2 eastCoupling = sim.createCoupling(eastProducer, eastMovement);
             effectorCouplings.add(eastCoupling);
-            sim.addCoupling(eastCoupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }
@@ -332,9 +329,8 @@ public class ActorCritic extends RegisteredSimulation {
         Consumer2 westMovement = oc.getConsumer(mouse, "moveWest");
         westMovement.setDescription("West");
         try {
-            Coupling2 westCoupling = new Coupling2(westProducer, westMovement);
+            Coupling2 westCoupling = sim.createCoupling(westProducer, westMovement);
             effectorCouplings.add(westCoupling);
-            sim.addCoupling(westCoupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }
@@ -344,9 +340,8 @@ public class ActorCritic extends RegisteredSimulation {
         smell.setDescription("Reward");
         Consumer2 rewardConsumer = nc.getConsumer(reward, "forceSetActivation");
         try {
-            Coupling2 rewardCoupling = new Coupling2(smell, rewardConsumer);
+            Coupling2 rewardCoupling = sim.createCoupling(smell, rewardConsumer);
             sensorCouplings.add(rewardCoupling);
-            sim.addCoupling(rewardCoupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }

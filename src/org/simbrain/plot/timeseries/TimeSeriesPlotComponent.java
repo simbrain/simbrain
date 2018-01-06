@@ -20,13 +20,12 @@ package org.simbrain.plot.timeseries;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -214,7 +213,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param value the current "y-axis" value for the time series
      * @param index which time series curve to set.
      */
-    @Consumible(indexListMethod = "getSeries")
+    @Consumable(indexListMethod = "getSeries")
     public void setValue(final double value, final Integer index) {
         // TODO: Throw exception if index out of current bounds
         model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()

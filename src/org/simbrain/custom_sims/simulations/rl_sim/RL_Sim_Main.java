@@ -193,7 +193,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         Consumer2 plotConsumer = plot.getProjectionPlotComponent()
                 .getConsumer(plot.getProjectionPlotComponent(), "addPoint");
         try {
-            sim.addCoupling(new Coupling2(inputProducer, plotConsumer));
+            sim.createCoupling(inputProducer, plotConsumer);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }

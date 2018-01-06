@@ -90,16 +90,11 @@ public class Simulation {
 	/**
 	 * Add a network and return a network builder.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param width
-	 *            width of component
-	 * @param height
-	 *            height of component
-	 * @param name
-	 *            title to display at top of panel
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param width width of component
+	 * @param height height of component
+	 * @param name title to display at top of panel
 	 * @return the component the network builder
 	 */
 	public NetBuilder addNetwork(int x, int y, int width, int height, String name) {
@@ -130,18 +125,12 @@ public class Simulation {
 	/**
 	 * Add a doc viewer component.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param width
-	 *            width of component
-	 * @param height
-	 *            height of component
-	 * @param name
-	 *            title to display at top of panel
-	 * @param filePath
-	 *            path to html file
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param width width of component
+	 * @param height height of component
+	 * @param name title to display at top of panel
+	 * @param filePath path to html file
 	 * @return the component
 	 */
 	public DocViewerComponent addDocViewer(int x, int y, int width, int height, String name, String filePath) {
@@ -157,16 +146,11 @@ public class Simulation {
 	/**
 	 * Add a time series plot and return a plot builder.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param width
-	 *            width of component
-	 * @param height
-	 *            height of component
-	 * @param name
-	 *            title to display at top of panel
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param width width of component
+	 * @param height height of component
+	 * @param name title to display at top of panel
 	 * @return the component the plot builder
 	 */
 	public PlotBuilder addTimeSeriesPlot(int x, int y, int width, int height, String name) {
@@ -179,16 +163,11 @@ public class Simulation {
 	/**
 	 * Add a projection plot and return a plot builder.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param width
-	 *            width of component
-	 * @param height
-	 *            height of component
-	 * @param name
-	 *            title to display at top of panel
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param width width of component
+	 * @param height height of component
+	 * @param name title to display at top of panel
 	 * @return the component the plot builder
 	 */
 	public PlotBuilder addProjectionPlot(int x, int y, int width, int height, String name) {
@@ -201,16 +180,11 @@ public class Simulation {
 	/**
 	 * Add an odor world and return an odor world builder.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param width
-	 *            width of component
-	 * @param height
-	 *            height of component
-	 * @param name
-	 *            title to display at top of panel
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param width width of component
+	 * @param height height of component
+	 * @param name title to display at top of panel
 	 * @return the component the odor world builder
 	 */
 	public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name) {
@@ -224,12 +198,9 @@ public class Simulation {
 	/**
 	 * Add an internal frame to a sim.
 	 *
-	 * @param x
-	 *            x location on screen
-	 * @param y
-	 *            y location on screen
-	 * @param name
-	 *            title to display at top of internal frame
+	 * @param x x location on screen
+	 * @param y y location on screen
+	 * @param name title to display at top of internal frame
 	 * @return reference to the frame
 	 */
 	public JInternalFrame addFrame(int x, int y, String name) {
@@ -241,12 +212,14 @@ public class Simulation {
 		return frame;
 	}
 
-	// TODO: Move to workspace level and improve exception handling.
 	/**
-	 * Convenience method. Forwards to workspace.
+	 * Create a coupling from a consumer and a producer of the same type.
 	 */
-	public void addCoupling(Coupling2<?> coupling) {
-		workspace.addCoupling(coupling);
+	public <T> Coupling2<T> createCoupling(Producer2<T> producer, Consumer2<T> consumer)
+            throws MismatchedAttributesException {
+	    Coupling2<T> coupling = new Coupling2<T>(producer, consumer);
+        workspace.addCoupling(coupling);
+        return coupling;
 	}
 
 	/**
@@ -259,50 +232,48 @@ public class Simulation {
 	 * @return the coupling
 	 */
 	public Coupling2<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
-		Producer2 neuronProducer = network.getProducer(neuron, "getActivation");
-		Consumer2 timeSeriesConsumer1 = plot.getConsumers().get(index);
-		timeSeriesConsumer1.setDescription("Time series " + index);
-		Coupling2<?> coupling = null;
 		try {
-            addCoupling(new Coupling2(neuronProducer, timeSeriesConsumer1));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+            Producer2<Double> neuronProducer = network.getProducer(neuron, "getActivation", Double.class);
+            Consumer2<Double> timeSeriesConsumer = (Consumer2<Double>) plot.getConsumers().get(index);
+            timeSeriesConsumer.setDescription("Time series " + index);
+            return createCoupling(neuronProducer, timeSeriesConsumer);
+        } catch (MismatchedAttributesException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
-		return coupling;
 	}
 
 	/**
 	 * Coupling a neuron group to a projection plot.
 	 */
 	public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
-		Producer2 ngProducer = network.getProducer(ng, "getActivations");
-		Consumer2 projConsumer = plot.getConsumer(plot, "addPoint");
-		try {
-            addCoupling(new Coupling2(ngProducer, projConsumer));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+        try {
+    	    Producer2<Double[]> ngProducer = network.getProducer(ng, "getActivations", Double[].class);
+	    	Consumer2<Double[]> projConsumer = plot.getConsumer(plot, "addPoint", Double[].class);
+            createCoupling(ngProducer, projConsumer);
+        } catch (MismatchedAttributesException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
 	}
 
 	/**
 	 * Create a coupling from a smell sensor to a neuron group.
 	 *
-	 * @param sensor
-	 *            the smell sensor
-	 * @param ng
-	 *            the neuron group
+	 * @param sensor The smell sensor
+	 * @param ng The neuron group
 	 */
 	public void couple(SmellSensor sensor, NeuronGroup ng) {
 		NetworkComponent nc = netMap.get(ng.getParentNetwork());
 		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
 
-		Producer2 sensoryProducer = ow.getProducer(sensor, "getCurrentValue");
-		Consumer2 sensoryConsumer = nc.getConsumer(ng, "forceSetActivations");
-
-		try {
-            addCoupling(new Coupling2(sensoryProducer, sensoryConsumer));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+        try {
+    		Producer2<Double[]> sensoryProducer = ow.getProducer(sensor, "getCurrentValue", Double[].class);
+	    	Consumer2<Double[]> sensoryConsumer = nc.getConsumer(ng, "forceSetActivations", Double[].class);
+            createCoupling(sensoryProducer, sensoryConsumer);
+        } catch (MismatchedAttributesException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
 	}
 
@@ -310,26 +281,22 @@ public class Simulation {
 	 * Make a coupling from a smell sensor to a neuron. Couples the provided smell
 	 * sensor one the indicated dimension to the provided neuron.
 	 *
-	 * @param producingSensor
-	 *            the smell sensor. Takes a scalar value.
-	 * @param stimulusDimension
-	 *            Which component of the smell vector on the agent to "smell",
-	 *            beginning at index "0"
-	 * @param consumingNeuron
-	 *            the neuron to write the values to
+	 * @param producingSensor The smell sensor. Takes a scalar value.
+	 * @param stimulusDimension Which component of the smell vector on the agent to "smell",
+	 *                          beginning at index "0"
+	 * @param consumingNeuron The neuron to write the values to
 	 */
 	public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
-
 		NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(producingSensor.getParent().getParentWorld());
 
-		Producer2 agentSensor = ow.getProducer(producingSensor, "getCurrentValue");
-		Consumer2 sensoryNeuron = nc.getConsumer(consumingNeuron, "forceSetActivation");
-
-		try {
-            addCoupling(new Coupling2(agentSensor, sensoryNeuron));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+        try {
+    		Producer2<Double> agentSensor = ow.getProducer(producingSensor, "getCurrentValue", Double.class);
+	    	Consumer2<Double> sensoryNeuron = nc.getConsumer(consumingNeuron, "forceSetActivation", Double.class);
+            createCoupling(agentSensor, sensoryNeuron);
+        } catch (MismatchedAttributesException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
 	}
 
@@ -340,36 +307,33 @@ public class Simulation {
 		NetworkComponent nc = netMap.get(neuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(effector.getParent().getParentWorld());
 
-		Producer2 effectorNeuron = nc.getProducer(neuron, "getActivation");
-		Consumer2 agentEffector = ow.getConsumer(effector, "addAmount");
-
-		try {
-            addCoupling(new Coupling2(effectorNeuron, agentEffector));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+        try {
+    		Producer2<Double> effectorNeuron = nc.getProducer(neuron, "getActivation", Double.class);
+	    	Consumer2<Double> agentEffector = ow.getConsumer(effector, "addAmount", Double.class);
+            createCoupling(effectorNeuron, agentEffector);
+        } catch (MismatchedAttributesException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
 	}
 
 	/**
 	 * Creates a coupling from a hearing sensor to a neuron
 	 * 
-	 * @param sensor
-	 *            The hearing sensor
-	 * @param neuron
-	 *            The neuron
+	 * @param sensor The hearing sensor
+	 * @param neuron The neuron
 	 */
 	public void couple(Hearing sensor, Neuron neuron) {
-
 		NetworkComponent nc = netMap.get(neuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
 
-		Producer2 agentSensor = ow.getProducer(sensor, "getValue");
-		Consumer2 sensoryNeuron = nc.getConsumer(neuron, "forceSetActivation");
-
-		try {
-            addCoupling(new Coupling2(agentSensor, sensoryNeuron));
-        } catch (MismatchedAttributesException e) {
-		    e.printStackTrace();
+        try {
+    		Producer2<Double> agentSensor = ow.getProducer(sensor, "getValue", Double.class);
+	    	Consumer2<Double> sensoryNeuron = nc.getConsumer(neuron, "forceSetActivation", Double.class);
+            createCoupling(agentSensor, sensoryNeuron);
+        } catch (MismatchedAttributesException ex) {
+		    // Should never happen
+		    throw new AssertionError(ex);
         }
 	}
 
@@ -395,5 +359,4 @@ public class Simulation {
 			e.printStackTrace();
 		}
 	}
-
 }

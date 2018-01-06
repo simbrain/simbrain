@@ -2,7 +2,7 @@ package org.simbrain.world.imageworld;
 
 import java.awt.image.BufferedImage;
 
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 
 public class EmitterMatrix extends ImageSourceAdapter {
     private double[][] emitterValues;
@@ -17,19 +17,19 @@ public class EmitterMatrix extends ImageSourceAdapter {
         emitterValues = new double[3][getWidth() * getHeight()];
     }
 
-    @Consumible
+    @Consumable
     public void setChannel1(double[] values) {
         System.arraycopy(values, 0, emitterValues[0], 0, values.length);
         emitImage();
     }
 
-    @Consumible
+    @Consumable
     public void setChannel2(double[] values) {
         System.arraycopy(values, 0, emitterValues[1], 0, values.length);
         emitImage();
     }
 
-    @Consumible
+    @Consumable
     public void setChannel3(double[] values) {
         System.arraycopy(values, 0, emitterValues[2], 0, values.length);
         emitImage();

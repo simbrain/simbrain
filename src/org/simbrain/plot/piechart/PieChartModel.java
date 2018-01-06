@@ -20,7 +20,7 @@ package org.simbrain.plot.piechart;
 
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -147,7 +147,7 @@ public class PieChartModel extends ChartModel {
      *
      * @param input the values for the slices as an array
      */
-    @Consumible
+    @Consumable
     public void setValues(double[] input) {
         for (int i = 0; i < input.length; i++) {
             setValue(input[i], new Integer(i));

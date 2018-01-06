@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -217,7 +217,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
         }
     }
 
-    @Consumible
+    @Consumable
     public void setValues(final double[] values) {
         setValues(values, 0);
     }

@@ -19,7 +19,6 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -32,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -242,7 +241,7 @@ public class BarChartModel extends ChartModel {
      *
      * @param input the values for the bars as an array
      */
-    @Consumible
+    @Consumable
     public void setBars(double[] input) {
         for (int i = 0; i < input.length; i++) {
             getDataset().setValue((Number) input[i], new Integer(1), i);
@@ -261,7 +260,7 @@ public class BarChartModel extends ChartModel {
      * @param value value of bar
      * @param index which bar value to set
      */
-    @Consumible(indexListMethod="getBarIndices")
+    @Consumable(indexListMethod="getBarIndices")
     public void setValue(final double value, final Integer index) {
         getDataset().setValue(value, new Integer(1), index);
     }

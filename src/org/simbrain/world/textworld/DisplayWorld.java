@@ -24,7 +24,7 @@ import java.util.List;
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -113,7 +113,7 @@ public class DisplayWorld extends TextWorld {
      *
      * @param key the vector to use to search the dictionary.
      */
-    @Consumible
+    @Consumable
     public void displayClosestWord(double[] key) {
         this.addText(getClosestWord(key) + " ");
     }

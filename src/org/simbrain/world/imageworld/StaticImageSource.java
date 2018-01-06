@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 /**
@@ -44,7 +44,7 @@ public class StaticImageSource extends ImageSourceAdapter {
     /**
      * @return Set the name of the current image file (load the file if changed).
      */
-    @Consumible
+    @Consumable
     public void setFilename(String value) {
         if (!filename.equals(value)) {
             try {

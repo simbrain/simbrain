@@ -202,7 +202,6 @@ public class PotentialAttributePanel extends JPanel
      * Refresh attribute list.
      */
     private void refresh(final WorkspaceComponent component) {
-
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {

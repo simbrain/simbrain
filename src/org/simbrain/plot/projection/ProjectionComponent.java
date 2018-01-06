@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -174,7 +174,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      *
      * @param newPoint the new point
      */
-    @Consumible
+    @Consumable
     public void addPoint(double[] newPoint) {
         if (newPoint.length != projectionModel
                 .getProjector().getDimensions()) {

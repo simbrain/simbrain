@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import org.simbrain.workspace.Consumible;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -111,7 +111,7 @@ public class TileSensor extends Sensor {
     /**
      * @param value the value to set
      */
-    @Consumible(customDescriptionMethod = "getMixedId")
+    @Consumable(customDescriptionMethod = "getMixedId")
     public void setValue(double value) {
         this.value = value;
     }

@@ -452,7 +452,7 @@ public class Creature {
 		Consumer2 chemReceptor = nc.getConsumer(neuron, "forceSetActivation");
 
 		try {
-			parentSim.getSim().addCoupling(new Coupling2(chemicalAmount, chemReceptor));
+			parentSim.getSim().createCoupling(chemicalAmount, chemReceptor);
 		} catch (MismatchedAttributesException e) {
 			e.printStackTrace();
 		}

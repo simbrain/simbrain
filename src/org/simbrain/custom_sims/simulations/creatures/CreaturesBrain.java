@@ -198,9 +198,8 @@ public class CreaturesBrain {
 
 				// Create the coupling and add it to the list
 				try {
-					Coupling2 coupling = new Coupling2(producer, consumer);
+					Coupling2 coupling = parentSim.getSim().createCoupling(producer, consumer);
 					list.add(coupling);
-					parentSim.getSim().addCoupling(coupling);
 				} catch (MismatchedAttributesException e) {
 					e.printStackTrace();
 				}

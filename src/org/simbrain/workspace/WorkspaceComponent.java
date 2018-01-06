@@ -32,10 +32,9 @@ import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
- * . Extend this class to create your own component type. Gui representations of
- * a workspace component should extend
- * {@link org.simbrain.workspace.gui.GuiComponent}.
+ * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
+ * Extend this class to create your own component type. Gui representations of
+ * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  */
 public abstract class WorkspaceComponent {
 
@@ -46,19 +45,19 @@ public abstract class WorkspaceComponent {
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     /** The set of all WorkspaceComponentListeners on this component. */
-    private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
+    private Collection<WorkspaceComponentListener> workspaceComponentListeners;
 
     /** List of attribute listeners. */
-    private final Collection<AttributeListener> attributeListeners;
+    private Collection<AttributeListener> attributeListeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
     /** List of producer types. */
-    private final List<AttributeType> producerTypes = new ArrayList<AttributeType>();
+    private List<AttributeType> producerTypes = new ArrayList<AttributeType>();
 
     /** List of consumer types. */
-    private final List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
+    private List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -67,10 +66,10 @@ public abstract class WorkspaceComponent {
      * views of the component. This design is kind of hack, based on the fact
      * that {@link ComponentPanel} has no easy access to {@link GuiComponent}.
      */
-    private Boolean guiOn = true;
+    private boolean guiOn = true;
 
     /** Whether to update this component. */
-    private Boolean updateOn = true;
+    private boolean updateOn = true;
 
     /** The name of this component. Used in the title, in saving, etc. */
     private String name = "";
@@ -103,8 +102,7 @@ public abstract class WorkspaceComponent {
      */
     public WorkspaceComponent(final String name) {
         this.name = name;
-        logger.trace(
-                this.getClass().getCanonicalName() + ": " + name + " created");
+        logger.trace(getClass().getCanonicalName() + ": " + name + " created");
     }
 
     /**
@@ -118,9 +116,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns a list of the formats that this component supports.
-     * <p>
-     * The default behavior is to return an empty list. This means that there is
-     * one format.
+     * The default behavior is to return a list containing the default format.
      *
      * @return a list of the formats that this component supports.
      */
@@ -346,8 +342,6 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the name of this component.
-     *
-     * @return The name of this component.
      */
     public String getName() {
         return name;
@@ -359,13 +353,12 @@ public abstract class WorkspaceComponent {
     @Override
     public String toString() {
         return name;
-        // return this.getClass().getSimpleName() + ": " + name;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
         // TODO: Think about this
         // for (WorkspaceComponentListener listener : this.getListeners()) {
@@ -402,37 +395,15 @@ public abstract class WorkspaceComponent {
      *
      * @param workspace The workspace for this component.
      */
-    public void setWorkspace(final Workspace workspace) {
+    public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
 
     /**
      * Returns the workspace associated with this component.
-     *
-     * @return The workspace associated with this component.
      */
     public Workspace getWorkspace() {
         return workspace;
-    }
-
-    /**
-     * Called when a coupling attached to this component is removed. This method
-     * will only be called once if this component has both the source and the
-     * target.
-     *
-     * @param coupling The coupling that has been removed.
-     */
-    public void couplingRemoved(final Coupling2<?> coupling) {
-        // No implementation.
-    }
-
-    /**
-     * Called when a coupling is attached to this component.
-     *
-     * @param coupling The coupling that is being added
-     */
-    public void couplingAdded(Coupling2<?> coupling) {
-        // Override is this function is needed in a component type
     }
 
     /**
@@ -475,7 +446,7 @@ public abstract class WorkspaceComponent {
     /**
      * @param currentFile the currentFile to set
      */
-    public void setCurrentFile(final File currentFile) {
+    public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
     }
 
@@ -496,14 +467,14 @@ public abstract class WorkspaceComponent {
     /**
      * @return the guiOn
      */
-    public Boolean isGuiOn() {
+    public boolean isGuiOn() {
         return guiOn;
     }
 
     /**
      * @param guiOn the guiOn to set
      */
-    public void setGuiOn(Boolean guiOn) {
+    public void setGuiOn(boolean guiOn) {
         this.guiOn = guiOn;
         this.fireGuiToggleEvent();
     }
@@ -511,14 +482,14 @@ public abstract class WorkspaceComponent {
     /**
      * @return the updateOn
      */
-    public Boolean getUpdateOn() {
+    public boolean getUpdateOn() {
         return updateOn;
     }
 
     /**
      * @param updateOn the updateOn to set
      */
-    public void setUpdateOn(Boolean updateOn) {
+    public void setUpdateOn(boolean updateOn) {
         this.updateOn = updateOn;
         this.fireComponentToggleEvent();
     }
@@ -605,7 +576,7 @@ public abstract class WorkspaceComponent {
         return getConsumers(this);
     }
 
-    public final List<Producer2<?>> getProducersFromList(List list) {
+    public List<Producer2<?>> getProducersFromList(List list) {
         List<Producer2<?>> returnList = new ArrayList<>();
         for (Object object : list) {
             returnList.addAll(getProducers(object));
@@ -613,7 +584,7 @@ public abstract class WorkspaceComponent {
         return returnList;
     }
 
-    public final List<Consumer2<?>> getConsumersFromList(List list) {
+    public List<Consumer2<?>> getConsumersFromList(List list) {
         List<Consumer2<?>> returnList = new ArrayList<>();
         for (Object object : list) {
             returnList.addAll(getConsumers(object));
@@ -621,9 +592,9 @@ public abstract class WorkspaceComponent {
         return returnList;
     }
 
-    // TODO: Rename to getProduersOnObject... to clarify it's a service / helper
-    public final List<Producer2<?>> getProducers(Object object) {
-        List<Producer2<?>> returnList = new ArrayList<>();
+    // TODO: Rename to getProducersOnObject... to clarify it's a service / helper
+    public List<Producer2<?>> getProducers(Object object) {
+        List<Producer2<?>> returnList = new ArrayList<Producer2<?>>();
         for (Method method : object.getClass().getMethods()) {
             Producible annotation = method.getAnnotation(Producible.class);
             if (annotation != null) {
@@ -648,17 +619,17 @@ public abstract class WorkspaceComponent {
                     //setCustomDescription(producer);
                     returnList.add(producer);
                 }
-             }
-         }
-         return returnList;
-     }
+            }
+        }
+        return returnList;
+    }
 
-    public final List<Consumer2<?>> getConsumers(Object object) {
+    public List<Consumer2<?>> getConsumers(Object object) {
         List<Consumer2<?>> returnList = new ArrayList<>();
         for (Method method : object.getClass().getMethods()) {
             // TODO: Docs; When this works do it for producers
             // Key case
-            Consumible annotation = method.getAnnotation(Consumible.class);
+            Consumable annotation = method.getAnnotation(Consumable.class);
             if (annotation != null) {
                 // A custom keyed annotation is being used
                 if (!annotation.indexListMethod().isEmpty()) {
@@ -692,9 +663,31 @@ public abstract class WorkspaceComponent {
                      .findFirst().get();
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Consumer2<T> getConsumer(Object object, String methodName, Class<T> type)
+            throws MismatchedAttributesException {
+        Consumer2<?> consumer = getConsumer(object, methodName);
+        if (consumer.getType() == type) {
+            return (Consumer2<T>) consumer;
+        } else {
+            throw new MismatchedAttributesException("Consumer type does not match method value type.");
+        }
+    }
+
     public Producer2<?> getProducer(Object object, String methodName) {
         return getProducers(object).stream().filter(
                 p -> p.getMethod().getName().equalsIgnoreCase(methodName))
                      .findFirst().get();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Producer2<T> getProducer(Object object, String methodName, Class<T> type)
+            throws MismatchedAttributesException {
+        Producer2<?> producer = getProducer(object, methodName);
+        if (producer.getType() == type) {
+            return (Producer2<T>) producer;
+        } else {
+            throw new MismatchedAttributesException("Producer type does not match method return type.");
+        }
     }
 }

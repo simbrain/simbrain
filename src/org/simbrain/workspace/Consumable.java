@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import java.util.List;
 
 /**
- * Consumible annotation marks a method as a potential consumer for a coupling.
+ * Consumable annotation marks a method as a potential consumer for a coupling.
  * These will generally be setters
  *
  * @author Tim Shea
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Consumible {
+public @interface Consumable {
 
     //TODO: Rename?
     /**

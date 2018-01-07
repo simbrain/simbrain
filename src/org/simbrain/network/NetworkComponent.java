@@ -37,6 +37,7 @@ import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.Consumer2;
 import org.simbrain.workspace.Producer2;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Network component.
@@ -219,16 +220,23 @@ public final class NetworkComponent extends WorkspaceComponent {
     public String getXML() {
         return Network.getXStream().toXML(network);
     }
-
-    // TODO
-    @Override
-    public List<Consumer2<?>> getConsumers() {
-        return null;
-    }
-
-    // TODO
+    
     @Override
     public List<Producer2<?>> getProducers() {
-        return null;
+        List<Producer2<?>> retList = new ArrayList();
+        retList.addAll(super.getProducers(network));
+        retList.addAll(super.getProducersFromList(network.getNeuronList()));
+        retList.addAll(super.getProducersFromList(network.getNeuronGroups()));
+        return retList;
     }
+
+    @Override
+    public List<Consumer2<?>> getConsumers() {
+        List<Consumer2<?>> retList = new ArrayList();
+        retList.addAll(super.getConsumers(network));
+        retList.addAll(super.getConsumersFromList(network.getNeuronList()));
+        retList.addAll(super.getConsumersFromList(network.getNeuronGroups()));
+        return retList;
+    }
+
 }

@@ -41,6 +41,8 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
@@ -740,6 +742,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * @param inputs
      *            the input vector as a double array.
      */
+    @Consumable
     public void setActivations(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
@@ -774,6 +777,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the activation array
      */
+    @Producible
     public double[] getActivations() {
         double[] retArray = new double[neuronList.size()];
         int i = 0;

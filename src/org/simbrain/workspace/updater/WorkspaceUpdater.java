@@ -32,17 +32,17 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * This class manages workspace updates. "Running" and "Stepping" the simulation
  * happen here, in a way that allows for concurrent update (in some cases) and
- * also interacts properly with single threaded guis using a
- * "task synchronization manager". Notification events about workspace events
- * are fired from here. Every time the workspace is updated, a list of actions
- * in the UpdateActionManager is invoked. By default one single action, a
- * "buffered update", occurs, in which components are updated in parallel, and
- * when they have all finished updating, couplings are updated. The update
- * action manager can also be used to customize update. Three executor services
- * are here, one for workspace updates (a single thread), one for event
- * notification updates (a single thread), and one for component updates (a
- * thread pool with multiple threads that can be configured), for cases when
- * component updating happens concurrently.
+ * also interacts properly with single threaded guis using a "task
+ * synchronization manager". Notification events about workspace events are
+ * fired from here. Every time the workspace is updated, a list of actions in
+ * the UpdateActionManager is invoked. By default one single action, a "buffered
+ * update", occurs, in which components are updated in parallel, and when they
+ * have all finished updating, couplings are updated. The update action manager
+ * can also be used to customize update. Three executor services are here, one
+ * for workspace updates (a single thread), one for event notification updates
+ * (a single thread), and one for component updates (a thread pool with multiple
+ * threads that can be configured), for cases when component updating happens
+ * concurrently.
  *
  * @author Matt Watson
  * @author Jeff Yoshimi
@@ -228,20 +228,20 @@ public class WorkspaceUpdater {
      * @param numIterations the number of iterations to update
      */
     public void iterate(final CountDownLatch latch, final int numIterations) {
-    	run = true;
         workspaceUpdateExecutor.submit(() -> {
             notifyWorkspaceUpdateStarted();
-            for (int i = 0; i < numIterations && run; i++) {
+            for (int i = 0; i < numIterations; i++) {
                 synchManager.queueTasks();
                 try {
                     doUpdate();
+                    // TODO: Specific Exception below
+                    // Move scope of this up?
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 synchManager.releaseTasks();
                 synchManager.runTasks();
             }
-            run = false;
             latch.countDown();
             notifyWorkspaceUpdateCompleted();
         });
@@ -255,6 +255,7 @@ public class WorkspaceUpdater {
 
         LOGGER.trace("starting: " + time);
 
+        // Skip this call if flag?
         try {
             Thread.sleep(workspace.getUpdateDelay());
         } catch (InterruptedException e) {

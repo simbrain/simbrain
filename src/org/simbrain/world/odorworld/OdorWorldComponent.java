@@ -47,8 +47,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
      */
     public OdorWorldComponent(String name) {
         super(name);
-        addListener();
         world = new OdorWorld();
+        addListener();
     }
 
     /**
@@ -61,7 +61,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
         super(name);
         this.world = world;
         addListener();
-        this.world = world;
     }
 
     /**

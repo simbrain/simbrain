@@ -18,10 +18,50 @@
  */
 package org.simbrain.workspace.gui;
 
-import bsh.EvalError;
-import bsh.Interpreter;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.actions.*;
+import org.simbrain.workspace.actions.ClearWorkspaceAction;
+import org.simbrain.workspace.actions.GlobalRunAction;
+import org.simbrain.workspace.actions.GlobalStopAction;
+import org.simbrain.workspace.actions.GlobalUpdateAction;
+import org.simbrain.workspace.actions.NewConsoleAction;
+import org.simbrain.workspace.actions.NewDataWorldAction;
+import org.simbrain.workspace.actions.NewDeviceInteractionWorldAction;
+import org.simbrain.workspace.actions.NewDisplayWorldAction;
+import org.simbrain.workspace.actions.NewDocViewerAction;
+import org.simbrain.workspace.actions.NewGameWorldAction;
+import org.simbrain.workspace.actions.NewMidiWorldAction;
+import org.simbrain.workspace.actions.NewNetworkAction;
+import org.simbrain.workspace.actions.NewOdorWorldAction;
+import org.simbrain.workspace.actions.NewReaderWorldAction;
+import org.simbrain.workspace.actions.NewThreeDWorldAction;
+import org.simbrain.workspace.actions.NewImageWorldAction;
+import org.simbrain.workspace.actions.OpenCouplingListAction;
+import org.simbrain.workspace.actions.OpenCouplingManagerAction;
+import org.simbrain.workspace.actions.OpenDataWorldAction;
+import org.simbrain.workspace.actions.OpenNetworkAction;
+import org.simbrain.workspace.actions.OpenOdorWorldAction;
+import org.simbrain.workspace.actions.OpenWorkspaceAction;
+import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
+import org.simbrain.workspace.actions.PropertyTabAction;
+import org.simbrain.workspace.actions.QuitWorkspaceAction;
+import org.simbrain.workspace.actions.RepositionAllWindowsAction;
+import org.simbrain.workspace.actions.SaveWorkspaceAction;
+import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
+import org.simbrain.workspace.actions.ScriptEditorAction;
+import org.simbrain.workspace.actions.ShowPropertyDialogAction;
+import org.simbrain.workspace.actions.ShowWorkspaceUpdaterDialog;
+import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewHistogramAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
@@ -30,17 +70,8 @@ import org.simbrain.workspace.actions.chart.NewRasterPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
 import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import bsh.EvalError;
+import bsh.Interpreter;
 
 /**
  * Workspace action manager.
@@ -62,21 +93,21 @@ public class WorkspaceActionManager {
 
     /** New odor world action. */
     private final Action newOdorWorldAction;
-
-    /** New odor world action. */
-    private final Action newGameWorldAction;
+    
+    /** New 3d world action. */
+    private final Action newThreedDWorldAction;
 
     /** New data world action. */
     private final Action newDataWorldAction;
-
-    /** New MIDI world action. */
-    private final Action newMidiWorldAction;
 
     /** New text world action. */
     private final Action newReaderWorldAction;
 
     /** New text world action. */
     private final Action newDisplayWorldAction;
+
+    /** New vision world action. */
+    private final Action newImageWorldAction;
 
     /** New device interaction world action. */
     private final Action newDeviceInteractionWorldAction;
@@ -201,11 +232,11 @@ public class WorkspaceActionManager {
         newRasterPlotAction = new NewRasterPlotAction(workspace);
 
         newDataWorldAction = new NewDataWorldAction(workspace);
-        newMidiWorldAction = new NewMidiWorldAction(workspace);
         newOdorWorldAction = new NewOdorWorldAction(workspace);
-        newGameWorldAction = new NewGameWorldAction(workspace);
+        newThreedDWorldAction = new NewThreeDWorldAction(workspace);
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
+        newImageWorldAction = new NewImageWorldAction(workspace);
         newDeviceInteractionWorldAction = new NewDeviceInteractionWorldAction(workspace);
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
@@ -250,36 +281,32 @@ public class WorkspaceActionManager {
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] {
-                openDataWorldAction,
-                openOdorWorldAction
-        });
+        return Arrays.asList(new Action[] { openDataWorldAction,
+                openOdorWorldAction });
     }
 
     /**
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
+        // These should be in alphabetical order in the resulting menus
         return Arrays.asList(new Action[] {
+                newThreedDWorldAction,
                 newDataWorldAction,
-                newOdorWorldAction,
+                newImageWorldAction,
+                newOdorWorldAction, 
                 newDisplayWorldAction,
                 newReaderWorldAction
-        });
+                 });
     }
 
     /**
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] {
-                newBarChartAction,
-                newHistogramAction,
-                newPieChartAction,
-                newProjectionPlotAction,
-                newRasterPlotAction,
-                newTimeSeriesAction
-        });
+        return Arrays.asList(new Action[] { newBarChartAction,
+                newHistogramAction, newPieChartAction, newProjectionPlotAction,
+                newRasterPlotAction, newTimeSeriesAction });
     }
 
     /**
@@ -393,6 +420,13 @@ public class WorkspaceActionManager {
      */
     public Action getNewOdorWorldAction() {
         return newOdorWorldAction;
+    }
+
+    /**
+     * @return the newVisionWorldAction.
+     */
+    public Action getNewVisionWorldAction() {
+        return newImageWorldAction;
     }
 
     /**

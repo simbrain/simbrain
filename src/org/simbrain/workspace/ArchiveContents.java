@@ -35,6 +35,8 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+//RENAME TO ARCHIVED WORKSPACE?
+
 /**
  * Instances of this class are used for building and reading the TOC of an
  * archive.

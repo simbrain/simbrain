@@ -445,17 +445,9 @@ public class Creature {
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
 		NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
-
-		// Hopefully borrowing nc's attribute manager for the producer won't cause
-		// problems later...
 		Producer2 chemicalAmount = nc.getProducer(chem, "getAmount");
 		Consumer2 chemReceptor = nc.getConsumer(neuron, "forceSetActivation");
-
-		try {
-			parentSim.getSim().createCoupling(chemicalAmount, chemReceptor);
-		} catch (MismatchedAttributesException e) {
-			e.printStackTrace();
-		}
+		parentSim.getSim().tryCoupling(chemicalAmount, chemReceptor);
 	}
 
 	public void approachBehavior(double strength) {

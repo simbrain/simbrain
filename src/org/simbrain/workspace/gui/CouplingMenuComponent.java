@@ -106,12 +106,12 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
         this.removeAll();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             final WorkspaceComponent targetComponent = component;
-            JMenuItem componentMenuItem = new JMenuItem(
-                    targetComponent.getName());
+            JMenuItem componentMenuItem = new JMenuItem(targetComponent.getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        workspace.coupleOneToOne(sourceComponent.getProducers(),
+                        workspace.getCouplingFactory().createOneToOneCouplings(
+                                sourceComponent.getProducers(),
                                 targetComponent.getConsumers());
                     } catch (MismatchedAttributesException e1) {
                         JOptionPane.showMessageDialog(null, e1.getMessage(),

@@ -295,56 +295,36 @@ public class ActorCritic extends RegisteredSimulation {
         Producer2 northProducer = nc.getProducer(outputs.getNeuronList().get(0), "getActivation");
         Consumer2 northMovement = oc.getConsumer(mouse, "moveNorth");
         northMovement.setDescription("North");
-        try {
-            Coupling2 northCoupling = sim.createCoupling(northProducer, northMovement);
-            effectorCouplings.add(northCoupling);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        Coupling2 northCoupling = sim.tryCoupling(northProducer, northMovement);
+        effectorCouplings.add(northCoupling);
 
         outputs.getNeuronList().get(1).setLabel("South");
         Producer2 southProducer = nc.getProducer(outputs.getNeuronList().get(1), "getActivation");
         Consumer2 southMovement = oc.getConsumer(mouse, "moveSouth");
         southMovement.setDescription("South");
-        try {
-            Coupling2 southCoupling = sim.createCoupling(southProducer, southMovement);
-            effectorCouplings.add(southCoupling);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        Coupling2 southCoupling = sim.tryCoupling(southProducer, southMovement);
+        effectorCouplings.add(southCoupling);
 
         outputs.getNeuronList().get(2).setLabel("East");
         Producer2 eastProducer = nc.getProducer(outputs.getNeuronList().get(2), "getActivation");
         Consumer2 eastMovement = oc.getConsumer(mouse, "moveEast");
         eastMovement.setDescription("East");
-        try {
-            Coupling2 eastCoupling = sim.createCoupling(eastProducer, eastMovement);
-            effectorCouplings.add(eastCoupling);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        Coupling2 eastCoupling = sim.tryCoupling(eastProducer, eastMovement);
+        effectorCouplings.add(eastCoupling);
 
         outputs.getNeuronList().get(3).setLabel("West");
         Producer2 westProducer = nc.getProducer(outputs.getNeuronList().get(3), "getActivation");
         Consumer2 westMovement = oc.getConsumer(mouse, "moveWest");
         westMovement.setDescription("West");
-        try {
-            Coupling2 westCoupling = sim.createCoupling(westProducer, westMovement);
-            effectorCouplings.add(westCoupling);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        Coupling2 westCoupling = sim.tryCoupling(westProducer, westMovement);
+        effectorCouplings.add(westCoupling);
 
         // Add reward smell coupling
         Producer2 smell = oc.getProducer(world.getSensor(mouse.getId(), "Sensor_2"), "getCurrentValue");
         smell.setDescription("Reward");
         Consumer2 rewardConsumer = nc.getConsumer(reward, "forceSetActivation");
-        try {
-            Coupling2 rewardCoupling = sim.createCoupling(smell, rewardConsumer);
-            sensorCouplings.add(rewardCoupling);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        Coupling2 rewardCoupling = sim.tryCoupling(smell, rewardConsumer);
+        sensorCouplings.add(rewardCoupling);
     }
 
     /**

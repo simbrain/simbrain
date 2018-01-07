@@ -192,11 +192,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
                 .getProducer(this, "getCombinedInputs");
         Consumer2 plotConsumer = plot.getProjectionPlotComponent()
                 .getConsumer(plot.getProjectionPlotComponent(), "addPoint");
-        try {
-            sim.createCoupling(inputProducer, plotConsumer);
-        } catch (MismatchedAttributesException e) {
-            e.printStackTrace();
-        }
+        sim.tryCoupling(inputProducer, plotConsumer);
 
         // Set custom network update
         updateMethod = new RL_Update(this);

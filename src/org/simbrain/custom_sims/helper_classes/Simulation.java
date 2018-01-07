@@ -44,8 +44,8 @@ public class Simulation {
 	 * added when networks or worlds are added using the sim object. Facilitates
 	 * making couplings using methods with fewer arguments.
 	 */
-	Hashtable<Network, NetworkComponent> netMap = new Hashtable();
-	Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
+	Hashtable<Network,NetworkComponent> netMap = new Hashtable();
+	Hashtable<OdorWorld,OdorWorldComponent> odorMap = new Hashtable();
 
 	/**
 	 * @param desktop
@@ -213,13 +213,11 @@ public class Simulation {
 	}
 
 	/**
-	 * Create a coupling from a consumer and a producer of the same type.
+	 * Helper for tryCoupling in the associated Workspace. Couples the producer to the consumer if possible,
+	 * ignores mismatch exceptions for simplicity.
 	 */
-	public <T> Coupling2<T> createCoupling(Producer2<T> producer, Consumer2<T> consumer)
-            throws MismatchedAttributesException {
-	    Coupling2<T> coupling = new Coupling2<T>(producer, consumer);
-        workspace.addCoupling(coupling);
-        return coupling;
+	public Coupling2 tryCoupling(Producer2 producer, Consumer2 consumer) {
+		return workspace.getCouplingFactory().tryCoupling(producer, consumer);
 	}
 
 	/**
@@ -232,29 +230,19 @@ public class Simulation {
 	 * @return the coupling
 	 */
 	public Coupling2<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
-		try {
-            Producer2<Double> neuronProducer = network.getProducer(neuron, "getActivation", Double.class);
-            Consumer2<Double> timeSeriesConsumer = (Consumer2<Double>) plot.getConsumers().get(index);
-            timeSeriesConsumer.setDescription("Time series " + index);
-            return createCoupling(neuronProducer, timeSeriesConsumer);
-        } catch (MismatchedAttributesException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
+		Producer2 neuronProducer = network.getProducer(neuron, "getActivation");
+		Consumer2 timeSeriesConsumer = plot.getConsumers().get(index);
+		timeSeriesConsumer.setDescription("Time series " + index);
+        return tryCoupling(neuronProducer, timeSeriesConsumer);
 	}
 
 	/**
 	 * Coupling a neuron group to a projection plot.
 	 */
 	public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
-        try {
-    	    Producer2<Double[]> ngProducer = network.getProducer(ng, "getActivations", Double[].class);
-	    	Consumer2<Double[]> projConsumer = plot.getConsumer(plot, "addPoint", Double[].class);
-            createCoupling(ngProducer, projConsumer);
-        } catch (MismatchedAttributesException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
+        Producer2 ngProducer = network.getProducer(ng, "getActivations");
+	    Consumer2 projConsumer = plot.getConsumer(plot, "addPoint");
+        tryCoupling(ngProducer, projConsumer);
 	}
 
 	/**
@@ -267,14 +255,9 @@ public class Simulation {
 		NetworkComponent nc = netMap.get(ng.getParentNetwork());
 		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
 
-        try {
-    		Producer2<Double[]> sensoryProducer = ow.getProducer(sensor, "getCurrentValue", Double[].class);
-	    	Consumer2<Double[]> sensoryConsumer = nc.getConsumer(ng, "forceSetActivations", Double[].class);
-            createCoupling(sensoryProducer, sensoryConsumer);
-        } catch (MismatchedAttributesException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
+        Producer2 sensoryProducer = ow.getProducer(sensor, "getCurrentValue");
+	    Consumer2 sensoryConsumer = nc.getConsumer(ng, "forceSetActivations");
+        tryCoupling(sensoryProducer, sensoryConsumer);
 	}
 
 	/**
@@ -290,14 +273,9 @@ public class Simulation {
 		NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(producingSensor.getParent().getParentWorld());
 
-        try {
-    		Producer2<Double> agentSensor = ow.getProducer(producingSensor, "getCurrentValue", Double.class);
-	    	Consumer2<Double> sensoryNeuron = nc.getConsumer(consumingNeuron, "forceSetActivation", Double.class);
-            createCoupling(agentSensor, sensoryNeuron);
-        } catch (MismatchedAttributesException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
+        Producer2 agentSensor = ow.getProducer(producingSensor, "getCurrentValue");
+	    Consumer2 sensoryNeuron = nc.getConsumer(consumingNeuron, "forceSetActivation");
+	    tryCoupling(agentSensor, sensoryNeuron);
 	}
 
 	/**
@@ -307,14 +285,9 @@ public class Simulation {
 		NetworkComponent nc = netMap.get(neuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(effector.getParent().getParentWorld());
 
-        try {
-    		Producer2<Double> effectorNeuron = nc.getProducer(neuron, "getActivation", Double.class);
-	    	Consumer2<Double> agentEffector = ow.getConsumer(effector, "addAmount", Double.class);
-            createCoupling(effectorNeuron, agentEffector);
-        } catch (MismatchedAttributesException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
+        Producer2 effectorNeuron = nc.getProducer(neuron, "getActivation");
+	    Consumer2 agentEffector = ow.getConsumer(effector, "addAmount");
+	    tryCoupling(effectorNeuron, agentEffector);
 	}
 
 	/**
@@ -327,14 +300,9 @@ public class Simulation {
 		NetworkComponent nc = netMap.get(neuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
 
-        try {
-    		Producer2<Double> agentSensor = ow.getProducer(sensor, "getValue", Double.class);
-	    	Consumer2<Double> sensoryNeuron = nc.getConsumer(neuron, "forceSetActivation", Double.class);
-            createCoupling(agentSensor, sensoryNeuron);
-        } catch (MismatchedAttributesException ex) {
-		    // Should never happen
-		    throw new AssertionError(ex);
-        }
+        Producer2 agentSensor = ow.getProducer(sensor, "getValue");
+	    Consumer2 sensoryNeuron = nc.getConsumer(neuron, "forceSetActivation");
+	    tryCoupling(agentSensor, sensoryNeuron);
 	}
 
 	/**

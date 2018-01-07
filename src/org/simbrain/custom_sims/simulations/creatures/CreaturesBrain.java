@@ -197,12 +197,8 @@ public class CreaturesBrain {
 						"forceSetActivation");
 
 				// Create the coupling and add it to the list
-				try {
-					Coupling2 coupling = parentSim.getSim().createCoupling(producer, consumer);
-					list.add(coupling);
-				} catch (MismatchedAttributesException e) {
-					e.printStackTrace();
-				}
+                Coupling2 coupling = parentSim.getSim().tryCoupling(producer, consumer);
+                list.add(coupling);
 			}
 		} else {
 

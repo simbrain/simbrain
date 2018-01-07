@@ -149,17 +149,18 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         return ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void couplingAdded(Coupling2 coupling) {
         couplingsUpdated();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void couplingRemoved(Coupling2 coupling) {
+        couplingsUpdated();
+    }
+
+    @Override
+    public void couplingsRemoved(List<Coupling2<?>> couplings2) {
         couplingsUpdated();
     }
 
@@ -191,5 +192,4 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         }
 
     }
-
 }

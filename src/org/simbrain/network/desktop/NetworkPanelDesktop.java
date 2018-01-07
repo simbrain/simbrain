@@ -293,11 +293,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
             contextMenu.addSeparator();
             Producer2 producer = component.getWorkspaceComponent()
                     .getProducer(neuron, "getActivation");
-            Consumer2 consumer = component.getWorkspaceComponent()
-                    .getConsumer(neuron, "setInputValue");
             JMenu producerMenu = new CouplingMenuProducer(
                     "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
+            Consumer2 consumer = component.getWorkspaceComponent()
+                    .getConsumer(neuron, "setInputValue");
             JMenu consumerMenu = new CouplingMenuConsumer(
                     "Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);

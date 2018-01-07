@@ -141,6 +141,13 @@ public class UpdateActionManager {
                         // couplingActionMap.size());
                     }
 
+                    @Override
+                    public void couplingsRemoved(List<Coupling2<?>> couplings) {
+                        for(Coupling2 coupling : couplings) {
+                            removeAction(couplingActionMap.remove(coupling));
+                        }
+                    }
+
                 });
     }
 

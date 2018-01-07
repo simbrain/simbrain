@@ -622,6 +622,12 @@ public class Workspace {
             listeners.couplingRemoved(coupling);
         }
     }
+    
+    private void fireCouplingsRemoved(List<Coupling2<?>> couplings2) {
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingsRemoved(couplings2);
+        }
+    }
 
     /**
      * @return the couplings
@@ -633,7 +639,7 @@ public class Workspace {
     public void removeCouplings(List<Coupling2<?>> couplings) {
         this.couplings.removeAll(couplings);
         // What to do here?
-        //this.fireCouplingsRemoved();
+        this.fireCouplingsRemoved(couplings);
     }
 
     //TODO: If not used by the time update actions are re-implemented, remove

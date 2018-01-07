@@ -675,6 +675,8 @@ public abstract class WorkspaceComponent {
     }
 
     public Producer2<?> getProducer(Object object, String methodName) {
+        //getProducers(object).stream().map(
+        //        p -> p.getMethod().getName()).forEach(System.out::println);
         return getProducers(object).stream().filter(
                 p -> p.getMethod().getName().equalsIgnoreCase(methodName))
                      .findFirst().get();

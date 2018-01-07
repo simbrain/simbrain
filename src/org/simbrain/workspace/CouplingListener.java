@@ -18,6 +18,8 @@
  */
 package org.simbrain.workspace;
 
+import java.util.List;
+
 /**
  * Listener for coupling related events.
  *
@@ -37,5 +39,9 @@ public interface CouplingListener {
      * @param coupling the coupling that is being removed
      */
     public void couplingRemoved(Coupling2<?> coupling);
+
+    //TODO
+    public void couplingsRemoved(List<Coupling2<?>> couplings2);
+
 
 }

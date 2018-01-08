@@ -39,6 +39,9 @@ public class Simulation {
 	/** Reference to parent workspace. */
 	Workspace workspace;
 
+	/** Reference to workspace coupling factory. */
+	CouplingFactory couplingFactory;
+
 	/**
 	 * Associate networks and worlds with their respective components. Entries are
 	 * added when networks or worlds are added using the sim object. Facilitates
@@ -53,7 +56,8 @@ public class Simulation {
 	public Simulation(SimbrainDesktop desktop) {
 		super();
 		this.desktop = desktop;
-		this.workspace = desktop.getWorkspace();
+		workspace = desktop.getWorkspace();
+		couplingFactory = workspace.getCouplingFactory();
 	}
 	
     // TODO: NEW STUFF USING NET WRAPPER. Work towards replacing netbuilder
@@ -212,11 +216,21 @@ public class Simulation {
 		return frame;
 	}
 
+	/** Helper for obtaining producers. */
+	public Producer getProducer(Object model, String methodName) {
+	    return couplingFactory.getProducer(model, methodName);
+    }
+
+    /** Helper for obtaining consumers. */
+    public Consumer getConsumer(Object model, String methodName) {
+        return couplingFactory.getConsumer(model, methodName);
+    }
+
 	/**
 	 * Helper for tryCoupling in the associated Workspace. Couples the producer to the consumer if possible,
 	 * ignores mismatch exceptions for simplicity.
 	 */
-	public Coupling2 tryCoupling(Producer2 producer, Consumer2 consumer) {
+	public Coupling tryCoupling(Producer producer, Consumer consumer) {
 		return workspace.getCouplingFactory().tryCoupling(producer, consumer);
 	}
 
@@ -229,9 +243,9 @@ public class Simulation {
 	 * @param index the index of the time series to write to
 	 * @return the coupling
 	 */
-	public Coupling2<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
-		Producer2 neuronProducer = network.getProducer(neuron, "getActivation");
-		Consumer2 timeSeriesConsumer = plot.getConsumers().get(index);
+	public Coupling<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
+		Producer neuronProducer = couplingFactory.getProducer(neuron, "getActivation");
+		Consumer timeSeriesConsumer = couplingFactory.getAllConsumers(plot).get(index);
 		timeSeriesConsumer.setDescription("Time series " + index);
         return tryCoupling(neuronProducer, timeSeriesConsumer);
 	}
@@ -240,8 +254,8 @@ public class Simulation {
 	 * Coupling a neuron group to a projection plot.
 	 */
 	public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
-        Producer2 ngProducer = network.getProducer(ng, "getActivations");
-	    Consumer2 projConsumer = plot.getConsumer(plot, "addPoint");
+        Producer ngProducer = couplingFactory.getProducer(ng, "getActivations");
+	    Consumer projConsumer = couplingFactory.getConsumer(plot, "addPoint");
         tryCoupling(ngProducer, projConsumer);
 	}
 
@@ -252,11 +266,8 @@ public class Simulation {
 	 * @param ng The neuron group
 	 */
 	public void couple(SmellSensor sensor, NeuronGroup ng) {
-		NetworkComponent nc = netMap.get(ng.getParentNetwork());
-		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
-
-        Producer2 sensoryProducer = ow.getProducer(sensor, "getCurrentValue");
-	    Consumer2 sensoryConsumer = nc.getConsumer(ng, "forceSetActivations");
+        Producer sensoryProducer = couplingFactory.getProducer(sensor, "getCurrentValue");
+	    Consumer sensoryConsumer = couplingFactory.getConsumer(ng, "forceSetActivations");
         tryCoupling(sensoryProducer, sensoryConsumer);
 	}
 
@@ -270,11 +281,8 @@ public class Simulation {
 	 * @param consumingNeuron The neuron to write the values to
 	 */
 	public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
-		NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
-		OdorWorldComponent ow = odorMap.get(producingSensor.getParent().getParentWorld());
-
-        Producer2 agentSensor = ow.getProducer(producingSensor, "getCurrentValue");
-	    Consumer2 sensoryNeuron = nc.getConsumer(consumingNeuron, "forceSetActivation");
+        Producer agentSensor = couplingFactory.getProducer(producingSensor, "getCurrentValue");
+	    Consumer sensoryNeuron = couplingFactory.getConsumer(consumingNeuron, "forceSetActivation");
 	    tryCoupling(agentSensor, sensoryNeuron);
 	}
 
@@ -282,11 +290,8 @@ public class Simulation {
 	 * Coupled a neuron to an effector on an odor world agent.
 	 */
 	public void couple(Neuron neuron, Effector effector) {
-		NetworkComponent nc = netMap.get(neuron.getNetwork());
-		OdorWorldComponent ow = odorMap.get(effector.getParent().getParentWorld());
-
-        Producer2 effectorNeuron = nc.getProducer(neuron, "getActivation");
-	    Consumer2 agentEffector = ow.getConsumer(effector, "addAmount");
+        Producer effectorNeuron = couplingFactory.getProducer(neuron, "getActivation");
+	    Consumer agentEffector = couplingFactory.getConsumer(effector, "addAmount");
 	    tryCoupling(effectorNeuron, agentEffector);
 	}
 
@@ -297,11 +302,8 @@ public class Simulation {
 	 * @param neuron The neuron
 	 */
 	public void couple(Hearing sensor, Neuron neuron) {
-		NetworkComponent nc = netMap.get(neuron.getNetwork());
-		OdorWorldComponent ow = odorMap.get(sensor.getParent().getParentWorld());
-
-        Producer2 agentSensor = ow.getProducer(sensor, "getValue");
-	    Consumer2 sensoryNeuron = nc.getConsumer(neuron, "forceSetActivation");
+        Producer agentSensor = couplingFactory.getProducer(sensor, "getValue");
+	    Consumer sensoryNeuron = couplingFactory.getConsumer(neuron, "forceSetActivation");
 	    tryCoupling(agentSensor, sensoryNeuron);
 	}
 

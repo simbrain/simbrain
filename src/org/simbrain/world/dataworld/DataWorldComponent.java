@@ -313,6 +313,12 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
     }
 
+    // TODO: Fix this
+    @Override
+    public List<Object> getModels() {
+        return new ArrayList<Object>();
+    }
+
     @Override
     public void update() {
         dataTable.updateCurrentRow();

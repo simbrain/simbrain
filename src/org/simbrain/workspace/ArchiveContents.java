@@ -118,7 +118,7 @@ class ArchiveContents {
         }
         // Get a coupling id, if this is coupling action
         if (action instanceof UpdateCoupling) {
-            Coupling2<?> coupling = ((UpdateCoupling) action).getCoupling();
+            Coupling<?> coupling = ((UpdateCoupling) action).getCoupling();
             if (coupling != null) {
                 coupling_id = coupling.getId();
             } else {
@@ -229,9 +229,9 @@ class ArchiveContents {
         } else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
-                Coupling2<?> coupling = workspace.getCoupling(id);
+                Coupling<?> coupling = workspace.getCoupling(id);
                 retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { Coupling2.class })
+                        .getConstructor(new Class[] { Coupling.class })
                         .newInstance(coupling);
 
             } catch (Exception e) {
@@ -248,7 +248,7 @@ class ArchiveContents {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    ArchivedCoupling addCoupling(final Coupling2<?> coupling) {
+    ArchivedCoupling addCoupling(final Coupling<?> coupling) {
         ArchivedCoupling c = new ArchivedCoupling(this, coupling);
         archivedCouplings.add(c);
         return c;
@@ -470,7 +470,7 @@ class ArchiveContents {
          * @param coupling The coupling this instance represents.
          */
         ArchivedCoupling(final ArchiveContents parent,
-                final org.simbrain.workspace.Coupling2<?> coupling) {
+                final Coupling<?> coupling) {
 
             this.archivedProducer = new ArchivedAttribute(parent, coupling.getProducer());
             this.archivedConsumer = new ArchivedAttribute(parent, coupling.getConsumer());
@@ -500,9 +500,6 @@ class ArchiveContents {
      */
     public static final class ArchivedAttribute {
 
-        /** The uri for the parent component of this attribute. */
-        private String parentComponentRef;
-
         /** The attribute id. */
         private String attributeId;
 
@@ -514,16 +511,8 @@ class ArchiveContents {
          * @param parent The parent archive.
          * @param attribute The attribute this instance represents.
          */
-        ArchivedAttribute(ArchiveContents parent, Attribute2 attribute) {
-            this.parentComponentRef = parent.componentUris.get(attribute.parentComponent);
+        ArchivedAttribute(ArchiveContents parent, Attribute attribute) {
             this.attributeId = attribute.getId();
-        }
-
-        /**
-         * @return the parentComponentRef
-         */
-        public String getParentComponentRef() {
-            return parentComponentRef;
         }
 
         /**

@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.simbrain.workspace.Coupling2;
+import org.simbrain.workspace.Coupling;
 
 /**
  * Updates a coupling
@@ -28,14 +28,14 @@ import org.simbrain.workspace.Coupling2;
 public class UpdateCoupling implements UpdateAction {
 
     /** of couplings to update. */
-    private final Coupling2<?> coupling;
+    private final Coupling<?> coupling;
 
     /**
      * Construct the action.
      *
      * @param coupling coupling to update
      */
-    public UpdateCoupling(Coupling2<?> coupling) {
+    public UpdateCoupling(Coupling<?> coupling) {
         this.coupling = coupling;
     }
 
@@ -69,7 +69,7 @@ public class UpdateCoupling implements UpdateAction {
     /**
      * @return the coupling
      */
-    public Coupling2<?> getCoupling() {
+    public Coupling<?> getCoupling() {
         return coupling;
     }
 

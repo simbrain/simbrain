@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 /**
  * Data for a JFreeChart ScatterPlot.
@@ -35,12 +33,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     /** Data Model. */
     private ScatterPlotModel model;
-
-    /** x attribute type. */
-    private AttributeType xAttributeType;
-
-    /** y attribute type. */
-    private AttributeType yAttributeType;
 
     /** Objects which can be used to set the scatter plot. */
     private List<ScatterPlotSetter> setterList = new ArrayList<ScatterPlotSetter>();
@@ -54,8 +46,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         super(name);
         model = new ScatterPlotModel();
         model.defaultInit();
-        initializeAttributes();
-        addListener();
+        initModelListener();
     }
 
     /**
@@ -69,8 +60,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public ScatterPlotComponent(final String name, final ScatterPlotModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
-        addListener();
+        initModelListener();
     }
 
     /**
@@ -83,48 +73,15 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         super(name);
         model = new ScatterPlotModel();
         model.addDataSources(numDataSources);
-        initializeAttributes();
-        addListener();
-    }
-
-    /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-        xAttributeType = new AttributeType(this, "Point", "setX", double.class,
-                true);
-        yAttributeType = new AttributeType(this, "Point", "setY", double.class,
-                true);
-        addConsumerType(xAttributeType);
-        addConsumerType(yAttributeType);
-        // TODO: What if called more than once?
-        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addSetter(i);
-        }
+        initModelListener();
     }
 
     @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
-        for (ScatterPlotSetter setter : setterList) {
-            if (xAttributeType.isVisible()) {
-//                String xDesc = xAttributeType.getSimpleDescription("Point "
-//                        + (setter.getIndex() + 1) + "[X]");
-//                Consumer2<?> xConsumer = getAttributeManager()
-//                        .createPotentialConsumer(setter, xAttributeType);
-//                xConsumer.setDescription(xDesc);
-//                returnList.add(xConsumer);
-            }
-            if (yAttributeType.isVisible()) {
-//                String yDesc = yAttributeType.getSimpleDescription("Point "
-//                        + (setter.getIndex() + 1) + "[Y]");
-//                Consumer2<?> yConsumer = getAttributeManager()
-//                        .createPotentialConsumer(setter, yAttributeType);
-//                yConsumer.setDescription(yDesc);
-//                returnList.add(yConsumer);
-            }
-        }
-        return returnList;
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.add(model);
+        models.addAll(setterList);
+        return models;
     }
 
     /**
@@ -156,39 +113,23 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         setterList.add(new ScatterPlotSetter(i));
     }
 
-    /**
-     * Add chart listener to model.
-     */
-    private void addListener() {
+    /** Add chart listener to model. */
+    private void initModelListener() {
         model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceAdded(final int index) {
                 if (getSetter(index) == null) {
                     addSetter(index);
-                    firePotentialAttributesChanged();
                 }
+                fireModelAdded(getSetter(index));
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceRemoved(final int index) {
                 ScatterPlotSetter setter = getSetter(index);
-                fireAttributeObjectRemoved(setter);
                 setterList.remove(setter);
-                firePotentialAttributesChanged();
+                fireModelRemoved(setter);
             }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void chartInitialized(int numSources) {
-                // No implementation yet (not used in this component thus far).
-            }
-
+            public void chartInitialized(int numSources) {}
         });
     }
 
@@ -210,13 +151,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
     }
 
-    /**
-     * {@inheritDoc}
-     * @param input
-     * @param name
-     * @param format
-     * @return 
-     */
     public static ScatterPlotComponent open(final InputStream input,
             final String name, final String format) {
         ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel
@@ -243,9 +177,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         ScatterPlotModel.getXStream().toXML(model, output);
@@ -302,6 +233,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         /**
          * @return the xval
          */
+        @Producible
         public double getX() {
             return xval;
         }
@@ -309,6 +241,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         /**
          * @param xval the xval to set
          */
+        @Consumable
         public void setX(double xval) {
             this.xval = xval;
         }
@@ -316,6 +249,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         /**
          * @return the yval
          */
+        @Producible
         public double getY() {
             return yval;
         }
@@ -323,6 +257,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         /**
          * @param yval the yval to set
          */
+        @Consumable
         public void setY(double yval) {
             this.yval = yval;
         }

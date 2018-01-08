@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.simbrain.workspace.Coupling2;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -60,7 +60,7 @@ public class UpdateActionManager {
      * Keep track of relations between coupling and coupling actions so they can
      * be cleaned up.
      */
-    private HashMap<Coupling2<?>, UpdateCoupling> couplingActionMap = new HashMap();
+    private HashMap<Coupling<?>, UpdateCoupling> couplingActionMap = new HashMap();
 
     /**
      * Keep track of relations between component and component actions so they
@@ -127,7 +127,7 @@ public class UpdateActionManager {
         // Add / remove coupling actions as needed
         workspaceUpdater.getWorkspace().addCouplingListener(new CouplingListener() {
                     @Override
-                    public void couplingAdded(Coupling2<?> coupling) {
+                    public void couplingAdded(Coupling<?> coupling) {
                         UpdateCoupling couplingAction = new UpdateCoupling(coupling);
                         couplingActionMap.put(coupling, couplingAction);
                         // System.out.println("Added coupling " +
@@ -135,7 +135,7 @@ public class UpdateActionManager {
                     }
 
                     @Override
-                    public void couplingRemoved(Coupling2<?> coupling) {
+                    public void couplingRemoved(Coupling<?> coupling) {
                         removeAction(couplingActionMap.remove(coupling));
                         // System.out.println("Removed coupling " +
                         // couplingActionMap.size());
@@ -299,7 +299,7 @@ public class UpdateActionManager {
         }
 
         // Add update actions for all components available
-        for (Coupling2 coupling : workspaceUpdater.getWorkspace().getCouplings()) {
+        for (Coupling coupling : workspaceUpdater.getWorkspace().getCouplings()) {
             availableActionList.add(new UpdateCoupling(coupling));
         }
 

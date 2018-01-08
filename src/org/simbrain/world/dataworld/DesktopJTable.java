@@ -18,15 +18,10 @@
  */
 package org.simbrain.world.dataworld;
 
-import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
-import org.simbrain.workspace.gui.CouplingMenuConsumer;
-import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Extends SimbrainJTable context menu with attribute menus.
@@ -60,7 +55,7 @@ public class DesktopJTable extends SimbrainJTable {
 //        ret.addSeparator();
 //        String producerDescription = component.getProducingColumnType()
 //                .getDescription("Column " + getSelectedColumn());
-//        Producer2 producer = component.getAttributeManager().createPotentialProducer(
+//        Producer producer = component.getAttributeManager().createPotentialProducer(
 //                        component.getObjectFromKey("producerList:" + getSelectedColumn()),
 //                        component.getProducingColumnType());
 //        producer.setDescription(producerDescription);
@@ -69,7 +64,7 @@ public class DesktopJTable extends SimbrainJTable {
 //        ret.add(producerMenu);
 //        String consumerDescription = component.getConsumingColumnType()
 //                .getDescription("Column " + getSelectedColumn());
-//        Consumer2 consumer = component.getAttributeManager().createPotentialConsumer(
+//        Consumer consumer = component.getAttributeManager().createPotentialConsumer(
 //                        component.getObjectFromKey("consumerList:" + getSelectedColumn()),
 //                        component.getConsumingColumnType());
 //        consumer.setDescription(consumerDescription);

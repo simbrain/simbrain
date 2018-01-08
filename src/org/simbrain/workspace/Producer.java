@@ -4,10 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-public class Producer2<V> extends Attribute2 {
+public class Producer<V> extends Attribute {
 
-    public Producer2(WorkspaceComponent wc, Object baseObject, Method method) {
-        this.parentComponent = wc;
+    public Producer(Object baseObject, Method method) {
         this.baseObject = baseObject;
         this.method = method;
     }
@@ -17,14 +16,12 @@ public class Producer2<V> extends Attribute2 {
             if (key == null) {
                 return (V) method.invoke(baseObject);
             } else {
-                // TODO: Not yet tested.
                 return (V) method.invoke(baseObject, new Object[] { key });
             }
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            // Should never happen
+            throw new RuntimeException(ex);
         }
-        return null;
     }
 
     @Override

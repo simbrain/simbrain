@@ -23,8 +23,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -189,24 +189,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Producer2<?>> getProducers() {
-        List<Producer2<?>> retList = new ArrayList();
+    public List getModels() {
+        List<Object> models = new ArrayList<Object>();
         for (OdorWorldEntity entity : world.getObjectList()) {
-            retList.addAll(super.getProducers(entity));
-            retList.addAll(super.getProducersFromList(entity.getSensors()));
-            retList.addAll(super.getProducersFromList(entity.getEffectors()));
+            models.add(entity);
+            models.addAll(entity.getSensors());
+            models.addAll(entity.getEffectors());
         }
-        return retList;
-    }
-
-    @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> retList = new ArrayList();
-        for (OdorWorldEntity entity : world.getObjectList()) {
-            retList.addAll(super.getConsumers(entity));
-            retList.addAll(super.getConsumersFromList(entity.getSensors()));
-            retList.addAll(super.getConsumersFromList(entity.getEffectors()));
-        }
-        return retList;
+        return models;
     }
 }

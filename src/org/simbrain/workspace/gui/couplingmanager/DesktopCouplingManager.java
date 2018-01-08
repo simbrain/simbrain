@@ -39,8 +39,8 @@ import javax.swing.border.Border;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
@@ -161,8 +161,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * Add couplings using the selected method.
      */
     private void addCouplings() {
-        List<Producer2<?>> producers = (List<Producer2<?>>) producerPanel.getSelectedAttributes();
-        List<Consumer2<?>> consumers = (List<Consumer2<?>>) consumerPanel.getSelectedAttributes();
+        List<Producer<?>> producers = (List<Producer<?>>) producerPanel.getSelectedAttributes();
+        List<Consumer<?>> consumers = (List<Consumer<?>>) consumerPanel.getSelectedAttributes();
 
         if ((producers.size() == 0) || (consumers.size() == 0)) {
             JOptionPane.showMessageDialog(null,

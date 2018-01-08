@@ -27,17 +27,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Network component.
@@ -69,77 +66,59 @@ public final class NetworkComponent extends WorkspaceComponent {
         init();
     }
 
-    /**
-     * Initialize attribute types and listeners.
-     */
+    /** Initialize attribute types and listeners. */
     private void init() {
         network.addNeuronListener(new NeuronListener() {
-            /**
-             * {@inheritDoc}
-             */
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelAdded(e);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(e);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronMoved(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronRemoved(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
-                fireAttributeObjectRemoved(e.getObject());
+                fireModelRemoved(e);
             }
 
-            @Override
             public void neuronChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(e);
             }
 
-            @Override
             public void labelChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
             }
         });
 
         network.addSynapseListener(new SynapseListener() {
-
             public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelAdded(networkEvent.getObject());
             }
 
             public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelChanged(networkEvent.getObject());
             }
 
             public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelRemoved(networkEvent.getObject());
             }
 
-            public void synapseTypeChanged(
-                    NetworkEvent<SynapseUpdateRule> networkEvent) {
+            public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(networkEvent.getObject());
             }
-
         });
-
     }
 
     @Override
@@ -168,6 +147,15 @@ public final class NetworkComponent extends WorkspaceComponent {
             return "SynapseGroup:" + ((SynapseGroup) object).getId();
         }
         return null;
+    }
+
+    @Override
+    public List<Object> getModels() {
+        List<Object> retList = new ArrayList<Object>();
+        retList.add(network);
+        retList.addAll(network.getNeuronList());
+        retList.addAll(network.getNeuronGroups());
+        return retList;
     }
 
     /**
@@ -212,31 +200,10 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
+    public void closing() {}
 
     @Override
     public String getXML() {
         return Network.getXStream().toXML(network);
     }
-    
-    @Override
-    public List<Producer2<?>> getProducers() {
-        List<Producer2<?>> retList = new ArrayList();
-        retList.addAll(super.getProducers(network));
-        retList.addAll(super.getProducersFromList(network.getNeuronList()));
-        retList.addAll(super.getProducersFromList(network.getNeuronGroups()));
-        return retList;
-    }
-
-    @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> retList = new ArrayList();
-        retList.addAll(super.getConsumers(network));
-        retList.addAll(super.getConsumersFromList(network.getNeuronList()));
-        retList.addAll(super.getConsumersFromList(network.getNeuronGroups()));
-        return retList;
-    }
-
 }

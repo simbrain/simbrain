@@ -37,10 +37,10 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private Producer2 producer;
+    private Producer producer;
 
     /** Reference to consuming attribute. */
-    private Consumer2 consumer;
+    private Consumer consumer;
 
     /** The workspace this object belongs to. */
     private Workspace workspace;
@@ -53,7 +53,7 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * @param producer The producer for the coupling.
      * @param consumer The consumer for the coupling.
      */
-    public CouplingMenuItem(Workspace workspace, String description, Producer2 producer, Consumer2 consumer) {
+    public CouplingMenuItem(Workspace workspace, String description, Producer producer, Consumer consumer) {
         super(description);
         this.workspace = workspace;
         this.producer = producer;
@@ -69,12 +69,8 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
     private final ActionListener listener = new ActionListener() {
         public void actionPerformed(final ActionEvent evt) {
             if (getState()) {
-                try {
-                    workspace.addCoupling(new Coupling2(producer, consumer));
-                    setSelected(true);
-                } catch (MismatchedAttributesException ex) {
-                    ex.printStackTrace();
-                }
+                Coupling coupling = workspace.getCouplingFactory().tryCoupling(producer, consumer);
+                setSelected(true);
             } else {
                 setSelected(false);
             }

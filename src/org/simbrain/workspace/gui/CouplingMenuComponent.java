@@ -25,10 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import org.simbrain.workspace.MismatchedAttributesException;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.*;
 
 /**
  * A menu for creating a set of couplings from one component to another. The
@@ -106,13 +103,14 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
         this.removeAll();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             final WorkspaceComponent targetComponent = component;
+            CouplingFactory factory = workspace.getCouplingFactory();
             JMenuItem componentMenuItem = new JMenuItem(targetComponent.getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        workspace.getCouplingFactory().createOneToOneCouplings(
-                                sourceComponent.getProducers(),
-                                targetComponent.getConsumers());
+                        factory.createOneToOneCouplings(
+                                factory.getAllProducers(sourceComponent),
+                                factory.getAllConsumers(targetComponent));
                     } catch (MismatchedAttributesException e1) {
                         JOptionPane.showMessageDialog(null, e1.getMessage(),
                                 "Unmatched Attributes",

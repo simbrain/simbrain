@@ -20,8 +20,8 @@ package org.simbrain.workspace.gui;
 
 import javax.swing.JMenu;
 
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -37,7 +37,7 @@ public class CouplingMenuProducer extends JMenu {
     Workspace workspace;
 
     /** The base attribute for this menu. */
-    Producer2<?> producer;
+    Producer<?> producer;
 
     /**
      * Construct the menu.
@@ -47,7 +47,7 @@ public class CouplingMenuProducer extends JMenu {
      * @param producer the target consuming attribute.
      */
     public CouplingMenuProducer(final String menuName,
-            final Workspace workspace, final Producer2<?> producer) {
+            final Workspace workspace, final Producer<?> producer) {
         super(menuName);
         this.workspace = workspace;
         this.producer = producer;
@@ -62,16 +62,13 @@ public class CouplingMenuProducer extends JMenu {
         this.removeAll();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             JMenu componentMenu = new JMenu(component.getName());
-            for (Consumer2<?> consumer : component
-                    .getConsumers()) {
+            for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getAllConsumers(component)) {
                 if (consumer.getType() == producer.getType()) {
-                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
-                            consumer.toString(), producer,
-                            consumer);
+                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace, consumer.toString(),
+                            producer, consumer);
                     componentMenu.add(menuItem);
                 }
             }
-
             this.add(componentMenu);
         }
     }

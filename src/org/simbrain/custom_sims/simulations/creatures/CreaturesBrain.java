@@ -12,10 +12,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.workspace.Coupling2;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.MismatchedAttributesException;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -183,21 +182,21 @@ public class CreaturesBrain {
 	 * @param index
 	 * @param list
 	 */
-	private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling2<?>> list) {
+	private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling<?>> list) {
 		// Check to see if the sizes are in safe parameters
 		if (producerLobe.size() <= consumerLobe.size() - index) {
 			for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
 
 				// Make the producer from neuron j of producerLobe
-				Producer2 producer = netComponent.getProducer(producerLobe.getNeuronList().get(j),
+				Producer producer = parentSim.getSim().getProducer(producerLobe.getNeuronList().get(j),
 						"getActivation");
 
 				// Make the consumer from neuron i of consumerLobe
-				Consumer2 consumer = netComponent.getConsumer(consumerLobe.getNeuronList().get(i),
+				Consumer consumer = parentSim.getSim().getConsumer(consumerLobe.getNeuronList().get(i),
 						"forceSetActivation");
 
 				// Create the coupling and add it to the list
-                Coupling2 coupling = parentSim.getSim().tryCoupling(producer, consumer);
+                Coupling coupling = parentSim.getSim().tryCoupling(producer, consumer);
                 list.add(coupling);
 			}
 		} else {

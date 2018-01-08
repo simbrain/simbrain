@@ -20,12 +20,7 @@ package org.simbrain.workspace;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
@@ -45,7 +40,7 @@ public abstract class WorkspaceComponent {
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     /** The set of all WorkspaceComponentListeners on this component. */
-    private Collection<WorkspaceComponentListener> workspaceComponentListeners;
+    private Collection<WorkspaceComponentListener> listeners;
 
     /** List of attribute listeners. */
     private Collection<AttributeListener> attributeListeners;
@@ -87,11 +82,9 @@ public abstract class WorkspaceComponent {
      */
     private int serializePriority = 0;
 
-    /**
-     * Initializer
-     */
+    /** Initializer */
     {
-        workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
+        listeners = new HashSet<WorkspaceComponentListener>();
         attributeListeners = new HashSet<AttributeListener>();
     }
 
@@ -133,97 +126,17 @@ public abstract class WorkspaceComponent {
         //TODO: If there is no Gui then close must be called directly
     }
 
-    /**
-     * Closes the WorkspaceComponent.
-     */
+    /** Closes the WorkspaceComponent. */
     public void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
 
-    /**
-     * Perform cleanup after closing.
-     */
+    /** Perform cleanup after closing. */
     protected abstract void closing();
 
-    /**
-     * Called by Workspace to update the state of the component.
-     */
-    public void update() {
-        /* no default implementation */
-    }
-
-    /**
-     * Fire attribute object removed event (when the base object of an attribute
-     * is removed).
-     *
-     * @param object the object which was removed
-     */
-    public void fireAttributeObjectRemoved(Object object) {
-        for (AttributeListener listener : attributeListeners) {
-            listener.attributeObjectRemoved(object);
-        }
-    }
-
-    /**
-     * Fire potential attributes changed event.
-     */
-    public void firePotentialAttributesChanged() {
-        for (AttributeListener listener : attributeListeners) {
-            listener.potentialAttributesChanged();
-        }
-    }
-
-    /**
-     * Fire attribute type visibility changed event.
-     *
-     * @param type the type whose visibility changed.
-     */
-    public void fireAttributeTypeVisibilityChanged(AttributeType type) {
-        for (AttributeListener listener : attributeListeners) {
-            listener.attributeTypeVisibilityChanged(type);
-        }
-    }
-
-    /**
-     * Adds a AttributeListener to this component.
-     *
-     * @param listener the AttributeListener to add.
-     */
-    public void addAttributeListener(final AttributeListener listener) {
-        attributeListeners.add(listener);
-    }
-
-    /**
-     * Removes an AttributeListener from this component.
-     *
-     * @param listener the AttributeListener to remove.
-     */
-    public void removeAttributeListener(AttributeListener listener) {
-        attributeListeners.remove(listener);
-    }
-
-    /**
-     * Add a new type of producer.
-     *
-     * @param type type to add
-     */
-    public void addProducerType(AttributeType type) {
-        if (!producerTypes.contains(type)) {
-            producerTypes.add(type);
-        }
-    }
-
-    /**
-     * Add a new type of consumer.
-     *
-     * @param type type to add
-     */
-    public void addConsumerType(AttributeType type) {
-        if (!consumerTypes.contains(type)) {
-            consumerTypes.add(type);
-        }
-    }
+    /** Called by Workspace to update the state of the component. */
+    public void update() {}
 
     /**
      * Finds objects based on a key. Used in deserializing attributes. Any class
@@ -232,7 +145,7 @@ public abstract class WorkspaceComponent {
      * @param objectKey String key
      * @return the corresponding object
      */
-    public Object getObjectFromKey(final String objectKey) {
+    public Object getObjectFromKey(String objectKey) {
         return null;
     }
 
@@ -249,6 +162,15 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Return a collection of all model objects currently managed by this component.
+     * Whenever this collection would
+     */
+    public List getModels() {
+        // TODO: This should be abstract.
+        return new ArrayList<Object>();
+    }
+
+    /**
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of
      * each part.
@@ -259,55 +181,60 @@ public abstract class WorkspaceComponent {
         return Collections.singleton(this);
     }
 
-    /**
-     * Called by Workspace to notify that updates have stopped.
-     */
-    protected void stopped() {
-        /* no default implementation */
-    }
+    /** Called by Workspace to notify that updates have stopped. */
+    protected void stopped() {}
 
-    /**
-     * Notify all workspaceComponentListeners of a componentUpdated event.
-     */
-    public final void fireUpdateEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the component has been updated. */
+    public void fireUpdateEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentUpdated();
         }
     }
 
-    /**
-     * Notify all workspaceComponentListeners that the gui has been turned on or
-     * off.
-     */
-    public final void fireGuiToggleEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the gui has been turned on or off. */
+    public void fireGuiToggleEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.guiToggled();
         }
     }
 
-    /**
-     * Notify all workspaceComponentListeners of a component has been turned on
-     * or off.
-     */
-    public final void fireComponentToggleEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the component has been turned on or off. */
+    public void fireComponentToggleEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentOnOffToggled();
         }
     }
 
-    /**
-     * Fired when component is closed.
-     */
+    /** Notify listeners that the component is closing. */
     public void fireComponentClosing() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentClosing();
         }
     }
 
-    /**
-     * Called after a global update ends.
-     */
-    final void doStopped() {
+    /** Notify listeners that a model object has been added to the component. */
+    public void fireModelAdded(Object addedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelAdded(addedModel);
+        }
+    }
+
+    /** Notify listeners that a model object has been removed from the component. */
+    public void fireModelRemoved(Object removedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelRemoved(removedModel);
+        }
+    }
+
+    /** Notify listeners that a model object has been changed in the component. */
+    public void fireModelChanged(Object removedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelRemoved(removedModel);
+        }
+    }
+
+    /** Called after a global update ends. */
+    void doStopped() {
         stopped();
     }
 
@@ -316,42 +243,33 @@ public abstract class WorkspaceComponent {
      *
      * @return The WorkspaceComponentListeners on this component.
      */
-    public Collection<WorkspaceComponentListener> getWorkspaceComponentListeners() {
-        return Collections.unmodifiableCollection(workspaceComponentListeners);
+    public Collection<WorkspaceComponentListener> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
     }
 
     /**
-     * Adds a WorkspaceComponentListener to this component.
+     * Adds a listener to this component.
      *
      * @param listener the WorkspaceComponentListener to add.
      */
-    public void addWorkspaceComponentListener(
-            final WorkspaceComponentListener listener) {
-        workspaceComponentListeners.add(listener);
+    public void addListener(WorkspaceComponentListener listener) {
+        listeners.add(listener);
     }
 
     /**
-     * Adds a WorkspaceComponentListener to this component.
+     * Adds a listener to this component.
      *
      * @param listener the WorkspaceComponentListener to add.
      */
-    public void removeWorkspaceComponentListener(
+    public void removeListener(
             final WorkspaceComponentListener listener) {
-        workspaceComponentListeners.remove(listener);
+        listeners.remove(listener);
     }
 
     /**
      * Returns the name of this component.
      */
     public String getName() {
-        return name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
         return name;
     }
 
@@ -364,6 +282,14 @@ public abstract class WorkspaceComponent {
         // for (WorkspaceComponentListener listener : this.getListeners()) {
         // listener.setTitle(name);
         // }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return name;
     }
 
     /**
@@ -390,6 +316,13 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Returns the workspace associated with this component.
+     */
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    /**
      * Sets the workspace for this component. Called by the workspace right
      * after this component is created.
      *
@@ -397,13 +330,6 @@ public abstract class WorkspaceComponent {
      */
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
-    }
-
-    /**
-     * Returns the workspace associated with this component.
-     */
-    public Workspace getWorkspace() {
-        return workspace;
     }
 
     /**
@@ -416,13 +342,11 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Set to true when a component changes, set to false after a component is
-     * saved.
+     * Set to true when a component changes, set to false after a component is saved.
      *
-     * @param changedSinceLastSave whether this component has changed since the
-     *            last save.
+     * @param changedSinceLastSave whether this component has changed since the last save.
      */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
+    public void setChangedSinceLastSave(boolean changedSinceLastSave) {
         logger.debug("component changed");
         this.changedSinceLastSave = changedSinceLastSave;
     }
@@ -495,50 +419,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * @return the producerTypes
-     */
-    public List<AttributeType> getProducerTypes() {
-        return Collections.unmodifiableList(producerTypes);
-    }
-
-    /**
-     * @return the consumerTypes
-     */
-    public List<AttributeType> getConsumerTypes() {
-        return Collections.unmodifiableList(consumerTypes);
-    }
-
-    /**
-     * Return visible producer types.
-     *
-     * @return the visible producerTypes
-     */
-    public List<AttributeType> getVisibleProducerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getProducerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * Return visible consumer types.
-     *
-     * @return the visible consumerTypes
-     */
-    public List<AttributeType> getVisibleConsumerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getConsumerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
      * @return the serializePriority
      */
     protected int getSerializePriority() {
@@ -557,137 +437,12 @@ public abstract class WorkspaceComponent {
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void start() {
-    }
+    public void start() {}
 
     /**
      * Called when a simulation stops, e.g. when the "stop" button is pressed.
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void stop() {
-    }
-
-    public List<Producer2<?>> getProducers() {
-        return getProducers(this);
-    }
-
-    public List<Consumer2<?>> getConsumers() {
-        return getConsumers(this);
-    }
-
-    public List<Producer2<?>> getProducersFromList(List list) {
-        List<Producer2<?>> returnList = new ArrayList<>();
-        for (Object object : list) {
-            returnList.addAll(getProducers(object));
-        }
-        return returnList;
-    }
-
-    public List<Consumer2<?>> getConsumersFromList(List list) {
-        List<Consumer2<?>> returnList = new ArrayList<>();
-        for (Object object : list) {
-            returnList.addAll(getConsumers(object));
-        }
-        return returnList;
-    }
-
-    // TODO: Rename to getProducersOnObject... to clarify it's a service / helper
-    public List<Producer2<?>> getProducers(Object object) {
-        List<Producer2<?>> returnList = new ArrayList<Producer2<?>>();
-        for (Method method : object.getClass().getMethods()) {
-            Producible annotation = method.getAnnotation(Producible.class);
-            if (annotation != null) {
-                // A custom keyed annotation is being used
-                if (!annotation.indexListMethod().isEmpty()) {
-                    try {
-                        Method indexListMethod = object.getClass()
-                                .getMethod(annotation.indexListMethod(), null);
-                        List keys = (List) indexListMethod.invoke(object, null);
-                        for (Object key: keys) {
-                            Producer2<?> consumer = new Producer2(this, object, method);
-                            consumer.key = key;
-                            returnList.add(consumer);
-                        }
-                    } catch (Exception e) {
-                        // TODO: Use multicatch
-                        e.printStackTrace();
-                    }
-                }  else {
-                    // Annotation has no key
-                    Producer2<?> producer = new Producer2(this, object, method);
-                    //setCustomDescription(producer);
-                    returnList.add(producer);
-                }
-            }
-        }
-        return returnList;
-    }
-
-    public List<Consumer2<?>> getConsumers(Object object) {
-        List<Consumer2<?>> returnList = new ArrayList<>();
-        for (Method method : object.getClass().getMethods()) {
-            // TODO: Docs; When this works do it for producers
-            // Key case
-            Consumable annotation = method.getAnnotation(Consumable.class);
-            if (annotation != null) {
-                // A custom keyed annotation is being used
-                if (!annotation.indexListMethod().isEmpty()) {
-                    try {
-                        Method indexListMethod = object.getClass()
-                                .getMethod(annotation.indexListMethod(), null);
-                        List keys = (List) indexListMethod.invoke(object, null);
-                        for (Object key: keys) {
-                            Consumer2<?> consumer = new Consumer2(this, object, method);
-                            consumer.key = key;
-                            returnList.add(consumer);
-                        }
-                    } catch (Exception e) {
-                        // TODO: Use multicatch
-                        e.printStackTrace();
-                    }
-                } else {
-                    // Annotation has no key
-                    Consumer2<?> consumer = new Consumer2(this, object, method);
-                    //setCustomDescription(consumer);
-                    returnList.add(consumer);
-                }
-            }
-        }
-        return returnList;
-    }
-
-    public Consumer2<?> getConsumer(Object object, String methodName) {
-        return getConsumers(object).stream().filter(
-                c -> c.getMethod().getName().equalsIgnoreCase(methodName))
-                     .findFirst().get();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Consumer2<T> getConsumer(Object object, String methodName, Class<T> type)
-            throws MismatchedAttributesException {
-        Consumer2<?> consumer = getConsumer(object, methodName);
-        if (consumer.getType() == type) {
-            return (Consumer2<T>) consumer;
-        } else {
-            throw new MismatchedAttributesException("Consumer type does not match method value type.");
-        }
-    }
-
-    public Producer2<?> getProducer(Object object, String methodName) {
-        return getProducers(object).stream().filter(
-                p -> p.getMethod().getName().equalsIgnoreCase(methodName))
-                     .findFirst().get();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Producer2<T> getProducer(Object object, String methodName, Class<T> type)
-            throws MismatchedAttributesException {
-        Producer2<?> producer = getProducer(object, methodName);
-        if (producer.getType() == type) {
-            return (Producer2<T>) producer;
-        } else {
-            throw new MismatchedAttributesException("Producer type does not match method return type.");
-        }
-    }
+    public void stop() {}
 }

@@ -2,6 +2,8 @@ package org.simbrain.world.deviceinteraction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +62,7 @@ public class KeyboardWorld {
         return tokenDictionary.stream().toArray(Character[]::new);
     }
 
+    @Producible
     public String getText() {
         return keys.stream().map(Object::toString).collect(Collectors.joining(" "));
     }
@@ -73,6 +76,11 @@ public class KeyboardWorld {
                 }
             }
         }
+    }
+
+    @Consumable
+    public void setPosition(int caretPosition) {
+        setPosition(caretPosition, true);
     }
 
     /**

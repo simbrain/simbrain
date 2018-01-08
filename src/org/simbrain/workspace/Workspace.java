@@ -25,11 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -48,7 +45,7 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
  * workspaces on different machines together). A workspace can be visualized via
  * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  *
- * @see org.simbrain.workspace.Coupling2
+ * @see Coupling
  *
  */
 public class Workspace {
@@ -567,15 +564,15 @@ public class Workspace {
     }
 
     /** All couplings for the workspace. */
-    private final List<Coupling2<?>> couplings = new ArrayList<Coupling2<?>>();
+    private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
-    public void addCoupling(Coupling2<?> coupling) {
+    public void addCoupling(Coupling<?> coupling) {
         couplings.add(coupling);
         fireCouplingAdded(coupling);
     }
 
     public void updateCouplings() {
-        for (Coupling2<?> coupling : couplings) {
+        for (Coupling<?> coupling : couplings) {
             coupling.update();
         }
     }
@@ -606,7 +603,7 @@ public class Workspace {
      *
      * @param coupling coupling that was added
      */
-    private void fireCouplingAdded(Coupling2<?> coupling) {
+    private void fireCouplingAdded(Coupling<?> coupling) {
         for (CouplingListener listeners : couplingListeners) {
             listeners.couplingAdded(coupling);
         }
@@ -617,7 +614,7 @@ public class Workspace {
      *
      * @param coupling coupling that was removed
      */
-    private void fireCouplingRemoved(Coupling2<?> coupling) {
+    private void fireCouplingRemoved(Coupling<?> coupling) {
         for (CouplingListener listeners : couplingListeners) {
             listeners.couplingRemoved(coupling);
         }
@@ -626,18 +623,18 @@ public class Workspace {
     /**
      * @return the couplings
      */
-    public List<Coupling2<?>> getCouplings() {
+    public List<Coupling<?>> getCouplings() {
         return couplings;
     }
 
-    public void removeCouplings(List<Coupling2<?>> couplings) {
+    public void removeCouplings(List<Coupling<?>> couplings) {
         this.couplings.removeAll(couplings);
         // What to do here?
         //this.fireCouplingsRemoved();
     }
 
     //TODO: If not used by the time update actions are re-implemented, remove
-    public Coupling2<?> getCoupling(String id) {
+    public Coupling<?> getCoupling(String id) {
         return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id))
                 .findFirst().get();
     }
@@ -647,11 +644,11 @@ public class Workspace {
      *
      * @param couplingList the list of couplings to be updated
      */
-    public void updateCouplings(List<Coupling2<?>> couplingList) {
-        // for (Coupling2<?> coupling : couplingList) {
+    public void updateCouplings(List<Coupling<?>> couplingList) {
+        // for (Coupling<?> coupling : couplingList) {
         // coupling.setBuffer();
         // }
-        for (Coupling2<?> coupling : couplingList) {
+        for (Coupling<?> coupling : couplingList) {
             coupling.update();
         }
     }

@@ -17,7 +17,6 @@ import java.util.List;
 @Target(ElementType.METHOD)
 public @interface Consumable {
 
-    //TODO: Rename?
     /**
      * The name of a method that returns a customized description for this
      * producible. 

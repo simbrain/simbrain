@@ -31,7 +31,7 @@ public abstract class Attribute {
         this.method = method;
         this.description = description;
         try {
-            idMethod = baseObject.getClass().getMethod("toString", String.class);
+            idMethod = baseObject.getClass().getMethod("toString");
         } catch (NoSuchMethodException ex) {
             // Should never happen
             throw new AssertionError(ex);

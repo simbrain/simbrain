@@ -620,9 +620,9 @@ public class Workspace {
         }
     }
     
-    private void fireCouplingsRemoved(List<Coupling2<?>> couplings2) {
+    private void fireCouplingsRemoved(List<Coupling<?>> couplings) {
         for (CouplingListener listeners : couplingListeners) {
-            listeners.couplingsRemoved(couplings2);
+            listeners.couplingsRemoved(couplings);
         }
     }
 

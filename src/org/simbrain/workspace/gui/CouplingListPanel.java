@@ -131,7 +131,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
     /**
      * Updates the list of couplings when new couplings are made.
      */
-    private void couplingsUpdated() {
+    private void updateCouplingsList() {
         couplingList = new ArrayList(desktop.getWorkspace().getCouplings());
         couplings.setListData(couplingList.toArray());
     }
@@ -149,34 +149,25 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         return ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void couplingAdded(Coupling coupling) {
-        couplingsUpdated();
+        updateCouplingsList();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void couplingRemoved(Coupling coupling) {
-        couplingsUpdated();
+        updateCouplingsList();
+    }
+
+    @Override
+    public void couplingsRemoved(List<Coupling<?>> couplings) {
+        updateCouplingsList();
     }
 
     /**
      * Custom attribute renderer for JList.
      */
     private class CouplingCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         * @overrides java.awt.Component
-         * @param list
-         * @param object
-         * @param index
-         * @param isSelected
-         * @param cellHasFocus
-         * @return
-         */
         public java.awt.Component getListCellRendererComponent(
                 final JList list, final Object object, final int index,
                 final boolean isSelected, final boolean cellHasFocus) {
@@ -189,7 +180,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             renderer.setForeground(DesktopCouplingManager.getColor(coupling.getType()));
             return renderer;
         }
-
     }
 
 }

@@ -40,8 +40,10 @@ public interface CouplingListener {
      */
     public void couplingRemoved(Coupling<?> coupling);
 
-    //TODO
-    public void couplingsRemoved(List<Coupling2<?>> couplings2);
-
+    /**
+     * Called whenever more than one coupling is removed.
+     * @param couplings the couplings that were removed.
+     */
+    public void couplingsRemoved(List<Coupling<?>> couplings);
 
 }

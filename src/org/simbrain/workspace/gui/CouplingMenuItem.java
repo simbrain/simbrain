@@ -55,26 +55,22 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      */
     public CouplingMenuItem(Workspace workspace, String description, Producer producer, Consumer consumer) {
         super(description);
+        this.setIcon(null);
         this.workspace = workspace;
         this.producer = producer;
         this.consumer = consumer;
-        addActionListener(listener);
-    }
-
-    /**
-     * Listens for events where this item is clicked. If this item is selected
-     * when there is no coupling one is created. If it is selected, then the
-     * coupling is removed.
-     */
-    private final ActionListener listener = new ActionListener() {
-        public void actionPerformed(final ActionEvent evt) {
+        /*
+         * Listen for events where this item is clicked. If this item is selected
+         * when there is no coupling one is created. If it is selected, then the
+         * coupling is removed.
+         */
+        addActionListener(evt -> {
             if (getState()) {
                 Coupling coupling = workspace.getCouplingFactory().tryCoupling(producer, consumer);
                 setSelected(true);
             } else {
                 setSelected(false);
             }
-        }
-    };
-
+        });
+    }
 }

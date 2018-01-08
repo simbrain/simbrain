@@ -7,8 +7,7 @@ import java.lang.reflect.Type;
 public class Producer<V> extends Attribute {
 
     public Producer(Object baseObject, Method method) {
-        this.baseObject = baseObject;
-        this.method = method;
+        super(baseObject, method);
     }
 
     V getValue() {

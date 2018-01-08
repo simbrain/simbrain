@@ -21,6 +21,7 @@ public abstract class Attribute {
     public Attribute(Object baseObject, Method method) {
         this.baseObject = baseObject;
         this.method = method;
+        description = method.getName();
     }
 
     /** Initializing constructor */

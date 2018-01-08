@@ -231,6 +231,8 @@ public class CouplingFactory {
      * @return The consumer.
      */
     public Consumer<?> getConsumer(Object model, String methodName) {
+        for (Consumer<?> consumer : getConsumersFromModel(model))
+            System.out.println(consumer);
         return getConsumersFromModel(model).stream().filter(
                 c -> c.getMethod().getName().equalsIgnoreCase(methodName))
                 .findFirst().get();

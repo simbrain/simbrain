@@ -46,8 +46,7 @@ public class CouplingMenuConsumer extends JMenu {
      * @param workspace the workspace
      * @param consumer the target consuming attribute.
      */
-    public CouplingMenuConsumer(final String menuName,
-            final Workspace workspace, final Consumer<?> consumer) {
+    public CouplingMenuConsumer(String menuName, Workspace workspace, Consumer<?> consumer) {
         super(menuName);
         this.workspace = workspace;
         this.consumer = consumer;

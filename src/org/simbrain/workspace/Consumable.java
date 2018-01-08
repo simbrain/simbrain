@@ -17,7 +17,10 @@ import java.util.List;
 @Target(ElementType.METHOD)
 public @interface Consumable {
 
-    /** The name of a method that returns a customized description for this producible. */
+    /**
+     * The name of a method that returns a customized description for this
+     * producible. 
+     */
     String customDescriptionMethod() default "";
 
     //TODO

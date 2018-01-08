@@ -142,8 +142,8 @@ public class UpdateActionManager {
                     }
 
                     @Override
-                    public void couplingsRemoved(List<Coupling2<?>> couplings) {
-                        for(Coupling2 coupling : couplings) {
+                    public void couplingsRemoved(List<Coupling<?>> couplings) {
+                        for(Coupling coupling : couplings) {
                             removeAction(couplingActionMap.remove(coupling));
                         }
                     }

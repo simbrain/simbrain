@@ -103,7 +103,7 @@ public class TileSensor extends Sensor {
     /**
      * @return value associated with this sensor, 0 if occupied,
      */
-    @Producible(customDescriptionMethod = "getMixedId")
+    @Producible(idMethod="getMixedId")
     public double getValue() {
         return value;
     }
@@ -111,7 +111,7 @@ public class TileSensor extends Sensor {
     /**
      * @param value the value to set
      */
-    @Consumable(customDescriptionMethod = "getMixedId")
+    @Consumable(idMethod="getMixedId")
     public void setValue(double value) {
         this.value = value;
     }

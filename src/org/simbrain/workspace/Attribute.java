@@ -1,11 +1,14 @@
 package org.simbrain.workspace;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 public abstract class Attribute {
     protected Object baseObject;
     protected Method method;
+    protected Method idMethod;
     protected String description = "";
 
     /**
@@ -22,6 +25,12 @@ public abstract class Attribute {
         this.baseObject = baseObject;
         this.method = method;
         description = method.getName();
+        try {
+            idMethod = baseObject.getClass().getMethod("toString", String.class);
+        } catch (NoSuchMethodException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
+        }
     }
 
     /** Initializing constructor */
@@ -31,49 +40,45 @@ public abstract class Attribute {
         this.description = description;
     }
 
+    /** Initializing constructor */
+    public Attribute(Object baseObject, Method method, Method idMethod) {
+        this.baseObject = baseObject;
+        this.method = method;
+        description = method.getName();
+        this.idMethod = idMethod;
+    }
+
+    /** Initializing constructor */
+    public Attribute(Object baseObject, Method method, String description, Method idMethod) {
+        this.baseObject = baseObject;
+        this.method = method;
+        this.description = description;
+        this.idMethod = idMethod;
+    }
+
     public abstract Type getType();
 
     /**
-     * Returns a string used to differentiate attribute types within a WorkspaceComponent.
-     * Return value should be unique to the given method within the component.
+     * Returns a string used to differentiate attributes.
      */
     public String getId() {
-        if (description.isEmpty()) {
-            description = baseObject.getClass().getSimpleName();
+        try {
+            return (String) idMethod.invoke(baseObject);
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            // Should never happen
+            throw new AssertionError(ex);
         }
-        return description + ":" + method.getName() ;
     }
 
     @Override
     public String toString() {
         String typeName;
         if (((Class<?>) getType()).isArray()) {
-            typeName = "array[" + ((Class<?>) getType()).getComponentType()
-                    + "]";
+            typeName = "ArrayOf" + ((Class<?>) getType()).getComponentType();
         } else {
             typeName = getType().toString();
         }
-
-        if (description.isEmpty()) {
-            description = baseObject.getClass().getSimpleName();
-        }
-
-        if(usesKey()) {
-            return  getId() + "<" + typeName + "," + key + ">";
-        }
-
-        return getId() + "<" + typeName + ">";
-    }
-
-    /**
-     * If the method requires a key to produce or consume a value, return true.
-     */
-    public boolean usesKey() {
-        if (this instanceof Producer) {
-            return method.getParameterCount() > 0;
-        } else {
-            return method.getParameterCount() > 1;
-        }
+        return getId() + "." + typeName;
     }
 
     /** @return the description */

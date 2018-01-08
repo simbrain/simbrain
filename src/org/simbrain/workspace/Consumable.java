@@ -17,16 +17,16 @@ import java.util.List;
 @Target(ElementType.METHOD)
 public @interface Consumable {
 
-    /**
-     * The name of a method that returns a customized description for this
-     * producible. 
-     */
-    String customDescriptionMethod() default "";
+    /** The description to use for this consumable instead of the method name. */
+    String description() default "";
 
-    //TODO
-    boolean visible() default true;
-    
-    // TODO: Better name?  Give example.  
-    String indexListMethod() default "";
+    /** The name of a method that returns a custom id for the base object of this consumable. */
+    String idMethod() default "";
+
+    /**
+     * Whether this method should be visible in the coupling panels and menus by default. User
+     * visibility settings will override this value.
+     */
+    boolean defaultVisibility() default true;
 
 }

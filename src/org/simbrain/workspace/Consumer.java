@@ -3,11 +3,16 @@ package org.simbrain.workspace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 public class Consumer<V> extends Attribute {
 
-    public Consumer(Object baseObject, Method method) {
-        super(baseObject, method);
+    public Consumer(Object baseObject, Method method, String description) {
+        super(baseObject, method, description);
+    }
+
+    public Consumer(Object baseObject, Method method, String description, Method idMethod) {
+        super(baseObject, method, description, idMethod);
     }
 
     void setValue(V value) {

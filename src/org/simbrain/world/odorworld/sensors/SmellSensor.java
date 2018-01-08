@@ -106,7 +106,7 @@ public class SmellSensor extends Sensor {
     /**
      * @return the currentValue
      */
-    @Producible(customDescriptionMethod = "getId")
+    @Producible(idMethod="getId")
     public double[] getCurrentValues() {
         return currentValue;
     }
@@ -122,7 +122,7 @@ public class SmellSensor extends Sensor {
      * @param index
      * @return the currentValue
      */
-    @Producible(indexListMethod = "getDimensionList")
+    @Producible(idMethod="getDimensionList")
     public double getCurrentValue(Integer index) {
         return currentValue[index];
     }

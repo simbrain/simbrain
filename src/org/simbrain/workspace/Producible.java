@@ -14,16 +14,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Producible {
 
-    //TODO: Rename
+    /** The description to use for this producible instead of the method name. */
+    String description() default "";
+
+    /** The name of a method that returns a custom id for the base object of this producible. */
+    String idMethod() default "";
+
     /**
-     * The name of a method that returns a customized description for this
-     * producible.
+     * Whether this method should be visible in the coupling panels and menus by default. User
+     * visibility settings will override this value.
      */
-    String customDescriptionMethod() default "";
-
-    //TODO:
-    boolean visible() default true;
-
-    String indexListMethod() default "";
+    boolean defaultVisibility() default true;
 
 }

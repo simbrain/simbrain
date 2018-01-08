@@ -168,24 +168,20 @@ public class CouplingFactory {
         for (Method method : model.getClass().getMethods()) {
             Producible annotation = method.getAnnotation(Producible.class);
             if (annotation != null) {
-                if (!annotation.indexListMethod().isEmpty()) {
-                    // A custom keyed annotation is being used
-                    try {
-                        Method indexListMethod = model.getClass().getMethod(annotation.indexListMethod(), null);
-                        List keys = (List) indexListMethod.invoke(model, null);
-                        for (Object key : keys) {
-                            Producer<?> consumer = new Producer(model, method);
-                            consumer.key = key;
-                            producers.add(consumer);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }  else {
-                    // Annotation has no key
-                    Producer<?> producer = new Producer(model, method);
-                    producers.add(producer);
+                Method idMethod = null;
+                try {
+                    idMethod = model.getClass().getMethod(annotation.idMethod(), model.getClass(), String.class);
+                } catch (NoSuchMethodException ex) {
+                    // Ignore
                 }
+                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+                Producer<?> producer;
+                if (idMethod != null) {
+                    producer = new Producer(model, method, description, idMethod);
+                } else {
+                    producer = new Producer(model, method, description);
+                }
+                producers.add(producer);
             }
         }
         return producers;
@@ -201,24 +197,20 @@ public class CouplingFactory {
         for (Method method : model.getClass().getMethods()) {
             Consumable annotation = method.getAnnotation(Consumable.class);
             if (annotation != null) {
-                if (!annotation.indexListMethod().isEmpty()) {
-                    // A custom keyed annotation is being used
-                    try {
-                        Method indexListMethod = model.getClass().getMethod(annotation.indexListMethod(), null);
-                        List keys = (List) indexListMethod.invoke(model, null);
-                        for (Object key: keys) {
-                            Consumer<?> consumer = new Consumer(model, method);
-                            consumer.key = key;
-                            consumers.add(consumer);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    // Annotation has no key
-                    Consumer<?> consumer = new Consumer(model, method);
-                    consumers.add(consumer);
+                Method idMethod = null;
+                try {
+                    idMethod = model.getClass().getMethod(annotation.idMethod(), model.getClass(), String.class);
+                } catch (NoSuchMethodException ex) {
+                    // Ignore
                 }
+                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+                Consumer<?> consumer;
+                if (idMethod != null) {
+                    consumer = new Consumer(model, method, description, idMethod);
+                } else {
+                    consumer = new Consumer(model, method, description);
+                }
+                consumers.add(consumer);
             }
         }
         return consumers;

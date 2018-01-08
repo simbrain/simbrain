@@ -3,11 +3,16 @@ package org.simbrain.workspace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 public class Producer<V> extends Attribute {
 
-    public Producer(Object baseObject, Method method) {
-        super(baseObject, method);
+    public Producer(Object baseObject, Method method, String description) {
+        super(baseObject, method, description);
+    }
+
+    public Producer(Object baseObject, Method method, String description, Method idMethod) {
+        super(baseObject, method, description, idMethod);
     }
 
     V getValue() {

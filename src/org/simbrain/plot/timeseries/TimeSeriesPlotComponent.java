@@ -213,17 +213,15 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param value the current "y-axis" value for the time series
      * @param index which time series curve to set.
      */
-    @Consumable(indexListMethod = "getSeries")
-    public void setValue(final double value, final Integer index) {
+    @Consumable
+    public void setValue(double value, Integer index) {
         // TODO: Throw exception if index out of current bounds
-        model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
-                .getTime(), value);
+        model.addData(index, TimeSeriesPlotComponent.this.getWorkspace().getTime(), value);
     }
 
     //TODO.  Rename.
     public List<Integer> getSeries() {
-        return IntStream.range(1, model.getDataset().getSeries().size()).boxed()
-                .collect(Collectors.toList());
+        return IntStream.range(1, model.getDataset().getSeries().size()).boxed().collect(Collectors.toList());
     }
 
 }

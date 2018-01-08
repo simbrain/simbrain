@@ -52,19 +52,19 @@ public class SensorMatrix implements ImageSourceListener {
 
     // TODO: The following three methods should be collapsed to a single indexed producer
     /** @return Returns an array of doubles for the each pixel */
-    @Producible(customDescriptionMethod = "getName")
+    @Producible(idMethod="getName")
     public double[] getChannel1() {
         return sensorValues[0];
     }
 
     /** @return Returns an array of doubles for the each pixel */
-    @Producible(customDescriptionMethod = "getName", visible = false)
+    @Producible(idMethod="getName", defaultVisibility=false)
     public double[] getChannel2() {
         return sensorValues[1];
     }
 
     /** @return Returns an array of doubles for the each pixel */
-    @Producible(customDescriptionMethod = "getName", visible = false)
+    @Producible(idMethod="getName", defaultVisibility=false)
     public double[] getChannel3() {
         return sensorValues[2];
     }

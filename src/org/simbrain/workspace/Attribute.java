@@ -22,9 +22,14 @@ public abstract class Attribute {
 
     /** Initializing constructor */
     public Attribute(Object baseObject, Method method) {
+        this(baseObject, method, method.getName());
+    }
+
+    /** Initializing constructor */
+    public Attribute(Object baseObject, Method method, String description) {
         this.baseObject = baseObject;
         this.method = method;
-        description = method.getName();
+        this.description = description;
         try {
             idMethod = baseObject.getClass().getMethod("toString", String.class);
         } catch (NoSuchMethodException ex) {
@@ -34,18 +39,8 @@ public abstract class Attribute {
     }
 
     /** Initializing constructor */
-    public Attribute(Object baseObject, Method method, String description) {
-        this.baseObject = baseObject;
-        this.method = method;
-        this.description = description;
-    }
-
-    /** Initializing constructor */
     public Attribute(Object baseObject, Method method, Method idMethod) {
-        this.baseObject = baseObject;
-        this.method = method;
-        description = method.getName();
-        this.idMethod = idMethod;
+        this(baseObject, method, method.getName(), idMethod);
     }
 
     /** Initializing constructor */

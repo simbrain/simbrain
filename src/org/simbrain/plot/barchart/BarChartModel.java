@@ -63,15 +63,11 @@ public class BarChartModel extends ChartModel {
 
     // private Range chartRange = new Range(0, 10);
 
-    /**
-     * Bar chart model constructor.
-     */
-    public BarChartModel() {
-    }
+    /** Bar chart model constructor. */
+    public BarChartModel() {}
 
     /**
-     * Return JFreeChart pie dataset.
-     *
+     * Return JFreeChart category dataset.
      * @return dataset
      */
     public DefaultCategoryDataset getDataset() {
@@ -82,16 +78,15 @@ public class BarChartModel extends ChartModel {
      * Default initialization.
      */
     public void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
+        addDataSources(1);
     }
 
     /**
-     * Create specified number of set of data sources. Adds these two existing
-     * data sources.
+     * Create specified number of set of data sources. Adds these two existing data sources.
      *
      * @param numDataSources number of data sources to initialize plot with
      */
-    public void addDataSources(final int numDataSources) {
+    public void addDataSources(int numDataSources) {
         int currentIndex = dataset.getColumnCount();
         for (int i = 0; i < numDataSources; i++) {
             addColumn(currentIndex + i);
@@ -100,10 +95,9 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Adds a new column to the dataset.
-     *
      * @param index
      */
-    public void addColumn(final int index) {
+    public void addColumn(int index) {
         dataset.addValue(0, new Integer(1), new Integer(index + 1));
         fireDataSourceAdded(index);
     }
@@ -150,20 +144,6 @@ public class BarChartModel extends ChartModel {
      */
     private Object readResolve() {
         return this;
-    }
-
-    /**
-     * Used for debugging model.
-     */
-    public void debug() {
-        System.out.println("------------ Debug model ------------");
-        for (int i = 0; i < dataset.getRowCount(); i++) {
-            for (int j = 0; j < dataset.getColumnCount(); j++) {
-                System.out.println(
-                        "<" + i + "," + j + "> " + dataset.getValue(i, j));
-            }
-        }
-        System.out.println("--------------------------------------");
     }
 
     /**
@@ -250,8 +230,7 @@ public class BarChartModel extends ChartModel {
 
     //TODO
     public List<Integer> getBarIndices() {
-        return IntStream.range(0, dataset.getColumnCount()).boxed()
-                .collect(Collectors.toList());
+        return IntStream.range(0, dataset.getColumnCount()).boxed().collect(Collectors.toList());
     }
 
     /**
@@ -265,8 +244,7 @@ public class BarChartModel extends ChartModel {
         getDataset().setValue(value, new Integer(1), index);
     }
 
-    static class ChartDataAdapter
-            extends XmlAdapter<Number[][], DefaultCategoryDataset> {
+    static class ChartDataAdapter extends XmlAdapter<Number[][], DefaultCategoryDataset> {
 
         @Override
         public DefaultCategoryDataset unmarshal(Number[][] v) throws Exception {

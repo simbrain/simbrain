@@ -68,8 +68,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
      * @param frame The frame in which to place GUI elements.
      * @param imageWorldComponent The ImageWorldComponent to interact with.
      */
-    public ImageDesktopComponent(GenericFrame frame,
-            ImageWorldComponent imageWorldComponent) {
+    public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent imageWorldComponent) {
         super(frame, imageWorldComponent);
         component = imageWorldComponent;
 

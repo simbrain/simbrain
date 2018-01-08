@@ -27,8 +27,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Menu for making a single coupling. This menu is initialized with a potential
- * producer It then produces a hierarchy of menus: One menu for each component
- * in the workspace Within each component, a menuitem for each Potential
+ * producer. It then produces a hierarchy of menus: One menu for each component
+ * in the workspace. Within each component, a menuitem for each Potential
  * Consumer.
  */
 public class CouplingMenuProducer extends JMenu {
@@ -46,8 +46,7 @@ public class CouplingMenuProducer extends JMenu {
      * @param workspace the workspace
      * @param producer the target consuming attribute.
      */
-    public CouplingMenuProducer(final String menuName,
-            final Workspace workspace, final Producer<?> producer) {
+    public CouplingMenuProducer(String menuName, Workspace workspace, Producer<?> producer) {
         super(menuName);
         this.workspace = workspace;
         this.producer = producer;

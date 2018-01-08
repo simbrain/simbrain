@@ -35,6 +35,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.actions.AddSmellSourceAction;
@@ -52,6 +54,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     // TODO: Move most of this input stuff to an input manager...
     private static final long serialVersionUID = 1L;
+
+    /** Reference to WorkspaceComponent. */
+    private OdorWorldComponent component;
 
     /** Reference to model world. */
     private OdorWorld world;
@@ -94,8 +99,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      *
      * @param world the frame in which this world is rendered
      */
-    public OdorWorldPanel(final OdorWorld world) {
-
+    public OdorWorldPanel(OdorWorldComponent component, OdorWorld world) {
+        this.component = component;
         this.world = world;
 
         renderer = new OdorWorldRenderer();
@@ -232,9 +237,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             // Show context menu for right click
-            if (mouseEvent.isControlDown()
-                    || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-                final JPopupMenu menu = buildPopupMenu(selectedEntity);
+            if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+                JPopupMenu menu = getContextMenu(selectedEntity);
                 if (menu != null) {
                     menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(),
                             (int) selectedPoint.getY());
@@ -398,48 +402,42 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /**
      * Create a popup menu based on location of mouse click.
      *
-     * @param theEntity the entity for which to build the menu
+     * @param entity the entity for which to build the menu
      * @return the popup menu
      */
-    public JPopupMenu buildPopupMenu(final OdorWorldEntity theEntity) {
-        final JPopupMenu ret = new JPopupMenu();
-
+    public JPopupMenu getContextMenu(OdorWorldEntity entity) {
+        JPopupMenu contextMenu = new JPopupMenu();
         // No entity was clicked on
-        if (theEntity == null) {
-            ret.add(new JMenuItem(new AddEntityAction(this)));
-            ret.add(new JMenuItem(new AddAgentAction(this)));
-            ret.addSeparator();
-            ret.add(new JMenuItem(new ShowWorldPrefsAction(this)));
-            return ret;
+        if (entity == null) {
+            contextMenu.add(new JMenuItem(new AddEntityAction(this)));
+            contextMenu.add(new JMenuItem(new AddAgentAction(this)));
+            contextMenu.addSeparator();
+        } else {
+            contextMenu.add(menu.getCopyItem());
+            contextMenu.add(menu.getCutItem());
+            JMenuItem pasteItem = menu.getPasteItem();
+            if (WorldClipboard.getClipboardEntity() == null) {
+                pasteItem.setEnabled(false);
+            }
+            contextMenu.add(pasteItem);
+            contextMenu.add(new JMenuItem(new ShowEntityDialogAction(entity)));
+            contextMenu.add(new JMenuItem(new DeleteEntityAction(this, entity)));
+            contextMenu.addSeparator();
+
+            // TODO: Create a delete smell source action
+            if (entity.getSmellSource() == null) {
+                contextMenu.add(new JMenuItem(new AddSmellSourceAction(this, entity)));
+            }
+
+            contextMenu.addSeparator();
+
+            contextMenu.add(new CouplingMenuProducer("Get Entity Location", component.getWorkspace(),
+                    component.getWorkspace().getCouplingFactory().getProducer(entity, "getCenterLocation")));
+            contextMenu.add(new CouplingMenuConsumer("Set Entity Location", component.getWorkspace(),
+                    component.getWorkspace().getCouplingFactory().getConsumer(entity, "setCenterLocation")));
         }
-
-        // ret.add(menu.getCopyItem());
-        // ret.add(menu.getCutItem());
-        // if (theEntity instanceof BasicEntity) {
-        // ret.addSeparator();
-        // ret.add(menu.getObjectPropsItem());
-        // } else if (theEntity instanceof Wall) {
-        // ret.addSeparator();
-        // ret.add(menu.getWallPropsItem());
-        // } else {
-
-        // if (WorldClipboard.getClipboardEntity() != null) {
-        // ret.add(menu.getPasteItem());
-        // ret.addSeparator();
-        // }
-
-        ret.add(new JMenuItem(new ShowEntityDialogAction(theEntity)));
-
-        // TODO: Create a delete smell source action
-        if (theEntity.getSmellSource() == null) {
-            ret.addSeparator();
-            ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
-        }
-
-        ret.addSeparator();
-        ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
-
-        return ret;
+        contextMenu.add(new JMenuItem(new ShowWorldPrefsAction(this)));
+        return contextMenu;
     }
 
     /**

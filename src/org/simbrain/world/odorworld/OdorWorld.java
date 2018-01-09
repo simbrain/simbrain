@@ -271,6 +271,7 @@ public class OdorWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         xstream.omitField(OdorWorld.class, "listenerList");
         xstream.omitField(Animation.class, "frames");
         xstream.omitField(Animation.class, "currFrameIndex");

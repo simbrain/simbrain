@@ -306,6 +306,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         xstream.omitField(AbstractTableModel.class, "listenerList");
         return xstream;
     }

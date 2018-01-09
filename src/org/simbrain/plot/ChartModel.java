@@ -120,6 +120,7 @@ public class ChartModel {
      */
     public static XStream getXStream() {
         final XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         xstream.omitField(ChartModel.class, "listenerList");
         xstream.omitField(ChartModel.class, "settingsListenerList");
         return xstream;

@@ -536,6 +536,7 @@ class ArchiveContents {
      */
     static XStream xstream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
 
         xstream.alias("Workspace", ArchiveContents.class);
         xstream.alias("Component", ArchivedComponent.class);

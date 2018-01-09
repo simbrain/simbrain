@@ -995,7 +995,8 @@ public class Network {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
-
+        xstream.ignoreUnknownElements();
+        
         xstream.omitField(Network.class, "groupListeners");
         xstream.omitField(Network.class, "neuronListeners");
         xstream.omitField(Network.class, "networkListeners");
@@ -1012,8 +1013,6 @@ public class Network {
         xstream.omitField(ConcurrentBufferedUpdate.class, "network");
         xstream.omitField(ConcurrentBufferedUpdate.class, "producer");
         xstream.omitField(ConcurrentBufferedUpdate.class, "collectorThread");
-//        xstream.omitField(ConcurrentBufferedUpdate.class,
-//                "synchronizingBarrier");
         xstream.omitField(ConcurrentBufferedUpdate.class,
                 "executors");
         
@@ -1032,9 +1031,6 @@ public class Network {
         xstream.omitField(Neuron.class, "generator");
 
         xstream.omitField(AllToAll.class, "selfConnectionAllowed");
-
-        // TODO: Backwards compatible
-        xstream.omitField(Synapse.class, "sendWeightedInput");
 
         return xstream;
     }

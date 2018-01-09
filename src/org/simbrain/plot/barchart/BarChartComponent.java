@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -33,6 +34,9 @@ public class BarChartComponent extends WorkspaceComponent {
 
     /** Data model. */
     private BarChartModel model;
+
+    /** Coupling listener to dynamically manage bars. */
+    private BarChartCouplingListener couplingListener;
 
     /**
      * Create new BarChart Component.
@@ -90,6 +94,13 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
+    public void setWorkspace(Workspace workspace) {
+        // This is a bit of a hack because the workspace is not available in the constructor.
+        super.setWorkspace(workspace);
+        couplingListener = new BarChartCouplingListener(getWorkspace(), model);
+    }
+
+    @Override
     public Object getObjectFromKey(String objectKey) {
         return model;
     }
@@ -142,6 +153,7 @@ public class BarChartComponent extends WorkspaceComponent {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
         models.addAll(model.getBars());
+        models.add(couplingListener);
         return models;
     }
 }

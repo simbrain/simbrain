@@ -55,7 +55,7 @@ public class WorkspaceComponentDeserializer {
      */
     @SuppressWarnings("unchecked")
     WorkspaceComponent deserializeWorkspaceComponent(
-            final ArchiveContents.ArchivedComponent archivedComponent,
+            final ArchivedWorkspaceComponent archivedComponent,
             final InputStream input) {
         try {
             Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>) Class

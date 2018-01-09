@@ -54,6 +54,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * workspace level save / reopen.
  *
  * @author Matt Watson
+ * @author Zoë Tosi
+ * @author Jeff Yoshimi
  */
 public class WorkspaceSerializer {
 
@@ -94,7 +96,7 @@ public class WorkspaceSerializer {
 
         // This archive object saves all the information about the workspace. It
         // will be saved as a zipentry "contents.xml"
-        ArchiveContents archive = new ArchiveContents(workspace, serializer);
+        ArchivedWorkspace archive = new ArchivedWorkspace(workspace, serializer);
 
         // Currently sorts components by a serialization priority
         workspace.preSerializationInit();
@@ -129,13 +131,13 @@ public class WorkspaceSerializer {
      */
     private void serializeComponents(
             final WorkspaceComponentSerializer serializer,
-            final ArchiveContents archive, final ZipOutputStream zipStream)
+            final ArchivedWorkspace archive, final ZipOutputStream zipStream)
             throws IOException {
 
         // Save the component entries and saves links to them in contents.xml
         for (WorkspaceComponent component : workspace.getComponentList()) {
 
-            ArchiveContents.ArchivedComponent archiveComp = archive
+            ArchivedWorkspaceComponent archiveComp = archive
                     .addComponent(component);
 
             // Initialize the entry with a path+name in the zip archive
@@ -154,7 +156,7 @@ public class WorkspaceSerializer {
             GuiComponent<?> desktopComponent = SimbrainDesktop
                     .getDesktop(workspace).getDesktopComponent(component);
             if (desktopComponent != null) {
-                ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc = archiveComp
+                ArchivedWorkspaceComponent.ArchivedDesktopComponent dc = archiveComp
                         .addDesktopComponent(desktopComponent);
                 entry = new ZipEntry(dc.getUri());
                 zipStream.putNextEntry(entry);
@@ -232,13 +234,13 @@ public class WorkspaceSerializer {
 
         // Read contents.xml file and create a new archived contents file,
         // which will be used to recreate the workspace
-        ArchiveContents contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
+        ArchivedWorkspace contents = (ArchivedWorkspace) ArchivedWorkspace.xstream().fromXML(
                 new ByteArrayInputStream(entries.get("contents.xml")));
 
         // Add Components
         WorkspaceComponentDeserializer componentDeserializer = new WorkspaceComponentDeserializer();
         if (contents.getArchivedComponents() != null) {
-            for (ArchiveContents.ArchivedComponent archivedComponent : contents
+            for (ArchivedWorkspaceComponent archivedComponent : contents
                     .getArchivedComponents()) {
 
                 WorkspaceComponent wc = componentDeserializer
@@ -265,7 +267,7 @@ public class WorkspaceSerializer {
 
         // Add Couplings
         if (contents.getArchivedCouplings() != null) {
-            for (ArchiveContents.ArchivedCoupling couplingRef : contents
+            for (ArchivedCoupling couplingRef : contents
                     .getArchivedCouplings()) {
  
                 CouplingFactory cf = workspace.getCouplingFactory();
@@ -279,7 +281,7 @@ public class WorkspaceSerializer {
         // Add update actions
         workspace.getUpdater().getUpdateManager().clear();
         if (contents.getArchivedActions() != null) {
-            for (ArchiveContents.ArchivedUpdateAction actionRef : contents
+            for (ArchivedUpdateAction actionRef : contents
                     .getArchivedActions()) {
                 workspace.getUpdater().getUpdateManager()
                         .addAction(contents.createUpdateAction(workspace,

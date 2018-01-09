@@ -333,8 +333,9 @@ public class NetworkPropertiesPanel extends JPanel {
     public void commitChanges() {
         networkPanel.getNetwork().setTimeStep(
                 Double.parseDouble(timeStepField.getText()));
-        networkPanel.getNetwork().setUpdateFreq(Integer
-        		.parseInt(iterUpdateField.getText()));
+		int upF = Integer.parseInt(iterUpdateField.getText());
+		upF = upF < 1 ? 1 : upF;
+        networkPanel.getNetwork().setUpdateFreq(upF);
         NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
         Network.setSynapseVisibilityThreshold(Integer

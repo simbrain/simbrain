@@ -213,10 +213,17 @@ public class WorkspaceUpdater {
             notifyWorkspaceUpdateStarted();
             synchManager.queueTasks();
 
+            for(WorkspaceComponent wc : workspace.getComponentList()) {
+            	wc.setRunning(false);
+            }
             try {
                 doUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            
+            for(WorkspaceComponent wc : workspace.getComponentList()) {
+            	wc.setRunning(false);
             }
 
             synchManager.releaseTasks();

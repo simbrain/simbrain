@@ -1,54 +1,64 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.Locale;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.YesNoNull;
 
 /**
- * Panel which displays the specific parameters of a particular synapse learning
- * rule.
+ * A panel containing more detailed generic information about synapse. Generally
+ * speaking, this panel is not meant to exist in a dialog by itself, it is a set
+ * of commonly used (hence generic) synapse value fields which is shared by
+ * multiple complete dialogs.
  *
- * @author Jeff Yoshimi
- * @author Zoë Tosi
+ * Values included are: Strength, label, frozen, upper / lower bounds, increment
+ *
+ * @author ztosi
+ * @author jyoshimi
  *
  */
-public class SynapsePropertiesExtended extends JPanel {
+public class GeneralSynapsePropertiesPanel extends JPanel
+        implements EditablePanel {
+    
+    /** The synapses being modified. */
+    private final Collection<Synapse> synapseList;
 
+    /** Id Label. */
+    private final JLabel idLabel = new JLabel();
+
+    /** Strength field. */
+    private final JFormattedTextField tfStrength = new JFormattedTextField();
+
+    /**
+     * A switch for determining whether or not the synapse will send a weighted
+     * input.
+     */
+    private final YesNoNull synapseEnabled = new YesNoNull(
+        "Enabled", "Disabled");
 
     /** Freeze synapse field. */
     private YesNoNull frozenDD = new YesNoNull();
-    
+
     // TODO: Implement...
     // private TristateDropDown clippingDD = new TristateDropDown();
 
@@ -65,14 +75,91 @@ public class SynapsePropertiesExtended extends JPanel {
     private JFormattedTextField tfDelay = new JFormattedTextField();
 
     /**
+     * A triangle that switches between an up (left) and a down state Used for
+     * showing/hiding extra synapse data.
+     */
+    private final DropDownTriangle detailTriangle;
+
+    /**
+     * The extra data panel. Includes: increment, upper bound, lower bound, and
+     * priority.
+     */
+    private final JPanel detailPanel = new JPanel();
+
+    /** Parent reference so pack can be called. */
+    private final Window parent;
+
+    /**
+     * If true, displays ID info and other fields that would only make sense to
+     * show if only one neuron was being edited. This value is set automatically
+     * unless otherwise specified at construction.
+     */
+    private boolean displayIDInfo;
+    
+    /**
+     * Creates a basic synapse info panel. Here the whether or not ID info is
+     * displayed is manually set. This is the case when the number of synapses
+     * (such as when adding multiple synapses) is unknown at the time of
+     * display. In fact this is probably the only reason to use this factory
+     * method over {@link #createBasicSynapseInfoPanel(Collection, Window)}.
+     *
+     * @param synapses
+     *            the synapses whose information is being displayed/made
+     *            available to edit on this panel
+     * @param parent
+     *            the parent window for dynamic resizing
+     * @param displayIDInfo
+     *            whether or not to display ID info
+     * @return A basic synapse info panel with the specified parameters
+     */
+    public static GeneralSynapsePropertiesPanel createPanel(
+        final Collection<Synapse> synapses, final Window parent,
+        final boolean displayIDInfo) {
+        GeneralSynapsePropertiesPanel panel = new GeneralSynapsePropertiesPanel(synapses,
+            parent, displayIDInfo);
+        panel.addListeners();
+        return panel;
+    }
+
+    
+    /**
+     * Creates a basic synapse info panel. Here whether or not to display ID
+     * info is automatically set based on the state of the synapse list.
+     *
+     * @param synapses
+     *            the synapses whose information is being displayed/made
+     *            available to edit on this panel
+     * @param parent
+     *            the parent window for dynamic resizing.
+     * @return A basic synapse info panel with the specified parameters
+     */
+    public static GeneralSynapsePropertiesPanel createPanel(
+        final Collection<Synapse> synapseList, final Window parent) {
+        return createPanel(synapseList, parent,
+                !(synapseList == null || synapseList.size() != 1));
+    }
+
+    
+    /**
+     * Construct the panel.
      *
      * @param synapseList
-     *            The list of synapses being edited.
+     *            the synapse list
+     * @param parent
+     *            the parent window
+     * @param displayIDInfo
+     *            whether to display ids
      */
-    public SynapsePropertiesExtended(final Collection<Synapse> synapseList) {
-        fillFieldValues(synapseList);
+    private GeneralSynapsePropertiesPanel(final Collection<Synapse> synapseList,
+        final Window parent, final boolean displayIDInfo) {
+        this.synapseList = synapseList;
+        this.parent = parent;
+        this.displayIDInfo = displayIDInfo;
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
+            "Less", parent);
         initializeLayout();
     }
+
 
     /**
      * Lays out the panel.
@@ -99,6 +186,7 @@ public class SynapsePropertiesExtended extends JPanel {
     /**
      * Fills the values of the text fields based on the corresponding values of
      * the synapses to be edited.
+     * 
      * @param synapseCollection
      */
     public void fillFieldValues(Collection<Synapse> synapseCollection) {
@@ -125,10 +213,8 @@ public class SynapsePropertiesExtended extends JPanel {
             tfIncrement.setValue(synapseRef.getIncrement());
         }
         // Handle Delay
-        if (synapseRef.getDelay() < 0
-                || !NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                        "getDelay"))
-        {
+        if (synapseRef.getDelay() < 0 || !NetworkUtils
+                .isConsistent(synapseCollection, Synapse.class, "getDelay")) {
             tfDelay.setValue(SimbrainConstants.NULL_STRING);
         } else {
             tfDelay.setValue(synapseRef.getDelay());
@@ -179,6 +265,7 @@ public class SynapsePropertiesExtended extends JPanel {
     /**
      * Uses the values from text fields to alter corresponding values in the
      * synapse(s) being edited. Called externally to apply changes.
+     * 
      * @param synapses
      */
     public void commitChanges(Collection<Synapse> synapses) {
@@ -212,13 +299,47 @@ public class SynapsePropertiesExtended extends JPanel {
             }
         }
         // Frozen ?
-        boolean frozen = frozenDD.getSelectedIndex() == YesNoNull
-                .getTRUE();
+        boolean frozen = frozenDD.getSelectedIndex() == YesNoNull.getTRUE();
         if (frozenDD.getSelectedIndex() != YesNoNull.getNULL()) {
             for (Synapse s : synapses) {
                 s.setFrozen(frozen);
             }
         }
+    }
+    
+    /**
+     * Add listeners.
+     */
+    private void addListeners() {
+
+        // Add a listener to display/hide extra editable neuron data
+        detailTriangle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Repaint to show/hide extra data
+                detailPanel.setVisible(detailTriangle.isDown());
+                detailPanel.repaint();
+                parent.pack();
+                parent.setLocationRelativeTo(null);
+            }
+        });
+    }
+    
+    @Override
+    public void fillFieldValues() {
+        // See GeneralNeuronPropertiesPanel
+
+    }
+
+    @Override
+    public boolean commitChanges() {
+        // TODO  See GeneralNeuronPropertiesPanel
+        return false;
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

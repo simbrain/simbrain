@@ -48,10 +48,10 @@ import org.simbrain.util.widgets.EditablePanel;
 @SuppressWarnings("serial")
 public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
 
-    /** The basic neuron info panel. */
+    /** Panel to edit general neuron properties. */
     private GeneralNeuronPropertiesPanel generalNeuronPropertiesPanel;
 
-    /** The neuron update settings panel. */
+    /** Panel to edit properties of specific neuron type. */
     private UpdateRulePanel updateRulePanel;
 
     /**
@@ -68,7 +68,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("useNativeFileChooser")) {
             DEFAULT_DISPLAY_UPDATE_RULE_PANEL = Boolean.parseBoolean(properties
-                .getProperty("initializeNeuronDialogToExpandedState"));
+                    .getProperty("initializeNeuronDialogToExpandedState"));
         }
     }
 

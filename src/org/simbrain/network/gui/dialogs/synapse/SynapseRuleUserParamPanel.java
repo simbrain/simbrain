@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.JLabel;
-import javax.swing.JToolTip;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
@@ -35,172 +34,184 @@ import org.simbrain.util.Parameter;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.widgets.ParameterWidget;
 
-
 /**
- * A synapse rule parameter editing panel for synapse update rules that use 
- * parameter fields annotated with {@link UserParameter}.
- * Automatically adds fields for all UserParameter-annotated fields.
- * May be sub-classed to add custom fields or behaviour.
+ * A synapse rule parameter editing panel for synapse update rules that use
+ * parameter fields annotated with {@link UserParameter}. Automatically adds
+ * fields for all UserParameter-annotated fields. May be sub-classed to add
+ * custom fields or behaviour.
  * 
  * @author O. J. Coleman
  */
 public class SynapseRuleUserParamPanel extends AbstractSynapseRulePanel {
-	/**
-	 * The available parameters, as a map from Parameter to input gui component
-	 */
-	protected Set<ParameterWidget> params;
-	
-	/**
-	 * The  prototype rule.
-	 */
-	protected SynapseUpdateRule prototypeRule;
-	
-	
-	/**
+
+    /**
+     * The available parameters, as a map from Parameter to input gui component
+     */
+    protected Set<ParameterWidget> params;
+
+    /**
+     * The prototype rule.
+     */
+    protected SynapseUpdateRule prototypeRule;
+
+    /**
      * Create a new SynapseRuleUserParamPanel for the given rule.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public SynapseRuleUserParamPanel(SynapseUpdateRule prototypeRule) {
-    	this();
-    	setRule(prototypeRule);
+    public SynapseRuleUserParamPanel(SynapseUpdateRule prototypeRule) {
+        this();
+        setRule(prototypeRule);
     }
-    
-    
+
     /**
      * Create a new SynapseRuleUserParamPanel with no rule set.
-     * {@link #setRule(SynapseUpdateRule)} must be set before other methods are called.
-     * Mostly for internal use. 
+     * {@link #setRule(SynapseUpdateRule)} must be set before other methods are
+     * called. Mostly for internal use.
      */
     public SynapseRuleUserParamPanel() {
     }
-    
-    
+
     public void setRule(SynapseUpdateRule prototypeRule) {
-    	if (this.prototypeRule != null) {
-    		throw new IllegalStateException("Multiple calls to SynapseRuleUserParamPanel.setRule(SynapseUpdateRule) are not allowed.");
-    	}
-    	
-    	this.prototypeRule = prototypeRule;
-    	
-    	params = new TreeSet<>();
-    	for (Parameter param : Parameter.getParameters(prototypeRule.getClass())) {
-    		params.add(new ParameterWidget(param));
-    	}
-    	
-    	// Add parameter widgets after collecting list of params so they're in the right order. 
-    	for (ParameterWidget pw : params) {
-    		JLabel label = new JLabel(pw.parameter.annotation.label());
-    		label.setToolTipText(pw.getToolTipText());
-    		this.addItemLabel(label, pw.component);
-    	}
+        if (this.prototypeRule != null) {
+            throw new IllegalStateException(
+                    "Multiple calls to SynapseRuleUserParamPanel.setRule(SynapseUpdateRule) are not allowed.");
+        }
+
+        this.prototypeRule = prototypeRule;
+
+        params = new TreeSet<>();
+        for (Parameter param : Parameter
+                .getParameters(prototypeRule.getClass())) {
+            params.add(new ParameterWidget(param));
+        }
+
+        // Add parameter widgets after collecting list of params so they're in
+        // the right order.
+        for (ParameterWidget pw : params) {
+            JLabel label = new JLabel(pw.parameter.annotation.label());
+            label.setToolTipText(pw.getToolTipText());
+            this.addItemLabel(label, pw.component);
+        }
     }
-    
-    
+
     @Override
     public SynapseRuleUserParamPanel deepCopy() {
-    	SynapseRuleUserParamPanel copy;
-		
-    	try {
-			copy = this.getClass().getConstructor().newInstance();
-			// If a (sub-class) constructor didn't call SynapseRuleUserParamPanel(SynapseUpdateRule) 
-			if (copy.prototypeRule == null) {
-				copy.setRule(this.prototypeRule);
-			}
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException("The class " + this.getClass().getName() + " must declare a constructor accepting no arguments (or override the deepCopy() method).", e);
-		}
-		
-    	// Iterate over both sets of parameters. They should be in the same order, 
-    	// unless something very odd is going on with the loaded classes.
-    	Iterator<ParameterWidget> thisParamsItr = params.iterator();
-    	Iterator<ParameterWidget> copyParamsItr = copy.params.iterator();
-    	while (thisParamsItr.hasNext()) {
-    		ParameterWidget thisPW = thisParamsItr.next();
-    		ParameterWidget copyPW = copyParamsItr.next();
-    		assert (thisPW.equals(copyPW));
-    		copyPW.setWidgetValue(thisPW.getWidgetValue());
-    	}
-	    return copy;
+        SynapseRuleUserParamPanel copy;
+
+        try {
+            copy = this.getClass().getConstructor().newInstance();
+            // If a (sub-class) constructor didn't call
+            // SynapseRuleUserParamPanel(SynapseUpdateRule)
+            if (copy.prototypeRule == null) {
+                copy.setRule(this.prototypeRule);
+            }
+        } catch (InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(
+                    "The class " + this.getClass().getName()
+                            + " must declare a constructor accepting no arguments (or override the deepCopy() method).",
+                    e);
+        }
+
+        // Iterate over both sets of parameters. They should be in the same
+        // order,
+        // unless something very odd is going on with the loaded classes.
+        Iterator<ParameterWidget> thisParamsItr = params.iterator();
+        Iterator<ParameterWidget> copyParamsItr = copy.params.iterator();
+        while (thisParamsItr.hasNext()) {
+            ParameterWidget thisPW = thisParamsItr.next();
+            ParameterWidget copyPW = copyParamsItr.next();
+            assert (thisPW.equals(copyPW));
+            copyPW.setWidgetValue(thisPW.getWidgetValue());
+        }
+        return copy;
     }
-    
 
-	@Override
-	public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
-		SynapseUpdateRule refSynapse = ruleList.get(0);
-		
-		for (ParameterWidget pw : params) {
-			// Check to see if the field values are consistent over all given instances.
-			boolean consistent = true;
-			Object refValue = pw.parameter.getFieldValue(refSynapse);
-			for (int i = 1; i < ruleList.size(); i++) {
-			    SynapseUpdateRule rule = ruleList.get(i);
-			    Object ruleValue = pw.parameter.getFieldValue(rule);
-				if ((refValue == null && ruleValue != null) || (refValue != null && !refValue.equals(ruleValue))) {
-					consistent = false;
-					break;
-				}
-			}
-			
-			if (!consistent) {
-				pw.setWidgetValue(null);
-	        } else {
-	        	pw.setWidgetValue(refValue);
-	        }
-		}
-	}
-	
+    @Override
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
+        SynapseUpdateRule refSynapse = ruleList.get(0);
 
-	@Override
-	public void fillDefaultValues() {
-		for (ParameterWidget pw : params) {
-			pw.setWidgetValue(pw.parameter.getDefaultValue());
-	    }
-	}
+        for (ParameterWidget pw : params) {
+            // Check to see if the field values are consistent over all given
+            // instances.
+            boolean consistent = true;
+            Object refValue = pw.parameter.getFieldValue(refSynapse);
+            for (int i = 1; i < ruleList.size(); i++) {
+                SynapseUpdateRule rule = ruleList.get(i);
+                Object ruleValue = pw.parameter.getFieldValue(rule);
+                if ((refValue == null && ruleValue != null)
+                        || (refValue != null && !refValue.equals(ruleValue))) {
+                    consistent = false;
+                    break;
+                }
+            }
 
-	@Override
-	public void commitChanges(Synapse synapse) {
-        if (!synapse.getLearningRule().getClass().equals(prototypeRule.getClass())) {
+            if (!consistent) {
+                pw.setWidgetValue(null);
+            } else {
+                pw.setWidgetValue(refValue);
+            }
+        }
+    }
+
+    @Override
+    public void fillDefaultValues() {
+        for (ParameterWidget pw : params) {
+            pw.setWidgetValue(pw.parameter.getDefaultValue());
+        }
+    }
+
+    @Override
+    public void commitChanges(Synapse synapse) {
+        if (!synapse.getLearningRule().getClass()
+                .equals(prototypeRule.getClass())) {
             synapse.setLearningRule(prototypeRule.deepCopy());
         }
         writeValuesToRules(Collections.singletonList(synapse));
-	}
+    }
 
-	@Override
-	public void commitChanges(Collection<Synapse> synapses) {
+    @Override
+    public void commitChanges(Collection<Synapse> synapses) {
         if (isReplace()) {
             for (Synapse s : synapses) {
-            	// Only replace if this is a different rule (otherwise when 
-            	// editing multiple rules with different parameter values which
-            	// have not been set those values will be replaced with the default).
-            	if (!s.getLearningRule().getClass().equals(prototypeRule.getClass())) {
-            		s.setLearningRule(prototypeRule.deepCopy());
-            	}
+                // Only replace if this is a different rule (otherwise when
+                // editing multiple rules with different parameter values which
+                // have not been set those values will be replaced with the
+                // default).
+                if (!s.getLearningRule().getClass()
+                        .equals(prototypeRule.getClass())) {
+                    s.setLearningRule(prototypeRule.deepCopy());
+                }
             }
         }
         writeValuesToRules(synapses);
-	}
+    }
 
-	@Override
-	protected void writeValuesToRules(Collection<Synapse> synapses) {
-		for (ParameterWidget pw : params) {
-			Object value = pw.getWidgetValue();
-			
-			// Ignore unspecified values.
-			// If the value isn't null and it's either not a String or not an empty string.
-			if (value != null && (!(value instanceof String) || !((String) value).equals(""))) {
-				for (Synapse s : synapses) {
-					pw.parameter.setFieldValue(s.getLearningRule(), value);
-				}
-			}
-		}
-		// Re-initialise. Allows updating cached values calculated from parameters.
-		for (Synapse s : synapses) {
-			s.getLearningRule().init(s);
-		}
-	}
-	
-	@Override
-	public SynapseUpdateRule getPrototypeRule() {
-		return prototypeRule;
-	}
+    @Override
+    protected void writeValuesToRules(Collection<Synapse> synapses) {
+        for (ParameterWidget pw : params) {
+            Object value = pw.getWidgetValue();
+
+            // Ignore unspecified values.
+            // If the value isn't null and it's either not a String or not an
+            // empty string.
+            if (value != null && (!(value instanceof String)
+                    || !((String) value).equals(""))) {
+                for (Synapse s : synapses) {
+                    pw.parameter.setFieldValue(s.getLearningRule(), value);
+                }
+            }
+        }
+        // Re-initialise. Allows updating cached values calculated from
+        // parameters.
+        for (Synapse s : synapses) {
+            s.getLearningRule().init(s);
+        }
+    }
+
+    @Override
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
 }

@@ -25,16 +25,18 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.network.gui.dialogs.neuron.GeneralNeuronPropertiesPanel;
+import org.simbrain.network.gui.dialogs.neuron.UpdateRulePanel;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * This panel combines synapse editing sub-panels and handles changes to one
  * being applied to the others.
+ * 
+ * TODO: See NeuronPropertiesPanel docs
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
@@ -52,111 +54,92 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     private static final boolean DEFAULT_DISPLAY_PARAMS = false;
 
-    /** The basic synapse info panel. */
-    private SynapsePropertiesSimple synapseInfoPanel;
+    /** Panel to edit general synapse properties. */
+    private GeneralSynapsePropertiesPanel generalSynapsePropertiesPanel;
 
-    /** The synapse update settings panel. */
-    private SpecificSynapseRulePanel updateInfoPanel;
+    /** Panel to edit specific synapse type */
+    private SynapseRulePanel synapseRulePanel;
 
     /** Panel to edit spike responders. */
     private SpikeResponderSettingsPanel editSpikeResponders;
 
     /**
-     * Creates a combined synapse info panel, which includes the basic synapse
-     * info panel and a synapse update settings panel. The panel is
-     * automatically built and laid out, such that it is immediately ready for
-     * display.
+     * Creates a synapse property panel with a default display state.
      *
-     * @param synapseList
-     *            the list of synapse synapses either being edited (editing) or
-     *            being used to fill the panel with default values (creation).
-     * @param parent
-     *            the parent window, made available for easy resizing.
-     * @return 
+     * @param synapseList the list of synapse synapses either being edited
+     *            (editing) or being used to fill the panel with default values
+     *            (creation).
+     * @param parent the parent window, made available for easy resizing.
+     * @return
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-        final Collection<Synapse> synapseList, final Window parent) {
+            final Collection<Synapse> synapseList, final Window parent) {
         return createSynapsePropertiesPanel(synapseList, parent,
-            DEFAULT_DISPLAY_PARAMS);
+                DEFAULT_DISPLAY_PARAMS);
     }
-    
+
     /**
-     * Creates a combined synapse info panel, which includes the basic synapse
-     * info panel and a synapse update settings panel. The panel is
-     * automatically built and laid out, such that it is immediately ready for
-     * display. The setting panel's display state is that extra data is by
-     * default hidden.
+     * Create the panel without specifying whether to display id (that is done
+     * automatically).
      *
-     * @param synapseList
-     *            the list of synapses either being edited (editing) or being
-     *            used to fill the panel with default values (creation).
-     * @param parent
-     *            the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams
-     *            whether or not to display the synapse update rule's details
-     *            initially
-     * @return		          
+     * @param synapseList the list of synapses either being edited (editing) or
+     *            being used to fill the panel with default values (creation).
+     * @param parent the parent window, made available for easy resizing.
+     * @param showSpecificRuleParams whether or not to display the synapse
+     *            update rule's details initially
+     * @return
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-        final Collection<Synapse> synapseList, final Window parent,
-        final boolean showSpecificRuleParams) {
-        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
-            synapseList, parent, showSpecificRuleParams);
-        cnip.synapseInfoPanel = SynapsePropertiesSimple
-        		.createBasicSynapseInfoPanel(synapseList, parent);
+            final Collection<Synapse> synapseList, final Window parent,
+            final boolean showSpecificRuleParams) {
+        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(synapseList,
+                parent, showSpecificRuleParams, true);
         cnip.initializeLayout();
         return cnip;
     }
 
     /**
-     * 
-     * @param synapseList
-     * @param parent
-     * @param showSpecificRuleParams
-     * @return
-     */
-    public static SynapsePropertiesPanel createBlankSynapsePropertiesPanel(
-    		final Collection<Synapse> synapseList, final Window parent,
-    		boolean showSpecificRuleParams) {
-    	SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
-    			synapseList, parent, showSpecificRuleParams);
-    	cnip.synapseInfoPanel = SynapsePropertiesSimple
-    			.createBlankSynapseInfoPanel(synapseList, parent, false);
-    	cnip.initializeLayout();
-    	return cnip;
-    }
-    
-    /**
      * {@link #createSynapsePropertiesPanel(List, Window, boolean)}
      *
-     * @param synapseList
-     *            the list of synapses either being edited (editing) or being
-     *            used to fill the panel with default values (creation).
-     * @param parent
-     *            the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams
-     *            whether or not to display the synapse update rule's details
-     *            initially.
+     * @param synapseList the list of synapses either being edited (editing) or
+     *            being used to fill the panel with default values (creation).
+     * @param parent the parent window, made available for easy resizing.
+     * @param showSpecificRuleParams whether or not to display the synapse
+     *            update rule's details initially.
      */
     private SynapsePropertiesPanel(final Collection<Synapse> synapseList,
-        final Window parent, final boolean showSpecificRuleParams) {
-        updateInfoPanel = new SpecificSynapseRulePanel(synapseList, parent,
-            showSpecificRuleParams);
+            final Window parent, final boolean showSpecificRuleParams,
+            final boolean displayID) {
+        synapseRulePanel = new SynapseRulePanel(synapseList, parent,
+                showSpecificRuleParams);
         if (SynapseDialog.targsUseSynapticInputs(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
-                parent);
+                    parent);
         }
+        generalSynapsePropertiesPanel = GeneralSynapsePropertiesPanel
+                .createPanel(synapseList, parent, displayID);
+        synapseRulePanel = new SynapseRulePanel(synapseList, parent,
+                showSpecificRuleParams);
     }
 
     /**
      * Lays out the panel.
      */
     private void initializeLayout() {
+        // Respond to update panel combo box changes here, so that general panel
+        // can be updated too
+        synapseRulePanel.getCbSynapseType()
+                .addActionListener(e -> SwingUtilities.invokeLater(() -> {
+                    // generalSynapsePropertiesPanel
+                    // .updateFieldVisibility(synapseRulePanel.getSynapsePanel().getPrototypeRule());
+                    repaint();
+                }));
+
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);
-        this.add(synapseInfoPanel);
+        this.add(generalSynapsePropertiesPanel);
         this.add(Box.createVerticalStrut(DEFAULT_VGAP));
-        this.add(updateInfoPanel);
+        this.add(synapseRulePanel);
         if (editSpikeResponders != null) {
             this.add(Box.createVerticalStrut(DEFAULT_VGAP));
             this.add(editSpikeResponders);
@@ -164,8 +147,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * {@inheritDoc} <b>Specifically:</b> Commits changes in the basic synapse
-     * info panel and the synapse update settings panel.
+     * Commits changes in the two or three sub-panels.
      */
     @Override
     public boolean commitChanges() {
@@ -176,23 +158,16 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         // This must be the first change committed, as other synapse panels
         // make assumptions about the type of the synapse update rule being
         // edited that can result in ClassCastExceptions otherwise.
-        success &= updateInfoPanel.commitChanges();
+        success &= synapseRulePanel.commitChanges();
 
-        success &= synapseInfoPanel.commitChanges();
-        
+        success &= generalSynapsePropertiesPanel.commitChanges();
+
         if (editSpikeResponders != null) {
             success &= editSpikeResponders.commitChanges();
         }
 
         return success;
 
-    }
-
-    /**
-     * @return a template rule associated with the synapses in question
-     */
-    public SynapseUpdateRule getTemplateSelectedRule() {
-        return updateInfoPanel.getTemplateRule();
     }
 
     @Override
@@ -204,34 +179,31 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
 
-    public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
-        synapseInfoPanel.fillFieldValues(synapseGroup, polarity);
+    /**
+     * @return the generalSynapsePropertiesPanel
+     */
+    public GeneralSynapsePropertiesPanel getGeneralSynapsePropertiesPanel() {
+        return generalSynapsePropertiesPanel;
     }
 
     /**
-     * @return the updateInfoPanel
+     * @return the synapseRulePanel
      */
-    public SpecificSynapseRulePanel getUpdateInfoPanel() {
-        return updateInfoPanel;
+    public SynapseRulePanel getSynapseRulePanel() {
+        return synapseRulePanel;
     }
 
-    /**
-     * @param updateInfoPanel
-     *            the updateInfoPanel to set
-     */
-    public void setUpdateInfoPanel(SpecificSynapseRulePanel updateInfoPanel) {
-        this.updateInfoPanel = updateInfoPanel;
-    }
+    // TODO?
+    // public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity)
+    // {
+    // synapseInfoPanel.fillFieldValues(synapseGroup, polarity);
+    // }
 
-    public double getStrength() {
-        return synapseInfoPanel.getStrength();
-    }
-    
-    /**
-     * @return the panel governing the editing of spike responders.
-     */
-    public SpikeResponderSettingsPanel getEditSpikeRespondersPanel() {
-    	return editSpikeResponders;
-    }
+    // /**
+    // * @return the panel governing the editing of spike responders.
+    // */
+    // public SpikeResponderSettingsPanel getEditSpikeRespondersPanel() {
+    // return editSpikeResponders;
+    // }
 
 }

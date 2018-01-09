@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,76 +37,45 @@ public class HistogramComponent extends WorkspaceComponent {
     /** Data model. */
     private HistogramModel model;
 
-    /** Neuron group consumer type. */
-    private AttributeType histogramConsumer;
-
     /**
      * Create new Histogram Component.
      *
-     * @param name
-     *            chart name
+     * @param name chart name
      */
     public HistogramComponent(final String name) {
         super(name);
         model = new HistogramModel(HistogramModel.INITIAL_DATA_SOURCES);
-        init();
-        addListener();
+        initModelListener();
     }
 
     /**
      * Create new Histogram Component from a specified model. Used in
      * deserializing.
      *
-     * @param name
-     *            chart name
-     * @param model
-     *            chart model
+     * @param name chart name
+     * @param model chart model
      */
     public HistogramComponent(final String name, final HistogramModel model) {
         super(name);
         this.model = model;
-        init();
-        addListener();
-    }
-
-    /**
-     * Initialize component.
-     */
-    private void init() {
-
-        histogramConsumer = new AttributeType(this, "Histogram", "getValue",
-                double[].class, true);
-        addConsumerType(histogramConsumer);
-
+        initModelListener();
     }
 
     /**
      * Add chart listener to model.
      */
-    private void addListener() {
-
+    private void initModelListener() {
         model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceAdded(final int index) {
-                firePotentialAttributesChanged();
+                // TODO: Fix this
+                fireModelAdded(null);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceRemoved(final int index) {
-                firePotentialAttributesChanged();
+                fireModelRemoved(null);
             }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void chartInitialized(int numSources) {
-                // No implementation yet (not used in this component thus far).
-            }
+            public void chartInitialized(int numSources) {}
         });
     }
 
@@ -127,18 +96,13 @@ public class HistogramComponent extends WorkspaceComponent {
     /**
      * Opens a saved bar chart.
      *
-     * @param input
-     *            stream
-     * @param name
-     *            name of file
-     * @param format
-     *            format
+     * @param input stream
+     * @param name name of file
+     * @param format format
      * @return bar chart component to be opened
      */
-    public static HistogramComponent open(final InputStream input,
-            final String name, final String format) {
-        HistogramModel dataModel = (HistogramModel) HistogramModel.getXStream()
-                .fromXML(input);
+    public static HistogramComponent open(final InputStream input, final String name, final String format) {
+        HistogramModel dataModel = (HistogramModel) HistogramModel.getXStream().fromXML(input);
         return new HistogramComponent(name, dataModel);
     }
 
@@ -162,20 +126,9 @@ public class HistogramComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
-        if (histogramConsumer.isVisible()) {
-            for (int i = 0; i < model.getData().size(); i++) {
-//                String description = "Histogram " + (i + 1);
-//                Consumer2<?> consumer = getAttributeManager()
-//                        .createPotentialConsumer(model, "addData",
-//                                new Class[] { double[].class, Integer.class },
-//                                new Object[] { i });
-//                consumer.setDescription(description);
-//                returnList.add(consumer);
-            }
-        }
-        return returnList;
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.add(model);
+        return models;
     }
-
 }

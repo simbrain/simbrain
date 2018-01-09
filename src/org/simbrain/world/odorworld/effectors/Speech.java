@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -100,6 +102,7 @@ public class Speech extends Effector {
     /**
      * @param phrase the phrase to set
      */
+    @Consumable
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -118,6 +121,7 @@ public class Speech extends Effector {
         this.activated = activated;
     }
 
+    @Producible
     public double getAmount() {
         return amount;
     }
@@ -125,6 +129,7 @@ public class Speech extends Effector {
     /**
      * @param amount the amount to set
      */
+    @Consumable
     public void setAmount(double amount) {
         this.amount = amount;
     }

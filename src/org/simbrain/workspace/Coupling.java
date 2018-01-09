@@ -2,21 +2,23 @@ package org.simbrain.workspace;
 
 import java.lang.reflect.Type;
 
-public class Coupling2<T> {
-    private Producer2<T> producer;
-    private Consumer2<T> consumer;
+public class Coupling<T> {
+    static <S> Coupling<S> create(Producer<S> producer, Consumer<S> consumer)
+            throws MismatchedAttributesException {
+        if (producer.getType() == consumer.getType()) {
+            return new Coupling<S>(producer, consumer);
+        } else {
+            throw new MismatchedAttributesException(String.format("Producer type %s does not match consumer type %s",
+                    producer.getType(), consumer.getType()));
+        }
+    }
 
-    public Coupling2(Producer2<T> producer, Consumer2<T> consumer) throws MismatchedAttributesException {
+    private Producer<T> producer;
+    private Consumer<T> consumer;
+
+    private Coupling(Producer<T> producer, Consumer<T> consumer) {
         this.producer = producer;
         this.consumer = consumer;
-        // Check that the types of the attributes match
-        if (producer.getType() != consumer.getType()) {
-            String warning = "Producer type ("
-                    + producer.getType().getTypeName()
-                    + ") does not match consumer type ("
-                    + consumer.getType().getTypeName();
-            throw new MismatchedAttributesException(warning);
-        }
     }
 
     public Type getType() {
@@ -54,14 +56,14 @@ public class Coupling2<T> {
     /**
      * @return the producer
      */
-    public Producer2<T> getProducer() {
+    public Producer<T> getProducer() {
         return producer;
     }
 
     /**
      * @return the consumer
      */
-    public Consumer2<T> getConsumer() {
+    public Consumer<T> getConsumer() {
         return consumer;
     }
 

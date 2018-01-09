@@ -66,7 +66,8 @@ public class AttributeTypePanel extends JPanel {
         table.setFocusable(false);
 
         if (component != null) {
-            if (poc == ProducerOrConsumer.Consuming) {
+            // TODO: Fix this
+            /*if (poc == ProducerOrConsumer.Consuming) {
                 for (AttributeType type : component.getConsumerTypes()) {
                     setBorder(BorderFactory
                             .createTitledBorder("Consumer type visibility for "
@@ -80,7 +81,7 @@ public class AttributeTypePanel extends JPanel {
                                     + component.getName()));
                     model.addRow(type);
                 }
-            }
+            }*/
         }
 
         JScrollPane scrollPane = new JScrollPane(table);

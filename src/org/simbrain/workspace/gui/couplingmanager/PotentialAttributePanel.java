@@ -35,14 +35,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.simbrain.workspace.Attribute2;
-import org.simbrain.workspace.AttributeListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.Producer;
 
 /**
  * Displays a panel with a JComboBox, which the user uses to select a component,
@@ -50,8 +44,7 @@ import org.simbrain.workspace.WorkspaceListener;
  *
  * TODO: Rename to AttributePanel?
  */
-public class PotentialAttributePanel extends JPanel
-        implements ActionListener, MouseListener {
+public class PotentialAttributePanel extends JPanel implements ActionListener, MouseListener {
 
     /** Parent frame. */
     private JFrame parentFrame = new JFrame();
@@ -105,10 +98,8 @@ public class PotentialAttributePanel extends JPanel
 
         // Scroll pane
         JScrollPane listScroll = new JScrollPane(attributeList);
-        listScroll.setHorizontalScrollBarPolicy(
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll.setVerticalScrollBarPolicy(
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(listScroll, BorderLayout.CENTER);
 
         // Bottom panel
@@ -143,25 +134,20 @@ public class PotentialAttributePanel extends JPanel
      * @param component component to listen to
      */
     private void addAttributeListener(final WorkspaceComponent component) {
-
-        component.addAttributeListener(new AttributeListener() {
-
-            public void attributeTypeVisibilityChanged(AttributeType type) {
+        component.addListener(new WorkspaceComponentAdapter() {
+            public void modelAdded(Object model) {
                 if (isSelectedComponent(component)) {
-                    // if (component == type.getParentComponent()) { // Not sure
-                    // if
-                    // // this is
-                    // // needed
                     refresh(component);
-                    // }
                 }
             }
 
-            public void attributeObjectRemoved(Object object) {
-                // No implementation
+            public void modelRemoved(Object model) {
+                if (isSelectedComponent(component)) {
+                    refresh(component);
+                }
             }
 
-            public void potentialAttributesChanged() {
+            public void modelChanged() {
                 if (isSelectedComponent(component)) {
                     refresh(component);
                 }
@@ -189,11 +175,10 @@ public class PotentialAttributePanel extends JPanel
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-
         // Refresh component list
         if (event.getSource() instanceof JComboBox) {
-            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event
-                    .getSource()).getSelectedItem();
+            JComboBox source = (JComboBox) event.getSource();
+            WorkspaceComponent component = (WorkspaceComponent) source.getSelectedItem();
             refresh(component);
         }
     }
@@ -205,11 +190,11 @@ public class PotentialAttributePanel extends JPanel
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (Producer2<?> producer : component.getProducers()) {
+                for (Producer<?> producer : component.getWorkspace().getCouplingFactory().getAllProducers(component)) {
                     model.addElement(producer);
                 }
             } else {
-                for (Consumer2<?> consumer : component.getConsumers()) {
+                for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getAllConsumers(component)) {
                     model.addElement(consumer);
                 }
             }
@@ -251,15 +236,15 @@ public class PotentialAttributePanel extends JPanel
      */
     public List getSelectedAttributes() {
         if (producerOrConsumer == ProducerOrConsumer.Producing) {
-            List<Producer2<?>> ret = new ArrayList<>();
+            List<Producer<?>> ret = new ArrayList<>();
             for (Object object : attributeList.getSelectedValuesList()) {
-                ret.add((Producer2<?>) object);
+                ret.add((Producer<?>) object);
             }
             return ret;
         } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-            List<Consumer2<?>> ret = new ArrayList<>();
+            List<Consumer<?>> ret = new ArrayList<>();
             for (Object object : attributeList.getSelectedValuesList()) {
-                ret.add((Consumer2<?>) object);
+                ret.add((Consumer<?>) object);
             }
             return ret;
         }
@@ -303,7 +288,7 @@ public class PotentialAttributePanel extends JPanel
             // TODO
             // PotentialAttribute id = (PotentialAttribute) object;
             // Set text color based on data type
-            Attribute2 atttribute = (Attribute2) object;
+            Attribute atttribute = (Attribute) object;
             renderer.setForeground(
                     DesktopCouplingManager.getColor(atttribute.getType()));
             //
@@ -317,8 +302,7 @@ public class PotentialAttributePanel extends JPanel
     /**
      * A JComboBox which listens to the workspace and updates accordingly.
      */
-    private class ComponentDropDownBox extends JComboBox
-            implements WorkspaceListener {
+    private class ComponentDropDownBox extends JComboBox implements WorkspaceListener {
 
         /** Reference to workspace. */
         private Workspace workspace;
@@ -339,26 +323,15 @@ public class PotentialAttributePanel extends JPanel
             workspace.addListener(this);
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @return
-         */
         public boolean clearWorkspace() {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void componentAdded(final WorkspaceComponent component) {
             this.addItem(component);
             addAttributeListener(component);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void componentRemoved(final WorkspaceComponent component) {
             this.removeItem(component);
             if (this.getItemCount() == 0) {
@@ -366,19 +339,11 @@ public class PotentialAttributePanel extends JPanel
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void workspaceCleared() {
             this.removeAllItems();
             PotentialAttributePanel.this.clearList();
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public void newWorkspaceOpened() {
-        }
+        public void newWorkspaceOpened() {}
     }
-
 }

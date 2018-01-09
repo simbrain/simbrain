@@ -37,7 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Coupling2;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
@@ -57,7 +57,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
     private SimbrainDesktop desktop;
 
     /** List of couplings. */
-    private List<Coupling2<?>> couplingList = new ArrayList<Coupling2<?>>();
+    private List<Coupling<?>> couplingList = new ArrayList<Coupling<?>>();
 
     /** Action which deletes current couplings. */
     Action deleteCouplingsAction = new AbstractAction() {
@@ -90,7 +90,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * @param desktop Reference to simbrain desktop
      * @param couplingList list of couplings to be shown in window
      */
-    public CouplingListPanel(SimbrainDesktop desktop, List<Coupling2<?>> couplingList) {
+    public CouplingListPanel(SimbrainDesktop desktop, List<Coupling<?>> couplingList) {
         super(new BorderLayout());
 
         // Reference to the simbrain desktop
@@ -131,7 +131,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
     /**
      * Updates the list of couplings when new couplings are made.
      */
-    private void couplingsUpdated() {
+    private void updateCouplingsList() {
         couplingList = new ArrayList(desktop.getWorkspace().getCouplings());
         couplings.setListData(couplingList.toArray());
     }
@@ -141,55 +141,45 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      *
      * @return selected consumers.
      */
-    private ArrayList<Coupling2<?>> getSelectedCouplings() {
-        ArrayList<Coupling2<?>> ret = new ArrayList<Coupling2<?>>();
+    private ArrayList<Coupling<?>> getSelectedCouplings() {
+        ArrayList<Coupling<?>> ret = new ArrayList<Coupling<?>>();
         for (Object object : couplings.getSelectedValues()) {
-            ret.add((Coupling2<?>) object);
+            ret.add((Coupling<?>) object);
         }
         return ret;
     }
 
     @Override
-    public void couplingAdded(Coupling2 coupling) {
-        couplingsUpdated();
+    public void couplingAdded(Coupling coupling) {
+        updateCouplingsList();
     }
 
     @Override
-    public void couplingRemoved(Coupling2 coupling) {
-        couplingsUpdated();
+    public void couplingRemoved(Coupling coupling) {
+        updateCouplingsList();
     }
 
     @Override
-    public void couplingsRemoved(List<Coupling2<?>> couplings2) {
-        couplingsUpdated();
+    public void couplingsRemoved(List<Coupling<?>> couplings) {
+        updateCouplingsList();
     }
 
     /**
      * Custom attribute renderer for JList.
      */
     private class CouplingCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         * @overrides java.awt.Component
-         * @param list
-         * @param object
-         * @param index
-         * @param isSelected
-         * @param cellHasFocus
-         * @return
-         */
         public java.awt.Component getListCellRendererComponent(
                 final JList list, final Object object, final int index,
                 final boolean isSelected, final boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
-            Coupling2<?> coupling = (Coupling2<?>) object;
+            Coupling<?> coupling = (Coupling<?>) object;
 
             // Set text color based on data type
             renderer.setForeground(DesktopCouplingManager.getColor(coupling.getType()));
             return renderer;
         }
-
     }
+
 }

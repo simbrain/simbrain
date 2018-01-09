@@ -18,29 +18,24 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.*;
 
 import org.simbrain.workspace.*;
 
 /**
  * A menu item corresponding to a potential coupling. When the menuitem is
- * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java)
- * It's a checkbox menu item. Checking it creates the coupling, unchecking it
- * removes it.
+ * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java).
  */
-public class CouplingMenuItem extends JCheckBoxMenuItem {
+public class CouplingMenuItem extends JMenuItem {
 
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private Producer2 producer;
+    private Producer producer;
 
     /** Reference to consuming attribute. */
-    private Consumer2 consumer;
+    private Consumer consumer;
 
     /** The workspace this object belongs to. */
     private Workspace workspace;
@@ -53,32 +48,16 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * @param producer The producer for the coupling.
      * @param consumer The consumer for the coupling.
      */
-    public CouplingMenuItem(Workspace workspace, String description, Producer2 producer, Consumer2 consumer) {
+    public CouplingMenuItem(Workspace workspace, String description, Producer producer, Consumer consumer) {
         super(description);
+        this.setIcon(null);
         this.workspace = workspace;
         this.producer = producer;
         this.consumer = consumer;
-        addActionListener(listener);
+        // Listen for events where this item is clicked.
+        addActionListener(evt -> {
+            Coupling coupling = workspace.getCouplingFactory().tryCoupling(producer, consumer);
+            setSelected(true);
+        });
     }
-
-    /**
-     * Listens for events where this item is clicked. If this item is selected
-     * when there is no coupling one is created. If it is selected, then the
-     * coupling is removed.
-     */
-    private final ActionListener listener = new ActionListener() {
-        public void actionPerformed(final ActionEvent evt) {
-            if (getState()) {
-                try {
-                    workspace.addCoupling(new Coupling2(producer, consumer));
-                    setSelected(true);
-                } catch (MismatchedAttributesException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                setSelected(false);
-            }
-        }
-    };
-
 }

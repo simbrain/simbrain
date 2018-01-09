@@ -145,8 +145,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Used for debugging model.
      */
     public void debug() {
-        System.out
-                .println("------------ Print contents of dataset ------------");
+        System.out.println("------------ Print contents of dataset ------------");
         Projector projector = projectionModel.getProjector();
         for (int i = 0; i < projector.getNumPoints(); i++) {
             // System.out.println("<" + i + "> "

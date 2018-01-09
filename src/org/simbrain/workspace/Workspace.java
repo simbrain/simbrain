@@ -25,11 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -48,23 +45,23 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
  * workspaces on different machines together). A workspace can be visualized via
  * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  *
- * @see org.simbrain.workspace.Coupling2
+ * @see Coupling
  *
  */
 public class Workspace {
 
     /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(Workspace.class);
+    private static transient final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /** List of workspace components. */
-    private List<WorkspaceComponent> componentList = Collections.synchronizedList(
+    private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(
             new ArrayList<WorkspaceComponent>());
 
     /** Flag to indicate workspace has been changed since last save. */
-    private boolean workspaceChanged = false;
+    private transient boolean workspaceChanged = false;
 
     /** Current workspace file. */
-    private File currentFile = null;
+    private transient File currentFile = null;
 
     /**
      * A persistence representation of the time (the updater's state is not
@@ -76,18 +73,18 @@ public class Workspace {
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
      * because writes to this list are uncommon.
      */
-    private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
+    private transient CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
      * Mapping from workspace component types to integers which show how many
      * have been added. For naming new workspace components.
      */
-    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
+    private transient Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
     /**
      * The updater used to manage component updates.
      */
-    private Object updaterLock = new Object();
+    private transient Object updaterLock = new Object();
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow
@@ -96,10 +93,10 @@ public class Workspace {
     private int updateDelay = 0;
 
     /** The updater used to manage component updates. */
-    private WorkspaceUpdater updater;
+    private transient WorkspaceUpdater updater;
 
     /** The CouplingFactory for this workspace. */
-    private CouplingFactory couplingFactory = new CouplingFactory(this);
+    private transient CouplingFactory couplingFactory = new CouplingFactory(this);
 
     /**
      * Construct a workspace.
@@ -567,21 +564,21 @@ public class Workspace {
     }
 
     /** All couplings for the workspace. */
-    private final List<Coupling2<?>> couplings = new ArrayList<Coupling2<?>>();
+    private final transient List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
-    public void addCoupling(Coupling2<?> coupling) {
+    public void addCoupling(Coupling<?> coupling) {
         couplings.add(coupling);
         fireCouplingAdded(coupling);
     }
 
     public void updateCouplings() {
-        for (Coupling2<?> coupling : couplings) {
+        for (Coupling<?> coupling : couplings) {
             coupling.update();
         }
     }
 
     /** List of listeners to fire updates when couplings are changed. */
-    private List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
+    private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
 
     /**
      * Adds a new listener to be updated when changes are made.
@@ -606,7 +603,7 @@ public class Workspace {
      *
      * @param coupling coupling that was added
      */
-    private void fireCouplingAdded(Coupling2<?> coupling) {
+    private void fireCouplingAdded(Coupling<?> coupling) {
         for (CouplingListener listeners : couplingListeners) {
             listeners.couplingAdded(coupling);
         }
@@ -617,33 +614,33 @@ public class Workspace {
      *
      * @param coupling coupling that was removed
      */
-    private void fireCouplingRemoved(Coupling2<?> coupling) {
+    private void fireCouplingRemoved(Coupling<?> coupling) {
         for (CouplingListener listeners : couplingListeners) {
             listeners.couplingRemoved(coupling);
         }
     }
     
-    private void fireCouplingsRemoved(List<Coupling2<?>> couplings2) {
+    private void fireCouplingsRemoved(List<Coupling<?>> couplings) {
         for (CouplingListener listeners : couplingListeners) {
-            listeners.couplingsRemoved(couplings2);
+            listeners.couplingsRemoved(couplings);
         }
     }
 
     /**
      * @return the couplings
      */
-    public List<Coupling2<?>> getCouplings() {
+    public List<Coupling<?>> getCouplings() {
         return couplings;
     }
 
-    public void removeCouplings(List<Coupling2<?>> couplings) {
+    public void removeCouplings(List<Coupling<?>> couplings) {
         this.couplings.removeAll(couplings);
         // What to do here?
         this.fireCouplingsRemoved(couplings);
     }
 
     //TODO: If not used by the time update actions are re-implemented, remove
-    public Coupling2<?> getCoupling(String id) {
+    public Coupling<?> getCoupling(String id) {
         return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id))
                 .findFirst().get();
     }
@@ -653,11 +650,11 @@ public class Workspace {
      *
      * @param couplingList the list of couplings to be updated
      */
-    public void updateCouplings(List<Coupling2<?>> couplingList) {
-        // for (Coupling2<?> coupling : couplingList) {
+    public void updateCouplings(List<Coupling<?>> couplingList) {
+        // for (Coupling<?> coupling : couplingList) {
         // coupling.setBuffer();
         // }
-        for (Coupling2<?> coupling : couplingList) {
+        for (Coupling<?> coupling : couplingList) {
             coupling.update();
         }
     }

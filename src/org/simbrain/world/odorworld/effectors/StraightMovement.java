@@ -66,7 +66,7 @@ public class StraightMovement extends Effector {
     /**
      * @param amount the amount to set
      */
-    @Consumable(customDescriptionMethod="getMixedId")
+    @Consumable(idMethod="getMixedId")
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -77,7 +77,7 @@ public class StraightMovement extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(customDescriptionMethod="getMixedId")
+    @Consumable(idMethod="getMixedId")
     public void addAmount(double amount) {
         this.amount += amount;
     }

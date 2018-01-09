@@ -5,10 +5,8 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.workspace.Coupling2;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.MismatchedAttributesException;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -445,8 +443,8 @@ public class Creature {
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
 		NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
-		Producer2 chemicalAmount = nc.getProducer(chem, "getAmount");
-		Consumer2 chemReceptor = nc.getConsumer(neuron, "forceSetActivation");
+		Producer chemicalAmount = parentSim.getSim().getProducer(chem, "getAmount");
+		Consumer chemReceptor = parentSim.getSim().getConsumer(neuron, "forceSetActivation");
 		parentSim.getSim().tryCoupling(chemicalAmount, chemReceptor);
 	}
 

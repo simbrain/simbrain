@@ -35,8 +35,6 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-//RENAME TO ARCHIVED WORKSPACE?
-
 /**
  * Instances of this class are used for building and reading the TOC of an
  * archive.
@@ -61,7 +59,7 @@ class ArchiveContents {
     private List<ArchivedUpdateAction> archivedActions = new ArrayList<ArchivedUpdateAction>();
 
     /** The serializer for this archive. */
-    private final WorkspaceComponentSerializer serializer;
+    private final transient WorkspaceComponentSerializer serializer;
 
     /** Reference to workspace used to serialize parameters in workspace. */
     private final Workspace workspaceParameters;
@@ -118,7 +116,7 @@ class ArchiveContents {
         }
         // Get a coupling id, if this is coupling action
         if (action instanceof UpdateCoupling) {
-            Coupling2<?> coupling = ((UpdateCoupling) action).getCoupling();
+            Coupling<?> coupling = ((UpdateCoupling) action).getCoupling();
             if (coupling != null) {
                 coupling_id = coupling.getId();
             } else {
@@ -229,9 +227,9 @@ class ArchiveContents {
         } else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
-                Coupling2<?> coupling = workspace.getCoupling(id);
+                Coupling<?> coupling = workspace.getCoupling(id);
                 retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { Coupling2.class })
+                        .getConstructor(new Class[] { Coupling.class })
                         .newInstance(coupling);
 
             } catch (Exception e) {
@@ -248,7 +246,7 @@ class ArchiveContents {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    ArchivedCoupling addCoupling(final Coupling2<?> coupling) {
+    ArchivedCoupling addCoupling(final Coupling<?> coupling) {
         ArchivedCoupling c = new ArchivedCoupling(this, coupling);
         archivedCouplings.add(c);
         return c;
@@ -263,7 +261,7 @@ class ArchiveContents {
     static final class ArchivedUpdateAction {
 
         /** Reference to the action itself. */
-        private final UpdateAction updateAction;
+        private final transient UpdateAction updateAction;
 
         /**
          * Reference to the component id for this action, or null if not needed.
@@ -470,7 +468,7 @@ class ArchiveContents {
          * @param coupling The coupling this instance represents.
          */
         ArchivedCoupling(final ArchiveContents parent,
-                final org.simbrain.workspace.Coupling2<?> coupling) {
+                final Coupling<?> coupling) {
 
             this.archivedProducer = new ArchivedAttribute(parent, coupling.getProducer());
             this.archivedConsumer = new ArchivedAttribute(parent, coupling.getConsumer());
@@ -500,13 +498,8 @@ class ArchiveContents {
      */
     public static final class ArchivedAttribute {
 
-        /** The uri for the parent component of this attribute. */
-        private String parentComponentRef;
-
         /** The attribute id. */
         private String attributeId;
-
-        public ArchivedAttribute() {}
 
         /**
          * Creates a new instance.
@@ -514,16 +507,8 @@ class ArchiveContents {
          * @param parent The parent archive.
          * @param attribute The attribute this instance represents.
          */
-        ArchivedAttribute(ArchiveContents parent, Attribute2 attribute) {
-            this.parentComponentRef = parent.componentUris.get(attribute.parentComponent);
+        ArchivedAttribute(ArchiveContents parent, Attribute attribute) {
             this.attributeId = attribute.getId();
-        }
-
-        /**
-         * @return the parentComponentRef
-         */
-        public String getParentComponentRef() {
-            return parentComponentRef;
         }
 
         /**
@@ -552,49 +537,12 @@ class ArchiveContents {
     static XStream xstream() {
         XStream xstream = new XStream(new DomDriver());
 
-        xstream.omitField(ArchiveContents.class, "serializer");
-        xstream.omitField(ArchiveContents.class, "archivedAvailableActions");
-        xstream.omitField(ArchivedComponent.class, "serializer");
-        xstream.omitField(ArchivedCoupling.class, "serializer");
-        xstream.omitField(ArchivedUpdateAction.class, "serializer");
-        xstream.omitField(ArchivedUpdateAction.class, "updater");
-        xstream.omitField(ArchivedComponent.class, "data");
-        xstream.omitField(ArchivedComponent.ArchivedDesktopComponent.class,
-                "data");
-
-        xstream.omitField(Workspace.class, "LOGGER");
-        xstream.omitField(Workspace.class, "manager");
-        xstream.omitField(Workspace.class, "componentList");
-        xstream.omitField(Workspace.class, "workspaceChanged");
-        xstream.omitField(Workspace.class, "currentDirectory");
-        xstream.omitField(Workspace.class, "currentFile");
-        xstream.omitField(Workspace.class, "updater");
-        xstream.omitField(Workspace.class, "listeners");
-        xstream.omitField(Workspace.class, "componentNameIndices");
-        xstream.omitField(Workspace.class, "updaterLock");
-        xstream.omitField(Workspace.class, "componentLock");
-
-        xstream.omitField(UpdateComponent.class, "component");
-        xstream.omitField(UpdateComponent.class, "updater");
-        xstream.omitField(UpdateCoupling.class, "coupling");
-        xstream.omitField(UpdateActionCustom.class, "interpreter");
-        xstream.omitField(UpdateActionCustom.class, "theAction");
-        xstream.omitField(UpdateActionCustom.class, "updater");
-        xstream.omitField(UpdateAllBuffered.class, "updater");
-
         xstream.alias("Workspace", ArchiveContents.class);
         xstream.alias("Component", ArchivedComponent.class);
         xstream.alias("Coupling", ArchivedCoupling.class);
         xstream.alias("UpdateAction", ArchivedUpdateAction.class);
         xstream.alias("DesktopComponent",
                 ArchivedComponent.ArchivedDesktopComponent.class);
-
-        // xstream.addImplicitCollection(ArchiveContents.class, "components",
-        // ArchivedComponent.class);
-        // xstream.addImplicitCollection(ArchiveContents.class, "couplings",
-        // ArchivedCoupling.class);
-        // xstream.addImplicitCollection(ArchivedComponent.class,
-        // "desktopComponents");
 
         return xstream;
     }

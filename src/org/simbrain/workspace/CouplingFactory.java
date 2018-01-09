@@ -1,7 +1,10 @@
 package org.simbrain.workspace;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * CouplingFactory provides methods for instantiating couplings between components in a workspace.
@@ -18,9 +21,9 @@ public class CouplingFactory {
     }
 
     /** Create a coupling from a producer and consumer of the same type. */
-    public <T> Coupling2<T> createCoupling(Producer2<T> producer, Consumer2<T> consumer)
+    public <T> Coupling<T> createCoupling(Producer<T> producer, Consumer<T> consumer)
             throws MismatchedAttributesException {
-        Coupling2<T> coupling = new Coupling2<T>(producer, consumer);
+        Coupling<T> coupling = Coupling.create(producer, consumer);
         workspace.addCoupling(coupling);
         return coupling;
     }
@@ -30,7 +33,7 @@ public class CouplingFactory {
      * do nothing if the types do not match and return null.
      */
     @SuppressWarnings("unchecked")
-    public Coupling2 tryCoupling(Producer2 producer, Consumer2 consumer) {
+    public Coupling tryCoupling(Producer producer, Consumer consumer) {
         if (producer.getType() == consumer.getType()) {
             try {
                 return createCoupling(producer, consumer);
@@ -51,10 +54,10 @@ public class CouplingFactory {
      * @exception MismatchedAttributesException An exception indicating that a pair of attributes did not match
      *     types. This will be thrown for the first such pair encountered.
      */
-     public void createOneToManyCouplings(Collection<Producer2<?>> producers, Collection<Consumer2<?>> consumers)
+     public void createOneToManyCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers)
             throws MismatchedAttributesException {
-         for (Producer2 producer : producers) {
-             for (Consumer2 consumer : consumers) {
+         for (Producer producer : producers) {
+             for (Consumer consumer : consumers) {
                  createCoupling(producer, consumer);
              }
          }
@@ -65,9 +68,9 @@ public class CouplingFactory {
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
      */
-    public void tryOneToManyCouplings(Collection<Producer2<?>> producers, Collection<Consumer2<?>> consumers) {
-        for (Producer2 producer : producers) {
-            for (Consumer2 consumer : consumers) {
+    public void tryOneToManyCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) {
+        for (Producer producer : producers) {
+            for (Consumer consumer : consumers) {
                 tryCoupling(producer, consumer);
             }
         }
@@ -81,12 +84,12 @@ public class CouplingFactory {
      * @exception MismatchedAttributesException An exception indicating that a pair of attributes did not match
      *     types. This will be thrown for the first such pair encountered.
      */
-    public void createOneToOneCouplings(Collection<Producer2<?>> producers, Collection<Consumer2<?>> consumers)
+    public void createOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers)
             throws MismatchedAttributesException {
-        Iterator<Consumer2<?>> consumerIterator = consumers.iterator();
-        for (Producer2<?> producer : producers) {
+        Iterator<Consumer<?>> consumerIterator = consumers.iterator();
+        for (Producer<?> producer : producers) {
             if (consumerIterator.hasNext()) {
-                Consumer2 consumer = consumerIterator.next();
+                Consumer consumer = consumerIterator.next();
                 createCoupling(producer, consumer);
             } else {
                 break;
@@ -99,15 +102,179 @@ public class CouplingFactory {
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
      */
-    public void tryOneToOneCouplings(Collection<Producer2<?>> producers, Collection<Consumer2<?>> consumers) {
-        Iterator<Consumer2<?>> consumerIterator = consumers.iterator();
-        for (Producer2 producer : producers) {
+    public void tryOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) {
+        Iterator<Consumer<?>> consumerIterator = consumers.iterator();
+        for (Producer producer : producers) {
             if (consumerIterator.hasNext()) {
-                Consumer2 consumer = consumerIterator.next();
+                Consumer consumer = consumerIterator.next();
                 tryCoupling(producer, consumer);
             } else {
                 break;
             }
+        }
+    }
+
+    /**
+     * Get all the potential producers for a given WorkspaceComponent.
+     * @param component The component to generate producers from.
+     * @return A list of potential producers.
+     */
+    public List<Producer<?>> getAllProducers(WorkspaceComponent component) {
+        return getProducersFromModels(component.getModels());
+    }
+
+    /**
+     * Get all the potential consumers for a given WorkspaceComponent.
+     * @param component The component to generate consumers from.
+     * @return A list of potential consumers.
+     */
+    public List<Consumer<?>> getAllConsumers(WorkspaceComponent component) {
+        return getConsumersFromModels(component.getModels());
+    }
+
+    /**
+     * Get all the potential producers from a list of model objects.
+     * @param listOfModels A list of models to check for Producibles.
+     * @return A list of producers.
+     */
+    public List<Producer<?>> getProducersFromModels(List listOfModels) {
+        List<Producer<?>> producers = new ArrayList<>();
+        for (Object model : listOfModels) {
+            producers.addAll(getProducersFromModel(model));
+        }
+        return producers;
+    }
+
+    /**
+     * Get all the potential consumers from a list of model objects.
+     * @param listOfModels A list of models to check for Consumables.
+     * @return A list of consumers.
+     */
+    public List<Consumer<?>> getConsumersFromModels(List listOfModels) {
+        List<Consumer<?>> consumers = new ArrayList<>();
+        for (Object model : listOfModels) {
+            consumers.addAll(getConsumersFromModel(model));
+        }
+        return consumers;
+    }
+
+    /**
+     * Get all the potential producers from a model object.
+     * @param model The object to check for Producibles.
+     * @return A list of producers.
+     */
+    public List<Producer<?>> getProducersFromModel(Object model) {
+        List<Producer<?>> producers = new ArrayList<Producer<?>>();
+        for (Method method : model.getClass().getMethods()) {
+            Producible annotation = method.getAnnotation(Producible.class);
+            if (annotation != null) {
+                Method idMethod = null;
+                try {
+                    idMethod = model.getClass().getMethod(annotation.idMethod());
+                } catch (NoSuchMethodException ex) {
+                    // Ignore
+                }
+                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+                Producer<?> producer;
+                if (idMethod != null) {
+                    producer = new Producer(model, method, description, idMethod);
+                } else {
+                    producer = new Producer(model, method, description);
+                }
+                producers.add(producer);
+            }
+        }
+        return producers;
+    }
+
+    /**
+     * Get all the potential consumers from a model object.
+     * @param model The object to check for Consumables.
+     * @return A list of consumers.
+     */
+    public List<Consumer<?>> getConsumersFromModel(Object model) {
+        List<Consumer<?>> consumers = new ArrayList<>();
+        for (Method method : model.getClass().getMethods()) {
+            Consumable annotation = method.getAnnotation(Consumable.class);
+            if (annotation != null) {
+                Method idMethod = null;
+                try {
+                    idMethod = model.getClass().getMethod(annotation.idMethod());
+                } catch (NoSuchMethodException ex) {
+                    // Ignore
+                }
+                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+                Consumer<?> consumer;
+                if (idMethod != null) {
+                    consumer = new Consumer(model, method, description, idMethod);
+                } else {
+                    consumer = new Consumer(model, method, description);
+                }
+                consumers.add(consumer);
+            }
+        }
+        return consumers;
+    }
+
+    /**
+     * Get a specific consumer from the model object.
+     * @param model The object in which to find the consumable.
+     * @param methodName The name of the consumable method.
+     * @return The consumer.
+     */
+    public Consumer<?> getConsumer(Object model, String methodName) {
+        return getConsumersFromModel(model).stream().filter(
+                c -> c.getMethod().getName().equalsIgnoreCase(methodName))
+                .findFirst().get();
+    }
+
+    /**
+     * Get a specific consumer from the model object and throw an exception if it is not of the specified type.
+     * @param model The object in which to find the consumable.
+     * @param methodName The name of the consumable method.
+     * @return The consumer.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Consumer<T> getConsumer(Object model, String methodName, Class<T> type)
+            throws MismatchedAttributesException {
+        Consumer<?> consumer = getConsumer(model, methodName);
+        if (consumer.getType() == type) {
+            return (Consumer<T>) consumer;
+        } else {
+            throw new MismatchedAttributesException(String.format(
+                    "Consumer type %s does not match method value type %s.",
+                    consumer.getType(), type));
+        }
+    }
+
+    /**
+     * Get a specific producer from the model object.
+     * @param model The object in which to find the producible.
+     * @param methodName The name of the producible method.
+     * @return The producer.
+     */
+    public Producer<?> getProducer(Object model, String methodName) {
+        return getProducersFromModel(model).stream().filter(
+                p -> p.getMethod().getName().equalsIgnoreCase(methodName))
+                .findFirst().get();
+    }
+
+    /**
+     * Get a specific producer from the model object and throw an exception if it is not of the specified type.
+     * @param model The object in which to find the producible.
+     * @param methodName The name of the producible method.
+     * @return The producer.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Producer<T> getProducer(Object model, String methodName, Class<T> type)
+            throws MismatchedAttributesException {
+        Producer<?> producer = getProducer(model, methodName);
+        if (producer.getType() == type) {
+            return (Producer<T>) producer;
+        } else {
+            throw new MismatchedAttributesException(String.format(
+                    "Producer type %s does not match method return type %s.",
+                    producer.getType(), type));
         }
     }
 }

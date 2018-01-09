@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -24,10 +23,8 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.Coupling2;
-import org.simbrain.workspace.MismatchedAttributesException;
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.BasicEntity;
@@ -188,10 +185,8 @@ public class RL_Sim_Main extends RegisteredSimulation {
                 "Sensory states + Predictions");
         plot.getProjectionModel().init(leftInputs.size() + rightInputs.size());
         plot.getProjectionModel().getProjector().setTolerance(.01);
-        Producer2 inputProducer = net.getNetworkComponent()
-                .getProducer(this, "getCombinedInputs");
-        Consumer2 plotConsumer = plot.getProjectionPlotComponent()
-                .getConsumer(plot.getProjectionPlotComponent(), "addPoint");
+        Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
+        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);
 
         // Set custom network update

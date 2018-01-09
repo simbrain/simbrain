@@ -36,10 +36,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentDeserializer;
-import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.*;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
@@ -89,37 +86,19 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
 
         // Add a default update listener
-        workspaceComponent
-                .addWorkspaceComponentListener(new WorkspaceComponentListener() {
+        workspaceComponent.addListener(new WorkspaceComponentAdapter() {
+            public void componentUpdated() {
+                GuiComponent.this.update();
+            }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void componentUpdated() {
-                        GuiComponent.this.update();
-                    }
+            public void guiToggled() {
+                GuiComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn());
+            }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void componentOnOffToggled() {
-                        // No implementation.
-                    }
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void guiToggled() {
-                        GuiComponent.this.getParentFrame().setVisible(
-                                workspaceComponent.isGuiOn());
-                    }
-
-                    @Override
-                    public void componentClosing() {
-                        close();
-                    }
-
-                });
+            public void componentClosing() {
+                close();
+            }
+        });
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }

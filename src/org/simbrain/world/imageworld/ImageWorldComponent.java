@@ -5,8 +5,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.workspace.Consumer2;
-import org.simbrain.workspace.Producer2;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -45,20 +45,11 @@ public class ImageWorldComponent extends WorkspaceComponent {
     protected void closing() { }
 
     @Override
-    public List<Producer2<?>> getProducers() {
-        // TODO: Name the couplings in an appropriate way
-        List<Producer2<?>> producers = new ArrayList<Producer2<?>>();
-        for (SensorMatrix sensorMatrix : getImageWorld().getSensorMatrices()) {
-            producers.addAll(getProducers(sensorMatrix));
-        }
-        return producers;
-    }
-
-    @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> consumers = new ArrayList<Consumer2<?>>();
-        consumers.addAll(getConsumersFromList(getImageWorld().getImageSources()));
-        return consumers;
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.addAll(imageWorld.getSensorMatrices());
+        models.addAll(imageWorld.getImageSources());
+        return models;
     }
 
     /**

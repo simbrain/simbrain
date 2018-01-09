@@ -28,8 +28,9 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
@@ -424,6 +425,7 @@ public class Synapse {
     /**
      * @return Strength of synapse.
      */
+    @Producible
     public final double getStrength() {
         return strength;
     }
@@ -433,6 +435,7 @@ public class Synapse {
      *
      * @param wt Strength value
      */
+    @Consumable
     public void setStrength(final double wt) {
         if (isTemplate) {
             forceSetStrength(wt);

@@ -53,7 +53,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
             OdorWorldComponent component) {
         super(frame, component);
         setLayout(new BorderLayout());
-        worldPanel = new OdorWorldPanel(component.getWorld());
+        worldPanel = new OdorWorldPanel(component, component.getWorld());
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this, component.getWorld());
         menu.setUpMenus();

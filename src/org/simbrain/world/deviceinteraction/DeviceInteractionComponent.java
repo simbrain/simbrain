@@ -1,12 +1,13 @@
 package org.simbrain.world.deviceinteraction;
 
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer2;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,10 +18,9 @@ import java.util.List;
 
 public class DeviceInteractionComponent extends WorkspaceComponent {
 
-    private final KeyboardWorld world;
-
     private static final String KEYBOARD_DEVICE_INTERACTION_WORLD = "Keyboard Device Interaction World";
 
+    private final KeyboardWorld world;
 
     /**
      * Construct a workspace component.
@@ -30,13 +30,11 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     public DeviceInteractionComponent(String name) {
         super(name);
         this.world = new KeyboardWorld();
-        init();
     }
 
     public DeviceInteractionComponent(String name, KeyboardWorld world) {
         super(name);
         this.world = world;
-        init();
     }
 
     public static DeviceInteractionComponent open (
@@ -46,34 +44,17 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
         return new DeviceInteractionComponent(name, newWorld);
     }
 
-    private void init() {
-        addConsumerType(new AttributeType(this, KEYBOARD_DEVICE_INTERACTION_WORLD, double.class, true));
-    }
-
     @Override
     public void save(OutputStream output, String format) {
         KeyboardWorld.getXStream().toXML(world, output);
     }
 
     @Override
-    protected void closing() {
-        //No implementation
-    }
+    protected void closing() {}
 
     @Override
-    public List<Consumer2<?>> getConsumers() {
-        List<Consumer2<?>> returnList = new ArrayList<Consumer2<?>>();
-        for (AttributeType type : getVisibleConsumerTypes()) {
-
-            if (type.getTypeName().equalsIgnoreCase(KEYBOARD_DEVICE_INTERACTION_WORLD)) {
-                for (Character character : world.getTokenDictionary()) {
-                    Consumer2 consumer = getConsumer(world, "keyPress");
-                    consumer.setDescription(String.valueOf(character));
-                    returnList.add(consumer);
-                }
-            }
-        }
-        return returnList;
+    public List<Object> getModels() {
+        return Arrays.asList(world);
     }
 
     public KeyboardWorld getWorld() {

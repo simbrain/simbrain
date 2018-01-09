@@ -3,19 +3,11 @@ package org.simbrain.world.imageworld;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -25,6 +17,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
@@ -45,31 +38,16 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private JToolBar sourceToolbar = new JToolBar();
     private JToolBar sensorToolbar = new JToolBar();
-    private ActionListener loadImageListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            SFileChooser fileChooser = new SFileChooser(
-                    System.getProperty("user.home"),
-                    "Select an image to load");
-            fileChooser.setUseImagePreview(true);
-            File file = fileChooser.showOpenDialog();
-            if (file != null) {
-                try {
-                    component.getImageWorld().loadImage(file.toString());
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "Unabled to load file: " + file.toString());
-                }
-            }
-        }
-    };
+
+    private JPopupMenu contextMenu;
+    private CouplingMenu couplingMenu;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
      * @param frame The frame in which to place GUI elements.
      * @param imageWorldComponent The ImageWorldComponent to interact with.
      */
-    public ImageDesktopComponent(GenericFrame frame,
-            ImageWorldComponent imageWorldComponent) {
+    public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent imageWorldComponent) {
         super(frame, imageWorldComponent);
         component = imageWorldComponent;
 
@@ -105,7 +83,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JButton loadImageButton = new JButton();
         loadImageButton.setIcon(ResourceManager.getSmallIcon("Open.png"));
         loadImageButton.setToolTipText("Load Static Image");
-        loadImageButton.addActionListener(loadImageListener);
+        loadImageButton.addActionListener(this::loadImage);
         sourceToolbar.add(loadImageButton);
 
         sensorToolbar.add(sensorMatrixCombo);
@@ -147,6 +125,19 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         imageWorldComponent.getImageWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
         component.getImageWorld().addListener(this::updateComboBox);
+
+        contextMenu = new JPopupMenu();
+        couplingMenu = new CouplingMenu(component.getWorkspace());
+        contextMenu.add(couplingMenu);
+        imageWorldComponent.getImageWorld().getImagePanel().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                super.mouseClicked(evt);
+                if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
+                    showContextMenu(evt);
+                }
+            }
+        });
     }
 
     /** Reset the combo box for the sensor panels. */
@@ -161,8 +152,27 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         }
     }
 
+    private void loadImage(ActionEvent evt) {
+        SFileChooser fileChooser = new SFileChooser(System.getProperty("user.home"), "Select an image to load");
+        fileChooser.setUseImagePreview(true);
+        File file = fileChooser.showOpenDialog();
+        if (file != null) {
+            try {
+                component.getImageWorld().loadImage(file.toString());
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Unable to load file: " + file.toString());
+            }
+        }
+    }
+
+    private void showContextMenu(MouseEvent evt) {
+        // TODO: Add support for EmitterMatrix
+        couplingMenu.setSourceModel(component.getImageWorld().getCurrentSensorMatrix());
+        contextMenu.show(component.getImageWorld().getImagePanel(), evt.getX(), evt.getY());
+    }
+
     @Override
-    protected void closing() { }
+    protected void closing() {}
 
     /**
      * Sets up menus.
@@ -173,7 +183,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         menuBar.add(fileMenu);
 
         JMenuItem loadImage = new JMenuItem("Load Image...");
-        loadImage.addActionListener(loadImageListener);
+        loadImage.addActionListener(this::loadImage);
         fileMenu.add(loadImage);
 
         fileMenu.addSeparator();

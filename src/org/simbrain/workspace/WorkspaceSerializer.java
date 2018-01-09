@@ -103,10 +103,9 @@ public class WorkspaceSerializer {
         serializeComponents(serializer, archive, zipStream);
 
         // Serialize couplings
-//        for (Coupling<?> coupling : workspace.getCouplingManager()
-//                .getCouplings()) {
-//            archive.addCoupling(coupling);
-//        }
+        for (Coupling<?> coupling : workspace.getCouplings()) {
+            archive.addCoupling(coupling);
+        }
 
         // Serialize update actions
         for (UpdateAction action : workspace.getUpdater().getUpdateManager()
@@ -173,12 +172,6 @@ public class WorkspaceSerializer {
                 .getActionList()) {
             archive.addUpdateAction(action);
         }
-
-        // Save the archive as contents.xml and save the zip file
-        ZipEntry entry = new ZipEntry("contents.xml");
-        zipStream.putNextEntry(entry);
-        archive.toXml(zipStream);
-        zipStream.finish();
     }
 
     /**

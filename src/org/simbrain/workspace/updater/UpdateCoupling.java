@@ -21,14 +21,14 @@ package org.simbrain.workspace.updater;
 import org.simbrain.workspace.Coupling;
 
 /**
- * Updates a coupling
+ * Updates a coupling.
  *
  * @author jyoshimi
  */
 public class UpdateCoupling implements UpdateAction {
 
     /** of couplings to update. */
-    private final Coupling<?> coupling;
+    private final transient Coupling<?> coupling;
 
     /**
      * Construct the action.

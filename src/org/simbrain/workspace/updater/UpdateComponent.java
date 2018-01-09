@@ -28,10 +28,10 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class UpdateComponent implements UpdateAction {
 
     /** Reference to component. */
-    private final WorkspaceComponent component;
+    private final transient WorkspaceComponent component;
 
     /** Provides access to update controls. */
-    private final WorkspaceUpdater updater;
+    private final transient WorkspaceUpdater updater;
 
     /**
      * @param updater

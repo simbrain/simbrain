@@ -36,7 +36,7 @@ import bsh.Interpreter;
 public class UpdateActionCustom implements UpdateAction {
 
     /** Provides access to workspace updater. */
-    private final WorkspaceUpdater updater;
+    private final transient WorkspaceUpdater updater;
 
     /** The custom update script in persistable string form. */
     private String scriptString;
@@ -45,10 +45,10 @@ public class UpdateActionCustom implements UpdateAction {
      * The interpreter for converting the the script into an executable update
      * action.
      */
-    private Interpreter interpreter = new Interpreter();
+    private transient Interpreter interpreter = new Interpreter();
 
     /** Custom update action. */
-    private UpdateAction theAction;
+    private transient UpdateAction theAction;
 
     /**
      * Create a new custom update action from a file containing the custom

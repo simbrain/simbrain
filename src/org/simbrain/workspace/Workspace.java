@@ -51,17 +51,17 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
 public class Workspace {
 
     /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(Workspace.class);
+    private static transient final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /** List of workspace components. */
-    private List<WorkspaceComponent> componentList = Collections.synchronizedList(
+    private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(
             new ArrayList<WorkspaceComponent>());
 
     /** Flag to indicate workspace has been changed since last save. */
-    private boolean workspaceChanged = false;
+    private transient boolean workspaceChanged = false;
 
     /** Current workspace file. */
-    private File currentFile = null;
+    private transient File currentFile = null;
 
     /**
      * A persistence representation of the time (the updater's state is not
@@ -73,18 +73,18 @@ public class Workspace {
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
      * because writes to this list are uncommon.
      */
-    private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
+    private transient CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
      * Mapping from workspace component types to integers which show how many
      * have been added. For naming new workspace components.
      */
-    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
+    private transient Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
     /**
      * The updater used to manage component updates.
      */
-    private Object updaterLock = new Object();
+    private transient Object updaterLock = new Object();
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow
@@ -93,10 +93,10 @@ public class Workspace {
     private int updateDelay = 0;
 
     /** The updater used to manage component updates. */
-    private WorkspaceUpdater updater;
+    private transient WorkspaceUpdater updater;
 
     /** The CouplingFactory for this workspace. */
-    private CouplingFactory couplingFactory = new CouplingFactory(this);
+    private transient CouplingFactory couplingFactory = new CouplingFactory(this);
 
     /**
      * Construct a workspace.
@@ -564,7 +564,7 @@ public class Workspace {
     }
 
     /** All couplings for the workspace. */
-    private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
+    private final transient List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
     public void addCoupling(Coupling<?> coupling) {
         couplings.add(coupling);
@@ -578,7 +578,7 @@ public class Workspace {
     }
 
     /** List of listeners to fire updates when couplings are changed. */
-    private List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
+    private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
 
     /**
      * Adds a new listener to be updated when changes are made.

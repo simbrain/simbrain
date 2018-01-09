@@ -264,8 +264,7 @@ public abstract class WorkspaceComponent {
      *
      * @param listener the WorkspaceComponentListener to add.
      */
-    public void removeListener(
-            final WorkspaceComponentListener listener) {
+    public void removeListener(WorkspaceComponentListener listener) {
         listeners.remove(listener);
     }
 
@@ -287,9 +286,6 @@ public abstract class WorkspaceComponent {
         // }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return name;

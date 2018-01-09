@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -45,20 +45,20 @@ public class BarChartModel extends ChartModel {
      * Bar encapsulates a single data column in the BarChartModel.
      */
     public class Bar {
-        private String key;
+        private String description;
 
-        Bar(String key) {
-            this.key = key;
-            dataset.addValue((Number)0, 1, key);
+        Bar(String description) {
+            this.description = description;
+            dataset.addValue((Number)0, 1, description);
         }
 
-        public String getId() {
-            return key;
+        public String getDescription() {
+            return description;
         }
 
-        @Consumable(idMethod="getId")
+        @Consumable(idMethod="getDescription")
         public void setValue(double value) {
-            dataset.setValue((Number)value, 1, key);
+            dataset.setValue((Number)value, 1, description);
         }
     }
 
@@ -102,12 +102,15 @@ public class BarChartModel extends ChartModel {
     }
 
     /** Add a new bar to the dataset. */
-    public void addBar() {
-        // Should fetch the name of the bar from the user
-        // Default should be "Bar" + (bars.size() + 1);
-        Bar bar = new Bar("Bar" + + (bars.size() + 1));
+    public Bar addBar() {
+        return addBar("Bar" + (bars.size() + 1));
+    }
+
+    public Bar addBar(String description) {
+        Bar bar = new Bar(description);
         bars.add(bar);
         fireDataSourceAdded(0);
+        return bar;
     }
 
     /**
@@ -120,10 +123,10 @@ public class BarChartModel extends ChartModel {
         }
     }
 
-    public void removeBar(int index) {
+    public void removeBar(String description) {
         // TODO: This won't work yet
-        dataset.removeColumn(index);
-        fireDataSourceRemoved(index);
+        dataset.removeColumn(description);
+        fireDataSourceRemoved(0);
     }
 
     /**

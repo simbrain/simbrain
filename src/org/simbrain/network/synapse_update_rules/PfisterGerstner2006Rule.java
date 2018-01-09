@@ -20,7 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.UserParameter;
+import org.simbrain.util.UserParameter;
 
 /**
  * Implementation of the model described by Pfister, J-P, Gerstner, W: Triplets

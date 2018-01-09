@@ -31,9 +31,9 @@ import javax.swing.JToolTip;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.Parameter;
-import org.simbrain.network.gui.ParameterWidget;
-import org.simbrain.network.gui.UserParameter;
+import org.simbrain.util.Parameter;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.widgets.ParameterWidget;
 
 
 /**

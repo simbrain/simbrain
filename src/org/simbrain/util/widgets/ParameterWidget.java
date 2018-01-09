@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui;
+package org.simbrain.util.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,8 @@ import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
-import org.simbrain.util.widgets.JNumberSpinnerWithNull;
-import org.simbrain.util.widgets.SpinnerNumberModelWithNull;
-import org.simbrain.util.widgets.YesNoNull;
+import org.simbrain.util.Parameter;
+import org.simbrain.util.UserParameter;
 
 /**
  * A wrapper class for a {@link Parameter} and an associated GUI widget (JComponent).

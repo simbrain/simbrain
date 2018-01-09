@@ -177,6 +177,9 @@ public class WorkspaceUpdater {
     public void run() {
         run = true;
 
+        for(WorkspaceComponent wc : workspace.getComponentList()) {
+        	wc.setRunning(true);
+        }
         workspaceUpdateExecutor.submit(() -> {
             notifyWorkspaceUpdateStarted();
 
@@ -188,6 +191,10 @@ public class WorkspaceUpdater {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            
+            for(WorkspaceComponent wc : workspace.getComponentList()) {
+            	wc.setRunning(false);
             }
 
             synchManager.releaseTasks();

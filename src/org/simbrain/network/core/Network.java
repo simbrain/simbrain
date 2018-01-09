@@ -167,6 +167,20 @@ public class Network {
     /** An optional name for the network that defaults to "Network[current_id]".*/
     private String name;
 
+    /** A counter for the total number of iterations run by this network. */
+    private int iterCount = 0;
+    
+    /** How frequently this network should fire events. */
+    private int updateFreq = 200;
+    
+    /** 
+     * A special flag for if the network is being run for a one-time single
+     * iteration.
+     */
+    private boolean oneOffRun = false;
+    
+
+    
     /** Static initializer */
     {
         try {
@@ -211,11 +225,11 @@ public class Network {
                 fireGroupUpdated(groupList.get(i)); // Groups
             }
         }
-
         // Clear input nodes
         clearInputs();
         // Update Time
         updateTime();
+        iterCount++;
         setUpdateCompleted(true);
     }
 
@@ -1881,5 +1895,25 @@ public class Network {
      */
     public void setRunning(boolean value) {
         isRunning.set(value);
+    }
+
+	public int getUpdateFreq() {
+		return updateFreq;
+	}
+
+	public void setUpdateFreq(int updateFreq) {
+		this.updateFreq = updateFreq;
+	}
+	
+    public boolean isRedrawTime() {
+    	return oneOffRun || iterCount % updateFreq == 0;
+    }
+    
+    public void setOneOffRun(boolean _oneOffRun) {
+    	this.oneOffRun = _oneOffRun;
+    }
+    
+    public boolean isOneOffRun() {
+    	return oneOffRun;
     }
 }

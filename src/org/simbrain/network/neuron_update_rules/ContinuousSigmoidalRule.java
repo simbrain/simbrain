@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunction;
@@ -131,6 +132,40 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     }
 
+    public int getNoBytes() { // bump to interface...
+    	// [ buff | netInp | netAct | leak | tau | UB | LB | slope ]
+    	return 56 + 8; // Do some reflection here... 8 is for buffer
+    }
+    
+    private int offset;
+    
+    public void update(int offset, final double[] arr) {
+    	arr[offset] = arr[offset+2]*(1-arr[offset+3]*arr[offset+4]) +
+    			arr[offset+4]*arr[offset+1];
+    	arr[offset] = sFunction.valueOf(arr[offset],
+    			arr[offset+5], arr[offset+6], arr[offset+7]);
+    }
+    
+    public int writeToArr(Network net, final double [] arr, int _offset) {
+    	offset=_offset;
+    	arr[_offset+1]=inputTerm;
+    	arr[_offset+2]=netActivation;
+    	arr[_offset+3]=leak;
+    	arr[_offset+4]=net.getTimeStep()/tau;
+    	arr[_offset+5]=getUpperBound();
+    	arr[_offset+6]=getLowerBound();
+    	arr[_offset+7]=getSlope();
+    	return _offset+8; // padding
+    }
+    
+    public void writeFromArr(Neuron neu, final double [] arr) {
+    	neu.setBuffer(arr[offset]);
+    	netActivation = arr[offset+2];
+    	leak = arr[offset+3];
+    	tau = 1/arr[offset+4] * neu.getNetwork().getTimeStep();
+    	inputTerm = arr[offset+1];
+    }
+    
     @Override
     public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();

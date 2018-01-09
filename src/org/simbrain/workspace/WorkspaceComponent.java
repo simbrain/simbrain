@@ -71,6 +71,9 @@ public abstract class WorkspaceComponent {
     /** Whether to update this component. */
     private boolean updateOn = true;
 
+    /** Whether or not this component is being iterated more than just one time.*/
+    private boolean isRunning = false;
+    
     /** The name of this component. Used in the title, in saving, etc. */
     private String name = "";
 
@@ -494,6 +497,22 @@ public abstract class WorkspaceComponent {
         this.fireComponentToggleEvent();
     }
 
+    /**
+     * Sets whether or not this component is marked as currently running... 
+     * meant to be false if only doing a one-off update
+     * @param running
+     */
+    public void setRunning(boolean running) {
+    	this.isRunning = running;
+    }
+    
+    /**
+     * @return if this component is marked as running
+     */
+    public boolean isRunning() {
+    	return isRunning;
+    }
+    
     /**
      * @return the producerTypes
      */

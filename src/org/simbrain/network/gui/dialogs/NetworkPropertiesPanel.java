@@ -122,6 +122,9 @@ public class NetworkPropertiesPanel extends JPanel {
 
     /** Network time step text field. */
     private JTextField timeStepField = new JTextField();
+    
+    /** A field for updating how often the GUI redraws the network... */
+    private JTextField iterUpdateField = new JTextField();
 
     /** Wand radius. */
     private JTextField wandRadiusField = new JTextField();
@@ -185,6 +188,7 @@ public class NetworkPropertiesPanel extends JPanel {
         // Other properties
         LabelledItemPanel miscPanel = new LabelledItemPanel();
         miscPanel.addItem("Network time step", timeStepField);
+        miscPanel.addItem("GUI update frequency", iterUpdateField);
         miscPanel.addItem("Synapse visibility threshold",
                 tfSynapseVisibilityThreshold);
         nudgeAmountField.setColumns(3);
@@ -312,6 +316,8 @@ public class NetworkPropertiesPanel extends JPanel {
         wandRadiusField.setText(Integer.toString(EditMode.getWandRadius()));
         timeStepField.setText(Double.toString(networkPanel.getNetwork()
                 .getTimeStep()));
+        iterUpdateField.setText(Integer.toString(networkPanel.getNetwork()
+        		.getUpdateFreq()));
         nudgeAmountField
                 .setText(Double.toString(NetworkPanel.getNudgeAmount()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(Network
@@ -327,6 +333,8 @@ public class NetworkPropertiesPanel extends JPanel {
     public void commitChanges() {
         networkPanel.getNetwork().setTimeStep(
                 Double.parseDouble(timeStepField.getText()));
+        networkPanel.getNetwork().setUpdateFreq(Integer
+        		.parseInt(iterUpdateField.getText()));
         NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
         Network.setSynapseVisibilityThreshold(Integer

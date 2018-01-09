@@ -489,7 +489,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons() {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -501,7 +501,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons(final Collection<Neuron> neurons) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -513,7 +513,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses() {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -525,7 +525,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses(final Collection<Synapse> synapses) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -686,7 +686,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupParameterChanged(NetworkEvent<Group> event) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 Group group = event.getObject();
@@ -725,7 +725,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 PNode groupNode = objectNodeMap.get(group);
@@ -798,6 +798,7 @@ public class NetworkPanel extends JPanel {
      * scripts).
      */
     private void updateSynapseNodes() {
+    	
         // System.out.println("In update synapse nodes");
         for (SynapseNode node : this.getSynapseNodes()) {
             if (node.getVisible()) {
@@ -2887,7 +2888,7 @@ public class NetworkPanel extends JPanel {
      * @return Returns the guiOn.
      */
     public boolean isGuiOn() {
-        return guiOn;
+        return guiOn && network.isRedrawTime();
     }
 
     /**

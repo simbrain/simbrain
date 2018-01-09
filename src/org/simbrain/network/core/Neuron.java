@@ -359,7 +359,7 @@ public class Neuron {
      * @param act
      *            the new activation value
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
@@ -368,7 +368,7 @@ public class Neuron {
     /**
      * @return the level of activation.
      */
-    @Producible
+    @Producible(idMethod="getId")
     public double getActivation() {
         return activation;
     }
@@ -662,7 +662,7 @@ public class Neuron {
      * @param inputValue
      *            The inputValue to set.
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
     }

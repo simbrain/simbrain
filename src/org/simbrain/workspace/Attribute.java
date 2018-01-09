@@ -30,12 +30,6 @@ public abstract class Attribute {
         this.baseObject = baseObject;
         this.method = method;
         this.description = description;
-        try {
-            idMethod = baseObject.getClass().getMethod("toString");
-        } catch (NoSuchMethodException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
-        }
     }
 
     /** Initializing constructor */
@@ -57,11 +51,15 @@ public abstract class Attribute {
      * Returns a string used to differentiate attributes.
      */
     public String getId() {
-        try {
-            return (String) idMethod.invoke(baseObject);
-        } catch (IllegalAccessException | InvocationTargetException ex) {
-            // Should never happen
-            throw new AssertionError(ex);
+        if (idMethod == null) {
+            return baseObject.getClass().getSimpleName();
+        } else {
+            try {
+                return (String) idMethod.invoke(baseObject);
+            } catch (IllegalAccessException | InvocationTargetException ex) {
+                // Should never happen
+                throw new AssertionError(ex);
+            }
         }
     }
 
@@ -69,11 +67,11 @@ public abstract class Attribute {
     public String toString() {
         String typeName;
         if (((Class<?>) getType()).isArray()) {
-            typeName = "ArrayOf" + ((Class<?>) getType()).getComponentType();
+            typeName = ((Class<?>) getType()).getComponentType().getSimpleName() + " array";
         } else {
-            typeName = getType().toString();
+            typeName = ((Class<?>) getType()).getSimpleName();
         }
-        return getId() + "." + typeName;
+        return getId() + " " + method.getName() + " (" + typeName + ")";
     }
 
     /** @return the description */

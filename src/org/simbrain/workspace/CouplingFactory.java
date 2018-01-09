@@ -170,7 +170,7 @@ public class CouplingFactory {
             if (annotation != null) {
                 Method idMethod = null;
                 try {
-                    idMethod = model.getClass().getMethod(annotation.idMethod(), model.getClass(), String.class);
+                    idMethod = model.getClass().getMethod(annotation.idMethod());
                 } catch (NoSuchMethodException ex) {
                     // Ignore
                 }
@@ -199,7 +199,7 @@ public class CouplingFactory {
             if (annotation != null) {
                 Method idMethod = null;
                 try {
-                    idMethod = model.getClass().getMethod(annotation.idMethod(), model.getClass(), String.class);
+                    idMethod = model.getClass().getMethod(annotation.idMethod());
                 } catch (NoSuchMethodException ex) {
                     // Ignore
                 }

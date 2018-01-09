@@ -33,6 +33,7 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
@@ -481,7 +482,7 @@ public class Workspace {
     /**
      * @return the savedTime
      */
-    protected int getSavedTime() {
+    public int getSavedTime() {
         return savedTime;
     }
 
@@ -518,7 +519,7 @@ public class Workspace {
     /**
      * Actions required prior to proper serialization.
      */
-    void preSerializationInit() {
+    public void preSerializationInit() {
         /*
          * TODO: A bit of a hack. Currently just moves trainer components to the
          * back of the list, so they are serialized last, and hence deserialized

@@ -102,7 +102,7 @@ import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
-import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.InterceptingEventQueue;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 import org.simbrain.world.dataworld.DataWorldComponent;

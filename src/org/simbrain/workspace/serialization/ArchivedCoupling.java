@@ -1,10 +1,15 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
+
+import org.simbrain.workspace.Coupling;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Class used to represent a coupling in the archive.
  *
  * @author Matt Watson
  */
+@XStreamAlias("ArchivedCoupling")
 final class ArchivedCoupling {
 
     /** The source attribute for the coupling. */

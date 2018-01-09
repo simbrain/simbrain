@@ -1,8 +1,10 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
 
 import java.io.OutputStream;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Class used to assist with serializing components.

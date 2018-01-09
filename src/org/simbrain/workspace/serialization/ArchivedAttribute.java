@@ -1,4 +1,8 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
+
+import org.simbrain.workspace.Attribute;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * The class used to represent an attribute in the archive.
@@ -6,6 +10,7 @@ package org.simbrain.workspace;
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
+@XStreamAlias("ArchivedAttribute")
 public final class ArchivedAttribute {
 
     /** The attribute id. */

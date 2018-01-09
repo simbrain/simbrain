@@ -29,7 +29,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 
 /**
  * Open a network within current workspace.

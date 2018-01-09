@@ -1,4 +1,6 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
+
+import org.simbrain.workspace.WorkspaceComponent;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -7,6 +9,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  * @author Matt Watson
  */
+@XStreamAlias("ArchivedWorkspaceComponent")
 final class ArchivedWorkspaceComponent {
 
     /** The name of the class for the component. */

@@ -37,6 +37,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 

@@ -1,6 +1,8 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
 
 import org.simbrain.workspace.updater.UpdateAction;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * A persistable form of update action that can be used to recreate the
@@ -8,6 +10,7 @@ import org.simbrain.workspace.updater.UpdateAction;
  *
  * @author Jeff Yoshimi
  */
+@XStreamAlias("ArchivedUpdateAction")
 final class ArchivedUpdateAction {
 
     /** Reference to the action itself. */

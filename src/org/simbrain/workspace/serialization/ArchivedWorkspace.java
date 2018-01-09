@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.serialization;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateAllBuffered;
@@ -33,6 +36,7 @@ import org.simbrain.workspace.updater.UpdateCoupling;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
@@ -44,6 +48,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
+@XStreamAlias("ArchivedWorkspace")
 class ArchivedWorkspace {
 
     /** A map of all the components to their uris. */
@@ -281,6 +286,11 @@ class ArchivedWorkspace {
     static XStream xstream() {
         XStream xstream = new XStream(new DomDriver());
         xstream.ignoreUnknownElements();
+        xstream.processAnnotations(ArchivedWorkspace.class);
+        xstream.processAnnotations(ArchivedWorkspaceComponent.class);
+        xstream.processAnnotations(ArchivedCoupling.class);
+        xstream.processAnnotations(ArchivedAttribute.class);
+        xstream.processAnnotations(ArchivedUpdateAction.class);
         return xstream;
     }
 

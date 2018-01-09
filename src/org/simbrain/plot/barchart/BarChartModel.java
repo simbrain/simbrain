@@ -45,20 +45,20 @@ public class BarChartModel extends ChartModel {
      * Bar encapsulates a single data column in the BarChartModel.
      */
     public class Bar {
-        private int columnIndex;
+        private String key;
 
-        Bar() {
-            columnIndex = dataset.getColumnCount();
-            dataset.addValue((Number)0, 1, columnIndex);
+        Bar(String key) {
+            this.key = key;
+            dataset.addValue((Number)0, 1, key);
         }
 
         public String getId() {
-            return "Column" + columnIndex;
+            return key;
         }
 
         @Consumable(idMethod="getId")
         public void setValue(double value) {
-            dataset.setValue((Number)value, 1, columnIndex);
+            dataset.setValue((Number)value, 1, key);
         }
     }
 
@@ -92,13 +92,6 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Default initialization.
-     */
-    public void defaultInit() {
-        addBar();
-    }
-
-    /**
      * Create specified number of bars.
      * @param numBars number of bars to add.
      */
@@ -110,9 +103,11 @@ public class BarChartModel extends ChartModel {
 
     /** Add a new bar to the dataset. */
     public void addBar() {
-        Bar bar = new Bar();
+        // Should fetch the name of the bar from the user
+        // Default should be "Bar" + (bars.size() + 1);
+        Bar bar = new Bar("Bar" + + (bars.size() + 1));
         bars.add(bar);
-        fireDataSourceAdded(bar.columnIndex);
+        fireDataSourceAdded(0);
     }
 
     /**

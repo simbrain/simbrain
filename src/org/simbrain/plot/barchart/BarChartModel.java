@@ -19,9 +19,8 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -42,12 +41,32 @@ import com.thoughtworks.xstream.XStream;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BarChartModel extends ChartModel {
 
+    /**
+     * Bar encapsulates a single data column in the BarChartModel.
+     */
+    public class Bar {
+        private int columnIndex;
+
+        Bar() {
+            columnIndex = dataset.getColumnCount();
+            dataset.addValue((Number)0, 1, columnIndex);
+        }
+
+        public String getId() {
+            return "Column" + columnIndex;
+        }
+
+        @Consumable(idMethod="getId")
+        public void setValue(double value) {
+            dataset.setValue((Number)value, 1, columnIndex);
+        }
+    }
+
     /** JFreeChart dataset for bar charts. */
     @XmlJavaTypeAdapter(ChartDataAdapter.class)
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    /** Initial number of data sources. */
-    private static final int INITIAL_DATA_SOURCES = 6;
+    private List<Bar> bars = new ArrayList<Bar>();
 
     /** Color of bars in barchart. */
     private Color barColor = Color.red;
@@ -60,8 +79,6 @@ public class BarChartModel extends ChartModel {
 
     /** Minimum range. */
     private double lowerBound = 0;
-
-    // private Range chartRange = new Range(0, 10);
 
     /** Bar chart model constructor. */
     public BarChartModel() {}
@@ -78,49 +95,38 @@ public class BarChartModel extends ChartModel {
      * Default initialization.
      */
     public void defaultInit() {
-        addDataSources(1);
+        addBar();
     }
 
     /**
-     * Create specified number of set of data sources. Adds these two existing data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
+     * Create specified number of bars.
+     * @param numBars number of bars to add.
      */
-    public void addDataSources(int numDataSources) {
-        int currentIndex = dataset.getColumnCount();
-        for (int i = 0; i < numDataSources; i++) {
-            addColumn(currentIndex + i);
+    public void addBars(int numBars) {
+        for (int i = 0; i < numBars; i++) {
+            addBar();
         }
     }
 
-    /**
-     * Adds a new column to the dataset.
-     * @param index
-     */
-    public void addColumn(int index) {
-        dataset.addValue(0, new Integer(1), new Integer(index + 1));
-        fireDataSourceAdded(index);
-    }
-
-    /**
-     * Adds a bar to the bar chart dataset.
-     */
-    public void addColumn() {
-        addColumn(dataset.getColumnCount());
+    /** Add a new bar to the dataset. */
+    public void addBar() {
+        Bar bar = new Bar();
+        bars.add(bar);
+        fireDataSourceAdded(bar.columnIndex);
     }
 
     /**
      * Removes the last bar from the bar chart data.
      */
-    public void removeColumn() {
+    public void removeBar() {
         if (dataset.getColumnCount() > 0) {
-            removeColumn(dataset.getColumnCount() - 1);
+            bars.remove(bars.size() - 1);
+            fireDataSourceRemoved(bars.size() - 1);
         }
     }
 
-    // TODO: Change names from row / column to "bars"?
-
-    public void removeColumn(final int index) {
+    public void removeBar(int index) {
+        // TODO: This won't work yet
         dataset.removeColumn(index);
         fireDataSourceRemoved(index);
     }
@@ -210,38 +216,15 @@ public class BarChartModel extends ChartModel {
      * @param lowerBound the lower range boundary.
      * @param upperBound the upper range boundary.
      */
-    public void setRange(final double lowerBound, final double upperBound) {
+    public void setRange(double lowerBound, double upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         fireSettingsChanged();
     }
 
-    /**
-     * Set the values for all the bars using an array.
-     *
-     * @param input the values for the bars as an array
-     */
-    @Consumable
-    public void setBars(double[] input) {
-        for (int i = 0; i < input.length; i++) {
-            getDataset().setValue((Number) input[i], new Integer(1), i);
-        }
-    }
-
-    //TODO
-    public List<Integer> getBarIndices() {
-        return IntStream.range(0, dataset.getColumnCount()).boxed().collect(Collectors.toList());
-    }
-
-    /**
-     * Set value of a specified bar.
-     *
-     * @param value value of bar
-     * @param index which bar value to set
-     */
-    @Consumable()
-    public void setValue(final double value, final Integer index) {
-        getDataset().setValue(value, new Integer(1), index);
+    /** Return a list of all bars used by this BarChartModel. */
+    public List<Bar> getBars() {
+        return bars;
     }
 
     static class ChartDataAdapter extends XmlAdapter<Number[][], DefaultCategoryDataset> {

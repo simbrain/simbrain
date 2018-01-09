@@ -39,10 +39,9 @@ public class BarChartComponent extends WorkspaceComponent {
      *
      * @param name chart name
      */
-    public BarChartComponent(final String name) {
+    public BarChartComponent(String name) {
         super(name);
         model = new BarChartModel();
-        model.defaultInit();
         initModelListener();
     }
 
@@ -53,7 +52,7 @@ public class BarChartComponent extends WorkspaceComponent {
      * @param name chart name
      * @param model chart model
      */
-    public BarChartComponent(final String name, final BarChartModel model) {
+    public BarChartComponent(String name, BarChartModel model) {
         super(name);
         this.model = model;
         initModelListener();
@@ -63,12 +62,12 @@ public class BarChartComponent extends WorkspaceComponent {
      * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
-     * @param numDataSources number of data sources to initialize plot with
+     * @param numBars number of bars in plot
      */
-    public BarChartComponent(final String name, final int numDataSources) {
+    public BarChartComponent(String name, int numBars) {
         super(name);
         model = new BarChartModel();
-        model.addDataSources(numDataSources);
+        model.addBars(numBars);
         initModelListener();
     }
 
@@ -142,6 +141,7 @@ public class BarChartComponent extends WorkspaceComponent {
     public List<Object> getModels() {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
+        models.addAll(model.getBars());
         return models;
     }
 }

@@ -175,28 +175,14 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * Deserializes all the entries in the provided stream.
-     *
-     * @param stream The input stream.
-     * @throws IOException If an IO error occurs.
-     */
-    public void deserialize(final InputStream stream) throws IOException {
-        Collection<? extends String> empty = Collections.emptySet();
-        deserialize(stream, empty);
-    }
-
-    // TODO: Remove exclude thing?
-    /**
      * Creates a workspace from a zip compressed input stream.
      *
      * @param stream The stream to read from. This is expected to be zip
      *            compressed.
-     * @param exclude The list of uris to ignore on import.
      * @throws IOException if an IO error occurs.
      */
     @SuppressWarnings("unchecked")
-    public void deserialize(final InputStream stream,
-            final Collection<? extends String> exclude) throws IOException {
+    public void deserialize(final InputStream stream) throws IOException {
 
         // Populate the byte stream BUFFER_SIZE at a time and create a zip input
         // stream (currently 1 kb at a time).
@@ -254,9 +240,6 @@ public class WorkspaceSerializer {
         if (contents.getArchivedComponents() != null) {
             for (ArchiveContents.ArchivedComponent archivedComponent : contents
                     .getArchivedComponents()) {
-                if (exclude.contains(archivedComponent.getUri())) {
-                    continue;
-                }
 
                 WorkspaceComponent wc = componentDeserializer
                         .deserializeWorkspaceComponent(archivedComponent,
@@ -285,19 +268,10 @@ public class WorkspaceSerializer {
             for (ArchiveContents.ArchivedCoupling couplingRef : contents
                     .getArchivedCouplings()) {
  
-                // if (exclude.contains(couplingRef.getArchivedProducer()
-                // .getParentRef())
-                // || exclude.contains(couplingRef.getArchivedProducer()
-                // .getParentRef())) {
-                // continue;
-                // }
-
-
-                //TODO
-//                CouplingFactory cf = workspace.getCouplingFactory();
-//                Producer<?> producer = cf.getProducer(couplingRef);
-//                Consumer<?> consumer = cf.getConsumer(couplingRef);
-//                cf.tryCoupling(producer, consumer);
+                CouplingFactory cf = workspace.getCouplingFactory();
+                //Producer<?> producer = cf.getProducer(cf.getObject(couplingRef));
+                //Consumer<?> consumer = cf.getConsumer(cf.getObject(couplingRef));
+                //cf.tryCoupling(producer, consumer);
                 
             }
         }

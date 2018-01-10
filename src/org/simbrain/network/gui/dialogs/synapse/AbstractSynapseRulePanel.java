@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -29,24 +28,6 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianCPCARulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianThresholdRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.OjaRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.STDPRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ShortTermPlasticityRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.SubtractiveNormalizationRulePanel;
-import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
-import org.simbrain.network.synapse_update_rules.HebbianRule;
-import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
-import org.simbrain.network.synapse_update_rules.OjaRule;
-import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule;
-import org.simbrain.network.synapse_update_rules.STDPRule;
-import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
-import org.simbrain.network.synapse_update_rules.TestAnnotatedRule;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -55,37 +36,6 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public abstract class AbstractSynapseRulePanel extends JPanel {
 
-    /**
-     * A mapping of available update rules to their respective panels. Used as a
-     * reference (especially for combo-boxes) by GUI classes.
-     */
-    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP =
-        new LinkedHashMap<String, AbstractSynapseRulePanel>();
-
-    // Populate synapse rule map
-    static {
-        // TODO: Backwards compatibility. Remove for 3.0 after converting all
-        // sims
-        RULE_MAP.put(new StaticSynapseRule().getName(),
-            new StaticSynapsePanel());
-        RULE_MAP
-            .put(new HebbianRule().getName(),
-                    new SynapseRuleUserParamPanel(new HebbianRule()));
-        RULE_MAP.put(new HebbianCPCARule().getName(),
-            new HebbianCPCARulePanel());
-        RULE_MAP.put(new HebbianThresholdRule().getName(),
-            new HebbianThresholdRulePanel());
-        RULE_MAP.put(new OjaRule().getName(), new OjaRulePanel());
-        RULE_MAP.put(new PfisterGerstner2006Rule().getName(),
-            new SynapseRuleUserParamPanel(new PfisterGerstner2006Rule()));
-        //RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
-        //    new ShortTermPlasticityRulePanel());
-        RULE_MAP.put(new STDPRule().getName(), new STDPRulePanel());
-        RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
-            new SubtractiveNormalizationRulePanel());
-        RULE_MAP.put(new TestAnnotatedRule().getName(),
-            new SynapseRuleUserParamPanel(new TestAnnotatedRule()));
-    }
 
     /**
      * A flag used to indicate whether this panel will be replacing synapse
@@ -214,13 +164,6 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
-    }
-
-    /**
-     * @return the ruleList
-     */
-    public static String[] getRuleList() {
-        return RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]);
     }
 
     /**

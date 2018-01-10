@@ -42,7 +42,7 @@ import org.simbrain.util.widgets.ParameterWidget;
  * 
  * @author O. J. Coleman
  */
-public class SynapseRuleUserParamPanel extends AbstractSynapseRulePanel {
+public class SynapseRulePropertiesPanel extends AbstractSynapseRulePanel {
 
     /**
      * The available parameters, as a map from Parameter to input gui component
@@ -58,7 +58,7 @@ public class SynapseRuleUserParamPanel extends AbstractSynapseRulePanel {
      * Create a new SynapseRuleUserParamPanel for the given rule.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public SynapseRuleUserParamPanel(SynapseUpdateRule prototypeRule) {
+    public SynapseRulePropertiesPanel(SynapseUpdateRule prototypeRule) {
         this();
         setRule(prototypeRule);
     }
@@ -68,7 +68,7 @@ public class SynapseRuleUserParamPanel extends AbstractSynapseRulePanel {
      * {@link #setRule(SynapseUpdateRule)} must be set before other methods are
      * called. Mostly for internal use.
      */
-    public SynapseRuleUserParamPanel() {
+    public SynapseRulePropertiesPanel() {
     }
 
     public void setRule(SynapseUpdateRule prototypeRule) {
@@ -95,8 +95,8 @@ public class SynapseRuleUserParamPanel extends AbstractSynapseRulePanel {
     }
 
     @Override
-    public SynapseRuleUserParamPanel deepCopy() {
-        SynapseRuleUserParamPanel copy;
+    public SynapseRulePropertiesPanel deepCopy() {
+        SynapseRulePropertiesPanel copy;
 
         try {
             copy = this.getClass().getConstructor().newInstance();

@@ -109,7 +109,7 @@ public final class SynapseDialog extends StandardDialog {
      * 
      * @param synapseList the logical synapses being adjusted
      */
-    private SynapseDialog(final Collection<Synapse> synapseList) {
+    private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = SynapsePropertiesPanel
                 .createSynapsePropertiesPanel(synapseList, this);
@@ -123,7 +123,7 @@ public final class SynapseDialog extends StandardDialog {
      * @param synapseList
      * @param parent
      */
-    private SynapseDialog(final Collection<Synapse> synapseList,
+    private SynapseDialog(final List<Synapse> synapseList,
             final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;

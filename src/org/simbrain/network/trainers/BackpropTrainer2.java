@@ -83,6 +83,8 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Error. */
     private List<DoubleMatrix> errors = new ArrayList<DoubleMatrix>();
+    
+    private List<DoubleMatrix> derivs = new ArrayList<DoubleMatrix>();
 
     /**
      * Input layer. Holds current input vector from input dataset. Separate for
@@ -146,6 +148,7 @@ public class BackpropTrainer2 extends IterableTrainer {
                 layers.add(DoubleMatrix.zeros(ng.size()));
                 netInputs.add(DoubleMatrix.zeros(ng.size()));
                 errors.add(DoubleMatrix.zeros(ng.size()));
+                derivs.add(DoubleMatrix.zeros(ng.size()));
                 DoubleMatrix bs = new DoubleMatrix(ng.getBiases());
                 biases.add(bs);
                 lastBiasUpdates.add(DoubleMatrix.zeros(bs.rows, bs.columns));
@@ -179,11 +182,14 @@ public class BackpropTrainer2 extends IterableTrainer {
         if (updateMethod == UpdateMethod.EPOCH) {
             for (int row = 0; row < numTrainingExamples; row++) {
                 mse += updateBackprop(row);
-//                if (count == 9999) {
+                if (count == 9999) {
 //                    System.out.println(
 //                            10 * (targetData.getColumn(row).data[0] - 0.5) + " "
 //                                    + 10 * (layers.get(1).data[0] - 0.5));
-//                }
+                    System.out.println(
+                            (targetData.getColumn(row).data[0]) + " "
+                                    + (layers.get(1).data[0]));
+                }
             }
             mse = mse / numTrainingExamples;
         } else if (updateMethod == UpdateMethod.STOCHASTIC) {
@@ -330,9 +336,12 @@ public class BackpropTrainer2 extends IterableTrainer {
             // The derivative for the logistic function has been
             // HARD CODED here!!!!
             DoubleMatrix currentLayer = layers.get(layerIndex);
-            DoubleMatrix derivs = currentLayer.rsub(1);
-            derivs.muli(currentLayer);
-            // updateRules.get(layerIndex).getDerivative(currentLayer, derivs);
+            //DoubleMatrix derivsLoc = derivs.get(layerIndex);
+            DoubleMatrix derivsLoc = currentLayer.rsub(1);
+            derivsLoc.muli(currentLayer);
+
+            
+            updateRules.get(layerIndex).getDerivative(currentLayer, derivsLoc);
 
             // System.out.println("Deriv: " + derivs);
 
@@ -343,7 +352,7 @@ public class BackpropTrainer2 extends IterableTrainer {
             for (int ii = 0; ii < currentLayer.length; ii++) {
                 for (int jj = 0; jj < prevLayer.length; jj++) {
                     double deltaVal = learningRate * error.data[ii]
-                            * derivs.data[ii] * prevLayer.data[jj]
+                            * derivsLoc.data[ii] * prevLayer.data[jj]
                             + (momentum * lastDeltas.data[ii]);
 
                     wm.data[kk] += deltaVal;
@@ -353,7 +362,7 @@ public class BackpropTrainer2 extends IterableTrainer {
             }
             for (int ii = 0; ii < biasVector.length; ii++) {
                 double deltaVal = learningRate * error.data[ii]
-                        * derivs.data[ii]
+                        * derivsLoc.data[ii]
                         + (momentum * lastBiasDeltas.data[ii]);
                 // System.out.println(deltaVal);
                 biasVector.data[ii] += deltaVal;

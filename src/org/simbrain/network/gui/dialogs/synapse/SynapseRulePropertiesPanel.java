@@ -45,7 +45,7 @@ import org.simbrain.util.widgets.ParameterWidget;
 public class SynapseRulePropertiesPanel extends AbstractSynapseRulePanel {
 
     /**
-     * The available parameters, as a map from Parameter to input gui component
+     * The available parameters, as a map from Parameter to input gui component.
      */
     protected Set<ParameterWidget> params;
 

@@ -83,9 +83,10 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Error. */
     private List<DoubleMatrix> errors = new ArrayList<DoubleMatrix>();
-    
-    private List<DoubleMatrix> derivs = new ArrayList<DoubleMatrix>();
 
+    /** Holder for derivatives. */
+    private List<DoubleMatrix> derivs = new ArrayList<DoubleMatrix>();
+    
     /**
      * Input layer. Holds current input vector from input dataset. Separate for
      * simpler indexing on other lists.
@@ -110,7 +111,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Possible update methods. */
     public static enum UpdateMethod {
-        EPOCH, BATCH, STOCHASTIC, MINI_BATCH;
+        EPOCH, BATCH, STOCHASTIC, MINI_BATCH, SINGLE;
     }
 
     /** Current update method. */
@@ -148,7 +149,6 @@ public class BackpropTrainer2 extends IterableTrainer {
                 layers.add(DoubleMatrix.zeros(ng.size()));
                 netInputs.add(DoubleMatrix.zeros(ng.size()));
                 errors.add(DoubleMatrix.zeros(ng.size()));
-                derivs.add(DoubleMatrix.zeros(ng.size()));
                 DoubleMatrix bs = new DoubleMatrix(ng.getBiases());
                 biases.add(bs);
                 lastBiasUpdates.add(DoubleMatrix.zeros(bs.rows, bs.columns));
@@ -168,10 +168,9 @@ public class BackpropTrainer2 extends IterableTrainer {
     }
 
     int count = 0;
-
     @Override
     public void apply() {
-        count++;
+    	
         int numTrainingExamples = getMinimumNumRows(network);
 
         // System.out.println("=== Before: ===\n");
@@ -182,21 +181,18 @@ public class BackpropTrainer2 extends IterableTrainer {
         if (updateMethod == UpdateMethod.EPOCH) {
             for (int row = 0; row < numTrainingExamples; row++) {
                 mse += updateBackprop(row);
-                if (count == 9999) {
-//                    System.out.println(
-//                            10 * (targetData.getColumn(row).data[0] - 0.5) + " "
-//                                    + 10 * (layers.get(1).data[0] - 0.5));
-                    System.out.println(
-                            (targetData.getColumn(row).data[0]) + " "
-                                    + (layers.get(1).data[0]));
+                if (count==9999) {
+                	System.out.println(10*(targetData.getColumn(row).data[0]-0.5) + " " + 10*(layers.get(1).data[0]-0.5));
                 }
             }
             mse = mse / numTrainingExamples;
         } else if (updateMethod == UpdateMethod.STOCHASTIC) {
             int rowNum = ThreadLocalRandom.current()
                     .nextInt(numTrainingExamples);
-            // System.out.println(10*(targetData.getColumn(rowNum).data[0]-0.5));
+          //  System.out.println(10*(targetData.getColumn(rowNum).data[0]-0.5));
             mse = updateBackprop(rowNum);
+        } else if (updateMethod == UpdateMethod.SINGLE) {
+        	mse = updateBackprop(count % numTrainingExamples);
         }
         // TODO: Other update types
 
@@ -242,6 +238,8 @@ public class BackpropTrainer2 extends IterableTrainer {
         for (int j = 0; j < outputError.length; j++) {
             error += (outputError.get(j) * outputError.get(j));
         }
+        
+        count++;
         mse = error / network.getOutputNeurons().size();
         return mse;
 
@@ -336,14 +334,15 @@ public class BackpropTrainer2 extends IterableTrainer {
             // The derivative for the logistic function has been
             // HARD CODED here!!!!
             DoubleMatrix currentLayer = layers.get(layerIndex);
+            // updateRules.get(layerIndex).getDerivative(currentLayer, derivs);
+
             //DoubleMatrix derivsLoc = derivs.get(layerIndex);
             DoubleMatrix derivsLoc = currentLayer.rsub(1);
             derivsLoc.muli(currentLayer);
 
             
             updateRules.get(layerIndex).getDerivative(currentLayer, derivsLoc);
-
-            // System.out.println("Deriv: " + derivs);
+           // // System.out.println("Deriv: " + derivs);
 
             // Update the weights
             // Note: JBlas data laid out in a 1-d array
@@ -353,7 +352,7 @@ public class BackpropTrainer2 extends IterableTrainer {
                 for (int jj = 0; jj < prevLayer.length; jj++) {
                     double deltaVal = learningRate * error.data[ii]
                             * derivsLoc.data[ii] * prevLayer.data[jj]
-                            + (momentum * lastDeltas.data[ii]);
+                           + (momentum * lastDeltas.data[ii]);
 
                     wm.data[kk] += deltaVal;
                     lastDeltas.data[kk] = deltaVal;
@@ -389,7 +388,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     public void randomize() {
         for (int kk = 0; kk < weightMatrices.size(); ++kk) {
             for (int ii = 0; ii < weightMatrices.get(kk).data.length; ii++) {
-                weightMatrices.get(kk).data[ii] = rand.getRandom();
+                 weightMatrices.get(kk).data[ii] =  rand.getRandom();
             }
         }
 
@@ -403,7 +402,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     /**
      * Print debug info.
      */
-    public void printDebugInfo() {
+    private void printDebugInfo() {
         System.out.println("---------------------------");
         System.out.println("Targets: " + targetVector);
         System.out.println("Node Layer 1");
@@ -542,6 +541,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         }
 
         _x.mmuli(_A, _y);
+        _y.divi(_y.data.length);
 
         if (wasColX) {
             // Fast transpose back

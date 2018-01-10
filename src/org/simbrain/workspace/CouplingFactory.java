@@ -224,8 +224,8 @@ public class CouplingFactory {
      */
     public Consumer<?> getConsumer(Object model, String methodName) {
         return getConsumersFromModel(model).stream().filter(
-                c -> c.getMethod().getName().equalsIgnoreCase(methodName))
-                .findFirst().get();
+                c -> c.getMethod().getName().equalsIgnoreCase(methodName)
+        ).findFirst().get();
     }
 
     /**

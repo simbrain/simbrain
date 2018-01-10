@@ -1,48 +1,56 @@
 package org.simbrain.workspace.serialization;
 
-import org.simbrain.workspace.Coupling;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Class used to represent a coupling in the archive.
  *
  * @author Matt Watson
  */
-@XStreamAlias("ArchivedCoupling")
-final class ArchivedCoupling {
+class ArchivedCoupling {
 
     /** The source attribute for the coupling. */
-    private final ArchivedAttribute archivedProducer;
+    private ArchivedAttribute producer;
 
     /** The target attribute for the coupling. */
-    private final ArchivedAttribute archivedConsumer;
+    private ArchivedAttribute consumer;
 
     /**
      * Creates a new instance.
-     *
-     * @param parent The parent archive.
-     * @param coupling The coupling this instance represents.
+     * @param producer The producer attribute.
+     * @param consumer The consumer attribute.
      */
-    ArchivedCoupling(final ArchivedWorkspace parent,
-            final Coupling<?> coupling) {
-
-        this.archivedProducer = new ArchivedAttribute(parent, coupling.getProducer());
-        this.archivedConsumer = new ArchivedAttribute(parent, coupling.getConsumer());
+    ArchivedCoupling(ArchivedAttribute producer, ArchivedAttribute consumer) {
+        this.producer = producer;
+        this.consumer = consumer;
     }
 
-    /**
-     * @return the archivedProducer
-     */
-    public ArchivedAttribute getArchivedProducer() {
-        return archivedProducer;
+    public ArchivedAttribute getProducer() {
+        return producer;
     }
 
-    /**
-     * @return the archivedConsumer
-     */
-    public ArchivedAttribute getArchivedConsumer() {
-        return archivedConsumer;
+    public ArchivedAttribute getConsumer() {
+        return consumer;
+    }
+
+    public Producer createProducer(Workspace workspace) {
+        Object object = getObjectFromWorkspace(workspace, producer);
+        String method = producer.getMethodName();
+        return workspace.getCouplingFactory().getProducer(object, method);
+    }
+
+    public Consumer createConsumer(Workspace workspace) {
+        Object object = getObjectFromWorkspace(workspace, consumer);
+        String method = consumer.getMethodName();
+        return workspace.getCouplingFactory().getConsumer(object, method);
+    }
+
+    private Object getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
+        WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
+        return component.getObjectFromKey(attribute.getId());
     }
 
 }

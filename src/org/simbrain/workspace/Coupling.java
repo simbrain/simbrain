@@ -31,26 +31,13 @@ public class Coupling<T> {
 
     @Override
     public String toString() {
-        String producerString;
-        String producerComponent = "";
-        String consumerString;
-        String consumerComponent = "";
-        if (producer == null) {
-            producerString = "None";
-        } else {
-            producerString = producer.toString();
-        }
-        if (consumer == null) {
-            consumerString = "None";
-        } else {
-            consumerString = consumer.toString();
-        }
-        return producerComponent + " " + producerString + " --> "
-                + consumerComponent + " " + consumerString;
+        String producerString = producer == null ? "None" : producer.toString();
+        String consumerString = consumer == null ? "None" : consumer.toString();
+        return producerString + " > " + consumerString;
     }
 
     public String getId() {
-        return producer.getId() + ">" + consumer.getId();
+        return producer.getId() + " > " + consumer.getId();
     }
 
     /**

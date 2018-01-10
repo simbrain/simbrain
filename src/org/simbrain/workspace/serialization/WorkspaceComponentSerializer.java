@@ -25,7 +25,7 @@ public class WorkspaceComponentSerializer {
      * @param component The component to return an id for.
      * @return The component's id.
      */
-    int getId(final WorkspaceComponent component) {
+    int getId(WorkspaceComponent component) {
         Integer id = componentIds.get(component);
         if (id == null) {
             id = lastComponent++;
@@ -42,8 +42,7 @@ public class WorkspaceComponentSerializer {
      * @param stream The stream to write to
      * @return The id for the component that was serialized.
      */
-    int serializeComponent(final WorkspaceComponent component,
-            OutputStream stream) {
+    int serializeComponent(WorkspaceComponent component, OutputStream stream) {
         component.save(stream, null);
         return getId(component);
     }

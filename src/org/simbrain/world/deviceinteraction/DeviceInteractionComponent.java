@@ -1,6 +1,5 @@
 package org.simbrain.world.deviceinteraction;
 
-import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 

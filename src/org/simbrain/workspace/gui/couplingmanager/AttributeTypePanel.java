@@ -31,7 +31,6 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
 
@@ -44,7 +43,7 @@ public class AttributeTypePanel extends JPanel {
     private JTable table;
 
     /** Table model. */
-    private AttributeTypeModel model;
+    //private AttributeTypeModel model;
 
     /**
      * Workspace component list panel constructor.
@@ -57,8 +56,8 @@ public class AttributeTypePanel extends JPanel {
         super(new BorderLayout());
 
         // Set up table
-        model = new AttributeTypeModel();
-        table = new JTable(model);
+        //model = new AttributeTypeModel();
+        //table = new JTable(model);
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
                 .setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(false);
@@ -91,103 +90,82 @@ public class AttributeTypePanel extends JPanel {
     /**
      * Table model which represents workspace components.
      */
-    class AttributeTypeModel extends AbstractTableModel {
-
-        /** Column names. */
-        String[] columnNames = { "Name", "Data Type", "Visible" };
-
-        /** Internal list of components. */
-        private List<AttributeType> data = new ArrayList<AttributeType>();
-
-        public void addRow(AttributeType type) {
-            data.add(type);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int getColumnCount() {
-            return columnNames.length;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int getRowCount() {
-            return data.size();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Object getValueAt(int row, int col) {
-            switch (col) {
-            case 0:
-                return data.get(row).getBaseDescription();
-            case 1:
-                return data.get(row).getDataType().getSimpleName();
-            case 2:
-                return data.get(row).isVisible();
-            default:
-                return null;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void setValueAt(Object value, int row, int col) {
-            switch (col) {
-            case 0:
-                return;
-            case 1:
-                return;
-            case 2:
-                data.get(row).setVisible((Boolean) value);
-                return;
-            }
-            this.fireTableDataChanged();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean isCellEditable(int row, int col) {
-            switch (col) {
-            case 0:
-                return false;
-            case 1:
-                return false;
-            case 2:
-                return true;
-            default:
-                return false;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Class getColumnClass(int col) {
-            switch (col) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return Boolean.class;
-            default:
-                return null;
-            }
-        }
-
-    }
+//    class AttributeTypeModel extends AbstractTableModel {
+//
+//        /** Column names. */
+//        String[] columnNames = { "Name", "Data Type", "Visible" };
+//
+//        /** Internal list of components. */
+//        private List<AttributeType> data = new ArrayList<AttributeType>();
+//
+//        public void addRow(AttributeType type) {
+//            data.add(type);
+//        }
+//
+//        public int getColumnCount() {
+//            return columnNames.length;
+//        }
+//
+//        public String getColumnName(int col) {
+//            return columnNames[col];
+//        }
+//
+//        public int getRowCount() {
+//            return data.size();
+//        }
+//
+//        public Object getValueAt(int row, int col) {
+//            switch (col) {
+//            case 0:
+//                return data.get(row).getBaseDescription();
+//            case 1:
+//                return data.get(row).getDataType().getSimpleName();
+//            case 2:
+//                return data.get(row).isVisible();
+//            default:
+//                return null;
+//            }
+//        }
+//
+//        public void setValueAt(Object value, int row, int col) {
+//            switch (col) {
+//            case 0:
+//                return;
+//            case 1:
+//                return;
+//            case 2:
+//                data.get(row).setVisible((Boolean) value);
+//                return;
+//            }
+//            this.fireTableDataChanged();
+//        }
+//
+//        public boolean isCellEditable(int row, int col) {
+//            switch (col) {
+//            case 0:
+//                return false;
+//            case 1:
+//                return false;
+//            case 2:
+//                return true;
+//            default:
+//                return false;
+//            }
+//        }
+//
+//        public Class getColumnClass(int col) {
+//            switch (col) {
+//            case 0:
+//                return String.class;
+//            case 1:
+//                return String.class;
+//            case 2:
+//                return Boolean.class;
+//            default:
+//                return null;
+//            }
+//        }
+//
+//    }
 
 }

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**

@@ -42,17 +42,8 @@ public abstract class WorkspaceComponent {
     /** The set of all WorkspaceComponentListeners on this component. */
     private Collection<WorkspaceComponentListener> listeners;
 
-    /** List of attribute listeners. */
-    private Collection<AttributeListener> attributeListeners;
-
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
-
-    /** List of producer types. */
-    private List<AttributeType> producerTypes = new ArrayList<AttributeType>();
-
-    /** List of consumer types. */
-    private List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -88,7 +79,6 @@ public abstract class WorkspaceComponent {
     /** Initializer */
     {
         listeners = new HashSet<WorkspaceComponentListener>();
-        attributeListeners = new HashSet<AttributeListener>();
     }
 
     /**
@@ -432,55 +422,9 @@ public abstract class WorkspaceComponent {
     public boolean isRunning() {
     	return isRunning;
     }
-    
-    /**
-     * @return the producerTypes
-     */
-    public List<AttributeType> getProducerTypes() {
-        return Collections.unmodifiableList(producerTypes);
-    }
 
-    /**
-     * @return the consumerTypes
-     */
-    public List<AttributeType> getConsumerTypes() {
-        return Collections.unmodifiableList(consumerTypes);
-    }
-
-    /**
-     * Return visible producer types.
-     *
-     * @return the visible producerTypes
-     */
-    public List<AttributeType> getVisibleProducerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getProducerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * Return visible consumer types.
-     *
-     * @return the visible consumerTypes
-     */
-    public List<AttributeType> getVisibleConsumerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getConsumerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * @return the serializePriority
-     */
-    protected int getSerializePriority() {
+    /** Return the serializePriority */
+    public int getSerializePriority() {
         return serializePriority;
     }
 

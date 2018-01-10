@@ -75,8 +75,7 @@ class ArchivedWorkspace {
      * @param workspace references to parent workspace
      * @param serializer The component serializer for this archive.
      */
-    ArchivedWorkspace(final Workspace workspace,
-            final WorkspaceComponentSerializer serializer) {
+    ArchivedWorkspace(Workspace workspace, WorkspaceComponentSerializer serializer) {
         this.workspaceParameters = workspace;
         this.serializer = serializer;
     }
@@ -87,10 +86,8 @@ class ArchivedWorkspace {
      * @param workspaceComponent The workspace component to add.
      * @return The component created for this WorkspaceComponent.
      */
-    ArchivedWorkspaceComponent addComponent(
-            final WorkspaceComponent workspaceComponent) {
-        ArchivedWorkspaceComponent component = new ArchivedWorkspaceComponent(
-                serializer, workspaceComponent);
+    ArchivedWorkspaceComponent addComponent(WorkspaceComponent workspaceComponent) {
+        ArchivedWorkspaceComponent component = new ArchivedWorkspaceComponent(serializer, workspaceComponent);
         archivedComponents.add(component);
         componentUris.put(workspaceComponent, component.uri);
         return component;
@@ -172,7 +169,6 @@ class ArchivedWorkspace {
                 return component;
             }
         }
-
         return null;
     }
 
@@ -248,10 +244,8 @@ class ArchivedWorkspace {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    ArchivedCoupling addCoupling(final Coupling<?> coupling) {
-        ArchivedCoupling c = new ArchivedCoupling(this, coupling);
-        archivedCouplings.add(c);
-        return c;
+    void addCoupling(ArchivedCoupling coupling) {
+        archivedCouplings.add(coupling);
     }
 
     /**

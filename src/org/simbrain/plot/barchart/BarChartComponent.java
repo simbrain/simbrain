@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -34,9 +36,6 @@ public class BarChartComponent extends WorkspaceComponent {
 
     /** Data model. */
     private BarChartModel model;
-
-    /** Coupling listener to dynamically manage bars. */
-    private BarChartCouplingListener couplingListener;
 
     /**
      * Create new BarChart Component.
@@ -80,16 +79,13 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void initModelListener() {
         model.addListener(new ChartListener() {
-            public void dataSourceAdded(final int index) {
-                // TODO: Fix this
-                fireModelAdded(null);
+            public void dataSourceAdded(ChartDataSource source) {
+                fireModelAdded(source);
             }
 
-            public void dataSourceRemoved(final int index) {
-                fireModelRemoved(null);
+            public void dataSourceRemoved(ChartDataSource source) {
+                fireModelRemoved(source);
             }
-
-            public void chartInitialized(int numSources) {}
         });
     }
 
@@ -97,12 +93,20 @@ public class BarChartComponent extends WorkspaceComponent {
     public void setWorkspace(Workspace workspace) {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
-        couplingListener = new BarChartCouplingListener(getWorkspace(), model);
+        workspace.addCouplingListener(new BarChartCouplingListener(getWorkspace(), model));
     }
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        return model;
+        if (objectKey.equals(model.getId())) {
+            return model;
+        } else {
+            Optional<BarChartModel.Bar> bar = model.getBar(objectKey);
+            if (bar.isPresent()) {
+                return bar.get();
+            }
+        }
+        return null;
     }
 
     /**
@@ -122,10 +126,8 @@ public class BarChartComponent extends WorkspaceComponent {
      * @param format format
      * @return bar chart component to be opened
      */
-    public static BarChartComponent open(final InputStream input,
-            final String name, final String format) {
-        BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream()
-                .fromXML(input);
+    public static BarChartComponent open(InputStream input, String name, String format) {
+        BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream().fromXML(input);
         return new BarChartComponent(name, dataModel);
     }
 
@@ -153,7 +155,6 @@ public class BarChartComponent extends WorkspaceComponent {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
         models.addAll(model.getBars());
-        models.add(couplingListener);
         return models;
     }
 }

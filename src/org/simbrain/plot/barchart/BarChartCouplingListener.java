@@ -12,14 +12,13 @@ public class BarChartCouplingListener implements CouplingListener {
     public BarChartCouplingListener(Workspace workspace, BarChartModel model) {
         this.workspace = workspace;
         this.model = model;
-        workspace.addCouplingListener(this);
         couplingFactory = workspace.getCouplingFactory();
     }
 
     public void couplingAdded(Coupling<?> coupling) {
-        if (coupling.getConsumer().getBaseObject() == this) {
+        if (coupling.getConsumer().getBaseObject() == model) {
             Producer<?> producer = coupling.getProducer();
-            String description = "BarChart" + producer.getId();
+            String description = "Bar" + producer.getId();
             BarChartModel.Bar bar = model.addBar(description);
             Consumer<?> consumer = couplingFactory.getConsumer(bar, "setValue");
             couplingFactory.tryCoupling(producer, consumer);
@@ -42,11 +41,4 @@ public class BarChartCouplingListener implements CouplingListener {
         }
     }
 
-    /** Dummy method for coupling to the bar chart. Couplings to this will be redirected to a new bar. */
-    @Consumable(idMethod="getDescription")
-    public void addBar(double value) {}
-
-    public String getDescription() {
-        return "BarChart";
-    }
 }

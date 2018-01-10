@@ -51,6 +51,7 @@ import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
@@ -481,30 +482,15 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     private void addListeners() {
         getWorkspaceComponent().getProjectionModel().addListener(
                 new ChartListener() {
-
-                    /**
-                     * Update bottom stats when a data source is added.
-                     */
-                    public void dataSourceAdded(int index) {
+                    public void dataSourceAdded(ChartDataSource source) {
                         update();
                         updateCoordinateProjectionComboBoxes();
                     }
 
-                    /**
-                     * Update bottom stats when a data source is removed
-                     */
-                    public void dataSourceRemoved(int index) {
+                    public void dataSourceRemoved(ChartDataSource source) {
                         update();
                         updateCoordinateProjectionComboBoxes();
                     }
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void chartInitialized(int numSources) {
-                        update();
-                    }
-
                 });
 
         // Listen to events from the underlying projector model.

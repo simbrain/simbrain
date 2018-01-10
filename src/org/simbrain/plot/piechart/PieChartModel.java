@@ -69,7 +69,7 @@ public class PieChartModel extends ChartModel {
     public void addDataSource() {
         Integer index = dataset.getItemCount() + 1;
         dataset.setValue(index, 1);
-        this.fireDataSourceAdded(index);
+        this.fireDataSourceAdded(null);
     }
 
     /**
@@ -78,7 +78,7 @@ public class PieChartModel extends ChartModel {
     public void removeDataSource() {
         int removalIndex = dataset.getItemCount();
         if (removalIndex > 0) {
-            this.fireDataSourceRemoved(removalIndex);
+            this.fireDataSourceRemoved(null);
             dataset.remove(removalIndex);
         }
     }

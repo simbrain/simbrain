@@ -102,7 +102,7 @@ public class TimeSeriesModel extends ChartModel {
         Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
 
         if (lastSeriesIndex >= 0) {
-            this.fireDataSourceRemoved(lastSeriesIndex);
+            this.fireDataSourceRemoved(null);
             dataset.removeSeries(lastSeriesIndex);
         }
     }
@@ -113,7 +113,7 @@ public class TimeSeriesModel extends ChartModel {
     public void addDataSource() {
         Integer currentSize = dataset.getSeriesCount();
         dataset.addSeries(new XYSeries(currentSize + 1));
-        this.fireDataSourceAdded(currentSize);
+        this.fireDataSourceAdded(null);
     }
 
     /**

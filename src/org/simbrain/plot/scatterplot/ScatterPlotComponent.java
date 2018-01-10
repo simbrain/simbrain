@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.*;
 
@@ -116,20 +117,13 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     /** Add chart listener to model. */
     private void initModelListener() {
         model.addListener(new ChartListener() {
-            public void dataSourceAdded(final int index) {
-                if (getSetter(index) == null) {
-                    addSetter(index);
-                }
-                fireModelAdded(getSetter(index));
+            public void dataSourceAdded(ChartDataSource source) {
+                fireModelAdded(source);
             }
 
-            public void dataSourceRemoved(final int index) {
-                ScatterPlotSetter setter = getSetter(index);
-                setterList.remove(setter);
-                fireModelRemoved(setter);
+            public void dataSourceRemoved(ChartDataSource source) {
+                fireModelRemoved(source);
             }
-
-            public void chartInitialized(int numSources) {}
         });
     }
 

@@ -228,22 +228,23 @@ public class WorkspaceSerializer {
             read(zip, data);
         }
 
-        // When a user unzips and rezips a workspace file, additional
-        // information is added to the beginnings of the byteArrays which must
-        // be stripped away.
+        // Find the contents.xml file and set the zip entries relative to that
         Set<String> zipEntries = new HashSet<String>(byteArrays.keySet());
-        for (String entName : zipEntries) {
-            // These guys are ok
-            if (entName.startsWith("guis" + File.separator) || entName.startsWith("components" + File.separator)) {
-                break;
+        String contentsFile = "contents.xml";
+        String contentsPath = "";
+        for (String entryName : zipEntries) {
+            if (entryName.endsWith(contentsFile)) {
+                contentsPath = entryName.substring(0, entryName.length() - contentsFile.length());
             }
-            // Replace the bad with the good
-            String newname = entName;
-            // TODO: improve regex to handle underscores etc...
-            newname = newname.replaceFirst("^[a-zA-Z1-9]*\\/", "");
-            if (!newname.equals(entName)) {
-                //byteArrays.put(newname, byteArrays.get(entName));
-                //byteArrays.remove(entName);
+        }
+
+        // Remove the contents path from all entries that have it
+        if (!contentsPath.isEmpty()) {
+            for (String entryName : zipEntries) {
+                if (entryName.startsWith(contentsPath)) {
+                    byteArrays.put(entryName.replace(contentsPath, ""), byteArrays.get(entryName));
+                    byteArrays.remove(entryName);
+                }
             }
         }
         return byteArrays;

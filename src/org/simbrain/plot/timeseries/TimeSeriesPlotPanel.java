@@ -29,6 +29,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
@@ -97,7 +98,7 @@ public class TimeSeriesPlotPanel extends JPanel {
 
         // Create chart settings listener
         model.addChartSettingsListener(new ChartSettingsListener() {
-            public void chartSettingsUpdated() {
+            public void chartSettingsUpdated(ChartModel theModel) {
 
                 // Handle range properties
                 chart.getXYPlot().getRangeAxis()

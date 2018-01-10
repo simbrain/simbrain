@@ -95,20 +95,8 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements
      */
     @Override
     public void postAddInit() {
-
-        // Generate the graph
-        chart = ChartFactory.createPieChart("", this
-                .getWorkspaceComponent().getModel().getDataset(), true, // include
-                                                                        // legend
-                true, false);
+        chart = ChartFactory.createPieChart("", getWorkspaceComponent().getModel().getDataset(), true, true, false);
         chartPanel.setChart(chart);
-
-        getWorkspaceComponent().getModel().addChartSettingsListener(
-                new ChartSettingsListener() {
-                    public void chartSettingsUpdated() {
-                        // No implementation
-                    }
-                });
     }
 
     /**

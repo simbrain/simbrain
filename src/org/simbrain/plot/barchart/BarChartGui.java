@@ -36,6 +36,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartSettingsListener;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -117,7 +118,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                 new ChartSettingsListener() {
                     // TODO: Explore parameters in chart, chart.getCategoryPlot(),
                     // chart.getCategoryPlot().getRenderer(), chartPanel..
-                    public void chartSettingsUpdated() {
+                    public void chartSettingsUpdated(ChartModel model) {
                         // Update colors
                         chart.getCategoryPlot().getRenderer().setSeriesPaint(
                                 0, getWorkspaceComponent().getModel().getBarColor());

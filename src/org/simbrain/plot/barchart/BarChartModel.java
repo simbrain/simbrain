@@ -21,14 +21,10 @@ package org.simbrain.plot.barchart;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Optional;
 
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.workspace.*;
 
@@ -37,14 +33,12 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Data for a JFreeChart pie chart.
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class BarChartModel extends ChartModel {
 
     /**
      * Bar encapsulates a single data column in the BarChartModel.
      */
-    public class Bar {
+    public class Bar implements ChartDataSource {
         private String description;
 
         Bar(String description) {
@@ -63,7 +57,6 @@ public class BarChartModel extends ChartModel {
     }
 
     /** JFreeChart dataset for bar charts. */
-    @XmlJavaTypeAdapter(ChartDataAdapter.class)
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
     private List<Bar> bars = new ArrayList<Bar>();
@@ -92,46 +85,7 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Create specified number of bars.
-     * @param numBars number of bars to add.
-     */
-    public void addBars(int numBars) {
-        for (int i = 0; i < numBars; i++) {
-            addBar();
-        }
-    }
-
-    /** Add a new bar to the dataset. */
-    public Bar addBar() {
-        return addBar("Bar" + (bars.size() + 1));
-    }
-
-    public Bar addBar(String description) {
-        Bar bar = new Bar(description);
-        bars.add(bar);
-        fireDataSourceAdded(0);
-        return bar;
-    }
-
-    /**
-     * Removes the last bar from the bar chart data.
-     */
-    public void removeBar() {
-        if (dataset.getColumnCount() > 0) {
-            bars.remove(bars.size() - 1);
-            fireDataSourceRemoved(bars.size() - 1);
-        }
-    }
-
-    public void removeBar(String description) {
-        // TODO: This won't work yet
-        dataset.removeColumn(description);
-        fireDataSourceRemoved(0);
-    }
-
-    /**
      * Returns a properly initialized xstream object.
-     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -225,31 +179,66 @@ public class BarChartModel extends ChartModel {
         return bars;
     }
 
-    static class ChartDataAdapter extends XmlAdapter<Number[][], DefaultCategoryDataset> {
 
-        @Override
-        public DefaultCategoryDataset unmarshal(Number[][] v) throws Exception {
-            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-            for (int i = 0; i < v.length; i++) {
-                for (int j = 0; j < v[0].length; j++) {
-                    dataset.addValue(v[i][j], i, j);
-                }
-            }
-            return dataset;
-        }
 
-        @Override
-        public Number[][] marshal(DefaultCategoryDataset dataset)
-                throws Exception {
-            Number[][] ret = new Number[dataset.getRowCount()][dataset
-                    .getColumnCount()];
-            for (int i = 0; i < dataset.getRowCount(); i++) {
-                for (int j = 0; j < dataset.getColumnCount(); j++) {
-                    ret[i][j] = dataset.getValue(i, j);
-                }
-            }
-            return ret;
+    /** Dummy method for coupling to the bar chart. Couplings to this will be redirected to a new bar. */
+    @Consumable(idMethod="getId")
+    public void addBar(double value) {}
+
+    /** Identify this model. */
+    public String getId() {
+        return "BarChart";
+    }
+
+    /**
+     * Create specified number of bars.
+     * @param numBars number of bars to add.
+     */
+    public void addBars(int numBars) {
+        for (int i = 0; i < numBars; i++) {
+            addBar();
         }
+    }
+
+    /** Add a new bar to the dataset. */
+    public Bar addBar() {
+        return addBar("Bar" + (bars.size() + 1));
+    }
+
+    public Bar addBar(String description) {
+        Bar bar = new Bar(description);
+        bars.add(bar);
+        fireDataSourceAdded(bar);
+        return bar;
+    }
+
+    /**
+     * Removes the last bar from the bar chart data.
+     */
+    public void removeBar() {
+        if (dataset.getColumnCount() > 0) {
+            Bar bar = bars.remove(bars.size() - 1);
+            dataset.removeColumn(bar.getDescription());
+            fireDataSourceRemoved(bar);
+        }
+    }
+
+    public void removeBar(String description) {
+        Optional<Bar> bar = getBar(description);
+        if (bar.isPresent()) {
+            bars.remove(bar.get());
+            dataset.removeColumn(description);
+            fireDataSourceRemoved(bar.get());
+        }
+    }
+
+    public Optional<Bar> getBar(String description) {
+        for (Bar bar : bars) {
+            if (bar.getDescription().equals(description)) {
+                return Optional.of(bar);
+            }
+        }
+        return Optional.empty();
     }
 
 }

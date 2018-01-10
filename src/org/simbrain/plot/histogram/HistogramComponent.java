@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -64,16 +65,14 @@ public class HistogramComponent extends WorkspaceComponent {
      */
     private void initModelListener() {
         model.addListener(new ChartListener() {
-            public void dataSourceAdded(final int index) {
-                // TODO: Fix this
-                fireModelAdded(null);
+            public void dataSourceAdded(ChartDataSource source) {
+                fireModelAdded(source);
             }
 
-            public void dataSourceRemoved(final int index) {
-                fireModelRemoved(null);
+            public void dataSourceRemoved(ChartDataSource source) {
+                fireModelRemoved(source);
             }
 
-            public void chartInitialized(int numSources) {}
         });
     }
 

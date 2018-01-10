@@ -117,7 +117,7 @@ public class ScatterPlotModel extends ChartModel {
     public void addDataSource() {
         Integer index = dataset.getSeriesCount();
         dataset.addSeries(new XYSeries(index + 1));
-        this.fireDataSourceAdded(index + 1);
+        this.fireDataSourceAdded(null);
     }
 
     /**
@@ -127,7 +127,7 @@ public class ScatterPlotModel extends ChartModel {
         Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
 
         if (lastSeriesIndex >= 0) {
-            this.fireDataSourceRemoved(lastSeriesIndex);
+            this.fireDataSourceRemoved(null);
             dataset.removeSeries(lastSeriesIndex);
             // chartSeriesPaint.remove(lastSeriesIndex);
         }

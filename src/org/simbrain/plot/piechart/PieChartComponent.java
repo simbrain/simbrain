@@ -23,7 +23,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -72,17 +74,13 @@ public class PieChartComponent extends WorkspaceComponent {
      */
     private void initModelListener() {
         model.addListener(new ChartListener() {
-            public void dataSourceAdded(final int index) {
-                // TODO: Fix this
-                //fireModelAdded(model.getDataset(index));
+            public void dataSourceAdded(ChartDataSource source) {
                 fireModelAdded(null);
             }
 
-            public void dataSourceRemoved(final int index) {
+            public void dataSourceRemoved(ChartDataSource source) {
                 fireModelRemoved(null);
             }
-
-            public void chartInitialized(int numSources) {}
         });
     }
 

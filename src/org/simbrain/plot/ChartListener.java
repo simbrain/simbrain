@@ -25,23 +25,15 @@ package org.simbrain.plot;
 public interface ChartListener {
 
     /**
-     * A data source was added at the specified index.
-     *
-     * @param index the index of the added data source
+     * A data source was added to the model.
+     * @param source The data source.
      */
-    void dataSourceAdded(final int index);
+    void dataSourceAdded(ChartDataSource source);
 
     /**
-     * A data source was removed at the specified index.
-     *
-     * @param index the index of the data source that was removed
+     * A data source was removed from the model.
+     * @param source The data source.
      */
-    void dataSourceRemoved(final int index);
+    void dataSourceRemoved(ChartDataSource source);
 
-    /**
-     * The chart has been reinitialized to a new number of data sources.
-     *
-     * @param numSources the new number of data sources.
-     */
-    void chartInitialized(final int numSources);
 }

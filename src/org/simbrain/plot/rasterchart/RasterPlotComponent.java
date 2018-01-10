@@ -21,6 +21,7 @@ package org.simbrain.plot.rasterchart;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -110,28 +111,13 @@ public class RasterPlotComponent extends WorkspaceComponent {
     private void addListener() {
 
         model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-//                firePotentialAttributesChanged();
+            public void dataSourceAdded(ChartDataSource source) {
+                fireModelAdded(source);
             }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-//                firePotentialAttributesChanged();
+            public void dataSourceRemoved(ChartDataSource source) {
+                fireModelRemoved(source);
             }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void chartInitialized(int numSources) {
-                // No implementation yet (not used in this component thus far).
-            }
-
         });
     }
 

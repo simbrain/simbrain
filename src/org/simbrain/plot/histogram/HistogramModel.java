@@ -210,7 +210,7 @@ public class HistogramModel extends ChartModel {
 
         data.add(new double[] { 0 });
         dataNames.add("Hist " + data.size());
-        this.fireDataSourceAdded(data.size());
+        this.fireDataSourceAdded(null);
         redraw();
     }
 

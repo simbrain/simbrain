@@ -35,6 +35,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -140,7 +141,7 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
 
         getWorkspaceComponent().getModel().addChartSettingsListener(
                 new ChartSettingsListener() {
-                    public void chartSettingsUpdated() {
+                    public void chartSettingsUpdated(ChartModel model) {
                         chart.getXYPlot()
                                 .getDomainAxis()
                                 .setAutoRange(

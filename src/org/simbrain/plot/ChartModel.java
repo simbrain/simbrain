@@ -34,15 +34,23 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class ChartModel {
 
+    /**
+     * Creates an xtream object for serializing the model.
+     */
+    public static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
+        return xstream;
+    }
+
     /** Listeners on this chart. */
-    private List<ChartListener> listenerList = new ArrayList<ChartListener>();
+    private transient List<ChartListener> listenerList = new ArrayList<ChartListener>();
 
     /** Settings Listeners on this chart. */
-    private List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
+    private transient List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
 
     /**
      * Add a chart listener.
-     *
      * @param listener listener to add.
      */
     public void addListener(ChartListener listener) {
@@ -70,59 +78,28 @@ public class ChartModel {
      */
     public void fireSettingsChanged() {
         for (ChartSettingsListener listener : settingsListenerList) {
-            listener.chartSettingsUpdated();
+            listener.chartSettingsUpdated(this);
         }
     }
 
     /**
      * Fire data source added event.
-     *
-     * @param index index of added data source
+     * @param source The added data source.
      */
-    public void fireDataSourceAdded(final int index) {
-        if (listenerList == null) {
-            listenerList = new ArrayList<ChartListener>();
-        }
+    public void fireDataSourceAdded(ChartDataSource source) {
         for (ChartListener listener : listenerList) {
-            listener.dataSourceAdded(index);
+            listener.dataSourceAdded(source);
         }
     }
 
     /**
      * Fire data source removed event.
-     *
-     * @param index index of removed data source
+     * @param source The removed data source.
      */
-    public void fireDataSourceRemoved(final int index) {
+    public void fireDataSourceRemoved(ChartDataSource source) {
         for (ChartListener listener : listenerList) {
-            listener.dataSourceRemoved(index);
+            listener.dataSourceRemoved(source);
         }
     }
 
-    /**
-     * Fire chart initialized.
-     *
-     * @param numSources number of sources
-     */
-    public void fireChartInitialized(final int numSources) {
-        if (listenerList == null) {
-            listenerList = new ArrayList<ChartListener>();
-        }
-        for (ChartListener listener : listenerList) {
-            listener.chartInitialized(numSources);
-        }
-    }
-
-    /**
-     * Creates an xtream object with relevant fields omitted.
-     *
-     * @return
-     */
-    public static XStream getXStream() {
-        final XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
-        xstream.omitField(ChartModel.class, "listenerList");
-        xstream.omitField(ChartModel.class, "settingsListenerList");
-        return xstream;
-    }
 }

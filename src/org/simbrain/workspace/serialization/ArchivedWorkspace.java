@@ -106,7 +106,7 @@ class ArchivedWorkspace {
      * Creates the archived action given the "real" update action.
      *
      * @param action the real update action.
-     * @return teh archived action.
+     * @return the archived action.
      */
     private ArchivedUpdateAction getArchivedAction(final UpdateAction action) {
         String component_id = null;

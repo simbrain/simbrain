@@ -14,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 final class ArchivedUpdateAction {
 
     /** Reference to the action itself. */
-    private final transient UpdateAction updateAction;
+    private final UpdateAction updateAction;
 
     /**
      * Reference to the component id for this action, or null if not needed.

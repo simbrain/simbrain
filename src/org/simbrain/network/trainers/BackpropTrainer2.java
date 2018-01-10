@@ -72,7 +72,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     private List<DoubleMatrix> lastBiasUpdates = new ArrayList<DoubleMatrix>();
 
     /** Activation vectors. */
-    private List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
+    public List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
     private List<NeuronGroup> ngroups = new ArrayList<NeuronGroup>();
 
     /** Net inputs. */
@@ -164,9 +164,10 @@ public class BackpropTrainer2 extends IterableTrainer {
         rand.setParam2(1);
     }
 
+    int count = 0;
     @Override
     public void apply() {
-
+    	count++;
         int numTrainingExamples = getMinimumNumRows(network);
 
         // System.out.println("=== Before: ===\n");
@@ -177,11 +178,15 @@ public class BackpropTrainer2 extends IterableTrainer {
         if (updateMethod == UpdateMethod.EPOCH) {
             for (int row = 0; row < numTrainingExamples; row++) {
                 mse += updateBackprop(row);
+                if (count==9999) {
+                	System.out.println(10*(targetData.getColumn(row).data[0]-0.5) + " " + 10*(layers.get(1).data[0]-0.5));
+                }
             }
             mse = mse / numTrainingExamples;
         } else if (updateMethod == UpdateMethod.STOCHASTIC) {
             int rowNum = ThreadLocalRandom.current()
                     .nextInt(numTrainingExamples);
+          //  System.out.println(10*(targetData.getColumn(rowNum).data[0]-0.5));
             mse = updateBackprop(rowNum);
         }
         // TODO: Other update types
@@ -221,8 +226,6 @@ public class BackpropTrainer2 extends IterableTrainer {
 
         // Update weights and biases
         updateParameters();
-
-        // TODO: Below has been modified for Mazur test
 
         // Update MSE
         // TODO: Settable error function
@@ -527,6 +530,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         }
 
         _x.mmuli(_A, _y);
+        _y.divi(_y.data.length);
 
         if (wasColX) {
             // Fast transpose back

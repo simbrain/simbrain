@@ -21,6 +21,8 @@ package org.simbrain.util.math;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
@@ -75,17 +77,32 @@ public class SquashingFunctionsTests {
         DoubleMatrix zeros = DoubleMatrix.zeros(5);
         DoubleMatrix halves = zeros.add(.5);
         DoubleMatrix ones = zeros.add(1);
+        DoubleMatrix fives = zeros.add(5);
+        DoubleMatrix logit5 = zeros.add(1-0.00669);
+        DoubleMatrix logitN5 = zeros.add(0.00669);
+        DoubleMatrix logit5D = zeros.add(0.00669);
         DoubleMatrix testOut = DoubleMatrix.zeros(5);
 
         // Test logistic and its derivative
         SquashingFunctions.logistic(zeros, testOut, 1, -1, 1);
-        assertArrayEquals(zeros.data, testOut.data, .01);
+        assertArrayEquals(zeros.data, DoubleMatrix.zeros(5).data, .01);
         SquashingFunctions.logistic(zeros, testOut, 1, 0, 1);
         assertArrayEquals(halves.data, testOut.data, .01);
 
+        SquashingFunctions.logistic(fives, testOut, 1, 0, .5);
+        assertArrayEquals(logit5.data, testOut.data, .0001);
+        SquashingFunctions.logistic(fives.muli(-1), testOut, 1, 0, .5);
+        assertArrayEquals(logitN5.data, testOut.data, .0001);
+        
         SquashingFunctions.derivLogistic(zeros, testOut, 1, -1, 1);
         assertArrayEquals(ones.data, testOut.data, .01);
 
+        SquashingFunctions.derivLogistic(fives, testOut, 1, 0, .5);
+        assertArrayEquals(logit5D.data, testOut.data, .0001);
+        
+        SquashingFunctions.derivLogistic(fives.muli(-1), testOut, 1, 0, .5);
+        assertArrayEquals(logit5D.data, testOut.data, .0001);
+        
         // TODO: Test Tanh, arctan
 
     }

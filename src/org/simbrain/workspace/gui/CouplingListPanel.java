@@ -111,11 +111,9 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
 
         // Scroll pane for showing lists larger than viewing window and setting
         // maximum size
-        final JScrollPane listScroll = new JScrollPane(couplings);
-        listScroll
-                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll
-                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane listScroll = new JScrollPane(couplings);
+        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Allows the user to delete couplings within the list frame.
         JPanel buttonPanel = new JPanel();
@@ -143,7 +141,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      */
     private ArrayList<Coupling<?>> getSelectedCouplings() {
         ArrayList<Coupling<?>> ret = new ArrayList<Coupling<?>>();
-        for (Object object : couplings.getSelectedValues()) {
+        for (Object object : couplings.getSelectedValuesList()) {
             ret.add((Coupling<?>) object);
         }
         return ret;
@@ -171,9 +169,8 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         public java.awt.Component getListCellRendererComponent(
                 final JList list, final Object object, final int index,
                 final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
-                    .getListCellRendererComponent(list, object, index,
-                            isSelected, cellHasFocus);
+            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(
+                    list, object, index, isSelected, cellHasFocus);
             Coupling<?> coupling = (Coupling<?>) object;
 
             // Set text color based on data type

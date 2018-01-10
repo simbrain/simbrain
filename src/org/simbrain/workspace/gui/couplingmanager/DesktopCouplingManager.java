@@ -45,7 +45,7 @@ import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
+import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 
 /**
  * GUI dialog for creating couplings.
@@ -56,10 +56,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     public static boolean isVisible;
 
     /** List of producers. */
-    private PotentialAttributePanel producerPanel;
+    private AttributePanel producerPanel;
 
     /** List of consumers. */
-    private PotentialAttributePanel consumerPanel;
+    private AttributePanel consumerPanel;
 
     /** Methods for making couplings. */
     private String[] tempStrings = { "One to One", "One to Many" };
@@ -88,12 +88,12 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Left Panel
         Border leftBorder = BorderFactory.createTitledBorder("Producers");
-        producerPanel = new PotentialAttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
+        producerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
         producerPanel.setBorder(leftBorder);
 
         // Right Panel
         Border rightBorder = BorderFactory.createTitledBorder("Consumers");
-        consumerPanel = new PotentialAttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Consuming);
+        consumerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Consuming);
         consumerPanel.setBorder(rightBorder);
 
         // Bottom Panel

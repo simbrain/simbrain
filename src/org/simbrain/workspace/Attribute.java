@@ -65,13 +65,16 @@ public abstract class Attribute {
 
     @Override
     public String toString() {
-        String typeName;
+        return getId() + " " + method.getName() + " (" + getTypeName() + ")";
+    }
+
+    /** Return the nicely formatted type name of this attribute. */
+    public String getTypeName() {
         if (((Class<?>) getType()).isArray()) {
-            typeName = ((Class<?>) getType()).getComponentType().getSimpleName() + " array";
+            return ((Class<?>) getType()).getComponentType().getSimpleName() + " array";
         } else {
-            typeName = ((Class<?>) getType()).getSimpleName();
+            return ((Class<?>) getType()).getSimpleName();
         }
-        return getId() + " " + method.getName() + " (" + typeName + ")";
     }
 
     /** @return the description */

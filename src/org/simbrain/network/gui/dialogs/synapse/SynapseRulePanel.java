@@ -28,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -40,7 +41,14 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
+import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
+import org.simbrain.network.synapse_update_rules.HebbianRule;
+import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
+import org.simbrain.network.synapse_update_rules.OjaRule;
+import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule;
+import org.simbrain.network.synapse_update_rules.STDPRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
@@ -50,11 +58,18 @@ import org.simbrain.util.widgets.EditablePanel;
  * A panel for setting the synapse type and changing the parameters of the
  * selected update rule.
  *
- * * @author ztosi
+ * @author Zoë Tosi
+ * @author Jeff Yoshimi
  *
  */
 @SuppressWarnings("serial")
 public class SynapseRulePanel extends JPanel implements EditablePanel {
+
+    /** The synapses being modified. */
+    private final Collection<Synapse> synapseCollection;
+
+    /** Null string. */
+    public static final String NULL_STRING = "...";
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -65,10 +80,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
 
     /** Synapse type combo box. */
     private final JComboBox<String> cbSynapseType = new JComboBox<String>(
-        AbstractSynapseRulePanel.getRuleList());
-
-    /** The synapses being modified. */
-    private final Collection<Synapse> synapseCollection;
+            RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
 
     /** Synapse panel. */
     private AbstractSynapseRulePanel synapsePanel;
@@ -91,43 +103,59 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     private final Window parent;
 
     /**
-     * Constructs a synapse update settings panel for a given synapse list and
-     * within a specified parent window. Starts in the default display state for
-     * the actual neuron update panel.
+     * A mapping of available update rules to their respective panels. Used as a
+     * reference (especially for combo-boxes) by GUI classes.
+     */
+    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapseRulePanel>();
+
+    // Populate synapse rule map
+    static {
+        RULE_MAP.put(new StaticSynapseRule().getName(),
+                new SynapseRulePropertiesPanel(new StaticSynapseRule()));
+        RULE_MAP.put(new HebbianRule().getName(),
+                new SynapseRulePropertiesPanel(new HebbianRule()));
+        RULE_MAP.put(new HebbianCPCARule().getName(),
+                new SynapseRulePropertiesPanel(new HebbianCPCARule()));
+        RULE_MAP.put(new HebbianThresholdRule().getName(),
+                new SynapseRulePropertiesPanel(new HebbianThresholdRule()));
+        RULE_MAP.put(new OjaRule().getName(),
+                new SynapseRulePropertiesPanel(new OjaRule()));
+        RULE_MAP.put(new PfisterGerstner2006Rule().getName(),
+                new SynapseRulePropertiesPanel(new PfisterGerstner2006Rule()));
+        // RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
+        // new ShortTermPlasticityRulePanel());
+        RULE_MAP.put(new STDPRule().getName(),
+                new SynapseRulePropertiesPanel(new STDPRule()));
+        RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
+                new SynapseRulePropertiesPanel(
+                        new SubtractiveNormalizationRule()));
+    }
+
+    /**
+     * Create the panel with specified starting visibility.
      *
-     * @param synapseList
-     *            the list of synapses which will be edited by the displayed
-     *            neuron update rule panel
-     * @param parent
-     *            the swing window within which this panel will be placed. Here
-     *            so that "pack()" can be called when this panel resizes itself.
+     * @param synapseList the list of synapses being edited
+     * @param parent parent window referenced for resizing via "Pack"
      */
     public SynapseRulePanel(Collection<Synapse> synapseList,
-        final Window parent) {
+            final Window parent) {
         this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
 
     /**
-     * Constructs a synapse update settings panel for a given synapse list and
-     * within a specified parent window, and with the starting display state of
-     * the neuron update panel specified.
+     * Construct the panel with default starting visibility.
      *
-     * @param synapseList
-     *            the list of synapses which will be edited by the displayed
-     *            neuron update rule panel
-     * @param startingState
-     *            whether or not the neuron update rule panel starts off
-     *            displayed or hidden
-     * @param parent
-     *            the swing window within which this panel will be placed. Here
-     *            so that "pack()" can be called when this panel resizes itself.
+     * @param synapseList the list of synapses being edited
+     * @param parent parent window referenced for resizing via "Pack"
+     * @param startingState the starting state of whether or not details of the
+     *            rule are initially visible
      */
     public SynapseRulePanel(Collection<Synapse> synapseList,
-        final Window parent, boolean startingState) {
+            final Window parent, boolean startingState) {
         this.synapseCollection = synapseList;
         this.parent = parent;
         displaySPTriangle = new DropDownTriangle(UpDirection.LEFT,
-            startingState, "Settings", "Settings", parent);
+                startingState, "Settings", "Settings", parent);
         initSynapseType();
         startingPanel = synapsePanel;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -181,9 +209,8 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                synapsePanel =
-                    AbstractSynapseRulePanel.RULE_MAP.get(cbSynapseType
-                        .getSelectedItem()).deepCopy();
+                synapsePanel = RULE_MAP.get(cbSynapseType.getSelectedItem())
+                        .deepCopy();
 
                 // Is the current panel different from the starting panel?
                 boolean replace = synapsePanel != startingPanel;
@@ -226,7 +253,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         boolean discrepancy = false;
         while (synIter.hasNext()) {
             if (!protoSyn.getLearningRule().getClass()
-                .equals(synIter.next().getLearningRule().getClass())) {
+                    .equals(synIter.next().getLearningRule().getClass())) {
                 discrepancy = true;
                 break;
             }
@@ -235,13 +262,12 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
             cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
             // Simply to serve as an empty panel
-            synapsePanel = new StaticSynapsePanel();
+            synapsePanel = new SynapseRulePropertiesPanel();
         } else {
             List<SynapseUpdateRule> synapseList = Synapse
-                .getRuleList(synapseCollection);
+                    .getRuleList(synapseCollection);
             String synapseName = synapseList.get(0).getName();
-            synapsePanel = AbstractSynapseRulePanel.RULE_MAP.get(synapseName)
-            		.deepCopy();
+            synapsePanel = RULE_MAP.get(synapseName).deepCopy();
             synapsePanel.fillFieldValues(synapseList);
             cbSynapseType.setSelectedItem(synapseName);
         }
@@ -274,9 +300,8 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @param synapsePanel
-     *            set the currently displayed synapse panel to the specified
-     *            panel
+     * @param synapsePanel set the currently displayed synapse panel to the
+     *            specified panel
      */
     public void setSynapsePanel(AbstractSynapseRulePanel synapsePanel) {
         this.synapsePanel = synapsePanel;

@@ -73,7 +73,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @return
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-            final Collection<Synapse> synapseList, final Window parent) {
+            final List<Synapse> synapseList, final Window parent) {
         return createSynapsePropertiesPanel(synapseList, parent,
                 DEFAULT_DISPLAY_PARAMS);
     }
@@ -90,7 +90,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @return
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-            final Collection<Synapse> synapseList, final Window parent,
+            final List<Synapse> synapseList, final Window parent,
             final boolean showSpecificRuleParams) {
         SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(synapseList,
                 parent, showSpecificRuleParams, true);
@@ -107,7 +107,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param showSpecificRuleParams whether or not to display the synapse
      *            update rule's details initially.
      */
-    private SynapsePropertiesPanel(final Collection<Synapse> synapseList,
+    private SynapsePropertiesPanel(final List<Synapse> synapseList,
             final Window parent, final boolean showSpecificRuleParams,
             final boolean displayID) {
         synapseRulePanel = new SynapseRulePanel(synapseList, parent,

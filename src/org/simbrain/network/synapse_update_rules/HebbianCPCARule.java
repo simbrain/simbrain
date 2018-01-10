@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 
 /**
@@ -27,33 +28,31 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class HebbianCPCARule extends SynapseUpdateRule {
 
-    /** Default Learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = .005;
-
     /**
      * Default Maximum weight value (see equation 4.19 in O'Reilly and
      * Munakata).
      */
-    public static final double DEFAULT_M =
-        SimbrainMath.roundDouble(.5 / .15, 4);
-
-    /** Default Weight offset. */
-    public static final double DEFAULT_THETA = 1;
-
-    /** Default Sigmoidal function. */
-    public static final double DEFAULT_LAMBDA = 1;
+    public static final double DEFAULT_M = .5 / .15;
 
     /** Learning rate. */
-    private double learningRate = DEFAULT_LEARNING_RATE;
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb CPCA", 
+            minimumValue = 0, maximumValue = DEFAULT_M, defaultValue = ".005", order = 1)
+    private double learningRate;
 
-    /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
-    private double m = DEFAULT_M;
+    /** Max Weight Value. */
+    @UserParameter(label = "m", description = "Max Weight", 
+            minimumValue = -10, maximumValue = 10, defaultValue = "" + DEFAULT_M, order = 1)
+    private double m;
 
     /** Weight offset. */
-    private double theta = DEFAULT_THETA;
+    @UserParameter(label = "Theta", description = "Weight Offset value", 
+            minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
+    private double theta;
 
-    /** Sigmoidal function. */
-    private double lambda = DEFAULT_LAMBDA;
+    /** Lambda. */
+    @UserParameter(label = "Lambda", description = "Sigmomid Function", 
+            minimumValue = -1, maximumValue = 10, defaultValue = "1", order = 1)
+     private double lambda;
 
     @Override
     public void init(Synapse synapse) {

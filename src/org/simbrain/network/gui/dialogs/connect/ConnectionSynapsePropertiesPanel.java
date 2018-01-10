@@ -197,12 +197,12 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             inhibitorySynapses.add(templateInhibitorySynapse);
         }
         if (creationPanel) {
-            excitatoryInfoPanel = SynapsePropertiesPanel
-                    .createSynapsePropertiesPanel(excitatorySynapses,
-                            parentWindow);
-            inhibitoryInfoPanel = SynapsePropertiesPanel
-                    .createSynapsePropertiesPanel(inhibitorySynapses,
-                            parentWindow);
+//            excitatoryInfoPanel = SynapsePropertiesPanel
+//                    .createSynapsePropertiesPanel(excitatorySynapses,
+//                            parentWindow);
+//            inhibitoryInfoPanel = SynapsePropertiesPanel
+//                    .createSynapsePropertiesPanel(inhibitorySynapses,
+//                            parentWindow);
         } else {
 //            excitatoryInfoPanel = SynapsePropertiesPanel
 //                    .createBlankSynapsePropertiesPanel(excitatorySynapses,
@@ -248,10 +248,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             inhibitorySynapses = Collections.singleton(
                     getTemplateInhibitorySynapse());
         }
-        excitatoryInfoPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+//        excitatoryInfoPanel = SynapsePropertiesPanel
+//                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
+//        inhibitoryInfoPanel = SynapsePropertiesPanel
+//                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 
@@ -276,10 +276,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 getTemplateExcitatorySynapse());
         inhibitorySynapses = Collections.singleton(
                 getTemplateInhibitorySynapse());
-        excitatoryInfoPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+//        excitatoryInfoPanel = SynapsePropertiesPanel
+//                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
+//        inhibitoryInfoPanel = SynapsePropertiesPanel
+//                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 

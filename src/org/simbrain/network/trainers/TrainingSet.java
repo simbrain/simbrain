@@ -95,7 +95,7 @@ public class TrainingSet {
     }
 
     /**
-     * Set the input data.
+     * Set the input data. Rows correspond to single training iteration.
      *
      * @param inputData the data to set.
      */

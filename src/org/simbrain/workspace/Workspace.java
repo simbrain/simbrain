@@ -578,6 +578,11 @@ public class Workspace {
         }
     }
 
+    public void removeCoupling(Coupling<?> coupling) {
+        couplings.remove(coupling);
+        fireCouplingRemoved(coupling);
+    }
+
     /** List of listeners to fire updates when couplings are changed. */
     private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
 

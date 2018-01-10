@@ -89,7 +89,7 @@ import java.util.List;
  * Holds the combo box for selecting an update rule, and a panel (which extends
  * abstractneuronrulepanel) for editing that rules properties.
  *
- * @author Zach Tosi
+ * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
@@ -195,8 +195,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Create a the panel with the default starting visibility for the neuron
-     * panel.
+     * Construct the panel with default starting visibility.
      *
      * @param neuronList the list of neurons being edited
      * @param parent the parent window referenced for resizing purposes

@@ -35,7 +35,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
- * <b>NeuronDialog</b> is a dialog box for setting the properties of a Neuron.
+ * <b>NeuronDialog</b> is a dialog box for setting the properties of neurons.
  */
 @SuppressWarnings("serial")
 public final class NeuronDialog extends StandardDialog {

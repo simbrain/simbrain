@@ -20,7 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.UserParameter;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>Hebbian</b> implements a standard Hebbian learning rule.

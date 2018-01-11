@@ -122,6 +122,8 @@ import org.simbrain.world.textworld.ReaderComponentDesktopGui;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
+import org.simbrain.world.threedworld.ThreeDDesktopComponent;
+import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
@@ -400,34 +402,24 @@ public class SimbrainDesktop {
     private static void registerComponents() {
         // TODO use a configuration file
         registerComponent(BarChartComponent.class, BarChartGui.class);
-        registerComponent(DocViewerComponent.class,
-                DocViewerDesktopComponent.class);
-        registerComponent(ConsoleComponent.class,
-                ConsoleDesktopComponent.class);
-        registerComponent(DisplayComponent.class,
-                DisplayComponentDesktopGui.class);
-        registerComponent(DataWorldComponent.class,
-                DataWorldDesktopComponent.class);
-        // registerComponent(MidiWorldComponent.class,
-        // MidiWorldDesktopComponent.class);
+        registerComponent(DocViewerComponent.class, DocViewerDesktopComponent.class);
+        registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
+        registerComponent(DisplayComponent.class, DisplayComponentDesktopGui.class);
+        registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
+        // registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(HistogramComponent.class, HistogramGui.class);
-        registerComponent(NetworkComponent.class,
-                NetworkDesktopComponent.class);
-        registerComponent(OdorWorldComponent.class,
-                OdorWorldDesktopComponent.class);
+        registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
+        registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
         registerComponent(PieChartComponent.class, PieChartGui.class);
         registerComponent(ProjectionComponent.class, ProjectionGui.class);
-        registerComponent(ReaderComponent.class,
-                ReaderComponentDesktopGui.class);
+        registerComponent(ReaderComponent.class, ReaderComponentDesktopGui.class);
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
-        registerComponent(TimeSeriesPlotComponent.class,
-                TimeSeriesPlotGui.class);
+        registerComponent(ThreeDWorldComponent.class, ThreeDDesktopComponent.class);
+        registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(RasterPlotComponent.class, RasterPlotGui.class);
-        registerComponent(ImageWorldComponent.class,
-                ImageDesktopComponent.class);
+        registerComponent(ImageWorldComponent.class, ImageDesktopComponent.class);
         registerComponent(GameComponent.class, GameDesktopComponent.class);
-        registerComponent(DeviceInteractionComponent.class,
-                DeviceInteractionDesktopComponent.class);
+        registerComponent(DeviceInteractionComponent.class, DeviceInteractionDesktopComponent.class);
     }
 
     /** Listener for swing component changes. */
@@ -1028,26 +1020,18 @@ public class SimbrainDesktop {
      * @return A new desktop component wrapping the provided component.
      */
     @SuppressWarnings("unchecked")
-    static GuiComponent<?> createDesktopComponent(
-            final GenericFrame parentFrame,
-            final WorkspaceComponent component) {
-        Class<? extends WorkspaceComponent> componentClass = component
-                .getClass();
-        Class<? extends GuiComponent<?>> guiClass = wrappers
-                .get(componentClass);
+    static GuiComponent<?> createDesktopComponent(GenericFrame parentFrame, WorkspaceComponent component) {
+        Class<? extends WorkspaceComponent> componentClass = component.getClass();
+        Class<? extends GuiComponent<?>> guiClass = wrappers.get(componentClass);
 
         if (guiClass == null) {
-            throw new IllegalArgumentException(
-                    "no desktop component registered for "
-                            + component.getClass());
+            throw new IllegalArgumentException("No desktop component registered for " + component.getClass());
         }
 
         try {
-            GenericFrame genericFrame = parentFrame != null ? parentFrame
-                    : new DesktopInternalFrame(component);
-
-            Constructor<? extends GuiComponent<?>> constructor = guiClass
-                    .getConstructor(GenericFrame.class, componentClass);
+            GenericFrame genericFrame = parentFrame != null ? parentFrame : new DesktopInternalFrame(component);
+            Constructor<? extends GuiComponent<?>> constructor = guiClass.getConstructor(
+                    GenericFrame.class, componentClass);
             return constructor.newInstance(genericFrame, component);
         } catch (RuntimeException e) {
             throw e;
@@ -1060,13 +1044,11 @@ public class SimbrainDesktop {
      * Shows the dialog for opening a workspace file.
      */
     public void openWorkspace() {
-        SFileChooser simulationChooser = new SFileChooser(
-                workspace.getCurrentDirectory(), "Zip Archive", "zip");
+        SFileChooser simulationChooser = new SFileChooser(workspace.getCurrentDirectory(), "Zip Archive", "zip");
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
             workspace.openWorkspace(simFile);
-            workspace.setCurrentDirectory(
-                    simulationChooser.getCurrentLocation());
+            workspace.setCurrentDirectory(simulationChooser.getCurrentLocation());
             workspace.setCurrentFile(simFile);
         }
     }

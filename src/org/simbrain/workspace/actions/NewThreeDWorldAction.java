@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-//import org.simbrain.world.threedworld.ThreeDWorldComponent;
+import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
 /**
  * Add 3d world to workspace.
@@ -23,7 +23,7 @@ public class NewThreeDWorldAction extends WorkspaceAction {
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-//        ThreeDWorldComponent worldComponent = new ThreeDWorldComponent("3D World");
-//        workspace.addWorkspaceComponent(worldComponent);
+        ThreeDWorldComponent worldComponent = new ThreeDWorldComponent("3D World");
+        workspace.addWorkspaceComponent(worldComponent);
     }
 }

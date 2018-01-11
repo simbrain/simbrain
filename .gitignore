@@ -16,3 +16,5 @@ out/*
 .metadata/*
 .checkstyle
 *.dylib
+lwjgl64.dll
+OpenAL64.dll

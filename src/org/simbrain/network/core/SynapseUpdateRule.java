@@ -19,13 +19,14 @@
 package org.simbrain.network.core;
 
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * A rule for updating a synapse. A learning rule.
  *
  * @author jyoshimi
  */
-public abstract class SynapseUpdateRule {
+public abstract class SynapseUpdateRule implements EditableObject {
 
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 9;
@@ -80,5 +81,11 @@ public abstract class SynapseUpdateRule {
     public String getToolTipText(final Synapse synapse) {
         return "(" + synapse.getId() + ") Strength: "
                 + Utils.round(synapse.getStrength(), MAX_DIGITS);
+    }
+    
+
+    @Override
+    public EditableObject copy() {
+        return this.deepCopy();
     }
 }

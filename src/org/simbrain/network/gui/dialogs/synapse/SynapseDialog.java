@@ -122,8 +122,7 @@ public final class SynapseDialog extends StandardDialog {
      * @param synapseList
      * @param parent
      */
-    private SynapseDialog(final List<Synapse> synapseList,
-            final Frame parent) {
+    private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = SynapsePropertiesPanel

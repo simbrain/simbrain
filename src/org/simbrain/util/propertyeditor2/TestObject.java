@@ -1,14 +1,13 @@
 package org.simbrain.util.propertyeditor2;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -17,7 +16,7 @@ import org.simbrain.util.propertyeditor.ComboBoxWrapper;
  *
  * @author Jeff Yoshimi
  */
-public class TestObject {
+public class TestObject implements EditableObject {
 
     // Color test
     Color theColor = Color.red;
@@ -43,13 +42,11 @@ public class TestObject {
     double theDouble = .9092342;
     float theFloat = 0;
     @UserParameter(label = "The long", description = "The long", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
+            minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
     long theLong = 20L;
     short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
-    @UserParameter(label = "The array", description = "The array", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
     double[] doubleArray = new double[] { .1, .2, .3, 4 };
 
     // Enum / Combo Box test
@@ -123,12 +120,19 @@ public class TestObject {
      */
     public static void main(String[] args) {
 
-        // Test ReflectivePropertyEditor as a panel with ok / cancel
         TestObject testObject = new TestObject();
-        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(
-                testObject);
-        JDialog dialog = editor.getDialog();
+        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(testObject);
+        StandardDialog dialog = editor.getDialog();
         dialog.pack();
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        // Don't click ok to see output; close the window using it's upper-right 
+        // close button
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent arg) {
+                editor.commitChanges();
+                System.out.println(testObject);
+            }
+        });
         dialog.setVisible(true);
    
     }
@@ -341,5 +345,12 @@ public class TestObject {
      */
     public void setDoubleArray(double[] doubleArray) {
         this.doubleArray = doubleArray;
+    }
+
+    @Override
+    public EditableObject copy() {
+        TestObject copy = new TestObject();
+        copy.setTheInt(theInt);
+        return copy;
     }
 }

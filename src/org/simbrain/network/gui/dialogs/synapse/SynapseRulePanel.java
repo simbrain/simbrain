@@ -26,10 +26,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -50,6 +50,8 @@ import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
@@ -64,6 +66,8 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 @SuppressWarnings("serial")
 public class SynapseRulePanel extends JPanel implements EditablePanel {
+
+    // TODO: Cache a rule list?
 
     /** The synapses being modified. */
     private final Collection<Synapse> synapseCollection;
@@ -82,8 +86,8 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     private final JComboBox<String> cbSynapseType = new JComboBox<String>(
             RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
 
-    /** Synapse panel. */
-    private AbstractSynapseRulePanel synapsePanel;
+    /** Panel for editing synapses. */
+    private AnnotatedPropertyEditor synapsePanel;
 
     /** For showing/hiding the synapse panel. */
     private final DropDownTriangle displaySPTriangle;
@@ -94,7 +98,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
      * sure that we are not editing synapse update rules, but rather are
      * replacing them.
      */
-    private final AbstractSynapseRulePanel startingPanel;
+    private final AnnotatedPropertyEditor startingPanel;
 
     /**
      * A reference to the parent window, for resizing after panel content
@@ -103,36 +107,37 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     private final Window parent;
 
     /**
-     * A mapping of available update rules to their respective panels. Used as a
-     * reference (especially for combo-boxes) by GUI classes.
+     * A mapping of available update rules to their respective panels.
      */
-    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapseRulePanel>();
+    public static final LinkedHashMap<String, AnnotatedPropertyEditor> RULE_MAP = new LinkedHashMap();
 
-    // Populate synapse rule map
+    /**
+     * Add new synapse rules here.
+     */
     static {
         RULE_MAP.put(new StaticSynapseRule().getName(),
-                new SynapseRulePropertiesPanel(new StaticSynapseRule()));
+                new AnnotatedPropertyEditor(new StaticSynapseRule()));
         RULE_MAP.put(new HebbianRule().getName(),
-                new SynapseRulePropertiesPanel(new HebbianRule()));
+                new AnnotatedPropertyEditor(new HebbianRule()));
         RULE_MAP.put(new HebbianCPCARule().getName(),
-                new SynapseRulePropertiesPanel(new HebbianCPCARule()));
+                new AnnotatedPropertyEditor(new HebbianCPCARule()));
         RULE_MAP.put(new HebbianThresholdRule().getName(),
-                new SynapseRulePropertiesPanel(new HebbianThresholdRule()));
+                new AnnotatedPropertyEditor(new HebbianThresholdRule()));
         RULE_MAP.put(new OjaRule().getName(),
-                new SynapseRulePropertiesPanel(new OjaRule()));
+                new AnnotatedPropertyEditor(new OjaRule()));
         RULE_MAP.put(new PfisterGerstner2006Rule().getName(),
-                new SynapseRulePropertiesPanel(new PfisterGerstner2006Rule()));
+                new AnnotatedPropertyEditor(new PfisterGerstner2006Rule()));
         // RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
         // new ShortTermPlasticityRulePanel());
         RULE_MAP.put(new STDPRule().getName(),
-                new SynapseRulePropertiesPanel(new STDPRule()));
+                new AnnotatedPropertyEditor(new STDPRule()));
         RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
-                new SynapseRulePropertiesPanel(
+                new AnnotatedPropertyEditor(
                         new SubtractiveNormalizationRule()));
     }
 
     /**
-     * Create the panel with specified starting visibility.
+     * Create the panel with default starting visibility.
      *
      * @param synapseList the list of synapses being edited
      * @param parent parent window referenced for resizing via "Pack"
@@ -143,12 +148,12 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Construct the panel with default starting visibility.
+     * Construct the panel with specified starting visibility.
      *
      * @param synapseList the list of synapses being edited
      * @param parent parent window referenced for resizing via "Pack"
-     * @param startingState the starting state of whether or not details of the
-     *            rule are initially visible
+     * @param startingState whether or not the dropdown showing rule parameters 
+     * should be visible by default.
      */
     public SynapseRulePanel(Collection<Synapse> synapseList,
             final Window parent, boolean startingState) {
@@ -170,32 +175,66 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
 
         Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-        JPanel tPanel = new JPanel();
-        tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
-        tPanel.add(cbSynapseType);
-        tPanel.add(Box.createHorizontalStrut(20));
-        tPanel.add(displaySPTriangle);
-
-        tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tPanel.setBorder(padding);
-        this.add(tPanel);
-
+        // Combo box and drop down triangle
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.add(cbSynapseType);
+        topPanel.add(Box.createHorizontalStrut(20));
+        topPanel.add(displaySPTriangle);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topPanel.setBorder(padding);
+        this.add(topPanel);
         this.add(Box.createRigidArea(new Dimension(0, 5)));
 
+        // The drop-down synapse panel
         synapsePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         synapsePanel.setBorder(padding);
         synapsePanel.setVisible(displaySPTriangle.isDown());
         this.add(synapsePanel);
 
+        // Border
         TitledBorder tb2 = BorderFactory.createTitledBorder("Update Rule");
         this.setBorder(tb2);
 
+    }
+    
+    /**
+     * Initialize the main synapse panel based on the type of the selected
+     * synapses. Assumes > 0 synapses are selected.
+     */
+    private void initSynapseType() {
+        Iterator<Synapse> synIter = synapseCollection.iterator();
+        Synapse protoSyn = synIter.next();
+        boolean discrepancy = false;
+        while (synIter.hasNext()) {
+            if (!protoSyn.getLearningRule().getClass()
+                    .equals(synIter.next().getLearningRule().getClass())) {
+                discrepancy = true;
+                break;
+            }
+        }
+        if (discrepancy) {
+            cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
+            cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
+            // Simply to serve as an empty panel
+            synapsePanel = new AnnotatedPropertyEditor();
+        } else {
+            List<EditableObject> ruleList = synapseCollection.stream()
+                    .map(Synapse::getLearningRule).collect(Collectors.toList());
+            String synapseName = ((SynapseUpdateRule)ruleList.get(0)).getName();
+            synapsePanel = RULE_MAP.get(synapseName).copy();
+//            synapsePanel.fillFieldValues(ruleList);
+            cbSynapseType.setSelectedItem(synapseName);
+        
+        }
     }
 
     /**
      * Adds the listeners to this dialog.
      */
     private void addListeners() {
+
+        // Respond to triangle drop down clicks
         displaySPTriangle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -205,14 +244,16 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             }
         });
 
+        // Respond to combo box changes
         cbSynapseType.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                synapsePanel = RULE_MAP.get(cbSynapseType.getSelectedItem())
-                        .deepCopy();
+
+                synapsePanel = RULE_MAP.get(cbSynapseType.getSelectedItem());
 
                 // Is the current panel different from the starting panel?
+                // If so, we  are changing the synapse type
                 boolean replace = synapsePanel != startingPanel;
 
                 if (replace) {
@@ -220,9 +261,10 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
                     synapsePanel.fillDefaultValues();
                 }
 
+                //TODO
                 // Tell the new panel whether it will have to replace
                 // synapse update rules or edit them upon commit.
-                synapsePanel.setReplace(replace);
+                //synapsePanel.setReplace(replace);
 
                 repaintPanel();
                 parent.pack();
@@ -243,34 +285,27 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         repaint();
     }
 
-    /**
-     * Initialize the main synapse panel based on the type of the selected
-     * synapses. Assumes > 0 synapses are selected.
-     */
-    private void initSynapseType() {
-        Iterator<Synapse> synIter = synapseCollection.iterator();
-        Synapse protoSyn = synIter.next();
-        boolean discrepancy = false;
-        while (synIter.hasNext()) {
-            if (!protoSyn.getLearningRule().getClass()
-                    .equals(synIter.next().getLearningRule().getClass())) {
-                discrepancy = true;
-                break;
+    @Override
+    public boolean commitChanges() {
+        
+        SynapseUpdateRule selectedRule = (SynapseUpdateRule) synapsePanel.getEditedObject();
+        
+        // TODO: Replace check
+        for (Synapse s : synapseCollection) {
+            // Only replace if this is a different rule (otherwise when
+            // editing multiple rules with different parameter values which
+            // have not been set those values will be replaced with the
+            // default).
+            if (!s.getLearningRule().getClass()
+                    .equals(selectedRule.getClass())) {
+                s.setLearningRule(selectedRule.deepCopy());
             }
         }
-        if (discrepancy) {
-            cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
-            cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
-            // Simply to serve as an empty panel
-            synapsePanel = new SynapseRulePropertiesPanel();
-        } else {
-            List<SynapseUpdateRule> synapseList = Synapse
-                    .getRuleList(synapseCollection);
-            String synapseName = synapseList.get(0).getName();
-            synapsePanel = RULE_MAP.get(synapseName).deepCopy();
-            synapsePanel.fillFieldValues(synapseList);
-            cbSynapseType.setSelectedItem(synapseName);
-        }
+        
+//        List<EditableObject> ruleList = synapseCollection.stream()
+//                .map(Synapse::getLearningRule).collect(Collectors.toList());
+        synapsePanel.commitChanges();
+        return true;
     }
 
     /**
@@ -280,41 +315,8 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         return cbSynapseType;
     }
 
-    /**
-     * @return a template synapse update rule object associated with the
-     *         selected synapse update rule panel.
-     */
-    public SynapseUpdateRule getTemplateRule() {
-        SynapseUpdateRule rule = synapsePanel.getPrototypeRule().deepCopy();
-        Synapse s = Synapse.getTemplateSynapse();
-        s.setLearningRule(rule);
-        synapsePanel.writeValuesToRules(Collections.singleton(s));
-        return rule;
-    }
-
-    /**
-     * @return the currently displayed synapse panel
-     */
-    public AbstractSynapseRulePanel getSynapsePanel() {
-        return synapsePanel;
-    }
-
-    /**
-     * @param synapsePanel set the currently displayed synapse panel to the
-     *            specified panel
-     */
-    public void setSynapsePanel(AbstractSynapseRulePanel synapsePanel) {
-        this.synapsePanel = synapsePanel;
-    }
-
     @Override
     public void fillFieldValues() {
-    }
-
-    @Override
-    public boolean commitChanges() {
-        synapsePanel.commitChanges(synapseCollection);
-        return true; // TODO:Finish implementation of CommittablePanel interface
     }
 
     @Override

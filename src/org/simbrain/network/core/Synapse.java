@@ -28,6 +28,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -83,6 +84,8 @@ public class Synapse {
     private static final int MAX_DIGITS = 2;
 
     /** Strength of synapse. */
+    @UserParameter(label = "Strength", description = "Weight Strength", 
+            minimumValue = -10, maximumValue = 10, defaultValue = "01", order = 1)
     private double strength = 0;
 
     /** Post-Synaptic Response */

@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * <b>ClampedSynapse</b>.

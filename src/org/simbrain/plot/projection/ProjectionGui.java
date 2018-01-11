@@ -35,6 +35,7 @@ import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -310,7 +311,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         stepSizeLabel.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(stepSizeLabel);
         try {
-            sammonStepSize = new JTextField(""
+            sammonStepSize = new JFormattedTextField(""
                     + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
         } catch (PropertyNotFoundException e1) {
             e1.printStackTrace();
@@ -534,8 +535,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                         .getProjectionMethod();
                 if (proj != null) {
                     if (proj instanceof ProjectSammon) {
-                        ((ProjectSammon) proj).setEpsilon(Double
-                                .parseDouble(sammonStepSize.getText()));
+                        ((ProjectSammon) proj).setEpsilon(
+                                Utils.doubleParsable(sammonStepSize.getText()));
                     }
                 }
             }

@@ -195,7 +195,7 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current x position.
      * @param newx
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void setX(final float newx) {
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
@@ -218,7 +218,7 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current y position.
      * @param newy
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void setY(final float newy) {
         // System.out.println("y:" + newy);
         if (parentWorld.getWrapAround()) {
@@ -294,7 +294,8 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @return
      */
-    @DisplayOrder(val = 80) @Producible
+    @DisplayOrder(val = 80) 
+    @Producible(idMethod="getId")
     public float getVelocityX() {
         return dx;
     }
@@ -304,7 +305,8 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @return
      */
-    @DisplayOrder(val = 90) @Producible
+    @DisplayOrder(val = 90) 
+    @Producible(idMethod="getId")
     public float getVelocityY() {
         return dy;
     }
@@ -314,7 +316,7 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @param dx
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void setVelocityX(final float dx) {
         this.dx = dx;
     }
@@ -324,7 +326,7 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @param dy
      */
-    @Consumable
+    @Consumable(idMethod="getId")
     public void setVelocityY(final float dy) {
         this.dy = dy;
     }
@@ -555,7 +557,7 @@ public abstract class OdorWorldEntity {
      *
      * @return center location of the entity.
      */
-    @Producible
+    @Producible(idMethod="getId")
     public double[] getCenterLocation() {
         return new double[] { getCenterX(), getCenterY() };
     }
@@ -563,7 +565,6 @@ public abstract class OdorWorldEntity {
     /**
      * Assigns the location of the center of this entity from a double array.
      */
-    @Consumable
     public void setCenterLocation(double[] value) {
         setCenterLocation(value[0], value[1]);
     }
@@ -573,7 +574,7 @@ public abstract class OdorWorldEntity {
      *
      * @return center x coordinate.
      */
-    @Producible
+    @Producible(idMethod="getId")
     public float getCenterX() {
         return x + (getWidth() / 2);
     }
@@ -583,7 +584,7 @@ public abstract class OdorWorldEntity {
      *
      * @return center y coordinate.
      */
-    @Producible
+    @Producible(idMethod="getId")
     public float getCenterY() {
         return y + (getHeight() / 2);
     }
@@ -604,7 +605,7 @@ public abstract class OdorWorldEntity {
      *
      * @return location of the entity.
      */
-    @Producible
+    @Producible(idMethod="getId")
     public double[] getLocation() {
         return new double[] { x, y };
     }
@@ -805,7 +806,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveNorth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -820,7 +821,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveSouth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -835,7 +836,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveEast(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -850,7 +851,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveWest(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {

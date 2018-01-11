@@ -20,6 +20,8 @@ package org.simbrain.plot.rasterchart;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
@@ -34,9 +36,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
     /** The data model. */
     private final RasterModel model;
 
-    /** Raster Plot consumer type. */
-//    private AttributeType rasterPlotConsumerType;
-
     /**
      * Create new raster plot component.
      *
@@ -45,7 +44,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
     public RasterPlotComponent(final String name) {
         super(name);
         model = new RasterModel();
-        initializeAttributes();
         addListener();
         model.defaultInit();
     }
@@ -61,7 +59,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
             final RasterModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
         addListener();
     }
 
@@ -74,36 +71,8 @@ public class RasterPlotComponent extends WorkspaceComponent {
     public RasterPlotComponent(final String name, final int numDataSources) {
         super(name);
         model = new RasterModel(numDataSources);
-        initializeAttributes();
         addListener();
     }
-
-    /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-//        rasterPlotConsumerType = new AttributeType(this, "Series", "setValue",
-//                double.class, true);
-//        addConsumerType(rasterPlotConsumerType);
-    }
-
-//    @Override
-//    public List<PotentialConsumer> getPotentialConsumers() {
-//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-//        if (rasterPlotConsumerType.isVisible()) {
-//            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-//                String description = rasterPlotConsumerType
-//                        .getSimpleDescription("Raster Series " + (i + 1));
-//                PotentialConsumer consumer = getAttributeManager()
-//                        .createPotentialConsumer(this, "setValues",
-//                                new Class[] { double[].class, Integer.class },
-//                                new Object[] { i });
-//                consumer.setCustomDescription(description);
-//                returnList.add(consumer);
-//            }
-//        }
-//        return returnList;
-//    }
 
     /**
      * Add chart listener to model.
@@ -159,9 +128,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
         return new RasterPlotComponent(name, dataModel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         RasterModel.getXStream().toXML(model, output);
@@ -169,13 +135,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -188,6 +152,16 @@ public class RasterPlotComponent extends WorkspaceComponent {
         return RasterModel.getXStream().toXML(model);
     }
 
+    /**
+     * Set raster values.  Can couple to this.
+     *
+     * @param values the current "y-axis" value for the raster series
+     */
+    @Consumable
+    public void setValues(final double[] values) {
+        setValues(values,0);
+    }
+    
     /**
      * Set the value of a specified data source (one curve in the raster 
      * plot). This is the main method for updating the data in a raster plot
@@ -203,9 +177,10 @@ public class RasterPlotComponent extends WorkspaceComponent {
         }
     }
 
-    @Consumable
-    public void setValues(final double[] values) {
-        setValues(values, 0);
+    @Override
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.add(this);
+        return models;
     }
-
 }

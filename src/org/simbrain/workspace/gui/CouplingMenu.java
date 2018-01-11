@@ -22,6 +22,10 @@ public class CouplingMenu extends JMenu {
         setText("Couple " + source.toString());
         updateItems();
     }
+    
+    public void setCustomName(String name) {
+        this.setText(name);
+    }
 
     private void updateItems() {
         removeAll();
@@ -36,7 +40,7 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createProducerSubmenu(Producer<?> producer) {
-        JMenu producerSubmenu = new JMenu(producer.getDescription());
+        JMenu producerSubmenu = new JMenu("Send:" + producer.getDescription());
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
@@ -64,7 +68,7 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createConsumerSubmenu(Consumer<?> consumer) {
-        JMenu consumerSubmenu = new JMenu(consumer.getDescription());
+        JMenu consumerSubmenu = new JMenu("Receive:" + consumer.getDescription());
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();

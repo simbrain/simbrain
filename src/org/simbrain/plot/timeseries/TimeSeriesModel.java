@@ -18,20 +18,33 @@
  */
 package org.simbrain.plot.timeseries;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.plot.barchart.BarChartModel.Bar;
+import org.simbrain.workspace.Consumable;
 
 import com.thoughtworks.xstream.XStream;
 
 /**
  * Data model for a time series plot.
+ * 
+ * TODO: Enable feature that limits max number of points
  */
 public class TimeSeriesModel extends ChartModel {
 
     /** Time Series Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
+    /** Lambda to supply time to the time series model. */
+    private transient Supplier<Integer> timeSupplier;
+    
     /** Default number of data sources for plot initialization. */
     private static final int INITIAL_DATA_SOURCES = 5;
 
@@ -49,21 +62,16 @@ public class TimeSeriesModel extends ChartModel {
 
     /** Whether this chart if fixed width or not. */
     private boolean fixedWidth = true;
+    
+    /** List of time series objects which can be coupled to. */
+    private List<TimeSeries> timeSeriesList = new ArrayList<TimeSeries>();
 
     /**
      * Time series model constructor.
      */
-    public TimeSeriesModel() {
+    public TimeSeriesModel(Supplier<Integer> timeSupplier) {
+        this.timeSupplier = timeSupplier;
         defaultInit();
-    }
-
-    /**
-     * Initialize model to specified number of data sources.
-     *
-     * @param numDataSources
-     */
-    public TimeSeriesModel(int numDataSources) {
-        addDataSources(numDataSources);
     }
 
     /**
@@ -99,11 +107,11 @@ public class TimeSeriesModel extends ChartModel {
      * Removes a data source from the chart.
      */
     public void removeDataSource() {
-        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
-
+        int lastSeriesIndex = dataset.getSeriesCount() - 1;
         if (lastSeriesIndex >= 0) {
-            this.fireDataSourceRemoved(null);
             dataset.removeSeries(lastSeriesIndex);
+            TimeSeries series = timeSeriesList.remove(lastSeriesIndex);
+            this.fireDataSourceRemoved(series);
         }
     }
 
@@ -111,9 +119,11 @@ public class TimeSeriesModel extends ChartModel {
      * Adds a data source to the chart.
      */
     public void addDataSource() {
-        Integer currentSize = dataset.getSeriesCount();
+        int currentSize = dataset.getSeriesCount();
         dataset.addSeries(new XYSeries(currentSize + 1));
-        this.fireDataSourceAdded(null);
+        TimeSeries series = new TimeSeries(currentSize + 1); 
+        timeSeriesList.add(series);
+        this.fireDataSourceAdded(series);
     }
 
     /**
@@ -259,6 +269,59 @@ public class TimeSeriesModel extends ChartModel {
         // }
         // }
 
+    }
+
+    /**
+     * Encapsulates a single time series.
+     */
+    public class TimeSeries implements ChartDataSource {
+        
+        /** Coupling Description. */
+        private int seriesIndex;
+
+        /** Construct the time series. */
+        TimeSeries(int seriesIndex) {
+            this.seriesIndex = seriesIndex;
+        }
+
+        /** Get the description. */
+        public String getDescription() {
+            return "" + seriesIndex;
+        }
+
+        @Consumable(idMethod="getDescription")
+        public void setValue(double value) {
+            addData(seriesIndex, timeSupplier.get(), value);
+        }
+    }
+    
+    /**
+     * @return the timeSeriesList
+     */
+    public List<TimeSeries> getTimeSeriesList() {
+        return timeSeriesList;
+    }
+    
+    /**
+     * Find matching time series object. Used to deserialize.
+     * 
+     * @param description key
+     * @return matching time series
+     */
+    public Optional<TimeSeries> getTimeSeries(String description) {
+        for (TimeSeries series: timeSeriesList) {
+            if (series.getDescription().equals(description)) {
+                return Optional.of(series);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * @param timeSupplier the timeSupplier to set
+     */
+    public void setTimeSupplier(Supplier<Integer> timeSupplier) {
+        this.timeSupplier = timeSupplier;
     }
 
 }

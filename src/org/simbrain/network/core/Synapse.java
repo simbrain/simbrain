@@ -425,7 +425,7 @@ public class Synapse {
     /**
      * @return Strength of synapse.
      */
-    @Producible
+    @Producible(idMethod="getId", defaultVisibility=false)
     public final double getStrength() {
         return strength;
     }
@@ -435,7 +435,7 @@ public class Synapse {
      *
      * @param wt Strength value
      */
-    @Consumable
+    @Consumable(idMethod="getId", defaultVisibility=false)
     public void setStrength(final double wt) {
         if (isTemplate) {
             forceSetStrength(wt);

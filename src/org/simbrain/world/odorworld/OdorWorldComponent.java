@@ -147,27 +147,35 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
-        String[] parsedKey = objectKey.split(":");
-        String entityName = parsedKey[0];
-        if (parsedKey.length == 1) {
-            return getWorld().getEntity(entityName);
-        } else {
-            String secondString = parsedKey[1];
-            if (secondString.equalsIgnoreCase("sensor")) {
-                return getWorld().getSensor(entityName, parsedKey[2]);
-            } else if (secondString.equalsIgnoreCase("effector")) {
-                return getWorld().getEffector(entityName, parsedKey[2]);
-            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
-                // Needed to read simulations created before 2/11; remove before
-                // beta release
-                int index = Integer.parseInt(parsedKey[3]);
-                return getWorld().getSensor(entityName, parsedKey[2]);
-            } else if (secondString.equalsIgnoreCase("smeller")) {
-                int index = Integer.parseInt(parsedKey[3]);
-                return getWorld().getSensor(entityName, parsedKey[2]);
-            }
+    public Object getObjectFromKey(String objectKey) {  
+        
+        //System.out.println("-->" + objectKey);
+        
+        if (objectKey.startsWith("Entity")) {
+            return getWorld().getEntity(objectKey);
         }
+        //
+
+//        String[] parsedKey = objectKey.split(":");
+//        String entityName = parsedKey[0];
+//        if (parsedKey.length == 1) {
+//            return getWorld().getEntity(entityName);
+//        } else {
+//            String secondString = parsedKey[1];
+//            if (secondString.equalsIgnoreCase("sensor")) {
+//                return getWorld().getSensor(entityName, parsedKey[2]);
+//            } else if (secondString.equalsIgnoreCase("effector")) {
+//                return getWorld().getEffector(entityName, parsedKey[2]);
+//            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
+//                // Needed to read simulations created before 2/11; remove before
+//                // beta release
+//                int index = Integer.parseInt(parsedKey[3]);
+//                return getWorld().getSensor(entityName, parsedKey[2]);
+//            } else if (secondString.equalsIgnoreCase("smeller")) {
+//                int index = Integer.parseInt(parsedKey[3]);
+//                return getWorld().getSensor(entityName, parsedKey[2]);
+//            }
+//        }
         return null;
     }
 

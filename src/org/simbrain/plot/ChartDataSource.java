@@ -1,5 +1,8 @@
 package org.simbrain.plot;
 
+/**
+ * Helper which encapsulates a source of data for charts.
+ */
 public interface ChartDataSource {
 
     /** Get a description of the data source. */

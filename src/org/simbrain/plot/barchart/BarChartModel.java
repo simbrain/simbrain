@@ -39,13 +39,17 @@ public class BarChartModel extends ChartModel {
      * Bar encapsulates a single data column in the BarChartModel.
      */
     public class Bar implements ChartDataSource {
+        
+        /** Coupling Description. */
         private String description;
 
+        /** Construct the Bar. */
         Bar(String description) {
             this.description = description;
             dataset.addValue((Number)0, 1, description);
         }
 
+        /** Get the description. */
         public String getDescription() {
             return description;
         }
@@ -59,6 +63,7 @@ public class BarChartModel extends ChartModel {
     /** JFreeChart dataset for bar charts. */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
+    /** List of bar objects which can be coupled to. */
     private List<Bar> bars = new ArrayList<Bar>();
 
     /** Color of bars in barchart. */
@@ -232,6 +237,12 @@ public class BarChartModel extends ChartModel {
         }
     }
 
+    /**
+     * Find matching bar object. Used to deserialize.
+     * 
+     * @param description key
+     * @return matching bar
+     */
     public Optional<Bar> getBar(String description) {
         for (Bar bar : bars) {
             if (bar.getDescription().equals(description)) {

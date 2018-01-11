@@ -35,6 +35,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.CouplingMenuConsumer;
 import org.simbrain.workspace.gui.CouplingMenuProducer;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
@@ -430,11 +431,12 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             contextMenu.addSeparator();
-
-            contextMenu.add(new CouplingMenuProducer("Get Entity Location", component.getWorkspace(),
-                    component.getWorkspace().getCouplingFactory().getProducer(entity, "getCenterLocation")));
-            contextMenu.add(new CouplingMenuConsumer("Set Entity Location", component.getWorkspace(),
-                    component.getWorkspace().getCouplingFactory().getConsumer(entity, "setCenterLocation")));
+            
+            CouplingMenu couplingMenu = new CouplingMenu(component.getWorkspace());
+            couplingMenu.setSourceModel(entity);
+            couplingMenu.setCustomName("Create couplings");
+            contextMenu.add(couplingMenu);
+            contextMenu.addSeparator();
         }
         contextMenu.add(new JMenuItem(new ShowWorldPrefsAction(this)));
         return contextMenu;

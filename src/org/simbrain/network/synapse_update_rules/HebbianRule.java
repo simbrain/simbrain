@@ -27,13 +27,10 @@ import org.simbrain.util.UserParameter;
  */
 public class HebbianRule extends SynapseUpdateRule {
 
-    /** Default learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = .1;
-
     /** Learning rate. */
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", 
             minimumValue = -10, maximumValue = 10, defaultValue = ".01", order = 1)
-    private double learningRate = DEFAULT_LEARNING_RATE;
+    private double learningRate;
 
     @Override
     public void init(Synapse synapse) {

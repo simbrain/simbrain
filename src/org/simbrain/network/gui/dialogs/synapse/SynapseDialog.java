@@ -46,7 +46,6 @@ public final class SynapseDialog extends StandardDialog {
     /** The synapses being modified. */
     private final List<Synapse> synapseList;
 
-    // TODO: REname
     /**
      * Main panel for editing synapses.
      */

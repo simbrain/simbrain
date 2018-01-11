@@ -20,13 +20,12 @@ package org.simbrain.plot.timeseries;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,9 +36,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /** The data model. */
     private final TimeSeriesModel model;
 
-    /** Time Series consumer type. */
-//    private AttributeType timeSeriesConsumerType;
-
     /**
      * Create new time series plot component.
      *
@@ -47,8 +43,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public TimeSeriesPlotComponent(final String name) {
         super(name);
-        model = new TimeSeriesModel();
-        initializeAttributes();
+        model = new TimeSeriesModel(() -> getWorkspace().getTime());
         addListener();
         model.defaultInit();
     }
@@ -64,49 +59,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             final TimeSeriesModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
+        model.setTimeSupplier(() -> getWorkspace().getTime());
         addListener();
     }
-
-    /**
-     * Initializes a JFreeChart with specific number of data sources.
-     *
-     * @param name name of component
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public TimeSeriesPlotComponent(final String name, final int numDataSources) {
-        super(name);
-        model = new TimeSeriesModel(numDataSources);
-        initializeAttributes();
-        addListener();
-    }
-
-    /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-//        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
-//                double.class, true);
-//        addConsumerType(timeSeriesConsumerType);
-    }
-
-//    @Override
-//    public List<PotentialConsumer> getPotentialConsumers() {
-//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-//        if (timeSeriesConsumerType.isVisible()) {
-//            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-//                String description = timeSeriesConsumerType
-//                        .getSimpleDescription("Time Series " + (i + 1));
-//                PotentialConsumer consumer = getAttributeManager()
-//                        .createPotentialConsumer(this, "setValue",
-//                                new Class[] { double.class, Integer.class },
-//                                new Object[] { i });
-//                consumer.setCustomDescription(description);
-//                returnList.add(consumer);
-//            }
-//        }
-//        return returnList;
-//    }
 
     /**
      * Add chart listener to model.
@@ -124,6 +79,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         });
     }
 
+    @Override
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.addAll(model.getTimeSeriesList());
+        return models;
+    }
+
     /**
      * @return the model.
      */
@@ -133,7 +95,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        return this;
+            Optional<TimeSeriesModel.TimeSeries> timeSeries = model.getTimeSeries(objectKey);
+            if (timeSeries.isPresent()) {
+                return timeSeries.get();
+            }
+        return null;
     }
 
     /**
@@ -162,9 +128,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         TimeSeriesModel.getXStream().toXML(model, output);
@@ -172,13 +135,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -192,22 +153,15 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Set the value of a specified data source (one curve in the time series
-     * plot). This is the main method for updating the data in a time series
-     * chart.
+     * Convenience method for setting the value of a specified time series in the plot. 
+     * Called by external simulations.
      *
      * @param value the current "y-axis" value for the time series
      * @param index which time series curve to set.
      */
-    @Consumable
     public void setValue(double value, Integer index) {
         // TODO: Throw exception if index out of current bounds
         model.addData(index, TimeSeriesPlotComponent.this.getWorkspace().getTime(), value);
-    }
-
-    //TODO.  Rename.
-    public List<Integer> getSeries() {
-        return IntStream.range(1, model.getDataset().getSeries().size()).boxed().collect(Collectors.toList());
     }
 
 }

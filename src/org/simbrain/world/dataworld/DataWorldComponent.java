@@ -313,12 +313,6 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
     }
 
-    // TODO: Fix this
-    @Override
-    public List<Object> getModels() {
-        return new ArrayList<Object>();
-    }
-
     @Override
     public void update() {
         dataTable.updateCurrentRow();
@@ -378,20 +372,6 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     }
 
-//    /**
-//     * @return the producingColumnType
-//     */
-//    public AttributeType getProducingColumnType() {
-//        return producingColumnType;
-//    }
-//
-//    /**
-//     * @return the consumingColumnType
-//     */
-//    public AttributeType getConsumingColumnType() {
-//        return consumingColumnType;
-//    }
-
     @Consumable
     public void setRow(final double[] values) {
         dataTable.setVectorCurrentRow(values);
@@ -401,4 +381,12 @@ public class DataWorldComponent extends WorkspaceComponent {
     public double[] getRow() {
         return dataTable.getVectorCurrentRow();
     }
+    
+    @Override
+    public List<Object> getModels() {
+        List<Object> retList = new ArrayList<Object>();
+        retList.add(this);
+        return retList;
+    }
+    
 }

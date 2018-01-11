@@ -127,24 +127,8 @@ public final class NetworkComponent extends WorkspaceComponent {
             return this.getNetwork().getNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse_")) {
             return this.getNetwork().getSynapse(objectKey);
-        } else if (objectKey.startsWith("NeuronGroup")) {
-            return this.getNetwork().getGroup(objectKey.split(":")[1]);
-        } else if (objectKey.startsWith("SynapseGroup")) {
-            return this.getNetwork().getGroup(objectKey.split(":")[1]);
-        }
-        return null;
-    }
-
-    @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof Neuron) {
-            return ((Neuron) object).getId();
-        } else if (object instanceof Synapse) {
-            return ((Synapse) object).getId();
-        } else if (object instanceof NeuronGroup) {
-            return "NeuronGroup:" + ((NeuronGroup) object).getId();
-        } else if (object instanceof SynapseGroup) {
-            return "SynapseGroup:" + ((SynapseGroup) object).getId();
+        } else if (objectKey.startsWith("Group_")) {
+            return this.getNetwork().getGroup(objectKey);
         }
         return null;
     }

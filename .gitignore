@@ -13,5 +13,5 @@
 out/*
 /bin1/
 .settings/
-
+.metadata/*
 .checkstyle

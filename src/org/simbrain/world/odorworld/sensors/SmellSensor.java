@@ -122,7 +122,6 @@ public class SmellSensor extends Sensor {
      * @param index
      * @return the currentValue
      */
-    @Producible(idMethod="getDimensionList")
     public double getCurrentValue(Integer index) {
         return currentValue[index];
     }

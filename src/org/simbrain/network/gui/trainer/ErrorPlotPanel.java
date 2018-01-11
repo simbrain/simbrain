@@ -54,7 +54,7 @@ public class ErrorPlotPanel extends JPanel {
         JPanel mainPanel = new JPanel();
 
         // Configure time series plot
-        model = new TimeSeriesModel(1);
+        model = new TimeSeriesModel(() -> trainer.getIteration());
         model.setRangeLowerBound(0);
         model.setRangeUpperBound(1);
         model.setAutoRange(false);

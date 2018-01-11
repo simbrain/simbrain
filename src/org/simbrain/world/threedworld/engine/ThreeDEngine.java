@@ -1,6 +1,8 @@
 package org.simbrain.world.threedworld.engine;
 
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.util.concurrent.Future;
 
@@ -46,12 +48,12 @@ public class ThreeDEngine extends Application {
 
     private ThreeDContext context;
     private ThreeDImagePanel panel;
-    private ThreeDRenderSource view;
+    private ThreeDRenderSource renderSource;
     private BulletAppState bulletAppState;
     private Node rootNode;
     private State state;
     private boolean updateSync;
-    private float fixedTimeStep = 1 / 60f;
+    private float fixedTimeStep = 1 / 30f;
     private String assetDirectory;
 
     /**
@@ -61,15 +63,16 @@ public class ThreeDEngine extends Application {
         super();
 
         AppSettings settings = new AppSettings(true);
-        settings.setFrameRate(60);
+        settings.setFrameRate(30);
         settings.setCustomRenderer(ThreeDContext.class);
+        settings.setWidth(600);
+        settings.setHeight(400);
         setSettings(settings);
         start();
 
         context = (ThreeDContext) getContext();
         panel = context.createPanel();
         panel.setPreferredSize(new Dimension(settings.getWidth(), settings.getHeight()));
-        context.setInputSource(panel);
         setPauseOnLostFocus(false);
 
         bulletAppState = new BulletAppState();
@@ -85,10 +88,10 @@ public class ThreeDEngine extends Application {
     }
 
     /**
-     * @return The main view of the 3d engine, i.e. the editor view.
+     * @return The main renderSource of the 3d engine, i.e. the editor renderSource.
      */
-    public ThreeDRenderSource getMainView() {
-        return view;
+    public ThreeDRenderSource getRenderSource() {
+        return renderSource;
     }
 
     /**
@@ -230,9 +233,15 @@ public class ThreeDEngine extends Application {
                 : "src/org/simbrain/world/threedworld/threedassets/assets");
         getAssetManager().registerLocator(assetDirectory, FileLocator.class);
 
-        view = new ThreeDRenderSource(getCamera().getWidth(), getCamera().getHeight());
-        view.attach(true, getViewPort());
-        panel.setImageSource(view, true);
+        renderSource = new ThreeDRenderSource(getViewPort(), true);
+        panel.setImageSource(renderSource);
+        panel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                renderSource.resize(panel.getWidth(), panel.getHeight());
+            }
+        });
 
         rootNode = new Node("root");
         viewPort.attachScene(rootNode);

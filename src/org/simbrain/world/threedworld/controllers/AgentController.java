@@ -98,7 +98,7 @@ public class AgentController implements ActionListener {
         engine.enqueue(() -> {
             VisionSensor sensor = agent.getSensor(VisionSensor.class);
             if (sensor != null) {
-                engine.getPanel().setImageSource(sensor.getSource(), false);
+                engine.getPanel().setImageSource(sensor.getSource());
             }
         });
     }
@@ -115,7 +115,7 @@ public class AgentController implements ActionListener {
         engine.enqueue(() -> {
             VisionSensor sensor = releasedAgent.getSensor(VisionSensor.class);
             if (sensor != null && engine.getPanel().getImageSource().equals(sensor.getSource())) {
-                engine.getPanel().setImageSource(engine.getMainView(), true);
+                engine.getPanel().setImageSource(engine.getRenderSource());
             }
         });
     }

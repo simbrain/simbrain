@@ -21,6 +21,7 @@ import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.threedworld.engine.ThreeDContext;
 import org.simbrain.world.threedworld.entities.EditorDialog;
 
 /**

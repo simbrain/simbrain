@@ -75,8 +75,7 @@ public class VisionSensor implements Sensor {
         viewPort = agent.getEngine().getRenderManager().createMainView(agent.getName() + "ViewPort", camera);
         viewPort.setClearFlags(true, true, true);
         viewPort.attachScene(agent.getEngine().getRootNode());
-        source = new ThreeDRenderSource(width, height);
-        source.attach(false, viewPort);
+        source = new ThreeDRenderSource(viewPort, false);
         //sourceCoupling = new ImageCoupling(source);
     }
 

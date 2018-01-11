@@ -1,6 +1,7 @@
 package org.simbrain.world.threedworld.engine;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import org.simbrain.world.threedworld.ThreeDImagePanel;
@@ -88,15 +89,16 @@ public class ThreeDContext implements JmeContext {
             super.mouseReleased(flippedEvent);
         }
     };
-    private AwtKeyInput keyInput = new AwtKeyInput();
+    private AwtKeyInput keyInput = new AwtKeyInput() {
+        @Override
+        public void keyTyped(KeyEvent evt) {
+            super.keyPressed(evt);
+        }
+
+    };
     private boolean lastThrottleState = false;
     
     public ThreeDContext() {}
-    
-    public void setInputSource(Component component) {
-        mouseInput.setInputSource(component);
-        keyInput.setInputSource(component);
-    }
     
     @Override
     public Type getType() {
@@ -155,6 +157,8 @@ public class ThreeDContext implements JmeContext {
     
     public ThreeDImagePanel createPanel() {
         panel = new ThreeDImagePanel();
+        mouseInput.setInputSource(panel);
+        keyInput.setInputSource(panel);
         return panel;
     }
     

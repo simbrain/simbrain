@@ -42,7 +42,7 @@ public class VisionSensorEditor extends SensorEditor {
     public VisionSensorEditor(VisionSensor sensor) {
         super(sensor.getAgent(), sensor);
         this.sensor = sensor;
-        previewPanel.setImageSource(sensor.getSource(), false);
+        previewPanel.setImageSource(sensor.getSource());
     }
 
     @Override

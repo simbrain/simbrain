@@ -5,14 +5,8 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.Arrays;
 
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.SpinnerListModel;
+import javax.swing.*;
+
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.util.widgets.ToggleButton;
@@ -94,26 +88,33 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
      */
     private Component createToolBar(ThreeDWorldComponent component) {
         JPanel toolPanel = new JPanel(new BorderLayout());
+
         JToolBar runToolbar = new JToolBar();
         runToolbar.add(createToggleButton(component.getWorld().getAction("Toggle Update Sync"), false));
         runToolbar.add(createToggleButton(component.getWorld().getAction("Toggle Run"), true));
+        for (Component child : runToolbar.getComponents()) {
+            ((JComponent) child).setFocusable(false);
+        }
 
         JToolBar editToolbar = new JToolBar();
-
         editToolbar.add(new ToggleButton(Arrays.asList(
                 component.getWorld().getAction("Control Agent"),
                 component.getWorld().getAction("Release Agent"))));
         editToolbar.add(component.getWorld().getAction("Camera Home"));
         editToolbar.add(createToggleButton(component.getWorld().getAction("Snap Transforms"), true));
-        SpinnerListModel rotationAxisModel = new SpinnerListModel(
-                Arrays.asList("X Axis", "Y Axis", "Z Axis", "Camera"));
-        rotationAxisModel.setValue(component.getWorld().getSelectionController().getRotationAxis());
-        JSpinner rotationAxisSpinner = new JSpinner(rotationAxisModel);
-        ((JSpinner.DefaultEditor) rotationAxisSpinner.getEditor()).getTextField().setColumns(4);
-        rotationAxisSpinner.addChangeListener((event) -> {
-            component.getWorld().getSelectionController().setRotationAxis((String) rotationAxisModel.getValue());
+        JComboBox<String> rotationAxisCombo = new JComboBox<String>();
+        rotationAxisCombo.addItem("X Axis");
+        rotationAxisCombo.addItem("Y Axis");
+        rotationAxisCombo.addItem("Z Axis");
+        rotationAxisCombo.addItem("Camera");
+        rotationAxisCombo.setSelectedItem(component.getWorld().getSelectionController().getRotationAxis());
+        rotationAxisCombo.addActionListener((event) -> {
+            component.getWorld().getSelectionController().setRotationAxis((String) rotationAxisCombo.getSelectedItem());
         });
-        editToolbar.add(rotationAxisSpinner);
+        editToolbar.add(rotationAxisCombo);
+        for (Component child : editToolbar.getComponents()) {
+            ((JComponent) child).setFocusable(false);
+        }
 
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
         flow.setHgap(0);

@@ -211,8 +211,8 @@ public class CameraController implements AnalogListener, ActionListener {
         input.addMapping(MoveRight.toString(), new KeyTrigger(KeyInput.KEY_D));
         input.addMapping(MoveForward.toString(), new KeyTrigger(KeyInput.KEY_W));
         input.addMapping(MoveBackward.toString(), new KeyTrigger(KeyInput.KEY_S));
-        input.addMapping(MoveUp.toString(), new KeyTrigger(KeyInput.KEY_Q));
-        input.addMapping(MoveDown.toString(), new KeyTrigger(KeyInput.KEY_Z));
+        input.addMapping(MoveUp.toString(), new KeyTrigger(KeyInput.KEY_E));
+        input.addMapping(MoveDown.toString(), new KeyTrigger(KeyInput.KEY_Q));
         for (Mapping mapping : Mapping.values()) {
             input.addListener(this, mapping.toString());
         }

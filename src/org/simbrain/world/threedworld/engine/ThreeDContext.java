@@ -89,13 +89,7 @@ public class ThreeDContext implements JmeContext {
             super.mouseReleased(flippedEvent);
         }
     };
-    private AwtKeyInput keyInput = new AwtKeyInput() {
-        @Override
-        public void keyTyped(KeyEvent evt) {
-            super.keyPressed(evt);
-        }
-
-    };
+    private AwtKeyInput keyInput = new AwtKeyInput();
     private boolean lastThrottleState = false;
     
     public ThreeDContext() {}

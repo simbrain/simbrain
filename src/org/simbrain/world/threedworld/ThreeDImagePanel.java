@@ -30,6 +30,7 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
      */
     public ThreeDImagePanel() {
         super();
+        setFocusable(true);
         repaint();
     }
 

@@ -74,7 +74,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
         List<Object> models = new ArrayList<Object>();
         models.add(world);
         for (Entity entity : world.getEntities()) {
-            models.add(new EntityCouplingAdapter(entity));
+            models.add(entity);
             if (entity instanceof Agent) {
                 Agent agent = (Agent) entity;
                 models.addAll(agent.getSensors());

@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,8 +67,6 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 @SuppressWarnings("serial")
 public class SynapseRulePanel extends JPanel implements EditablePanel {
-
-    // TODO: Cache a rule list?
 
     /** The synapses being modified. */
     private final Collection<Synapse> synapseCollection;
@@ -204,28 +203,32 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
      */
     private void initSynapseType() {
         Iterator<Synapse> synIter = synapseCollection.iterator();
-        Synapse protoSyn = synIter.next();
+        Synapse synapseRef = synIter.next();
+        
+        // Check whether the set of synapses being edited are of the
+        // same type or not
         boolean discrepancy = false;
         while (synIter.hasNext()) {
-            if (!protoSyn.getLearningRule().getClass()
+            if (!synapseRef.getLearningRule().getClass()
                     .equals(synIter.next().getLearningRule().getClass())) {
                 discrepancy = true;
                 break;
             }
         }
+        
+        // If they are different types, display combo box as null
         if (discrepancy) {
             cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
             cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
             // Simply to serve as an empty panel
-            synapsePanel = new AnnotatedPropertyEditor();
+            synapsePanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
         } else {
-            List<EditableObject> ruleList = synapseCollection.stream()
-                    .map(Synapse::getLearningRule).collect(Collectors.toList());
-            String synapseName = ((SynapseUpdateRule)ruleList.get(0)).getName();
-            synapsePanel = RULE_MAP.get(synapseName).copy();
-//            synapsePanel.fillFieldValues(ruleList);
+            // If they are the same type, use the appropriate editor panel.
+            // Later if ok is pressed the values from that panel will be written
+            // to the rules
+            String synapseName = synapseRef.getLearningRule().getName();
+            synapsePanel = RULE_MAP.get(synapseName);
             cbSynapseType.setSelectedItem(synapseName);
-        
         }
     }
 
@@ -275,20 +278,15 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
 
     }
 
-    /**
-     * Called to repaint the panel based on changes in the to the selected
-     * synapse type.
-     */
-    public void repaintPanel() {
-        removeAll();
-        initializeLayout();
-        repaint();
-    }
-
     @Override
     public boolean commitChanges() {
         
         SynapseUpdateRule selectedRule = (SynapseUpdateRule) synapsePanel.getEditedObject();
+        
+        // If an inconsistent set of objects is being edited return with no action
+        if(selectedRule == null) {
+            return true;
+        }
         
         // TODO: Replace check
         for (Synapse s : synapseCollection) {
@@ -302,10 +300,21 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             }
         }
         
-//        List<EditableObject> ruleList = synapseCollection.stream()
-//                .map(Synapse::getLearningRule).collect(Collectors.toList());
-        synapsePanel.commitChanges();
+        // TODO: Think about this in relation to above
+        List<EditableObject> ruleList = synapseCollection.stream()
+                .map(Synapse::getLearningRule).collect(Collectors.toList());
+        synapsePanel.commitChanges(ruleList);
         return true;
+    }
+
+    /**
+     * Called to repaint the panel based on changes in the to the selected
+     * synapse type.
+     */
+    public void repaintPanel() {
+        removeAll();
+        initializeLayout();
+        repaint();
     }
 
     /**

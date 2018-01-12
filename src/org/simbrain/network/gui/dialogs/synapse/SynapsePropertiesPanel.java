@@ -19,17 +19,15 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Window;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.neuron.GeneralNeuronPropertiesPanel;
-import org.simbrain.network.gui.dialogs.neuron.UpdateRulePanel;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -54,8 +52,11 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     private static final boolean DEFAULT_DISPLAY_PARAMS = false;
 
-    /** Panel to edit general synapse properties. */
-    private GeneralSynapsePropertiesPanel generalSynapsePropertiesPanel;
+    /** The synapses being modified. */
+    private final List<Synapse> synapseList;
+
+    /** Panel to edit general synapse properties */
+    private AnnotatedPropertyEditor generalSynapseProperties;
 
     /** Panel to edit specific synapse type */
     private SynapseRulePanel synapseRulePanel;
@@ -94,7 +95,6 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
             final boolean showSpecificRuleParams) {
         SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(synapseList,
                 parent, showSpecificRuleParams, true);
-        cnip.initializeLayout();
         return cnip;
     }
 
@@ -110,36 +110,37 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     private SynapsePropertiesPanel(final List<Synapse> synapseList,
             final Window parent, final boolean showSpecificRuleParams,
             final boolean displayID) {
+        
+        this.synapseList = synapseList;
+
+        BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+        this.setLayout(layout);
+        
+        // General Synapse Properties
+        generalSynapseProperties = new AnnotatedPropertyEditor(synapseList);
+        this.add(generalSynapseProperties);
+        this.add(Box.createVerticalStrut(DEFAULT_VGAP));
+        
+        // Synapse Rule panel
         synapseRulePanel = new SynapseRulePanel(synapseList, parent,
                 showSpecificRuleParams);
+
+//        // Respond to update panel combo box changes here, so that general panel
+//        // can be updated too
+//        synapseRulePanel.getCbSynapseType()
+//                .addActionListener(e -> SwingUtilities.invokeLater(() -> {
+//                    // generalSynapsePropertiesPanel
+//                    // .updateFieldVisibility(synapseRulePanel.getSynapsePanel().getPrototypeRule());
+//                    repaint();
+//                }));
+        
+        this.add(synapseRulePanel);
+        
+        // Spike Responders
         if (SynapseDialog.targsUseSynapticInputs(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
                     parent);
         }
-        generalSynapsePropertiesPanel = GeneralSynapsePropertiesPanel
-                .createPanel(synapseList, parent, displayID);
-        synapseRulePanel = new SynapseRulePanel(synapseList, parent,
-                showSpecificRuleParams);
-    }
-
-    /**
-     * Lays out the panel.
-     */
-    private void initializeLayout() {
-        // Respond to update panel combo box changes here, so that general panel
-        // can be updated too
-        synapseRulePanel.getCbSynapseType()
-                .addActionListener(e -> SwingUtilities.invokeLater(() -> {
-                    // generalSynapsePropertiesPanel
-                    // .updateFieldVisibility(synapseRulePanel.getSynapsePanel().getPrototypeRule());
-                    repaint();
-                }));
-
-        BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-        this.setLayout(layout);
-        this.add(generalSynapsePropertiesPanel);
-        this.add(Box.createVerticalStrut(DEFAULT_VGAP));
-        this.add(synapseRulePanel);
         if (editSpikeResponders != null) {
             this.add(Box.createVerticalStrut(DEFAULT_VGAP));
             this.add(editSpikeResponders);
@@ -160,7 +161,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         // edited that can result in ClassCastExceptions otherwise.
         success &= synapseRulePanel.commitChanges();
 
-        success &= generalSynapsePropertiesPanel.commitChanges();
+        generalSynapseProperties.commitChanges();
 
         if (editSpikeResponders != null) {
             success &= editSpikeResponders.commitChanges();
@@ -180,30 +181,10 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @return the generalSynapsePropertiesPanel
-     */
-    public GeneralSynapsePropertiesPanel getGeneralSynapsePropertiesPanel() {
-        return generalSynapsePropertiesPanel;
-    }
-
-    /**
      * @return the synapseRulePanel
      */
     public SynapseRulePanel getSynapseRulePanel() {
         return synapseRulePanel;
     }
-
-    // TODO?
-    // public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity)
-    // {
-    // synapseInfoPanel.fillFieldValues(synapseGroup, polarity);
-    // }
-
-    // /**
-    // * @return the panel governing the editing of spike responders.
-    // */
-    // public SpikeResponderSettingsPanel getEditSpikeRespondersPanel() {
-    // return editSpikeResponders;
-    // }
 
 }

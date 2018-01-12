@@ -19,10 +19,8 @@
 package org.simbrain.util.propertyeditor2;
 
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,8 +50,8 @@ import org.simbrain.util.widgets.ParameterWidget;
  * inconsistent states. Closing the dialog in that case without changing the value
  * will not change the values of the fields.
  *
- * @author Oliver Coleman
  * @author Jeff Yoshimi
+ * @author Oliver Coleman
  */
 public class AnnotatedPropertyEditor extends JPanel {
 
@@ -62,21 +60,16 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     protected Set<ParameterWidget> widgets;
 
+    //TODO: Use a collection instead?
+
     /**
      * The objects whose annotated fields will be edited using the
      * editor. Passing in a single object to edit is fine.
      */
-    private List<EditableObject> editedObjects;
+    private List<? extends EditableObject> editedObjects;
 
     /** Main item panel. */
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
-
-    /**
-     * No-arg constructor. Mostly for internal use.
-     */
-    public AnnotatedPropertyEditor() {
-        add(itemPanel);
-    }
     
     /**
      * Construct with one object.
@@ -92,7 +85,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      *
      * @param objects
      */
-    public AnnotatedPropertyEditor(List<EditableObject> objects) {
+    public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
         this.editedObjects = objects;
         add(itemPanel);
         init();
@@ -105,10 +98,19 @@ public class AnnotatedPropertyEditor extends JPanel {
      * editable objects. If they have inconsistent values use a null value.
      */
     private void init() {
-//        if (this.editedObjects != null) {
-//            throw new IllegalStateException(
-//                    "Multiple calls to setObjectToEdit are not allowed.");
-//        }
+
+        // Can be implemented to "null" state.
+        if(editedObjects.isEmpty()) {
+            return;
+        }
+        
+        // Check that the objects given are of the same type
+        boolean objectsSameType = editedObjects.stream().allMatch(
+                m -> m.getClass().equals(editedObjects.get(0).getClass()));
+        if(!objectsSameType) {
+            throw new IllegalArgumentException(
+                    "Edited objects must be of the same type as each other");
+        }
 
         widgets = new TreeSet<>();
         for (Parameter param : Parameter
@@ -156,10 +158,38 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
     }
 
+    //TODO: Evaluate boolean returns from commmit as in EditablePanel
+    
     /**
-     * Commit changes on edited object. 
+     * Commit changes on the internal object or list of objects 
      */
     public void commitChanges() {
+        commitChanges(editedObjects);
+    }
+
+    /**
+     * Apply the values of the editor panel to a list of objects.
+     * 
+     * @objectsToEdit the objects whose values should be set using this panel.
+     *                All objects must be of the same type as the objects
+     *                maintained by this panel.
+     */
+    public void commitChanges(List<? extends EditableObject> objectsToEdit) {
+   
+        // Check that the objects given are of the same type
+        if(objectsToEdit.isEmpty()) {
+            return;
+        }
+        boolean objectsSameType = objectsToEdit.stream().allMatch(
+                m -> m.getClass().equals(objectsToEdit.get(0).getClass()));
+        boolean objectsSameTypeAsInternal = objectsToEdit.get(0).getClass()
+                .equals(editedObjects.get(0).getClass());
+        if(!objectsSameType || !objectsSameTypeAsInternal) {
+            throw new IllegalArgumentException(
+                    "Committed objects must be of the same type as each other and"
+                    + "as the objects handled by this editor");
+        }
+        
         for (ParameterWidget pw : widgets) {
 
             Object value = pw.getWidgetValue();
@@ -169,7 +199,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             // empty string.
             if (value != null && (!(value instanceof String)
                     || !((String) value).equals(""))) {
-                for (Object o : editedObjects) {
+                for (Object o : objectsToEdit) {
                     pw.parameter.setFieldValue(o, value);
                 }
             }
@@ -177,54 +207,12 @@ public class AnnotatedPropertyEditor extends JPanel {
 
         // Re-initialize. Allows updating cached values calculated from
         // parameters.
-        for (Object o : editedObjects) {
+        for (Object o : objectsToEdit) {
             //s.getLearningRule().init(s); 
             // TODO!  If usd add an init field to EditedObjects
         }
     }
     
-
-    // TODO: Remove? 
-    
-    /**
-     * Provides a copy of this panel.
-     * 
-     * @return a copy of the panel.
-     */
-    public AnnotatedPropertyEditor copy() {
-        AnnotatedPropertyEditor copy;
-        try {
-            copy = this.getClass().getConstructor().newInstance();
-            // If a (sub-class) constructor didn't call
-            // SynapseRuleUserParamPanel(SynapseUpdateRule)
-            if (copy.editedObjects == null) {
-                copy.editedObjects = new ArrayList(editedObjects);
-                copy.init();
-            }
-        } catch (InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException(
-                    "The class " + this.getClass().getName()
-                            + " must declare a constructor accepting no arguments (or override the deepCopy() method).",
-                    e);
-        }
-
-        
-        // Iterate over both sets of parameters. They should be in the same
-        // order, unless something very odd is going on with the loaded classes.
-        Iterator<ParameterWidget> thisParamsItr = widgets.iterator();
-        Iterator<ParameterWidget> copyParamsItr = copy.widgets.iterator();
-        while (thisParamsItr.hasNext()) {
-            ParameterWidget thisPW = thisParamsItr.next();
-            ParameterWidget copyPW = copyParamsItr.next();
-            assert (thisPW.equals(copyPW));
-            copyPW.setWidgetValue(thisPW.getWidgetValue());
-        }
-        return copy;
-    }
-    
-    // TODO: Remove if not used
     /**
      * Returns an action for showing a property dialog for the provided objects.
      *
@@ -284,7 +272,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      * @return the edited object
      */
     public EditableObject getEditedObject() {
-        return editedObjects.get(0);
+        return editedObjects.isEmpty() ? null : editedObjects.get(0);
     }
 
     /**
@@ -292,11 +280,8 @@ public class AnnotatedPropertyEditor extends JPanel {
      * 
      * @return the objects being edited
      */
-    public List<EditableObject> getEditedObjects() {
+    public List<? extends EditableObject> getEditedObjects() {
         return editedObjects;
     }
-
-
-
 
 }

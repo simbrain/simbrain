@@ -18,8 +18,9 @@
  */
 package org.simbrain.util.propertyeditor2;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +88,8 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
         this.editedObjects = objects;
-        add(itemPanel);
+        this.setLayout(new BorderLayout());
+        add(itemPanel, BorderLayout.CENTER);
         init();
     }
     
@@ -98,7 +100,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      * editable objects. If they have inconsistent values use a null value.
      */
     private void init() {
-
+               
         // Can be implemented to "null" state.
         if(editedObjects.isEmpty()) {
             return;

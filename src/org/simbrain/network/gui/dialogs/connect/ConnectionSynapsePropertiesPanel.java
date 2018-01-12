@@ -205,11 +205,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                             parentWindow);
         } else {
             excitatoryInfoPanel = SynapsePropertiesPanel
-                    .createBlankSynapsePropertiesPanel(excitatorySynapses,
-                            parentWindow, false);
+                    .createSynapsePropertiesPanel(excitatorySynapses,
+                            parentWindow);
             inhibitoryInfoPanel = SynapsePropertiesPanel
-                    .createBlankSynapsePropertiesPanel(inhibitorySynapses,
-                            parentWindow, false);
+                    .createSynapsePropertiesPanel(inhibitorySynapses,
+                            parentWindow);
 //            excitatoryInfoPanel.fillFieldValues(synapseGroup,
 //                    Polarity.EXCITATORY);
 //            inhibitoryInfoPanel.fillFieldValues(synapseGroup,

@@ -1,8 +1,6 @@
 package org.simbrain.world.imageworld.dialogs;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -15,6 +13,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
     private ImageWorld world;
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
+    private JCheckBox useColorCheckBox = new JCheckBox();
     private JTextField widthField = new JTextField("10");
     private JTextField heightField = new JTextField("10");
 
@@ -24,10 +23,11 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
      */
     public ResizeEmitterMatrixDialog(ImageWorld world) {
         this.world = world;
-        setTitle("Resize Emitter Matrix");
+        setTitle("Emitter Matrix Settings");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/emitterMatrix.html");
         addButton(new JButton(helpAction));
         mainPanel.add(emitterMatrixPanel);
+        emitterMatrixPanel.addItem("Use Color", useColorCheckBox);
         emitterMatrixPanel.addItem("Width", widthField);
         emitterMatrixPanel.addItem("Height", heightField);
         setContentPane(mainPanel);
@@ -43,8 +43,10 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
 
     /** Called externally when the dialog is closed, to commit any changes made. */
     public void commitChanges() {
+        boolean useColor = useColorCheckBox.isSelected();
         int width = Integer.parseInt(widthField.getText());
         int height = Integer.parseInt(heightField.getText());
+        world.setUseColorEmitter(useColor);
         world.resizeEmitterMatrix(width, height);
     }
 }

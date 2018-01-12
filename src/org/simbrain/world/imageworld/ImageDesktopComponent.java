@@ -19,6 +19,7 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 
@@ -40,7 +41,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private JToolBar sensorToolbar = new JToolBar();
 
     private JPopupMenu contextMenu;
-    private CouplingMenu couplingMenu;
+    private MultiCouplingMenu multiCouplingMenu;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
@@ -124,11 +125,23 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         add(imageWorldComponent.getImageWorld().getImagePanel(), BorderLayout.CENTER);
         imageWorldComponent.getImageWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
-        component.getImageWorld().addListener(this::updateComboBox);
+        component.getImageWorld().addListener(new ImageWorld.Listener() {
+            @Override
+            public void imageSourceChanged(ImageSource changedSource) {}
+
+            @Override
+            public void sensorMatrixAdded(SensorMatrix addedMatrix) {
+                updateComboBox();
+            }
+
+            @Override
+            public void sensorMatrixRemoved(SensorMatrix removedMatrix) {
+                updateComboBox();
+            }
+        });
 
         contextMenu = new JPopupMenu();
-        couplingMenu = new CouplingMenu(component.getWorkspace());
-        contextMenu.add(couplingMenu);
+        multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 5);
         imageWorldComponent.getImageWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
@@ -166,8 +179,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void showContextMenu(MouseEvent evt) {
-        // TODO: Add support for EmitterMatrix
-        couplingMenu.setSourceModel(component.getImageWorld().getCurrentSensorMatrix());
+        multiCouplingMenu.setSourceModels(component.getSelectedModels());
         contextMenu.show(component.getImageWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 

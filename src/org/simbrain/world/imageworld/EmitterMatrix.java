@@ -5,55 +5,104 @@ import java.awt.image.BufferedImage;
 import org.simbrain.workspace.Consumable;
 
 public class EmitterMatrix extends ImageSourceAdapter {
-    private double[][] emitterValues;
+    private boolean usingColor = false;
+    private double[][] channels;
+    private int[] colors;
 
     public EmitterMatrix() {
         super();
-        emitterValues = new double[3][getWidth() * getHeight()];
+        channels = new double[3][getWidth() * getHeight()];
+        colors = new int[getWidth() * getHeight()];
     }
 
     public EmitterMatrix(BufferedImage currentImage) {
         super(currentImage);
-        emitterValues = new double[3][getWidth() * getHeight()];
+        channels = new double[3][getWidth() * getHeight()];
+        colors = new int[getWidth() * getHeight()];
+    }
+
+    /** Returns whether the emitter matrix should use int RGB colors or double channels. */
+    public boolean isUsingColor() {
+        return usingColor;
+    }
+
+    /**
+     * Set whether the emitter matrix should use int RGB color values (true) or double channel values (false).
+     * Note that the set brightness coupling requires useColor = false.
+     */
+    public void setUsingColor(boolean value) {
+        usingColor = value;
     }
 
     @Consumable
-    public void setChannel1(double[] values) {
-        System.arraycopy(values, 0, emitterValues[0], 0, values.length);
-        emitImage();
+    public void setBrightness(double[] values) {
+        int length = Math.min(values.length, getWidth() * getHeight());
+        System.arraycopy(values, 0, channels[0], 0, length);
+        System.arraycopy(values, 0, channels[1], 0, length);
+        System.arraycopy(values, 0, channels[2], 0, length);
     }
 
     @Consumable
-    public void setChannel2(double[] values) {
-        System.arraycopy(values, 0, emitterValues[1], 0, values.length);
-        emitImage();
+    public void setColor(int[] values) {
+        int length = Math.min(values.length, getWidth() * getHeight());
+        System.arraycopy(values, 0, colors, 0, length);
     }
 
-    @Consumable
-    public void setChannel3(double[] values) {
-        System.arraycopy(values, 0, emitterValues[2], 0, values.length);
-        emitImage();
+    @Consumable(defaultVisibility=false)
+    public void setRed(double[] values) {
+        int length = Math.min(values.length, getWidth() * getHeight());
+        System.arraycopy(values, 0, channels[0], 0, length);
+    }
+
+    @Consumable(defaultVisibility=false)
+    public void setGreen(double[] values) {
+        int length = Math.min(values.length, getWidth() * getHeight());
+        System.arraycopy(values, 0, channels[1], 0, length);
+    }
+
+    @Consumable(defaultVisibility=false)
+    public void setBlue(double[] values) {
+        int length = Math.min(values.length, getWidth() * getHeight());
+        System.arraycopy(values, 0, channels[2], 0, length);
     }
 
     public void setSize(int width, int height) {
         setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
-        emitterValues = new double[3][getWidth() * getHeight()];
+        channels = new double[3][getWidth() * getHeight()];
     }
 
-    private void emitImage() {
-        BufferedImage image = getCurrentImage();
-        for (int y = 0; y < image.getHeight(); ++y) {
-            for (int x = 0; x < image.getWidth(); ++x) {
-                int red = (int) (emitterValues[0][y * getWidth() + x] * 255.0);
-                red = Math.max(Math.min(red, 255), 0) << 16;
-                int blue = (int) (emitterValues[1][y * getWidth() + x] * 255.0);
-                blue = Math.max(Math.min(blue, 255), 0) << 8;
-                int green = (int) (emitterValues[2][y * getWidth() + x] * 255.0);
-                green = Math.max(Math.min(green, 255), 0);
-                int color = red + blue + green;
-                image.setRGB(x, y, color);
+    public void emitImage() {
+        if (usingColor) {
+            BufferedImage image = getCurrentImage();
+            for (int y = 0; y < image.getHeight(); ++y) {
+                for (int x = 0; x < image.getWidth(); ++x) {
+                    int rgb = colors[y * getWidth() + x];
+                    image.setRGB(x, y, rgb);
+                }
+            }
+        } else {
+            BufferedImage image = getCurrentImage();
+            for (int y = 0; y < image.getHeight(); ++y) {
+                for (int x = 0; x < image.getWidth(); ++x) {
+                    int red = (int) (channels[0][y * getWidth() + x] * 255.0);
+                    red = Math.max(Math.min(red, 255), 0) << 16;
+                    int blue = (int) (channels[1][y * getWidth() + x] * 255.0);
+                    blue = Math.max(Math.min(blue, 255), 0) << 8;
+                    int green = (int) (channels[2][y * getWidth() + x] * 255.0);
+                    green = Math.max(Math.min(green, 255), 0);
+                    int color = red + blue + green;
+                    image.setRGB(x, y, color);
+                    channels[0][y * getWidth() + x] = 0;
+                    channels[1][y * getWidth() + x] = 0;
+                    channels[2][y * getWidth() + x] = 0;
+                }
             }
         }
         notifyImageUpdate();
+    }
+
+    @Override
+    public String toString() {
+        return "EmitterMatrix";
     }
 }

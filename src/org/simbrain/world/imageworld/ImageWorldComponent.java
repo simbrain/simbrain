@@ -14,9 +14,9 @@ import org.simbrain.workspace.WorkspaceComponent;
  * pipeline and coupling inputs and outputs within a Simbrain workspace.
  * @author Tim Shea
  */
-public class ImageWorldComponent extends WorkspaceComponent {
+public class ImageWorldComponent extends WorkspaceComponent implements ImageWorld.Listener {
     /** The image world this component displays. */
-    private final ImageWorld imageWorld;
+    private ImageWorld imageWorld;
 
     /**
      * Construct a new ImageWorldComponent.
@@ -25,6 +25,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
     public ImageWorldComponent(String name) {
         super(name);
         imageWorld = new ImageWorld();
+        imageWorld.addListener(this);
     }
 
     /**
@@ -39,7 +40,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void save(OutputStream output, String format) { }
+    public void save(OutputStream output, String format) {
+
+    }
 
     @Override
     protected void closing() { }
@@ -52,11 +55,34 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return models;
     }
 
+    public List<Object> getSelectedModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.add(imageWorld.getCurrentSensorMatrix());
+        models.add(imageWorld.getCurrentImageSource());
+        return models;
+    }
+
+    @Override
+    public void update() {
+        if (imageWorld.isEmitterMatrixSelected()) {
+            imageWorld.emitImage();
+        }
+    }
+
     /**
      * @return the imageWorld
      */
     public ImageWorld getImageWorld() {
         return imageWorld;
     }
+
+    @Override
+    public void imageSourceChanged(ImageSource source) {}
+
+    @Override
+    public void sensorMatrixAdded(SensorMatrix matrix) {}
+
+    @Override
+    public void sensorMatrixRemoved(SensorMatrix matrix) {}
 
 }

@@ -19,19 +19,17 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.NeuronUpdateRule.InputType;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainConstants;
@@ -77,7 +75,7 @@ public final class SynapseDialog extends StandardDialog {
      * Creates a neuron dialog from a collection of SynapseNodes with a frame
      * specified.
      *
-     * @param selectedSynapse synapses to edit.
+     * @param selectedSynapses synapses to edit.
      * @param parent the parent frame
      * @return the dialog.
      */
@@ -129,21 +127,6 @@ public final class SynapseDialog extends StandardDialog {
                 .createSynapsePropertiesPanel(synapseList, this);
         initializeLayout();
         updateHelp();
-    }
-
-    /**
-     * Gets the logical synapses from a list of gui Synapse Nodes.
-     *
-     * @param selectedSynapses the selected Synapse Node gui objects
-     * @return the synapses contained within the selected synapse nodes
-     */
-    private static ArrayList<Synapse> getSynapses(
-            final Collection<SynapseNode> selectedSynapses) {
-        ArrayList<Synapse> sl = new ArrayList<Synapse>();
-        for (SynapseNode s : selectedSynapses) {
-            sl.add(s.getSynapse());
-        }
-        return sl;
     }
 
     /**
@@ -238,6 +221,18 @@ public final class SynapseDialog extends StandardDialog {
             }
         }
         return false;
+    }
+
+    /**
+     * Helper which returns logical synapses from a list of gui Synapse Nodes.
+     *
+     * @param selectedSynapses the selected Synapse Node gui objects
+     * @return the synapses contained within the selected synapse nodes
+     */
+    private static List<Synapse> getSynapses(
+            final Collection<SynapseNode> selectedSynapses) {
+        return selectedSynapses.stream().map(SynapseNode::getSynapse)
+                .collect(Collectors.toList());
     }
 
 }

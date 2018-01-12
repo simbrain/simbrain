@@ -346,11 +346,4 @@ public class TestObject implements EditableObject {
     public void setDoubleArray(double[] doubleArray) {
         this.doubleArray = doubleArray;
     }
-
-    @Override
-    public EditableObject copy() {
-        TestObject copy = new TestObject();
-        copy.setTheInt(theInt);
-        return copy;
-    }
 }

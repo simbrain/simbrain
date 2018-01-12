@@ -30,6 +30,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -42,7 +43,7 @@ import org.simbrain.workspace.Producible;
  * @author Zoë Tosi
  *
  */
-public class Synapse {
+public class Synapse implements EditableObject {
 
     /** A default update rule for the synapse. */
     private static final SynapseUpdateRule DEFAULT_LEARNING_RULE = new StaticSynapseRule();
@@ -92,15 +93,23 @@ public class Synapse {
     private double psr;
 
     /** Amount to increment the neuron. */
+    @UserParameter(label = "Increment", description = "Strength Increment", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "1", order = 2)
     private double increment = 1;
 
     /** Upper limit of synapse. */
+    @UserParameter(label = "Upper bound", description = "Upper bound", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "10", order = 3)
     private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** Lower limit of synapse. */
+    @UserParameter(label = "Lower bound", description = "Lower bound", 
+            minimumValue = -100, maximumValue = 0, defaultValue = "10", order = 4)
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /** Time to delay sending activation to target neuron. */
+    @UserParameter(label = "Delay", description = "delay", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "0", order = 5)
     private int delay;
 
     /** Parent group, if any (null if none). */

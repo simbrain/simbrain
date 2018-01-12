@@ -60,11 +60,13 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     protected Set<ParameterWidget> widgets;
 
+    //TODO: Use a collection instead?
+
     /**
      * The objects whose annotated fields will be edited using the
      * editor. Passing in a single object to edit is fine.
      */
-    private List<EditableObject> editedObjects;
+    private List<? extends EditableObject> editedObjects;
 
     /** Main item panel. */
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
@@ -83,7 +85,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      *
      * @param objects
      */
-    public AnnotatedPropertyEditor(List<EditableObject> objects) {
+    public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
         this.editedObjects = objects;
         add(itemPanel);
         init();
@@ -156,6 +158,8 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
     }
 
+    //TODO: Evaluate boolean returns from commmit as in EditablePanel
+    
     /**
      * Commit changes on the internal object or list of objects 
      */
@@ -170,7 +174,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      *                All objects must be of the same type as the objects
      *                maintained by this panel.
      */
-    public void commitChanges(List<EditableObject> objectsToEdit) {
+    public void commitChanges(List<? extends EditableObject> objectsToEdit) {
    
         // Check that the objects given are of the same type
         if(objectsToEdit.isEmpty()) {
@@ -276,7 +280,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      * 
      * @return the objects being edited
      */
-    public List<EditableObject> getEditedObjects() {
+    public List<? extends EditableObject> getEditedObjects() {
         return editedObjects;
     }
 

@@ -83,9 +83,4 @@ public abstract class SynapseUpdateRule implements EditableObject {
                 + Utils.round(synapse.getStrength(), MAX_DIGITS);
     }
     
-
-    @Override
-    public EditableObject copy() {
-        return this.deepCopy();
-    }
 }

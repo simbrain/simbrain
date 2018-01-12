@@ -9,11 +9,14 @@ import org.jblas.DoubleMatrix;
 import org.junit.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer2.UpdateMethod;
+import org.simbrain.util.math.SquashingFunction;
 
 public class BackpropTrainer2Test {
 
@@ -204,5 +207,34 @@ public class BackpropTrainer2Test {
 		
 	}
 
+	
+	  public BackpropNetwork createTestNetwork(int noInp, int noHid, int noOut, NeuronUpdateRule hidRule, NeuronUpdateRule outRule) {
+	        BackpropNetwork network = new BackpropNetwork(new Network(),
+	                new int[] { noInp, noHid, noOut });
+	        network.getHiddenLayer().setNeuronType(hidRule);
+	        network.getOutputLayer().setNeuronType(outRule);
+	        return network;
+	    }
+
+	    // Just to illustrate how to set up some tests
+	    public void createSomeNetworks() {
+
+	        SigmoidalRule tanh = new SigmoidalRule(SquashingFunction.TANH);
+	        SigmoidalRule logistic = new SigmoidalRule(SquashingFunction.LOGISTIC);
+	        SigmoidalRule arctan = new SigmoidalRule(SquashingFunction.ARCTAN);
+	        LinearRule linear = new LinearRule(); // May have to make Linear implement transfer function
+
+	        BackpropNetwork network1 = createTestNetwork(2,2,2, tanh, linear);
+	        BackpropNetwork network2 = createTestNetwork(2,2,2, logistic, linear);
+	        BackpropNetwork network3 = createTestNetwork(2,2,2, arctan, linear);
+	        BackpropNetwork network4 = createTestNetwork(2,2,2, tanh, tanh);
+
+	        // Try some non-standard bounds. The transfer functions should be able to handle this
+	        SigmoidalRule logistic_1_1 = new SigmoidalRule(SquashingFunction.LOGISTIC);
+	        logistic_1_1.setLowerBound(-1);
+	        logistic_1_1.setUpperBound(1);
+	        BackpropNetwork network5 = createTestNetwork(2,2,2, logistic_1_1, linear);
+
+	    }
 	
 }

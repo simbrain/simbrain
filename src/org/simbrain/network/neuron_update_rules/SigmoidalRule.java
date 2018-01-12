@@ -22,7 +22,6 @@ import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunction;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal

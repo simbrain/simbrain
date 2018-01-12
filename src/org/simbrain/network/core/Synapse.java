@@ -119,12 +119,15 @@ public class Synapse implements EditableObject {
      * Boolean flag, indicating whether this type of synapse participates in the
      * computation of weighted input. Set to a default value of true.
      */
+    @UserParameter(label = "Enabled", description = "Synapse is enabled. If disabled, it won't pass activation through", defaultValue = "True", order = 6)
     private boolean enabled = true;
 
     /**
      * Boolean flag, indicating whether or not this synapse's strength can be
      * changed by any means other than direct user intervention.
      */
+    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", 
+            defaultValue = "False", order = 6)
     private boolean frozen;
 
     /** Manages synaptic delay */

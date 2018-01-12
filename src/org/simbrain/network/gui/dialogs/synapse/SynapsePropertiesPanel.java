@@ -18,13 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.awt.Component;
 import java.awt.Window;
 import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
@@ -33,7 +37,7 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * This panel combines synapse editing sub-panels and handles changes to one
  * being applied to the others.
- * 
+ *
  * TODO: See NeuronPropertiesPanel docs
  *
  * @author Jeff Yoshimi
@@ -41,16 +45,8 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
-    /**
-     * The default vertical gap between the basic synapse info panel and the
-     * synapse update settings panel.
-     */
+    /** Vertical gap between panel elements. */
     private static final int DEFAULT_VGAP = 10;
-
-    /**
-     * The default initial display state of the panel's learning rule panel.
-     */
-    private static final boolean DEFAULT_DISPLAY_PARAMS = false;
 
     /** The synapses being modified. */
     private final List<Synapse> synapseList;
@@ -75,29 +71,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
             final List<Synapse> synapseList, final Window parent) {
-        return createSynapsePropertiesPanel(synapseList, parent,
-                DEFAULT_DISPLAY_PARAMS);
+        return new SynapsePropertiesPanel(synapseList, parent);
     }
-
-    /**
-     * Create the panel without specifying whether to display id (that is done
-     * automatically).
-     *
-     * @param synapseList the list of synapses either being edited (editing) or
-     *            being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams whether or not to display the synapse
-     *            update rule's details initially
-     * @return
-     */
-    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-            final List<Synapse> synapseList, final Window parent,
-            final boolean showSpecificRuleParams) {
-        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(synapseList,
-                parent, showSpecificRuleParams, true);
-        return cnip;
-    }
-
+    
     /**
      * {@link #createSynapsePropertiesPanel(List, Window, boolean)}
      *
@@ -108,34 +84,41 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      *            update rule's details initially.
      */
     private SynapsePropertiesPanel(final List<Synapse> synapseList,
-            final Window parent, final boolean showSpecificRuleParams,
-            final boolean displayID) {
-        
+            final Window parent) {
+
         this.synapseList = synapseList;
 
-        BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-        this.setLayout(layout);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
+        // Show id if editing one synapse
+        if(synapseList.size() ==1) {
+            JLabel idlabel = new JLabel(synapseList.get(0).getId());
+            idlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            this.add(idlabel);
+            this.add(new JSeparator(SwingConstants.HORIZONTAL));
+        }
+
         // General Synapse Properties
         generalSynapseProperties = new AnnotatedPropertyEditor(synapseList);
         this.add(generalSynapseProperties);
         this.add(Box.createVerticalStrut(DEFAULT_VGAP));
-        
-        // Synapse Rule panel
-        synapseRulePanel = new SynapseRulePanel(synapseList, parent,
-                showSpecificRuleParams);
 
-//        // Respond to update panel combo box changes here, so that general panel
-//        // can be updated too
-//        synapseRulePanel.getCbSynapseType()
-//                .addActionListener(e -> SwingUtilities.invokeLater(() -> {
-//                    // generalSynapsePropertiesPanel
-//                    // .updateFieldVisibility(synapseRulePanel.getSynapsePanel().getPrototypeRule());
-//                    repaint();
-//                }));
-        
+        // Synapse Rule panel
+        synapseRulePanel = new SynapseRulePanel(synapseList, parent);
+
+        // // Respond to update panel combo box changes here, so that general
+        // panel
+        // // can be updated too
+        // synapseRulePanel.getCbSynapseType()
+        // .addActionListener(e -> SwingUtilities.invokeLater(() -> {
+        // // generalSynapsePropertiesPanel
+        // //
+        // .updateFieldVisibility(synapseRulePanel.getSynapsePanel().getPrototypeRule());
+        // repaint();
+        // }));
+
         this.add(synapseRulePanel);
-        
+
         // Spike Responders
         if (SynapseDialog.targsUseSynapticInputs(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
@@ -185,25 +168,6 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     public SynapseRulePanel getSynapseRulePanel() {
         return synapseRulePanel;
-    }
-    
-    // TODO: Evaluate
-    /**
-     * 
-     * @param synapseList
-     * @param parent
-     * @param showSpecificRuleParams
-     * @return
-     */
-    public static SynapsePropertiesPanel createBlankSynapsePropertiesPanel(
-            final Collection<Synapse> synapseList, final Window parent,
-            boolean showSpecificRuleParams) {
-        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
-                (List<Synapse>) synapseList, parent, showSpecificRuleParams, true);
-//        cnip.synapseInfoPanel = SynapsePropertiesSimple
-//                .createBlankSynapseInfoPanel(synapseList, parent, false);
-//        cnip.initializeLayout();
-        return cnip;
     }
 
 }

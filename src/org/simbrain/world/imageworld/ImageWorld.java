@@ -20,12 +20,17 @@ import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 public class ImageWorld {
 
     /**
-     * WorldListener receives notifications when the list of sensor matrices is
-     * changed.
+     * WorldListener receives notifications when the is changed.
      */
-    public interface WorldListener {
-        /** Called when list of sensor matrices changed. */
-        void sensorMatricesUpdated();
+    public interface Listener {
+        /** Called whenever an image source is changed. */
+        void imageSourceChanged(ImageSource changedSource);
+
+        /** Called whenever a sensor matrix is added. */
+        void sensorMatrixAdded(SensorMatrix addedMatrix);
+
+        /** Called whenever a sensor matrix is removed. */
+        void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
     private StaticImageSource staticSource;
@@ -45,7 +50,7 @@ public class ImageWorld {
     private ImagePanel imagePanel;
 
     /** List of world listener. */
-    private transient List<WorldListener> listeners = new ArrayList<WorldListener>();
+    private transient List<Listener> listeners = new ArrayList<Listener>();
 
     /**
      * Construct the image world.
@@ -88,21 +93,39 @@ public class ImageWorld {
      */
     public void loadImage(String filename) throws IOException {
         staticSource.loadImage(filename);
+        fireImageSourceChanged(staticSource);
     }
 
     /** Switch the CompositeImageSource to the static image. */
     public void selectStaticSource() {
-        compositeSource.selectSource(staticSource);
+        compositeSource.setImageSource(staticSource);
+    }
+
+    /** Set the color mode of the emitter matrix. */
+    public void setUseColorEmitter(boolean value) {
+        emitterMatrix.setUsingColor(value);
+        fireImageSourceChanged(emitterMatrix);
     }
 
     /** Set the size of the emitter matrix. */
     public void resizeEmitterMatrix(int width, int height) {
         emitterMatrix.setSize(width, height);
+        fireImageSourceChanged(emitterMatrix);
+    }
+
+    /** Returns whether the emitter matrix is the current source for the image world. */
+    public boolean isEmitterMatrixSelected() {
+        return compositeSource.getImageSource() == emitterMatrix;
     }
 
     /** Switch the CompositeImageSource to the emitter matrix. */
     public void selectEmitterMatrix() {
-        compositeSource.selectSource(emitterMatrix);
+        compositeSource.setImageSource(emitterMatrix);
+    }
+
+    /** Update the emitter matrix image. */
+    public void emitImage() {
+        emitterMatrix.emitImage();
     }
 
     /**
@@ -113,7 +136,7 @@ public class ImageWorld {
     public void addSensorMatrix(SensorMatrix matrix) {
         sensorMatrices.add(matrix);
         setCurrentSensorMatrix(matrix);
-        fireSensorMatricesUpdated();
+        fireSensorMatrixAdded(matrix);
     }
 
     /**
@@ -127,8 +150,7 @@ public class ImageWorld {
             return;
         }
         int dialogResult = JOptionPane.showConfirmDialog(
-                null, "Are you sure you want to delete sensor panel \""
-                        + sensorMatrix.getName() + "\" ?",
+                null, "Are you sure you want to delete sensor panel \"" + sensorMatrix.getName() + "\" ?",
                 "Warning", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             int index = sensorMatrices.indexOf(sensorMatrix);
@@ -140,7 +162,7 @@ public class ImageWorld {
                 compositeSource.removeListener((ImageFilter) source);
             }
             sensorMatrix.getSource().removeListener(sensorMatrix);
-            fireSensorMatricesUpdated();
+            fireSensorMatrixRemoved(sensorMatrix);
         }
     }
 
@@ -167,6 +189,10 @@ public class ImageWorld {
         return sources;
     }
 
+    public ImageSource getCurrentImageSource() {
+        return compositeSource.getImageSource();
+    }
+
     /** @return the currentSensorPanel */
     public SensorMatrix getCurrentSensorMatrix() {
         return currentSensorMatrix;
@@ -190,14 +216,28 @@ public class ImageWorld {
     }
 
     /** @param listener the listener to add. */
-    public void addListener(WorldListener listener) {
+    public void addListener(Listener listener) {
         listeners.add(listener);
     }
 
-    /** Fire sensor matrices update event. */
-    public void fireSensorMatricesUpdated() {
-        for (WorldListener listener : listeners) {
-            listener.sensorMatricesUpdated();
+    /** Notify listeners that an image source was changed. */
+    protected void fireImageSourceChanged(ImageSource source) {
+        for (Listener listener : listeners) {
+            listener.imageSourceChanged(source);
+        }
+    }
+
+    /** Notify listeners that a sensor matrix was added to the image world. */
+    protected void fireSensorMatrixAdded(SensorMatrix matrix) {
+        for (Listener listener : listeners) {
+            listener.sensorMatrixAdded(matrix);
+        }
+    }
+
+    /** Notify listeners that a sensor matrix was removed from the image world. */
+    protected void fireSensorMatrixRemoved(SensorMatrix matrix) {
+        for (Listener listener : listeners) {
+            listener.sensorMatrixRemoved(matrix);
         }
     }
 }

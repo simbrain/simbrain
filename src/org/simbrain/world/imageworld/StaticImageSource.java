@@ -90,4 +90,9 @@ public class StaticImageSource extends ImageSourceAdapter {
     public void setCurrentImage(BufferedImage value) {
         super.setCurrentImage(value);
     }
+
+    @Override
+    public String toString() {
+        return "Image" + filename;
+    }
 }

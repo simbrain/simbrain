@@ -1,9 +1,8 @@
 package org.simbrain.world.threedworld.entities;
 
 import java.awt.image.BufferedImageOp;
-import java.util.Collections;
 
-import org.simbrain.world.threedworld.ThreeDWorldComponent;
+import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.threedworld.engine.ThreeDRenderSource;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -16,7 +15,7 @@ import com.jme3.renderer.ViewPort;
  *
  * @author Tim Shea
  */
-public class VisionSensor implements Sensor {
+public class VisionSensor extends SensorMatrix implements Sensor {
     
     /** MODE_COLOR uses the unfiltered, full color rendered view for the sensor. */
     public static final int MODE_COLOR = 0;
@@ -40,15 +39,14 @@ public class VisionSensor implements Sensor {
     private transient Camera camera;
     private transient ViewPort viewPort;
     private transient ThreeDRenderSource source;
-    //private transient ImageCoupling sourceCoupling;
     private transient BufferedImageOp colorFilter;
 
     /**
      * Construct a new VisionSensor.
-     * 
      * @param agent The agent to attach the sensor to.
      */
     public VisionSensor(Agent agent) {
+        super(agent.getName() + "VisionSensor");
         this.agent = agent;
         agent.addSensor(this);
         initializeView();
@@ -75,8 +73,7 @@ public class VisionSensor implements Sensor {
         viewPort = agent.getEngine().getRenderManager().createMainView(agent.getName() + "ViewPort", camera);
         viewPort.setClearFlags(true, true, true);
         viewPort.attachScene(agent.getEngine().getRootNode());
-        source = new ThreeDRenderSource(viewPort, false);
-        //sourceCoupling = new ImageCoupling(source);
+        setSource(new ThreeDRenderSource(viewPort, false));
     }
 
     @Override
@@ -112,27 +109,6 @@ public class VisionSensor implements Sensor {
      */
     public Quaternion getSensorRotation() {
         return agent.getRotation();
-    }
-
-    /**
-     * @return Get the camera that will be used to render the view.
-     */
-    public Camera getCamera() {
-        return camera;
-    }
-
-    /**
-     * @return Get the viewport for this view.
-     */
-    public ViewPort getViewPort() {
-        return viewPort;
-    }
-
-    /**
-     * @return Get the source for the rendered view.
-     */
-    public ThreeDRenderSource getSource() {
-        return source;
     }
 
     /**

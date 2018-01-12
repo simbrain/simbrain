@@ -1,7 +1,9 @@
 package org.simbrain.world.imageworld;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 /**
@@ -17,12 +19,24 @@ public class SensorMatrix implements ImageSourceListener {
     private ImageSource source;
 
     /** The vales this matrix produces for couplings. */
-    private double[][] sensorValues;
+    private double[][] channels;
+
+    private int[] colors;
+
+    private boolean useColor = true;
 
     /**
-     * Construct the sensor matrix with a specified name.
-     * @param name the name of this sensor matrix
-     * @param source the source to couple
+     * Construct a sensor matrix without attaching it to a source.
+     * @param name The name of the sensor matrix.
+     */
+    protected SensorMatrix(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Construct a sensor matrix attached to an ImageSource.
+     * @param name The name of the sensor matrix.
+     * @param source The source to attach.
      */
     public SensorMatrix(String name, ImageSource source) {
         this.name = name;
@@ -40,6 +54,17 @@ public class SensorMatrix implements ImageSourceListener {
         return source;
     }
 
+    protected void setSource(ImageSource source) {
+        if (this.source == source) {
+            return;
+        }
+        if (this.source != null) {
+            this.source.removeListener(this);
+        }
+        this.source = source;
+        this.source.addListener(this);
+    }
+
     /** @return the width */
     public int getWidth() {
         return source.getWidth();
@@ -50,23 +75,34 @@ public class SensorMatrix implements ImageSourceListener {
         return source.getHeight();
     }
 
-    // TODO: The following three methods should be collapsed to a single indexed producer
-    /** @return Returns an array of doubles for the each pixel */
+    /** Returns an array of RGB colors encoded in integers. */
+    @Producible(idMethod="getName", defaultVisibility=true)
+    public int[] getColor() {
+        return colors;
+    }
+
+    /** Returns an array of doubles which corresponds to the brightness of the pixels. */
     @Producible(idMethod="getName")
-    public double[] getChannel1() {
-        return sensorValues[0];
+    public double[] getBrightness() {
+        return channels[0];
     }
 
     /** @return Returns an array of doubles for the each pixel */
     @Producible(idMethod="getName", defaultVisibility=false)
-    public double[] getChannel2() {
-        return sensorValues[1];
+    public double[] getRed() {
+        return channels[1];
     }
 
     /** @return Returns an array of doubles for the each pixel */
     @Producible(idMethod="getName", defaultVisibility=false)
-    public double[] getChannel3() {
-        return sensorValues[2];
+    public double[] getGreen() {
+        return channels[2];
+    }
+
+    /** @return Returns an array of doubles for the each pixel */
+    @Producible(idMethod="getName", defaultVisibility=false)
+    public double[] getBlue() {
+        return channels[3];
     }
 
     @Override
@@ -87,18 +123,24 @@ public class SensorMatrix implements ImageSourceListener {
         for (int y = 0; y < image.getHeight(); ++y) {
             for (int x = 0; x < image.getWidth(); ++x) {
                 int color = image.getRGB(x, y);
-                int red = (color >>> 16) & 0xFF;
-                int green = (color >>> 8) & 0xFF;
-                int blue = color & 0xFF;
-                sensorValues[0][y * getWidth() + x] = red / 255.0;
-                sensorValues[1][y * getWidth() + x] = green / 255.0;
-                sensorValues[2][y * getWidth() + x] = blue / 255.0;
+                if (useColor) {
+                    colors[y * getWidth() + x] = color;
+                } else {
+                    double red = ((color >>> 16) & 0xFF) / 255.0;
+                    double green = ((color >>> 8) & 0xFF) / 255.0;
+                    double blue = (color & 0xFF) / 255.0;
+                    channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
+                    channels[1][y * getWidth() + x] = red;
+                    channels[2][y * getWidth() + x] = green;
+                    channels[3][y * getWidth() + x] = blue;
+                }
             }
         }
     }
 
     @Override
     public void onResize(ImageSource source) {
-        sensorValues = new double[3][getWidth() * getHeight()];
+        colors = new int[getWidth() * getHeight()];
+        channels = new double[4][getWidth() * getHeight()];
     }
 }

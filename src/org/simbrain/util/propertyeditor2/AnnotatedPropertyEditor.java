@@ -131,9 +131,10 @@ public class AnnotatedPropertyEditor extends JPanel {
     }
 
     /**
-     * Fill the values of the editor panel based on a list of objects. These can
-     * be externally provided objects of the same type as those maintained by
-     * the dialog (and then used in conjunction with commitChanges(list)).
+     * Fill the values of the editor panel widgets based on a list of objects.
+     * These can be externally provided objects of the same type as those
+     * maintained by the dialog (and then used in conjunction with
+     * commitChanges(list)).
      * 
      * @objectsToEdit the objects whose values should be set using this panel.
      *                All objects must be of the same type as the objects

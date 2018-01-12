@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -228,6 +229,9 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             // to the rules
             String synapseName = synapseRef.getLearningRule().getName();
             synapsePanel = RULE_MAP.get(synapseName);
+            List<EditableObject> ruleList = synapseCollection.stream()
+                    .map(Synapse::getLearningRule).collect(Collectors.toList());
+            synapsePanel.fillFieldValues(ruleList);
             cbSynapseType.setSelectedItem(synapseName);
         }
     }

@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Window;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
@@ -27,7 +28,6 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -185,6 +185,25 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     public SynapseRulePanel getSynapseRulePanel() {
         return synapseRulePanel;
+    }
+    
+    // TODO: Evaluate
+    /**
+     * 
+     * @param synapseList
+     * @param parent
+     * @param showSpecificRuleParams
+     * @return
+     */
+    public static SynapsePropertiesPanel createBlankSynapsePropertiesPanel(
+            final Collection<Synapse> synapseList, final Window parent,
+            boolean showSpecificRuleParams) {
+        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
+                (List<Synapse>) synapseList, parent, showSpecificRuleParams, true);
+//        cnip.synapseInfoPanel = SynapsePropertiesSimple
+//                .createBlankSynapseInfoPanel(synapseList, parent, false);
+//        cnip.initializeLayout();
+        return cnip;
     }
 
 }

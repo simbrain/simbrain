@@ -184,9 +184,11 @@ public class BarChartModel extends ChartModel {
         return bars;
     }
 
-
-
-    /** Dummy method for coupling to the bar chart. Couplings to this will be redirected to a new bar. */
+    /**
+     * This method is used only for coupling to the bar chart. It does not do anything.
+     * Couplings to this method will be replaced by couplings to new data sources by the
+     * ChartCouplingListener.
+     */
     @Consumable(idMethod="getId")
     public void addBar(double value) {}
 
@@ -217,6 +219,11 @@ public class BarChartModel extends ChartModel {
         return bar;
     }
 
+    @Override
+    public ChartDataSource addDataSource(String description) {
+        return addBar(description);
+    }
+
     /**
      * Removes the last bar from the bar chart data.
      */
@@ -228,12 +235,25 @@ public class BarChartModel extends ChartModel {
         }
     }
 
+    /** Remove a bar with the specified description from the model. */
     public void removeBar(String description) {
         Optional<Bar> bar = getBar(description);
         if (bar.isPresent()) {
-            bars.remove(bar.get());
-            dataset.removeColumn(description);
-            fireDataSourceRemoved(bar.get());
+            removeBar(bar.get());
+        }
+    }
+
+    public void removeBar(Bar bar) {
+        if (bars.remove(bar)) {
+            dataset.removeColumn(bar.getDescription());
+            fireDataSourceRemoved(bar);
+        }
+    }
+
+    @Override
+    public void removeDataSource(ChartDataSource source) {
+        if (source instanceof Bar) {
+            removeBar((Bar)source);
         }
     }
 
@@ -250,6 +270,11 @@ public class BarChartModel extends ChartModel {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<? extends ChartDataSource> getDataSource(String description) {
+        return getBar(description);
     }
 
 }

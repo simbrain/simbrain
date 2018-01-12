@@ -591,7 +591,7 @@ public class Workspace {
      *
      * @param listener to be updated of changes
      */
-    public void addCouplingListener(final CouplingListener listener) {
+    public void addCouplingListener(CouplingListener listener) {
         couplingListeners.add(listener);
     }
 
@@ -600,7 +600,7 @@ public class Workspace {
      *
      * @param listener to be removed
      */
-    public void removeCouplingListener(final CouplingListener listener) {
+    public void removeCouplingListener(CouplingListener listener) {
         couplingListeners.remove(listener);
     }
 
@@ -645,7 +645,7 @@ public class Workspace {
         this.fireCouplingsRemoved(couplings);
     }
 
-    //TODO: If not used by the time update actions are re-implemented, remove
+    /** Return a coupling in the workspace by the coupling id. */
     public Coupling<?> getCoupling(String id) {
         return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id))
                 .findFirst().get();
@@ -653,13 +653,9 @@ public class Workspace {
 
     /**
      * Convenience method for updating a set of couplings.
-     *
      * @param couplingList the list of couplings to be updated
      */
     public void updateCouplings(List<Coupling<?>> couplingList) {
-        // for (Coupling<?> coupling : couplingList) {
-        // coupling.setBuffer();
-        // }
         for (Coupling<?> coupling : couplingList) {
             coupling.update();
         }

@@ -18,11 +18,13 @@
  */
 package org.simbrain.plot.timeseries;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.scene.chart.Chart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartDataSource;
@@ -34,25 +36,44 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * Data model for a time series plot.
- * 
- * TODO: Enable feature that limits max number of points
  */
 public class TimeSeriesModel extends ChartModel {
+
+    /**
+     * Encapsulates a single time series.
+     */
+    public class TimeSeries implements ChartDataSource {
+
+        /** The time series index to write data. */
+        private int seriesIndex;
+
+        /** Construct the time series. */
+        TimeSeries(int seriesIndex) {
+            this.seriesIndex = seriesIndex;
+        }
+
+        /** Get the description. */
+        public String getDescription() {
+            return dataset.getSeries(seriesIndex).getDescription();
+        }
+
+        @Consumable(idMethod="getDescription")
+        public void setValue(double value) {
+            addData(seriesIndex, timeSupplier.get(), value);
+        }
+    }
+
+    /** Default number of data sources for plot initialization. */
+    private static final int INITIAL_DATA_SOURCES = 5;
 
     /** Time Series Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
     /** Lambda to supply time to the time series model. */
     private transient Supplier<Integer> timeSupplier;
-    
-    /** Default number of data sources for plot initialization. */
-    private static final int INITIAL_DATA_SOURCES = 5;
 
     /** Should the range automatically change to reflect the data. */
     private boolean autoRange = true;
-
-    /** Size of window. */
-    private int windowSize = 100;
 
     /** Upper bound of the chart range. */
     private double rangeUpperBound = 1;
@@ -60,8 +81,8 @@ public class TimeSeriesModel extends ChartModel {
     /** Lower bound of the chart range. */
     private double rangeLowerBound = 0;
 
-    /** Whether this chart if fixed width or not. */
-    private boolean fixedWidth = true;
+    /** Set the maximum number of data points per series to plot. */
+    private int maxDataPoints = 1000;
     
     /** List of time series objects which can be coupled to. */
     private List<TimeSeries> timeSeriesList = new ArrayList<TimeSeries>();
@@ -71,31 +92,40 @@ public class TimeSeriesModel extends ChartModel {
      */
     public TimeSeriesModel(Supplier<Integer> timeSupplier) {
         this.timeSupplier = timeSupplier;
-        defaultInit();
     }
 
     /**
-     * Default plot initialization.
+     * Create specified number of data sources.
+     * @param numDataSources number of data sources to add to the plot.
      */
-    public void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
-    }
-
-    /**
-     * Create specified number of set of data sources. Adds these two existing
-     * data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
+    public void addDataSources(int numDataSources) {
         for (int i = 0; i < numDataSources; i++) {
             addDataSource();
         }
     }
 
+    /** Adds a data source to the chart with a default description. */
+    public ChartDataSource addDataSource() {
+        String description = "TimeSeries" + (timeSeriesList.size() + 1);
+        return addDataSource(description);
+    }
+
     /**
-     * Clears the plot.
+     * Adds a data source to the chart with the specified description.
      */
+    public ChartDataSource addDataSource(String description) {
+        int currentSize = dataset.getSeriesCount();
+        XYSeries xy = new XYSeries(currentSize);
+        xy.setMaximumItemCount(maxDataPoints);
+        xy.setDescription(description);
+        dataset.addSeries(xy);
+        TimeSeries series = new TimeSeries(currentSize);
+        timeSeriesList.add(series);
+        this.fireDataSourceAdded(series);
+        return series;
+    }
+
+    /** Clears the plot. */
     public void clearData() {
         int seriesCount = dataset.getSeriesCount();
         for (int i = 0; seriesCount > i; ++i) {
@@ -103,9 +133,7 @@ public class TimeSeriesModel extends ChartModel {
         }
     }
 
-    /**
-     * Removes a data source from the chart.
-     */
+    /** Removes a data source from the chart. */
     public void removeDataSource() {
         int lastSeriesIndex = dataset.getSeriesCount() - 1;
         if (lastSeriesIndex >= 0) {
@@ -115,15 +143,21 @@ public class TimeSeriesModel extends ChartModel {
         }
     }
 
-    /**
-     * Adds a data source to the chart.
-     */
-    public void addDataSource() {
-        int currentSize = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(currentSize + 1));
-        TimeSeries series = new TimeSeries(currentSize + 1); 
-        timeSeriesList.add(series);
-        this.fireDataSourceAdded(series);
+    /** Remove the specified data source, if it exists. */
+    @Override
+    public void removeDataSource(ChartDataSource source) {
+        if (source instanceof TimeSeries) {
+            TimeSeries series = (TimeSeries) source;
+            if (timeSeriesList.remove(series)) {
+                dataset.removeSeries(series.seriesIndex);
+                fireDataSourceRemoved(series);
+            }
+        }
+    }
+
+    @Override
+    public Optional<? extends ChartDataSource> getDataSource(String description) {
+        return getTimeSeries(description);
     }
 
     /**
@@ -135,7 +169,6 @@ public class TimeSeriesModel extends ChartModel {
 
     /**
      * Returns a properly initialized xstream object.
-     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -154,33 +187,17 @@ public class TimeSeriesModel extends ChartModel {
         return this;
     }
 
-    /**
-     * @return the fixedWidth
-     */
-    public boolean isFixedWidth() {
-        return fixedWidth;
+    /** Returns the maximum number of data points (corresponds to time steps) to plot for each time series. */
+    public int getMaximumDataPoints() {
+        return maxDataPoints;
     }
 
-    /**
-     * @param fixedWidth the fixedWidth to set
-     */
-    public void setFixedWidth(final boolean fixedWidth) {
-        this.fixedWidth = fixedWidth;
-        fireSettingsChanged();
-    }
-
-    /**
-     * @return the windowSize
-     */
-    public int getWindowSize() {
-        return windowSize;
-    }
-
-    /**
-     * @param windowSize the windowSize to set
-     */
-    public void setWindowSize(final int windowSize) {
-        this.windowSize = windowSize;
+    /** Set the maximum number of data points to (corresponds to time steps) to plot for each time series. */
+    public void setMaximumDataPoints(int value) {
+        maxDataPoints = value;
+        for (Object s : dataset.getSeries()) {
+            ((XYSeries)s).setMaximumItemCount(value);
+        }
         fireSettingsChanged();
     }
 
@@ -228,83 +245,9 @@ public class TimeSeriesModel extends ChartModel {
         this.rangeLowerBound = lowerRangeBoundary;
         fireSettingsChanged();
     }
-
-    /**
-     * Add data to this model.
-     *
-     * @param dataSourceIndex index of data source to use
-     * @param time data for x axis
-     * @param value data for y axis
-     */
-    public void addData(final int dataSourceIndex, final double time,
-            final double value) {
-        getDataset().getSeries(dataSourceIndex).add(time, value);
-    }
-
-    /**
-     * Update the model; currently used to remove unused data when in
-     * "fixed width" mode.
-     */
-    public void update() {
-
-        // Trim appropriately if fixed width
-
-        // TODO: This does not work well in trainer.gui. Concurrency issues. So
-        // disabling for now.
-        // if (isFixedWidth()) {
-        // System.out.println("Dataset Size: " +
-        // dataset.getSeries(0).getItemCount());
-        // for (Iterator iterator = getDataset().getSeries().iterator();
-        // iterator
-        // .hasNext();) {
-        // XYSeries series = (XYSeries) iterator.next();
-        // if (series.getItemCount() > getWindowSize()) {
-        // int diff = Math
-        // .abs(series.getItemCount() - getWindowSize());
-        // System.out.println("diff:" + diff);
-        // for (int i = 0; i < diff; i++) {
-        // series.remove(i);
-        // }
-        // }
-        // }
-        // }
-
-    }
-
-    /**
-     * Encapsulates a single time series.
-     */
-    public class TimeSeries implements ChartDataSource {
-        
-        /** Coupling Description. */
-        private int seriesIndex;
-
-        /** Construct the time series. */
-        TimeSeries(int seriesIndex) {
-            this.seriesIndex = seriesIndex;
-        }
-
-        /** Get the description. */
-        public String getDescription() {
-            return "" + seriesIndex;
-        }
-
-        @Consumable(idMethod="getDescription")
-        public void setValue(double value) {
-            addData(seriesIndex, timeSupplier.get(), value);
-        }
-    }
-    
-    /**
-     * @return the timeSeriesList
-     */
-    public List<TimeSeries> getTimeSeriesList() {
-        return timeSeriesList;
-    }
     
     /**
      * Find matching time series object. Used to deserialize.
-     * 
      * @param description key
      * @return matching time series
      */
@@ -318,10 +261,40 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
+     * Add data to this model.
+     * @param dataSourceIndex index of data source to use
+     * @param time data for x axis
+     * @param value data for y axis
+     */
+    public void addData(int dataSourceIndex, double time, double value) {
+        getDataset().getSeries(dataSourceIndex).add(time, value);
+    }
+
+    /** Update the model */
+    public void update() {}
+
+    /** Returns a list of time series. */
+    public List<TimeSeries> getTimeSeriesList() {
+        return timeSeriesList;
+    }
+
+    /**
      * @param timeSupplier the timeSupplier to set
      */
     public void setTimeSupplier(Supplier<Integer> timeSupplier) {
         this.timeSupplier = timeSupplier;
     }
 
+    /**
+     * This method is used only for coupling to the chart. It does not do anything.
+     * Couplings to this method will be replaced by couplings to new data sources by the
+     * ChartCouplingListener.
+     */
+    @Consumable(idMethod="getName")
+    public void addTimeSeries(double value) {}
+
+    /** Return the name to use for this model in coupling descriptions. */
+    public String getName() {
+        return "TimeSeriesPlot";
+    }
 }

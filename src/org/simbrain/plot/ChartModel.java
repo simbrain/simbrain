@@ -20,6 +20,7 @@ package org.simbrain.plot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -48,6 +49,19 @@ public class ChartModel {
 
     /** Settings Listeners on this chart. */
     private transient List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
+
+    /** Add a data source to the chart model. */
+    public ChartDataSource addDataSource(String description) {
+        return null;
+    }
+
+    /** Remove the data source from the chart model. */
+    public void removeDataSource(ChartDataSource source) {}
+
+    /** Get the data source with the specified description, if it exists. */
+    public Optional<? extends ChartDataSource> getDataSource(String description) {
+        return Optional.empty();
+    }
 
     /**
      * Add a chart listener.

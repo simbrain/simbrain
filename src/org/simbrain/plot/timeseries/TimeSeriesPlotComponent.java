@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.simbrain.plot.ChartCouplingListener;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -41,11 +43,10 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      *
      * @param name name
      */
-    public TimeSeriesPlotComponent(final String name) {
+    public TimeSeriesPlotComponent(String name) {
         super(name);
         model = new TimeSeriesModel(() -> getWorkspace().getTime());
         addListener();
-        model.defaultInit();
     }
 
     /**
@@ -55,8 +56,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param name chart name
      * @param model chart model
      */
-    public TimeSeriesPlotComponent(final String name,
-            final TimeSeriesModel model) {
+    public TimeSeriesPlotComponent(String name, TimeSeriesModel model) {
         super(name);
         this.model = model;
         model.setTimeSupplier(() -> getWorkspace().getTime());
@@ -67,7 +67,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Add chart listener to model.
      */
     private void addListener() {
-
         model.addListener(new ChartListener() {
             public void dataSourceAdded(ChartDataSource source) {
                 fireModelAdded(source);
@@ -80,8 +79,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     @Override
+    public void setWorkspace(Workspace workspace) {
+        // This is a bit of a hack because the workspace is not available in the constructor.
+        super.setWorkspace(workspace);
+        workspace.addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "TimeSeries"));
+    }
+
+    @Override
     public List<Object> getModels() {
         List<Object> models = new ArrayList<Object>();
+        models.add(model);
         models.addAll(model.getTimeSeriesList());
         return models;
     }
@@ -95,10 +102,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
+        if (objectKey.equals(model.getName())) {
+            return model;
+        } else {
             Optional<TimeSeriesModel.TimeSeries> timeSeries = model.getTimeSeries(objectKey);
             if (timeSeries.isPresent()) {
                 return timeSeries.get();
             }
+        }
         return null;
     }
 

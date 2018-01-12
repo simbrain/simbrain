@@ -40,10 +40,8 @@ public class TimeSeriesPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getPropertiesDialogAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getPropertiesDialogAction(TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
-
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
@@ -51,9 +49,6 @@ public class TimeSeriesPlotActions {
                 putValue(SHORT_DESCRIPTION, "Show time series graph properties");
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void actionPerformed(ActionEvent arg0) {
                 timeSeriesPanel.showPropertiesDialog();
             }
@@ -66,23 +61,17 @@ public class TimeSeriesPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getClearGraphAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getClearGraphAction(TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
-
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
                 putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void actionPerformed(ActionEvent arg0) {
                 timeSeriesPanel.getTimeSeriesModel().clearData();
             }
-
         };
     }
 
@@ -92,25 +81,18 @@ public class TimeSeriesPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getAddSourceAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getAddSourceAction(TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
-
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Add");
                 putValue(SHORT_DESCRIPTION, "Add a data source");
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void actionPerformed(ActionEvent arg0) {
                 timeSeriesPanel.getTimeSeriesModel().addDataSource();
             }
-
         };
     }
 

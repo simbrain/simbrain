@@ -29,6 +29,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -82,43 +83,26 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Initialize Chart Panel.
      */
     public void init() {
-
-        // Generate the graph
-        chart = ChartFactory.createXYLineChart("", // Title
-                "Iterations", // x-axis Label
-                "Value(s)", // y-axis Label
-                model.getDataset(), // Dataset
-                PlotOrientation.VERTICAL, // Plot Orientation
-                true, // Show Legend
-                true, // Use tooltips
-                false // Configure chart to generate URLs?
-                );
+        String title = "";
+        String xLabel = "Time";
+        String yLabel = "Value";
+        boolean showLegend = true;
+        boolean useTooltips = true;
+        boolean generateUrls = false;
+        chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, model.getDataset(),
+                PlotOrientation.VERTICAL, true, true, false);
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
         // Create chart settings listener
         model.addChartSettingsListener(new ChartSettingsListener() {
             public void chartSettingsUpdated(ChartModel theModel) {
-
-                // Handle range properties
-                chart.getXYPlot().getRangeAxis()
-                        .setAutoRange(model.isAutoRange());
+                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
                 if (!model.isAutoRange()) {
-                    chart.getXYPlot()
-                            .getRangeAxis()
-                            .setRange(model.getRangeLowerBound(),
-                                    model.getRangeUpperBound());
+                    chart.getXYPlot().getRangeAxis().setRange(
+                            model.getRangeLowerBound(), model.getRangeUpperBound());
                 }
-
-                // Handle domain properties
-                if (model.isFixedWidth()) {
-                    chart.getXYPlot().getDomainAxis()
-                            .setFixedAutoRange(model.getWindowSize());
-                } else {
-                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
-                    chart.getXYPlot().getDomainAxis().setAutoRange(true);
-                }
-
+                chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
             }
         });
 
@@ -148,8 +132,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void addAddDeleteButtons() {
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(TimeSeriesPlotActions
-                .getRemoveSourceAction(this));
+        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
         JButton addButton = new JButton("Add");
         addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
         buttonPanel.add(deleteButton);
@@ -172,8 +155,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void addPreferencesButton() {
         JButton prefsButton = new JButton("Prefs");
         prefsButton.setHideActionText(true);
-        prefsButton.setAction(TimeSeriesPlotActions
-                .getPropertiesDialogAction(this));
+        prefsButton.setAction(TimeSeriesPlotActions.getPropertiesDialogAction(this));
         buttonPanel.add(prefsButton);
     }
 

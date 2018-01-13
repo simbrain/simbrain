@@ -23,9 +23,7 @@ import java.util.Arrays;
 
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer2.UpdateMethod;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 
@@ -37,7 +35,7 @@ import org.simbrain.util.math.ProbDistribution;
 public class BackpropTrainerTest {
 
     public static void main(String[] args) {
-       testXor();
+       //testXor();
        //testAssociator();
        //testAssociator5();
        //testMazur();
@@ -51,7 +49,7 @@ public class BackpropTrainerTest {
     public static void testXor() {
 
         BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 2, 2, 1 });
+                new int[] { 2, 3, 1 });
 
         network.getTrainingSet().setInputData(
                 new double[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } });
@@ -63,6 +61,10 @@ public class BackpropTrainerTest {
         trainer.initData();
         trainer.setLearningRate(.1);
         trainer.setMomentum(.9);
+        trainer.rand.setPdf(ProbDistribution.NORMAL);
+        trainer.rand.setParam1(0);
+        trainer.rand.setParam2(.1);
+        trainer.randomize();
         //trainer.setUpdateMethod(UpdateMethod.STOCHASTIC);
         //trainer.rand.setPdf(ProbDistribution.UNIFORM);
         //trainer.rand.setParam1(-.95);
@@ -92,7 +94,10 @@ public class BackpropTrainerTest {
 
         //BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
-        
+        trainer.rand.setPdf(ProbDistribution.NORMAL);
+        trainer.rand.setParam1(0);
+        trainer.rand.setParam2(.1);
+        trainer.randomize();
         trainer.initData();
         trainer.setLearningRate(.15);
         trainer.setMomentum(.8);
@@ -126,6 +131,10 @@ public class BackpropTrainerTest {
 
         //BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
+        trainer.rand.setPdf(ProbDistribution.NORMAL);
+        trainer.rand.setParam1(0);
+        trainer.rand.setParam2(.1);
+        trainer.randomize();
         trainer.initData();
         //trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.EPOCH);
         trainer.setLearningRate(.1);
@@ -161,7 +170,10 @@ public class BackpropTrainerTest {
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         //BackpropTrainer trainer = new BackpropTrainer(network);
         trainer.initData();
-        
+        trainer.rand.setPdf(ProbDistribution.NORMAL);
+        trainer.rand.setParam1(0);
+        trainer.rand.setParam2(.1);
+        trainer.randomize();
         trainer.setLearningRate(0.05);
         trainer.setMomentum(0.5);
       // trainer.setUpdateMethod(UpdateMethod.EPOCH);
@@ -179,19 +191,6 @@ public class BackpropTrainerTest {
 //            }
         }
         
-    	
-    }
-    
-    public static void testDumb() {
-    	DoubleMatrix bob = DoubleMatrix.zeros(5);
-    	bob.addi(2);
-    	DoubleMatrix jim = DoubleMatrix.zeros(5);
-    	jim.addi(1);
-    	DoubleMatrix tom = DoubleMatrix.zeros(5);
-    	
-    	bob.subi(jim, tom);
-    	
-    	System.out.println(Arrays.toString(tom.data));
     	
     }
     

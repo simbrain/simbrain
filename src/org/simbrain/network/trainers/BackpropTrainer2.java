@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.jblas.DoubleMatrix;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -172,12 +170,14 @@ public class BackpropTrainer2 extends IterableTrainer {
         errors = DoubleMatrix.zeros(getOutputLayer().data.length);
 
         // Initialize randomizer
-        rand.setPdf(ProbDistribution.NORMAL);
-        rand.setParam1(0);
-        rand.setParam2(.1);
-        randomize();
+//        rand.setPdf(ProbDistribution.NORMAL);
+//        rand.setParam1(0);
+//        rand.setParam2(.1);
+//        randomize();
     }
 
+    
+    
     @Override
     public void apply() {
     	
@@ -363,9 +363,10 @@ public class BackpropTrainer2 extends IterableTrainer {
             }
         }
 
+        // TODO: Separate bias randomizer
         for (int kk = 0; kk < biases.size(); ++kk) {
             for (int ii = 0; ii < biases.get(kk).length; ii++) {
-                biases.get(kk).data[ii] = (Math.random()*0.1) -0.05;
+                biases.get(kk).data[ii] = (Math.random()*0.1) -0.05; 
             }
         }
     }

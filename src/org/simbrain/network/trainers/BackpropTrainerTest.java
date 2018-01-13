@@ -19,7 +19,6 @@
 package org.simbrain.network.trainers;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network;
@@ -35,12 +34,11 @@ import org.simbrain.util.math.ProbDistribution;
 public class BackpropTrainerTest {
 
     public static void main(String[] args) {
-       //testXor();
-       //testAssociator();
-       //testAssociator5();
-       //testMazur();
-       //testSineWave();
-       //testDumb();
+        testXor();
+        // testAssociator();
+        // testAssociator5();
+        // testMazur();
+        // testSineWave();
     }
 
     /**
@@ -49,14 +47,14 @@ public class BackpropTrainerTest {
     public static void testXor() {
 
         BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 2, 3, 1 });
+                new int[] { 2, 2, 1 });
 
         network.getTrainingSet().setInputData(
                 new double[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } });
-        network.getTrainingSet()
-                .setTargetData(new double[][] { { .2 }, { .8 }, { .8 }, { .2 } });
+        network.getTrainingSet().setTargetData(
+                new double[][] { { .2 }, { .8 }, { .8 }, { .2 } });
 
-        //BackpropTrainer trainer = new BackpropTrainer(network);
+        // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
         trainer.setLearningRate(.1);
@@ -65,16 +63,17 @@ public class BackpropTrainerTest {
         trainer.rand.setParam1(0);
         trainer.rand.setParam2(.1);
         trainer.randomize();
-        //trainer.setUpdateMethod(UpdateMethod.STOCHASTIC);
-        //trainer.rand.setPdf(ProbDistribution.UNIFORM);
-        //trainer.rand.setParam1(-.95);
-        //trainer.rand.setParam2(.95);
+        // trainer.setUpdateMethod(UpdateMethod.STOCHASTIC);
+        // trainer.rand.setPdf(ProbDistribution.UNIFORM);
+        // trainer.rand.setParam1(-.95);
+        // trainer.rand.setParam2(.95);
         for (int i = 0; i < 10000; i++) {
             trainer.apply();
             trainer.commitChanges();
-        	for(int jj=0; jj<2; jj++) {
-            	System.out.println(Arrays.deepToString(trainer.getWeightMatrices().get(jj).toArray2()));
-        	}
+            //for (int jj = 0; jj < 2; jj++) {
+            //    System.out.println(Arrays.deepToString(
+            //            trainer.getWeightMatrices().get(jj).toArray2()));
+            //}
             System.out.println(trainer.getError());
         }
     }
@@ -92,7 +91,7 @@ public class BackpropTrainerTest {
         network.getTrainingSet().setTargetData(
                 new double[][] { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } });
 
-        //BackpropTrainer trainer = new BackpropTrainer(network);
+        // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.rand.setPdf(ProbDistribution.NORMAL);
         trainer.rand.setParam1(0);
@@ -101,23 +100,22 @@ public class BackpropTrainerTest {
         trainer.initData();
         trainer.setLearningRate(.15);
         trainer.setMomentum(.8);
-//        trainer.rand.setPdf(ProbDistribution.UNIFORM);
-//        trainer.rand.setParam1(0);
-//        trainer.rand.setParam2(.5);
-        
+        // trainer.rand.setPdf(ProbDistribution.UNIFORM);
+        // trainer.rand.setParam1(0);
+        // trainer.rand.setParam2(.5);
+
         trainer.randomize();
-        
+
         for (int i = 0; i < 10000; i++) {
             trainer.apply();
             if (i % 100 == 0) {
-                System.out.println(trainer.getError());                
+                System.out.println(trainer.getError());
             }
         }
     }
-    
+
     /**
-     * 5-5-5 auto-associator. Currently failing on the new array backed system.
-     * But decent performance on the 
+     * 5-5-5 auto-associator.
      */
     public static void testAssociator5() {
 
@@ -129,46 +127,47 @@ public class BackpropTrainerTest {
         network.getTrainingSet().setTargetData(Utils.getDoubleMatrix(
                 new File("./simulations/tables/5_binary.csv")));
 
-        //BackpropTrainer trainer = new BackpropTrainer(network);
+        // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.rand.setPdf(ProbDistribution.NORMAL);
         trainer.rand.setParam1(0);
         trainer.rand.setParam2(.1);
         trainer.randomize();
         trainer.initData();
-        //trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.EPOCH);
+        // trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.EPOCH);
         trainer.setLearningRate(.1);
         trainer.setMomentum(.9);
-        //trainer.rand.setPdf(ProbDistribution.UNIFORM);
-        //trainer.rand.setParam1(1);
-        //trainer.rand.setParam2(1.1);
+        // trainer.rand.setPdf(ProbDistribution.UNIFORM);
+        // trainer.rand.setParam1(1);
+        // trainer.rand.setParam2(1.1);
         trainer.randomize();
-        
+
         for (int i = 0; i < 10_000; i++) {
             trainer.apply();
             if (i % 1000 == 0) {
-            	System.out.println(trainer.getError());                
+                System.out.println(trainer.getError());
             }
         }
-        
+
     }
 
     public static void testSineWave() {
-    	BackpropNetwork network = new BackpropNetwork(new Network(),
+        BackpropNetwork network = new BackpropNetwork(new Network(),
                 new int[] { 1, 5, 1 });
-    	
-    	double[][] inpData = new double[100][1];
-    	double[][] targData = new double[100][1];
-    	for(int ii=0; ii<100; ++ii) {
-    		inpData[ii][0] = ii * (2 * Math.PI / 100);
-    		targData[ii][0] = Math.sin(inpData[ii][0])/10 + 0.5;
-    		//System.out.println(inpData[ii][0] + "     " + 10*(targData[ii][0]-0.5));
-    	}
-    	network.getTrainingSet().setInputData(inpData);
-    	network.getTrainingSet().setTargetData(targData);
-    	
+
+        double[][] inpData = new double[100][1];
+        double[][] targData = new double[100][1];
+        for (int ii = 0; ii < 100; ++ii) {
+            inpData[ii][0] = ii * (2 * Math.PI / 100);
+            targData[ii][0] = Math.sin(inpData[ii][0]) / 10 + 0.5;
+            // System.out.println(inpData[ii][0] + " " +
+            // 10*(targData[ii][0]-0.5));
+        }
+        network.getTrainingSet().setInputData(inpData);
+        network.getTrainingSet().setTargetData(targData);
+
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
-        //BackpropTrainer trainer = new BackpropTrainer(network);
+        // BackpropTrainer trainer = new BackpropTrainer(network);
         trainer.initData();
         trainer.rand.setPdf(ProbDistribution.NORMAL);
         trainer.rand.setParam1(0);
@@ -176,27 +175,29 @@ public class BackpropTrainerTest {
         trainer.randomize();
         trainer.setLearningRate(0.05);
         trainer.setMomentum(0.5);
-      // trainer.setUpdateMethod(UpdateMethod.EPOCH);
-     //   int plorp = 0;
+        // trainer.setUpdateMethod(UpdateMethod.EPOCH);
+        // int plorp = 0;
         for (int i = 0; i <= 10_000; i++) {
             trainer.apply();
-//            if (i % (1000) == 0) {
-//            	DoubleMatrix bob = trainer.getWeightMatrices().get(1);
-//            	for(int jj=0; jj<5; jj++) {
-//               	System.out.println(Arrays.toString(bob.data));
-//            	}
-            	//plorp++;
-            	System.out.println(trainer.getError()); //+ "      " + i + "     " + 10*(trainer.layers.get(1).data[0]-0.5));  
-            	
-//            }
+            // if (i % (1000) == 0) {
+            // DoubleMatrix bob = trainer.getWeightMatrices().get(1);
+            // for(int jj=0; jj<5; jj++) {
+            // System.out.println(Arrays.toString(bob.data));
+            // }
+            // plorp++;
+            System.out.println(trainer.getError()); // + " " + i + " " +
+                                                    // 10*(trainer.layers.get(1).data[0]-0.5));
+
+            // }
         }
-        
-    	
+
     }
-    
+
     /**
      * Test based on this discussion.
      * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+     * 
+     * TODO: Migrate to unit testing
      */
     public static void testMazur() {
 
@@ -224,7 +225,7 @@ public class BackpropTrainerTest {
 
         DoubleMatrix biases2 = new DoubleMatrix(new double[] { .6, .6 });
         trainer.getBiases().set(1, biases2);
-        
+
         for (int i = 0; i < 1; i++) {
             trainer.apply();
             System.out.println("Error:" + trainer.getError());

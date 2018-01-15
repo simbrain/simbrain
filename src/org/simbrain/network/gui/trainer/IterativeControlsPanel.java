@@ -35,13 +35,16 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.trainers.BackpropTrainer2;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * The main controller panel for iterative learning, with buttons etc. to run
@@ -128,6 +131,10 @@ public class IterativeControlsPanel extends JPanel {
         JButton propertiesButton = new JButton(setPropertiesAction);
         propertiesButton.setHideActionText(true);
         runTools.add(propertiesButton);
+
+        JButton randPropertiesButton = new JButton(randPropertiesAction);
+        runTools.add(randPropertiesButton);
+
         JButton randomizeButton = new JButton(randomizeAction);
         randomizeButton.setHideActionText(true);
         runTools.add(randomizeButton);
@@ -221,15 +228,15 @@ public class IterativeControlsPanel extends JPanel {
                     "Iterate training until stop button pressed.");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             initTrainer(false);
             if (trainer == null) {
                 return;
             }
             if (trainer.isUpdateCompleted()) {
+
+                //TODO: Relation to stop trainer
                 // Start running
                 trainer.setUpdateCompleted(false);
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
@@ -266,6 +273,7 @@ public class IterativeControlsPanel extends JPanel {
                 // Stop running
                 trainer.setUpdateCompleted(true);
                 trainer.revalidateSynapseGroups();
+                trainer.commitChanges();
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             }
 
@@ -285,9 +293,7 @@ public class IterativeControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Iterate training once");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             initTrainer(false);
             if (trainer == null) {
@@ -346,9 +352,7 @@ public class IterativeControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Edit Trainer Settings...");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             initTrainer(false);
             if (trainer == null) {
@@ -367,6 +371,45 @@ public class IterativeControlsPanel extends JPanel {
             dialog.setVisible(true);
         }
     };
+
+    /**
+     * Action for setting randomizer.
+     */
+    private Action randPropertiesAction;
+
+    {
+        randPropertiesAction = new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+                putValue(NAME, "Edit Randomizer");
+                putValue(SHORT_DESCRIPTION, "Edit Randomizer Settings...");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                StandardDialog dialog = new StandardDialog(null, "Randomizer Properties") {
+                    RandomizerPanel randomPanel = new RandomizerPanel(this);
+                    {
+                        setContentPane(randomPanel);
+                        //TODO: Change this obviously!
+                        randomPanel.fillFieldValues(((BackpropTrainer2) trainer).getRandomizer());
+                    }
+                    @Override
+                    protected void closeDialogOk() {
+                        super.closeDialogOk();
+                        //TODO: Change this obviously!
+                        randomPanel.commitRandom(((BackpropTrainer2) trainer).getRandomizer());
+                    }
+                };
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        };
+    }
 
     /**
      * @return the trainer

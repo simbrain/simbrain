@@ -39,7 +39,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * (BackpropTrainer2), and the old one. Once that's stabilized this code can
      * be removed.
      */
-    private boolean useExperimentalTrainer = false;
+    private boolean useExperimentalTrainer = true;
     private IterableTrainer currentTrainer;
 
     /**
@@ -84,6 +84,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     protected void stopTrainer() {
         if (currentTrainer != null) {
             currentTrainer.setUpdateCompleted(true);
+            currentTrainer.commitChanges();
         }
     }
     

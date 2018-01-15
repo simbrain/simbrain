@@ -49,81 +49,52 @@ public class WorkspaceComponentDeserializer {
     /**
      * Deserializes a workspace component using the information from the
      * provided component and input stream.
-     *
      * @param archivedComponent The component entry from the archive contents.
      * @param input The input stream to read data from.
      * @return The deserialized WorkspaceComponent.
      */
-    @SuppressWarnings("unchecked")
-    WorkspaceComponent deserializeWorkspaceComponent(
-            final ArchivedWorkspaceComponent archivedComponent,
-            final InputStream input) {
-        try {
-            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>) Class
-                    .forName(archivedComponent.getClassName());
-
-            WorkspaceComponent wc = deserializeWorkspaceComponent(clazz,
-                    archivedComponent.getName(), input, null);
-
-            componentKeys.put(archivedComponent.getUri(), wc);
-            wc.setChangedSinceLastSave(false);
-            return wc;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    WorkspaceComponent deserializeWorkspaceComponent(ArchivedWorkspaceComponent archivedComponent, InputStream input)
+            throws ReflectiveOperationException {
+        Class<?> componentClass = Class.forName(archivedComponent.getClassName());
+        WorkspaceComponent wc = deserializeWorkspaceComponent(componentClass, archivedComponent.getName(), input, null);
+        componentKeys.put(archivedComponent.getUri(), wc);
+        wc.setChangedSinceLastSave(false);
+        return wc;
     }
 
     /**
      * Deserialized a component for the given class, input and input format.
-     *
-     * @param clazz the class of the component
+     * @param componentClass the class of the component
      * @param name the name of the component
      * @param input the input stream
      * @param format the format of the data
      * @return a new component
      */
-    public static WorkspaceComponent deserializeWorkspaceComponent(
-            final Class<?> clazz, final String name, final InputStream input,
-            final String format) {
-        try {
-            Method method = clazz.getMethod("open", InputStream.class,
-                    String.class, String.class);
-            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null,
-                    input, name, format);
-            wc.setChangedSinceLastSave(false);
-            return wc;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public static WorkspaceComponent deserializeWorkspaceComponent(Class<?> componentClass, String name,
+            InputStream input, String format) throws ReflectiveOperationException {
+        Method method = componentClass.getMethod("open", InputStream.class, String.class, String.class);
+        Object obj = method.invoke(null, input, name, format);
+        if (obj instanceof WorkspaceComponent) {
+            WorkspaceComponent component = (WorkspaceComponent) obj;
+            component.setChangedSinceLastSave(false);
+            return component;
+        } else {
+            throw new ReflectiveOperationException("Incompatible open method return type in class " + componentClass);
         }
     }
 
     /**
      * Deserializes a desktop component given a class, input stream and name.
-     *
      * @param className The class name for the DesktopComponent
      * @param component The desktop component entry for the desktop component.
      * @param input The input stream.
      * @param name The name of the desktop component.
      * @return The deserialized desktop component.
      */
-    @SuppressWarnings("unchecked")
-    GuiComponent<?> deserializeDesktopComponent(final String className,
-            final WorkspaceComponent component, final InputStream input,
-            final String name) {
-        try {
-            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>) Class
-                    .forName(className);
-            Method method = clazz.getMethod("open", WorkspaceComponent.class,
-                    InputStream.class, String.class);
-
-            return (GuiComponent<?>) method
-                    .invoke(null, component, input, name);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    GuiComponent<?> deserializeDesktopComponent(String className, WorkspaceComponent component,
+            InputStream input, String name) throws ReflectiveOperationException {
+        Class<?> clazz = Class.forName(className);
+        Method method = clazz.getMethod("open", WorkspaceComponent.class, InputStream.class, String.class);
+        return (GuiComponent<?>) method.invoke(null, component, input, name);
     }
 }

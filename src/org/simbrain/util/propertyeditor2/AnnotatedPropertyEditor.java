@@ -77,7 +77,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      *
      * @param toEdit the object to edit
      */
-    public AnnotatedPropertyEditor(final EditableObject toEdit) {
+    public AnnotatedPropertyEditor(EditableObject toEdit) {
         this(Collections.singletonList(toEdit));
     }
 

@@ -67,7 +67,7 @@ public class SelectionController implements ActionListener, AnalogListener {
     private boolean snapTransformations = true;
     private long selectReleaseTime = 0;
     private float gridSize = 1;
-    private String rotationAxis = "Y Axis";
+    private String rotationAxis = "Yaw";
     private EditorDialog editorDialog;
     private List<SelectionListener> listeners;
 
@@ -400,13 +400,13 @@ public class SelectionController implements ActionListener, AnalogListener {
             Vector3f target = contact.getContactPoint().subtract(entity.getPosition());
             Vector3f axis;
             switch (rotationAxis) {
-            case "X Axis":
+            case "Pitch":
                 axis = Vector3f.UNIT_X.clone();
                 break;
-            case "Y Axis":
+            case "Yaw":
                 axis = Vector3f.UNIT_Y.clone();
                 break;
-            case "Z Axis":
+            case "Roll":
                 axis = Vector3f.UNIT_Z.clone();
                 break;
             case "Camera":

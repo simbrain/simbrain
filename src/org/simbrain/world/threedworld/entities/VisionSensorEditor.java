@@ -20,7 +20,7 @@ public class VisionSensorEditor extends SensorEditor {
     private JFormattedTextField headOffsetXField = new JFormattedTextField(EditorDialog.floatFormat);
     private JFormattedTextField headOffsetYField = new JFormattedTextField(EditorDialog.floatFormat);
     private JFormattedTextField headOffsetZField = new JFormattedTextField(EditorDialog.floatFormat);
-    private JComboBox<String> modeComboBox = new JComboBox<String>();
+    private JComboBox<VisionSensor.FilterType> filterComboBox = new JComboBox<>();
     private ThreeDImagePanel previewPanel = new ThreeDImagePanel();
 
     {
@@ -29,9 +29,9 @@ public class VisionSensorEditor extends SensorEditor {
         headOffsetXField.setColumns(6);
         headOffsetYField.setColumns(6);
         headOffsetZField.setColumns(6);
-        modeComboBox.addItem("Color");
-        modeComboBox.addItem("Gray");
-        modeComboBox.addItem("Threshold");
+        filterComboBox.addItem(VisionSensor.FilterType.COLOR);
+        filterComboBox.addItem(VisionSensor.FilterType.GRAY);
+        filterComboBox.addItem(VisionSensor.FilterType.THRESHOLD);
         previewPanel.setPreferredSize(new Dimension(100, 100));
     }
 
@@ -59,7 +59,7 @@ public class VisionSensorEditor extends SensorEditor {
         getPanel().add(headOffsetZField, "wrap");
 
         getPanel().add(new JLabel("Mode"));
-        getPanel().add(modeComboBox, "wrap");
+        getPanel().add(filterComboBox, "wrap");
 
         getPanel().add(previewPanel, "east, gaptop 4px, gapright 4px, gapbottom 4px, gapleft 4px");
 
@@ -73,7 +73,7 @@ public class VisionSensorEditor extends SensorEditor {
         headOffsetXField.setValue(sensor.getHeadOffset().x);
         headOffsetYField.setValue(sensor.getHeadOffset().y);
         headOffsetZField.setValue(sensor.getHeadOffset().z);
-        modeComboBox.setSelectedIndex(sensor.getMode());
+        filterComboBox.setSelectedItem(sensor.getFilterType());
     }
 
     @Override
@@ -82,7 +82,7 @@ public class VisionSensorEditor extends SensorEditor {
         sensor.getHeadOffset().x = ((Number) headOffsetXField.getValue()).floatValue();
         sensor.getHeadOffset().y = ((Number) headOffsetYField.getValue()).floatValue();
         sensor.getHeadOffset().z = ((Number) headOffsetZField.getValue()).floatValue();
-        sensor.setMode(modeComboBox.getSelectedIndex());
+        sensor.setFilterType((VisionSensor.FilterType) filterComboBox.getSelectedItem());
     }
 
     @Override

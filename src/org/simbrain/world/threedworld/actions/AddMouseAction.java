@@ -36,7 +36,7 @@ public class AddMouseAction extends AbstractAction {
             Agent agent = new Agent(model);
             VisionSensor sensor = new VisionSensor(agent);
             sensor.setHeadOffset(new Vector3f(0, 1.25f, 2.25f));
-            sensor.setMode(VisionSensor.MODE_GRAY);
+            sensor.setFilterType(VisionSensor.FilterType.GRAY);
             WalkingEffector effector = new WalkingEffector(agent);
             effector.setWalkAnimSpeed(3);
             world.getEntities().add(agent);

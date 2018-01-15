@@ -15,11 +15,13 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 
 public class AgentEditor extends ModelEditor {
-    private static Map<String, Class<? extends Sensor>> sensorTypes = new HashMap<String, Class<? extends Sensor>>();
-    private static Map<String, Class<? extends Effector>> effectorTypes = new HashMap<String, Class<? extends Effector>>();
+    private static Map<String, Class<? extends Sensor>> sensorTypes = new HashMap<>();
+    private static Map<String, Class<? extends Effector>> effectorTypes = new HashMap<>();
 
     static {
         sensorTypes.put("Vision", VisionSensor.class);
@@ -29,7 +31,7 @@ public class AgentEditor extends ModelEditor {
 
     private Agent agent;
     private JPanel sensorTab;
-    private JComboBox<String> sensorTypesComboBox = new JComboBox<String>();
+    private JComboBox<String> sensorTypesComboBox = new JComboBox<>();
     private Action addSensorAction = new AbstractAction("Add") {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -38,9 +40,9 @@ public class AgentEditor extends ModelEditor {
     };
     private JButton addSensorButton = new JButton(addSensorAction);
     private JPanel effectorTab;
-    private List<SensorEditor> sensorEditors = new ArrayList<SensorEditor>();
-    private List<EffectorEditor> effectorEditors = new ArrayList<EffectorEditor>();
-    private JComboBox<String> effectorTypesComboBox = new JComboBox<String>();
+    private List<AnnotatedPropertyEditor> sensorEditors = new ArrayList<>();
+    private List<EffectorEditor> effectorEditors = new ArrayList<>();
+    private JComboBox<String> effectorTypesComboBox = new JComboBox<>();
     private Action addEffectorAction = new AbstractAction("Add") {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -79,19 +81,20 @@ public class AgentEditor extends ModelEditor {
     }
 
     public void addSensor(String sensorName) {
+        Class<? extends Sensor> sensorType = sensorTypes.get(sensorName);
         agent.getEngine().enqueue(() -> {
             try {
-                Class<? extends Sensor> sensorType = sensorTypes.get(sensorName);
                 Sensor sensor = sensorType.getConstructor(Agent.class).newInstance(agent);
-                SensorEditor editor = sensor.getEditor();
-                sensorEditors.add(editor);
-                layoutSensorEditor(editor);
-                editor.readValues();
-                filterSensorTypes();
             } catch (Exception e) {
                 throw new RuntimeException("Unable to add sensor", e);
             }
-        });
+        }, true);
+        Sensor sensor = agent.getSensor(sensorType);
+        if (sensor != null) {
+            AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(sensor);
+            sensorEditors.add(editor);
+            filterSensorTypes();
+        }
     }
 
     public void addEffector(String effectorName) {
@@ -110,26 +113,21 @@ public class AgentEditor extends ModelEditor {
         });
     }
 
-    public void deleteSensor(SensorEditor editor) {
-        agent.getEngine().enqueue(() -> {
-            sensorEditors.remove(editor);
-            Sensor sensor = editor.getSensor();
-            sensor.delete();
-            sensorTab.remove(editor.getPanel());
-            filterSensorTypes();
-            sensorTab.repaint();
-        });
+    public void deleteSensor(Sensor sensor, AnnotatedPropertyEditor editor) {
+        agent.getEngine().enqueue(sensor::delete, true);
+        sensorEditors.remove(editor);
+        sensorTab.remove(editor);
+        filterSensorTypes();
+        sensorTab.repaint();
     }
 
     public void deleteEffector(EffectorEditor editor) {
-        agent.getEngine().enqueue(() -> {
-            effectorEditors.remove(editor);
-            Effector effector = editor.getEffector();
-            effector.delete();
-            effectorTab.remove(editor.getPanel());
-            filterEffectorTypes();
-            effectorTab.repaint();
-        });
+        Effector effector = editor.getEffector();
+        agent.getEngine().enqueue(effector::delete, true);
+        effectorEditors.remove(editor);
+        effectorTab.remove(editor.getPanel());
+        filterEffectorTypes();
+        effectorTab.repaint();
     }
 
     @Override
@@ -152,21 +150,9 @@ public class AgentEditor extends ModelEditor {
     private void layoutSensors() {
         sensorTab.add(sensorTypesComboBox, "growx, split 2");
         sensorTab.add(addSensorButton, "wrap");
-        for (SensorEditor editor : sensorEditors) {
-            layoutSensorEditor(editor);
+        for (AnnotatedPropertyEditor editor : sensorEditors) {
+            sensorTab.add(editor, "growx, wrap");
         }
-    }
-
-    private void layoutSensorEditor(SensorEditor editor) {
-        sensorTab.add(editor.layoutFields(), "growx, wrap");
-        Action deleteAction = new AbstractAction("Delete") {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                deleteSensor(editor);
-            }
-        };
-        JButton deleteButton = new JButton(deleteAction);
-        editor.getPanel().add(deleteButton, "wrap");
     }
 
     private void layoutEffectors() {
@@ -193,9 +179,16 @@ public class AgentEditor extends ModelEditor {
     public void readValues() {
         super.readValues();
         for (Sensor sensor : agent.getSensors()) {
-            SensorEditor sensorEditor = sensor.getEditor();
-            sensorEditor.readValues();
-            sensorEditors.add(sensorEditor);
+            AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(sensor);
+            Action deleteAction = new AbstractAction("Delete") {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    deleteSensor(sensor, editor);
+                }
+            };
+            JButton deleteButton = new JButton(deleteAction);
+            editor.add(deleteButton);
+            sensorEditors.add(editor);
         }
         for (Effector effector : agent.getEffectors()) {
             EffectorEditor effectorEditor = effector.getEditor();
@@ -207,8 +200,8 @@ public class AgentEditor extends ModelEditor {
     @Override
     public void writeValues() {
         super.writeValues();
-        for (Editor sensorEditor : sensorEditors) {
-            sensorEditor.writeValues();
+        for (AnnotatedPropertyEditor sensorEditor : sensorEditors) {
+            sensorEditor.commitChanges();
         }
         for (Editor effectorEditor : effectorEditors) {
             effectorEditor.writeValues();
@@ -218,9 +211,6 @@ public class AgentEditor extends ModelEditor {
     @Override
     public void close() {
         super.close();
-        for (Editor sensorEditor : sensorEditors) {
-            sensorEditor.close();
-        }
         for (Editor effectorEditor : effectorEditors) {
             effectorEditor.close();
         }

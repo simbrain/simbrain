@@ -217,7 +217,7 @@ public class TrainerGuiActions {
                     new ReflectivePropertyEditor();
                 editor.setExcludeList(new String[] { "iteration",
                     "updateCompleted" });
-                editor.setObject(trainer);
+                editor.setObjectToEdit(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();

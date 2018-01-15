@@ -1,8 +1,11 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.awt.image.BufferedImageOp;
+import java.awt.image.ImageFilter;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.world.imageworld.SensorMatrix;
+import org.simbrain.world.imageworld.filters.ImageFilterFactory;
+import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 import org.simbrain.world.threedworld.engine.ThreeDRenderSource;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -17,12 +20,18 @@ import com.jme3.renderer.ViewPort;
  */
 public class VisionSensor extends SensorMatrix implements Sensor {
     
-    /** MODE_COLOR uses the unfiltered, full color rendered view for the sensor. */
-    public static final int MODE_COLOR = 0;
-    /** MODE_GRAY transforms the colorspace of the rendered view to grayscale. */
-    public static final int MODE_GRAY = 1;
-    /** MODE_THRESHOLD applies a black-white threshold to the luminance of the rendered view. */
-    public static final int MODE_THRESHOLD = 2;
+    /** Color filter type for the sensor. */
+    public enum FilterType {
+        /** Color filter preserves full color renders. */
+        COLOR,
+        /** Gray filter sets all pixel channels to the brightness of the rendered pixel. */
+        GRAY,
+        /**
+         * Threshold filter sets all pixel channels to one if the brightness of the
+         * rendered pixel was greater than the threshold value or zero otherwise.
+         */
+        THRESHOLD
+    }
 
     /** FOV defines the angular width in degrees of the sensor. */
     public static final float FOV = 45;
@@ -33,13 +42,15 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     private Agent agent;
     private Vector3f headOffset = Vector3f.UNIT_Z.clone();
+    @UserParameter(label="Width", defaultValue="10", minimumValue=1, maximumValue=2048)
     private int width = 10;
+    @UserParameter(label="Height", defaultValue="10", minimumValue=1, maximumValue=2048)
     private int height = 10;
-    private int mode;
+    private FilterType filterType = FilterType.COLOR;
+    private double threshold = 0.5;
     private transient Camera camera;
     private transient ViewPort viewPort;
-    private transient ThreeDRenderSource source;
-    private transient BufferedImageOp colorFilter;
+    private transient ThreeDRenderSource renderSource;
 
     /**
      * Construct a new VisionSensor.
@@ -50,7 +61,6 @@ public class VisionSensor extends SensorMatrix implements Sensor {
         this.agent = agent;
         agent.addSensor(this);
         initializeView();
-        setMode(MODE_COLOR);
     }
 
     /**
@@ -58,7 +68,6 @@ public class VisionSensor extends SensorMatrix implements Sensor {
      */
     private Object readResolve() {
         initializeView();
-        applyMode();
         return this;
     }
 
@@ -73,7 +82,13 @@ public class VisionSensor extends SensorMatrix implements Sensor {
         viewPort = agent.getEngine().getRenderManager().createMainView(agent.getName() + "ViewPort", camera);
         viewPort.setClearFlags(true, true, true);
         viewPort.attachScene(agent.getEngine().getRootNode());
-        setSource(new ThreeDRenderSource(viewPort, false));
+        renderSource = new ThreeDRenderSource(viewPort, false);
+        applyFilter();
+    }
+
+    @Override
+    public String getName() {
+        return agent.getName() + "Vision";
     }
 
     @Override
@@ -112,44 +127,38 @@ public class VisionSensor extends SensorMatrix implements Sensor {
     }
 
     /**
-     * @return Get the color mode for sensor.
+     * @return Get the filter type for the sensor.
      */
-    public int getMode() {
-        return mode;
+    public FilterType getFilterType() {
+        return filterType;
     }
 
     /**
-     * @param value Assign the color mode for the sensor.
+     * @param value Assign the filter type for the sensor.
      */
-    public void setMode(int value) {
-        if (mode != value) {
-            mode = value;
-            applyMode();
+    public void setFilterType(FilterType value) {
+        if (filterType != value) {
+            filterType = value;
+            applyFilter();
         }
     }
 
     /**
-     * Update the ImageSource filter to apply the assigned color mode.
+     * Update the ImageSource filter to apply the assigned filter.
      */
-    private void applyMode() {
-        /*
-        if (colorFilter != null) {
-            source.removeFilter(colorFilter);
-        }
-        switch (mode) {
-        case MODE_GRAY:
-            colorFilter = ImageFilters.gray();
+    private void applyFilter() {
+        ImageFilter filter;
+        switch (filterType) {
+        case COLOR:
+            setSource(ImageFilterFactory.createColorFilter(renderSource, width, height));
             break;
-        case MODE_THRESHOLD:
-            colorFilter = ImageFilters.threshold(0.75f);
+        case GRAY:
+            setSource(ImageFilterFactory.createGrayFilter(renderSource, width, height));
             break;
-        case MODE_COLOR:
-        default:
-            colorFilter = ImageFilters.identity();
+        case THRESHOLD:
+            setSource(ThresholdFilterFactory.createThresholdFilter(renderSource, threshold, width, height));
             break;
         }
-        source.addFilter(colorFilter);
-        */
     }
 
     /**
@@ -182,7 +191,6 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     /**
      * Resize the sensor by providing a new width and height in pixels.
-     * 
      * @param width The new width.
      * @param height The new height.
      */
@@ -193,7 +201,8 @@ public class VisionSensor extends SensorMatrix implements Sensor {
         this.width = width;
         this.height = height;
         camera.resize(width, height, true);
-        source.resize(width, height);
+        renderSource.resize(width, height);
+        applyFilter();
     }
 
     /**
@@ -219,14 +228,9 @@ public class VisionSensor extends SensorMatrix implements Sensor {
      * Delete the sensor and clean up its resources.
      */
     public void delete() {
-        source.cleanup();
+        renderSource.cleanup();
         viewPort.detachScene(agent.getEngine().getRootNode());
         agent.getEngine().getRenderManager().removeMainView(viewPort);
         agent.removeSensor(this);
-    }
-
-    @Override
-    public SensorEditor getEditor() {
-        return new VisionSensorEditor(this);
     }
 }

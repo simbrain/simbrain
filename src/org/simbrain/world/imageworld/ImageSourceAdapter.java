@@ -16,8 +16,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class ImageSourceAdapter implements ImageSource {
 
     private boolean enabled = true;
-    private BufferedImage currentImage;
-    private List<ImageSourceListener> listeners = new CopyOnWriteArrayList<ImageSourceListener>();
+    private transient BufferedImage currentImage;
+    private transient List<ImageSourceListener> listeners = new CopyOnWriteArrayList<ImageSourceListener>();
 
     /** Construct a new ImageSourceAdapter and initialize the current image. */
     public ImageSourceAdapter() {

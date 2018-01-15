@@ -25,13 +25,15 @@ import com.jme3.renderer.RenderManager;
  */
 public class ThreeDWorld implements AppState {
     /**
-     * WorldListener receives notifications when a ThreeDWorld is initialized or updated.
+     * Listener receives notifications when a ThreeDWorld is initialized or updated.
      */
-    public interface WorldListener {
+    public interface Listener {
         /** @param world The world which has been initialized. */
         void onWorldInitialize(ThreeDWorld world);
         /** @param world The world which has been updated. */
         void onWorldUpdate(ThreeDWorld world);
+        /** @param world The world which is closing. */
+        void onWorldClosing(ThreeDWorld world);
     }
 
     private transient boolean initialized;
@@ -42,7 +44,7 @@ public class ThreeDWorld implements AppState {
     private transient SelectionController selectionController;
     private transient AgentController agentController;
     private transient ClipboardController clipboardController;
-    private transient List<WorldListener> listeners;
+    private transient List<Listener> listeners;
     private transient Map<String, AbstractAction> actions;
     private transient ContextMenu contextMenu;
     private AtomicInteger idCounter;
@@ -58,7 +60,7 @@ public class ThreeDWorld implements AppState {
         selectionController = new SelectionController(this);
         agentController = new AgentController(this);
         clipboardController = new ClipboardController(this);
-        listeners = new ArrayList<WorldListener>();
+        listeners = new ArrayList<Listener>();
         scene = new ThreeDScene();
         entities = new ArrayList<Entity>();
         actions = ActionManager.createActions(this);
@@ -76,7 +78,7 @@ public class ThreeDWorld implements AppState {
         selectionController = new SelectionController(this);
         agentController = new AgentController(this);
         clipboardController = new ClipboardController(this);
-        listeners = new ArrayList<WorldListener>();
+        listeners = new ArrayList<Listener>();
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         return this;
@@ -129,7 +131,7 @@ public class ThreeDWorld implements AppState {
      * Add a listener to this ThreeDWorld to receive initialize and update notifications.
      * @param listener The listener to notify.
      */
-    public void addListener(WorldListener listener) {
+    public void addListener(Listener listener) {
         listeners.add(listener);
     }
 
@@ -137,7 +139,7 @@ public class ThreeDWorld implements AppState {
      * Remove a listener from this ThreeDWorld.
      * @param listener The listener to remove.
      */
-    public void removeListener(WorldListener listener) {
+    public void removeListener(Listener listener) {
         listeners.remove(listener);
     }
 
@@ -200,11 +202,9 @@ public class ThreeDWorld implements AppState {
         cameraController.moveCameraHome();
         agentController.registerInput();
         scene.load(engine);
-        for (WorldListener listener : listeners) {
-            listener.onWorldInitialize(ThreeDWorld.this);
-        }
         initialized = true;
-        engine.queueState(ThreeDEngine.State.RunAll, false);
+        listeners.forEach(l -> l.onWorldInitialize(this));
+        engine.queueState(ThreeDEngine.State.RenderOnly, false);
     }
 
     @Override
@@ -227,9 +227,7 @@ public class ThreeDWorld implements AppState {
             for (Entity entity : getEntities()) {
                 entity.update(tpf);
             }
-            for (WorldListener listener : listeners) {
-                listener.onWorldUpdate(ThreeDWorld.this);
-            }
+            listeners.forEach(l -> l.onWorldUpdate(this));
         }
     }
 
@@ -241,8 +239,13 @@ public class ThreeDWorld implements AppState {
 
     @Override
     public void cleanup() {
-        cameraController.unregisterInput();
-        selectionController.unregisterInput();
-        initialized = false;
+        try {
+            cameraController.unregisterInput();
+            selectionController.unregisterInput();
+            initialized = false;
+        } catch (Exception ex) {
+            // Ignore exceptions during shutdown
+        }
+        listeners.forEach(l -> l.onWorldClosing(this));
     }
 }

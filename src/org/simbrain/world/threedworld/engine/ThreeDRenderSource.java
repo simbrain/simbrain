@@ -9,19 +9,12 @@ import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
 
-import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.simbrain.world.imageworld.ImageSourceAdapter;
 

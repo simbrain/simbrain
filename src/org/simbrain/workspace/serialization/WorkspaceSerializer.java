@@ -42,6 +42,8 @@ import org.simbrain.workspace.updater.UpdateAction;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import javax.swing.*;
+
 /**
  * Serializes and deserializes workspaces. Custom serialization (beyond what
  * XStream can do) is required, in order to recreate workspace components and
@@ -254,14 +256,20 @@ public class WorkspaceSerializer {
             Map<String,byte[]> byteArrays) {
         if (archive.getArchivedComponents() != null) {
             for (ArchivedWorkspaceComponent archivedComponent : archive.getArchivedComponents()) {
-                WorkspaceComponent wc = deserializer.deserializeWorkspaceComponent(
-                        archivedComponent, new ByteArrayInputStream(byteArrays.get(archivedComponent.getUri())));
-                workspace.addWorkspaceComponent(wc);
-                if (archivedComponent.getDesktopComponent() != null) {
-                    Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(
-                            new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
-                    GuiComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
-                    desktopComponent.getParentFrame().setBounds(bounds);
+                try {
+                    WorkspaceComponent wc = deserializer.deserializeWorkspaceComponent(
+                            archivedComponent, new ByteArrayInputStream(byteArrays.get(archivedComponent.getUri())));
+                    workspace.addWorkspaceComponent(wc);
+                    if (archivedComponent.getDesktopComponent() != null) {
+                        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(
+                                new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
+                        GuiComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
+                        desktopComponent.getParentFrame().setBounds(bounds);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    String message = String.format("Failed to deserialize component %s.", archivedComponent.getName());
+                    JOptionPane.showMessageDialog(null, message);
                 }
             }
         }

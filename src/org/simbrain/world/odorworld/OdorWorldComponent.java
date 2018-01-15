@@ -36,6 +36,17 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  * {@link OdorWorldPanel}.
  */
 public class OdorWorldComponent extends WorkspaceComponent {
+    /**
+     * Recreates an instance of this class from a saved component.
+     * @param input
+     * @param name
+     * @param format
+     * @return
+     */
+    public static OdorWorldComponent open(InputStream input, String name, String format) {
+        OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
+        return new OdorWorldComponent(name, newWorld);
+    }
 
     /** Reference to model world. */
     private OdorWorld world;
@@ -105,19 +116,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 setChangedSinceLastSave(true);
             }
         });
-    }
-
-    /**
-     * Recreates an instance of this class from a saved component.
-     *
-     * @param input
-     * @param name
-     * @param format
-     * @return
-     */
-    public static OdorWorldComponent open(InputStream input, String name, String format) {
-        OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
-        return new OdorWorldComponent(name, newWorld);
     }
 
     @Override

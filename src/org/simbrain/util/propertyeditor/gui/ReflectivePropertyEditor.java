@@ -65,8 +65,7 @@ public class ReflectivePropertyEditor extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The object whose public fields will be edited using the
-     * ReflectivePropertyEditor
+     * The object whose public fields will be edited using the ReflectivePropertyEditor
      */
     private Object toEdit;
 
@@ -74,10 +73,10 @@ public class ReflectivePropertyEditor extends JPanel {
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
 
     /** List of methods that can be edited. Used when committing changes. */
-    private List<Method> editableMethods = new ArrayList<Method>();
+    private List<Method> editableMethods = new ArrayList<>();
 
     /** Map from property names for Color objects to selected selectedColor. */
-    private HashMap<String, Color> selectedColor = new HashMap<String, Color>();
+    private HashMap<String, Color> selectedColor = new HashMap<>();
 
     /** List of methods to exclude from the dialog, listed by name. */
     private String[] excludeList = new String[] {};
@@ -89,7 +88,7 @@ public class ReflectivePropertyEditor extends JPanel {
      * Associate property names with JComponents that are used to set those
      * values.
      */
-    HashMap<String, JComponent> componentMap = new HashMap<String, JComponent>();
+    HashMap<String, JComponent> componentMap = new HashMap<>();
 
     /**
      * Construct a property editor panel only. It's up to the user to embed it
@@ -97,9 +96,9 @@ public class ReflectivePropertyEditor extends JPanel {
      *
      * @param toEdit the object to edit
      */
-    public ReflectivePropertyEditor(final Object toEdit) {
+    public ReflectivePropertyEditor(Object toEdit) {
         this.toEdit = toEdit;
-        this.add(itemPanel);
+        add(itemPanel);
         initPanel();
     }
 
@@ -132,7 +131,7 @@ public class ReflectivePropertyEditor extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
                 editor.setUseSuperclass(false);
-                editor.setObject(object);
+                editor.setObjectToEdit(object);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();
@@ -143,14 +142,18 @@ public class ReflectivePropertyEditor extends JPanel {
         };
     }
 
+    /** Return the object to edit. */
+    public Object getObjectToEdit() {
+        return toEdit;
+    }
+
     /**
      * Set object to edit. For use with no argument constructor.
-     *
-     * @param edit the object to edit
+     * @param value The object to edit
      */
-    public void setObject(final Object edit) {
+    public void setObjectToEdit(Object value) {
         if (this.toEdit == null) {
-            this.toEdit = edit;
+            this.toEdit = value;
             this.add(itemPanel);
             initPanel();
         } // else throw exception?
@@ -162,8 +165,7 @@ public class ReflectivePropertyEditor extends JPanel {
      * @return parentDialog parent dialog
      */
     public EditorDialog getDialog() {
-
-        final EditorDialog ret = new EditorDialog();
+        EditorDialog ret = new EditorDialog();
         ret.setContentPane(itemPanel);
         return ret;
     }
@@ -172,10 +174,9 @@ public class ReflectivePropertyEditor extends JPanel {
      * Extension of Standard Dialog for Editor Panel
      */
     private class EditorDialog extends StandardDialog {
-
         @Override
         protected void closeDialogOk() {
-            ReflectivePropertyEditor.this.commit();
+            commit();
             dispose();
         }
     }
@@ -212,11 +213,9 @@ public class ReflectivePropertyEditor extends JPanel {
             }
         });
 
-        for (final Method method : methods) {
-            boolean inSuperClass = (method.getDeclaringClass() != toEdit
-                    .getClass());
-            // If useSuperClass is false, then if the method is in the base
-            // class,
+        for (Method method : methods) {
+            boolean inSuperClass = (method.getDeclaringClass() != toEdit.getClass());
+            // If useSuperClass is false, then if the method is in the base class,
             // this flag should be false.
             boolean skipMethod = !useSuperclass & inSuperClass;
 
@@ -232,8 +231,7 @@ public class ReflectivePropertyEditor extends JPanel {
                         // Combo Boxes must be wrapped in a ComboBoxable
                         if (method.getReturnType() == ComboBoxWrapper.class) {
                             ComboBoxWrapper boxable = (ComboBoxWrapper) getGetterValue(method);
-                            JComboBox comboBox = new JComboBox(
-                                    boxable.getObjects());
+                            JComboBox<?> comboBox = new JComboBox<>(boxable.getObjects());
                             componentMap.put(propertyName, comboBox);
                             comboBox.setSelectedItem(boxable.getCurrentObject());
                             itemPanel.addItem(formattedPropertyName, comboBox);
@@ -248,8 +246,7 @@ public class ReflectivePropertyEditor extends JPanel {
                             colorIndicator.setSize(20, 20);
                             final Color currentColor = (Color) getGetterValue(method);
                             selectedColor.put(propertyName, currentColor);
-                            colorIndicator.setBorder(BorderFactory
-                                    .createLineBorder(Color.black));
+                            colorIndicator.setBorder(BorderFactory.createLineBorder(Color.black));
                             colorIndicator.setBackground(currentColor);
                             colorPanel.add(colorIndicator);
                             colorButton.addActionListener(new ActionListener() {
@@ -263,13 +260,11 @@ public class ReflectivePropertyEditor extends JPanel {
                                     selectedColor.put(propertyName, theColor);
                                 }
                             });
-                            itemPanel
-                                    .addItem(formattedPropertyName, colorPanel);
+                            itemPanel.addItem(formattedPropertyName, colorPanel);
                         } else if (method.getReturnType() == String.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         }
 
                         else if (method.getReturnType() == double[].class) {
@@ -303,8 +298,7 @@ public class ReflectivePropertyEditor extends JPanel {
                         // Booleans > Checkboxes
                         else if (method.getReturnType() == Boolean.class) {
                             JCheckBox checkBox = new JCheckBox();
-                            checkBox.setSelected(Boolean.class.cast(
-                                    getGetterValue(method)).booleanValue());
+                            checkBox.setSelected(Boolean.class.cast(getGetterValue(method)).booleanValue());
                             componentMap.put(propertyName, checkBox);
                             itemPanel.addItem(formattedPropertyName, checkBox);
                         } else if (method.getReturnType() == boolean.class) {
@@ -346,32 +340,27 @@ public class ReflectivePropertyEditor extends JPanel {
                         else if (method.getReturnType() == int.class) {
                             JTextField textField = new JTextField();
                             componentMap.put(propertyName, textField);
-                            textField.setText((getGetterValue(method))
-                                    .toString());
+                            textField.setText((getGetterValue(method)).toString());
                             itemPanel.addItem(formattedPropertyName, textField);
                         } else if (method.getReturnType() == double.class) {
                             JTextField textField = new JTextField();
                             componentMap.put(propertyName, textField);
-                            textField.setText(((Double) getGetterValue(method))
-                                    .toString());
+                            textField.setText(((Double) getGetterValue(method)).toString());
                             itemPanel.addItem(formattedPropertyName, textField);
                         } else if (method.getReturnType() == float.class) {
                             JTextField textField = new JTextField();
                             componentMap.put(propertyName, textField);
-                            textField.setText((getGetterValue(method))
-                                    .toString());
+                            textField.setText((getGetterValue(method)).toString());
                             itemPanel.addItem(formattedPropertyName, textField);
                         } else if (method.getReturnType() == long.class) {
                             JTextField textField = new JTextField();
                             componentMap.put(propertyName, textField);
-                            textField.setText((getGetterValue(method))
-                                    .toString());
+                            textField.setText((getGetterValue(method)).toString());
                             itemPanel.addItem(formattedPropertyName, textField);
                         } else if (method.getReturnType() == short.class) {
                             JTextField textField = new JTextField();
                             componentMap.put(propertyName, textField);
-                            textField.setText((getGetterValue(method))
-                                    .toString());
+                            textField.setText((getGetterValue(method)).toString());
                             itemPanel.addItem(formattedPropertyName, textField);
                         }
                     }
@@ -635,7 +624,7 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Set an exclude list.
      *
-     * TODO: Brittle. Only works when the argument-less constructor + setObject
+     * TODO: Brittle. Only works when the argument-less constructor + setObjectToEdit
      * is used. Make it so that if the panel is already initialized when this is
      * called, relevant items are removed.
      *

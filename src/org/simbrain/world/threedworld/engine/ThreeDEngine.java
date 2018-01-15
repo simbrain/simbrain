@@ -16,6 +16,8 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 
+import javax.swing.*;
+
 /**
  * ThreeDEngine is a modification of jme3 SimpleApplication to provide
  * greater control over the update cycle, input mapping, and root node.
@@ -188,7 +190,8 @@ public class ThreeDEngine extends Application {
             try {
                 future.get();
             } catch (Exception e) {
-                throw new RuntimeException("Unable to complete run in thread", e);
+                JOptionPane.showMessageDialog(null,
+                        "An exception occurred while waiting for queued action in 3D World.");
             }
         }
     }
@@ -224,36 +227,46 @@ public class ThreeDEngine extends Application {
 
     @Override
     public void initialize() {
-        super.initialize();
+        try {
+            super.initialize();
 
-        String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
-        getAssetManager().registerLocator(rootDirectory, FileLocator.class);
+            String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
+            getAssetManager().registerLocator(rootDirectory, FileLocator.class);
 
-        assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets"
-                : "src/org/simbrain/world/threedworld/threedassets/assets");
-        getAssetManager().registerLocator(assetDirectory, FileLocator.class);
+            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets"
+                    : "src/org/simbrain/world/threedworld/threedassets/assets");
+            getAssetManager().registerLocator(assetDirectory, FileLocator.class);
 
-        renderSource = new ThreeDRenderSource(getViewPort(), true);
-        panel.setImageSource(renderSource);
-        panel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
-                renderSource.resize(panel.getWidth(), panel.getHeight());
-            }
-        });
+            renderSource = new ThreeDRenderSource(getViewPort(), true);
+            panel.setImageSource(renderSource);
+            panel.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    super.componentResized(e);
+                    renderSource.resize(panel.getWidth(), panel.getHeight());
+                }
+            });
 
-        rootNode = new Node("root");
-        viewPort.attachScene(rootNode);
+            rootNode = new Node("root");
+            viewPort.attachScene(rootNode);
 
-        updateSync = false;
-        setState(State.RunAll);
-        update();
+            updateSync = false;
+            setState(State.RunAll);
+            update();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Failed to initialize 3D World.");
+            setState(State.SystemPause);
+        }
     }
 
     @Override
     public void update() {
-        runQueuedTasks();
+        try {
+            runQueuedTasks();
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(null, "Failed to execute queued tasks in 3D World.");
+        }
+
         if (paused) {
             return;
         }
@@ -268,23 +281,26 @@ public class ThreeDEngine extends Application {
             tpf = timer.getTimePerFrame();
         }
 
-        if (inputEnabled) {
-            inputManager.update(tpf);
+        try {
+            if (inputEnabled) {
+                inputManager.update(tpf);
+            }
+
+            AudioContext.setAudioRenderer(audioRenderer);
+            if (audioRenderer != null) {
+                audioRenderer.update(tpf);
+            }
+
+            stateManager.update(tpf);
+
+            rootNode.updateLogicalState(tpf);
+            rootNode.updateGeometricState();
+
+            stateManager.render(renderManager);
+            renderManager.render(tpf, context.isRenderable());
+            stateManager.postRender();
+        } catch (RuntimeException ex) {
         }
-
-        AudioContext.setAudioRenderer(audioRenderer);
-        if (audioRenderer != null) {
-            audioRenderer.update(tpf);
-        }
-
-        stateManager.update(tpf);
-
-        rootNode.updateLogicalState(tpf);
-        rootNode.updateGeometricState();
-
-        stateManager.render(renderManager);
-        renderManager.render(tpf, context.isRenderable());
-        stateManager.postRender();
 
         if (updateSync) {
             paused = true;

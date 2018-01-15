@@ -18,9 +18,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.threedworld.engine.ThreeDContext;
 import org.simbrain.world.threedworld.entities.EditorDialog;
 
-/**
- * ThreeDDesktopComponent is the GUI component for a ThreeDWorld.
- */
+/** ThreeDDesktopComponent is the GUI component for a ThreeDWorld. */
 public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     private static final long serialVersionUID = 8711925427252261845L;
 
@@ -90,10 +88,10 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
         JPanel toolPanel = new JPanel(new BorderLayout());
 
         JToolBar runToolbar = new JToolBar();
-        runToolbar.add(createToggleButton(component.getWorld().getAction("Toggle Update Sync"), false));
-        runToolbar.add(createToggleButton(component.getWorld().getAction("Toggle Run"), true));
+        runToolbar.add(createToggleButton(component.getWorld().getAction("Sync Update"), false));
+        runToolbar.add(createToggleButton(component.getWorld().getAction("Run Physics"), false));
         for (Component child : runToolbar.getComponents()) {
-            ((JComponent) child).setFocusable(false);
+            child.setFocusable(false);
         }
 
         JToolBar editToolbar = new JToolBar();
@@ -103,9 +101,9 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
         editToolbar.add(component.getWorld().getAction("Camera Home"));
         editToolbar.add(createToggleButton(component.getWorld().getAction("Snap Transforms"), true));
         JComboBox<String> rotationAxisCombo = new JComboBox<String>();
-        rotationAxisCombo.addItem("X Axis");
-        rotationAxisCombo.addItem("Y Axis");
-        rotationAxisCombo.addItem("Z Axis");
+        rotationAxisCombo.addItem("Pitch");
+        rotationAxisCombo.addItem("Yaw");
+        rotationAxisCombo.addItem("Roll");
         rotationAxisCombo.addItem("Camera");
         rotationAxisCombo.setSelectedItem(component.getWorld().getSelectionController().getRotationAxis());
         rotationAxisCombo.addActionListener((event) -> {
@@ -113,7 +111,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
         });
         editToolbar.add(rotationAxisCombo);
         for (Component child : editToolbar.getComponents()) {
-            ((JComponent) child).setFocusable(false);
+            child.setFocusable(false);
         }
 
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
@@ -142,6 +140,6 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     }
 
     @Override
-    protected void closing() { }
+    protected void closing() {}
 
 }

@@ -221,7 +221,7 @@ public class TextWorldActions {
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
                 editor.setUseSuperclass(false);
-                editor.setObject(world);
+                editor.setObjectToEdit(world);
                 JDialog dialog = editor.getDialog();
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();

@@ -574,7 +574,7 @@ public class NetworkPanel extends JPanel {
                 // and then removes and adds the appropriate pnode to the
                 // NeuronNode
                 // NeuronNode node = (NeuronNode)
-                // objectNodeMap.get(e.getObject());
+                // objectNodeMap.get(e.getObjectToEdit());
                 // if (node != null) {
                 // node.updateShape();
                 // }
@@ -606,7 +606,7 @@ public class NetworkPanel extends JPanel {
             @Override
             public void synapseChanged(final NetworkEvent<Synapse> e) {
                 //SynapseNode node = (SynapseNode) objectNodeMap
-                //        .get(e.getObject());
+                //        .get(e.getObjectToEdit());
                 // node.updateClampStatus();
             }
 

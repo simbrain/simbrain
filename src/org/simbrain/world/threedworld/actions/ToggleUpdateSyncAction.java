@@ -24,10 +24,10 @@ public class ToggleUpdateSyncAction extends AbstractAction {
      * @param world The world to toggle the update synchronization state for.
      */
     public ToggleUpdateSyncAction(ThreeDWorld world) {
-        super("Toggle Update Sync");
+        super("Sync Update");
         this.world = world;
         putValue(SMALL_ICON, ResourceManager.getSmallIcon("Clock.png"));
-        putValue(SHORT_DESCRIPTION, "Toggle Update Sync");
+        putValue(SHORT_DESCRIPTION, "Synchronize Update to Workspace");
     }
 
     @Override public void actionPerformed(ActionEvent event) {

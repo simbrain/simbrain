@@ -23,10 +23,10 @@ public class ToggleRunAction extends AbstractAction {
      *  @param world The world to toggle the run status in.
      */
     public ToggleRunAction(ThreeDWorld world) {
-        super("Toggle Run");
+        super("Run Physics");
         this.world = world;
         putValue(SMALL_ICON, ResourceManager.getSmallIcon("physics.png"));
-        putValue(SHORT_DESCRIPTION, "Toggle Run");
+        putValue(SHORT_DESCRIPTION, "Run Physics Simulation");
     }
 
     @Override

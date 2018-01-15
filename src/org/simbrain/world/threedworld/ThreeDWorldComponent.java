@@ -50,6 +50,18 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     public ThreeDWorldComponent(String name) {
         super(name);
         world = new ThreeDWorld();
+        world.addListener(new ThreeDWorld.Listener() {
+            @Override
+            public void onWorldInitialize(ThreeDWorld world) {}
+
+            @Override
+            public void onWorldUpdate(ThreeDWorld world) {}
+
+            @Override
+            public void onWorldClosing(ThreeDWorld world) {
+                close();
+            }
+        });
     }
 
     /**

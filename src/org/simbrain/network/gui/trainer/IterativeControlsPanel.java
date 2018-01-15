@@ -25,7 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -359,7 +358,7 @@ public class IterativeControlsPanel extends JPanel {
             editor.setExcludeList(new String[] { "iteration",
                     "updateCompleted", "stoppingCond", "stoppingCondition",
                     "iterationsBeforeStopping", "errorThreshold" });
-            editor.setObject(trainer);
+            editor.setObjectToEdit(trainer);
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();

@@ -16,7 +16,7 @@ public class SensorMatrix implements ImageSourceListener {
     private String name;
 
     /** An ImageSource from which to extract sensor values. */
-    private ImageSource source;
+    private transient ImageSource source;
 
     /** The vales this matrix produces for couplings. */
     private double[][] channels;

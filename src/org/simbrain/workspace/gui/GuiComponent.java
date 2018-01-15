@@ -156,36 +156,46 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
             chooser.addExtension(format);
         }
 
-        File theFile = chooser.showOpenDialog();
-        if (theFile != null) {
-            try {
-                Rectangle bounds = this.getParentFrame().getBounds();
-                Workspace workspace = workspaceComponent.getWorkspace();
-                workspace.removeWorkspaceComponent(workspaceComponent);
-                workspaceComponent = (E) WorkspaceComponentDeserializer
-                        .deserializeWorkspaceComponent(
-                                workspaceComponent.getClass(),
-                                theFile.getName(),
-                                new FileInputStream(theFile),
-                                SFileChooser.getExtension(theFile));
-                workspace.addWorkspaceComponent(workspaceComponent);
-                workspaceComponent.setCurrentFile(theFile);
-                setDefaultDirectory(workspaceComponent
-                        .getClass(), theFile.getParentFile().getAbsolutePath());
-                SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-                GuiComponent desktopComponent = desktop
-                        .getDesktopComponent(workspaceComponent);
-                desktop.registerComponentInstance(workspaceComponent,
-                        desktopComponent);
-                desktopComponent.getParentFrame().setBounds(bounds);
-                workspaceComponent.setName(theFile.getName());
-                getParentFrame().setTitle(workspaceComponent.getName());
-                postAddInit();
+        File file = chooser.showOpenDialog();
+        String dir = file.getParentFile().getAbsolutePath();
+        String name = file.getName();
+        String ext = SFileChooser.getExtension(file);
 
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        FileInputStream inputStream;
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(null, String.format("File %s was not found.", file));
+            return;
         }
+
+        E newComponent;
+        try {
+            newComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
+                    workspaceComponent.getClass(), name, inputStream, ext);
+        } catch (ReflectiveOperationException ex) {
+            String message = String.format(
+                    "Failed to deserialize workspace component %s\nCould not execute save method in class %s.",
+                    name, workspaceComponent.getClass().getSimpleName());
+            JOptionPane.showMessageDialog(null, message);
+            return;
+        }
+
+        Rectangle bounds = getParentFrame().getBounds();
+        Workspace workspace = workspaceComponent.getWorkspace();
+        workspace.removeWorkspaceComponent(workspaceComponent);
+        workspaceComponent = newComponent;
+
+        workspace.addWorkspaceComponent(workspaceComponent);
+        workspaceComponent.setCurrentFile(file);
+        setDefaultDirectory(workspaceComponent.getClass(), dir);
+        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+        GuiComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
+        desktop.registerComponentInstance(workspaceComponent, desktopComponent);
+        desktopComponent.getParentFrame().setBounds(bounds);
+        workspaceComponent.setName(name);
+        getParentFrame().setTitle(name);
+        postAddInit();
     }
 
     /**

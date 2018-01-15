@@ -171,7 +171,7 @@ public class Network {
     private int iterCount = 0;
     
     /** How frequently this network should fire events. */
-    private int updateFreq = 200;
+    private int updateFreq = 1;
     
     /** 
      * A special flag for if the network is being run for a one-time single

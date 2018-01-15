@@ -19,27 +19,24 @@
 package org.simbrain.network.trainers;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer2.UpdateMethod;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 
 /**
  * Test backprop trainer.
- *
+ * 
  * Future test methods. But for now just run them with a main.
  */
 public class BackpropTrainerTest {
 
     public static void main(String[] args) {
-        // testXor();
+        testXor();
         // testAssociator();
-        testAssociator5();
+        // testAssociator5();
         // testMazur();
         // testSineWave();
     }
@@ -53,25 +50,30 @@ public class BackpropTrainerTest {
                 new int[] { 2, 2, 1 });
 
         network.getTrainingSet().setInputData(
-                new double[][] { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } });
-        network.getTrainingSet()
-                .setTargetData(new double[][] { { 0 }, { 1 }, { 1 }, { 0 } });
+                new double[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } });
+        network.getTrainingSet().setTargetData(
+                new double[][] { { .2 }, { .8 }, { .8 }, { .2 } });
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
         trainer.setLearningRate(.1);
         trainer.setMomentum(.9);
+        trainer.getRandomizer().setPdf(ProbDistribution.NORMAL);
+        trainer.getRandomizer().setParam1(0);
+        trainer.getRandomizer().setParam2(.1);
+        trainer.randomize();
+        // trainer.setUpdateMethod(UpdateMethod.STOCHASTIC);
         // trainer.rand.setPdf(ProbDistribution.UNIFORM);
         // trainer.rand.setParam1(-.95);
         // trainer.rand.setParam2(.95);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             trainer.apply();
-//            Object[] bob = network.getHiddenLayer().getIncomingSgs().toArray();
-//            for (int jj = 0; jj < 2; jj++) {
-//                System.out.println(Arrays.toString(
-//                        ((SynapseGroup) bob[0]).getWeightMatrix()[jj]));
-//            }
+            trainer.commitChanges();
+            //for (int jj = 0; jj < 2; jj++) {
+            //    System.out.println(Arrays.deepToString(
+            //            trainer.getWeightMatrices().get(jj).toArray2()));
+            //}
             System.out.println(trainer.getError());
         }
     }
@@ -91,13 +93,16 @@ public class BackpropTrainerTest {
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
-
+        trainer.getRandomizer().setPdf(ProbDistribution.NORMAL);
+        trainer.getRandomizer().setParam1(0);
+        trainer.getRandomizer().setParam2(.1);
+        trainer.randomize();
         trainer.initData();
         trainer.setLearningRate(.15);
         trainer.setMomentum(.8);
-        trainer.rand.setPdf(ProbDistribution.UNIFORM);
-        trainer.rand.setParam1(0);
-        trainer.rand.setParam2(.5);
+        // trainer.rand.setPdf(ProbDistribution.UNIFORM);
+        // trainer.rand.setParam1(0);
+        // trainer.rand.setParam2(.5);
 
         trainer.randomize();
 
@@ -110,8 +115,7 @@ public class BackpropTrainerTest {
     }
 
     /**
-     * 5-5-5 auto-associator. Currently failing on the new array backed system.
-     * But decent performance on the
+     * 5-5-5 auto-associator.
      */
     public static void testAssociator5() {
 
@@ -123,12 +127,16 @@ public class BackpropTrainerTest {
         network.getTrainingSet().setTargetData(Utils.getDoubleMatrix(
                 new File("./simulations/tables/5_binary.csv")));
 
-        //BackpropTrainer trainer = new BackpropTrainer(network);
+        // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
+        trainer.getRandomizer().setPdf(ProbDistribution.NORMAL);
+        trainer.getRandomizer().setParam1(0);
+        trainer.getRandomizer().setParam2(.1);
+        trainer.randomize();
         trainer.initData();
         // trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.EPOCH);
-        trainer.setLearningRate(.01);
-        trainer.setMomentum(.1);
+        trainer.setLearningRate(.1);
+        trainer.setMomentum(.9);
         // trainer.rand.setPdf(ProbDistribution.UNIFORM);
         // trainer.rand.setParam1(1);
         // trainer.rand.setParam2(1.1);
@@ -136,14 +144,7 @@ public class BackpropTrainerTest {
 
         for (int i = 0; i < 10_000; i++) {
             trainer.apply();
-            if (i % 1002 == 0) {
-                System.out.println(trainer.getBiases());
-//                Object[] bob = network.getOutputLayer().getIncomingSgs()
-//                        .toArray();
-//                for (int jj = 0; jj < 5; jj++) {
-//                    System.out.println(Arrays.toString(
-//                            ((SynapseGroup) bob[0]).getWeightMatrix()[jj]));
-//                }
+            if (i % 1000 == 0) {
                 System.out.println(trainer.getError());
             }
         }
@@ -168,9 +169,12 @@ public class BackpropTrainerTest {
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         // BackpropTrainer trainer = new BackpropTrainer(network);
         trainer.initData();
-
-        trainer.setLearningRate(0.5);
-        trainer.setMomentum(0.9);
+        trainer.getRandomizer().setPdf(ProbDistribution.NORMAL);
+        trainer.getRandomizer().setParam1(0);
+        trainer.getRandomizer().setParam2(.1);
+        trainer.randomize();
+        trainer.setLearningRate(0.05);
+        trainer.setMomentum(0.5);
         // trainer.setUpdateMethod(UpdateMethod.EPOCH);
         // int plorp = 0;
         for (int i = 0; i <= 10_000; i++) {
@@ -192,6 +196,8 @@ public class BackpropTrainerTest {
     /**
      * Test based on this discussion.
      * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+     * 
+     * TODO: Migrate to unit testing
      */
     public static void testMazur() {
 

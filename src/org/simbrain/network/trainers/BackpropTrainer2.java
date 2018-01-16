@@ -123,7 +123,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     private List<TransferFunction> updateRules = new ArrayList<TransferFunction>();
 
     /** Current update method. */
-    private UpdateMethod updateMethod = UpdateMethod.SINGLE;
+    private UpdateMethod updateMethod = UpdateMethod.STOCHASTIC;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
@@ -193,7 +193,6 @@ public class BackpropTrainer2 extends IterableTrainer {
         }
         incrementIteration();
         fireErrorUpdated();
-        printDebugInfo();
     }
 
     /**
@@ -246,29 +245,29 @@ public class BackpropTrainer2 extends IterableTrainer {
      * Update the array-based "shadow" network.
      */
     private void updateNetwork() {
-        int ii = 0;
-        for (DoubleMatrix wm : weightMatrices) {
+        int layerIndex = 0;
+        for (DoubleMatrix weights : weightMatrices) {
             // Set up variables for easy reading
             DoubleMatrix inputs;
-            if (ii == 0) {
+            if (layerIndex == 0) {
                 inputs = inputLayer;
             } else {
-                inputs = layers.get(ii - 1);
+                inputs = layers.get(layerIndex - 1);
             }
-            DoubleMatrix activations = layers.get(ii);
-            DoubleMatrix netInput = netInputs.get(ii);
-            DoubleMatrix biasVec = biases.get(ii);
+            DoubleMatrix activations = layers.get(layerIndex);
+            DoubleMatrix netInput = netInputs.get(layerIndex);
+            DoubleMatrix biasVec = biases.get(layerIndex);
 
             // Take the inputs multiply them by the weight matrix get the netInput for the next layer
-            forwardPropagate(inputs, wm, netInput);
+            forwardPropagate(inputs, weights, netInput);
             // Add biases to the net input before biases were not part of the net input...
             netInput.addi(biasVec);
             // Apply the transfer function to net input to get the activation values for the next layer and store
             // that value in the activations vector, also calculate derivatives.
             // TODO think of a way to take advantage of logistic's very simple derivative.
-            updateRules.get(ii).applyFunction(netInput, activations);
-            updateRules.get(ii).getDerivative(netInput, derivs.get(ii));
-            ii++;
+            updateRules.get(layerIndex).applyFunction(netInput, activations);
+            updateRules.get(layerIndex).getDerivative(netInput, derivs.get(layerIndex));
+            layerIndex++;
         }
     }
 

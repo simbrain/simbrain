@@ -93,7 +93,6 @@ public class BackpropNetwork extends FeedForward implements Trainable {
         } else {
             try {
                 trainer.apply();
-                ((BackpropTrainer2) trainer).commitChanges();
                 super.update();
             } catch (Trainer.DataNotInitializedException ex) {
                 JOptionPane.showMessageDialog(null, "Unable to apply trainer: training data not initialized.");

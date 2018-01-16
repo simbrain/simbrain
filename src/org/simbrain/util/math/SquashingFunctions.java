@@ -68,31 +68,31 @@ public class SquashingFunctions {
      * @param ceil the desired maximum value (upper boundary) of logistic
      * @param floor the desired minimum value (lower boundary) of logistic
      * @param slope the desired slope of the logistic function for val == 0
-     * @return the value of val after being passed through a logistic function
-     *         with these parameters
+     * @return the value of val after being passed through a logistic function with these parameters
      *         
      * @author Scott Hotton
      */
-    public static double logistic(double val, double u, double l,
-            double slope) {
-        return (u - l) * logistic((4 * slope * val) / (u - l)) + l;
+    public static double logistic(double val, double ceil, double floor, double slope) {
+        return (ceil - floor) * logistic((4 * slope * val) / (ceil - floor)) + floor;
     }
 
-    // TODO: Test
-    public static void logistic(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
+    /**
+     * Compute the scaled logistic function on a DoubleMatrix of input values.
+     * @param valIn The input array, will not be modified.
+     * @param valOut The output array, will be overwritten with the result.
+     * @param ceil The upper limit of the logistic curve.
+     * @param floor The lower limit of the logistic curve.
+     * @param slope The slope of the curve at val == 0.
+     */
+    public static void logistic(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
         if (valIn != valOut) {
             valOut.copy(valIn);
         }
-        for (int ii = 0; ii < valIn.length; ii++) {
-            valOut.data[ii] = logistic(valOut.data[ii]);  //TODO: For testing Mazur
-            //valOut.data[ii] = logistic(valOut.data[ii], ceil, floor, slope);
-        }
-        // valOut.muli(-slope/diff);
-        // MatrixFunctions.expi(valOut);
-        // valOut.addi(1);
-        // valOut.rdivi(diff);
-        // valOut.addi(floor);
+        // Same as double form above
+        double s = 4 * slope / (ceil - floor);
+        valOut.muli(s);
+        MatrixFunctions.expi(valOut.negi()).addi(1).rdivi(1);
+        valOut.muli(ceil - floor).addi(floor);
     }
 
     /**
@@ -266,22 +266,20 @@ public class SquashingFunctions {
      * upper and lower bounds, and slope for a given value.
      *
      * @param val the input to the derivative of the logistic function
-     * @param u the desired maximum value (upper boundary) of the logistic
+     * @param ceil the desired maximum value (upper boundary) of the logistic
      *            function that this is the derivative of
-     * @param l the desired minimum value (lower boundary) of the logistic
+     * @param floor the desired minimum value (lower boundary) of the logistic
      *            function that this is the derivative of
-     * @param m the desired slope of the logistic function function that this is
+     * @param slope the desired slope of the logistic function function that this is
      *            the derivative of for val == 0
      * @return the value of val after being passed through the derivative of the
      *         logistic function with these parameters.
      * 
      * @author Scott Hotton
      */
-    public static double derivLogistic(double val, double u, double l,
-            double m) {
-        double logisticOutput = logistic(val, u, l, m);
-        return (4 * m) / ((u - l) * (u - l)) * (logisticOutput - l)
-                * (u - logisticOutput);
+    public static double derivLogistic(double val, double ceil, double floor, double slope) {
+        double logisticOutput = logistic(val, ceil, floor, slope);
+        return (4 * slope) / ((ceil - floor) * (ceil - floor)) * (logisticOutput - floor) * (ceil - logisticOutput);
     }
 
     /**
@@ -295,15 +293,13 @@ public class SquashingFunctions {
      * @param floor
      * @param slope
      */
-    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
+    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
         if (valIn != valOut) {
             valOut.copy(valIn);
         }
         //TODO use matrix operations
         for (int ii = 0; ii < valOut.data.length; ++ii) {
-            valOut.data[ii] = derivLogistic(valOut.data[ii], ceil, floor,
-                    slope);
+            valOut.data[ii] = derivLogistic(valOut.data[ii], ceil, floor, slope);
         }
     }
 

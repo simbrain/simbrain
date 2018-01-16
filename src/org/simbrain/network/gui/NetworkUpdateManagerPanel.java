@@ -41,7 +41,7 @@ import javax.swing.TransferHandler;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
+import org.simbrain.network.core.NetworkUpdateManager.Listener;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -424,7 +424,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
     /**
      * Listener for update manager changes.
      */
-    private UpdateManagerListener listener = new UpdateManagerListener() {
+    private Listener listener = new Listener() {
 
         public void actionAdded(NetworkUpdateAction action) {
             updateCurrentActionsList();

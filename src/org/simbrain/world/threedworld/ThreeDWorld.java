@@ -24,9 +24,7 @@ import com.jme3.renderer.RenderManager;
  * for the simbrain 3d environment.
  */
 public class ThreeDWorld implements AppState {
-    /**
-     * Listener receives notifications when a ThreeDWorld is initialized or updated.
-     */
+    /** Listener receives notifications when a ThreeDWorld is initialized or updated. */
     public interface Listener {
         /** @param world The world which has been initialized. */
         void onWorldInitialize(ThreeDWorld world);

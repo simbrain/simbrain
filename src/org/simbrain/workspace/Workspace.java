@@ -32,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
@@ -369,13 +368,7 @@ public class Workspace {
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
-        try {
-            return SimbrainPreferences
-                    .getString("workspaceSimulationDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-            return ".";
-        }
+        return SimbrainPreferences.getString("workspaceSimulationDirectory");
     }
 
     /**

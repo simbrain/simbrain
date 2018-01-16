@@ -144,9 +144,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         return retList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static NetworkComponent open(final InputStream input,
             final String name, final String format) {
         Network newNetwork = (Network) Network.getXStream().fromXML(input);
@@ -166,8 +163,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      * @return the new network component
      */
     public NetworkComponent copy() {
-        NetworkComponent ret = new NetworkComponent(
-                "Copy of " + network.getName(), network.copy());
+        NetworkComponent ret = new NetworkComponent("Copy of " + network.getName(), network.copy());
         return ret;
     }
 

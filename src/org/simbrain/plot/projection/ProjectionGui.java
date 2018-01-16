@@ -57,7 +57,6 @@ import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.DataPoint;
@@ -303,19 +302,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         theToolBar.add(randomBtn);
         theToolBar.addSeparator();
         warningLabel.setPreferredSize(new Dimension(16, 16));
-        warningLabel.setToolTipText("This method works best with more "
-                + "datapoints already added");
+        warningLabel.setToolTipText("This method works best with more datapoints already added");
         theToolBar.add(warningLabel);
         String stepSizeToolTip = "Scales the amount points are moved on each iteration";
         JLabel stepSizeLabel = new JLabel("Step Size");
         stepSizeLabel.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(stepSizeLabel);
-        try {
-            sammonStepSize = new JFormattedTextField(""
-                    + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
-        } catch (PropertyNotFoundException e1) {
-            e1.printStackTrace();
-        }
+        sammonStepSize = new JFormattedTextField("" + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
         sammonStepSize.setColumns(3);
         sammonStepSize.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(sammonStepSize);

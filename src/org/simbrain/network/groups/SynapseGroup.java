@@ -450,19 +450,15 @@ public class SynapseGroup extends Group {
      */
     public void update() {
         if (useGroupLevelSettings) {
-            if (!exStatic) { // Only iterate if excitatory synapses aren't
-                             // static
-                // Assuming they're not static, only iterate if they aren't
-                // frozen.
+            if (!exStatic) { // Only iterate if excitatory synapses aren't static
+                // Assuming they're not static, only iterate if they aren't frozen.
                 if (!isFrozen(Polarity.EXCITATORY)) {
                     updateExcitatorySynapses();
                 }
             }
 
-            if (!inStatic) { // Only iterate if inhibitory synapses aren't
-                             // static
-                // Assuming they're not static, only iterate if they aren't
-                // frozen.
+            if (!inStatic) { // Only iterate if inhibitory synapses aren't static
+                // Assuming they're not static, only iterate if they aren't frozen.
                 if (!isFrozen(Polarity.INHIBITORY)) {
                     updateInhibitorySynapses();
                 }

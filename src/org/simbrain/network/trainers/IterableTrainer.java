@@ -16,10 +16,10 @@ package org.simbrain.network.trainers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Superclass for all types of trainer which can be iterated and which return an
@@ -56,7 +56,7 @@ public abstract class IterableTrainer extends Trainer {
 
     /** Stopping condition. */
     public enum StoppingCondition {
-        THERESHOLD_ERROR {
+        THRESHOLD_ERROR {
             public String toString() {
                 return "Threshold error";
             }
@@ -142,7 +142,7 @@ public abstract class IterableTrainer extends Trainer {
             }
             setUpdateCompleted(true);
             break;
-        case THERESHOLD_ERROR:
+        case THRESHOLD_ERROR:
             do {
                 apply();
             } while ((getError() > errorThreshold) && (!updateCompleted));
@@ -351,6 +351,10 @@ public abstract class IterableTrainer extends Trainer {
      * Called when the trainer is closed.  Override if needed.
      */
     public void commitChanges() {
+    }
+
+    public Optional<Randomizer> getRandomizer() {
+        return Optional.empty();
     }
 
 }

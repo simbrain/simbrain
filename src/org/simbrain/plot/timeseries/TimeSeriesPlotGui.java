@@ -48,8 +48,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
      * @param frame parent frame
      * @param component the underlying component
      */
-    public TimeSeriesPlotGui(final GenericFrame frame,
-            final TimeSeriesPlotComponent component) {
+    public TimeSeriesPlotGui(GenericFrame frame, TimeSeriesPlotComponent component) {
         super(frame, component);
 
         actionManager = new PlotActionManager(this);
@@ -57,7 +56,6 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
         createAttachMenuBar();
         this.setLayout(new BorderLayout());
         add("Center", timeSeriesPanel);
-
     }
 
     /**
@@ -82,12 +80,10 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(new JMenuItem(TimeSeriesPlotActions
-                .getPropertiesDialogAction(timeSeriesPanel)));
+        editMenu.add(new JMenuItem(TimeSeriesPlotActions.getPropertiesDialogAction(timeSeriesPanel)));
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/time_series.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/time_series.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 
@@ -99,11 +95,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
     }
 
     @Override
-    public void closing() {
-    }
+    public void closing() {}
 
     @Override
-    public void update() {
-    }
+    public void update() {}
 
 }

@@ -63,8 +63,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      *
      * @param timeSeriesModel model underlying model
      */
-    public TimeSeriesPlotPanel(final TimeSeriesModel timeSeriesModel) {
-
+    public TimeSeriesPlotPanel(TimeSeriesModel timeSeriesModel) {
         model = timeSeriesModel;
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
@@ -102,7 +101,8 @@ public class TimeSeriesPlotPanel extends JPanel {
                     chart.getXYPlot().getRangeAxis().setRange(
                             model.getRangeLowerBound(), model.getRangeUpperBound());
                 }
-                chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
+                chart.getXYPlot().getDomainAxis().setAutoRange(true);
+                //chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
             }
         });
 

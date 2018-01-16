@@ -26,7 +26,6 @@ import javax.swing.AbstractAction;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -51,13 +50,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String defaultDirectory = ".";
-        try {
-            defaultDirectory = SimbrainPreferences
-            .getString("workspaceOdorWorldDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        String defaultDirectory = SimbrainPreferences.getString("workspaceOdorWorldDirectory");
         SFileChooser chooser = new SFileChooser(defaultDirectory,
                 "xml file", "xml");
         File theFile = chooser.showOpenDialog();

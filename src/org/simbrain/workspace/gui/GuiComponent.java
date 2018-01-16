@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
@@ -391,25 +390,16 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param componentType the component type
      * @return the directory
      */
-    private String getDefaultDirectory(
-            Class<? extends WorkspaceComponent> componentType) {
-        String defaultDirectory = ".";
-        try {
-            if (componentType == OdorWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceOdorWorldDirectory");
-            } else if (componentType == DataWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceTableDirectory");
-            } else if (componentType == NetworkComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceNetworkDirectory");
-            } else {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceBaseDirectory");
-            }
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
+    private String getDefaultDirectory(Class<? extends WorkspaceComponent> componentType) {
+        String defaultDirectory;
+        if (componentType == OdorWorldComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceOdorWorldDirectory");
+        } else if (componentType == DataWorldComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceTableDirectory");
+        } else if (componentType == NetworkComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceNetworkDirectory");
+        } else {
+            defaultDirectory = SimbrainPreferences.getString("workspaceBaseDirectory");
         }
         return defaultDirectory;
     }
@@ -420,8 +410,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param componentType the component type
      * @param dir the directory to set
      */
-    private void setDefaultDirectory(
-            Class<? extends WorkspaceComponent> componentType, String dir) {
+    private void setDefaultDirectory(Class<? extends WorkspaceComponent> componentType, String dir) {
         if (componentType == OdorWorldComponent.class) {
             SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir);
         } else if (componentType == DataWorldComponent.class) {

@@ -49,7 +49,6 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
@@ -104,35 +103,19 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * cases where NetworkPanel is used by itself.
      */
     public void applyUserPrefsToNetwork() {
-        try {
-            NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences
-                    .getInt("networkBackgroundColor")));
-            EditMode.setWandRadius(SimbrainPreferences
-                    .getInt("networkWandRadius"));
-            NetworkPanel.setNudgeAmount(SimbrainPreferences
-                    .getDouble("networkNudgeAmount"));
-            Network.setSynapseVisibilityThreshold(SimbrainPreferences
-                    .getInt("networkSynapseVisibilityThreshold"));
-            NeuronNode.setHotColor(SimbrainPreferences
-                    .getFloat("networkHotNodeColor"));
-            NeuronNode.setCoolColor(SimbrainPreferences
-                    .getFloat("networkCoolNodeColor"));
-            NeuronNode.setSpikingColor(new Color(SimbrainPreferences
-                    .getInt("networkSpikingColor")));
-            SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences
-                    .getInt("networkExcitatorySynapseColor")));
-            SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences
-                    .getInt("networkInhibitorySynapseColor")));
-            SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences
-                    .getInt("networkZeroWeightColor")));
-            SynapseNode.setMaxDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMaxSize"));
-            SynapseNode.setMinDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMinSize"));
-            resetColors();
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences.getInt("networkBackgroundColor")));
+        EditMode.setWandRadius(SimbrainPreferences.getInt("networkWandRadius"));
+        NetworkPanel.setNudgeAmount(SimbrainPreferences.getDouble("networkNudgeAmount"));
+        Network.setSynapseVisibilityThreshold(SimbrainPreferences.getInt("networkSynapseVisibilityThreshold"));
+        NeuronNode.setHotColor(SimbrainPreferences.getFloat("networkHotNodeColor"));
+        NeuronNode.setCoolColor(SimbrainPreferences.getFloat("networkCoolNodeColor"));
+        NeuronNode.setSpikingColor(new Color(SimbrainPreferences.getInt("networkSpikingColor")));
+        SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences.getInt("networkExcitatorySynapseColor")));
+        SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences.getInt("networkInhibitorySynapseColor")));
+        SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences.getInt("networkZeroWeightColor")));
+        SynapseNode.setMaxDiameter(SimbrainPreferences.getInt("networkSynapseMaxSize"));
+        SynapseNode.setMinDiameter(SimbrainPreferences.getInt("networkSynapseMinSize"));
+        resetColors();
     }
 
     /**

@@ -1461,39 +1461,32 @@ public class NetworkPanel extends JPanel {
      * @return the PNode represention of the subnetwork.
      */
     private SubnetworkNode createSubnetworkNode(Subnetwork subnet) {
-
-        SubnetworkNode ret = null;
-
+        SubnetworkNode subnetNode = null;
         if (subnet instanceof Hopfield) {
-            ret = new HopfieldNode(NetworkPanel.this, (Hopfield) subnet);
+            subnetNode = new HopfieldNode(NetworkPanel.this, (Hopfield) subnet);
         } else if (subnet instanceof CompetitiveNetwork) {
-            ret = new CompetitiveNetworkNode(NetworkPanel.this,
-                    (CompetitiveNetwork) subnet);
+            subnetNode = new CompetitiveNetworkNode(NetworkPanel.this, (CompetitiveNetwork) subnet);
         } else if (subnet instanceof SOMNetwork) {
-            ret = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) subnet);
+            subnetNode = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) subnet);
         } else if (subnet instanceof EchoStateNetwork) {
-            ret = new ESNNetworkNode(NetworkPanel.this,
-                    (EchoStateNetwork) subnet);
+            subnetNode = new ESNNetworkNode(NetworkPanel.this, (EchoStateNetwork) subnet);
         } else if (subnet instanceof SimpleRecurrentNetwork) {
-            ret = new SRNNetworkNode(NetworkPanel.this,
-                    (SimpleRecurrentNetwork) subnet);
+            subnetNode = new SRNNetworkNode(NetworkPanel.this, (SimpleRecurrentNetwork) subnet);
         } else if (subnet instanceof FeedForward) {
             if (subnet instanceof BackpropNetwork) {
-                ret = new BackpropNetworkNode(NetworkPanel.this,
-                        (BackpropNetwork) subnet);
+                subnetNode = new BackpropNetworkNode(NetworkPanel.this, (BackpropNetwork) subnet);
             } else if (subnet instanceof LMSNetwork) {
-                ret = new LMSNetworkNode(NetworkPanel.this,
-                        (LMSNetwork) subnet);
+                subnetNode = new LMSNetworkNode(NetworkPanel.this, (LMSNetwork) subnet);
             } else if (subnet instanceof BPTTNetwork) {
-                ret = new BPTTNode(NetworkPanel.this, (BPTTNetwork) subnet);
+                subnetNode = new BPTTNode(NetworkPanel.this, (BPTTNetwork) subnet);
             } else {
-                ret = new SubnetworkNode(NetworkPanel.this, subnet);
+                subnetNode = new SubnetworkNode(NetworkPanel.this, subnet);
             }
         } else {
-            ret = new SubnetworkNode(NetworkPanel.this, subnet);
+            subnetNode = new SubnetworkNode(NetworkPanel.this, subnet);
         }
 
-        return ret;
+        return subnetNode;
     }
 
     /**

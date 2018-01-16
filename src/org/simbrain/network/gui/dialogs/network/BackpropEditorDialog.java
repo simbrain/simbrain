@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -25,6 +26,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.*;
+
+import javax.swing.*;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
@@ -45,12 +48,11 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     /**
      * Default constructor.
      *
-     * @param np parent panel
+     * @param networkPanel parent panel
      * @param backprop edited network
      */
-    public BackpropEditorDialog(final NetworkPanel np,
-        final BackpropNetwork backprop) {
-        super(np, backprop);
+    public BackpropEditorDialog(NetworkPanel networkPanel, BackpropNetwork backprop) {
+        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, backprop);
         this.backprop = backprop;
         init();
         initDefaultTabs();
@@ -64,18 +66,18 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        if(useExperimentalTrainer) {
+        if (useExperimentalTrainer) {
             currentTrainer = new BackpropTrainer2(backprop);
         } else {
             currentTrainer = new BackpropTrainer(backprop);
         }
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-            networkPanel, currentTrainer);
+        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, currentTrainer);
         addTab("Train", iterativeControls);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 currentTrainer.commitChanges();
+                backprop.setTrainer(null);
             }
         });
     }

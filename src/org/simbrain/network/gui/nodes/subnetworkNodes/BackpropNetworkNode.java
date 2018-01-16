@@ -18,24 +18,14 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer2;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -51,11 +41,9 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public BackpropNetworkNode(final NetworkPanel networkPanel,
-        final BackpropNetwork group) {
+    public BackpropNetworkNode(NetworkPanel networkPanel, BackpropNetwork group) {
         super(networkPanel, group);
         setContextMenu();
-
     }
 
     /**
@@ -68,28 +56,21 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.add(renameAction);
         menu.add(removeAction);
         menu.addSeparator();
-        final BackpropNetwork network = (BackpropNetwork) getSubnetwork();
+        BackpropNetwork network = (BackpropNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
-            getNetworkPanel(), network));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getInputNeurons(), network.getTrainingSet()
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getOutputNeurons(), network.getTrainingSet()
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(),
+                network.getTrainingSet().getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(),
+                network.getTrainingSet().getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
-
         setContextMenu(menu);
     }
 
     @Override
     protected StandardDialog getPropertyDialog() {
-
-        return new BackpropEditorDialog(this.getNetworkPanel(),
-            (BackpropNetwork) getSubnetwork());
+        return new BackpropEditorDialog(getNetworkPanel(), (BackpropNetwork) getSubnetwork());
     }
-
 
 }

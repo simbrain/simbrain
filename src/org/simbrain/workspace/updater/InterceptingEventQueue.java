@@ -38,11 +38,10 @@ import org.simbrain.workspace.Workspace;
  *
  * @author Matt Watson
  */
-public class InterceptingEventQueue extends EventQueue implements
-        TaskSynchronizationManager {
+public class InterceptingEventQueue extends EventQueue implements TaskSynchronizationManager {
+
     /** the static logger for this class. */
-    private static final Logger LOGGER = Logger
-            .getLogger(InterceptingEventQueue.class);
+    private static final Logger LOGGER = Logger.getLogger(InterceptingEventQueue.class);
 
     /** The workspace this object is associated with. */
     private final Workspace workspace;
@@ -54,7 +53,7 @@ public class InterceptingEventQueue extends EventQueue implements
     private boolean paused = false;
 
     /** Lock for paused flag access. */
-    private Object lock = new Object();
+    private final Object lock = new Object();
 
     /** Latch used for tracking when events are done. */
     private volatile CompletionSignal signal = null;
@@ -76,7 +75,7 @@ public class InterceptingEventQueue extends EventQueue implements
      *
      * @param workspace The workspace to associate this event queue with.
      */
-    public InterceptingEventQueue(final Workspace workspace) {
+    public InterceptingEventQueue(Workspace workspace) {
         this.workspace = workspace;
     }
 
@@ -141,22 +140,16 @@ public class InterceptingEventQueue extends EventQueue implements
     @Override
     public void postEvent(final AWTEvent event) {
         LOGGER.trace("event posted: " + event);
-
-        // final CompletionSignal signal = this.signal;
-
         if (event instanceof InvocationEvent) {
             synchronized (lock) {
                 if (paused) {
                     LOGGER.trace("event queued: " + event);
-
                     queue.add(new SynchronizingInvocationEvent(
                             (InvocationEvent) event, workspace, deQueueSignal));
                 } else {
                     LOGGER.trace("event passed: " + event);
-
                     super.postEvent(new SynchronizingInvocationEvent(
-                            (InvocationEvent) event, workspace,
-                            CompletionSignal.IGNORE));
+                            (InvocationEvent) event, workspace, CompletionSignal.IGNORE));
                 }
             }
         } else {

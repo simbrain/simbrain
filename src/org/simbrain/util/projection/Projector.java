@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -96,11 +95,7 @@ public class Projector {
         projectionMethods.put(ProjectTriangulate.class, "Triangulation");
         projectionMethods.put(ProjectSammon.class, "Sammon Map");
 
-        try {
-            tolerance = SimbrainPreferences.getDouble("projectorTolerance");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        tolerance = SimbrainPreferences.getDouble("projectorTolerance");
     }
 
     /** Manages coloring the datapoints. */

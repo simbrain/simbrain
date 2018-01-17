@@ -138,12 +138,9 @@ public class BackpropTrainer2 extends IterableTrainer {
      * Construct the trainer.
      * @param network the network to train
      */
-    public BackpropTrainer2(Trainable network) {
+    public BackpropTrainer2(BackpropNetwork network) {
         super(network);
-        if (!(network instanceof BackpropNetwork)) {
-            throw new IllegalArgumentException("Backprop trainer must be applied to backprop network");
-        }
-        net = (BackpropNetwork) network;
+        net = network;
         net.setTrainer(this);
 
         // Synapse group list is ordered from input to output layers
@@ -257,16 +254,14 @@ public class BackpropTrainer2 extends IterableTrainer {
             DoubleMatrix activations = layers.get(layerIndex);
             DoubleMatrix netInput = netInputs.get(layerIndex);
             DoubleMatrix biasVec = biases.get(layerIndex);
-
+            DoubleMatrix derivatives = derivs.get(layerIndex);
             // Take the inputs multiply them by the weight matrix get the netInput for the next layer
-            forwardPropagate(inputs, weights, netInput);
+            weights.mmuli(inputs, netInput);
             // Add biases to the net input before biases were not part of the net input...
             netInput.addi(biasVec);
             // Apply the transfer function to net input to get the activation values for the next layer and store
             // that value in the activations vector, also calculate derivatives.
-            // TODO think of a way to take advantage of logistic's very simple derivative.
-            updateRules.get(layerIndex).applyFunction(netInput, activations);
-            updateRules.get(layerIndex).getDerivative(netInput, derivs.get(layerIndex));
+            updateRules.get(layerIndex).applyFunctionAndDerivative(netInput, activations, derivatives);
             layerIndex++;
         }
     }
@@ -408,16 +403,12 @@ public class BackpropTrainer2 extends IterableTrainer {
      * Initialize input and target datasets as JBlas matrices.
      */
     public void initData() {
-        // Store data as columns since that's what everything else deals with
-        // So no need to do tranposes later.
+        // Store data as columns since that's what everything else deals with so there is no need to transpose later.
         if (network.getTrainingSet().getInputData() != null) {
-            inputData = new DoubleMatrix(
-                    network.getTrainingSet().getInputData()).transpose();
+            inputData = new DoubleMatrix(network.getTrainingSet().getInputData()).transpose();
         }
         if (network.getTrainingSet().getTargetData() != null) {
-            targetData = new DoubleMatrix(
-                    network.getTrainingSet().getTargetData()).transpose();
-
+            targetData = new DoubleMatrix(network.getTrainingSet().getTargetData()).transpose();
         }
     }
 
@@ -431,39 +422,38 @@ public class BackpropTrainer2 extends IterableTrainer {
      * which can be considered a "forward" propagation in a column-major
      * paradigm.
      *
-     * @param _x the right-hand vector MUST be a vector
-     * @param _A the matrix
-     * @param _y the result of a matrix-vector multiply MUST be a vector of the
-     *           same number of elements as _x, can be equal to _x.
+     * @param inputs the right-hand vector MUST be a vector
+     * @param weights the matrix
+     * @param outputs the result of a matrix-vector multiply MUST be a vector of the
+     *           same number of elements as inputs, can be equal to inputs.
      */
-    public static void forwardPropagate(DoubleMatrix _x, DoubleMatrix _A,
-                                        DoubleMatrix _y) {
+    public static void forwardPropagate(DoubleMatrix inputs, DoubleMatrix weights, DoubleMatrix outputs) {
         boolean wasRowX = false;
         boolean wasRowY = false;
-        if (_x.isRowVector()) {
+        if (inputs.isRowVector()) {
             // Fast transpose
-            _x.rows = _x.columns;
-            _x.columns = 1;
+            inputs.rows = inputs.columns;
+            inputs.columns = 1;
             wasRowX = true;
         }
-        if (_x != _y && _y.isRowVector()) {
+        if (inputs != outputs && outputs.isRowVector()) {
             // Fast transpose
-            _y.rows = _y.columns;
-            _y.columns = 1;
+            outputs.rows = outputs.columns;
+            outputs.columns = 1;
             wasRowY = true;
         }
 
-        _A.mmuli(_x, _y);
+        weights.mmuli(inputs, outputs);
 
         if (wasRowX) {
             // Fast transpose back
-            _x.columns = _x.rows;
-            _x.rows = 1;
+            inputs.columns = inputs.rows;
+            inputs.rows = 1;
         }
         if (wasRowY) {
             // Fast transpose back
-            _y.columns = _y.rows;
-            _y.rows = 1;
+            outputs.columns = outputs.rows;
+            outputs.rows = 1;
         }
     }
 

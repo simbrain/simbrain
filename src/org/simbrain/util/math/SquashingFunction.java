@@ -29,7 +29,7 @@ import org.jblas.DoubleMatrix;
  * @author Jeff Yoshimi
  */
 public enum SquashingFunction {
-    
+
     // TODO:Rename to SquashingFunctionEnum?
 
     /** Arctangent. */
@@ -47,20 +47,17 @@ public enum SquashingFunction {
         }
 
         @Override
-        public double valueOf(double val, double ceil, double floor,
-                double slope) {
+        public double valueOf(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.atan(val, ceil, floor, slope);
         }
 
         @Override
-        public double inverseVal(double val, double ceil, double floor,
-                double slope) {
+        public double inverseVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.invAtan(val, ceil, floor, slope);
         }
 
         @Override
-        public double derivVal(double val, double ceil, double floor,
-                double slope) {
+        public double derivVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.derivAtan(val, ceil, floor, slope);
         }
 
@@ -75,22 +72,26 @@ public enum SquashingFunction {
         }
 
 		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.atan(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.invAtan(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.derivAtan(in, out, ceil, floor, slope);
 		}
+
+		@Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
+                                  double slope) {
+            valueOf(in, out, ceil, floor, slope);
+            derivVal(in, out, ceil, floor, slope);
+        }
 
     },
 
@@ -115,14 +116,12 @@ public enum SquashingFunction {
         }
 
         @Override
-        public double inverseVal(double val, double ceil, double floor,
-                double slope) {
+        public double inverseVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.invLogistic(val, ceil, floor, slope);
         }
 
         @Override
-        public double derivVal(double val, double ceil, double floor,
-                double slope) {
+        public double derivVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.derivLogistic(val, ceil, floor, slope);
         }
 
@@ -137,20 +136,25 @@ public enum SquashingFunction {
         }
 
 		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-		    SquashingFunctions.logistic(valIn, valOut, ceil, floor, slope);
+		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+		    SquashingFunctions.logistic(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.invLogistic(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-		    SquashingFunctions.derivLogistic(valIn, valOut, ceil, floor, slope);
+		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+		    SquashingFunctions.derivLogistic(in, out, ceil, floor, slope);
 		}
+
+		@Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
+                                  double slope) {
+            SquashingFunctions.logisticWithDerivative(in, out, deriv, ceil, floor, slope);
+        }
 
     },
 
@@ -197,22 +201,27 @@ public enum SquashingFunction {
         }
 
 		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.invTanh(in, out, ceil, floor, slope);
 		}
 
 		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+			SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
 		}
+
+		@Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
+                                  double slope) {
+            SquashingFunctions.tanh(in, out, ceil, floor, slope);
+            SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
+        }
+
     },
 
     /**
@@ -228,20 +237,17 @@ public enum SquashingFunction {
         }
 
         @Override
-        public double valueOf(double val, double ceil, double floor,
-                double slope) {
+        public double valueOf(double val, double ceil, double floor, double slope) {
             return 0;
         }
 
         @Override
-        public double inverseVal(double val, double ceil, double floor,
-                double slope) {
+        public double inverseVal(double val, double ceil, double floor, double slope) {
             return 0;
         }
 
         @Override
-        public double derivVal(double val, double ceil, double floor,
-                double slope) {
+        public double derivVal(double val, double ceil, double floor, double slope) {
             return 0;
         }
 
@@ -256,22 +262,17 @@ public enum SquashingFunction {
         }
 
 		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
 
 		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
 
 		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
+
+		@Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
+                                  double slope) {}
     };
 
     /*
@@ -328,6 +329,9 @@ public enum SquashingFunction {
             double slope);
     
     public abstract void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
+
+    public abstract void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil,
+                                       double floor, double slope);
 
     /**
      * @return the default upper boundary (ceiling) of this particular squashing

@@ -39,4 +39,12 @@ public interface TransferFunction {
      */
     void getDerivative(DoubleMatrix input, DoubleMatrix output);
 
+    /**
+     * Apply the transfer function to the input vector and store the result in output. Then apply the derivative
+     * of the transfer function to the input and store the result of that in derivative.
+     * @param input The input vector.
+     * @param output The output vector.
+     * @param derivative The derivative vector.
+     */
+    void applyFunctionAndDerivative(DoubleMatrix input, DoubleMatrix output, DoubleMatrix derivative);
 }

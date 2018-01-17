@@ -43,6 +43,7 @@ abstract class AbstractVisionWorldModel extends VisionWorldModelListenerSupport
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         // TODO: Too much is stored in pixel matrix and elsewhere
         // Also the pixels don't actually get stored
         // xstream.omitField(MutableVisionWorldModel.class, "pixelMatrix");

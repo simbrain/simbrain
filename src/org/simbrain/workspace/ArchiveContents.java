@@ -617,6 +617,7 @@ class ArchiveContents {
      */
     static XStream xstream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
 
         xstream.omitField(ArchiveContents.class, "serializer");
         xstream.omitField(ArchiveContents.class, "archivedAvailableActions");

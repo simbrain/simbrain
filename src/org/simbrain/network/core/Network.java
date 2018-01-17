@@ -1008,7 +1008,7 @@ public class Network {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
-
+        xstream.ignoreUnknownElements();
         xstream.omitField(Network.class, "groupListeners");
         xstream.omitField(Network.class, "neuronListeners");
         xstream.omitField(Network.class, "networkListeners");

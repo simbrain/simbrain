@@ -12,5 +12,8 @@
 *.iml
 out/*
 /bin1/
-
+.settings/
+.metadata/*
 .checkstyle
+*.dylib
+*.dll

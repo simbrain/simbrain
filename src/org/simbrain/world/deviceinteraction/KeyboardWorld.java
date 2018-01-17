@@ -82,6 +82,7 @@ public class KeyboardWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         return xstream;
 
     }

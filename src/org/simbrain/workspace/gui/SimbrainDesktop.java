@@ -206,6 +206,9 @@ public class SimbrainDesktop {
     /** "Throbber" to indicate a simulation is running. */
     private JLabel runningLabel = new JLabel();
 
+    /** Name to display in Simbrain desktop window. */
+    private static String FRAME_TITLE = "Simbrain 3.03";
+
     /**
      * Associates workspace components with their corresponding gui components.
      */
@@ -221,7 +224,7 @@ public class SimbrainDesktop {
             guiComponents.clear();
             desktop.removeAll();
             desktop.repaint();
-            frame.setTitle("Simbrain");
+            frame.setTitle(FRAME_TITLE);
             updateTimeLabel();
         }
 
@@ -316,7 +319,7 @@ public class SimbrainDesktop {
 
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
-        frame = new JFrame("Simbrain");
+        frame = new JFrame(FRAME_TITLE);
         actionManager = new WorkspaceActionManager(this);
         createAndAttachMenus();
         wsToolBar = createToolBar();

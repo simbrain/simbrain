@@ -12,7 +12,6 @@
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
-    <module name="FileContentsHolder"/>
     <module name="AvoidStarImport"/>
     <module name="ConstantName"/>
     <module name="EmptyBlock"/>
@@ -115,7 +114,6 @@
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
   </module>
-  <module name="SuppressionCommentFilter"/>
   <module name="JavadocPackage"/>
   <module name="Translation">
     <property name="severity" value="warning"/>
@@ -127,6 +125,4 @@
   </module>
   <module name="SeverityMatchFilter"/>
   <module name="SuppressionFilter"/>
-  <module name="SuppressionCommentFilter"/>
-  <module name="SuppressWithNearbyCommentFilter"/>
 </module>

@@ -239,13 +239,13 @@ public class BackpropTrainer2Test {
 //	    }
 
 	@Test
-    public void testLogisticSquashingFunction() {
-	    double delta = 0.001;
+    public void testLogistic() {
+	    double epsilon = 0.001;
 
 	    // Check that the logistic is in between the bounds at 0
 	    double actual = SquashingFunctions.logistic(0, 1, 0, 1);
 	    double expected = 0.5;
-        assertEquals(actual, expected, delta);
+        assertEquals(actual, expected, epsilon);
 
         // Check that logistic of a small value is less than logistic of a large value
         actual = SquashingFunctions.logistic(-100, 1, 0, 1);
@@ -255,11 +255,11 @@ public class BackpropTrainer2Test {
         // Check that logistic approximately reaches the bounds for very large or small values
         actual = SquashingFunctions.logistic(1e9, 5, 0, 1);
         expected = 5;
-        assertEquals(actual, expected, delta);
+        assertEquals(actual, expected, epsilon);
 
         actual = SquashingFunctions.logistic(-1e9, 1, -3, 1);
         expected = -3;
-        assertEquals(actual, expected, delta);
+        assertEquals(actual, expected, epsilon);
 
         // Check that logistic with a large slope is more negative for negative values and more positive
         // for positive values, and equal for zero
@@ -269,7 +269,7 @@ public class BackpropTrainer2Test {
 
         actual = SquashingFunctions.logistic(0, 1, 0, 1);
         expected = SquashingFunctions.logistic(0, 1, 0, 10);
-        assertEquals(actual, expected, delta);
+        assertEquals(actual, expected, epsilon);
 
         actual = SquashingFunctions.logistic(1, 1, 0, 1);
         expected = SquashingFunctions.logistic(1, 1, 0, 10);
@@ -284,8 +284,42 @@ public class BackpropTrainer2Test {
         SquashingFunctions.logistic(xs, actuals, -2, 4.7, 0.8);
         for (int i = 0; i < 1000; ++i) {
             expected = SquashingFunctions.logistic(xs.get(i), -2, 4.7, 0.8);
-            assertEquals(actuals.get(i), expected, delta);
+            assertEquals(actuals.get(i), expected, epsilon);
         }
     }
+
+    @Test
+	public void testLogisticDerivative() {
+        double delta = 0.001;
+        double epsilon = 0.001;
+
+        // Check that the derivative is approximately equal to the limit of the difference f(x) - f(x+d) as d goes to 0
+        double[] xs = {-1e9, -1000, -10, -3.33, -1, -0.001, 0.0, 0.0001, 4.7, 16, 1e9};
+        for (double x : xs) {
+            double actual = SquashingFunctions.derivLogistic(x, 13, 3, 1.9);
+            double expected = (SquashingFunctions.logistic(x, 13, 3, 1.9) -
+                    SquashingFunctions.logistic(x - delta, 13, 3, 1.9)) / delta;
+            assertEquals(actual, expected, epsilon);
+        }
+
+        // Check that the matrix form is approximately equal to the singular form
+        DoubleMatrix inputs = new DoubleMatrix(xs);
+        DoubleMatrix actuals = DoubleMatrix.zeros(xs.length);
+        SquashingFunctions.derivLogistic(inputs, actuals, 10, 0, 0.25);
+        for (int i = 0; i < actuals.length; ++i) {
+            double expected = SquashingFunctions.derivLogistic(xs[i], 10, 0, 0.25);
+            assertEquals(actuals.get(i), expected, epsilon);
+        }
+
+        // Check that the logistic with derivatives is equal to the logistic and the derivative
+        DoubleMatrix actualDerivs = DoubleMatrix.zeros(xs.length);
+        SquashingFunctions.logisticWithDerivative(inputs, actuals, actualDerivs, 100, -100, 1);
+        DoubleMatrix expecteds = DoubleMatrix.zeros(xs.length);
+        SquashingFunctions.logistic(inputs, expecteds, 100, -100, 1);
+        DoubleMatrix expectedDerivs = DoubleMatrix.zeros(xs.length);
+        SquashingFunctions.derivLogistic(inputs, expectedDerivs, 100, -100, 1);
+        //assertArrayEquals(actuals.data, expecteds.data, epsilon);
+        //assertArrayEquals(actualDerivs.data, expectedDerivs.data, epsilon);
+	}
 	
 }

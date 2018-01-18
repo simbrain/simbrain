@@ -20,10 +20,10 @@ package org.simbrain.util.math;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
+import static org.junit.Assert.assertTrue;
 
 import org.jblas.DoubleMatrix;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -35,22 +35,22 @@ public class SquashingFunctionsTests {
 
     @Test
     public void testSigmoids() {
-        assertEquals(0, SquashingFunctions.atan(0, 1, -1, 1), 0.01);
-        assertEquals(0, SquashingFunctions.logistic(0, 1, -1, 1), 0.01);
-        assertEquals(0, SquashingFunctions.tanh(0, 1, -1, 1), 0.01);
+        double epsilon = 0.001;
+        assertEquals(0, SquashingFunctions.atan(0, 1, -1, 1), epsilon);
+        assertEquals(0, SquashingFunctions.logistic(0, 1, -1, 1), epsilon);
+        assertEquals(0, SquashingFunctions.tanh(0, 1, -1, 1), epsilon);
 
-        assertEquals(.5, SquashingFunctions.atan(0, 1, 0, 1), 0.01);
-        assertEquals(.5, SquashingFunctions.logistic(0, 1, 0, 1), 0.01);
-        assertEquals(.5, SquashingFunctions.tanh(0, 1, 0, 1), 0.01);
+        assertEquals(.5, SquashingFunctions.atan(0, 1, 0, 1), epsilon);
+        assertEquals(.5, SquashingFunctions.logistic(0, 1, 0, 1), epsilon);
+        assertEquals(.5, SquashingFunctions.tanh(0, 1, 0, 1), epsilon);
 
-        // Below fails at tolerance of .01
-        assertEquals(1, SquashingFunctions.atan(10, 1, -1, 1), 0.1);
-        assertEquals(1, SquashingFunctions.logistic(10, 1, -1, 1), 0.01);
-        assertEquals(1, SquashingFunctions.tanh(10, 1, -1, 1), 0.1);
+        assertEquals(1, SquashingFunctions.atan(1000, 1, -1, 1), epsilon);
+        assertEquals(1, SquashingFunctions.logistic(1000, 1, -1, 1), epsilon);
+        assertEquals(1, SquashingFunctions.tanh(1000, 1, -1, 1), epsilon);
 
-        assertEquals(-1, SquashingFunctions.atan(-10, 1, -1, 1), 0.1);
-        assertEquals(-1, SquashingFunctions.logistic(-10, 1, -1, 1), 0.1);
-        assertEquals(-1, SquashingFunctions.tanh(-10, 1, -1, 1), 0.1);
+        assertEquals(-1, SquashingFunctions.atan(-1000, 1, -1, 1), epsilon);
+        assertEquals(-1, SquashingFunctions.logistic(-1000, 1, -1, 1), epsilon);
+        assertEquals(-1, SquashingFunctions.tanh(-1000, 1, -1, 1), epsilon);
     }
 
     @Test
@@ -68,43 +68,67 @@ public class SquashingFunctionsTests {
 
     @Test
     public void testInverses() {
+        // TODO: Inverse tanh doesn't seem to work.
+        double epsilon = 0.001;
+        assertEquals(0, SquashingFunctions.invAtan(0, 1, -1, 1), epsilon);
+        assertEquals(0, SquashingFunctions.invLogistic(0, 1, -1, 1), epsilon);
+        assertEquals(0, SquashingFunctions.invTanh(0, 1, -1, 1), epsilon);
+
+        assertEquals(0, SquashingFunctions.invAtan(0.5, 1, 0, 1), epsilon);
+        assertEquals(0, SquashingFunctions.invLogistic(0.5, 1, 0, 1), epsilon);
+        assertEquals(0, SquashingFunctions.invTanh(0.5, 1, 0, 1), epsilon);
+
+        assertTrue(10 < SquashingFunctions.invAtan(0.999, 1, -1, 1));
+        assertTrue(10 < SquashingFunctions.invLogistic(0.999, 1, -1, 1));
+        //assertTrue(10 < SquashingFunctions.invTanh(0.999, 1, -1, 1));
+
+        assertTrue(-10 > SquashingFunctions.invAtan(-0.999, 1, -1, 1));
+        assertTrue(-10 > SquashingFunctions.invLogistic(-0.999, 1, -1, 1));
+        //assertTrue(-10 > SquashingFunctions.invTanh(-0.999, 1, -1, 1));
     }
 
     @Test
-    public void testJBlasBackedFunctions() {
+    public void testMatrixFunctions() {
+        // Check that the matrix forms are approximately equal to the singular forms
+        double epsilon = 0.001;
+        DoubleMatrix inputs = DoubleMatrix.linspace(-10, 10, 1000);
+        inputs.put(0, 0);
+        inputs.put(1, -1e9);
+        inputs.put(2, 1e9);
 
-        // Objects for testing
-        DoubleMatrix zeros = DoubleMatrix.zeros(5);
-        DoubleMatrix halves = zeros.add(.5);
-        DoubleMatrix ones = zeros.add(1);
-        DoubleMatrix fives = zeros.add(5);
-        DoubleMatrix logit5 = zeros.add(1-0.00669);
-        DoubleMatrix logitN5 = zeros.add(0.00669);
-        DoubleMatrix logit5D = zeros.add(0.00669);
-        DoubleMatrix testOut = DoubleMatrix.zeros(5);
+        DoubleMatrix actuals = DoubleMatrix.zeros(1000);
+        DoubleMatrix actualDerivs = DoubleMatrix.zeros(1000);
+        DoubleMatrix expecteds = DoubleMatrix.zeros(1000);
+        DoubleMatrix expectedDerivs = DoubleMatrix.zeros(1000);
 
-        // Test logistic and its derivative
-        SquashingFunctions.logistic(zeros, testOut, 1, -1, 1);
-        assertArrayEquals(zeros.data, DoubleMatrix.zeros(5).data, .01);
-        SquashingFunctions.logistic(zeros, testOut, 1, 0, 1);
-        assertArrayEquals(halves.data, testOut.data, .01);
+        SquashingFunctions.logistic(inputs, actuals, 1, 0, 1);
+        SquashingFunctions.derivLogistic(inputs, actualDerivs, 1, 0, 1);
+        for (int i = 0; i < 1000; ++i) {
+            assertEquals(actuals.get(i), SquashingFunctions.logistic(inputs.get(i), 1, 0, 1), epsilon);
+            assertEquals(actualDerivs.get(i), SquashingFunctions.derivLogistic(inputs.get(i), 1, 0, 1), epsilon);
+        }
+        expecteds.copy(actuals);
+        expectedDerivs.copy(actualDerivs);
+        SquashingFunctions.logisticWithDerivative(inputs, actuals, actualDerivs, 1, 0, 1);
+        assertArrayEquals(actuals.data, expecteds.data, epsilon);
+        assertArrayEquals(actualDerivs.data, expectedDerivs.data, epsilon);
 
-        SquashingFunctions.logistic(fives, testOut, 1, 0, .5);
-        assertArrayEquals(logit5.data, testOut.data, .0001);
-        SquashingFunctions.logistic(fives.muli(-1), testOut, 1, 0, .5);
-        assertArrayEquals(logitN5.data, testOut.data, .0001);
-        
-        SquashingFunctions.derivLogistic(zeros, testOut, 1, -1, 1);
-        assertArrayEquals(ones.data, testOut.data, .01);
+        SquashingFunctions.atan(inputs, actuals, 1, 0, 1);
+        SquashingFunctions.derivAtan(inputs, actualDerivs, 1, 0, 1);
+        for (int i = 0; i < 1000; ++i) {
+            double expected = SquashingFunctions.atan(inputs.get(i), 1, 0, 1);
+            double expectedDeriv = SquashingFunctions.derivAtan(inputs.get(i), 1, 0, 1);
+            assertEquals(actuals.get(i), expected, epsilon);
+            assertEquals(actualDerivs.get(i), expectedDeriv, epsilon);
+        }
 
-        SquashingFunctions.derivLogistic(fives, testOut, 1, 0, .5);
-        assertArrayEquals(logit5D.data, testOut.data, .0001);
-        
-        SquashingFunctions.derivLogistic(fives.muli(-1), testOut, 1, 0, .5);
-        assertArrayEquals(logit5D.data, testOut.data, .0001);
-        
-        // TODO: Test Tanh, arctan
-
+        SquashingFunctions.tanh(inputs, actuals, 1, 0, 1);
+        SquashingFunctions.derivTanh(inputs, actualDerivs, 1, 0, 1);
+        for (int i = 0; i < 1000; ++i) {
+            double expected = SquashingFunctions.tanh(inputs.get(i), 1, 0, 1);
+            double expectedDeriv = SquashingFunctions.derivTanh(inputs.get(i), 1, 0, 1);
+            assertEquals(actuals.get(i), expected, epsilon);
+            assertEquals(actualDerivs.get(i), expectedDeriv, epsilon);
+        }
     }
-
 }

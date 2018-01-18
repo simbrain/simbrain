@@ -304,9 +304,13 @@ public class SquashingFunctions {
      */
     public static void logisticWithDerivative(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil,
                                               double floor, double slope) {
-        logistic(in, out, 0, 1, 1);
-        out.rsubi(1, deriv);
-        deriv.muli(out).muli(4 * slope * (ceil - floor));
+        logistic(in, out, ceil, floor, slope);
+        // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
+        out.rsubi(ceil, deriv);
+        out.subi(floor);
+        deriv.muli(out).muli((4 * slope) / ((ceil - floor) * (ceil - floor)));
+        // Restore out after calculating the derivative
+        out.addi(floor);
     }
 
     /**

@@ -210,7 +210,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the row
-        return batchErrors.mul(batchErrors).mean();
+        return batchErrors.mul(batchErrors).sum();
     }
 
     /**

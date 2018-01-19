@@ -141,7 +141,6 @@ public class BackpropTrainer2 extends IterableTrainer {
     public BackpropTrainer2(BackpropNetwork network) {
         super(network);
         net = network;
-        net.setTrainer(this);
 
         // Synapse group list is ordered from input to output layers
         for (SynapseGroup synapseGroup : net.getSynapseGroupList()) {
@@ -226,6 +225,7 @@ public class BackpropTrainer2 extends IterableTrainer {
             updateNetwork();
             targetVector = targetData.getColumn(row);
             targetVector.subi(getOutputLayer(), errors);
+
             // Calculate batch errors
             batchErrors.addi(errors);
         }

@@ -14,15 +14,12 @@
 package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
-import java.util.Optional;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.trainers.BackpropTrainer2;
 import org.simbrain.network.trainers.Trainable;
-import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainingSet;
 
 import javax.swing.*;
@@ -36,9 +33,6 @@ public class BackpropNetwork extends FeedForward implements Trainable {
 
     /** Training set. */
     private final TrainingSet trainingSet = new TrainingSet();
-
-    /** The trainer for this backprop network. */
-    private Trainer trainer;
 
     /**
      * Construct a new backprop network.
@@ -68,16 +62,6 @@ public class BackpropNetwork extends FeedForward implements Trainable {
         return trainingSet;
     }
 
-    /** Return the trainer currently training this network. */
-    public Optional<Trainer> getTrainer() {
-        return Optional.ofNullable(trainer);
-    }
-
-    /** Set the trainer currently training this network. */
-    public void setTrainer(Trainer value) {
-        trainer = value;
-    }
-
     @Override
     public Group getNetwork() {
         return this;
@@ -86,17 +70,4 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     @Override
     public void initNetwork() {}
 
-    @Override
-    public void update() {
-        if (trainer == null) {
-            super.update();
-        } else {
-            try {
-                trainer.apply();
-                super.update();
-            } catch (Trainer.DataNotInitializedException ex) {
-                JOptionPane.showMessageDialog(null, "Unable to apply trainer: training data not initialized.");
-            }
-        }
-    }
 }

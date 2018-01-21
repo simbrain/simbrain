@@ -3,10 +3,11 @@ package org.simbrain.custom_sims.simulations.creatures;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
@@ -14,9 +15,6 @@ import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.effectors.Effector;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -33,19 +31,17 @@ public class CreaturesBrain {
 	private List<NeuronGroup> lobes = new ArrayList();
 
 	/**
-	 * Reference to the NetBuilder object this wraps around.
+	 * Reference to the NetworkWrapper object this wraps around.
 	 */
-	private NetBuilder builder;
-
-	/**
-	 * The amount of space to spread between neurons.
-	 */
-	private double gridSpace = 50;
+	private NetworkWrapper netWrapper;
 
 	/**
 	 * Reference to network component.
 	 */
-	private NetworkComponent netComponent;
+    private NetworkComponent netComponent;
+    
+    //TODO: Needed?
+    private NetworkDesktopComponent netDesktopComponent;
 
 	/**
 	 * Reference to parent sim.
@@ -57,9 +53,10 @@ public class CreaturesBrain {
 	 *
 	 * @param component
 	 */
-	public CreaturesBrain(NetworkComponent component, CreaturesSim parentSim) {
-		this.netComponent = component;
-		this.builder = new NetBuilder(component);
+	public CreaturesBrain(NetworkDesktopComponent component, CreaturesSim parentSim) {
+        this.netDesktopComponent = component;
+		this.netWrapper = new NetworkWrapper(component);
+        this.netComponent = netWrapper.getNetworkComponent();
 		this.parentSim = parentSim;
 	}
 
@@ -68,8 +65,8 @@ public class CreaturesBrain {
 	 *
 	 * @param netBuilder
 	 */
-	public CreaturesBrain(NetBuilder netBuilder, CreaturesSim parentSim) {
-		this.builder = netBuilder;
+	public CreaturesBrain(NetworkWrapper netBuilder, CreaturesSim parentSim) {
+		this.netWrapper = netBuilder;
 		this.netComponent = netBuilder.getNetworkComponent();
 		this.parentSim = parentSim;
 	}
@@ -91,7 +88,7 @@ public class CreaturesBrain {
 	 */
 	public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName,
 			CreaturesNeuronRule neuronRule) {
-		NeuronGroup lobe = builder.addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
+		NeuronGroup lobe = netWrapper.addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
 		lobe.setLabel(lobeName);
 		lobes.add(lobe);
 		return lobe;
@@ -121,7 +118,7 @@ public class CreaturesBrain {
 	 * @return
 	 */
 	public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
-		WinnerTakeAll lobe = builder.addWTAGroup(x, y, numNeurons);
+		WinnerTakeAll lobe = netWrapper.addWTAGroup(x, y, numNeurons);
 		lobe.setLabel(lobeName);
 		lobe.setNeuronType(new CreaturesNeuronRule());
 		// TODO: Either make the below method public, or copy & paste it to this
@@ -217,7 +214,7 @@ public class CreaturesBrain {
 	 * @param lobe
 	 * @param numColumns
 	 */
-	public void setLobeColumns(NeuronGroup lobe, int numColumns) {
+	public void setLobeColumns(NeuronGroup lobe, int numColumns, double gridSpace) {
 		GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
 		lobe.setLayout(gridLayout);
 		lobe.applyLayout();
@@ -236,7 +233,7 @@ public class CreaturesBrain {
 		// generate a customized ConnectNeurons object to use.
 
 		// Temporary method call
-		SynapseGroup synapseGroup = builder.addSynapseGroup(sourceLobe, targetLobe);
+		SynapseGroup synapseGroup = netWrapper.addSynapseGroup(sourceLobe, targetLobe);
 
 		synapseGroup.setLabel(groupName);
 
@@ -247,7 +244,7 @@ public class CreaturesBrain {
 
 	public NeuronGroup buildDriveLobe() {
 		NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Drive Lobe");
-		setLobeColumns(lobe, 6);
+		setLobeColumns(lobe, 6, 65);
 
 		nameNeuron(lobe, 0, "Pain");
 		nameNeuron(lobe, 1, "Comfort");
@@ -288,7 +285,7 @@ public class CreaturesBrain {
 	// TODO: Make this a WTA lobe.
 	public NeuronGroup buildVerbLobe() {
 		NeuronGroup lobe = createLobe(0, 182.37, 14, "grid", "Verb Lobe");
-		setLobeColumns(lobe, 7);
+		setLobeColumns(lobe, 7, 60);
 
 		nameNeuron(lobe, 0, "Wait");
 		nameNeuron(lobe, 1, "Left");
@@ -329,7 +326,7 @@ public class CreaturesBrain {
 
 	public NeuronGroup buildSensesLobe() {
 		NeuronGroup lobe = createLobe(0, 379.61, 14, "grid", "General Senses Lobe");
-		setLobeColumns(lobe, 7);
+		setLobeColumns(lobe, 7, 75);
 
 		nameNeuron(lobe, 0, "Attacked");
 		nameNeuron(lobe, 1, "Played with");
@@ -359,8 +356,8 @@ public class CreaturesBrain {
 		}
 
 		// Build that lobe!
-		NeuronGroup perception = createLobe(474.88, 54.71, totalSize, "grid", "Perception Lobe");
-		setLobeColumns(perception, 7);
+		NeuronGroup perception = createLobe(591.02, 7.20, totalSize, "grid", "Perception Lobe");
+		setLobeColumns(perception, 7, 75);
 
 		// Label and connect neurons
 		int indexPointer = 0;
@@ -370,7 +367,7 @@ public class CreaturesBrain {
 
 			// Connect
 			for (Neuron n : l.getNeuronList()) {
-				builder.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
+				netWrapper.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
 			}
 
 			// Increment pointer for the next loop
@@ -383,15 +380,15 @@ public class CreaturesBrain {
 	// Accessor methods below this point
 
 	public Network getNetwork() {
-		return builder.getNetwork();
+		return netWrapper.getNetwork();
 	}
 
 	public List<NeuronGroup> getLobeList() {
 		return lobes;
 	}
 
-	public NetBuilder getBuilder() {
-		return builder;
+	public NetworkWrapper getNetworkWrapper() {
+		return netWrapper;
 	}
 
 	/**

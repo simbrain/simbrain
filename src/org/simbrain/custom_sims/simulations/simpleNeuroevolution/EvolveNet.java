@@ -93,6 +93,7 @@ public class EvolveNet extends Network {
 	
     private void addInput() {
 		for(int i = 0; i < sensoryDimension; i++) {
+		    
 			NeuronGroup newInput = addNeuronGroup(inputX, inputY + (i * 150), inputSize);
 			newInput.setLayout(new LineLayout(40, LineLayout.LineOrientation.VERTICAL));
 			newInput.setLabel("Input" + i);

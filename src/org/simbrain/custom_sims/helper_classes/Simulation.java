@@ -10,12 +10,12 @@ import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;
@@ -23,9 +23,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
-import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
@@ -60,6 +58,23 @@ public class Simulation {
 		this.desktop = desktop;
 		this.workspace = desktop.getWorkspace();
 	}
+	
+    // TODO: NEW STUFF USING NET WRAPPER. Work towards replacing netbuilder
+    // entirely.
+
+    public NetworkWrapper addNetwork2(int x, int y, int width, int height,
+            String name) {
+        NetworkComponent networkComponent = new NetworkComponent(name);
+        workspace.addWorkspaceComponent(networkComponent);
+        NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop
+                .getDesktopComponent(networkComponent);
+        ndc.getParentFrame().setBounds(x, y, width, height);
+        netMap.put(networkComponent.getNetwork(), networkComponent);
+        return new NetworkWrapper(ndc);
+    }
+
+    //// NEW STUFF END ///
+    
 
 	/**
 	 * @return the desktop

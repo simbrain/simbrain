@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.util.environment.SmellSource;
@@ -64,18 +64,12 @@ public class CreaturesSim extends RegisteredSimulation {
 		// Create starting creatures
 		Creature ron = createCreature(0, 0, 833, 629, "Ron");
 		Creature eve = createCreature(0, 0, 233, 629, "Eve");
-		// Was not here before last pull
 		eve.setAgentLocation(25, 25);
 
-		// Make Eve a deaf lion
-		// Was not here before last pull
+		// Make Eve a lion
 		eve.setAgentSkin("Lion");
-		// TODO: Possibly create a way "disabling" lobes
-		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Verb Lobe"));
-		//eve.deleteLobe(eve.getBrain().getLobeByLabel("Noun Lobe"));
 
-		// Let's test some painkillers on Eve too, why not?
-		// Was not here before last pull
+		// Testing chem reaction update log
 		eve.injectChem("Pain", 8);
 		eve.injectChem("Endorphin", 10);
 
@@ -93,8 +87,8 @@ public class CreaturesSim extends RegisteredSimulation {
 
 	private void setUpNPC() {
 		// Create a 'non-player character' that talks randomly
-		npc = world.addAgent(350, 250, "Mouse");
-		npc.setName("Mouse");
+		npc = world.addAgent(350, 250, "Cow");
+		npc.setName("Cow");
 		npc.setSmellSource(new SmellSource(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0 }));
 
 		// Give npc speech effectors
@@ -198,13 +192,13 @@ public class CreaturesSim extends RegisteredSimulation {
 	 */
 	public Creature createCreature(int x, int y, int width, int height, String name) {
 
-		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
+		NetworkWrapper net = sim.addNetwork2(x, y, 600, 600, name + "'s Brain");
 
 		// TODO: Below not working quite right because the network has not
 		// finished
 		// being created when the next two calls are made
-		// net.getNetworkPanel(sim).setAutoZoomMode(false);
-		// net.getNetworkPanel(sim).zoomToFitPage(true);
+		// net.getNetworkPanel().setAutoZoomMode(false);
+		// net.getNetworkPanel().zoomToFitPage(true);
 
 		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
 		Creature creature = new Creature(this, name, net, agent);

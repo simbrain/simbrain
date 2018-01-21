@@ -15,10 +15,11 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -26,27 +27,40 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 
 /**
- * A wrapper for a network and networkcomponent that makes it easy to add stuff
- * to a network.
+ * A wrapper for a network with access to GUI network.
  */
-public class NetBuilder {
+public class NetworkWrapper {
     
-    // Consider keeping this as a set of static methods. Example
-    // NeuronGroup test = NetBuilder.addNeuronGroup(Network network, ....);
+    // Consider adding static methods for adding neurons, neuron groups, etc.
 
+    private final NetworkDesktopComponent desktopComponent;
+    
     private final NetworkComponent networkComponent;
 
     private final Network network;
 
     private double GRID_SPACE = 50; // todo; make this settable
 
+    //// NEW STUFF  ////
+    
     /**
      * @param networkComponent
      */
-    public NetBuilder(NetworkComponent networkComponent) {
-        this.networkComponent = networkComponent;
+    public NetworkWrapper(NetworkDesktopComponent desktopComponent) {
+        this.desktopComponent = desktopComponent;
+        this.networkComponent = desktopComponent.getWorkspaceComponent();
         this.network = networkComponent.getNetwork();
     }
+    
+    public NeuronNode getNode(Neuron neuron) {
+        return getNetworkPanel().getNode(neuron);
+    }
+
+    public NetworkPanelDesktop getNetworkPanel() {
+        return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
+    }
+    
+    // BELOW FROM THE ORIGINAL NET BUILDER CLASS //
 
     /**
      * Add a neuron at a specified location.
@@ -221,18 +235,6 @@ public class NetBuilder {
 
     public Network getNetwork() {
         return network;
-    }
-
-    /**
-     * Return a copy of the network panel associated with this network.
-     *
-     * @param sim the simulation that has the reference to the desktop component
-     * @return the network panel associated with this network
-     */
-    public NetworkPanel getNetworkPanel(Simulation sim) {
-        return ((NetworkDesktopComponent) sim.getDesktop()
-                .getDesktopComponent(networkComponent)).getNetworkPanel();
-
     }
     
     /**

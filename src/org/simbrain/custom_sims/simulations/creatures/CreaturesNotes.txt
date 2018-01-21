@@ -1,0 +1,67 @@
+REINFORCEMENT
+
+Meaningful behavior in Creatures is not something the creatures start out with, but something that they learn, through a combination of experimentation and user intervention (while they're awake), and instincts (when they're asleep). Learning in Creatures is only possible thanks to the following factors, which I've put in an outline format:
+
+1. Dendrites/Synapses
+
+	A. Dendrite Migration
+		* Controlled by Dendrite Strength
+			- Strength is calculated based on SVRules
+
+	B. Dendrite LTW and STW (Weights)
+		* STW changes based on susceptibility and reinforcement
+		* LTW represents a sort of "base-line" weight
+		* LTW and STW relax towards each other
+			- Susceptibility and reinforcement are calculated based on SVRules
+2. Chemicals
+
+	A. Important Chemicals
+		* Reward, Punishment
+		* Reinforcement
+			- Reward and punishment decay into this, along with echo
+			- Typically used in reinforcement SVRules
+		* Reward Echo, Punish Echo
+			- Reward and punishment decay into this, along with reinforcement
+			- A longer lasting chemical than Reward or Punishment, used as a measure of "recent" punishment or reward for that reason
+		* ConASH (Concept layer Atrophy Suppressing Hormone) and DecASH 1 & 2 (Decision layer Atrophy Suppressing Hormone) 
+			- Typically used to regulate the number of loose dendrites in the Concept lobe and Decision lobe (via SVRules)
+			- Emmitted based on number of current loose dendrites of that type and lobe by a chemical emitter
+
+	B. Chemical Receptors
+		* Used to define chem 0-chem 3 for brain lobes (for SVRule use)
+
+	C. Chemical Reactions
+		* Some reactions have reward or punishment as a product
+		* Punishment and reward decay into reinforcement and echo through reactions
+
+	D. Chemical Emitters
+		* ConASH and DecASH are released by chemical emitters in response to the # of loose dendrites
+
+COUPLINGS
+
+How world-to-brain couplings would work would depend on which lobe you're talking about: 
+
+* The noun and verb lobes would have input coupled directly from the hearing sensors of the agent. 
+
+* The drive lobe would be affected directly by the agent's biochemistry, but the agent's current action and what the agent is close to (as specified by either direct positioning or by what the center smell sensor detects) would have an effect on the biochemistry. 
+
+* I'm not sure if the stimulus lobe should either be coupled to one of the agent's smell sensors directly, or if there should be something that averages all the agent's smell sensors first, or if we should do something different with that. 
+
+* The sensory lobe's input depends on stimulus lobes gene and hard-coded methods that use information from the world.
+
+The perception coupling system should do most of the work it needs to in the last stages of initializing the lobe. Using the same array of lobes it took in when defining the size and labels of the lobe, it should couple the neurons together in such a way that neurons with the same label should be coupled together. After that, it would be preferable if the couplings would update before the concept lobe and it's fan-in dendrites update and after all the lobes that were in the array update (along with their fan-in dendrites, and the lobes those dendrites fan-out from, etc).
+
+OPCODES
+
+Opcodes are just the individual parts of an SVRule that, in combination, define how it works. These webpages might help you understand opcodes better:
+http://double.nz/creatures/tutorial2/tutorial2.htm
+http://double.nz/creatures/genetics/svrules.htm
+
+SVRULES
+
+The SVrules and characteristics constraining dendrites are defined in the lobe that the dendrites fan-into. Each dendrite shares these same characteristics with other dendrites with both the same lobe and type (but do not share individual LTW, STW, or Strength values). SVrules and characteristics control various things, such as how many or how little dendrites there can be, how the dendrites are distributed, if they can migrate (and if so, when they migrate), and which lobe the dendrites fan-out from. More information can be found here:
+http://double.nz/creatures/brainlobes/intro.htm
+
+IDEA
+
+One thing that I've just thought of is that we could avoid the difficulty in dealing with limited dendrite types if we can seperate the genetics and characteristics for the dendrites from the rest of the lobes' genetics and characteristics, such that separate genes would encode them instead. This would diverge greatly from the model we're basing this on, however. I'm not sure how important keeping the fundamentals of our model consistent with the old one is to you or this project.

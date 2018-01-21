@@ -38,19 +38,19 @@ public class ImageWorld {
     private EmitterMatrix emitterMatrix;
 
     /** Helper so that it's easy to switch between images sources. */
-    private CompositeImageSource compositeSource;
+    private transient CompositeImageSource compositeSource;
 
     /** List of sensor matrices associated with this world. */
-    private List<SensorMatrix> sensorMatrices = new ArrayList<SensorMatrix>();
+    private transient List<SensorMatrix> sensorMatrices;
 
     /** Currently selected sensor matrix. */
-    private SensorMatrix currentSensorMatrix;
+    private transient SensorMatrix currentSensorMatrix;
 
     /** GUI container for the current image or sensor view. */
-    private ImagePanel imagePanel;
+    private transient ImagePanel imagePanel;
 
     /** List of world listener. */
-    private transient List<Listener> listeners = new ArrayList<Listener>();
+    private transient List<Listener> listeners;
 
     /**
      * Construct the image world.
@@ -62,6 +62,8 @@ public class ImageWorld {
         compositeSource = new CompositeImageSource(staticSource);
         staticSource.loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
         imagePanel = new ImagePanel();
+        sensorMatrices = new ArrayList<SensorMatrix>();
+        listeners = new ArrayList<Listener>();
 
         // Load default sensor matrices
         SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
@@ -84,6 +86,38 @@ public class ImageWorld {
         sensorMatrices.add(threshold100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
+    }
+
+    /** Returns a deserialized ImageWorld. */
+    public Object readResolve() {
+        // Setup ImageSources
+        compositeSource = new CompositeImageSource(staticSource);
+        imagePanel = new ImagePanel();
+        sensorMatrices = new ArrayList<SensorMatrix>();
+        listeners = new ArrayList<Listener>();
+
+        // Load default sensor matrices
+        SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
+        sensorMatrices.add(unfiltered);
+
+        SensorMatrix gray75x75 = new SensorMatrix("Color 25x25",
+                ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
+        sensorMatrices.add(gray75x75);
+
+        SensorMatrix gray200x200 = new SensorMatrix("Gray 200x200",
+                ImageFilterFactory.createGrayFilter(compositeSource, 200, 200));
+        sensorMatrices.add(gray200x200);
+
+        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10",
+                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
+        sensorMatrices.add(threshold10x10);
+
+        SensorMatrix threshold100x100 = new SensorMatrix("Threshold 100x100",
+                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 100, 100));
+        sensorMatrices.add(threshold100x100);
+
+        setCurrentSensorMatrix(sensorMatrices.get(0));
+        return this;
     }
 
     /**

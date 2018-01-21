@@ -63,8 +63,7 @@ public class StaticImageSource extends ImageSourceAdapter {
     public void loadImage(String filename) throws IOException {
         if (filename == null || filename.isEmpty()) {
             this.filename = "";
-            setCurrentImage(new BufferedImage(10, 10,
-                    BufferedImage.TYPE_INT_RGB));
+            setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
         } else {
             BufferedImage image = ImageIO.read(new File(filename));
             this.filename = filename;

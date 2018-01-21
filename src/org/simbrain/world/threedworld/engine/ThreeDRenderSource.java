@@ -57,6 +57,10 @@ public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProce
     }
 
     public void resize(int width, int height) {
+        // Cannot resize until initialized
+        if (renderManager == null) {
+            return;
+        }
         byteBuffer = BufferUtils.ensureLargeEnough(byteBuffer, width * height * 4);
         intBuffer = byteBuffer.asIntBuffer();
         frameBuffer = new FrameBuffer(width, height, 1);

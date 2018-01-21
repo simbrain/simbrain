@@ -2,6 +2,7 @@ package org.simbrain.world.threedworld.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.simbrain.world.threedworld.ThreeDWorldComponent;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
@@ -16,6 +17,7 @@ import com.jme3.scene.Node;
  * Agent is an Entity which contains a Model, Sensors, and Effectors.
  */
 public class Agent implements Entity {
+
     private ModelEntity model;
     private List<Sensor> sensors = new ArrayList<Sensor>();
     private List<Effector> effectors = new ArrayList<Effector>();
@@ -36,26 +38,27 @@ public class Agent implements Entity {
         sensors.remove(sensor);
     }
 
-    public <T extends Sensor> T getSensor(Class<T> sensorType) {
+    /** Returns the sensor of the specified class, if one exists. */
+    public <T extends Sensor> Optional<T> getSensor(Class<T> sensorType) {
         for (Sensor sensor : sensors) {
-            if (sensorType.isAssignableFrom(sensor.getClass())) {
-                return (T) sensor;
+            if (sensorType.isInstance(sensor)) {
+                return Optional.of(sensorType.cast(sensor));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
-     * @param type The type (simple class name) of the sensor to return, if it exists.
-     * @return The sensor of the given type, or null if none exists.
+     * Returns the sensor of the specified type, if one exists.
+     * @param type The simple name of a class of sensor.
      */
-    public Sensor getSensor(String type) {
+    public Optional<Sensor> getSensor(String type) {
         for (Sensor sensor : sensors) {
             if (sensor.getClass().getSimpleName().equals(type)) {
-                return sensor;
+                return Optional.of(sensor);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Sensor> getSensors() {
@@ -70,26 +73,27 @@ public class Agent implements Entity {
         effectors.remove(effector);
     }
 
-    public <T extends Effector> T getEffector(Class<T> effectorType) {
+    /** Return the effector of the specified type, if one exists. */
+    public <T extends Effector> Optional<T> getEffector(Class<T> effectorType) {
         for (Effector effector : effectors) {
-            if (effectorType.isAssignableFrom(effector.getClass())) {
-                return (T) effector;
+            if (effectorType.isInstance(effector)) {
+                return Optional.of(effectorType.cast(effector));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
-     * @param type The type (simple class name) of the effector to return, if it exists.
-     * @return The effector of the given type, or null if none exists.
+     * Return the effector the specified type, if one exists.
+     * @param type The simple name of a class of effector.
      */
-    public Effector getEffector(String type) {
+    public Optional<Effector> getEffector(String type) {
         for (Effector effector : effectors) {
             if (effector.getClass().getSimpleName().equals(type)) {
-                return effector;
+                return Optional.of(effector);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Effector> getEffectors() {

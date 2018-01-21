@@ -122,6 +122,11 @@ public class WalkingEffector implements Effector {
     }
 
     @Override
+    public String getName() {
+        return agent.getName() + ":WalkingEffector";
+    }
+
+    @Override
     public Agent getAgent() {
         return agent;
     }

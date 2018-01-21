@@ -10,6 +10,7 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+
 import static org.simbrain.world.threedworld.controllers.AgentController.Mapping.*;
 
 /**
@@ -94,13 +95,12 @@ public class AgentController implements ActionListener {
     public void control(Agent agent) {
         this.agent = agent;
         controlActive = true;
-        ThreeDEngine engine = world.getEngine();
-        engine.enqueue(() -> {
-            VisionSensor sensor = agent.getSensor(VisionSensor.class);
-            if (sensor != null) {
-                engine.getPanel().setImageSource(sensor.getSource());
-            }
-        });
+        world.getEngine().enqueue(
+                () -> agent.getSensor(VisionSensor.class).ifPresent(this::attachAgentVision));
+    }
+
+    private void attachAgentVision(VisionSensor sensor) {
+        world.getEngine().getPanel().setImageSource(sensor.getSource());
     }
 
     /**
@@ -111,31 +111,34 @@ public class AgentController implements ActionListener {
         final Agent releasedAgent = agent;
         agent = null;
         controlActive = false;
+        world.getEngine().enqueue(
+                () -> releasedAgent.getSensor(VisionSensor.class).ifPresent(this::releaseAgentVision));
+    }
+
+    private void releaseAgentVision(VisionSensor sensor) {
         ThreeDEngine engine = world.getEngine();
-        engine.enqueue(() -> {
-            VisionSensor sensor = releasedAgent.getSensor(VisionSensor.class);
-            if (sensor != null && engine.getPanel().getImageSource().equals(sensor.getSource())) {
-                engine.getPanel().setImageSource(engine.getRenderSource());
-            }
-        });
+        if (engine.getPanel().getImageSource().equals(sensor.getSource())) {
+            engine.getPanel().setImageSource(engine.getRenderSource());
+        }
     }
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
         if (controlActive) {
-            WalkingEffector effector = agent.getEffector(WalkingEffector.class);
-            if (effector == null) {
-                return;
-            }
-            if (TurnLeft.isName(name)) {
-                effector.setTurning(isPressed ? 1 : 0);
-            } else if (TurnRight.isName(name)) {
-                effector.setTurning(isPressed ? -1 : 0);
-            } else if (WalkForward.isName(name)) {
-                effector.setWalking(isPressed ? 1 : 0);
-            } else if (WalkBackward.isName(name)) {
-                effector.setWalking(isPressed ? -1 : 0);
-            }
+            agent.getEffector(WalkingEffector.class).ifPresent(
+                    effector -> applyKeyboardControl(effector, name, isPressed));
+        }
+    }
+
+    private void applyKeyboardControl(WalkingEffector effector, String name, boolean isPressed) {
+        if (TurnLeft.isName(name)) {
+            effector.setTurning(isPressed ? 1 : 0);
+        } else if (TurnRight.isName(name)) {
+            effector.setTurning(isPressed ? -1 : 0);
+        } else if (WalkForward.isName(name)) {
+            effector.setWalking(isPressed ? 1 : 0);
+        } else if (WalkBackward.isName(name)) {
+            effector.setWalking(isPressed ? -1 : 0);
         }
     }
 }

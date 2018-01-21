@@ -1,5 +1,6 @@
 package org.simbrain.world.threedworld;
 
+import com.jme3.scene.Node;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
 import com.jme3.light.Light;
@@ -10,7 +11,7 @@ import com.jme3.scene.Spatial;
  */
 public class ThreeDScene {
     private String name;
-    private transient Spatial node;
+    private transient Node node;
 
     /**
      * Construct a new ThreeDScene with the default name.
@@ -35,7 +36,13 @@ public class ThreeDScene {
         if (node != null) {
             unload(engine);
         }
-        node = engine.getAssetManager().loadModel(name);
+        Spatial model = engine.getAssetManager().loadModel(name);
+        if (model instanceof Node) {
+            node = (Node) model;
+        } else {
+            node = new Node("scene");
+            node.attachChild(model);
+        }
         engine.getRootNode().attachChild(node);
         engine.getPhysicsSpace().addAll(node);
         // HACK: lights must be attached to the root in order to light entities
@@ -71,5 +78,10 @@ public class ThreeDScene {
      */
     public void setName(String value) {
         name = value;
+    }
+
+    /** Return the node which serves as the root for the loaded scene. */
+    public Node getNode() {
+        return node;
     }
 }

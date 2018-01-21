@@ -17,7 +17,6 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
@@ -60,7 +59,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         selectEmitterButton.setIcon(ResourceManager.getSmallIcon("light-bulb.png"));
         selectEmitterButton.setToolTipText("View Emitter Matrix");
         selectEmitterButton.addActionListener(evt -> {
-            component.getImageWorld().selectEmitterMatrix();
+            component.getWorld().selectEmitterMatrix();
         });
         sourceToolbar.add(selectEmitterButton);
 
@@ -68,7 +67,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         resizeEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
         resizeEmitterButton.setToolTipText("Resize Emitter Matrix");
         resizeEmitterButton.addActionListener(evt -> {
-            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getImageWorld());
+            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
             dialog.setVisible(true);
         });
         sourceToolbar.add(resizeEmitterButton);
@@ -77,7 +76,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         viewImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
         viewImageButton.setToolTipText("View Static Image");
         viewImageButton.addActionListener(evt -> {
-            component.getImageWorld().selectStaticSource();
+            component.getWorld().selectStaticSource();
         });
         sourceToolbar.add(viewImageButton);
 
@@ -95,7 +94,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         sensorMatrixCombo.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
             if (selectedSensorMatrix != null) {
-                component.getImageWorld().setCurrentSensorMatrix(selectedSensorMatrix);
+                component.getWorld().setCurrentSensorMatrix(selectedSensorMatrix);
             }
         });
 
@@ -103,7 +102,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
                 ResourceManager.getImageIcon("plus.png"));
         addSensorMatrix.setToolTipText("Add sensor matrix...");
         addSensorMatrix.addActionListener(evt -> {
-            SensorMatrixDialog dialog = new SensorMatrixDialog(component.getImageWorld());
+            SensorMatrixDialog dialog = new SensorMatrixDialog(component.getWorld());
             dialog.setVisible(true);
         });
         sensorToolbar.add(addSensorMatrix);
@@ -113,7 +112,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         deleteSensorMatrix.setToolTipText("Delete sensor matrix");
         deleteSensorMatrix.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            component.getImageWorld().removeSensorMatrix(selectedSensorMatrix);
+            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
         });
         sensorToolbar.add(deleteSensorMatrix);
 
@@ -122,10 +121,10 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         add(toolbars, BorderLayout.NORTH);
         toolbars.add(sourceToolbar);
         toolbars.add(sensorToolbar);
-        add(imageWorldComponent.getImageWorld().getImagePanel(), BorderLayout.CENTER);
-        imageWorldComponent.getImageWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
+        add(imageWorldComponent.getWorld().getImagePanel(), BorderLayout.CENTER);
+        imageWorldComponent.getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
-        component.getImageWorld().addListener(new ImageWorld.Listener() {
+        component.getWorld().addListener(new ImageWorld.Listener() {
             @Override
             public void imageSourceChanged(ImageSource changedSource) {}
 
@@ -142,7 +141,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
         contextMenu = new JPopupMenu();
         multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 5);
-        imageWorldComponent.getImageWorld().getImagePanel().addMouseListener(new MouseAdapter() {
+        imageWorldComponent.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 super.mouseClicked(evt);
@@ -156,8 +155,8 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     /** Reset the combo box for the sensor panels. */
     private void updateComboBox() {
         sensorMatrixCombo.removeAllItems();
-        SensorMatrix selectedSensorMatrix = component.getImageWorld().getCurrentSensorMatrix();
-        for (SensorMatrix sensorMatrix : component.getImageWorld().getSensorMatrices()) {
+        SensorMatrix selectedSensorMatrix = component.getWorld().getCurrentSensorMatrix();
+        for (SensorMatrix sensorMatrix : component.getWorld().getSensorMatrices()) {
             sensorMatrixCombo.addItem(sensorMatrix);
             if (sensorMatrix.equals(selectedSensorMatrix)) {
                 sensorMatrixCombo.setSelectedItem(sensorMatrix);
@@ -171,7 +170,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         File file = fileChooser.showOpenDialog();
         if (file != null) {
             try {
-                component.getImageWorld().loadImage(file.toString());
+                component.getWorld().loadImage(file.toString());
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Unable to load file: " + file.toString());
             }
@@ -180,7 +179,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
     private void showContextMenu(MouseEvent evt) {
         multiCouplingMenu.setSourceModels(component.getSelectedModels());
-        contextMenu.show(component.getImageWorld().getImagePanel(), evt.getX(), evt.getY());
+        contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 
     @Override

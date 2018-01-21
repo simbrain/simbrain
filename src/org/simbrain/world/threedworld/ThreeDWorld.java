@@ -3,6 +3,7 @@ package org.simbrain.world.threedworld;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.AbstractAction;
@@ -164,15 +165,10 @@ public class ThreeDWorld implements AppState {
 
     /**
      * @param name The name of the entity to return.
-     * @return An entity or null if none exists.
+     * @return An entity if it exists.
      */
-    public Entity getEntity(String name) {
-        for (Entity entity : entities) {
-            if (entity.getName().equals(name)) {
-                return entity;
-            }
-        }
-        return null;
+    public Optional<Entity> getEntity(String name) {
+        return entities.stream().filter(e -> e.getName().equals(name)).findFirst();
     }
 
     /**

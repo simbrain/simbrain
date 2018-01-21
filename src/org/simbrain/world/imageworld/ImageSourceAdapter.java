@@ -16,12 +16,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class ImageSourceAdapter implements ImageSource {
 
     private boolean enabled = true;
-    private transient BufferedImage currentImage;
-    private transient List<ImageSourceListener> listeners = new CopyOnWriteArrayList<ImageSourceListener>();
+    private BufferedImage currentImage;
+    private transient List<ImageSourceListener> listeners;
 
     /** Construct a new ImageSourceAdapter and initialize the current image. */
     public ImageSourceAdapter() {
-        currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        this(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
     }
 
     /**
@@ -30,6 +30,13 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public ImageSourceAdapter(BufferedImage currentImage) {
         this.currentImage = currentImage;
+        listeners = new CopyOnWriteArrayList<>();
+    }
+
+    /** Return a deserialized ImageSourceAdapter. */
+    public Object readResolve() {
+        listeners = new CopyOnWriteArrayList<>();
+        return this;
     }
 
     @Override

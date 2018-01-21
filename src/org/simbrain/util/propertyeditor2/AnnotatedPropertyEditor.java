@@ -88,7 +88,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
         this.editedObjects = objects;
-        this.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         add(itemPanel, BorderLayout.CENTER);
         initWidgets();
         fillFieldValues(editedObjects);
@@ -116,8 +116,7 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
 
         widgets = new TreeSet<>();
-        for (Parameter param : Parameter
-                .getParameters(editedObjects.get(0).getClass())) {
+        for (Parameter param : Parameter.getParameters(editedObjects.get(0).getClass())) {
             widgets.add(new ParameterWidget(param));
         }
 

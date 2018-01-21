@@ -82,8 +82,8 @@ public class EditorDialog {
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
         this.editor = editor;
-        editor.readValues();
         contentPane.add(editor.layoutFields(), "Center");
+        editor.readValues();
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout());
         buttonPane.add(okButton);

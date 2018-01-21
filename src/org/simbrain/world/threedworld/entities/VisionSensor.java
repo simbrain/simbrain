@@ -57,7 +57,7 @@ public class VisionSensor extends SensorMatrix implements Sensor {
      * @param agent The agent to attach the sensor to.
      */
     public VisionSensor(Agent agent) {
-        super(agent.getName() + "VisionSensor");
+        super(agent.getName() + ":VisionSensor");
         this.agent = agent;
         agent.addSensor(this);
         initializeView();
@@ -88,7 +88,7 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     @Override
     public String getName() {
-        return agent.getName() + "Vision";
+        return agent.getName() + ":VisionSensor";
     }
 
     @Override

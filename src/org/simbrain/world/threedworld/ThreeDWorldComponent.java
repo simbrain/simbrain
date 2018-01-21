@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
@@ -38,6 +39,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
      */
     public static ThreeDWorldComponent open(InputStream input, String name, String format) {
         ThreeDWorld world = (ThreeDWorld) getXStream().fromXML(input);
+        world.getEngine().queueState(ThreeDEngine.State.RenderOnly, false);
         return new ThreeDWorldComponent(name, world);
     }
 
@@ -110,21 +112,24 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
             return null;
         }
         String[] parsedKey = objectKey.split(":");
-        Entity entity = getWorld().getEntity(parsedKey[0]);
-        if (parsedKey.length == 1) {
-            return entity;
-        } else if (entity instanceof Agent) {
-            String objectType = parsedKey[1];
-            Agent agent = (Agent) entity;
-            if ("sensor".equalsIgnoreCase(objectType)) {
-                String sensorType = parsedKey[2];
-                return agent.getSensor(sensorType);
-            } else if ("effector".equalsIgnoreCase(objectType)) {
-                String effectorType = parsedKey[2];
-                return agent.getEffector(effectorType);
+
+        Optional<Entity> entity = getWorld().getEntity(parsedKey[0]);
+        if (entity.isPresent()) {
+            if (parsedKey.length == 1) {
+                return entity;
+            } else {
+                String objectType = parsedKey[1];
+                Agent agent = (Agent) entity.get();
+                if (objectType.toLowerCase().contains("sensor")) {
+                    return agent.getSensor(objectType);
+                } else if (objectType.toLowerCase().contains("effector")) {
+                    return agent.getEffector(objectType);
+                }
+                return null;
             }
+        } else {
+            return null;
         }
-        return null;
     }
 
     @Override

@@ -300,6 +300,9 @@ public class ThreeDEngine extends Application {
             renderManager.render(tpf, context.isRenderable());
             stateManager.postRender();
         } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong in 3D World.");
+            setState(State.SystemPause);
         }
 
         if (updateSync) {

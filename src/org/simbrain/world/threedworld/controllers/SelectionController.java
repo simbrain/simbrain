@@ -2,7 +2,9 @@ package org.simbrain.world.threedworld.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import com.jme3.scene.Spatial;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.Agent;
@@ -138,9 +140,7 @@ public class SelectionController implements ActionListener, AnalogListener {
         if (!appendSelection) {
             clearSelection();
         }
-        if (entity != null) {
-            addEntityToSelection(entity);
-        }
+        addEntityToSelection(entity);
     }
 
     public void selectAll(List<Entity> entities) {
@@ -318,18 +318,22 @@ public class SelectionController implements ActionListener, AnalogListener {
         if (isTransformActive()) {
             setMoveActive(isPressed);
         } else {
-            Entity entity = getCursorEntity();
-            if (getSelection().contains(entity)) {
-                if (!isPressed) {
+            Optional<Entity> entity = getCursorEntity();
+            if (entity.isPresent()) {
+                if (isPressed) {
+                    select(entity.get());
+                } else {
                     long time = System.currentTimeMillis();
                     if (time - selectReleaseTime < DOUBLE_CLICK_MSEC) {
-                        editorDialog.showEditor(entity.getEditor());
+                        editorDialog.showEditor(entity.get().getEditor());
                     }
                     selectReleaseTime = System.currentTimeMillis();
                 }
                 setMoveActive(isPressed);
             } else {
-                select(entity);
+                if (!appendSelection && hasSelection()) {
+                    clearSelection();
+                }
             }
         }
     }
@@ -434,39 +438,50 @@ public class SelectionController implements ActionListener, AnalogListener {
         }
     }
 
-    public Entity getCursorEntity() {
-        CollisionResult contact = getCursorContact(false);
-        Entity cursorEntity = null;
-        if (contact != null) {
-            String name = contact.getGeometry().getParent().getName();
-            for (Entity entity : world.getEntities()) {
-                if (name.contains(entity.getName())) {
-                    cursorEntity = entity;
-                }
+    public Optional<Entity> getCursorEntity() {
+        CollisionResults results = getCursorContacts();
+        for (CollisionResult result : results) {
+            String name = result.getGeometry().getParent().getName();
+            Optional<Entity> entity = world.getEntity(name);
+            if (entity.isPresent()) {
+                return entity;
             }
         }
-        return cursorEntity;
+        return Optional.empty();
     }
 
     public CollisionResult getCursorContact(boolean excludeSelected) {
         ThreeDEngine engine = world.getEngine();
         Vector2f click2d = engine.getInputManager().getCursorPosition();
-        Vector3f click3d = engine.getCamera().getWorldCoordinates(click2d, 0f);
+        Vector3f click3d = engine.getCamera().getWorldCoordinates(click2d, 0.01f);
         Vector3f direction = engine.getCamera().getWorldCoordinates(click2d, 1f);
         direction.subtractLocal(click3d).normalizeLocal();
         Ray ray = new Ray(click3d, direction);
         CollisionResults results = new CollisionResults();
         engine.getRootNode().collideWith(ray, results);
-        Node excludeNode = null;
-        if (excludeSelected && hasSelection()) {
-            excludeNode = getSelectedEntity().getNode();
-        }
-        for (CollisionResult result : results) {
-            if (excludeNode == null || !excludeNode.hasChild(result.getGeometry())) {
-                return result;
+        if (hasSelection() && excludeSelected) {
+            Node selection = getSelectedEntity().getNode();
+            for (CollisionResult result : results) {
+                if (!selection.hasChild(result.getGeometry())) {
+                    return result;
+                }
             }
+            return null;
+        } else {
+            return results.getClosestCollision();
         }
-        return null;
+    }
+
+    public CollisionResults getCursorContacts() {
+        ThreeDEngine engine = world.getEngine();
+        Vector2f click2d = engine.getInputManager().getCursorPosition();
+        Vector3f click3d = engine.getCamera().getWorldCoordinates(click2d, 0.01f);
+        Vector3f direction = engine.getCamera().getWorldCoordinates(click2d, 1f);
+        direction.subtractLocal(click3d).normalizeLocal();
+        Ray ray = new Ray(click3d, direction);
+        CollisionResults results = new CollisionResults();
+        engine.getRootNode().collideWith(ray, results);
+        return results;
     }
 
     public void addListener(SelectionListener listener) {

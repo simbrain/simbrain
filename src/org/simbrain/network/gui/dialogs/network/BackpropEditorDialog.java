@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
@@ -36,7 +37,30 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
     /** Reference to the backprop network being edited. */
     private BackpropNetwork backprop;
-    
+
+    /** An update action to update the backprop trainer when the network is updated. */
+    private NetworkUpdateAction updater = new NetworkUpdateAction() {
+        @Override
+        public void invoke() {
+            try {
+                currentTrainer.apply();
+            } catch (Trainer.DataNotInitializedException ex) {
+                JOptionPane.showMessageDialog(null, "Unable to apply trainer: data not initialized.");
+            }
+        }
+
+        @Override
+        public String getDescription() {
+            return "Apply Backprop Trainer";
+        }
+
+        @Override
+        public String getLongDescription() {
+            return "Applies one training step (usually one epoch) of the currently opened trainer dialog to the" +
+                   "associated BackpropNetwork.";
+        }
+    };
+
     /**
      * Make it easy to switch between the new, experimental trainer
      * (BackpropTrainer2), and the old one. Once that's stabilized this code can
@@ -71,13 +95,14 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         } else {
             currentTrainer = new BackpropTrainer(backprop);
         }
+        networkPanel.getNetwork().getUpdateManager().addAction(updater);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, currentTrainer);
         addTab("Train", iterativeControls);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 currentTrainer.commitChanges();
-                backprop.setTrainer(null);
+                networkPanel.getNetwork().getUpdateManager().removeAction(updater);
             }
         });
     }

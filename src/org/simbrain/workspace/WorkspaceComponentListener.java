@@ -26,24 +26,25 @@ package org.simbrain.workspace;
  */
 public interface WorkspaceComponentListener {
 
-    /**
-     * Called when the workspace component is updated.
-     */
+    /** Called when the workspace component is updated. */
     public void componentUpdated();
 
-    /**
-     * Called when the component's gui(s) are turned on or off.
-     */
+    /** Called when the component's gui(s) are turned on or off. */
     public void guiToggled();
 
-    /**
-     * Called when the component is turned on or off.
-     */
+    /** Called when the component is turned on or off. */
     public void componentOnOffToggled();
 
-    /**
-     * Called when closing this component.
-     */
+    /** Called when closing this component. */
     public void componentClosing();
+
+    /** Called whenever a model object is added to this component. */
+    public void modelAdded(Object addedModel);
+
+    /** Called whenever a model object is removed from this component. */
+    public void modelRemoved(Object removedModel);
+
+    /** Called whenever a model object for this component changes. */
+    public void modelChanged(Object changedModel);
 
 }

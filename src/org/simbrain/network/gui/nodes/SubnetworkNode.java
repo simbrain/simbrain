@@ -36,6 +36,7 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronGroupNode.NeuronGroupInteractionBox;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -113,6 +114,20 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     }
 
     /**
+     * Set a custom interaction box.
+     *
+     * @param newBox
+     *            the newBox to set.
+     */
+    protected void setInteractionBox(SubnetworkNodeInteractionBox newBox) {
+        this.removeChild(interactionBox);
+        this.interactionBox = newBox;
+        this.addChild(interactionBox);
+        updateText();
+    }
+
+
+    /**
      * Update the text in the interaction box.
      */
     public void updateText() {
@@ -165,7 +180,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
      * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
-    private class SubnetworkNodeInteractionBox extends InteractionBox {
+    public class SubnetworkNodeInteractionBox extends InteractionBox {
 
         public SubnetworkNodeInteractionBox(NetworkPanel net) {
             super(net);

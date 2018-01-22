@@ -1,0 +1,15 @@
+Material Hand : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        HighQuality: True
+        UseMaterialColors: True
+        DiffuseMap : Textures/hand_d.png
+        Shininess : 0.01
+        SpecularMap : Textures/hand_s.png
+        NormalMap : Textures/hand_n.png
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        Ambient : 1.0 1.0 1.0 1.0
+     }
+    AdditionalRenderState {
+    }
+}

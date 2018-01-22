@@ -45,7 +45,7 @@ import javax.swing.SpringLayout;
 import javax.swing.filechooser.FileFilter;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 
 /**
  * <b>WorkspaceChangedDialog</b> tells the user what components have changed

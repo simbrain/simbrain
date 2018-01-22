@@ -41,58 +41,21 @@ public class SquashingFunctions {
      * @return the value of val after being passed through a tanh function with
      *         these parameters
      */
-    public static double tanh(double val, double ceil, double floor,
-            double slope) {
+    public static double tanh(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
         return (diff / 2) * Math.tanh(a * val) + ((ceil + floor) / 2);
     }
 
-    public static void tanh(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
+    public static void tanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
-        if (valIn != valOut) {
-            valOut.copy(valIn);
+        if (in != out) {
+            out.copy(in);
         }
-        MatrixFunctions.tanhi(valOut.muli(a));
-        valOut.muli(diff / 2);
-        valOut.addi((ceil + floor) / 2);
-    }
-
-    /**
-     * The logistic function given an upper and lower limit and slope for a
-     * particular value.
-     *
-     * @param val the input to the logistic function
-     * @param ceil the desired maximum value (upper boundary) of logistic
-     * @param floor the desired minimum value (lower boundary) of logistic
-     * @param slope the desired slope of the logistic function for val == 0
-     * @return the value of val after being passed through a logistic function
-     *         with these parameters
-     *         
-     * @author Scott Hotton
-     */
-    public static double logistic(double val, double u, double l,
-            double slope) {
-        return (u - l) * logistic((4 * slope * val) / (u - l)) + l;
-    }
-
-    // TODO: Test
-    public static void logistic(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
-        if (valIn != valOut) {
-            valOut.copy(valIn);
-        }
-        for (int ii = 0; ii < valIn.length; ii++) {
-            valOut.data[ii] = logistic(valOut.data[ii]);  //TODO: For testing Mazur
-            //valOut.data[ii] = logistic(valOut.data[ii], ceil, floor, slope);
-        }
-        // valOut.muli(-slope/diff);
-        // MatrixFunctions.expi(valOut);
-        // valOut.addi(1);
-        // valOut.rdivi(diff);
-        // valOut.addi(floor);
+        MatrixFunctions.tanhi(out.muli(a));
+        out.muli(diff / 2);
+        out.addi((ceil + floor) / 2);
     }
 
     /**
@@ -107,6 +70,38 @@ public class SquashingFunctions {
     }
 
     /**
+     * The logistic function given an upper and lower limit and slope for a
+     * particular value.
+     *
+     * @param val the input to the logistic function
+     * @param ceil the desired maximum value (upper boundary) of logistic
+     * @param floor the desired minimum value (lower boundary) of logistic
+     * @param slope the desired slope of the logistic function for val == 0
+     * @return the value of val after being passed through a logistic function with these parameters
+     *         
+     * @author Scott Hotton
+     */
+    public static double logistic(double val, double ceil, double floor, double slope) {
+        return (ceil - floor) * logistic((4 * slope * val) / (ceil - floor)) + floor;
+    }
+
+    /**
+     * Compute the scaled logistic function on a DoubleMatrix of input values.
+     * @param in The input array, will not be modified.
+     * @param out The output array, will be overwritten with the result.
+     * @param ceil The upper limit of the logistic curve.
+     * @param floor The lower limit of the logistic curve.
+     * @param slope The slope of the curve at val == 0.
+     */
+    public static void logistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        // Same as double form above
+        double s = 4 * slope / (ceil - floor);
+        in.muli(s, out);
+        MatrixFunctions.expi(out.negi()).addi(1).rdivi(1);
+        out.muli(ceil - floor).addi(floor);
+    }
+
+    /**
      * The arctan function given an upper and lower limit and slope for a
      * particular value.
      *
@@ -117,24 +112,22 @@ public class SquashingFunctions {
      * @return the value of val after being passed through a arctan function
      *         with these parameters
      */
-    public static double atan(double val, double ceil, double floor,
-            double slope) {
+    public static double atan(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
         return (diff / Math.PI) * Math.atan(a * val) + ((ceil + floor) / 2);
     }
 
-    public static void atan(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
+    public static void atan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
-        if (valIn != valOut) {
-            valOut.copy(valIn);
+        if (in != out) {
+            out.copy(in);
         }
-        valOut.muli(a);
-        MatrixFunctions.atani(valOut);
-        valOut.muli(diff / Math.PI);
-        valOut.addi((ceil + floor) / 2);
+        out.muli(a);
+        MatrixFunctions.atani(out);
+        out.muli(diff / Math.PI);
+        out.addi((ceil + floor) / 2);
     }
 
     /*
@@ -157,31 +150,22 @@ public class SquashingFunctions {
      * @return the value of val after being passed through the inverse tanh
      *         function with these parameters
      */
-    public static double invTanh(double val, double ceil, double floor,
-            double slope) {
+    public static double invTanh(double val, double ceil, double floor, double slope) {
         double z = 0.5 * (((val - floor) / (ceil - floor)) - 0.5);
-        return (Math.log((1 + z)) / (1 - z));
+        return Math.log((1 + z)) / (1 - z);
     }
 
-    public static void invTan(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
-        if (valIn != valOut) {
-            valOut.copy(valIn);
+    public static void invTanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        if (in != out) {
+            out.copy(in);
         }
-        valOut.addi(-floor);
-        valOut.rdivi(ceil - floor);
-        valOut.addi(-0.5);
-        valOut.muli(0.5);
-        DoubleMatrix temp;
-        if (valOut.isVector())
-            temp = new DoubleMatrix(valOut.toArray());
-        else
-            temp = new DoubleMatrix(valOut.toArray2()); // TODO: make this not
-                                                        // dumb
-        valOut.addi(1);
-        temp.rsubi(1);
-        valOut.rdivi(temp);
-        MatrixFunctions.logi(valOut);
+        out.addi(-floor);
+        out.rdivi(ceil - floor);
+        out.addi(-0.5);
+        out.muli(0.5);
+        // One matrix allocation here could be expensive
+        DoubleMatrix denom = out.rsub(1);
+        MatrixFunctions.logi(out.addi(1)).divi(denom);
     }
 
     /**
@@ -198,10 +182,15 @@ public class SquashingFunctions {
      * @return the value of val after being passed through the inverse logistic
      *         function with these parameters.
      */
-    public static double invLogistic(double val, double ceil, double floor,
-            double slope) {
+    public static double invLogistic(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         return diff * -Math.log(diff / (val - floor) - 1) / slope;
+    }
+
+    public static void invLogistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length; ++i) {
+            out.data[i] = invLogistic(in.data[i], ceil, floor, slope);
+        }
     }
 
     /**
@@ -217,12 +206,17 @@ public class SquashingFunctions {
      * @return the value of val after being passed through the inverse arctan
      *         function with these parameters
      */
-    public static double invAtan(double val, double ceil, double floor,
-            double slope) {
+    public static double invAtan(double val, double ceil, double floor, double slope) {
         double a = (Math.PI * slope) / (ceil - floor);
         double diff = ceil - floor;
         double z = ((val - ((ceil + floor) / 2)) * (Math.PI / diff));
         return Math.tan(z) / a;
+    }
+
+    public static void invAtan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length; ++i) {
+            out.data[i] = invAtan(in.data[i], ceil, floor, slope);
+        }
     }
 
     /*
@@ -245,20 +239,19 @@ public class SquashingFunctions {
      * @return the value of val after being passed through the derivative of the
      *         tanh function with these parameters
      */
-    public static double derivTanh(double val, double ceil, double floor,
-            double slope) {
+    public static double derivTanh(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
         return diff / 2 * a * Math.pow(1 / Math.cosh(a * val), 2);
     }
 
-    public static void derivTanh(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
+    public static void derivTanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
-        if (valIn != valOut) {
-            valOut.copy(valIn);
-        }
+        in.muli(a, out);
+        MatrixFunctions.coshi(out).rdivi(1);
+        MatrixFunctions.powi(out, 2);
+        out.muli(a * diff / 2);
     }
 
     /**
@@ -266,45 +259,58 @@ public class SquashingFunctions {
      * upper and lower bounds, and slope for a given value.
      *
      * @param val the input to the derivative of the logistic function
-     * @param u the desired maximum value (upper boundary) of the logistic
+     * @param ceil the desired maximum value (upper boundary) of the logistic
      *            function that this is the derivative of
-     * @param l the desired minimum value (lower boundary) of the logistic
+     * @param floor the desired minimum value (lower boundary) of the logistic
      *            function that this is the derivative of
-     * @param m the desired slope of the logistic function function that this is
+     * @param slope the desired slope of the logistic function function that this is
      *            the derivative of for val == 0
      * @return the value of val after being passed through the derivative of the
      *         logistic function with these parameters.
      * 
      * @author Scott Hotton
      */
-    public static double derivLogistic(double val, double u, double l,
-            double m) {
-        double logisticOutput = logistic(val, u, l, m);
-        return (4 * m) / ((u - l) * (u - l)) * (logisticOutput - l)
-                * (u - logisticOutput);
+    public static double derivLogistic(double val, double ceil, double floor, double slope) {
+        double logisticOutput = logistic(val, ceil, floor, slope);
+        return (4 * slope) / ((ceil - floor) * (ceil - floor)) * (logisticOutput - floor) * (ceil - logisticOutput);
     }
 
     /**
-     * ASSUMES valIn is the ACTIVATION NOT NET input since this is how the
-     * derivative of the logistic sigmoid works... for this reason ceil and
-     * floor do nothing.
-     * 
-     * @param valIn
-     * @param valOut
-     * @param ceil
-     * @param floor
-     * @param slope
+     * Calculate the derivative of the logistic function at each value in the input array.
+     * @param in The input array, will not be modified.
+     * @param out The output array.
+     * @param ceil The upper bound on the logistic function.
+     * @param floor The lower bound on the logistic function.
+     * @param slope The slope of the logistic function.
      */
-    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut,
-            double ceil, double floor, double slope) {
-        if (valIn != valOut) {
-            valOut.copy(valIn);
+    public static void derivLogistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        if (in != out) {
+            out.copy(in);
         }
-        //TODO use matrix operations
-        for (int ii = 0; ii < valOut.data.length; ++ii) {
-            valOut.data[ii] = derivLogistic(valOut.data[ii], ceil, floor,
-                    slope);
+        for (int ii = 0; ii < out.data.length; ++ii) {
+            out.data[ii] = derivLogistic(out.data[ii], ceil, floor, slope);
         }
+    }
+
+    /**
+     * Calculate the logistic function and its derivative on each value of the input array. Makes use of an
+     * optimization to avoid recomputing the logistic.
+     * @param in The input array, will not be modified.
+     * @param out The output array.
+     * @param deriv The derivative array.
+     * @param ceil The upper bound of the logistic function.
+     * @param floor The lower bound of the logistic function.
+     * @param slope The slope of the logistic function.
+     */
+    public static void logisticWithDerivative(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil,
+                                              double floor, double slope) {
+        logistic(in, out, ceil, floor, slope);
+        // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
+        out.rsubi(ceil, deriv);
+        out.subi(floor);
+        deriv.muli(out).muli((4 * slope) / ((ceil - floor) * (ceil - floor)));
+        // Restore out after calculating the derivative
+        out.addi(floor);
     }
 
     /**
@@ -321,11 +327,16 @@ public class SquashingFunctions {
      * @return the value of val after being passed through the derivative of the
      *         arctan function with these parameters
      */
-    public static double derivAtan(double val, double ceil, double floor,
-            double slope) {
+    public static double derivAtan(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
         return a * (diff / Math.PI) * (1 / (1 + Math.pow(a * val, 2)));
+    }
+
+    public static void derivAtan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length; ++i) {
+            out.data[i] = derivAtan(in.data[i], ceil, floor, slope);
+        }
     }
 
 }

@@ -18,35 +18,27 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 
-import javax.swing.JCheckBoxMenuItem;
-
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.*;
 
 /**
  * A menu item corresponding to a potential coupling. When the menuitem is
- * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java)
- * It's a checkbox menu item. Checking it creates the coupling, unchecking it
- * removes it.
+ * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java).
  */
-public class CouplingMenuItem extends JCheckBoxMenuItem {
+public class CouplingMenuItem extends JMenuItem {
 
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private final PotentialProducer potentialProducer;
+    private Producer producer;
 
     /** Reference to consuming attribute. */
-    private final PotentialConsumer potentialConsumer;
+    private Consumer consumer;
 
     /** The workspace this object belongs to. */
-    private final Workspace workspace;
+    private Workspace workspace;
 
     /**
      * Creates a new instance.
@@ -56,40 +48,16 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * @param producer The producer for the coupling.
      * @param consumer The consumer for the coupling.
      */
-    @SuppressWarnings("unchecked")
-    public CouplingMenuItem(final Workspace workspace,
-            final String description, final PotentialProducer producer,
-            final PotentialConsumer consumer) {
-        super(description, workspace.getCouplingManager()
-                .containseEquivalentCoupling(
-                        new Coupling(producer.createProducer(), consumer
-                                .createConsumer())));
+    public CouplingMenuItem(Workspace workspace, String description, Producer producer, Consumer consumer) {
+        super(description);
+        this.setIcon(null);
         this.workspace = workspace;
-        this.potentialProducer = producer;
-        this.potentialConsumer = consumer;
-
-        addActionListener(listener);
+        this.producer = producer;
+        this.consumer = consumer;
+        // Listen for events where this item is clicked.
+        addActionListener(evt -> {
+            Coupling coupling = workspace.getCouplingFactory().tryCoupling(producer, consumer);
+            setSelected(true);
+        });
     }
-
-    /**
-     * Listens for events where this item is clicked. If this item is selected
-     * when there is no coupling one is created. If it is selected, then the
-     * coupling is removed.
-     */
-    @SuppressWarnings("unchecked")
-    private final ActionListener listener = new ActionListener() {
-        public void actionPerformed(final ActionEvent e) {
-            if (getState()) {
-                workspace.addCoupling(new Coupling(potentialProducer
-                        .createProducer(), potentialConsumer.createConsumer()));
-                setSelected(true);
-            } else {
-                workspace.getCouplingManager().removeMatchingCoupling(
-                        new Coupling(potentialProducer.createProducer(),
-                                potentialConsumer.createConsumer()));
-                setSelected(false);
-            }
-        }
-    };
-
 }

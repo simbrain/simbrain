@@ -28,32 +28,23 @@ import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * 
  * An abstract superclass for discrete and continuous time sigmodial squashing
- * function based update rules containing methods and variables common to
- * both.
+ * function based update rules containing methods and variables common to both.
  * 
  * @author Zoë Tosi
- *
  */
 public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
     BoundedUpdateRule, NoisyUpdateRule {
 
-    /**
-     * The default squashing function, informs the default upper and lower
-     * bounds.
-     */
-    public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
-        SquashingFunction.LOGISTIC;
+    /** The default squashing function, informs the default upper and lower bounds. */
+    public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION = SquashingFunction.LOGISTIC;
 
     /** The Default upper bound. */
-    public static final double DEFAULT_UPPER_BOUND =
-        DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
+    public static final double DEFAULT_UPPER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
 
     /** The Default lower bound. */
-    public static final double DEFAULT_LOWER_BOUND =
-        DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
+    public static final double DEFAULT_LOWER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
 
     /** Current implementation. */
     protected SquashingFunction sFunction;
@@ -184,8 +175,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
      * @param sr the sigmoid rule to copy
      * @return the copy.
      */
-    protected final AbstractSigmoidalRule baseDeepCopy(
-            final AbstractSigmoidalRule sr) {
+    protected AbstractSigmoidalRule baseDeepCopy(AbstractSigmoidalRule sr) {
         sr.setBias(getBias());
         sr.setSquashFunctionType(getSquashFunctionType());
         sr.setSlope(getSlope());

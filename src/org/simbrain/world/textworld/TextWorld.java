@@ -321,6 +321,7 @@ public abstract class TextWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.ignoreUnknownElements();
         xstream.omitField(TextWorld.class, "listenerList");
         return xstream;
     }

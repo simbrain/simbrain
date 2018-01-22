@@ -25,7 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,8 +39,10 @@ import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * The main controller panel for iterative learning, with buttons etc. to run
@@ -53,6 +54,22 @@ import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
  * @author Jeff Yoshimi
  */
 public class IterativeControlsPanel extends JPanel {
+
+    // A small helper method to reduce code repetition. This could be moved to util somewhere.
+    private static Action createAction(String name, String description, String iconFile, Runnable runnable) {
+        return new AbstractAction() {
+            {
+                putValue(NAME, name);
+                putValue(SHORT_DESCRIPTION, description);
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconFile));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runnable.run();
+            }
+        };
+    }
 
     /** Reference to trainer object. */
     private IterableTrainer trainer;
@@ -78,28 +95,31 @@ public class IterativeControlsPanel extends JPanel {
     /** The error listener. */
     private ErrorListener errorListener;
 
-    /**
-     * Construct the panel with no trainer. It will be supplied later once it
-     * has been created. This is used by SRN and ESN for example where the
-     * "logical input data" must first be constructed and only then is the
-     * trainer created.
-     *
-     * @param networkPanel the parent network panel
-     */
-    public IterativeControlsPanel(final NetworkPanel networkPanel) {
-        this.panel = networkPanel;
-        init();
-    }
+    /** A play action that repeatedly iterates training algorithms. */
+    private Action runAction = createAction("Run", "Iterate training until stop button is pressed.", "Play.png",
+            this::run);
+
+    /** A step action that iterates learning algorithms one time. */
+    private Action stepAction = createAction("Iterate", "Iterate training once.", "Step.png", this::iterate);
+
+    /** Action for randomizing the underlying network. */
+    private Action randomizeAction = createAction("Randomize", "Randomize network.", "Rand.png",
+            this::randomizeNetwork);
+
+    /** Action for setting properties of the trainer. */
+    private Action setPropertiesAction = createAction("Properties", "Edit trainer properties.", "Prefs.png",
+            this::editTrainerProperties);
+
+    /** Action for setting randomizer properties. */
+    private Action randPropertiesAction = createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png",
+            this::editRandomizerProperties);
 
     /**
-     * Construct the panel with a trainer specified.
-     *
+     * Construct the panel.
      * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
-    public IterativeControlsPanel(final NetworkPanel networkPanel,
-            final IterableTrainer trainer) {
-
+    public IterativeControlsPanel(NetworkPanel networkPanel, IterableTrainer trainer) {
         this.trainer = trainer;
         this.panel = networkPanel;
         init();
@@ -109,7 +129,6 @@ public class IterativeControlsPanel extends JPanel {
      * Initialize the panel.
      */
     public void init() {
-
         //setBorder(BorderFactory.createTitledBorder("Controls"));
 
         // Set up properties tab
@@ -122,12 +141,16 @@ public class IterativeControlsPanel extends JPanel {
         runTools.add(new JLabel("Iterate: "));
         runTools.add(new JButton(runAction));
         runTools.add(new JButton(stepAction));
-        //showUpdates
-        //        .setToolTipText("Update display of network while iterating trainer (slows performance but didactically useful)");
+        //showUpdates.setToolTipText(
+        //    "Update display of network while iterating trainer (slows performance but didactically useful)");
         //runTools.add(showUpdates);
         JButton propertiesButton = new JButton(setPropertiesAction);
         propertiesButton.setHideActionText(true);
         runTools.add(propertiesButton);
+
+        JButton randPropertiesButton = new JButton(randPropertiesAction);
+        runTools.add(randPropertiesButton);
+
         JButton randomizeButton = new JButton(randomizeAction);
         randomizeButton.setHideActionText(true);
         runTools.add(randomizeButton);
@@ -163,25 +186,15 @@ public class IterativeControlsPanel extends JPanel {
         addErrorListener();
     }
 
-    /**
-     * Add an error listener.
-     */
-    public void addErrorListener() {
-        // Add listener
-        if (trainer != null) {
-            if (errorListener != null) {
-                trainer.removeErrorListener(errorListener);
-            }
-            errorListener = new ErrorListener() {
-
-                public void errorUpdated() {
-                    iterationsLabel.setText("" + trainer.getIteration());
-                    updateError();
-                }
-
-            };
-            trainer.addErrorListener(errorListener);
+    /** Add an error listener to the trainer to update error views. */
+    private void addErrorListener() {
+        if (errorListener != null) {
+            trainer.removeErrorListener(errorListener);
         }
+        trainer.addErrorListener(() -> {
+            iterationsLabel.setText("" + trainer.getIteration());
+            updateError();
+        });
     }
 
     /**
@@ -206,169 +219,6 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     /**
-     * A "play" action, that can be used to repeatedly iterate iterable training
-     * algorithms.
-     *
-     */
-    private Action runAction = new AbstractAction() {
-
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
-            // putValue(NAME, "Open (.csv)");
-            // TODO: Later change to "until stopping condition met".
-            putValue(SHORT_DESCRIPTION,
-                    "Iterate training until stop button pressed.");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            initTrainer(false);
-            if (trainer == null) {
-                return;
-            }
-            if (trainer.isUpdateCompleted()) {
-                // Start running
-                trainer.setUpdateCompleted(false);
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
-                Executors.newSingleThreadExecutor().submit(new Runnable() {
-                    public void run() {
-                        try {
-                            while (!trainer.isUpdateCompleted()) {
-                                trainer.iterate();
-//                                if (showUpdates.isSelected()) {
-//                                    panel.getNetwork()
-//                                            .setUpdateCompleted(false);
-//                                    panel.getNetwork().fireGroupUpdated(
-//                                            trainer.getTrainableNetwork()
-//                                                    .getNetwork());
-//                                    while (!panel.getNetwork()
-//                                            .isUpdateCompleted()) {
-//                                        try {
-//                                            Thread.sleep(1);
-//                                        } catch (InterruptedException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }
-                            }
-                        } catch (DataNotInitializedException e) {
-                            JOptionPane.showOptionDialog(null, e.getMessage(),
-                                    "Warning", JOptionPane.DEFAULT_OPTION,
-                                    JOptionPane.WARNING_MESSAGE, null, null,
-                                    null);
-                        }
-                    }
-                });
-            } else {
-                // Stop running
-                trainer.setUpdateCompleted(true);
-                trainer.revalidateSynapseGroups();
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
-            }
-
-        }
-
-    };
-
-    /**
-     * A step action, for iterating iteratable learning algorithms one time.
-     */
-    private Action stepAction = new AbstractAction() {
-
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-            // putValue(NAME, "Open (.csv)");
-            putValue(SHORT_DESCRIPTION, "Iterate training once");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            initTrainer(false);
-            if (trainer == null) {
-                return;
-            }
-            try {
-                trainer.iterate();
-//                if (showUpdates.isSelected()) {
-//                    panel.getNetwork().fireGroupUpdated(
-//                            trainer.getTrainableNetwork().getNetwork());
-//                }
-                trainer.revalidateSynapseGroups();
-            } catch (DataNotInitializedException e) {
-                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
-            }
-        }
-
-    };
-
-    /**
-     * Action for randomizing the underlying network.
-     */
-    private Action randomizeAction = new AbstractAction() {
-
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-            putValue(NAME, "Randomize");
-            putValue(SHORT_DESCRIPTION, "Randomize network");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            initTrainer(true);
-            if (trainer != null) {
-                trainer.randomize();
-                panel.getNetwork().fireGroupUpdated(
-                        trainer.getTrainableNetwork().getNetwork());
-            }
-        }
-    };
-
-    /**
-     * Action for setting properties.
-     */
-    private Action setPropertiesAction = new AbstractAction() {
-
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-            putValue(NAME, "Properties");
-            putValue(SHORT_DESCRIPTION, "Edit Trainer Settings...");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            initTrainer(false);
-            if (trainer == null) {
-                return;
-            }
-            ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-            // TODO: un-exclude once those features are implemented!
-            editor.setExcludeList(new String[] { "iteration",
-                    "updateCompleted", "stoppingCond", "stoppingCondition",
-                    "iterationsBeforeStopping", "errorThreshold" });
-            editor.setObject(trainer);
-            JDialog dialog = editor.getDialog();
-            dialog.setModal(true);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-        }
-    };
-
-    /**
      * @return the trainer
      */
     public IterableTrainer getTrainer() {
@@ -380,6 +230,90 @@ public class IterativeControlsPanel extends JPanel {
      */
     public void setTrainer(IterableTrainer trainer) {
         this.trainer = trainer;
+    }
+
+    private void run() {
+        if (trainer.isUpdateCompleted()) {
+            //TODO: Relation to stop trainer
+            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
+            startRunning();
+        } else {
+            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            stopRunning();
+        }
+    }
+
+    private void startRunning() {
+        initTrainer(false);
+        trainer.setUpdateCompleted(false);
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                while (!trainer.isUpdateCompleted()) {
+                    trainer.iterate();
+                }
+            } catch (DataNotInitializedException e) {
+                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
+            }
+        });
+    }
+
+    private void stopRunning() {
+        trainer.setUpdateCompleted(true);
+        trainer.revalidateSynapseGroups();
+        trainer.commitChanges();
+    }
+
+    private void iterate() {
+        initTrainer(false);
+        try {
+            trainer.iterate();
+            trainer.revalidateSynapseGroups();
+        } catch (DataNotInitializedException e) {
+            JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, null, null);
+        }
+    }
+
+    private void randomizeNetwork() {
+        initTrainer(true);
+        trainer.randomize();
+        panel.getNetwork().fireGroupUpdated(trainer.getTrainableNetwork().getNetwork());
+    }
+
+    private void editTrainerProperties() {
+        initTrainer(false);
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+        // TODO: un-exclude once those features are implemented!
+        editor.setExcludeList(new String[] { "iteration", "updateCompleted", "stoppingCond",
+                "stoppingCondition", "iterationsBeforeStopping", "errorThreshold" });
+        editor.setObjectToEdit(trainer);
+        JDialog dialog = editor.getDialog();
+        dialog.setModal(true);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private void editRandomizerProperties() {
+        StandardDialog dialog = new StandardDialog(null, "Randomizer Properties") {
+            RandomizerPanel randomPanel = new RandomizerPanel(this);
+
+            // Initializer
+            {
+                setContentPane(randomPanel);
+                trainer.getRandomizer().ifPresent(randomPanel::fillFieldValues);
+            }
+
+            @Override
+            protected void closeDialogOk() {
+                super.closeDialogOk();
+                trainer.getRandomizer().ifPresent(randomPanel::commitRandom);
+            }
+        };
+        dialog.setLocationRelativeTo(null);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
 }

@@ -35,6 +35,7 @@ import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -51,11 +52,11 @@ import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.DataPoint;
@@ -301,19 +302,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         theToolBar.add(randomBtn);
         theToolBar.addSeparator();
         warningLabel.setPreferredSize(new Dimension(16, 16));
-        warningLabel.setToolTipText("This method works best with more "
-                + "datapoints already added");
+        warningLabel.setToolTipText("This method works best with more datapoints already added");
         theToolBar.add(warningLabel);
         String stepSizeToolTip = "Scales the amount points are moved on each iteration";
         JLabel stepSizeLabel = new JLabel("Step Size");
         stepSizeLabel.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(stepSizeLabel);
-        try {
-            sammonStepSize = new JTextField(""
-                    + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
-        } catch (PropertyNotFoundException e1) {
-            e1.printStackTrace();
-        }
+        sammonStepSize = new JFormattedTextField("" + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
         sammonStepSize.setColumns(3);
         sammonStepSize.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(sammonStepSize);
@@ -481,30 +476,15 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     private void addListeners() {
         getWorkspaceComponent().getProjectionModel().addListener(
                 new ChartListener() {
-
-                    /**
-                     * Update bottom stats when a data source is added.
-                     */
-                    public void dataSourceAdded(int index) {
+                    public void dataSourceAdded(ChartDataSource source) {
                         update();
                         updateCoordinateProjectionComboBoxes();
                     }
 
-                    /**
-                     * Update bottom stats when a data source is removed
-                     */
-                    public void dataSourceRemoved(int index) {
+                    public void dataSourceRemoved(ChartDataSource source) {
                         update();
                         updateCoordinateProjectionComboBoxes();
                     }
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void chartInitialized(int numSources) {
-                        update();
-                    }
-
                 });
 
         // Listen to events from the underlying projector model.
@@ -548,8 +528,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                         .getProjectionMethod();
                 if (proj != null) {
                     if (proj instanceof ProjectSammon) {
-                        ((ProjectSammon) proj).setEpsilon(Double
-                                .parseDouble(sammonStepSize.getText()));
+                        ((ProjectSammon) proj).setEpsilon(
+                                Utils.doubleParsable(sammonStepSize.getText()));
                     }
                 }
             }
@@ -629,7 +609,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                         .getProjector().getDimensions());
                 int dims = Integer.parseInt(dimsString); //todo; Catch exception
                 getWorkspaceComponent().getProjectionModel().init(dims);
-                getWorkspaceComponent().initializeConsumers();
             }
 
         });

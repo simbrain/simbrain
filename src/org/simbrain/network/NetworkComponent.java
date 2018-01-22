@@ -27,15 +27,12 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -69,330 +66,59 @@ public final class NetworkComponent extends WorkspaceComponent {
         init();
     }
 
-    /**
-     * Initialize attribute types and listeners.
-     */
+    /** Initialize attribute types and listeners. */
     private void init() {
-
-        // Initialize attribute types and their default visibility
-        addProducerType(new AttributeType(this, "Neuron Activation", "getActivation",
-                double.class, true));
-        addProducerType(new AttributeType(this, "Neuron Upper Bound", "getUpperBound",
-                double.class, false));
-        addProducerType(new AttributeType(this, "Neuron Lower Bound", "getLowerBound",
-                double.class, false));
-        addProducerType(new AttributeType(this, "Neuron Label", "getLabel",
-                String.class, false));
-        addProducerType(new AttributeType(this, "Synapse", "getStrength",
-                double.class, false));
-        addProducerType(new AttributeType(this, "NeuronGroupActivations",
-                "getExternalActivations", double[].class, true));
-        addProducerType(new AttributeType(this, "NeuronGroupSpikes",
-                "getSpikeIndexes", double[].class, true));
-        addProducerType(new AttributeType(this, "SynapseGroup",
-                "getWeightVector", double[].class, true));
-
-        addConsumerType(new AttributeType(this, "Neuron Input Value", "setInputValue",
-                double.class, true));
-        addConsumerType(new AttributeType(this, "Neuron Activation", "setActivation",
-                double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron Upper Bound", "setUpperBound",
-                double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron Lower Bound", "setLowerBound",
-                double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron Label", "setLabel",
-                String.class, false));
-        addConsumerType(new AttributeType(this, "Synapse", "setStrength",
-                double.class, false));
-        addConsumerType(new AttributeType(this, "NeuronGroup",
-                "setInputValues", double[].class, true));
-        addConsumerType(new AttributeType(this, "SynapseGroup",
-                "setWeightVector", double[].class, false));
-
         network.addNeuronListener(new NeuronListener() {
-            /**
-             * {@inheritDoc}
-             */
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelAdded(e);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(e);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronMoved(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void neuronRemoved(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
-                fireAttributeObjectRemoved(e.getObject());
+                fireModelRemoved(e);
             }
 
-            @Override
             public void neuronChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(e);
             }
 
-            @Override
             public void labelChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
             }
         });
 
         network.addSynapseListener(new SynapseListener() {
-
             public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelAdded(networkEvent.getObject());
             }
 
             public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelChanged(networkEvent.getObject());
             }
 
             public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                firePotentialAttributesChanged();
+                fireModelRemoved(networkEvent.getObject());
             }
 
-            public void synapseTypeChanged(
-                    NetworkEvent<SynapseUpdateRule> networkEvent) {
+            public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
                 setChangedSinceLastSave(true);
+                fireModelChanged(networkEvent.getObject());
             }
-
         });
-
-    }
-
-    /**
-     * Helper method for making neuron consumers, since it happens in a few
-     * different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param neuron the neuron that will consume activations
-     * @param methodName the name of the method called by this consumer
-     * @return the neuron consumer
-     */
-    public static PotentialConsumer getNeuronConsumer(
-            NetworkComponent component, Neuron neuron, String methodName) {
-        PotentialConsumer consumer = component.getAttributeManager()
-                .createPotentialConsumer(neuron, methodName, double.class);
-        consumer.setCustomDescription(neuron.getId() + ":" + methodName);
-        return consumer;
-    }
-
-    /**
-     * Helper method for making synapse consumers, since it happens in a few
-     * different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param synapse the synapse that will "consume" strengths
-     * @param methodName the name of the method called by this consumer
-     * @return the synapse consumer
-     */
-    public static PotentialConsumer getSynapseConsumer(
-            NetworkComponent component, Synapse synapse, String methodName) {
-        PotentialConsumer consumer = component.getAttributeManager()
-                .createPotentialConsumer(synapse, methodName, double.class);
-        consumer.setCustomDescription(synapse.getId() + ":" + methodName);
-        return consumer;
-    }
-
-    /**
-     * Helper method for making neuron group vector consumers, since it happens
-     * in a few different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param group the group that will "consume" activations
-     * @param methodName the name of the method called by this consumer
-     * @return the neuron group consumer
-     */
-    public static PotentialConsumer getNeuronGroupConsumer(
-            NetworkComponent component, NeuronGroup group, String methodName) {
-        PotentialConsumer consumer = component.getAttributeManager()
-                .createPotentialConsumer(group, methodName, double[].class);
-        consumer.setCustomDescription(group.getId() + ":" + methodName);
-        return consumer;
-    }
-
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        for (AttributeType type : getVisibleConsumerTypes()) {
-            if (type.getTypeName().startsWith("Neuron ")) {
-                if (type.getTypeName().equalsIgnoreCase("Neuron Input Value")) {
-                    for (Neuron neuron : network.getFlatNeuronList()) {
-                        returnList.add(getNeuronConsumer(this, neuron,
-                                type.getMethodName()));
-                    }
-                } else {
-                    for (Neuron neuron : network.getFlatNeuronList()) {
-                        String description = type.getDescription(neuron.getId());
-                        PotentialConsumer consumer = getAttributeManager()
-                                .createPotentialConsumer(neuron, type); 
-                        consumer.setCustomDescription(description);
-                        returnList.add(consumer);
-                    }
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
-                for (Synapse synapse : network.getFlatSynapseList()) {
-                    String description = type.getDescription(synapse.getId());
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(synapse, type);
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroup")) {
-                // Handle NeuronGroup attributes
-                for (Group group : network.getFlatGroupList()) {
-                    if (group instanceof NeuronGroup) {
-                        PotentialConsumer consumer = getNeuronGroupConsumer(
-                                this, (NeuronGroup) group, type.getMethodName());
-                        returnList.add(consumer);
-
-                    }
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("SynapseGroup")) {
-                // Handle SynapseGroup attributes
-                for (Group group : network.getFlatGroupList()) {
-                    if (group instanceof SynapseGroup) {
-                        PotentialConsumer consumer = getAttributeManager()
-                                .createPotentialConsumer(group,
-                                        "setWeightVector", double[].class);
-                        consumer.setCustomDescription("Synapse Group: "
-                                + group.getLabel());
-                        returnList.add(consumer);
-                    }
-                }
-            }
-
-        }
-        return returnList;
-    }
-
-    /**
-     * Helper method for making neuron producers, since it happens in a few
-     * different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param neuron the neuron that will produce activations
-     * @param methodName the name of the method called by this producer
-     * @return the neuron producer
-     */
-    public static PotentialProducer getNeuronProducer(
-            NetworkComponent component, Neuron neuron, String methodName) {
-        PotentialProducer producer = component.getAttributeManager()
-                .createPotentialProducer(neuron, methodName, double.class);
-        producer.setCustomDescription(neuron.getId() + ":" + methodName);
-        return producer;
-    }
-
-    /**
-     * Helper method for making neuron group producers, since it happens in a
-     * few different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param group the neuron group that will produce activations
-     * @param methodName the name of the method called by this producer
-     * @return the neuron group producer
-     */
-    public static PotentialProducer getNeuronGroupProducer(
-            NetworkComponent component, NeuronGroup group, String methodName) {
-        PotentialProducer producer = component.getAttributeManager()
-                .createPotentialProducer(group, methodName, double[].class);
-        producer.setCustomDescription(group.getId() + ":" + methodName);
-        return producer;
-    }
-
-    /**
-     * Helper method for making synapse producers, since it happens in a few
-     * different places and is important to be consistent about.
-     *
-     * @param component network component
-     * @param synapse the synapse that will "produce" strengths
-     * @param methodName the name of the method called by this producer
-     * @return the synapse producer
-     */
-    public static PotentialProducer getSynapseProducer(
-            NetworkComponent component, Synapse synapse, String methodName) {
-        PotentialProducer producer = component.getAttributeManager()
-                .createPotentialProducer(synapse, methodName, double.class);
-        producer.setCustomDescription(synapse.getId() + ":" + methodName);
-        return producer;
-    }
-
-    @Override
-    public List<PotentialProducer> getPotentialProducers() {
-        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-        for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeName().startsWith("Neuron ")) {
-                if (type.getTypeName().equalsIgnoreCase("Neuron Activation")) {
-                    for (Neuron neuron : network.getFlatNeuronList()) {
-                        returnList.add(getNeuronProducer(this, neuron,
-                                type.getMethodName()));
-                    }
-                } else {
-                    for (Neuron neuron : network.getFlatNeuronList()) {
-                        String description = type.getDescription(neuron.getId());
-                        PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(neuron, type); 
-                        producer.setCustomDescription(description);
-                        returnList.add(producer);
-                    }
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
-                for (Synapse synapse : network.getFlatSynapseList()) {
-                    String description = type.getDescription(synapse.getId());
-                    PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(synapse, type);
-                    producer.setCustomDescription(description);
-                    returnList.add(producer);
-                }
-            } else if (type.getTypeName().equalsIgnoreCase(
-                    "NeuronGroupActivations")) {
-                for (Group group : network.getFlatGroupList()) {
-                    if (group instanceof NeuronGroup) {
-                        returnList.add(getNeuronGroupProducer(this,
-                                (NeuronGroup) group, type.getMethodName()));
-                    }
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroupSpikes")) {
-                for (Group group : network.getFlatGroupList()) {
-                    if (group instanceof NeuronGroup) {
-                        returnList.add(getNeuronGroupProducer(this,
-                                (NeuronGroup) group, type.getMethodName()));
-                    }
-                }
-            } else if (type.getTypeName().equalsIgnoreCase("SynapseGroup")) {
-                // Handle SynapseGroup attributes
-                for (Group group : network.getFlatGroupList()) {
-                    if (group instanceof SynapseGroup) {
-                        PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(group,
-                                        "getWeightVector", double[].class);
-                        producer.setCustomDescription("Synapse Group: "
-                                + group.getLabel());
-                        returnList.add(producer);
-                    }
-                }
-            }
-        }
-
-        return returnList;
     }
 
     @Override
@@ -401,31 +127,23 @@ public final class NetworkComponent extends WorkspaceComponent {
             return this.getNetwork().getNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse_")) {
             return this.getNetwork().getSynapse(objectKey);
-        } else if (objectKey.startsWith("NeuronGroup")) {
-            return this.getNetwork().getGroup(objectKey.split(":")[1]);
-        } else if (objectKey.startsWith("SynapseGroup")) {
-            return this.getNetwork().getGroup(objectKey.split(":")[1]);
+        } else if (objectKey.startsWith("Group_")) {
+            return this.getNetwork().getGroup(objectKey);
         }
         return null;
     }
 
     @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof Neuron) {
-            return ((Neuron) object).getId();
-        } else if (object instanceof Synapse) {
-            return ((Synapse) object).getId();
-        } else if (object instanceof NeuronGroup) {
-            return "NeuronGroup:" + ((NeuronGroup) object).getId();
-        } else if (object instanceof SynapseGroup) {
-            return "SynapseGroup:" + ((SynapseGroup) object).getId();
-        }
-        return null;
+    public List<Object> getModels() {
+        List<Object> retList = new ArrayList<Object>();
+        retList.add(network);
+        retList.addAll(network.getNeuronList());
+        retList.addAll(network.getSynapseList());
+        retList.addAll(network.getNeuronGroups());
+        retList.addAll(network.getSynapseGroups());
+        return retList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static NetworkComponent open(final InputStream input,
             final String name, final String format) {
         Network newNetwork = (Network) Network.getXStream().fromXML(input);
@@ -438,18 +156,28 @@ public final class NetworkComponent extends WorkspaceComponent {
         Network.getXStream().toXML(network, output);
         network.postSaveReInit();
     }
-    
+
     /**
      * Returns a copy of this NetworkComponent.
      *
      * @return the new network component
      */
     public NetworkComponent copy() {
-        NetworkComponent ret = new NetworkComponent(
-                "Copy of " + network.getName(), network.copy());
+        NetworkComponent ret = new NetworkComponent("Copy of " + network.getName(), network.copy());
         return ret;
     }
 
+    /**
+     * Sets whether or not this component is marked as currently running... 
+     * meant to be false if only doing a one-off update
+     * @param running
+     */
+    @Override
+    public void setRunning(boolean running) {
+    	super.setRunning(running);
+    	network.setOneOffRun(!running);
+    }
+    
     /**
      * Returns the root network.
      *
@@ -465,13 +193,10 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
+    public void closing() {}
 
     @Override
     public String getXML() {
         return Network.getXStream().toXML(network);
     }
-
 }

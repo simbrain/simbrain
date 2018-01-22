@@ -28,8 +28,11 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
@@ -40,7 +43,7 @@ import org.simbrain.util.Utils;
  * @author Zoë Tosi
  *
  */
-public class Synapse {
+public class Synapse implements EditableObject {
 
     /** A default update rule for the synapse. */
     private static final SynapseUpdateRule DEFAULT_LEARNING_RULE = new StaticSynapseRule();
@@ -82,21 +85,31 @@ public class Synapse {
     private static final int MAX_DIGITS = 2;
 
     /** Strength of synapse. */
+    @UserParameter(label = "Strength", description = "Weight Strength", 
+            minimumValue = -10, maximumValue = 10, defaultValue = "01", order = 1)
     private double strength = 0;
 
     /** Post-Synaptic Response */
     private double psr;
 
     /** Amount to increment the neuron. */
+    @UserParameter(label = "Increment", description = "Strength Increment", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "1", order = 2)
     private double increment = 1;
 
     /** Upper limit of synapse. */
+    @UserParameter(label = "Upper bound", description = "Upper bound", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "10", order = 3)
     private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** Lower limit of synapse. */
+    @UserParameter(label = "Lower bound", description = "Lower bound", 
+            minimumValue = -100, maximumValue = 0, defaultValue = "10", order = 4)
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /** Time to delay sending activation to target neuron. */
+    @UserParameter(label = "Delay", description = "delay", 
+            minimumValue = 0, maximumValue = 100, defaultValue = "0", order = 5)
     private int delay;
 
     /** Parent group, if any (null if none). */
@@ -106,12 +119,15 @@ public class Synapse {
      * Boolean flag, indicating whether this type of synapse participates in the
      * computation of weighted input. Set to a default value of true.
      */
+    @UserParameter(label = "Enabled", description = "Synapse is enabled. If disabled, it won't pass activation through", defaultValue = "True", order = 6)
     private boolean enabled = true;
 
     /**
      * Boolean flag, indicating whether or not this synapse's strength can be
      * changed by any means other than direct user intervention.
      */
+    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", 
+            defaultValue = "False", order = 6)
     private boolean frozen;
 
     /** Manages synaptic delay */
@@ -424,6 +440,7 @@ public class Synapse {
     /**
      * @return Strength of synapse.
      */
+    @Producible(idMethod="getId", defaultVisibility=false)
     public final double getStrength() {
         return strength;
     }
@@ -433,6 +450,7 @@ public class Synapse {
      *
      * @param wt Strength value
      */
+    @Consumable(idMethod="getId", defaultVisibility=false)
     public void setStrength(final double wt) {
         if (isTemplate) {
             forceSetStrength(wt);

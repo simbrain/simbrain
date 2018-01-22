@@ -26,8 +26,6 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -51,14 +49,11 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.CouplingMenuConsumer;
 import org.simbrain.workspace.gui.CouplingMenuProducer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -108,37 +103,19 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * cases where NetworkPanel is used by itself.
      */
     public void applyUserPrefsToNetwork() {
-        try {
-            NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences
-                    .getInt("networkBackgroundColor")));
-            EditMode.setWandRadius(SimbrainPreferences
-                    .getInt("networkWandRadius"));
-            NetworkPanel.setNudgeAmount(SimbrainPreferences
-                    .getDouble("networkNudgeAmount"));
-            Network.setSynapseVisibilityThreshold(SimbrainPreferences
-                    .getInt("networkSynapseVisibilityThreshold"));
-            NeuronNode.setHotColor(SimbrainPreferences
-                    .getFloat("networkHotNodeColor"));
-            NeuronNode.setCoolColor(SimbrainPreferences
-                    .getFloat("networkCoolNodeColor"));
-            NeuronNode.setSpikingColor(new Color(SimbrainPreferences
-                    .getInt("networkSpikingColor")));
-            SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences
-                    .getInt("networkExcitatorySynapseColor")));
-            SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences
-                    .getInt("networkInhibitorySynapseColor")));
-            SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences
-                    .getInt("networkZeroWeightColor")));
-            SynapseNode.setMaxDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMaxSize"));
-            SynapseNode.setMinDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMinSize"));
-            AllToAll.setSelfConnectionAllowed(
-                    SimbrainPreferences.getBoolean("selfConnectionAllowed"));
-            resetColors();
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences.getInt("networkBackgroundColor")));
+        EditMode.setWandRadius(SimbrainPreferences.getInt("networkWandRadius"));
+        NetworkPanel.setNudgeAmount(SimbrainPreferences.getDouble("networkNudgeAmount"));
+        Network.setSynapseVisibilityThreshold(SimbrainPreferences.getInt("networkSynapseVisibilityThreshold"));
+        NeuronNode.setHotColor(SimbrainPreferences.getFloat("networkHotNodeColor"));
+        NeuronNode.setCoolColor(SimbrainPreferences.getFloat("networkCoolNodeColor"));
+        NeuronNode.setSpikingColor(new Color(SimbrainPreferences.getInt("networkSpikingColor")));
+        SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences.getInt("networkExcitatorySynapseColor")));
+        SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences.getInt("networkInhibitorySynapseColor")));
+        SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences.getInt("networkZeroWeightColor")));
+        SynapseNode.setMaxDiameter(SimbrainPreferences.getInt("networkSynapseMaxSize"));
+        SynapseNode.setMinDiameter(SimbrainPreferences.getInt("networkSynapseMinSize"));
+        resetColors();
     }
 
     /**
@@ -290,20 +267,16 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JPopupMenu getNeuronContextMenu(Neuron neuron) {
         JPopupMenu contextMenu = super.getNeuronContextMenu(neuron);
-
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+        CouplingFactory factory = workspace.getCouplingFactory();
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            PotentialProducer producer = NetworkComponent.getNeuronProducer(
-                    component.getWorkspaceComponent(), neuron, "getActivation");
-            PotentialConsumer consumer = NetworkComponent.getNeuronConsumer(
-                    component.getWorkspaceComponent(), neuron, "setInputValue");
-            JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Scalar Coupling to", workspace, producer);
+            Producer producer = factory.getProducer(neuron, "getActivation");
+            Consumer consumer = factory.getConsumer(neuron, "setInputValue");
+            JMenu producerMenu = new CouplingMenuProducer("Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = new CouplingMenuConsumer(
-                    "Receive Scalar Coupling from", workspace, consumer);
+            JMenu consumerMenu = new CouplingMenuConsumer("Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;
@@ -324,17 +297,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
         contextMenu.add(new SetSynapsePropertiesAction(this));
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+        CouplingFactory factory = workspace.getCouplingFactory();
         if (getSelectedSynapses().size() == 1) {
             contextMenu.addSeparator();
-            PotentialProducer producer = NetworkComponent.getSynapseProducer(
-                    component.getWorkspaceComponent(), synapse, "getStrength");
-            PotentialConsumer consumer = NetworkComponent.getSynapseConsumer(
-                    component.getWorkspaceComponent(), synapse, "setStrength");
-            JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Scalar Coupling to", workspace, producer);
+            Producer<?> producer = factory.getProducer(synapse, "getStrength");
+            Consumer<?> consumer = factory.getConsumer(synapse, "setStrength");
+            JMenu producerMenu = new CouplingMenuProducer("Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = new CouplingMenuConsumer(
-                    "Receive Scalar Coupling from", workspace, consumer);
+            JMenu consumerMenu = new CouplingMenuConsumer("Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;
@@ -437,37 +407,19 @@ public class NetworkPanelDesktop extends NetworkPanel {
         if (component.getWorkspaceComponent() != null) {
             JMenu topMenu = new JMenu("Send Vector Coupling to");
             // Activations
-            PotentialProducer producer = NetworkComponent
-                    .getNeuronGroupProducer(component.getWorkspaceComponent(),
-                            neuronGroup, "getExternalActivations");
-
+            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+            CouplingFactory factory = workspace.getCouplingFactory();
+            Producer<?> producer = factory.getProducer(neuronGroup, "getExternalActivations");
             JMenu producerMenu = new CouplingMenuProducer("Activations",
                     component.getWorkspaceComponent().getWorkspace(), producer);
-            
-            // For spiking neuron groups, produce two menus.
-            // Note that the method to test if a neuron group
-            // is spiking is rough pending a future refactor.
-            if (neuronGroup.isSpiking2()) {
-                topMenu.add(producerMenu);
+            topMenu.add(producerMenu);
 
-                // Spikes
-                PotentialProducer Producer = NetworkComponent
-                        .getNeuronGroupProducer(
-                                component.getWorkspaceComponent(), neuronGroup,
-                                "getSpikeIndexes");
-                JMenu producerMenu2 = new CouplingMenuProducer("Spike Indices",
-                        component.getWorkspaceComponent().getWorkspace(),
-                        Producer);
-                topMenu.add(producerMenu2);
-                return topMenu;
-            } else {
-                // The network is not spiking
-                producerMenu = new CouplingMenuProducer(
-                        "Send Vector Coupling to",
-                        component.getWorkspaceComponent().getWorkspace(),
-                        producer);
-                return producerMenu;
-            }
+            // Spikes
+            Producer<?> producer2 =  factory.getProducer(neuronGroup, "getSpikeIndexes");
+            JMenu producerMenu2 = new CouplingMenuProducer("Spike Indices",
+                    component.getWorkspaceComponent().getWorkspace(), producer2);
+            topMenu.add(producerMenu2);
+            return topMenu;
         }
         return null;
     }
@@ -475,12 +427,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
-            PotentialConsumer consumer = NetworkComponent
-                    .getNeuronGroupConsumer(component.getWorkspaceComponent(),
-                            neuronGroup, "setInputValues");
-            JMenu menu = new CouplingMenuConsumer(
-                    "Receive Vector Coupling from",
-                    component.getWorkspaceComponent().getWorkspace(), consumer);
+            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+            CouplingFactory factory = workspace.getCouplingFactory();
+            Consumer<?> consumer = factory.getConsumer(neuronGroup, "setInputValues");
+            JMenu menu = new CouplingMenuConsumer("Receive Vector Coupling from", workspace, consumer);
             return menu;
         }
         return null;
@@ -489,20 +439,17 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getSynapseGroupProducerMenu(SynapseGroup sg) {
         if (component.getWorkspaceComponent() != null) {
-            PotentialProducer producer = component.getWorkspaceComponent()
-                    .getAttributeManager().createPotentialProducer(sg,
-                            "getWeightVector", double[].class);
-            producer.setCustomDescription("Synapse Group: " + sg.getLabel());
-            JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to",
-                    component.getWorkspaceComponent().getWorkspace(), producer);
+            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+            CouplingFactory factory = workspace.getCouplingFactory();
+            Producer<?> producer = factory.getProducer(sg, "getWeightVector");
+            JMenu producerMenu = new CouplingMenuProducer("Send Vector Coupling to", workspace, producer);
             return producerMenu;
         }
         return null;
     }
 
     @Override
-    public JMenu getSynapseGroupConsumerMenu(final SynapseGroup synapseGroup) {
+    public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
         //
         // Below not implemented now for two reasons. (1) There are no obvious
         // uses now. (2) Assigning components in a 1-d array of weights to

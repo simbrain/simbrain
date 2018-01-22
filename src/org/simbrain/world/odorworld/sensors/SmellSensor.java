@@ -18,8 +18,13 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
@@ -46,7 +51,8 @@ public class SmellSensor extends Sensor {
     private double radius = DEFAULT_RADIUS;
 
     /** Current value of this sensor, as an array of doubles. */
-    private double[] currentValue = new double[7];
+    // TODO: Settable numDims!
+    private double[] currentValue = new double[10];
 
     /**
      * Construct a smell sensor.
@@ -79,9 +85,7 @@ public class SmellSensor extends Sensor {
         return new double[] { x, y };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
         double[] temp = new double[currentValue.length];
         for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
@@ -102,8 +106,15 @@ public class SmellSensor extends Sensor {
     /**
      * @return the currentValue
      */
-    public double[] getCurrentValue() {
+    @Producible(idMethod="getId")
+    public double[] getCurrentValues() {
         return currentValue;
+    }
+
+    //TODO. Rename...
+    public List<Integer> getDimensionList() {
+        return IntStream.range(1, this.getCurrentValues().length).boxed()
+                .collect(Collectors.toList());
     }
 
     /**
@@ -111,7 +122,7 @@ public class SmellSensor extends Sensor {
      * @param index
      * @return the currentValue
      */
-    public double getCurrentValue(int index) {
+    public double getCurrentValue(Integer index) {
         return currentValue[index];
     }
 

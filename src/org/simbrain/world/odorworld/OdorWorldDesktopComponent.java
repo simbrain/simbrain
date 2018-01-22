@@ -49,11 +49,10 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      * @param frame
      * @param component
      */
-    public OdorWorldDesktopComponent(GenericFrame frame,
-            OdorWorldComponent component) {
+    public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
         super(frame, component);
         setLayout(new BorderLayout());
-        worldPanel = new OdorWorldPanel(component.getWorld());
+        worldPanel = new OdorWorldPanel(component, component.getWorld());
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this, component.getWorld());
         menu.setUpMenus();
@@ -121,11 +120,9 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      * object.
      */
     private void setGuiSizeToWorldSize() {
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld()
-                .getWidth(), worldPanel.getWorld().getHeight()));
-        worldPanel.setSize(new Dimension(worldPanel.getWorld().getWidth(),
-                worldPanel.getWorld().getHeight()));
-        this.getParentFrame().pack();
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
+        worldPanel.setSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
+        getParentFrame().pack();
     }
 
     /**

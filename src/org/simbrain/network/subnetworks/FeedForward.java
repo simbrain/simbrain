@@ -187,7 +187,7 @@ public class FeedForward extends Subnetwork {
      * @return the hidden layer
      */
     public NeuronGroup getHiddenLayer() {
-        return getHiddenLayer(1);
+        return getHiddenLayer(0);
     }
     
     /**

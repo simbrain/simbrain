@@ -19,15 +19,14 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,13 +39,13 @@ import javax.swing.border.Border;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
+import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 
 /**
  * GUI dialog for creating couplings.
@@ -56,23 +55,23 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     /** Flag to ensure that only one dialog is opened at a time. */
     public static boolean isVisible;
 
-    /** List of producing attributes. */
-    private PotentialAttributePanel producingAttributes;
+    /** List of producers. */
+    private AttributePanel producerPanel;
 
-    /** List of consuming attributes. */
-    private PotentialAttributePanel consumingAttributes;
-
-    /** Methods for making couplings. */
-    private String[] tempStrings = { "One to one", "One to many" };
+    /** List of consumers. */
+    private AttributePanel consumerPanel;
 
     /** Methods for making couplings. */
-    private JComboBox couplingMethodComboBox = new JComboBox(tempStrings);
+    private String[] tempStrings = { "One to One", "One to Many" };
+
+    /** Methods for making couplings. */
+    private JComboBox<String> couplingMethodComboBox = new JComboBox<String>(tempStrings);
 
     /** Reference to desktop. */
     private SimbrainDesktop desktop;
 
     /** Reference of parent frame. */
-    private final GenericFrame frame;
+    private GenericFrame frame;
 
     /**
      * Creates and displays the coupling manager.
@@ -89,22 +88,17 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Left Panel
         Border leftBorder = BorderFactory.createTitledBorder("Producers");
-        producingAttributes = new PotentialAttributePanel(
-                desktop.getWorkspace(), ProducerOrConsumer.Producing);
-        producingAttributes.setBorder(leftBorder);
+        producerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
+        producerPanel.setBorder(leftBorder);
 
         // Right Panel
         Border rightBorder = BorderFactory.createTitledBorder("Consumers");
-        consumingAttributes = new PotentialAttributePanel(
-                desktop.getWorkspace(), ProducerOrConsumer.Consuming);
-        consumingAttributes.setBorder(rightBorder);
+        consumerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Consuming);
+        consumerPanel.setBorder(rightBorder);
 
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-        bottomPanel.add(new JButton(
-                new ShowHelpAction("Pages/Workspace/Couplings.html")));
-
+        bottomPanel.add(new JButton(new ShowHelpAction("Pages/Workspace/Couplings.html")));
         bottomPanel.add(couplingMethodComboBox);
 
         JButton addCouplingsButton = new JButton("Add Coupling(s)");
@@ -122,23 +116,20 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         cancelButton.addActionListener(this);
         bottomPanel.add(cancelButton);
 
-        JComponent couplingList = new CouplingListPanel(desktop, new Vector(
-                desktop.getWorkspace().getCouplingManager().getCouplings()));
+        JComponent couplingList = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
         couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 
         // Main Panel
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-        centerPanel.add(producingAttributes);
+        centerPanel.add(producerPanel);
         centerPanel.add(couplingList);
-        centerPanel.add(consumingAttributes);
+        centerPanel.add(consumerPanel);
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
 
-
         frame.getRootPane().setDefaultButton(okButton);
         frame.pack();
-
     }
 
     /**
@@ -170,36 +161,46 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * Add couplings using the selected method.
      */
     private void addCouplings() {
+        List<Producer<?>> producers = (List<Producer<?>>) producerPanel.getSelectedAttributes();
+        List<Consumer<?>> consumers = (List<Consumer<?>>) consumerPanel.getSelectedAttributes();
 
-        List<PotentialProducer> potentialProducers = (List<PotentialProducer>) producingAttributes
-                .getSelectedAttributes();
-        List<PotentialConsumer> potentialConsumers = (List<PotentialConsumer>) consumingAttributes
-                .getSelectedAttributes();
-
-        if ((potentialProducers.size() == 0)
-                || (potentialConsumers.size() == 0)) {
+        if ((producers.size() == 0) || (consumers.size() == 0)) {
             JOptionPane.showMessageDialog(null,
-                    "You must select at least one consuming and producing attribute \n in order to create couplings!",
+                    "You must select at least one consuming and producing attribute\nto create couplings.",
                     "No Attributes Selected Warning",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
-            if (((String) couplingMethodComboBox.getSelectedItem())
-                    .equalsIgnoreCase("One to one")) {
-                desktop.getWorkspace().coupleOneToOne(potentialProducers,
-                        potentialConsumers);
-            } else if (((String) couplingMethodComboBox.getSelectedItem())
-                    .equalsIgnoreCase("One to many")) {
-                desktop.getWorkspace().coupleOneToMany(potentialProducers,
-                        potentialConsumers);
+            String couplingMethod = (String) couplingMethodComboBox.getSelectedItem();
+            if (couplingMethod.equalsIgnoreCase("One to One")) {
+                desktop.getWorkspace().getCouplingFactory().createOneToOneCouplings(producers, consumers);
+            } else if (couplingMethod.equalsIgnoreCase("One to Many")) {
+                desktop.getWorkspace().getCouplingFactory().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(),
                     "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
-
         }
+    }
+
+    /**
+     * Associates attribute and coupling data types (classes) with colors used
+     * in displaying attributes and couplings.
+     *
+     * @param dataType the data type to associate with a color
+     * @return the color associated with a data type
+     */
+    public static Color getColor(Type dataType) {
+        if (dataType == double.class) {
+            return Color.black;
+        } else if (dataType == double[].class) {
+            return Color.green.darker().darker();
+        } else if (dataType == String.class) {
+            return Color.blue.brighter();
+        }
+        return Color.black;
     }
 
 }

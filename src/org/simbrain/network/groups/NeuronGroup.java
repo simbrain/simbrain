@@ -41,6 +41,8 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
@@ -721,6 +723,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * @param inputs
      *            the input vector as a double array.
      */
+    @Consumable(idMethod="getId")
     public void setInputValues(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
@@ -740,6 +743,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * @param inputs
      *            the input vector as a double array.
      */
+    @Consumable(idMethod="getId")
     public void setActivations(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
@@ -774,6 +778,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the activation array
      */
+    @Producible(idMethod="getId")
     public double[] getActivations() {
         double[] retArray = new double[neuronList.size()];
         int i = 0;
@@ -790,6 +795,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * 
      * @return the spike index array
      */
+    @Producible(idMethod="getId")
     public double[] getSpikeIndexes() {
         List<Double> inds = new ArrayList<Double>(size());
         int i = 0;
@@ -1581,6 +1587,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the vector of external activations.
      */
+    @Producible(idMethod="getId")
     public double[] getExternalActivations() {
         if (!useSubSampling) {
             return getActivations();

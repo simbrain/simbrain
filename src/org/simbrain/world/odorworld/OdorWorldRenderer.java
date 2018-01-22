@@ -100,9 +100,6 @@ public class OdorWorldRenderer {
             // For debugging entity boundary issues
             // g.drawRect((int) entity.getX(), (int) entity.getY(),
             // entity.getWidth(), entity.getHeight());
-            
-            //TODO: Initial code for showing entity names.
-            // g.drawString(entity.getName(), x, y);
 
             while (g.drawImage(entity.getImage(), x, y, null) == false) {
                 ; // keep trying to draw the image until you can. Dangerous?
@@ -142,7 +139,7 @@ public class OdorWorldRenderer {
 
                             double val = SimbrainMath
                                     .getVectorNorm(((SmellSensor) sensor)
-                                            .getCurrentValue());
+                                            .getCurrentValues());
                             float saturation = 0;
                             if (world.getTotalSmellVectorLength() > 0) {
                                 saturation = checkValid((float) Math.abs(val

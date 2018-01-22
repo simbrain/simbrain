@@ -73,9 +73,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     private double timeStep;
     private double val;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public IzhikevichRule deepCopy() {
         IzhikevichRule in = new IzhikevichRule();
         in.setA(getA());

@@ -34,12 +34,9 @@ import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentDeserializer;
-import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
@@ -89,37 +86,19 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
 
         // Add a default update listener
-        workspaceComponent
-                .addWorkspaceComponentListener(new WorkspaceComponentListener() {
+        workspaceComponent.addListener(new WorkspaceComponentAdapter() {
+            public void componentUpdated() {
+                GuiComponent.this.update();
+            }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void componentUpdated() {
-                        GuiComponent.this.update();
-                    }
+            public void guiToggled() {
+                GuiComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn());
+            }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void componentOnOffToggled() {
-                        // No implementation.
-                    }
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void guiToggled() {
-                        GuiComponent.this.getParentFrame().setVisible(
-                                workspaceComponent.isGuiOn());
-                    }
-
-                    @Override
-                    public void componentClosing() {
-                        close();
-                    }
-
-                });
+            public void componentClosing() {
+                close();
+            }
+        });
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
@@ -144,7 +123,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
         closing();
         workspaceComponent.close();
-        getDesktop().unregisterComponent(this);        
     }
 
     /**
@@ -177,36 +155,46 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
             chooser.addExtension(format);
         }
 
-        File theFile = chooser.showOpenDialog();
-        if (theFile != null) {
-            try {
-                Rectangle bounds = this.getParentFrame().getBounds();
-                Workspace workspace = workspaceComponent.getWorkspace();
-                workspace.removeWorkspaceComponent(workspaceComponent);
-                workspaceComponent = (E) WorkspaceComponentDeserializer
-                        .deserializeWorkspaceComponent(
-                                workspaceComponent.getClass(),
-                                theFile.getName(),
-                                new FileInputStream(theFile),
-                                SFileChooser.getExtension(theFile));
-                workspace.addWorkspaceComponent(workspaceComponent);
-                workspaceComponent.setCurrentFile(theFile);
-                setDefaultDirectory(workspaceComponent
-                        .getClass(), theFile.getParentFile().getAbsolutePath());
-                SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-                GuiComponent desktopComponent = desktop
-                        .getDesktopComponent(workspaceComponent);
-                desktop.registerComponentInstance(workspaceComponent,
-                        desktopComponent);
-                desktopComponent.getParentFrame().setBounds(bounds);
-                workspaceComponent.setName(theFile.getName());
-                getParentFrame().setTitle(workspaceComponent.getName());
-                postAddInit();
+        File file = chooser.showOpenDialog();
+        String dir = file.getParentFile().getAbsolutePath();
+        String name = file.getName();
+        String ext = SFileChooser.getExtension(file);
 
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        FileInputStream inputStream;
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(null, String.format("File %s was not found.", file));
+            return;
         }
+
+        E newComponent;
+        try {
+            newComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
+                    workspaceComponent.getClass(), name, inputStream, ext);
+        } catch (ReflectiveOperationException ex) {
+            String message = String.format(
+                    "Failed to deserialize workspace component %s\nCould not execute save method in class %s.",
+                    name, workspaceComponent.getClass().getSimpleName());
+            JOptionPane.showMessageDialog(null, message);
+            return;
+        }
+
+        Rectangle bounds = getParentFrame().getBounds();
+        Workspace workspace = workspaceComponent.getWorkspace();
+        workspace.removeWorkspaceComponent(workspaceComponent);
+        workspaceComponent = newComponent;
+
+        workspace.addWorkspaceComponent(workspaceComponent);
+        workspaceComponent.setCurrentFile(file);
+        setDefaultDirectory(workspaceComponent.getClass(), dir);
+        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+        GuiComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
+        desktop.registerComponentInstance(workspaceComponent, desktopComponent);
+        desktopComponent.getParentFrame().setBounds(bounds);
+        workspaceComponent.setName(name);
+        getParentFrame().setTitle(name);
+        postAddInit();
     }
 
     /**
@@ -402,25 +390,16 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param componentType the component type
      * @return the directory
      */
-    private String getDefaultDirectory(
-            Class<? extends WorkspaceComponent> componentType) {
-        String defaultDirectory = ".";
-        try {
-            if (componentType == OdorWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceOdorWorldDirectory");
-            } else if (componentType == DataWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceTableDirectory");
-            } else if (componentType == NetworkComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceNetworkDirectory");
-            } else {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceBaseDirectory");
-            }
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
+    private String getDefaultDirectory(Class<? extends WorkspaceComponent> componentType) {
+        String defaultDirectory;
+        if (componentType == OdorWorldComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceOdorWorldDirectory");
+        } else if (componentType == DataWorldComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceTableDirectory");
+        } else if (componentType == NetworkComponent.class) {
+            defaultDirectory = SimbrainPreferences.getString("workspaceNetworkDirectory");
+        } else {
+            defaultDirectory = SimbrainPreferences.getString("workspaceBaseDirectory");
         }
         return defaultDirectory;
     }
@@ -431,8 +410,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param componentType the component type
      * @param dir the directory to set
      */
-    private void setDefaultDirectory(
-            Class<? extends WorkspaceComponent> componentType, String dir) {
+    private void setDefaultDirectory(Class<? extends WorkspaceComponent> componentType, String dir) {
         if (componentType == OdorWorldComponent.class) {
             SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir);
         } else if (componentType == DataWorldComponent.class) {

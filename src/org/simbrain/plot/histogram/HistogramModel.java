@@ -20,6 +20,7 @@ import java.util.List;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries;
+import org.simbrain.workspace.Consumable;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
@@ -147,6 +148,17 @@ public class HistogramModel extends ChartModel {
     }
 
     /**
+     * For now only only coupling to a single histogram. Later draw on Barchart
+     * to allow coupling to multiple histograms
+     *
+     * @param histData the array of histogram data
+     */
+    @Consumable
+    public void addData(double[] histData) {
+        addData(histData, 0);
+    }
+
+    /**
      * Add double array data to a specified data series. This is the main method
      * used to dynamically add data when the histogram is used as a plot
      * component. Called via reflection from HistogramComponent.
@@ -210,7 +222,7 @@ public class HistogramModel extends ChartModel {
 
         data.add(new double[] { 0 });
         dataNames.add("Hist " + data.size());
-        this.fireDataSourceAdded(data.size());
+        this.fireDataSourceAdded(null);
         redraw();
     }
 

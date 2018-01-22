@@ -48,17 +48,16 @@ public class ErrorPlotPanel extends JPanel {
      *
      * @param trainer the trainer this panel represents
      */
-    public ErrorPlotPanel(final IterableTrainer trainer) {
-
+    public ErrorPlotPanel(IterableTrainer trainer) {
         this.trainer = trainer;
         JPanel mainPanel = new JPanel();
 
         // Configure time series plot
-        model = new TimeSeriesModel(1);
+        model = new TimeSeriesModel(trainer::getIteration);
         model.setRangeLowerBound(0);
         model.setRangeUpperBound(1);
         model.setAutoRange(false);
-        model.setWindowSize(1000);
+        model.setMaximumDataPoints(Integer.MAX_VALUE);
         TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
         graphPanel.getChartPanel().getChart().setTitle("");
         graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis()

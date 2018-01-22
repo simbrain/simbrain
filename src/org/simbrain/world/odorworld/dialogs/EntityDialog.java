@@ -115,7 +115,7 @@ public class EntityDialog extends StandardDialog implements ActionListener {
             mainEditor.setExcludeList(new String[] { "entityType", "id",
                     "showSensors", "sensorsEnabled", "effectorsEnabled" });
         }
-        mainEditor.setObject(entityRef);
+        mainEditor.setObjectToEdit(entityRef);
         tabbedPane.addTab("Main", mainEditor);
 
         // Smell tabs

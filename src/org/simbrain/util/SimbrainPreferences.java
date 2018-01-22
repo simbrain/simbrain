@@ -42,8 +42,7 @@ import java.util.prefs.Preferences;
 public class SimbrainPreferences {
 
     /** The main preference object. */
-    private static final Preferences SIMBRAIN_PREFERENCES = Preferences
-            .userRoot().node("/org/simbrain");
+    private static final Preferences SIMBRAIN_PREFERENCES = Preferences.userRoot().node("/org/simbrain");
 
     /** Mapping from property names to default values. */
     private static final HashMap<String, Object> DEFAULT_MAP = new HashMap<String, Object>();
@@ -53,24 +52,16 @@ public class SimbrainPreferences {
 
     /** Initialize default map */
     static {
-        DEFAULT_MAP.put("workspaceBaseDirectory", "." + FS
-                + "simulations");
-        DEFAULT_MAP.put("workspaceSimulationDirectory", "." + FS
-                + "simulations" + FS + "workspaces");
-        DEFAULT_MAP.put("workspaceNetworkDirectory", "." + FS + "simulations"
-                + FS + "networks");
-        DEFAULT_MAP.put("workspaceOdorWorldDirectory", "." + FS + "simulations"
-                + FS + "worlds");
-        DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations"
-                + FS + "tables");
-        DEFAULT_MAP.put("workspaceScriptDirectory", "." + FS + "scripts"
-                + FS + "scriptMenu");
+        DEFAULT_MAP.put("workspaceBaseDirectory", "." + FS + "simulations");
+        DEFAULT_MAP.put("workspaceSimulationDirectory", "." + FS + "simulations" + FS + "workspaces");
+        DEFAULT_MAP.put("workspaceNetworkDirectory", "." + FS + "simulations" + FS + "networks");
+        DEFAULT_MAP.put("workspaceOdorWorldDirectory", "." + FS + "simulations" + FS + "worlds");
+        DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations" + FS + "tables");
+        DEFAULT_MAP.put("workspaceScriptDirectory", "." + FS + "scripts" + FS + "scriptMenu");
         DEFAULT_MAP.put("networkBackgroundColor", Color.WHITE.getRGB());
         DEFAULT_MAP.put("networkLineColor", Color.BLACK.getRGB());
-        DEFAULT_MAP.put("networkHotNodeColor",
-                Color.RGBtoHSB(255, 0, 0, null)[0]);
-        DEFAULT_MAP.put("networkCoolNodeColor",
-                Color.RGBtoHSB(0, 0, 255, null)[0]);
+        DEFAULT_MAP.put("networkHotNodeColor", Color.RGBtoHSB(255, 0, 0, null)[0]);
+        DEFAULT_MAP.put("networkCoolNodeColor", Color.RGBtoHSB(0, 0, 255, null)[0]);
         DEFAULT_MAP.put("networkSpikingColor", Color.YELLOW.getRGB());
         DEFAULT_MAP.put("networkExcitatorySynapseColor", Color.RED.getRGB());
         DEFAULT_MAP.put("networkInhibitorySynapseColor", Color.BLUE.getRGB());
@@ -79,9 +70,9 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkSynapseMaxSize", 20);
         DEFAULT_MAP.put("networkNudgeAmount", 2d);
         DEFAULT_MAP.put("networkSynapseVisibilityThreshold", 200);
+        DEFAULT_MAP.put("networkDefaultTimeStep", 0.1);
         DEFAULT_MAP.put("networkWandRadius", 40);
-        DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
-                + "tables");
+        DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS + "tables");
         DEFAULT_MAP.put("projectorTolerance", .1);
         DEFAULT_MAP.put("projectorSammonPerturbationAmount", .1);
         DEFAULT_MAP.put("projectorSammonEpsilon", .5);
@@ -124,26 +115,12 @@ public class SimbrainPreferences {
     }
 
     /**
-     * Retrieve a property whose value is a string.
-     *
-     * @param property the property name
-     * @return the retrieved value
-     * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     * Retrieve a property whose value is a string. If the property is not defined but a default value is defined,
+     * then return the default. If neither is defined, then return the empty string.
      */
-    public static String getString(String property)
-            throws PropertyNotFoundException {
-        String defVal = (String) DEFAULT_MAP.get(property);
-        if (defVal == null) {
-            defVal = "";
-        }
-        String value = SIMBRAIN_PREFERENCES.get(property, defVal);
-        if (value == null) {
-            throw new PropertyNotFoundException("Property " + property
-                    + "not found.");
-        } else {
-            return value;
-        }
+    public static String getString(String property) {
+        String defaultValue = DEFAULT_MAP.containsKey(property) ? (String) DEFAULT_MAP.get(property) : "";
+        return SIMBRAIN_PREFERENCES.get(property, defaultValue);
     }
 
     /**
@@ -157,26 +134,12 @@ public class SimbrainPreferences {
     }
 
     /**
-     * Retrieve a property whose value is a double.
-     *
-     * @param property the property name
-     * @return the retrieved value
-     * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     * Retrieve a property whose value is a double. If the property is not defined but a default value is defined,
+     * then return the default. If neither is defined, then return the value 0.0.
      */
-    public static double getDouble(String property)
-            throws PropertyNotFoundException {
-        Double defVal = (Double) DEFAULT_MAP.get(property);
-        if (defVal == null) {
-            defVal = 0d;
-        }
-        Double value = SIMBRAIN_PREFERENCES.getDouble(property, defVal);
-        if (value == null) {
-            throw new PropertyNotFoundException("Property " + property
-                    + "not found.");
-        } else {
-            return value;
-        }
+    public static double getDouble(String property) {
+        Double defaultValue = DEFAULT_MAP.containsKey(property) ? (Double) DEFAULT_MAP.get(property) : 0.0;
+        return SIMBRAIN_PREFERENCES.getDouble(property, defaultValue);
     }
     
     /**
@@ -188,29 +151,14 @@ public class SimbrainPreferences {
     public static void putBoolean(String property, boolean val) {
         SIMBRAIN_PREFERENCES.putBoolean(property, val);
     }
-    
 
     /**
-     * Retrieve a property whose value is a boolean.
-     *
-     * @param property the property name
-     * @return the retrieved value
-     * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     * Retrieve a property whose value is a boolean. If the property is not defined but a default value is defined,
+     * then return the default. If neither is defined, then return the value false.
      */
-    public static boolean getBoolean(String property)
-            throws PropertyNotFoundException {
-        Boolean defVal = (Boolean) DEFAULT_MAP.get(property);
-        if (defVal == null) {
-            defVal = false;
-        }
-        Boolean value = SIMBRAIN_PREFERENCES.getBoolean(property, defVal);
-        if (value == null) {
-            throw new PropertyNotFoundException("Property " + property
-                    + "not found.");
-        } else {
-            return value;
-        }
+    public static boolean getBoolean(String property) {
+        Boolean defaultValue = DEFAULT_MAP.containsKey(property) ? (Boolean) DEFAULT_MAP.get(property) : false;
+        return SIMBRAIN_PREFERENCES.getBoolean(property, defaultValue);
     }
 
     /**
@@ -224,25 +172,12 @@ public class SimbrainPreferences {
     }
 
     /**
-     * Retrieve a property whose value is an integer.
-     *
-     * @param property the property name
-     * @return the retrieved value
-     * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     * Retrieve a property whose value is an integer. If the property is not defined but a default value is defined,
+     * then return the default. If neither is defined, then return the value 0.
      */
-    public static int getInt(String property) throws PropertyNotFoundException {
-        Integer defVal = (Integer) DEFAULT_MAP.get(property);
-        if (defVal == null) {
-            defVal = 0;
-        }
-        Integer value = SIMBRAIN_PREFERENCES.getInt(property, defVal);
-        if (value == null) {
-            throw new PropertyNotFoundException("Property " + property
-                    + "not found.");
-        } else {
-            return value;
-        }
+    public static int getInt(String property) {
+        Integer defaultValue = DEFAULT_MAP.containsKey(property) ? (Integer) DEFAULT_MAP.get(property) : 0;
+        return SIMBRAIN_PREFERENCES.getInt(property, defaultValue);
     }
 
     /**
@@ -256,43 +191,12 @@ public class SimbrainPreferences {
     }
 
     /**
-     * Retrieve a property whose value is a float.
-     *
-     * @param property the property name
-     * @return the retrieved value
-     * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     * Retrieve a property whose value is a float. If the property is not defined but a default value is defined,
+     * then return the default. If neither is defined, then return the value 0.0f.
      */
-    public static float getFloat(String property)
-            throws PropertyNotFoundException {
-        Float defVal = (Float) DEFAULT_MAP.get(property);
-        if (defVal == null) {
-            defVal = 0f;
-        }
-        Float value = SIMBRAIN_PREFERENCES.getFloat(property, defVal);
-        if (value == null) {
-            throw new PropertyNotFoundException("Property " + property
-                    + "not found.");
-        } else {
-            return value;
-        }
-    }
-
-    /**
-     * Thrown when a property cannot be found.
-     */
-    public static class PropertyNotFoundException extends Exception {
-
-        /**
-         * Construct the exception with an error message, indicating the
-         * property name that could not be found.
-         *
-         * @param string the property name that could not be found.
-         */
-        public PropertyNotFoundException(String string) {
-            super(string);
-        }
-
+    public static float getFloat(String property) {
+        Float defaultValue = DEFAULT_MAP.containsKey(property) ? (Float) DEFAULT_MAP.get(property) : 0.0f;
+        return SIMBRAIN_PREFERENCES.getFloat(property, defaultValue);
     }
 
 }

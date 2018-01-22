@@ -33,7 +33,6 @@ import javax.swing.JDialog;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.world.textworld.dictionary.DictionarySelector;
@@ -221,7 +220,7 @@ public class TextWorldActions {
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
                 editor.setUseSuperclass(false);
-                editor.setObject(world);
+                editor.setObjectToEdit(world);
                 JDialog dialog = editor.getDialog();
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
@@ -247,13 +246,7 @@ public class TextWorldActions {
      * @return return the dictionary directory
      */
     public static String getDictionaryDirectory() {
-        try {
-            return SimbrainPreferences
-                    .getString("textWorldDictionaryDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SimbrainPreferences.getString("textWorldDictionaryDirectory");
     }
 
 }

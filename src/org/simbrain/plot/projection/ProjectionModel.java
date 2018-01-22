@@ -83,7 +83,7 @@ public class ProjectionModel extends ChartModel {
         } else {
             projector = new Projector(numDataSources);
         }
-        fireChartInitialized(projector.getDimensions());
+        //fireChartInitialized(projector.getDimensions());
         resetData();
         addListeners();
     }

@@ -5,9 +5,8 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -444,14 +443,9 @@ public class Creature {
 
 	private void couple(CreaturesChem chem, Neuron neuron) {
 		NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
-
-		// Hopefully borrowing nc's attribute manager for the producer won't cause
-		// problems later...
-		PotentialProducer chemicalAmount = nc.getAttributeManager().createPotentialProducer(chem, "getAmount",
-				double.class);
-		PotentialConsumer chemReceptor = nc.getNeuronConsumer(nc, neuron, "forceSetActivation");
-
-		parentSim.getSim().addCoupling(new Coupling(chemicalAmount, chemReceptor));
+		Producer chemicalAmount = parentSim.getSim().getProducer(chem, "getAmount");
+		Consumer chemReceptor = parentSim.getSim().getConsumer(neuron, "forceSetActivation");
+		parentSim.getSim().tryCoupling(chemicalAmount, chemReceptor);
 	}
 
 	public void approachBehavior(double strength) {

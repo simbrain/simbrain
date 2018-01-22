@@ -20,15 +20,15 @@ package org.simbrain.workspace.gui;
 
 import javax.swing.JMenu;
 
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Menu for making a single coupling. This menu is initialized with a potential
- * producer It then produces a hierarchy of menus: One menu for each component
- * in the workspace Within each component, a menuitem for each Potential
+ * producer. It then produces a hierarchy of menus: One menu for each component
+ * in the workspace. Within each component, a menuitem for each Potential
  * Consumer.
  */
 public class CouplingMenuProducer extends JMenu {
@@ -37,7 +37,7 @@ public class CouplingMenuProducer extends JMenu {
     Workspace workspace;
 
     /** The base attribute for this menu. */
-    PotentialProducer producer;
+    Producer<?> producer;
 
     /**
      * Construct the menu.
@@ -46,8 +46,7 @@ public class CouplingMenuProducer extends JMenu {
      * @param workspace the workspace
      * @param producer the target consuming attribute.
      */
-    public CouplingMenuProducer(final String menuName,
-            final Workspace workspace, final PotentialProducer producer) {
+    public CouplingMenuProducer(String menuName, Workspace workspace, Producer<?> producer) {
         super(menuName);
         this.workspace = workspace;
         this.producer = producer;
@@ -62,16 +61,13 @@ public class CouplingMenuProducer extends JMenu {
         this.removeAll();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             JMenu componentMenu = new JMenu(component.getName());
-            for (PotentialConsumer potentialConsumer : component
-                    .getPotentialConsumers()) {
-                if (potentialConsumer.getDataType() == producer.getDataType()) {
-                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
-                            potentialConsumer.getDescription(), producer,
-                            potentialConsumer);
+            for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getAllConsumers(component)) {
+                if (consumer.getType() == producer.getType()) {
+                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace, consumer.toString(),
+                            producer, consumer);
                     componentMenu.add(menuItem);
                 }
             }
-
             this.add(componentMenu);
         }
     }

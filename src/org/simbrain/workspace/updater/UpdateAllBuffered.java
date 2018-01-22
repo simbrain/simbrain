@@ -127,7 +127,7 @@ public class UpdateAllBuffered implements UpdateAction {
      * Update couplings.
      */
     public void updateCouplings() {
-        updater.getWorkspace().getCouplingManager().updateAllCouplings();
+        updater.getWorkspace().updateCouplings();
         LOGGER.trace("couplings updated");
         updater.notifyCouplingsUpdated();
     }

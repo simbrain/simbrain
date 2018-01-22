@@ -21,7 +21,6 @@ package org.simbrain.util.projection;
 import java.util.ArrayList;
 
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 
 /**
  * <B>ProjectSammon.java</B> implements gradient descent to compute image of
@@ -91,12 +90,8 @@ public class ProjectSammon extends IterableProjectionMethod {
 
     @Override
     public void init() {
-        try {
-            perturbationAmount = SimbrainPreferences.getDouble("projectorSammonPerturbationAmount");
-            perturbationAmount = SimbrainPreferences.getDouble("projectorSammonEpsilon");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        perturbationAmount = SimbrainPreferences.getDouble("projectorSammonPerturbationAmount");
+        epsilon = SimbrainPreferences.getDouble("projectorSammonEpsilon");
         dstar = projector.getUpstairs().getDistances();
         dstarSum = projector.getUpstairs().getSumDistances();
         projector.getDownstairs().perturbOverlappingPoints(perturbationAmount);

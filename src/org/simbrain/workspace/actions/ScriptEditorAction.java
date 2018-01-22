@@ -26,7 +26,6 @@ import javax.swing.AbstractAction;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.SimbrainScriptEditor;
@@ -54,14 +53,7 @@ public final class ScriptEditorAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String scriptDirectory = ".";
-        try {
-            scriptDirectory = SimbrainPreferences
-                    .getString("workspaceScriptDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
-
+        String scriptDirectory = SimbrainPreferences.getString("workspaceScriptDirectory");
         SFileChooser fileChooser = new SFileChooser(scriptDirectory,
                 "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();

@@ -18,13 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.*;
+
+import javax.swing.*;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
@@ -33,24 +37,46 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
     /** Reference to the backprop network being edited. */
     private BackpropNetwork backprop;
-    
+
+    /** An update action to update the backprop trainer when the network is updated. */
+    private NetworkUpdateAction updater = new NetworkUpdateAction() {
+        @Override
+        public void invoke() {
+            try {
+                currentTrainer.apply();
+            } catch (Trainer.DataNotInitializedException ex) {
+                JOptionPane.showMessageDialog(null, "Unable to apply trainer: data not initialized.");
+            }
+        }
+
+        @Override
+        public String getDescription() {
+            return "Apply Backprop Trainer";
+        }
+
+        @Override
+        public String getLongDescription() {
+            return "Applies one training step (usually one epoch) of the currently opened trainer dialog to the" +
+                   "associated BackpropNetwork.";
+        }
+    };
+
     /**
      * Make it easy to switch between the new, experimental trainer
      * (BackpropTrainer2), and the old one. Once that's stabilized this code can
      * be removed.
      */
-    private boolean useExperimentalTrainer = false;
+    private boolean useExperimentalTrainer = true;
     private IterableTrainer currentTrainer;
 
     /**
      * Default constructor.
      *
-     * @param np parent panel
+     * @param networkPanel parent panel
      * @param backprop edited network
      */
-    public BackpropEditorDialog(final NetworkPanel np,
-        final BackpropNetwork backprop) {
-        super(np, backprop);
+    public BackpropEditorDialog(NetworkPanel networkPanel, BackpropNetwork backprop) {
+        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, backprop);
         this.backprop = backprop;
         init();
         initDefaultTabs();
@@ -64,18 +90,19 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        if(useExperimentalTrainer) {
+        if (useExperimentalTrainer) {
             currentTrainer = new BackpropTrainer2(backprop);
         } else {
             currentTrainer = new BackpropTrainer(backprop);
         }
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-            networkPanel, currentTrainer);
+        networkPanel.getNetwork().getUpdateManager().addAction(updater);
+        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, currentTrainer);
         addTab("Train", iterativeControls);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 currentTrainer.commitChanges();
+                networkPanel.getNetwork().getUpdateManager().removeAction(updater);
             }
         });
     }
@@ -84,6 +111,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     protected void stopTrainer() {
         if (currentTrainer != null) {
             currentTrainer.setUpdateCompleted(true);
+            currentTrainer.commitChanges();
         }
     }
     

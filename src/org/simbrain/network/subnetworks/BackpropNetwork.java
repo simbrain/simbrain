@@ -22,6 +22,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 
+import javax.swing.*;
+
 /**
  * Backprop network.
  *
@@ -29,9 +31,7 @@ import org.simbrain.network.trainers.TrainingSet;
  */
 public class BackpropNetwork extends FeedForward implements Trainable {
 
-    /**
-     * Training set.
-     */
+    /** Training set. */
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
@@ -41,10 +41,8 @@ public class BackpropNetwork extends FeedForward implements Trainable {
      * @param nodesPerLayer number of layers
      * @param initialPosition initial position in network
      */
-    public BackpropNetwork(Network network, int[] nodesPerLayer,
-            Point2D initialPosition) {
-        super(network, nodesPerLayer, initialPosition,
-                new Neuron(network, new LinearRule()));
+    public BackpropNetwork(Network network, int[] nodesPerLayer, Point2D initialPosition) {
+        super(network, nodesPerLayer, initialPosition, new Neuron(network, new LinearRule()));
         setLabel("Backprop");
     }
 
@@ -55,8 +53,7 @@ public class BackpropNetwork extends FeedForward implements Trainable {
      * @param nodesPerLayer number of layers
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer) {
-        super(network, nodesPerLayer, new Point2D.Double(1, 1),
-                new Neuron(network, new LinearRule()));
+        super(network, nodesPerLayer, new Point2D.Double(1, 1), new Neuron(network, new LinearRule()));
         setLabel("Backprop");
     }
     
@@ -71,6 +68,6 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     }
 
     @Override
-    public void initNetwork() {
-    }
+    public void initNetwork() {}
+
 }

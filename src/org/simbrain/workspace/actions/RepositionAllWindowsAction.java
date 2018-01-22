@@ -53,6 +53,7 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        desktop.repositionAllWindows();
+        // TODO: How did this get in here?
+        //desktop.repositionAllWindows();
     }
 }

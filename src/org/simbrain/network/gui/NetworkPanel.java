@@ -188,9 +188,6 @@ public class NetworkPanel extends JPanel {
     /** The model neural-Network object. */
     private Network network;
 
-    /** The Network hierarchy panel. */
-    private NetworkHierarchyPanel networkHierarchyPanel;
-
     /** Main splitter pane: network in middle, hierarchy on left. */
     private JSplitPane splitPane;
 
@@ -327,9 +324,6 @@ public class NetworkPanel extends JPanel {
 
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
-
-    /** Local thread flag for manually starting and stopping the network. */
-    private AtomicBoolean isRunning = new AtomicBoolean();
 
     /** Toolbar panel. */
     private JPanel toolbars;
@@ -495,7 +489,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons() {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -507,7 +501,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons(final Collection<Neuron> neurons) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -519,7 +513,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses() {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -531,7 +525,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses(final Collection<Synapse> synapses) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 EventQueue.invokeLater(new Runnable() {
@@ -580,7 +574,7 @@ public class NetworkPanel extends JPanel {
                 // and then removes and adds the appropriate pnode to the
                 // NeuronNode
                 // NeuronNode node = (NeuronNode)
-                // objectNodeMap.get(e.getObject());
+                // objectNodeMap.get(e.getObjectToEdit());
                 // if (node != null) {
                 // node.updateShape();
                 // }
@@ -612,7 +606,7 @@ public class NetworkPanel extends JPanel {
             @Override
             public void synapseChanged(final NetworkEvent<Synapse> e) {
                 //SynapseNode node = (SynapseNode) objectNodeMap
-                //        .get(e.getObject());
+                //        .get(e.getObjectToEdit());
                 // node.updateClampStatus();
             }
 
@@ -692,7 +686,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupParameterChanged(NetworkEvent<Group> event) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 Group group = event.getObject();
@@ -731,7 +725,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
-                if (!guiOn) {
+                if (!isGuiOn()) {
                     return;
                 }
                 PNode groupNode = objectNodeMap.get(group);
@@ -784,7 +778,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Update visible state of group nodes.
      *
-     * @param group the group to update
+     * @param groups the group to update
      */
     private void updateGroupNodes(Collection<Group> groups) {
         // System.out.println("In update group node. Updating group " + group);
@@ -804,6 +798,7 @@ public class NetworkPanel extends JPanel {
      * scripts).
      */
     private void updateSynapseNodes() {
+    	
         // System.out.println("In update synapse nodes");
         for (SynapseNode node : this.getSynapseNodes()) {
             if (node.getVisible()) {
@@ -994,7 +989,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Add GUI representation of specified model synapse to network panel.
      *
-     * @param the synapse to add
+     * @param synapse the synapse to add
      */
     private void addSynapse(final Synapse synapse) {
         if (objectNodeMap.get(synapse) != null) {
@@ -1466,39 +1461,32 @@ public class NetworkPanel extends JPanel {
      * @return the PNode represention of the subnetwork.
      */
     private SubnetworkNode createSubnetworkNode(Subnetwork subnet) {
-
-        SubnetworkNode ret = null;
-
+        SubnetworkNode subnetNode = null;
         if (subnet instanceof Hopfield) {
-            ret = new HopfieldNode(NetworkPanel.this, (Hopfield) subnet);
+            subnetNode = new HopfieldNode(NetworkPanel.this, (Hopfield) subnet);
         } else if (subnet instanceof CompetitiveNetwork) {
-            ret = new CompetitiveNetworkNode(NetworkPanel.this,
-                    (CompetitiveNetwork) subnet);
+            subnetNode = new CompetitiveNetworkNode(NetworkPanel.this, (CompetitiveNetwork) subnet);
         } else if (subnet instanceof SOMNetwork) {
-            ret = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) subnet);
+            subnetNode = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) subnet);
         } else if (subnet instanceof EchoStateNetwork) {
-            ret = new ESNNetworkNode(NetworkPanel.this,
-                    (EchoStateNetwork) subnet);
+            subnetNode = new ESNNetworkNode(NetworkPanel.this, (EchoStateNetwork) subnet);
         } else if (subnet instanceof SimpleRecurrentNetwork) {
-            ret = new SRNNetworkNode(NetworkPanel.this,
-                    (SimpleRecurrentNetwork) subnet);
+            subnetNode = new SRNNetworkNode(NetworkPanel.this, (SimpleRecurrentNetwork) subnet);
         } else if (subnet instanceof FeedForward) {
             if (subnet instanceof BackpropNetwork) {
-                ret = new BackpropNetworkNode(NetworkPanel.this,
-                        (BackpropNetwork) subnet);
+                subnetNode = new BackpropNetworkNode(NetworkPanel.this, (BackpropNetwork) subnet);
             } else if (subnet instanceof LMSNetwork) {
-                ret = new LMSNetworkNode(NetworkPanel.this,
-                        (LMSNetwork) subnet);
+                subnetNode = new LMSNetworkNode(NetworkPanel.this, (LMSNetwork) subnet);
             } else if (subnet instanceof BPTTNetwork) {
-                ret = new BPTTNode(NetworkPanel.this, (BPTTNetwork) subnet);
+                subnetNode = new BPTTNode(NetworkPanel.this, (BPTTNetwork) subnet);
             } else {
-                ret = new SubnetworkNode(NetworkPanel.this, subnet);
+                subnetNode = new SubnetworkNode(NetworkPanel.this, subnet);
             }
         } else {
-            ret = new SubnetworkNode(NetworkPanel.this, subnet);
+            subnetNode = new SubnetworkNode(NetworkPanel.this, subnet);
         }
 
-        return ret;
+        return subnetNode;
     }
 
     /**
@@ -2796,25 +2784,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Set the visibility of the hiearchy panel.
-     *
-     * @param showIt whether it should be visible or not
-     */
-    public void setHierarchyPanelVisible(boolean showIt) {
-        this.showNetworkHierarchyPanel = showIt;
-        actionManager.getShowNetworkHierarchyPanel()
-                .setState(showNetworkHierarchyPanel);
-        if (!showNetworkHierarchyPanel) {
-            splitPane.setLeftComponent(null);
-            splitPane.setDividerSize(0);
-        } else {
-            splitPane.setLeftComponent(networkHierarchyPanel);
-            splitPane.setDividerSize(4);
-        }
-        networkHierarchyPanel.setVisible(showNetworkHierarchyPanel);
-    }
-
-    /**
      * @return the prioritiesVisible
      */
     public boolean getPrioritiesVisible() {
@@ -2912,7 +2881,7 @@ public class NetworkPanel extends JPanel {
      * @return Returns the guiOn.
      */
     public boolean isGuiOn() {
-        return guiOn;
+        return guiOn && network.isRedrawTime();
     }
 
     /**
@@ -3085,14 +3054,14 @@ public class NetworkPanel extends JPanel {
      * @return the isRunning
      */
     public boolean isRunning() {
-        return isRunning.get();
+        return network.isRunning();
     }
 
     /**
-     * @param isRunning the isRunning to set
+     * @param value the isRunning to set
      */
-    public void setRunning(boolean isRunning) {
-        this.isRunning.set(isRunning);
+    public void setRunning(boolean value) {
+        network.setRunning(value);
     }
 
     /**

@@ -27,9 +27,9 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 
 /**
  * Open a network within current workspace.
@@ -52,20 +52,12 @@ public final class OpenNetworkAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String defaultDirectory = ".";
-        try {
-            defaultDirectory = SimbrainPreferences
-            .getString("workspaceNetworkDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
-        SFileChooser chooser = new SFileChooser(defaultDirectory,
-                "xml file", "xml");
+        String defaultDirectory = SimbrainPreferences.getString("workspaceNetworkDirectory");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            NetworkComponent networkComponent = (NetworkComponent) WorkspaceSerializer
-                    .open(NetworkComponent.class, theFile);
-            workspace.addWorkspaceComponent(networkComponent);
+            WorkspaceComponent component = WorkspaceSerializer.open(NetworkComponent.class, theFile);
+            workspace.addWorkspaceComponent(component);
         }
     }
 }

@@ -53,6 +53,7 @@ public class AdditiveRulePanel extends AbstractNeuronRulePanel {
     public AdditiveRulePanel() {
         super();
         this.add(tabbedPane);
+        // Create text field AND populate an "editor list"
         JTextField tfLambda = createTextField(
                 (r) -> ((AdditiveRule) r).getLambda(),
                 (r, val) -> ((AdditiveRule) r).setLambda((double) val));

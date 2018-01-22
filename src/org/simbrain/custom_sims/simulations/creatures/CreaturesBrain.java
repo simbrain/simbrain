@@ -12,9 +12,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Producer;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -188,17 +188,16 @@ public class CreaturesBrain {
 			for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
 
 				// Make the producer from neuron j of producerLobe
-				PotentialProducer producer = netComponent.createPotentialProducer(producerLobe.getNeuronList().get(j),
-						"getActivation", double.class);
+				Producer producer = parentSim.getSim().getProducer(producerLobe.getNeuronList().get(j),
+						"getActivation");
 
 				// Make the consumer from neuron i of consumerLobe
-				PotentialConsumer consumer = netComponent.createPotentialConsumer(consumerLobe.getNeuronList().get(i),
-						"forceSetActivation", double.class);
+				Consumer consumer = parentSim.getSim().getConsumer(consumerLobe.getNeuronList().get(i),
+						"forceSetActivation");
 
 				// Create the coupling and add it to the list
-				Coupling coupling = new Coupling(producer, consumer);
-				list.add(coupling);
-				parentSim.getSim().addCoupling(coupling);
+                Coupling coupling = parentSim.getSim().tryCoupling(producer, consumer);
+                list.add(coupling);
 			}
 		} else {
 

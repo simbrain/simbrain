@@ -20,21 +20,16 @@ package org.simbrain.workspace;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
- * . Extend this class to create your own component type. Gui representations of
- * a workspace component should extend
- * {@link org.simbrain.workspace.gui.GuiComponent}.
+ * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
+ * Extend this class to create your own component type. Gui representations of
+ * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  */
 public abstract class WorkspaceComponent {
 
@@ -45,19 +40,10 @@ public abstract class WorkspaceComponent {
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     /** The set of all WorkspaceComponentListeners on this component. */
-    private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
-
-    /** List of attribute listeners. */
-    private final Collection<AttributeListener> attributeListeners;
+    private Collection<WorkspaceComponentListener> listeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
-
-    /** List of producer types. */
-    private final List<AttributeType> producerTypes = new ArrayList<AttributeType>();
-
-    /** List of consumer types. */
-    private final List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -66,11 +52,14 @@ public abstract class WorkspaceComponent {
      * views of the component. This design is kind of hack, based on the fact
      * that {@link ComponentPanel} has no easy access to {@link GuiComponent}.
      */
-    private Boolean guiOn = true;
+    private boolean guiOn = true;
 
     /** Whether to update this component. */
-    private Boolean updateOn = true;
+    private boolean updateOn = true;
 
+    /** Whether or not this component is being iterated more than just one time.*/
+    private boolean isRunning = false;
+    
     /** The name of this component. Used in the title, in saving, etc. */
     private String name = "";
 
@@ -80,9 +69,6 @@ public abstract class WorkspaceComponent {
      */
     private File currentFile;
 
-    /** Manage creation of attributes on this component. */
-    private final AttributeManager attributeManager;
-
     /**
      * If set to true, serialize this component before others. Possibly replace
      * with priority system later.
@@ -90,13 +76,9 @@ public abstract class WorkspaceComponent {
      */
     private int serializePriority = 0;
 
-    /**
-     * Initializer
-     */
+    /** Initializer */
     {
-        workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
-        attributeListeners = new HashSet<AttributeListener>();
-        attributeManager = new AttributeManager(this);
+        listeners = new HashSet<WorkspaceComponentListener>();
     }
 
     /**
@@ -106,8 +88,7 @@ public abstract class WorkspaceComponent {
      */
     public WorkspaceComponent(final String name) {
         this.name = name;
-        logger.trace(
-                this.getClass().getCanonicalName() + ": " + name + " created");
+        logger.trace(getClass().getCanonicalName() + ": " + name + " created");
     }
 
     /**
@@ -121,9 +102,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns a list of the formats that this component supports.
-     * <p>
-     * The default behavior is to return an empty list. This means that there is
-     * one format.
+     * The default behavior is to return a list containing the default format.
      *
      * @return a list of the formats that this component supports.
      */
@@ -140,117 +119,17 @@ public abstract class WorkspaceComponent {
         //TODO: If there is no Gui then close must be called directly
     }
 
-    /**
-     * Closes the WorkspaceComponent.
-     */
+    /** Closes the WorkspaceComponent. */
     public void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
 
-    /**
-     * Perform cleanup after closing.
-     */
+    /** Perform cleanup after closing. */
     protected abstract void closing();
 
-    /**
-     * Called by Workspace to update the state of the component.
-     */
-    public void update() {
-        /* no default implementation */
-    }
-
-    /**
-     * Return the potential consumers associated with this component. Subclasses
-     * should override this to make their consumers available.
-     *
-     * @return the consumer list.
-     */
-    public List<PotentialConsumer> getPotentialConsumers() {
-        return Collections.EMPTY_LIST;
-    }
-
-    /**
-     * Return the potential producers associated with this component. Subclasses
-     * should override this to make their producers available.
-     *
-     * @return the producer list.
-     */
-    public List<PotentialProducer> getPotentialProducers() {
-        return Collections.EMPTY_LIST;
-    }
-
-    /**
-     * Fire attribute object removed event (when the base object of an attribute
-     * is removed).
-     *
-     * @param object the object which was removed
-     */
-    public void fireAttributeObjectRemoved(Object object) {
-        for (AttributeListener listener : attributeListeners) {
-            listener.attributeObjectRemoved(object);
-        }
-    }
-
-    /**
-     * Fire potential attributes changed event.
-     */
-    public void firePotentialAttributesChanged() {
-        for (AttributeListener listener : attributeListeners) {
-            listener.potentialAttributesChanged();
-        }
-    }
-
-    /**
-     * Fire attribute type visibility changed event.
-     *
-     * @param type the type whose visibility changed.
-     */
-    public void fireAttributeTypeVisibilityChanged(AttributeType type) {
-        for (AttributeListener listener : attributeListeners) {
-            listener.attributeTypeVisibilityChanged(type);
-        }
-    }
-
-    /**
-     * Adds a AttributeListener to this component.
-     *
-     * @param listener the AttributeListener to add.
-     */
-    public void addAttributeListener(final AttributeListener listener) {
-        attributeListeners.add(listener);
-    }
-
-    /**
-     * Removes an AttributeListener from this component.
-     *
-     * @param listener the AttributeListener to remove.
-     */
-    public void removeAttributeListener(AttributeListener listener) {
-        attributeListeners.remove(listener);
-    }
-
-    /**
-     * Add a new type of producer.
-     *
-     * @param type type to add
-     */
-    public void addProducerType(AttributeType type) {
-        if (!producerTypes.contains(type)) {
-            producerTypes.add(type);
-        }
-    }
-
-    /**
-     * Add a new type of consumer.
-     *
-     * @param type type to add
-     */
-    public void addConsumerType(AttributeType type) {
-        if (!consumerTypes.contains(type)) {
-            consumerTypes.add(type);
-        }
-    }
+    /** Called by Workspace to update the state of the component. */
+    public void update() {}
 
     /**
      * Finds objects based on a key. Used in deserializing attributes. Any class
@@ -259,7 +138,7 @@ public abstract class WorkspaceComponent {
      * @param objectKey String key
      * @return the corresponding object
      */
-    public Object getObjectFromKey(final String objectKey) {
+    public Object getObjectFromKey(String objectKey) {
         return null;
     }
 
@@ -276,6 +155,15 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Return a collection of all model objects currently managed by this component.
+     * Whenever this collection would
+     */
+    public List getModels() {
+        // TODO: This should be abstract.
+        return new ArrayList<Object>();
+    }
+
+    /**
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of
      * each part.
@@ -286,55 +174,60 @@ public abstract class WorkspaceComponent {
         return Collections.singleton(this);
     }
 
-    /**
-     * Called by Workspace to notify that updates have stopped.
-     */
-    protected void stopped() {
-        /* no default implementation */
-    }
+    /** Called by Workspace to notify that updates have stopped. */
+    protected void stopped() {}
 
-    /**
-     * Notify all workspaceComponentListeners of a componentUpdated event.
-     */
-    public final void fireUpdateEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the component has been updated. */
+    public void fireUpdateEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentUpdated();
         }
     }
 
-    /**
-     * Notify all workspaceComponentListeners that the gui has been turned on or
-     * off.
-     */
-    public final void fireGuiToggleEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the gui has been turned on or off. */
+    public void fireGuiToggleEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.guiToggled();
         }
     }
 
-    /**
-     * Notify all workspaceComponentListeners of a component has been turned on
-     * or off.
-     */
-    public final void fireComponentToggleEvent() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+    /** Notify listeners that the component has been turned on or off. */
+    public void fireComponentToggleEvent() {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentOnOffToggled();
         }
     }
 
-    /**
-     * Fired when component is closed.
-     */
+    /** Notify listeners that the component is closing. */
     public void fireComponentClosing() {
-        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentClosing();
         }
     }
 
-    /**
-     * Called after a global update ends.
-     */
-    final void doStopped() {
+    /** Notify listeners that a model object has been added to the component. */
+    public void fireModelAdded(Object addedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelAdded(addedModel);
+        }
+    }
+
+    /** Notify listeners that a model object has been removed from the component. */
+    public void fireModelRemoved(Object removedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelRemoved(removedModel);
+        }
+    }
+
+    /** Notify listeners that a model object has been changed in the component. */
+    public void fireModelChanged(Object removedModel) {
+        for (WorkspaceComponentListener listener : listeners) {
+            listener.modelRemoved(removedModel);
+        }
+    }
+
+    /** Called after a global update ends. */
+    void doStopped() {
         stopped();
     }
 
@@ -343,57 +236,49 @@ public abstract class WorkspaceComponent {
      *
      * @return The WorkspaceComponentListeners on this component.
      */
-    public Collection<WorkspaceComponentListener> getWorkspaceComponentListeners() {
-        return Collections.unmodifiableCollection(workspaceComponentListeners);
+    public Collection<WorkspaceComponentListener> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
     }
 
     /**
-     * Adds a WorkspaceComponentListener to this component.
+     * Adds a listener to this component.
      *
      * @param listener the WorkspaceComponentListener to add.
      */
-    public void addWorkspaceComponentListener(
-            final WorkspaceComponentListener listener) {
-        workspaceComponentListeners.add(listener);
+    public void addListener(WorkspaceComponentListener listener) {
+        listeners.add(listener);
     }
 
     /**
-     * Adds a WorkspaceComponentListener to this component.
+     * Adds a listener to this component.
      *
      * @param listener the WorkspaceComponentListener to add.
      */
-    public void removeWorkspaceComponentListener(
-            final WorkspaceComponentListener listener) {
-        workspaceComponentListeners.remove(listener);
+    public void removeListener(WorkspaceComponentListener listener) {
+        listeners.remove(listener);
     }
 
     /**
      * Returns the name of this component.
-     *
-     * @return The name of this component.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return name;
-        // return this.getClass().getSimpleName() + ": " + name;
-    }
-
-    /**
      * @param name the name to set
      */
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
         // TODO: Think about this
         // for (WorkspaceComponentListener listener : this.getListeners()) {
         // listener.setTitle(name);
         // }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     /**
@@ -420,42 +305,20 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Sets the workspace for this component. Called by the workspace right
-     * after this component is created.
-     *
-     * @param workspace The workspace for this component.
-     */
-    public void setWorkspace(final Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    /**
      * Returns the workspace associated with this component.
-     *
-     * @return The workspace associated with this component.
      */
     public Workspace getWorkspace() {
         return workspace;
     }
 
     /**
-     * Called when a coupling attached to this component is removed. This method
-     * will only be called once if this component has both the source and the
-     * target.
+     * Sets the workspace for this component. Called by the workspace right
+     * after this component is created.
      *
-     * @param coupling The coupling that has been removed.
+     * @param workspace The workspace for this component.
      */
-    public void couplingRemoved(final Coupling<?> coupling) {
-        // No implementation.
-    }
-
-    /**
-     * Called when a coupling is attached to this component.
-     *
-     * @param coupling The coupling that is being added
-     */
-    public void couplingAdded(Coupling<?> coupling) {
-        // Override is this function is needed in a component type
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
     /**
@@ -468,13 +331,11 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Set to true when a component changes, set to false after a component is
-     * saved.
+     * Set to true when a component changes, set to false after a component is saved.
      *
-     * @param changedSinceLastSave whether this component has changed since the
-     *            last save.
+     * @param changedSinceLastSave whether this component has changed since the last save.
      */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
+    public void setChangedSinceLastSave(boolean changedSinceLastSave) {
         logger.debug("component changed");
         this.changedSinceLastSave = changedSinceLastSave;
     }
@@ -498,7 +359,7 @@ public abstract class WorkspaceComponent {
     /**
      * @param currentFile the currentFile to set
      */
-    public void setCurrentFile(final File currentFile) {
+    public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
     }
 
@@ -519,14 +380,14 @@ public abstract class WorkspaceComponent {
     /**
      * @return the guiOn
      */
-    public Boolean isGuiOn() {
+    public boolean isGuiOn() {
         return guiOn;
     }
 
     /**
      * @param guiOn the guiOn to set
      */
-    public void setGuiOn(Boolean guiOn) {
+    public void setGuiOn(boolean guiOn) {
         this.guiOn = guiOn;
         this.fireGuiToggleEvent();
     }
@@ -534,73 +395,36 @@ public abstract class WorkspaceComponent {
     /**
      * @return the updateOn
      */
-    public Boolean getUpdateOn() {
+    public boolean getUpdateOn() {
         return updateOn;
     }
 
     /**
      * @param updateOn the updateOn to set
      */
-    public void setUpdateOn(Boolean updateOn) {
+    public void setUpdateOn(boolean updateOn) {
         this.updateOn = updateOn;
         this.fireComponentToggleEvent();
     }
 
     /**
-     * @return the producerTypes
+     * Sets whether or not this component is marked as currently running... 
+     * meant to be false if only doing a one-off update
+     * @param running
      */
-    public List<AttributeType> getProducerTypes() {
-        return Collections.unmodifiableList(producerTypes);
+    public void setRunning(boolean running) {
+    	this.isRunning = running;
+    }
+    
+    /**
+     * @return if this component is marked as running
+     */
+    public boolean isRunning() {
+    	return isRunning;
     }
 
-    /**
-     * @return the consumerTypes
-     */
-    public List<AttributeType> getConsumerTypes() {
-        return Collections.unmodifiableList(consumerTypes);
-    }
-
-    /**
-     * Return visible producer types.
-     *
-     * @return the visible producerTypes
-     */
-    public List<AttributeType> getVisibleProducerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getProducerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * Return visible consumer types.
-     *
-     * @return the visible consumerTypes
-     */
-    public List<AttributeType> getVisibleConsumerTypes() {
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        for (AttributeType type : getConsumerTypes()) {
-            if (type.isVisible()) {
-                returnList.add(type);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * @return the attributeManager
-     */
-    public AttributeManager getAttributeManager() {
-        return attributeManager;
-    }
-
-    /**
-     * @return the serializePriority
-     */
-    protected int getSerializePriority() {
+    /** Return the serializePriority */
+    public int getSerializePriority() {
         return serializePriority;
     }
 
@@ -610,35 +434,18 @@ public abstract class WorkspaceComponent {
     protected void setSerializePriority(int serializePriority) {
         this.serializePriority = serializePriority;
     }
-    
-    // Convenience methods which forward to attribute manager.
-    //  A small bit of merging from 3.1 refactor
-    public PotentialConsumer createPotentialConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        return attributeManager.createPotentialConsumer(baseObject, methodName,
-                dataType);
-    }
-
-    public PotentialProducer createPotentialProducer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        return attributeManager.createPotentialProducer(baseObject, methodName,
-                dataType);
-    }
 
     /**
      * Called when a simulation begins, e.g. when the "run" button is pressed.
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void start() {
-    }
+    public void start() {}
 
     /**
      * Called when a simulation stops, e.g. when the "stop" button is pressed.
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void stop() {
-    }
-
+    public void stop() {}
 }

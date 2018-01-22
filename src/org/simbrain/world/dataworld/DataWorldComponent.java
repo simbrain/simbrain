@@ -28,9 +28,8 @@ import javax.swing.event.TableModelListener;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.table.NumericTable;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -56,19 +55,19 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     private List<ColumnAttribute> producerList = new ArrayList<ColumnAttribute>();
 
-    /** Producing column attribute type. */
-    private final AttributeType producingColumnType = new AttributeType(this,
-            "Column", "getValue", double.class, true);
-
-    /** Consuming column attribute type. */
-    private final AttributeType consumingColumnType = new AttributeType(this,
-            "Column", "setValue", double.class, true);
-
-    private final AttributeType consumingColumnVectorType = new AttributeType(
-            this, "Current row", "setVector", double[].class, true);
-
-    private final AttributeType producingColumnVectorType = new AttributeType(
-            this, "Current row", "getVector", double[].class, true);
+//    /** Producing column attribute type. */
+//    private final AttributeType producingColumnType = new AttributeType(this,
+//            "Column", "getValue", double.class, true);
+//
+//    /** Consuming column attribute type. */
+//    private final AttributeType consumingColumnType = new AttributeType(this,
+//            "Column", "setValue", double.class, true);
+//
+//    private final AttributeType consumingColumnVectorType = new AttributeType(
+//            this, "Current row", "setVector", double[].class, true);
+//
+//    private final AttributeType producingColumnVectorType = new AttributeType(
+//            this, "Current row", "getVector", double[].class, true);
 
     /**
      * Create the data world component.
@@ -98,10 +97,10 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        addProducerType(producingColumnType);
-        addConsumerType(consumingColumnType);
-        addProducerType(producingColumnVectorType);
-        addConsumerType(consumingColumnVectorType);
+//        addProducerType(producingColumnType);
+//        addConsumerType(consumingColumnType);
+//        addProducerType(producingColumnVectorType);
+//        addConsumerType(consumingColumnVectorType);
 
         initProducerConsumerLists();
 
@@ -119,7 +118,7 @@ public class DataWorldComponent extends WorkspaceComponent {
                         || (e.getType() == TableModelEvent.INSERT)
                         || (e.getFirstRow() == TableModelEvent.HEADER_ROW)) {
                     initProducerConsumerLists();
-                    firePotentialAttributesChanged();
+//                    firePotentialAttributesChanged();
                 }
                 setChangedSinceLastSave(true);
             }
@@ -138,53 +137,53 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
     }
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (consumingColumnType.isVisible()) {
-            for (ColumnAttribute attribute : consumerList) {
-                String description = consumingColumnType
-                        .getSimpleDescription("Column "
-                                + (attribute.getIndex() + 1));
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(attribute, consumingColumnType);
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-        }
-        if (consumingColumnVectorType.isVisible()) {
-            PotentialConsumer consumer = getAttributeManager()
-                    .createPotentialConsumer(dataTable, "setVectorCurrentRow",
-                            double[].class);
-            consumer.setCustomDescription("Set current row");
-            returnList.add(consumer);
-        }
-        return returnList;
-    }
-
-    @Override
-    public List<PotentialProducer> getPotentialProducers() {
-        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-        if (producingColumnType.isVisible()) {
-            for (ColumnAttribute attribute : consumerList) {
-                String description = producingColumnType
-                        .getDescription("Column_" + (attribute.getIndex() + 1));
-                PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(attribute, producingColumnType);
-                producer.setCustomDescription(description);
-                returnList.add(producer);
-            }
-        }
-        if (producingColumnVectorType.isVisible()) {
-
-            PotentialProducer producer = getAttributeManager()
-                    .createPotentialProducer(dataTable, "getVectorCurrentRow",
-                            double[].class);
-            producer.setCustomDescription("Get current row");
-            returnList.add(producer);
-        }
-        return returnList;
-    }
+//    @Override
+//    public List<PotentialConsumer> getPotentialConsumers() {
+//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+//        if (consumingColumnType.isVisible()) {
+//            for (ColumnAttribute attribute : consumerList) {
+//                String description = consumingColumnType
+//                        .getSimpleDescription("Column "
+//                                + (attribute.getIndex() + 1));
+//                PotentialConsumer consumer = getAttributeManager()
+//                        .createPotentialConsumer(attribute, consumingColumnType);
+//                consumer.setCustomDescription(description);
+//                returnList.add(consumer);
+//            }
+//        }
+//        if (consumingColumnVectorType.isVisible()) {
+//            PotentialConsumer consumer = getAttributeManager()
+//                    .createPotentialConsumer(dataTable, "setVectorCurrentRow",
+//                            double[].class);
+//            consumer.setCustomDescription("Set current row");
+//            returnList.add(consumer);
+//        }
+//        return returnList;
+//    }
+//
+//    @Override
+//    public List<PotentialProducer> getPotentialProducers() {
+//        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+//        if (producingColumnType.isVisible()) {
+//            for (ColumnAttribute attribute : consumerList) {
+//                String description = producingColumnType
+//                        .getDescription("Column_" + (attribute.getIndex() + 1));
+//                PotentialProducer producer = getAttributeManager()
+//                        .createPotentialProducer(attribute, producingColumnType);
+//                producer.setCustomDescription(description);
+//                returnList.add(producer);
+//            }
+//        }
+//        if (producingColumnVectorType.isVisible()) {
+//
+//            PotentialProducer producer = getAttributeManager()
+//                    .createPotentialProducer(dataTable, "getVectorCurrentRow",
+//                            double[].class);
+//            producer.setCustomDescription("Get current row");
+//            returnList.add(producer);
+//        }
+//        return returnList;
+//    }
 
     /**
      * Return the column producer with specified index, or null if none found.
@@ -373,18 +372,21 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     }
 
-    /**
-     * @return the producingColumnType
-     */
-    public AttributeType getProducingColumnType() {
-        return producingColumnType;
+    @Consumable
+    public void setRow(final double[] values) {
+        dataTable.setVectorCurrentRow(values);
     }
 
-    /**
-     * @return the consumingColumnType
-     */
-    public AttributeType getConsumingColumnType() {
-        return consumingColumnType;
+    @Producible
+    public double[] getRow() {
+        return dataTable.getVectorCurrentRow();
     }
-
+    
+    @Override
+    public List<Object> getModels() {
+        List<Object> retList = new ArrayList<Object>();
+        retList.add(this);
+        return retList;
+    }
+    
 }

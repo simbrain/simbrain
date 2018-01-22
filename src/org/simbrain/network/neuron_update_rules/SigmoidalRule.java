@@ -22,7 +22,6 @@ import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunction;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
@@ -127,14 +126,17 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
 
     @Override
     public void applyFunction(DoubleMatrix input, DoubleMatrix output) {
-        this.sFunction.valueOf(input, output, getUpperBound(), getLowerBound(),
-                slope);
+        sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
     }
 
     @Override
     public void getDerivative(DoubleMatrix input, DoubleMatrix output) {
-        this.sFunction.derivVal(input, output, getUpperBound(), getLowerBound(),
-                slope);
+        sFunction.derivVal(input, output, getUpperBound(), getLowerBound(), slope);
+    }
+
+    @Override
+    public void applyFunctionAndDerivative(DoubleMatrix input, DoubleMatrix output, DoubleMatrix derivative) {
+        sFunction.valueAndDeriv(input, output, derivative, getUpperBound(), getLowerBound(), slope);
     }
 
 }

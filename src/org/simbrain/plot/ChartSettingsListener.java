@@ -26,6 +26,6 @@ public interface ChartSettingsListener {
     /**
      * The chart settings have been updated.
      */
-    void chartSettingsUpdated();
+    void chartSettingsUpdated(ChartModel model);
 
 }

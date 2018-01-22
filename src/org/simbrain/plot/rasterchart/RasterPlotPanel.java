@@ -35,6 +35,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
@@ -113,27 +114,21 @@ public class RasterPlotPanel extends JPanel {
 
         // Create chart settings listener
         model.addChartSettingsListener(new ChartSettingsListener() {
-            public void chartSettingsUpdated() {
+            public void chartSettingsUpdated(ChartModel theModel) {
 
                 // Handle range properties
-                chart.getXYPlot().getRangeAxis()
-                        .setAutoRange(model.isAutoRange());
+                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
                 if (!model.isAutoRange()) {
-                    chart.getXYPlot()
-                            .getRangeAxis()
-                            .setRange(model.getRangeLowerBound(),
-                                    model.getRangeUpperBound());
+                    chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
                 }
 
                 // Handle domain properties
                 if (model.isFixedWidth()) {
-                    chart.getXYPlot().getDomainAxis()
-                            .setFixedAutoRange(model.getWindowSize());
+                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
                 } else {
                     chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
                     chart.getXYPlot().getDomainAxis().setAutoRange(true);
                 }
-
             }
         });
 

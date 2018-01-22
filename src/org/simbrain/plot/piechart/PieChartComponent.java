@@ -23,9 +23,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -36,12 +36,6 @@ public class PieChartComponent extends WorkspaceComponent {
     /** Data model. */
     private PieChartModel model;
 
-    /** Pie chart consumer type (for one "slice" at a time). */
-    private AttributeType pieChartConsumer;
-
-    /** Pit chart vector consumer type (for all "slice" at once). */
-    private AttributeType pieChartVectorConsumer;
-
     /**
      * Create new PieChart Component.
      *
@@ -51,8 +45,7 @@ public class PieChartComponent extends WorkspaceComponent {
         super(name);
         model = new PieChartModel();
         model.defaultInit();
-        initializeAttributes();
-        addListener();
+        initModelListener();
     }
 
     /**
@@ -66,76 +59,28 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name, final PieChartModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
-        addListener();
-    }
-
-    /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-        pieChartConsumer = new AttributeType(this, "Slice", "setValue",
-                double.class, true);
-        addConsumerType(pieChartConsumer);
-
-        pieChartVectorConsumer = new AttributeType(this, "Pie Slices",
-                double[].class, true);
-        addConsumerType(pieChartVectorConsumer);
-
+        initModelListener();
     }
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (pieChartConsumer.isVisible()) {
-            for (int i = 0; i < model.getDataset().getItemCount(); i++) {
-                String description = pieChartConsumer
-                        .getSimpleDescription("Slice " + (i + 1));
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(model, "setValue",
-                                new Class[] { double.class, Integer.class },
-                                new Object[] { i });
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-        }
-        if (pieChartVectorConsumer.isVisible()) {
-            PotentialConsumer consumer = getAttributeManager()
-                    .createPotentialConsumer(model, "setValues", double[].class);
-            consumer.setCustomDescription("Set slices");
-            returnList.add(consumer);
-        }
-        return returnList;
+    public List<Object> getModels() {
+        List<Object> models = new ArrayList<Object>();
+        models.add(model);
+        return models;
     }
 
     /**
-     * Add chart listener to model.
+     * Add chart listener to model for this component.
      */
-    private void addListener() {
-
+    private void initModelListener() {
         model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                firePotentialAttributesChanged();
+            public void dataSourceAdded(ChartDataSource source) {
+                fireModelAdded(null);
             }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                firePotentialAttributesChanged();
+            public void dataSourceRemoved(ChartDataSource source) {
+                fireModelRemoved(null);
             }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void chartInitialized(int numSources) {
-                // No implementation yet (not used in this component thus far).
-            }
-
         });
     }
 
@@ -166,9 +111,6 @@ public class PieChartComponent extends WorkspaceComponent {
         return model;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         PieChartModel.getXStream().toXML(model, output);
@@ -176,14 +118,11 @@ public class PieChartComponent extends WorkspaceComponent {
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
+    public void closing() {}
 
     @Override
     public void update() {

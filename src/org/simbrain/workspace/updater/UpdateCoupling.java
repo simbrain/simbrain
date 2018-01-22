@@ -21,14 +21,14 @@ package org.simbrain.workspace.updater;
 import org.simbrain.workspace.Coupling;
 
 /**
- * Updates a coupling
+ * Updates a coupling.
  *
  * @author jyoshimi
  */
 public class UpdateCoupling implements UpdateAction {
 
     /** of couplings to update. */
-    private final Coupling<?> coupling;
+    private final transient Coupling<?> coupling;
 
     /**
      * Construct the action.
@@ -43,7 +43,6 @@ public class UpdateCoupling implements UpdateAction {
      * {@inheritDoc}
      */
     public void invoke() {
-        coupling.setBuffer();
         coupling.update();
     }
 
@@ -54,11 +53,7 @@ public class UpdateCoupling implements UpdateAction {
         if (coupling == null) {
             return "Invalid action";
         } else {
-            return "Update coupling ("
-                    + coupling.getProducer().getParentComponent().getName()
-                    + ">"
-                    + coupling.getConsumer().getParentComponent().getName()
-                    + ")";
+            return "Update coupling (" + coupling.getConsumer() + ">" + coupling.getProducer() + ")";
         }
     }
 

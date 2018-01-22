@@ -18,17 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -72,14 +68,26 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
     /**
      * Default constructor.
      *
-     * @param np parent panel
+     * @param networkPanel parent panel
      * @param trainable edited network
      */
-    public SupervisedTrainingDialog(final NetworkPanel np,
-        final Trainable trainable) {
-        networkPanel = np;
+    public SupervisedTrainingDialog(NetworkPanel networkPanel, Trainable trainable) {
+        this.networkPanel = networkPanel;
         this.trainable = trainable;
 
+        // Stop trainer from running any time the window is closed
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                stopTrainer();
+            }
+        });
+    }
+
+    public SupervisedTrainingDialog(Frame parent, NetworkPanel networkPanel, Trainable trainable) {
+        super(parent, "");
+        this.networkPanel = networkPanel;
+        this.trainable = trainable;
         // Stop trainer from running any time the window is closed
         this.addWindowListener(new WindowAdapter() {
             @Override

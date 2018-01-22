@@ -26,6 +26,8 @@ import java.util.List;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.DisplayOrder;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
@@ -193,6 +195,7 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current x position.
      * @param newx
      */
+    @Consumable(idMethod="getId")
     public void setX(final float newx) {
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
@@ -215,6 +218,7 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current y position.
      * @param newy
      */
+    @Consumable(idMethod="getId")
     public void setY(final float newy) {
         // System.out.println("y:" + newy);
         if (parentWorld.getWrapAround()) {
@@ -266,7 +270,6 @@ public abstract class OdorWorldEntity {
      * image.
      * @return
      */
-
     public int getWidth() {
         while (getImage().getWidth(null) < 0) {
             ;
@@ -291,7 +294,8 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @return
      */
-    @DisplayOrder(val = 80)
+    @DisplayOrder(val = 80) 
+    @Producible(idMethod="getId")
     public float getVelocityX() {
         return dx;
     }
@@ -301,7 +305,8 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @return
      */
-    @DisplayOrder(val = 90)
+    @DisplayOrder(val = 90) 
+    @Producible(idMethod="getId")
     public float getVelocityY() {
         return dy;
     }
@@ -311,6 +316,7 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @param dx
      */
+    @Consumable(idMethod="getId")
     public void setVelocityX(final float dx) {
         this.dx = dx;
     }
@@ -320,6 +326,7 @@ public abstract class OdorWorldEntity {
      * millisecond.
      * @param dy
      */
+    @Consumable(idMethod="getId")
     public void setVelocityY(final float dy) {
         this.dy = dy;
     }
@@ -550,8 +557,16 @@ public abstract class OdorWorldEntity {
      *
      * @return center location of the entity.
      */
+    @Producible(idMethod="getId")
     public double[] getCenterLocation() {
         return new double[] { getCenterX(), getCenterY() };
+    }
+
+    /**
+     * Assigns the location of the center of this entity from a double array.
+     */
+    public void setCenterLocation(double[] value) {
+        setCenterLocation(value[0], value[1]);
     }
 
     /**
@@ -559,7 +574,8 @@ public abstract class OdorWorldEntity {
      *
      * @return center x coordinate.
      */
-    public double getCenterX() {
+    @Producible(idMethod="getId")
+    public float getCenterX() {
         return x + (getWidth() / 2);
     }
 
@@ -568,7 +584,8 @@ public abstract class OdorWorldEntity {
      *
      * @return center y coordinate.
      */
-    public double getCenterY() {
+    @Producible(idMethod="getId")
+    public float getCenterY() {
         return y + (getHeight() / 2);
     }
 
@@ -578,7 +595,7 @@ public abstract class OdorWorldEntity {
      * @param x x coordinate
      * @param y y coordinate
      */
-    public void setCenterLocation(float x, float y) {
+    public void setCenterLocation(double x, double y) {
         setX(x - (getWidth() / 2));
         setY(y - (getHeight() / 2));
     }
@@ -588,6 +605,7 @@ public abstract class OdorWorldEntity {
      *
      * @return location of the entity.
      */
+    @Producible(idMethod="getId")
     public double[] getLocation() {
         return new double[] { x, y };
     }
@@ -598,7 +616,7 @@ public abstract class OdorWorldEntity {
      * @param x x coordinate
      * @param y y coordinate
      */
-    public void setLocation(float x, float y) {
+    public void setLocation(double x, double y) {
         setX(x);
         setY(y);
     }
@@ -788,7 +806,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveNorth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -803,7 +821,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveSouth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -818,7 +836,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveEast(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -833,7 +851,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    //@Consumible(customDescriptionMethod="getId")
+    @Consumable(idMethod="getId")
     public void moveWest(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {

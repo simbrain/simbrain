@@ -19,10 +19,14 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
-import java.awt.EventQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.workspace.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -31,11 +35,36 @@ import com.thoughtworks.xstream.XStream;
  */
 public class BarChartModel extends ChartModel {
 
+    /**
+     * Bar encapsulates a single data column in the BarChartModel.
+     */
+    public class Bar implements ChartDataSource {
+        
+        /** Coupling Description. */
+        private String description;
+
+        /** Construct the Bar. */
+        Bar(String description) {
+            this.description = description;
+            dataset.addValue((Number)0, 1, description);
+        }
+
+        /** Get the description. */
+        public String getDescription() {
+            return description;
+        }
+
+        @Consumable(idMethod="getDescription")
+        public void setValue(double value) {
+            dataset.setValue((Number)value, 1, description);
+        }
+    }
+
     /** JFreeChart dataset for bar charts. */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    /** Initial number of data sources. */
-    private static final int INITIAL_DATA_SOURCES = 6;
+    /** List of bar objects which can be coupled to. */
+    private List<Bar> bars = new ArrayList<Bar>();
 
     /** Color of bars in barchart. */
     private Color barColor = Color.red;
@@ -49,17 +78,11 @@ public class BarChartModel extends ChartModel {
     /** Minimum range. */
     private double lowerBound = 0;
 
-    // private Range chartRange = new Range(0, 10);
+    /** Bar chart model constructor. */
+    public BarChartModel() {}
 
     /**
-     * Bar chart model constructor.
-     */
-    public BarChartModel() {
-    }
-
-    /**
-     * Return JFreeChart pie dataset.
-     *
+     * Return JFreeChart category dataset.
      * @return dataset
      */
     public DefaultCategoryDataset getDataset() {
@@ -67,79 +90,12 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Default initialization.
-     */
-    public void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
-    }
-
-    /**
-     * Create specified number of set of data sources. Adds these two existing
-     * data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
-        int currentIndex = dataset.getColumnCount();
-        for (int i = 0; i < numDataSources; i++) {
-            addColumn(currentIndex + i);
-        }
-    }
-
-    /**
-     * Adds a new column to the dataset.
-     * @param index
-     */
-    public void addColumn(final int index) {
-        dataset.addValue(0, new Integer(1), new Integer(index + 1));
-        fireDataSourceAdded(index);
-    }
-
-    /**
-     * Adds a bar to the bar chart dataset.
-     */
-    public void addColumn() {
-        addColumn(dataset.getColumnCount());
-    }
-
-    /**
-     * Removes the last bar from the bar chart data.
-     */
-    public void removeColumn() {
-        if (dataset.getColumnCount() > 0) {
-            removeColumn(dataset.getColumnCount() - 1);
-        }
-    }
-
-    // TODO: Change names from row / column to "bars"?
-
-    public void removeColumn(final int index) {
-        dataset.removeColumn(index);
-        fireDataSourceRemoved(index);
-    }
-
-    /**
      * Returns a properly initialized xstream object.
-     *
      * @return the XStream object
      */
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
         return xstream;
-    }
-
-    /**
-     * Set value of a specified bar.
-     *
-     * @param value value of bar
-     * @param index which bar value to set
-     */
-    public void setValue(final double value, final Integer index) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                getDataset().setValue(value, new Integer(1), index);
-            }
-        });
     }
 
     /**
@@ -151,20 +107,6 @@ public class BarChartModel extends ChartModel {
      */
     private Object readResolve() {
         return this;
-    }
-
-    /**
-     * Used for debugging model.
-     */
-    public void debug() {
-        System.out.println("------------ Debug model ------------");
-        for (int i = 0; i < dataset.getRowCount(); i++) {
-            for (int j = 0; j < dataset.getColumnCount(); j++) {
-                System.out.println("<" + i + "," + j + "> "
-                        + dataset.getValue(i, j));
-            }
-        }
-        System.out.println("--------------------------------------");
     }
 
     /**
@@ -231,21 +173,108 @@ public class BarChartModel extends ChartModel {
      * @param lowerBound the lower range boundary.
      * @param upperBound the upper range boundary.
      */
-    public void setRange(final double lowerBound, final double upperBound) {
+    public void setRange(double lowerBound, double upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         fireSettingsChanged();
     }
 
+    /** Return a list of all bars used by this BarChartModel. */
+    public List<Bar> getBars() {
+        return bars;
+    }
+
     /**
-     * Set the values for all the bars using an array.
-     *
-     * @param input the values for the bars as an array
+     * This method is used only for coupling to the bar chart. It does not do anything.
+     * Couplings to this method will be replaced by couplings to new data sources by the
+     * ChartCouplingListener.
      */
-    public void setBars(double[] input) {
-        for (int i = 0; i < input.length; i++) {
-            getDataset().setValue((Number) input[i], new Integer(1), i);
+    @Consumable(idMethod="getId")
+    public void addBar(double value) {}
+
+    /** Identify this model. */
+    public String getId() {
+        return "BarChart";
+    }
+
+    /**
+     * Create specified number of bars.
+     * @param numBars number of bars to add.
+     */
+    public void addBars(int numBars) {
+        for (int i = 0; i < numBars; i++) {
+            addBar();
         }
+    }
+
+    /** Add a new bar to the dataset. */
+    public Bar addBar() {
+        return addBar("Bar" + (bars.size() + 1));
+    }
+
+    public Bar addBar(String description) {
+        Bar bar = new Bar(description);
+        bars.add(bar);
+        fireDataSourceAdded(bar);
+        return bar;
+    }
+
+    @Override
+    public ChartDataSource addDataSource(String description) {
+        return addBar(description);
+    }
+
+    /**
+     * Removes the last bar from the bar chart data.
+     */
+    public void removeBar() {
+        if (dataset.getColumnCount() > 0) {
+            Bar bar = bars.remove(bars.size() - 1);
+            dataset.removeColumn(bar.getDescription());
+            fireDataSourceRemoved(bar);
+        }
+    }
+
+    /** Remove a bar with the specified description from the model. */
+    public void removeBar(String description) {
+        Optional<Bar> bar = getBar(description);
+        if (bar.isPresent()) {
+            removeBar(bar.get());
+        }
+    }
+
+    public void removeBar(Bar bar) {
+        if (bars.remove(bar)) {
+            dataset.removeColumn(bar.getDescription());
+            fireDataSourceRemoved(bar);
+        }
+    }
+
+    @Override
+    public void removeDataSource(ChartDataSource source) {
+        if (source instanceof Bar) {
+            removeBar((Bar)source);
+        }
+    }
+
+    /**
+     * Find matching bar object. Used to deserialize.
+     * 
+     * @param description key
+     * @return matching bar
+     */
+    public Optional<Bar> getBar(String description) {
+        for (Bar bar : bars) {
+            if (bar.getDescription().equals(description)) {
+                return Optional.of(bar);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<? extends ChartDataSource> getDataSource(String description) {
+        return getBar(description);
     }
 
 }

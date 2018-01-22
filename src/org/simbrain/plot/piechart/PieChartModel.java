@@ -20,6 +20,7 @@ package org.simbrain.plot.piechart;
 
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.workspace.Consumable;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -68,7 +69,7 @@ public class PieChartModel extends ChartModel {
     public void addDataSource() {
         Integer index = dataset.getItemCount() + 1;
         dataset.setValue(index, 1);
-        this.fireDataSourceAdded(index);
+        this.fireDataSourceAdded(null);
     }
 
     /**
@@ -77,7 +78,7 @@ public class PieChartModel extends ChartModel {
     public void removeDataSource() {
         int removalIndex = dataset.getItemCount();
         if (removalIndex > 0) {
-            this.fireDataSourceRemoved(removalIndex);
+            this.fireDataSourceRemoved(null);
             dataset.remove(removalIndex);
         }
     }
@@ -146,6 +147,7 @@ public class PieChartModel extends ChartModel {
      *
      * @param input the values for the slices as an array
      */
+    @Consumable
     public void setValues(double[] input) {
         for (int i = 0; i < input.length; i++) {
             setValue(input[i], new Integer(i));

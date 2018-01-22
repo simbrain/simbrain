@@ -26,9 +26,8 @@ import javax.swing.AbstractAction;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
 /**
@@ -52,19 +51,12 @@ public final class OpenDataWorldAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String defaultDirectory = ".";
-        try {
-            defaultDirectory = SimbrainPreferences
-            .getString("workspaceTableDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
-        SFileChooser chooser = new SFileChooser(defaultDirectory,
-                "xml file", "xml");
+        String defaultDirectory = SimbrainPreferences.getString("workspaceTableDirectory");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            DataWorldComponent tableComponent = (DataWorldComponent) WorkspaceSerializer
-                    .open(DataWorldComponent.class, theFile);
+            DataWorldComponent tableComponent = (DataWorldComponent) WorkspaceSerializer.open(
+                    DataWorldComponent.class, theFile);
             workspace.addWorkspaceComponent(tableComponent);
         }
     }

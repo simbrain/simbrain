@@ -203,14 +203,14 @@ public class StandardDialog extends GenericJDialog {
     }
 
     /**
-     * Overrideen to perform specific clean up when dialog closed.
+     * Override to perform specific clean up when dialog closed.
      */
     protected void closeDialogOk() {
         dispose();
     }
 
     /**
-     * Overriden to perform specific clean up when dialog closed.
+     * Override to perform specific clean up when dialog closed.
      */
     protected void closeDialogCancel() {
         dispose();

@@ -19,12 +19,11 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
@@ -38,15 +37,15 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
- * The <b>SynapseDialog</b> is initialized with a list of synapses. When the
- * dialog is closed the synapses are changed based on the state of the dialog.
+ * The <b>SynapseDialog</b> is a dialog for setting the properties of synapses.
  */
 public final class SynapseDialog extends StandardDialog {
 
+    /** The synapses being modified. */
+    private final List<Synapse> synapseList;
+
     /**
      * Main panel for editing synapses.
-     *
-     * @see SynapsePropertiesSimple
      */
     private SynapsePropertiesPanel synapseEditingPanel;
 
@@ -59,14 +58,11 @@ public final class SynapseDialog extends StandardDialog {
     /** Show Help Action. The action executed by the help button */
     private ShowHelpAction helpAction;
 
-    /** The synapses being modified. */
-    private ArrayList<Synapse> synapseList;
-
     /**
-     * Creates a synapse dialog from a collection of SynapseNodes.
-     *
-     * @param selectedSynapses
-     *            the nodes
+     * Creates a synapse dialog from a collection of SynapseNodes. No frame
+     * available.
+     * 
+     * @param selectedSynapses the nodes
      * @return the dialog.
      */
     public static SynapseDialog createSynapseDialog(
@@ -74,7 +70,15 @@ public final class SynapseDialog extends StandardDialog {
         SynapseDialog sd = createSynapseDialog(getSynapses(selectedSynapses));
         return sd;
     }
-    
+
+    /**
+     * Creates a neuron dialog from a collection of SynapseNodes with a frame
+     * specified.
+     *
+     * @param selectedSynapses synapses to edit.
+     * @param parent the parent frame
+     * @return the dialog.
+     */
     public static SynapseDialog createSynapseDialog(
             final Collection<SynapseNode> selectedSynapses,
             final Frame parent) {
@@ -85,10 +89,9 @@ public final class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * Creates synapse dialog from a collection of synapses.
+     * Creates synapse dialog from a list of model synapses.
      *
-     * @param selectedSynapses
-     *            the synapses
+     * @param selectedSynapses the synapses
      * @return the dialog.
      */
     public static SynapseDialog createSynapseDialog(
@@ -99,10 +102,11 @@ public final class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * @param synapseList
-     *            the logical synapses being adjusted
+     * Private constructor without frame.
+     * 
+     * @param synapseList the logical synapses being adjusted
      */
-    private SynapseDialog(final Collection<Synapse> synapseList) {
+    private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = SynapsePropertiesPanel
                 .createSynapsePropertiesPanel(synapseList, this);
@@ -110,30 +114,19 @@ public final class SynapseDialog extends StandardDialog {
         updateHelp();
     }
 
-    private SynapseDialog(final Collection<Synapse> synapseList,
-            final Frame parent) {
+    /**
+     * Private constructor with frame.
+     * 
+     * @param synapseList
+     * @param parent
+     */
+    private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = SynapsePropertiesPanel
                 .createSynapsePropertiesPanel(synapseList, this);
         initializeLayout();
         updateHelp();
-    }
-    
-    /**
-     * Gets the logical synapses from a list of gui Synapse Nodes.
-     *
-     * @param selectedSynapses
-     *            the selected Synapse Node gui objects
-     * @return the synapses contained within the slected synapse nodes
-     */
-    private static ArrayList<Synapse> getSynapses(
-            final Collection<SynapseNode> selectedSynapses) {
-        ArrayList<Synapse> sl = new ArrayList<Synapse>();
-        for (SynapseNode s : selectedSynapses) {
-            sl.add(s.getSynapse());
-        }
-        return sl;
     }
 
     /**
@@ -147,9 +140,6 @@ public final class SynapseDialog extends StandardDialog {
         this.addButton(helpButton);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
@@ -157,36 +147,29 @@ public final class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * Add listeners to the components of the dialog.
+     * Add listeners to the components of the dialog. Specifically alters the
+     * destination of the help button to reflect the currently selected synapse
+     * update rule.
      */
     private void addListeners() {
-        synapseEditingPanel.getUpdateInfoPanel().getCbSynapseType()
-                .addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateHelp();
-                            }
-                        });
-                    }
-                });
+        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType()
+                .addActionListener(
+                        e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     /**
      * Set the help page based on the currently selected synapse type.
      */
     public void updateHelp() {
-        if (synapseEditingPanel.getUpdateInfoPanel().getCbSynapseType()
+        if (synapseEditingPanel.getSynapseRulePanel().getCbSynapseType()
                 .getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else {
-            String name = (String) synapseEditingPanel.getUpdateInfoPanel()
+            String name = (String) synapseEditingPanel.getSynapseRulePanel()
                     .getCbSynapseType().getSelectedItem();
             name = name.replaceAll("\\s", ""); // Remove white space
-            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
-                    + ".html");
+            helpAction = new ShowHelpAction(
+                    "Pages/Network/synapse/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }
@@ -205,7 +188,7 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * @return the list of synapses which are being edited by this dialog
      */
-    public ArrayList<Synapse> getSynapseList() {
+    public List<Synapse> getSynapseList() {
         return synapseList;
     }
 
@@ -214,30 +197,42 @@ public final class SynapseDialog extends StandardDialog {
      * of synapses is a spiking neuron. . This is used to determine if a spike
      * responder panel should or shouldn't be displayed.
      *
-     * @param synapses
-     *            the synapses whose source neurons will be tested.
+     * @param synapses the synapses whose source neurons will be tested.
      * @return whether or not at least one of the synapses has a spike responder
      */
-    public static boolean targsUseSynapticInputs(Collection<Synapse> synapses)
-    {
-    	if (synapses.isEmpty()) {return true;}
-    	if (synapses.size() == 1) {
-    		Iterator<Synapse> synIter = synapses.iterator();
-    		if (synIter.next().getTarget() == null) {
-    			// Assumed template synapses (only possible synapses w/ out
-    			// source or target, are assumed to contain a spike responder
-    			return true;
-    		}
-    	}
+    public static boolean targsUseSynapticInputs(Collection<Synapse> synapses) {
+        if (synapses.isEmpty()) {
+            return true;
+        }
+        if (synapses.size() == 1) {
+            Iterator<Synapse> synIter = synapses.iterator();
+            if (synIter.next().getTarget() == null) {
+                // Assumed template synapses (only possible synapses w/ out
+                // source or target, are assumed to contain a spike responder
+                return true;
+            }
+        }
         for (Synapse s : synapses) {
-        	if (s.getTarget() != null) {
-        		if (s.getTarget().getUpdateRule().getInputType()
-        				== InputType.SYNAPTIC) {
-        			return true;
-        		}
-        	}
+            if (s.getTarget() != null) {
+                if (s.getTarget().getUpdateRule()
+                        .getInputType() == InputType.SYNAPTIC) {
+                    return true;
+                }
+            }
         }
         return false;
+    }
+
+    /**
+     * Helper which returns logical synapses from a list of gui Synapse Nodes.
+     *
+     * @param selectedSynapses the selected Synapse Node gui objects
+     * @return the synapses contained within the selected synapse nodes
+     */
+    private static List<Synapse> getSynapses(
+            final Collection<SynapseNode> selectedSynapses) {
+        return selectedSynapses.stream().map(SynapseNode::getSynapse)
+                .collect(Collectors.toList());
     }
 
 }

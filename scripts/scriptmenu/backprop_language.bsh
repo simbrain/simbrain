@@ -1,0 +1,185 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.subnetworks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.trainers.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.util.*;
+import org.simbrain.workspace.*;
+import org.simbrain.util.math.*;
+import java.io.*;
+import java.awt.geom.Point2D;
+import java.util.*;
+
+//
+// Template for creating a backprop network and computing error on a test set.
+// Lines to adjust are marked with "(*)".
+// 
+// Current trained on a subset of R's mtcars dataset.  
+// See the backprop_cars directory for information on how the data was
+// obtained and prepared for use in this script.
+//
+// See this video for more information: https://www.youtube.com/watch?v=K4GZ51cozRs
+// 
+
+// Global variables
+NetworkComponent networkComponent;
+Network network;
+BackpropNetwork bp;
+double[][] inputData;
+double[][] targetData;
+String FS = System.getProperty("file.separator");
+
+// Main script
+void main() {
+  workspace.clearWorkspace();
+  buildTrainNetwork();
+  addCustomNodes(); // Can comment this out if custom nodes are not desired (*)
+  testNetwork();
+}
+
+//
+// Create and train the backprop network
+// 
+void buildTrainNetwork() {
+
+  // Create backprop network
+  networkComponent = new NetworkComponent("Backprop Cars");
+  network = networkComponent.getNetwork();
+  bp = new BackpropNetwork(network, new int[]{3,5,2}); // 3 inputs, 5 hidden, 2 outputs (*)
+  workspace.addWorkspaceComponent(networkComponent);
+  network.addGroup(bp);
+
+  // Custom layout.   Comment out for default locations.
+  // To get locations I adjusted it how I liked it in the GUI, and from 
+  // Simbrain terminal called:
+  //     >print(getNetwork("Backprop Cars"));
+  bp.getInputLayer().setLocation(-157.72,-26.46);
+  bp.getHiddenLayer().setLocation(-49.00,-199.00);
+  bp.getOutputLayer().setLocation(-170.07,-332.09);
+
+  // Load data (*)
+  bp.getTrainingSet().setInputData(Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_train_in.csv")));
+  bp.getTrainingSet().setTargetData(Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_train_targ.csv")));
+
+  // Train the network (*)
+  BackpropTrainer trainer = new BackpropTrainer(bp, bp.getNeuronGroupsAsList());
+  trainer.randomize();
+  trainer.setLearningRate(.01);
+  int numIterations = 15000;
+  // trainer.setMomentum(.25);
+  System.out.println("------ Training ------ ");
+  for (int i = 0; i < numIterations; i++) {
+    trainer.iterate();
+    if (i % numIterations/10 == 0) {
+      System.out.println("MSE: " + trainer.getError());          
+    }
+  }
+
+  // Update network
+  network.clearActivations();
+  network.fireNeuronsUpdated();
+}
+
+//
+// Compute mean squared error for test data and print to console
+// 
+void testNetwork() {
+
+  // Set Test data (*)
+  double[][] testIn = Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_test_in.csv"));
+  double[][] testTarg = Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_test_targ.csv"));
+
+  //Load test data in to input layer (for Gui exploration, not used below).
+  bp.getInputLayer().setTestData(testIn); // To use this input data, setClamped (next line) must be turned off
+  
+  // Iterate through the data and print error info to terminal
+  double totalError = 0;
+  System.out.println();
+  System.out.println("------ Testing ------ ");
+  for(int i = 0; i < testTarg.length;i++) {
+    bp.getInputLayer().forceSetActivations(testIn[i]);
+    bp.update();
+    double[] outputs = bp.getOutputLayer().getActivations();
+    totalError += SimbrainMath.getMeanSquaredError(outputs, testTarg[i]);
+    // System.out.println("Row " + i
+    //       //  + "\toutput: " + Arrays.toString(outputs)
+    //       // + "\ttarget: " + Arrays.toString(testTarg[i])
+    //   + ", mse = " + SimbrainMath.getMeanSquaredError(outputs, testTarg[i]));
+  }
+  System.out.println("\nTest set MSE: " + totalError/testTarg.length);
+
+}
+
+//
+// Create custom input and output nodes for easy testing. 
+//
+void addCustomNodes() {
+    // Create special input and output nodes that scale values back
+  // to their original ranges
+  Neuron mpgNeuron = new Neuron(network, "LinearRule");
+  mpgNeuron.setLabel("MPG");
+  mpgNeuron.setLocation(-431,-26);
+  mpgNeuron.setClamped(true);
+  mpgNeuron.setIncrement(4);
+  mpgNeuron.setUpperBound(33.9);
+  network.addNeuron(mpgNeuron);
+  Neuron cylNeuron = new Neuron(network, "LinearRule");
+  cylNeuron.setLabel("Cylinders");
+  cylNeuron.setLocation(-361,-26);
+  cylNeuron.setUpperBound(8);
+  cylNeuron.setIncrement(2);
+  cylNeuron.setClamped(true);
+  network.addNeuron(cylNeuron);
+  Neuron dispNeuron = new Neuron(network, "LinearRule");
+  dispNeuron.setLabel("Displacement");
+  dispNeuron.setLocation(-280,-26);
+  dispNeuron.setUpperBound(472);
+  dispNeuron.setIncrement(50);
+  dispNeuron.setClamped(true);
+  network.addNeuron(dispNeuron);
+  Neuron hpNeuron = new Neuron(network, "LinearRule");
+  hpNeuron.setLabel("Horse Power");
+  hpNeuron.setLocation(-410,-331);
+  hpNeuron.setUpperBound(335);
+  network.addNeuron(hpNeuron);
+  Neuron qmNeuron = new Neuron(network, "LinearRule");
+  qmNeuron.setLabel("Quarter Mile (seconds)");
+  qmNeuron.setLocation(-306,-331);
+  qmNeuron.setUpperBound(22.9);
+  network.addNeuron(qmNeuron);
+  // Synapse strenghts obtained by finding max values in R: "apply(mtcars, 2, max)"
+  Synapse synapse = new Synapse(mpgNeuron, bp.getInputLayer().getNeuronList().get(0));
+  synapse.setUpperBound(1);
+  synapse.setStrength(1/33.9f);
+  network.addSynapse(synapse);
+  Synapse synapse = new Synapse(cylNeuron, bp.getInputLayer().getNeuronList().get(1));
+  synapse.setUpperBound(1);
+  synapse.setStrength(1/8f);
+  network.addSynapse(synapse);
+  Synapse synapse = new Synapse(dispNeuron, bp.getInputLayer().getNeuronList().get(2));
+  synapse.setUpperBound(1);
+  synapse.setStrength(1/472f);
+  network.addSynapse(synapse);
+  Synapse synapse = new Synapse(bp.getOutputLayer().getNeuronList().get(0),hpNeuron);
+  synapse.setUpperBound(700);
+  synapse.setStrength(335);
+  network.addSynapse(synapse);
+  Synapse synapse = new Synapse(bp.getOutputLayer().getNeuronList().get(1),qmNeuron);
+  synapse.setUpperBound(45);
+  synapse.setStrength(22.9);
+  network.addSynapse(synapse);
+
+  // Required in order to use the custom nodes
+  bp.getInputLayer().setClamped(false); 
+
+}
+
+//
+// Run the script
+//
+main();
+

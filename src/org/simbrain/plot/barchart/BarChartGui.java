@@ -36,6 +36,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartSettingsListener;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -46,8 +47,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Display a PieChart.
  */
-public class BarChartGui extends GuiComponent<BarChartComponent> implements
-        ActionListener {
+public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
 
     /** Main JFreeChart object. */
     private JFreeChart chart;
@@ -67,8 +67,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
      * @param frame Generic frame
      * @param component Bar chart component
      */
-    public BarChartGui(final GenericFrame frame,
-            final BarChartComponent component) {
+    public BarChartGui(GenericFrame frame, BarChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
@@ -96,62 +95,41 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
      */
     @Override
     public void postAddInit() {
+        String title = "";
+        String xLabel = "Bar";
+        String yLabel = "Value";
+        boolean legend = false;
+        boolean tooltips = true;
+        boolean urls = false;
 
-        // Generate the graph
-        chart = ChartFactory.createBarChart("", // chart title
-                "Bar", // domain axis label
-                "Value", // range axis label
-                this.getWorkspaceComponent().getModel().getDataset(), // data
-                PlotOrientation.VERTICAL, // orientation
-                false, // include legend
-                true, // tooltips?
-                false // URLs?
-
-                );
+        chart = ChartFactory.createBarChart(title, xLabel, yLabel,
+                this.getWorkspaceComponent().getModel().getDataset(),
+                PlotOrientation.VERTICAL, legend, tooltips, urls);
         chartPanel.setChart(chart);
-        chart.getCategoryPlot().getRangeAxis()
-                .setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
+        chart.getCategoryPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
         if (!getWorkspaceComponent().getModel().isAutoRange()) {
-            chart.getCategoryPlot()
-                    .getRangeAxis()
-                    .setRange(
-                            getWorkspaceComponent().getModel().getLowerBound(),
-                            getWorkspaceComponent().getModel().getUpperBound());
+            chart.getCategoryPlot().getRangeAxis().setRange(
+                    getWorkspaceComponent().getModel().getLowerBound(),
+                    getWorkspaceComponent().getModel().getUpperBound());
         }
 
         // Add a chart setting listener
         getWorkspaceComponent().getModel().addChartSettingsListener(
                 new ChartSettingsListener() {
-
-                    // TODO: Explore parameters in
-                    // chart, chart.getCategoryPlot(),
+                    // TODO: Explore parameters in chart, chart.getCategoryPlot(),
                     // chart.getCategoryPlot().getRenderer(), chartPanel..
-                    public void chartSettingsUpdated() {
-
+                    public void chartSettingsUpdated(ChartModel model) {
                         // Update colors
-                        chart.getCategoryPlot()
-                                .getRenderer()
-                                .setSeriesPaint(
-                                        0,
-                                        getWorkspaceComponent().getModel()
-                                                .getBarColor());
-
+                        chart.getCategoryPlot().getRenderer().setSeriesPaint(
+                                0, getWorkspaceComponent().getModel().getBarColor());
                         // Update auto-range
-                        chart.getCategoryPlot()
-                                .getRangeAxis()
-                                .setAutoRange(
-                                        getWorkspaceComponent().getModel()
-                                                .isAutoRange());
-
+                        chart.getCategoryPlot().getRangeAxis().setAutoRange(
+                                getWorkspaceComponent().getModel().isAutoRange());
                         // Update ranges
                         if (!getWorkspaceComponent().getModel().isAutoRange()) {
-                            chart.getCategoryPlot()
-                                    .getRangeAxis()
-                                    .setRange(
-                                            getWorkspaceComponent().getModel()
-                                                    .getLowerBound(),
-                                            getWorkspaceComponent().getModel()
-                                                    .getUpperBound());
+                            chart.getCategoryPlot().getRangeAxis().setRange(
+                                    getWorkspaceComponent().getModel().getLowerBound(),
+                                    getWorkspaceComponent().getModel().getUpperBound());
                         }
                     }
                 });
@@ -180,8 +158,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
         editMenu.add(preferences);
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/bar_chart.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/bar_chart.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 
@@ -193,30 +170,27 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
     }
 
     @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
+    public void closing() {}
 
     @Override
-    public void update() {
-    }
+    public void update() {}
 
     /** @see ActionListener 
      * @param arg0
      */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
-                    getWorkspaceComponent().getModel()));
+            ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
+                    getWorkspaceComponent().getModel());
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-            this.getWorkspaceComponent().getModel().removeColumn();
+            getWorkspaceComponent().getModel().removeBar();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-            this.getWorkspaceComponent().getModel().addColumn();
+            getWorkspaceComponent().getModel().addBar();
         }
     }
 }

@@ -31,7 +31,6 @@ import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
@@ -134,13 +133,7 @@ public class TrainerGuiActions {
      * @return return the data directory
      */
     public static String getDataDirectory() {
-        try {
-            return SimbrainPreferences
-                .getString("networkTableDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return SimbrainPreferences.getString("networkTableDirectory");
     }
 
     /**
@@ -217,7 +210,7 @@ public class TrainerGuiActions {
                     new ReflectivePropertyEditor();
                 editor.setExcludeList(new String[] { "iteration",
                     "updateCompleted" });
-                editor.setObject(trainer);
+                editor.setObjectToEdit(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();

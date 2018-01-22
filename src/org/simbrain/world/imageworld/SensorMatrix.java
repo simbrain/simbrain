@@ -16,12 +16,12 @@ public class SensorMatrix implements ImageSourceListener {
     private String name;
 
     /** An ImageSource from which to extract sensor values. */
-    private transient ImageSource source;
+    private ImageSource source;
 
     /** The vales this matrix produces for couplings. */
-    private double[][] channels;
+    private transient double[][] channels;
 
-    private int[] colors;
+    private transient int[] colors;
 
     private boolean useColor = true;
 
@@ -42,6 +42,12 @@ public class SensorMatrix implements ImageSourceListener {
         this.name = name;
         this.source = source;
         source.addListener(this);
+    }
+
+    public Object readResolve() {
+        source.addListener(this);
+        onResize(source);
+        return this;
     }
 
     /** @return the name */

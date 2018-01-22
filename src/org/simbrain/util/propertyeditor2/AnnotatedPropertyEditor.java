@@ -57,6 +57,17 @@ import org.simbrain.util.widgets.ParameterWidget;
 public class AnnotatedPropertyEditor extends JPanel {
 
     /**
+     * Extension of Standard Dialog for Editor Panel
+     */
+    private class EditorDialog extends StandardDialog {
+        @Override
+        protected void closeDialogOk() {
+            commitChanges();
+            dispose();
+        }
+    }
+
+    /**
      * The available parameters, as a map from Parameter to input gui component.
      */
     protected Set<ParameterWidget> widgets;
@@ -278,18 +289,6 @@ public class AnnotatedPropertyEditor extends JPanel {
         final EditorDialog ret = new EditorDialog();
         ret.setContentPane(this);
         return ret;
-    }
-
-    /**
-     * Extension of Standard Dialog for Editor Panel
-     */
-    private class EditorDialog extends StandardDialog {
-
-        @Override
-        protected void closeDialogOk() {
-            AnnotatedPropertyEditor.this.commitChanges();
-            dispose();
-        }
     }
 
     /**

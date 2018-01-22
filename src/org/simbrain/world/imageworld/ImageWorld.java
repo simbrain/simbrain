@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.imageworld.filters.ImageFilter;
+import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
@@ -38,13 +38,13 @@ public class ImageWorld {
     private EmitterMatrix emitterMatrix;
 
     /** Helper so that it's easy to switch between images sources. */
-    private transient CompositeImageSource compositeSource;
+    private CompositeImageSource compositeSource;
 
     /** List of sensor matrices associated with this world. */
-    private transient List<SensorMatrix> sensorMatrices;
+    private List<SensorMatrix> sensorMatrices;
 
     /** Currently selected sensor matrix. */
-    private transient SensorMatrix currentSensorMatrix;
+    private SensorMatrix currentSensorMatrix;
 
     /** GUI container for the current image or sensor view. */
     private transient ImagePanel imagePanel;
@@ -91,32 +91,10 @@ public class ImageWorld {
     /** Returns a deserialized ImageWorld. */
     public Object readResolve() {
         // Setup ImageSources
-        compositeSource = new CompositeImageSource(staticSource);
         imagePanel = new ImagePanel();
-        sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
 
-        // Load default sensor matrices
-        SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
-        sensorMatrices.add(unfiltered);
-
-        SensorMatrix gray75x75 = new SensorMatrix("Color 25x25",
-                ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
-        sensorMatrices.add(gray75x75);
-
-        SensorMatrix gray200x200 = new SensorMatrix("Gray 200x200",
-                ImageFilterFactory.createGrayFilter(compositeSource, 200, 200));
-        sensorMatrices.add(gray200x200);
-
-        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10",
-                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
-        sensorMatrices.add(threshold10x10);
-
-        SensorMatrix threshold100x100 = new SensorMatrix("Threshold 100x100",
-                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 100, 100));
-        sensorMatrices.add(threshold100x100);
-
-        setCurrentSensorMatrix(sensorMatrices.get(0));
+        setCurrentSensorMatrix(currentSensorMatrix);
         return this;
     }
 
@@ -135,10 +113,25 @@ public class ImageWorld {
         compositeSource.setImageSource(staticSource);
     }
 
+    /** Get whether the emitter matrix is using color. */
+    public boolean getUseColorEmitter() {
+        return emitterMatrix.isUsingColor();
+    }
+
     /** Set the color mode of the emitter matrix. */
     public void setUseColorEmitter(boolean value) {
         emitterMatrix.setUsingColor(value);
         fireImageSourceChanged(emitterMatrix);
+    }
+
+    /** Get the width of the emitter matrix. */
+    public int getEmitterWidth() {
+        return emitterMatrix.getWidth();
+    }
+
+    /** Get the height of the emitter matrix. */
+    public int getEmitterHeight() {
+        return emitterMatrix.getHeight();
     }
 
     /** Set the size of the emitter matrix. */
@@ -192,8 +185,8 @@ public class ImageWorld {
             sensorMatrices.remove(sensorMatrix);
             // TODO: This is bad and should be handled in SensorMatrix
             ImageSource source = sensorMatrix.getSource();
-            if (source instanceof ImageFilter) {
-                compositeSource.removeListener((ImageFilter) source);
+            if (source instanceof FilteredImageSource) {
+                compositeSource.removeListener((FilteredImageSource) source);
             }
             sensorMatrix.getSource().removeListener(sensorMatrix);
             fireSensorMatrixRemoved(sensorMatrix);

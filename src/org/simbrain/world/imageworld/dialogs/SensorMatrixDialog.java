@@ -10,7 +10,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.SensorMatrix;
-import org.simbrain.world.imageworld.filters.ImageFilter;
+import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 
 /**
@@ -70,7 +70,7 @@ public class SensorMatrixDialog extends StandardDialog {
     /** Called externally when the dialog is closed, to commit any changes made. */
     public void commitChanges() {
         String name = nameField.getText();
-        ImageFilter filter = filterFactory.create(world.getCompositeImageSource());
+        FilteredImageSource filter = filterFactory.create(world.getCompositeImageSource());
         SensorMatrix matrix = new SensorMatrix(name, filter);
         world.addSensorMatrix(matrix);
     }

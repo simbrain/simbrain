@@ -174,7 +174,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                     workspaceComponent.getClass(), name, inputStream, ext);
         } catch (ReflectiveOperationException ex) {
             String message = String.format(
-                    "Failed to deserialize workspace component %s\nCould not execute save method in class %s.",
+                    "Failed to deserialize workspace component %s\nCould not execute open method in class %s.",
                     name, workspaceComponent.getClass().getSimpleName());
             JOptionPane.showMessageDialog(null, message);
             return;

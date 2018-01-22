@@ -7,6 +7,8 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageWorld;
 
+import java.text.NumberFormat;
+
 public class ResizeEmitterMatrixDialog extends StandardDialog {
     private static final long serialVersionUID = 1L;
 
@@ -14,8 +16,8 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
     private JCheckBox useColorCheckBox = new JCheckBox();
-    private JTextField widthField = new JTextField("10");
-    private JTextField heightField = new JTextField("10");
+    private JFormattedTextField widthField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    private JFormattedTextField heightField = new JFormattedTextField(NumberFormat.getIntegerInstance());
 
     /**
      * Construct a new ResizeEmitterMatrixDialog.
@@ -30,6 +32,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
         emitterMatrixPanel.addItem("Use Color", useColorCheckBox);
         emitterMatrixPanel.addItem("Width", widthField);
         emitterMatrixPanel.addItem("Height", heightField);
+        readValues();
         setContentPane(mainPanel);
         pack();
         setLocationRelativeTo(null);
@@ -39,6 +42,12 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
+    }
+
+    public void readValues() {
+        useColorCheckBox.setSelected(world.getUseColorEmitter());
+        widthField.setValue(world.getEmitterWidth());
+        heightField.setValue(world.getEmitterHeight());
     }
 
     /** Called externally when the dialog is closed, to commit any changes made. */

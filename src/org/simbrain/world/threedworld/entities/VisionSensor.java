@@ -66,7 +66,7 @@ public class VisionSensor extends SensorMatrix implements Sensor {
     /**
      * @return Returns a deserialized VisionSensor.
      */
-    private Object readResolve() {
+    public Object readResolve() {
         initializeView();
         return this;
     }

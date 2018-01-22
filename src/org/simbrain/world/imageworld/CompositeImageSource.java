@@ -9,6 +9,12 @@ public class CompositeImageSource extends ImageSourceAdapter implements ImageSou
         this.selectedSource = selectedSource;
     }
 
+    public Object readResolve() {
+        super.readResolve();
+        selectedSource.addListener(this);
+        return this;
+    }
+
     /** Get the current ImageSource used by the composite. */
     public ImageSource getImageSource() {
         return selectedSource;

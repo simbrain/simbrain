@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.util.propertyeditor2.EditableObject;
+
 import java.awt.image.BufferedImage;
 
 /**

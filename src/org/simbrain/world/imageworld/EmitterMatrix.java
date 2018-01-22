@@ -2,9 +2,11 @@ package org.simbrain.world.imageworld;
 
 import java.awt.image.BufferedImage;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 
 public class EmitterMatrix extends ImageSourceAdapter {
+    @UserParameter(label="Use Color Integers", description="Sets whether to use coupled integer array as RGB colors.")
     private boolean usingColor = false;
     private double[][] channels;
     private int[] colors;
@@ -69,8 +71,18 @@ public class EmitterMatrix extends ImageSourceAdapter {
     public void setSize(int width, int height) {
         setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
         channels = new double[3][getWidth() * getHeight()];
+        colors = new int[getWidth() * getHeight()];
     }
 
+    /**
+     * Update the emitter matrix image from the couplable arrays.
+     *
+     * If the emitter matrix is using color ints, then the new image will simply copy the coupled integer array
+     * to the current image.
+     *
+     * If the emitter matrix is using double channels, then each channel of values (0.0 to 1.0) will be translated
+     * to integers (0 to 255) and assigned to the corresponding pixels.
+     */
     public void emitImage() {
         if (usingColor) {
             BufferedImage image = getCurrentImage();

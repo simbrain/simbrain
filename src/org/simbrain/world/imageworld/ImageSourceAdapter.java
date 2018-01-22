@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Abstract helper class which provides basic listener and image management for
  * an {@link ImageSource}
 
- * Whenever the private current image is updated, imagesourceadapter compares it to previous
+ * Whenever the private current image is updated, the adapter compares it to previous
  * image and decides which events need to be called.
  *
  * @author Tim Shea
@@ -21,7 +21,8 @@ public abstract class ImageSourceAdapter implements ImageSource {
 
     /** Construct a new ImageSourceAdapter and initialize the current image. */
     public ImageSourceAdapter() {
-        this(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+        currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     /**

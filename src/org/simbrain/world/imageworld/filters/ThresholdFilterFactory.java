@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld.filters;
 
+import java.awt.image.BufferedImageOp;
 import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
@@ -8,12 +9,28 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.imageworld.ImageSource;
 
 public class ThresholdFilterFactory extends ImageFilterFactory {
+    private static class ThresholdFilterSource extends FilteredImageSource {
+        private double threshold;
+
+        ThresholdFilterSource(ImageSource source, double threshold, int width, int height) {
+            super(source, "Threshold Filter", new ThresholdOp(threshold), width, height);
+            this.threshold = threshold;
+        }
+
+        @Override
+        public Object readResolve() {
+            super.readResolve();
+            setColorOp(new ThresholdOp(threshold));
+            return this;
+        }
+    }
+
     static {
         ImageFilterFactory.putFactory("Threshold Filter", new ThresholdFilterFactory());
     }
 
-    public static ImageFilter createThresholdFilter(ImageSource source, double threshold, int width, int height) {
-        return new ImageFilter(source, "Threshold Filter", new ThresholdOp(threshold), width, height); 
+    public static FilteredImageSource createThresholdFilter(ImageSource source, double threshold, int width, int height) {
+        return new ThresholdFilterSource(source, threshold, width, height);
     }
 
     private double threshold;
@@ -25,7 +42,7 @@ public class ThresholdFilterFactory extends ImageFilterFactory {
     }
 
     @Override
-    public void getValuesFromFilter(ImageFilter filter) {
+    public void getValuesFromFilter(FilteredImageSource filter) {
         super.getValuesFromFilter(filter);
         threshold = ((ThresholdOp) filter.getColorOp()).getThreshold();
     }
@@ -45,7 +62,7 @@ public class ThresholdFilterFactory extends ImageFilterFactory {
     }
 
     @Override
-    public ImageFilter create(ImageSource source) {
+    public FilteredImageSource create(ImageSource source) {
         return createThresholdFilter(source, threshold, getWidth(), getHeight());
     }
 }

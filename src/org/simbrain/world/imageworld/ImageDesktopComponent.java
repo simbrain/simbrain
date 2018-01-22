@@ -12,6 +12,7 @@ import javax.swing.*;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;

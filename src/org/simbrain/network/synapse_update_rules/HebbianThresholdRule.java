@@ -20,34 +20,32 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>HebbianThresholdSynapse</b>.
  */
 public class HebbianThresholdRule extends SynapseUpdateRule {
-
+	
+	// TODO: check description
     /** Learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = .1;
-
-    /** Output threshold momentum. */
-    public static final double DEFAULT_OUTPUT_THRESHOLD_MOMENTUM = .1;
-
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb threshold rule", 
+            defaultValue = ".1", order = 1)
+    private double learningRate;
+    
     /** Output threshold. */
-    public static final double DEFAULT_OUTPUT_THRESHOLD = .5;
-
-    /** Use sliding output threshold. */
-    public static final boolean DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD = false;
-
-    /** Learning rate. */
-    private double learningRate = .1;
-
-    /** Output threshold momentum. */
-    private double outputThresholdMomentum = .1;
-
-    /** Output threshold. */
+    @UserParameter(label = "Threshold", description = "Output threshold for Hebb threshold rule", 
+            defaultValue = ".5", order = 1)
     private double outputThreshold = .5;
 
+    /** Output threshold momentum. */
+    @UserParameter(label = "Threshold Momentum", description = "Output threshold momentum for Hebb threshold rule", 
+            defaultValue = ".1", order = 1)
+    private double outputThresholdMomentum = .1;
+
     /** Use sliding output threshold. */
+    @UserParameter(label = "Sliding Threshold", description = "Use sliding output threshold for Hebb threshold rule", 
+            defaultValue = "false", order = 1)
     private boolean useSlidingOutputThreshold = false;
 
     @Override

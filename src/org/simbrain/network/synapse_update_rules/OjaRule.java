@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>OjaSynapse</b> is a synapse which asymptotically normalizes the sum of
@@ -28,16 +29,15 @@ import org.simbrain.network.core.SynapseUpdateRule;
 public class OjaRule extends SynapseUpdateRule {
 
     /** Learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = .1;
+	@UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", 
+            defaultValue = ".1", order = 1)
+    private double learningRate;
+
+	// TODO: check description
     /** Normalization factor. */
-
-    public static final double DEFAULT_NORMALIZATION_FACTOR = 1;
-
-    /** Learning rate. */
-    private double learningRate = DEFAULT_LEARNING_RATE;
-
-    /** Normalization factor. */
-    private double normalizationFactor = DEFAULT_NORMALIZATION_FACTOR;
+	@UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", 
+            defaultValue = "1", order = 1)
+    private double normalizationFactor;
 
     @Override
     public void init(Synapse synapse) {

@@ -37,6 +37,10 @@ public class NetWorldPairAttribute {
 		return fitnessScore;
 	}
 	
+	public void resetFitness() {
+		fitnessScore = 0;
+	}
+	
 	public void addFitness() {
 		fitnessScore += 1;
 	}

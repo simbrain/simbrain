@@ -20,14 +20,6 @@ public class NetWorldPair {
 	NetBuilder net;
 	int generation;
 	
-	List<Neuron> neuronFlat = new ArrayList<>();
-	List<Integer[]> inputIndex = new ArrayList<>();
-	List<Integer> inputFlatIndex = new ArrayList<>();
-	List<Integer> hiddenIndex = new ArrayList<>();
-	List<Integer> outputIndex = new ArrayList<>();
-	List<Integer> sourceNeuronIndex = new ArrayList<>();
-	List<Integer> targetNeuronIndex = new ArrayList<>();
-	List<SynapseIndex> synapseIndex = new ArrayList<>();
 	
 	List<NeuronGroup> input = new ArrayList<>();
 	List<Neuron>inputFlat = new ArrayList<>();
@@ -44,7 +36,7 @@ public class NetWorldPair {
 	
 	public NetWorldPair(int netIndex, int x, int y, int width, int height, long seed) {
 		initializeNetwork(netIndex, x, y, width, height, seed);
-	}
+	} 
 	
 	public void initializeNetwork(int netIndex, int x, int y, int width, int height, long seed) {
 		Random rand = new Random(seed + netIndex);

@@ -20,17 +20,18 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>SubtractiveNormalizationSynapse</b>.
  */
 public class SubtractiveNormalizationRule extends SynapseUpdateRule {
 
-    /** Default learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = 1;
-
+	//TODO: check description
     /** Momentum. */
-    private double learningRate = DEFAULT_LEARNING_RATE;
+    @UserParameter(label = "Learning rate", description = "Momentum", 
+            defaultValue = "1", order = 1)
+    private double learningRate;
 
     @Override
     public void init(Synapse synapse) {

@@ -133,6 +133,9 @@ public class EvolveNet extends Network {
 			n.setLowerBound(0);
 			targetNeuron.add(n);
 		}
+		newOutput.getNeuron(0).setLabel("F");
+		newOutput.getNeuron(1).setLabel("L");
+		newOutput.getNeuron(2).setLabel("R");
     }
 
 	

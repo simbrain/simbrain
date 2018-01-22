@@ -24,6 +24,7 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
@@ -37,39 +38,38 @@ import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
  */
 public class STDPRule extends SynapseUpdateRule {
 
-    /** Default tau plus. */
-    public static final double TAU_PLUS_DEFAULT = 30;
-
-    /** Default tau minus. */
-    public static final double TAU_MINUS_DEFAULT = 60;
-
-    /** Default W plus. */
-    public static final double W_PLUS_DEFAULT = 10;
-
-    /** Default W - . */
-    public static final double W_MINUS_DEFAULT = 10;
-
-    /** Default Learning rate. */
-    public static final double LEARNING_RATE_DEFAULT = .01;
+	// TODO: check description
+    /** Time constant for LTD. */
+    @UserParameter(label = "Tau minus", description = "Time constant "
+    		+ "for LTD.", defaultValue = "60", order = 0)
+    protected double tau_minus;
 
     /** Time constant for LTP. */
-    protected double tau_plus = TAU_PLUS_DEFAULT;
-
-    /** Time constant for LTD. */
-    protected double tau_minus = TAU_MINUS_DEFAULT;
-
+    @UserParameter(label = "Tau plus", description = "Time constant "
+    		+ "for LTP.", 
+            defaultValue = "30", order = 1)
+    protected double tau_plus;
+    
     /**
      * Learning rate for LTP case. Controls magnitude of LTP changes.
      */
-    protected double W_plus = W_PLUS_DEFAULT;
+    @UserParameter(label = "W+", description = "Learning rate for "
+    		+ "LTP case. Controls magnitude of LTP changes.", 
+            defaultValue = "10", order = 2)
+    protected double W_plus;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTD changes.
      */
-    protected double W_minus = W_MINUS_DEFAULT;
+    @UserParameter(label = "W-", description = "Learning rate for "
+    		+ "LTP case. Controls magnitude of LTD changes.", 
+            defaultValue = "10", order = 3)
+    protected double W_minus;
 
     /** General learning rate. */
-    protected double learningRate = LEARNING_RATE_DEFAULT;
+    @UserParameter(label = "Learning rate", description = "General learning "
+    		+ "rate.", defaultValue = ".01", order = 4)
+    protected double learningRate;
 
     @Override
     public void init(Synapse synapse) {

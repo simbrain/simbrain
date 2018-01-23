@@ -23,11 +23,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * <b>SpikeResponder</b>.
  */
-public abstract class SpikeResponder {
+public abstract class SpikeResponder implements EditableObject {
 
     /** Value. */
     protected double value;

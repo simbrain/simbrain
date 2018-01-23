@@ -98,6 +98,10 @@ public class AnnotatedPropertyEditor extends JPanel {
      * @param objects
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
+
+        if(objects.isEmpty()) {
+            return;
+        }
         this.editedObjects = objects;
         setLayout(new BorderLayout());
         add(itemPanel, BorderLayout.CENTER);
@@ -152,6 +156,9 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public void fillFieldValues(List<? extends EditableObject> objectsToFillFieldValues) {
 
+        if(objectsToFillFieldValues.isEmpty()) {
+            return;
+        }
         checkTypes(objectsToFillFieldValues);
 
         // Check to see if the field values are consistent over all given

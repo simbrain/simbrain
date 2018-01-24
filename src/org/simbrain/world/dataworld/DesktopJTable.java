@@ -31,7 +31,7 @@ import org.simbrain.util.table.SimbrainJTable;
 public class DesktopJTable extends SimbrainJTable {
 
     /** Parent component. */
-    DataWorldComponent component;
+    private DataWorldComponent component;
 
     /**
      * Construct the table.

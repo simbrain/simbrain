@@ -20,6 +20,7 @@ package org.simbrain.world.textworld;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.workspace.Producer;
@@ -64,10 +65,8 @@ public class ReaderComponent extends WorkspaceComponent {
         this.world = world;
     }
 
-    public static ReaderComponent open(InputStream input, String name,
-            String format) {
-        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(
-                input);
+    public static ReaderComponent open(InputStream input, String name, String format) {
+        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(input);
         return new ReaderComponent(name, newWorld);
     }
 
@@ -77,9 +76,7 @@ public class ReaderComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
+    public void closing() {}
 
     @Override
     public void update() {
@@ -96,5 +93,10 @@ public class ReaderComponent extends WorkspaceComponent {
     @Override
     public Object getObjectFromKey(String objectKey) {
         return world;
+    }
+
+    @Override
+    public List<Object> getModels() {
+        return Arrays.asList(world);
     }
 }

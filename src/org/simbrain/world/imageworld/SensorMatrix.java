@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import org.junit.Assert;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -125,21 +126,20 @@ public class SensorMatrix implements ImageSourceListener {
      * @param image the image to copy to the sensor values
      */
     private void updateSensorValues(BufferedImage image) {
+        if (image.getHeight() != getHeight() || image.getWidth() != getWidth()) {
+            throw new AssertionError();
+        }
         for (int y = 0; y < image.getHeight(); ++y) {
             for (int x = 0; x < image.getWidth(); ++x) {
                 int color = image.getRGB(x, y);
                 double red = ((color >>> 16) & 0xFF) / 255.0;
                 double green = ((color >>> 8) & 0xFF) / 255.0;
                 double blue = (color & 0xFF) / 255.0;
-                try {
-                    channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
-                    channels[1][y * getWidth() + x] = red;
-                    channels[2][y * getWidth() + x] = green;
-                    channels[3][y * getWidth() + x] = blue;
-                    colors[y * getWidth() + x] = color;
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                    System.out.println(String.format("%s %s %s %s", getWidth(), getHeight(), x, y));
-                }
+                channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
+                channels[1][y * getWidth() + x] = red;
+                channels[2][y * getWidth() + x] = green;
+                channels[3][y * getWidth() + x] = blue;
+                colors[y * getWidth() + x] = color;
             }
         }
     }

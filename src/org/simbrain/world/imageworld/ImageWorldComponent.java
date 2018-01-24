@@ -71,6 +71,21 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return models;
     }
 
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        for (ImageSource source : world.getImageSources()) {
+            if (objectKey.equals(source.getClass().getSimpleName())) {
+                return source;
+            }
+        }
+        for (SensorMatrix sensor : world.getSensorMatrices()) {
+            if (objectKey.equals(sensor.getName())) {
+                return sensor;
+            }
+        }
+        return null;
+    }
+
     public List<Object> getSelectedModels() {
         List<Object> models = new ArrayList<Object>();
         models.add(world.getCurrentSensorMatrix());

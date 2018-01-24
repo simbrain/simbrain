@@ -94,7 +94,6 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * Factory method for Reader world.
-     *
      * @return the constructed world.
      */
     public static ReaderWorld createReaderWorld() {

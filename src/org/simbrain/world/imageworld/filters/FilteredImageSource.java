@@ -101,8 +101,9 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     }
 
     protected void scaleToFit(ImageSource source) {
-        float scaleX = (float) width / source.getWidth();
-        float scaleY = (float) height / source.getHeight();
+        // Subtract 0.1 from width and height to avoid exceeding the specified dimension due to floating point error.
+        float scaleX = (width - 0.1f) / source.getWidth();
+        float scaleY = (height - 0.1f) / source.getHeight();
         scaleOp = ImageFilterFactory.createScaleOp(scaleX, scaleY, true);
     }
 }

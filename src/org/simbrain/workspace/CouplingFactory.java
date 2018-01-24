@@ -1,10 +1,8 @@
 package org.simbrain.workspace;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * CouplingFactory provides methods for instantiating couplings between components in a workspace.
@@ -164,24 +162,10 @@ public class CouplingFactory {
      * @return A list of producers.
      */
     public List<Producer<?>> getProducersFromModel(Object model) {
-        List<Producer<?>> producers = new ArrayList<Producer<?>>();
+        List<Producer<?>> producers = new ArrayList<>();
         for (Method method : model.getClass().getMethods()) {
-            Producible annotation = method.getAnnotation(Producible.class);
-            if (annotation != null) {
-                Method idMethod = null;
-                try {
-                    idMethod = model.getClass().getMethod(annotation.idMethod());
-                } catch (NoSuchMethodException ex) {
-                    // Ignore
-                }
-                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
-                Producer<?> producer;
-                if (idMethod != null) {
-                    producer = new Producer(model, method, description, idMethod);
-                } else {
-                    producer = new Producer(model, method, description);
-                }
-                producers.add(producer);
+            if (isProducible(method)) {
+                producers.add(createProducer(model, method));
             }
         }
         return producers;
@@ -195,22 +179,8 @@ public class CouplingFactory {
     public List<Consumer<?>> getConsumersFromModel(Object model) {
         List<Consumer<?>> consumers = new ArrayList<>();
         for (Method method : model.getClass().getMethods()) {
-            Consumable annotation = method.getAnnotation(Consumable.class);
-            if (annotation != null) {
-                Method idMethod = null;
-                try {
-                    idMethod = model.getClass().getMethod(annotation.idMethod());
-                } catch (NoSuchMethodException ex) {
-                    // Ignore
-                }
-                String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
-                Consumer<?> consumer;
-                if (idMethod != null) {
-                    consumer = new Consumer(model, method, description, idMethod);
-                } else {
-                    consumer = new Consumer(model, method, description);
-                }
-                consumers.add(consumer);
+            if (isConsumable(method)) {
+                consumers.add(createConsumer(model, method));
             }
         }
         return consumers;
@@ -223,9 +193,15 @@ public class CouplingFactory {
      * @return The consumer.
      */
     public Consumer<?> getConsumer(Object model, String methodName) {
-        return getConsumersFromModel(model).stream().filter(
-                c -> c.getMethod().getName().equalsIgnoreCase(methodName)
-        ).findFirst().get();
+        Stream<Method> stream = Arrays.stream(model.getClass().getMethods());
+        Optional<Method> method = stream.filter(m -> m.getName().equals(methodName)).findFirst();
+        if (method.isPresent()) {
+            return createConsumer(model, method.get());
+        } else {
+            throw new IllegalArgumentException(String.format(
+                    "No consumable method with name %s was found in class %s.",
+                    methodName, model.getClass().getSimpleName()));
+        }
     }
 
     /**
@@ -235,13 +211,12 @@ public class CouplingFactory {
      * @return The consumer.
      */
     @SuppressWarnings("unchecked")
-    public <T> Consumer<T> getConsumer(Object model, String methodName, Class<T> type)
-            throws MismatchedAttributesException {
+    public <T> Consumer<T> getConsumer(Object model, String methodName, Class<T> type) throws NoSuchMethodException {
         Consumer<?> consumer = getConsumer(model, methodName);
         if (consumer.getType() == type) {
             return (Consumer<T>) consumer;
         } else {
-            throw new MismatchedAttributesException(String.format(
+            throw new NoSuchMethodException(String.format(
                     "Consumer type %s does not match method value type %s.",
                     consumer.getType(), type));
         }
@@ -254,9 +229,12 @@ public class CouplingFactory {
      * @return The producer.
      */
     public Producer<?> getProducer(Object model, String methodName) {
-        return getProducersFromModel(model).stream().filter(
-                p -> p.getMethod().getName().equalsIgnoreCase(methodName))
-                .findFirst().get();
+        try {
+            Method method = model.getClass().getMethod(methodName);
+            return createProducer(model, method);
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     /**
@@ -266,15 +244,54 @@ public class CouplingFactory {
      * @return The producer.
      */
     @SuppressWarnings("unchecked")
-    public <T> Producer<T> getProducer(Object model, String methodName, Class<T> type)
-            throws MismatchedAttributesException {
+    public <T> Producer<T> getProducer(Object model, String methodName, Class<T> type) throws NoSuchMethodException {
         Producer<?> producer = getProducer(model, methodName);
-        if (producer.getType() == type) {
+        if (producer.getType().equals(type)) {
             return (Producer<T>) producer;
         } else {
-            throw new MismatchedAttributesException(String.format(
-                    "Producer type %s does not match method return type %s.",
+            throw new NoSuchMethodException(String.format(
+                    "Producer with type %s does not match method return type %s.",
                     producer.getType(), type));
+        }
+    }
+
+    /** Return whether the specified method is producible. */
+    private boolean isProducible(Method method) {
+        return method.getAnnotation(Producible.class) != null;
+    }
+
+    /** Return whether the specified method is consumable. */
+    private boolean isConsumable(Method method) {
+        return method.getAnnotation(Consumable.class) != null;
+    }
+
+    /** Create a producer from the specified method on the model object. */
+    private Producer<?> createProducer(Object model, Method method) {
+        Producible annotation = method.getAnnotation(Producible.class);
+        if (annotation == null) {
+            throw new IllegalArgumentException(String.format("Method %s is not producible.", method.getName()));
+        }
+        Method idMethod = getIdMethod(model, annotation.idMethod());
+        String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+        return new Producer(model, method, description, idMethod);
+    }
+
+    /** Create a consumer from the specified method on the model object. */
+    private Consumer<?> createConsumer(Object model, Method method) {
+        Consumable annotation = method.getAnnotation(Consumable.class);
+        if (annotation == null) {
+            throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
+        }
+        Method idMethod = getIdMethod(model, annotation.idMethod());
+        String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
+        return new Consumer(model, method, description, idMethod);
+    }
+
+    private Method getIdMethod(Object model, String idMethodName) {
+        try {
+            return model.getClass().getMethod(idMethodName);
+        } catch (NoSuchMethodException ex) {
+            return null;
         }
     }
 }

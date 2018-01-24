@@ -50,7 +50,12 @@ class ArchivedCoupling {
 
     private Object getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
         WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
-        return component.getObjectFromKey(attribute.getId());
+        Object object = component.getObjectFromKey(attribute.getId());
+        if (object == null) {
+            throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.",
+                    attribute.getId(), attribute.getComponentId()));
+        }
+        return object;
     }
 
 }

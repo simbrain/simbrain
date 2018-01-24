@@ -18,35 +18,34 @@ import org.simbrain.workspace.Producible;
  * @author Tim Shea
  */
 public class StaticImageSource extends ImageSourceAdapter {
-    private String filename;
+    private String[] filenames;
+    private int fileIndex;
 
     /**
      * Construct a new StaticImageSource.
      */
     public StaticImageSource() {
         super();
-        filename = "";
+        filenames = new String[] { "" };
+        fileIndex = 0;
     }
 
     public StaticImageSource(String filename, BufferedImage currentImage) {
         super(currentImage);
-        this.filename = filename;
+        filenames = new String[] { filename };
+        fileIndex = 0;
     }
 
-    /**
-     * @return Get the name of the currently loaded image file.
-     */
+    /** Get the name of the currently loaded image file. */
     @Producible
     public String getFilename() {
-        return filename;
+        return filenames[fileIndex];
     }
 
-    /**
-     * @return Set the name of the current image file (load the file if changed).
-     */
+    /** Load the image file. */
     @Consumable
-    public void setFilename(String value) {
-        if (!filename.equals(value)) {
+    public void loadFilename(String value) {
+        if (!getFilename().equals(value)) {
             try {
                 loadImage(value);
             } catch (IOException ex) {
@@ -62,36 +61,31 @@ public class StaticImageSource extends ImageSourceAdapter {
      */
     public void loadImage(String filename) throws IOException {
         if (filename == null || filename.isEmpty()) {
-            this.filename = "";
+            filenames = new String[] { "" };
             setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
         } else {
             BufferedImage image = ImageIO.read(new File(filename));
-            this.filename = filename;
+            filenames = new String[] { filename };
             setCurrentImage(image);
         }
     }
 
     /**
-     * Create image from  a provided image icon.
+     * Create image from a provided image icon.
      * @param imageIcon the image icon
      */
     public void loadImage(ImageIcon imageIcon) {
-        filename = "";
+        filenames = new String[] { "" };
         BufferedImage image = new BufferedImage(imageIcon.getIconWidth(),
                 imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
-        g.drawImage(imageIcon.getImage(), 0, 0, null);
-        g.dispose();
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(imageIcon.getImage(), 0, 0, null);
+        graphics.dispose();
         setCurrentImage(image);
     }
 
     @Override
-    public void setCurrentImage(BufferedImage value) {
-        super.setCurrentImage(value);
-    }
-
-    @Override
     public String toString() {
-        return "Image" + filename;
+        return "Image" + filenames[fileIndex];
     }
 }

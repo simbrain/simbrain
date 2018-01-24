@@ -150,6 +150,11 @@ public class SFileChooser {
         return filters;
     }
 
+    /** Set the description used by this file chooser. */
+    public void setDescription(String value) {
+        description = value;
+    }
+
     /**
      * Shows dialog for opening files.
      *
@@ -169,14 +174,19 @@ public class SFileChooser {
      * @return file
      */
     private File showOpenDialogNative() {
-
-        FileDialog chooser = new FileDialog(new JFrame(), "Open",
-                FileDialog.LOAD);
+        FileDialog chooser = new FileDialog(new JFrame(), "Open", FileDialog.LOAD);
         chooser.setDirectory(getCurrentLocation());
 
         if (exts.size() >= 1) {
-            chooser.setFilenameFilter(new ExtensionSetFileFilter(exts.keySet(),
-                    description));
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                String file = "";
+                for (String ext : exts.keySet()) {
+                    file = file + "*" + ext + ";";
+                }
+                chooser.setFile(file);
+            } else {
+                chooser.setFilenameFilter(new ExtensionSetFileFilter(exts.keySet(), description));
+            }
         }
         chooser.setVisible(true);
 
@@ -200,8 +210,7 @@ public class SFileChooser {
         setCurrentDirectory(chooser);
 
         if (exts.size() > 1) {
-            chooser.addChoosableFileFilter(new ExtensionSetFileFilter(exts
-                    .keySet(), description));
+            chooser.addChoosableFileFilter(new ExtensionSetFileFilter(exts.keySet(), description));
         }
 
         if (useViewer) {
@@ -412,8 +421,7 @@ public class SFileChooser {
      *
      * @author Matt Watson
      */
-    private class ExtensionSetFileFilter extends FileFilter implements
-            FilenameFilter {
+    private class ExtensionSetFileFilter extends FileFilter implements FilenameFilter {
 
         /** A collection of extension names. */
         private final Collection<String> extensions;
@@ -439,8 +447,7 @@ public class SFileChooser {
          * @return whether the file has the correct extension type
          */
         public boolean accept(final File file) {
-            return (file.isDirectory())
-                    || extensions.contains(getExtension(file));
+            return (file.isDirectory()) || extensions.contains(getExtension(file));
         }
 
         /**
@@ -514,7 +521,7 @@ public class SFileChooser {
      * Check to see if the file has the extension, and if not, add it.
      *
      * @param theFile File to add extension to
-     * @param extension Extension to add to file
+     * @param filter Extension to add to file
      * @return The file name with the correct extension
      */
     private File addExtension(final File theFile, final FileFilter filter) {

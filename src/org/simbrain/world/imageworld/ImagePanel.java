@@ -22,9 +22,9 @@ public class ImagePanel extends JPanel implements ImageSourceListener {
     private BufferedImage currentImage;
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
+    protected void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+        graphics.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
     }
 
     @Override

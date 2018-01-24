@@ -30,38 +30,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.actions.ClearWorkspaceAction;
-import org.simbrain.workspace.actions.GlobalRunAction;
-import org.simbrain.workspace.actions.GlobalStopAction;
-import org.simbrain.workspace.actions.GlobalUpdateAction;
-import org.simbrain.workspace.actions.NewConsoleAction;
-import org.simbrain.workspace.actions.NewDataWorldAction;
-import org.simbrain.workspace.actions.NewDeviceInteractionWorldAction;
-import org.simbrain.workspace.actions.NewDisplayWorldAction;
-import org.simbrain.workspace.actions.NewDocViewerAction;
-import org.simbrain.workspace.actions.NewGameWorldAction;
-import org.simbrain.workspace.actions.NewMidiWorldAction;
-import org.simbrain.workspace.actions.NewNetworkAction;
-import org.simbrain.workspace.actions.NewOdorWorldAction;
-import org.simbrain.workspace.actions.NewReaderWorldAction;
-import org.simbrain.workspace.actions.NewThreeDWorldAction;
-import org.simbrain.workspace.actions.NewImageWorldAction;
-import org.simbrain.workspace.actions.OpenCouplingListAction;
-import org.simbrain.workspace.actions.OpenCouplingManagerAction;
-import org.simbrain.workspace.actions.OpenDataWorldAction;
-import org.simbrain.workspace.actions.OpenNetworkAction;
-import org.simbrain.workspace.actions.OpenOdorWorldAction;
-import org.simbrain.workspace.actions.OpenWorkspaceAction;
-import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
-import org.simbrain.workspace.actions.PropertyTabAction;
-import org.simbrain.workspace.actions.QuitWorkspaceAction;
-import org.simbrain.workspace.actions.RepositionAllWindowsAction;
-import org.simbrain.workspace.actions.SaveWorkspaceAction;
-import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
-import org.simbrain.workspace.actions.ScriptEditorAction;
-import org.simbrain.workspace.actions.ShowPropertyDialogAction;
-import org.simbrain.workspace.actions.ShowWorkspaceUpdaterDialog;
-import org.simbrain.workspace.actions.WorkspaceAction;
+import org.simbrain.workspace.actions.*;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewHistogramAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
@@ -72,6 +41,7 @@ import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import org.simbrain.world.imageworld.ImageWorldComponent;
 
 /**
  * Workspace action manager.
@@ -151,6 +121,9 @@ public class WorkspaceActionManager {
     /** Open odor world action. */
     private final Action openOdorWorldAction;
 
+    /** Open image world action. */
+    private final Action openImageWorldAction;
+
     /** Open workspace action. */
     private final Action openWorkspaceAction;
 
@@ -212,6 +185,8 @@ public class WorkspaceActionManager {
         openDataWorldAction = new OpenDataWorldAction(workspace);
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
+        openImageWorldAction = new OpenComponentAction<>(
+                ImageWorldComponent.class, "Image World", "Camera.png", workspace);
 
         showPropertyDialogAction = new ShowPropertyDialogAction(workspace);
 
@@ -265,24 +240,28 @@ public class WorkspaceActionManager {
      * @return a list of network control actions
      */
     public List<Action> getGlobalControlActions() {
-        return Arrays
-                .asList(new Action[] { globalRunAction, globalStopAction });
+        return Arrays.asList(globalRunAction, globalStopAction);
     }
 
     /**
      * @return Open and save workspace actions.
      */
     public List<Action> getOpenSaveWorkspaceActions() {
-        return Arrays.asList(new Action[] { openWorkspaceAction,
-                saveWorkspaceAction, saveWorkspaceAsAction });
+        return Arrays.asList(
+            openWorkspaceAction,
+            saveWorkspaceAction,
+            saveWorkspaceAsAction
+        );
     }
 
     /**
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] { openDataWorldAction,
-                openOdorWorldAction });
+        return Arrays.asList(
+            openDataWorldAction,
+            openOdorWorldAction,
+            openImageWorldAction);
     }
 
     /**
@@ -290,23 +269,26 @@ public class WorkspaceActionManager {
      */
     public List<Action> getNewWorldActions() {
         // These should be in alphabetical order in the resulting menus
-        return Arrays.asList(new Action[] {
-                newThreedDWorldAction,
-                newDataWorldAction,
-                newImageWorldAction,
-                newOdorWorldAction, 
-                newDisplayWorldAction,
-                newReaderWorldAction
-                 });
+        return Arrays.asList(
+            newThreedDWorldAction,
+            newDataWorldAction,
+            newImageWorldAction,
+            newOdorWorldAction,
+            newDisplayWorldAction,
+            newReaderWorldAction);
     }
 
     /**
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] { newBarChartAction,
-                newHistogramAction, newPieChartAction, newProjectionPlotAction,
-                newRasterPlotAction, newTimeSeriesAction });
+        return Arrays.asList(
+            newBarChartAction,
+            newHistogramAction,
+            newPieChartAction,
+            newProjectionPlotAction,
+            newRasterPlotAction,
+            newTimeSeriesAction);
     }
 
     /**

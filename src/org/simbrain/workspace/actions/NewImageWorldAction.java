@@ -9,13 +9,12 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 /**
  * Add ImageWorld to workspace.
  */
-public final class NewImageWorldAction extends WorkspaceAction {
-
+public class NewImageWorldAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
      * Create a new ImageWorld action with the specified workspace.
-     * @param workspace
+     * @param workspace The workspace which will own new ImageWorlds.
      */
     public NewImageWorldAction(Workspace workspace) {
         super("Image World", workspace);
@@ -24,7 +23,7 @@ public final class NewImageWorldAction extends WorkspaceAction {
     }
 
     @Override
-    public void actionPerformed(final ActionEvent event) {
-        workspace.addWorkspaceComponent(new ImageWorldComponent("Image World"));
+    public void actionPerformed(ActionEvent event) {
+        workspace.addWorkspaceComponent(new ImageWorldComponent());
     }
 }

@@ -18,12 +18,11 @@ public class SensorMatrix implements ImageSourceListener {
     /** An ImageSource from which to extract sensor values. */
     private ImageSource source;
 
-    /** The vales this matrix produces for couplings. */
+    /** The vales this matrix produces for floating point channel couplings. */
     private transient double[][] channels;
 
+    /** The values this matrix produces for integer color coupling. */
     private transient int[] colors;
-
-    private boolean useColor = true;
 
     /**
      * Construct a sensor matrix without attaching it to a source.
@@ -81,12 +80,6 @@ public class SensorMatrix implements ImageSourceListener {
         return source.getHeight();
     }
 
-    /** Returns an array of RGB colors encoded in integers. */
-    @Producible(idMethod="getName", defaultVisibility=true)
-    public int[] getColor() {
-        return colors;
-    }
-
     /** Returns an array of doubles which corresponds to the brightness of the pixels. */
     @Producible(idMethod="getName")
     public double[] getBrightness() {
@@ -111,6 +104,12 @@ public class SensorMatrix implements ImageSourceListener {
         return channels[3];
     }
 
+    /** Returns an array of RGB colors encoded in integers. */
+    @Producible(idMethod="getName", defaultVisibility=true)
+    public int[] getRGBColor() {
+        return colors;
+    }
+
     @Override
     public String toString() {
         return this.name;
@@ -129,16 +128,17 @@ public class SensorMatrix implements ImageSourceListener {
         for (int y = 0; y < image.getHeight(); ++y) {
             for (int x = 0; x < image.getWidth(); ++x) {
                 int color = image.getRGB(x, y);
-                if (useColor) {
-                    colors[y * getWidth() + x] = color;
-                } else {
-                    double red = ((color >>> 16) & 0xFF) / 255.0;
-                    double green = ((color >>> 8) & 0xFF) / 255.0;
-                    double blue = (color & 0xFF) / 255.0;
+                double red = ((color >>> 16) & 0xFF) / 255.0;
+                double green = ((color >>> 8) & 0xFF) / 255.0;
+                double blue = (color & 0xFF) / 255.0;
+                try {
                     channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
                     channels[1][y * getWidth() + x] = red;
                     channels[2][y * getWidth() + x] = green;
                     channels[3][y * getWidth() + x] = blue;
+                    colors[y * getWidth() + x] = color;
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    System.out.println(String.format("%s %s %s %s", getWidth(), getHeight(), x, y));
                 }
             }
         }
@@ -146,7 +146,7 @@ public class SensorMatrix implements ImageSourceListener {
 
     @Override
     public void onResize(ImageSource source) {
-        colors = new int[getWidth() * getHeight()];
         channels = new double[4][getWidth() * getHeight()];
+        colors = new int[getWidth() * getHeight()];
     }
 }

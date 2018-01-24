@@ -49,9 +49,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
             // Default to color filter
             colorOp = ImageFilterFactory.createIdentityOp();
         }
-        float scaleX = (float) width / wrappedSource.getWidth();
-        float scaleY = (float) height / wrappedSource.getHeight();
-        scaleOp = ImageFilterFactory.createScaleOp(scaleX, scaleY, true);
+        scaleToFit(wrappedSource);
         wrappedSource.addListener(this);
         return this;
     }
@@ -80,6 +78,16 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     }
 
     @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
     public void onImageUpdate(ImageSource source) {
         BufferedImage image = scaleOp.filter(source.getCurrentImage(), null);
         image = colorOp.filter(image, null);
@@ -88,9 +96,13 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
 
     @Override
     public void onResize(ImageSource source) {
+        scaleToFit(source);
+        notifyResize();
+    }
+
+    protected void scaleToFit(ImageSource source) {
         float scaleX = (float) width / source.getWidth();
         float scaleY = (float) height / source.getHeight();
         scaleOp = ImageFilterFactory.createScaleOp(scaleX, scaleY, true);
-        notifyResize();
     }
 }

@@ -18,8 +18,8 @@ import javax.swing.JTextField;
  * @author Tim Shea
  */
 public class ThresholdOp implements BufferedImageOp {
-    private static int white = 0x00FFFFFF;
-    private static int black = 0x00000000;
+    private static final int white = 0x00FFFFFF;
+    private static final int black = 0x00000000;
 
     private double threshold;
 
@@ -43,17 +43,17 @@ public class ThresholdOp implements BufferedImageOp {
     }
 
     @Override
-    public BufferedImage filter(BufferedImage src, BufferedImage dest) {
-        if (dest == null) {
-            dest = createCompatibleDestImage(src, null);
+    public BufferedImage filter(BufferedImage source, BufferedImage destination) {
+        if (destination == null) {
+            destination = createCompatibleDestImage(source, null);
         }
-        for (int y = 0; y < src.getHeight(); ++y) {
-            for (int x = 0; x < src.getWidth(); ++x) {
-                double luminance = getLuminance(src.getRGB(x, y));
-                dest.setRGB(x, y, luminance >= threshold ? white : black);
+        for (int y = 0; y < source.getHeight(); ++y) {
+            for (int x = 0; x < source.getWidth(); ++x) {
+                double luminance = getLuminance(source.getRGB(x, y));
+                destination.setRGB(x, y, luminance >= threshold ? white : black);
             }
         }
-        return dest;
+        return destination;
     }
 
     /**
@@ -73,17 +73,17 @@ public class ThresholdOp implements BufferedImageOp {
     }
 
     @Override
-    public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel destCM) {
-        return new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+    public BufferedImage createCompatibleDestImage(BufferedImage source, ColorModel colorModel) {
+        return new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_RGB);
     }
 
     @Override
-    public Point2D getPoint2D(Point2D srcPt, Point2D dstPt) {
-        if (dstPt == null) {
-            return srcPt;
+    public Point2D getPoint2D(Point2D sourcePoint, Point2D destinationPoint) {
+        if (destinationPoint == null) {
+            return sourcePoint;
         } else {
-            dstPt.setLocation(srcPt);
-            return dstPt;
+            destinationPoint.setLocation(sourcePoint);
+            return destinationPoint;
         }
     }
 

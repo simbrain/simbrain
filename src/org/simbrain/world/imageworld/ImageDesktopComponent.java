@@ -1,18 +1,17 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -40,92 +39,31 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private JToolBar sourceToolbar = new JToolBar();
     private JToolBar sensorToolbar = new JToolBar();
 
+    SFileChooser fileChooser;
     private JPopupMenu contextMenu;
     private MultiCouplingMenu multiCouplingMenu;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
      * @param frame The frame in which to place GUI elements.
-     * @param imageWorldComponent The ImageWorldComponent to interact with.
+     * @param component The ImageWorldComponent to interact with.
      */
-    public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent imageWorldComponent) {
-        super(frame, imageWorldComponent);
-        component = imageWorldComponent;
+    public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent component) {
+        super(frame, component);
+        this.component = component;
 
-        JMenuBar menuBar = new JMenuBar();
-        this.setUpMenus(menuBar);
-        frame.setJMenuBar(menuBar);
-
-        JButton selectEmitterButton = new JButton();
-        selectEmitterButton.setIcon(ResourceManager.getSmallIcon("light-bulb.png"));
-        selectEmitterButton.setToolTipText("View Emitter Matrix");
-        selectEmitterButton.addActionListener(evt -> {
-            component.getWorld().selectEmitterMatrix();
-        });
-        sourceToolbar.add(selectEmitterButton);
-
-        JButton resizeEmitterButton = new JButton();
-        resizeEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
-        resizeEmitterButton.setToolTipText("Resize Emitter Matrix");
-        resizeEmitterButton.addActionListener(evt -> {
-            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
-            dialog.setVisible(true);
-        });
-        sourceToolbar.add(resizeEmitterButton);
-
-        JButton viewImageButton = new JButton();
-        viewImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
-        viewImageButton.setToolTipText("View Static Image");
-        viewImageButton.addActionListener(evt -> {
-            component.getWorld().selectStaticSource();
-        });
-        sourceToolbar.add(viewImageButton);
-
-        JButton loadImageButton = new JButton();
-        loadImageButton.setIcon(ResourceManager.getSmallIcon("Open.png"));
-        loadImageButton.setToolTipText("Load Static Image");
-        loadImageButton.addActionListener(this::loadImage);
-        sourceToolbar.add(loadImageButton);
-
-        sensorToolbar.add(sensorMatrixCombo);
-        sensorMatrixCombo.setToolTipText("Which Sensor Matrix to View");
-        updateComboBox();
-        sensorMatrixCombo.setSelectedIndex(0);
-        sensorMatrixCombo.setMaximumSize(new java.awt.Dimension(200, 100));
-        sensorMatrixCombo.addActionListener(evt -> {
-            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            if (selectedSensorMatrix != null) {
-                component.getWorld().setCurrentSensorMatrix(selectedSensorMatrix);
-            }
-        });
-
-        JButton addSensorMatrix = new JButton(
-                ResourceManager.getImageIcon("plus.png"));
-        addSensorMatrix.setToolTipText("Add sensor matrix...");
-        addSensorMatrix.addActionListener(evt -> {
-            SensorMatrixDialog dialog = new SensorMatrixDialog(component.getWorld());
-            dialog.setVisible(true);
-        });
-        sensorToolbar.add(addSensorMatrix);
-
-        JButton deleteSensorMatrix = new JButton(
-                ResourceManager.getImageIcon("minus.png"));
-        deleteSensorMatrix.setToolTipText("Delete sensor matrix");
-        deleteSensorMatrix.addActionListener(evt -> {
-            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
-        });
-        sensorToolbar.add(deleteSensorMatrix);
+        setupMenuBar(frame);
+        setupToolbars();
 
         // Lay out the whole component
         setLayout(new BorderLayout());
         add(toolbars, BorderLayout.NORTH);
         toolbars.add(sourceToolbar);
         toolbars.add(sensorToolbar);
-        add(imageWorldComponent.getWorld().getImagePanel(), BorderLayout.CENTER);
-        imageWorldComponent.getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
+        add(component.getWorld().getImagePanel(), BorderLayout.CENTER);
+        component.getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
-        component.getWorld().addListener(new ImageWorld.Listener() {
+        this.component.getWorld().addListener(new ImageWorld.Listener() {
             @Override
             public void imageSourceChanged(ImageSource changedSource) {}
 
@@ -140,9 +78,60 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
             }
         });
 
+        setupContextMenu(component);
+        setupFileChooser();
+    }
+
+    private void setupMenuBar(GenericFrame frame) {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File  ");
+        menuBar.add(fileMenu);
+
+        JMenuItem loadImage = new JMenuItem("Load Image...");
+        loadImage.addActionListener(this::loadImage);
+        fileMenu.add(loadImage);
+        JMenuItem saveImage = new JMenuItem("Save Image...");
+        saveImage.addActionListener(this::saveImage);
+        fileMenu.add(saveImage);
+
+        fileMenu.addSeparator();
+        fileMenu.add(new OpenAction(this));
+        fileMenu.add(new SaveAction(this));
+        fileMenu.add(new SaveAsAction(this));
+        fileMenu.addSeparator();
+        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
+
+        // Help Menu
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem helpItem = new JMenuItem("World Help");
+        menuBar.add(helpMenu);
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Worlds/ImageWorld/ImageWorld.html");
+        helpItem.setAction(helpAction);
+        helpMenu.add(helpItem);
+
+        frame.setJMenuBar(menuBar);
+    }
+
+    private void setupContextMenu(ImageWorldComponent component) {
         contextMenu = new JPopupMenu();
+        Action copyAction = new AbstractAction("Copy") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                component.getWorld().getClipboard().copyImage();
+            }
+        };
+        contextMenu.add(copyAction);
+        Action pasteAction = new AbstractAction("Paste") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                component.getWorld().getClipboard().pasteImage();
+            }
+        };
+        contextMenu.add(pasteAction);
+        contextMenu.addSeparator();
         multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 5);
-        imageWorldComponent.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
+        component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 super.mouseClicked(evt);
@@ -151,6 +140,118 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
                 }
             }
         });
+    }
+
+    private void showContextMenu(MouseEvent evt) {
+        multiCouplingMenu.setSourceModels(component.getSelectedModels());
+        contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
+    }
+
+    @Override
+    protected void closing() {}
+
+    private void setupToolbars() {
+        JButton selectEmitterButton = new JButton();
+        selectEmitterButton.setIcon(ResourceManager.getSmallIcon("light-bulb.png"));
+        selectEmitterButton.setToolTipText("View Emitter Matrix");
+        selectEmitterButton.addActionListener(evt -> component.getWorld().selectEmitterMatrix());
+        sourceToolbar.add(selectEmitterButton);
+
+        JButton editEmitterButton = new JButton();
+        editEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
+        editEmitterButton.setToolTipText("Edit Emitter Matrix");
+        editEmitterButton.addActionListener(evt -> {
+            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
+            dialog.setVisible(true);
+        });
+        sourceToolbar.add(editEmitterButton);
+
+        JButton viewImageButton = new JButton();
+        viewImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
+        viewImageButton.setToolTipText("View Image");
+        viewImageButton.addActionListener(evt -> component.getWorld().selectStaticSource());
+        sourceToolbar.add(viewImageButton);
+
+        JButton loadImageButton = new JButton();
+        loadImageButton.setIcon(ResourceManager.getSmallIcon("Open.png"));
+        loadImageButton.setToolTipText("Load Image");
+        loadImageButton.addActionListener(this::loadImage);
+        sourceToolbar.add(loadImageButton);
+
+        JButton saveImageButton = new JButton();
+        saveImageButton.setIcon(ResourceManager.getSmallIcon("Save.png"));
+        saveImageButton.setToolTipText("Save Image");
+        saveImageButton.addActionListener(this::saveImage);
+        sourceToolbar.add(saveImageButton);
+
+        JButton clearImageButton = new JButton();
+        clearImageButton.setIcon(ResourceManager.getSmallIcon("Eraser.png"));
+        clearImageButton.setToolTipText("Clear Image");
+        clearImageButton.addActionListener(evt -> component.getWorld().clearImage());
+        sourceToolbar.add(clearImageButton);
+
+        sensorToolbar.add(sensorMatrixCombo);
+        sensorMatrixCombo.setToolTipText("Which Sensor Matrix to View");
+        updateComboBox();
+        sensorMatrixCombo.setSelectedIndex(0);
+        sensorMatrixCombo.setMaximumSize(new java.awt.Dimension(200, 100));
+        sensorMatrixCombo.addActionListener(evt -> {
+            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
+            if (selectedSensorMatrix != null) {
+                component.getWorld().setCurrentSensorMatrix(selectedSensorMatrix);
+            }
+        });
+
+        JButton addSensorMatrix = new JButton(ResourceManager.getImageIcon("plus.png"));
+        addSensorMatrix.setToolTipText("Add Sensor Matrix");
+        addSensorMatrix.addActionListener(evt -> {
+            SensorMatrixDialog dialog = new SensorMatrixDialog(component.getWorld());
+            dialog.setVisible(true);
+        });
+        sensorToolbar.add(addSensorMatrix);
+
+        JButton deleteSensorMatrix = new JButton(ResourceManager.getImageIcon("minus.png"));
+        deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
+        deleteSensorMatrix.addActionListener(evt -> {
+            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
+            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
+        });
+        sensorToolbar.add(deleteSensorMatrix);
+    }
+
+    private void setupFileChooser() {
+        fileChooser = new SFileChooser(SimbrainPreferences.getString("imagesDirectory"), "");
+        fileChooser.setUseImagePreview(true);
+        String[] exts = ImageIO.getReaderFileSuffixes();
+        String[] descriptions = ImageIO.getReaderFormatNames();
+        for (int i = 0; i < exts.length; ++i) {
+            fileChooser.addExtension(descriptions[i], "." + exts[i]);
+        }
+    }
+
+    private void loadImage(ActionEvent evt) {
+        fileChooser.setDescription("Select an image to load");
+        File file = fileChooser.showOpenDialog();
+        if (file != null) {
+            try {
+                component.getWorld().loadImage(file.toString());
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Unable to load file: " + file.toString());
+            }
+        }
+    }
+
+    private void saveImage(ActionEvent evt) {
+        fileChooser.setDescription("Select filename to save");
+        fileChooser.setUseImagePreview(true);
+        File file = fileChooser.showSaveDialog();
+        if (file != null) {
+            try {
+                component.getWorld().saveImage(file.toString());
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Unable to save file: " + file.toString());
+            }
+        }
     }
 
     /** Reset the combo box for the sensor panels. */
@@ -163,56 +264,5 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
                 sensorMatrixCombo.setSelectedItem(sensorMatrix);
             }
         }
-    }
-
-    private void loadImage(ActionEvent evt) {
-        SFileChooser fileChooser = new SFileChooser(System.getProperty("user.home"), "Select an image to load");
-        fileChooser.setUseImagePreview(true);
-        File file = fileChooser.showOpenDialog();
-        if (file != null) {
-            try {
-                component.getWorld().loadImage(file.toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Unable to load file: " + file.toString());
-            }
-        }
-    }
-
-    private void showContextMenu(MouseEvent evt) {
-        multiCouplingMenu.setSourceModels(component.getSelectedModels());
-        contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
-    }
-
-    @Override
-    protected void closing() {}
-
-    /**
-     * Sets up menus.
-     * @param menuBar the bar to add menus
-     */
-    public void setUpMenus(JMenuBar menuBar) {
-        JMenu fileMenu = new JMenu("File  ");
-        menuBar.add(fileMenu);
-
-        JMenuItem loadImage = new JMenuItem("Load Image...");
-        loadImage.addActionListener(this::loadImage);
-        fileMenu.add(loadImage);
-
-        fileMenu.addSeparator();
-        // TODO: Serialization not hooked up yet
-        fileMenu.add(new OpenAction(this));
-        fileMenu.add(new SaveAction(this));
-        fileMenu.add(new SaveAsAction(this));
-        fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
-
-        // Help Menu
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem helpItem = new JMenuItem("World Help");
-        menuBar.add(helpMenu);
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/ImageWorld/ImageWorld.html"); // TODO: Create docs
-        helpItem.setAction(helpAction);
-        helpMenu.add(helpItem);
     }
 }

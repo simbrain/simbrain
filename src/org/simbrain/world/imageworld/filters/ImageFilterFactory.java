@@ -64,15 +64,31 @@ public abstract class ImageFilterFactory extends XmlAdapter<String, FilteredImag
 
     /**
      * Create a scaling image op.
-     * @param x the horizontal scaling factor
-     * @param y the vertical scaling factor
+     * @param sX the horizontal scaling factor
+     * @param sY the vertical scaling factor
      * @param smooth whether the output image should receive bilinear smoothing
      * @return a BufferedImageOp which applies a scaling transform to input images
      */
-    protected static BufferedImageOp createScaleOp(float x, float y, boolean smooth) {
-        AffineTransform transform = AffineTransform.getScaleInstance(x, y);
+    protected static BufferedImageOp createScaleOp(float sX, float sY, boolean smooth) {
+        AffineTransform transform = AffineTransform.getScaleInstance(sX, sY);
         int interpolation = smooth ? AffineTransformOp.TYPE_BILINEAR
                 : AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
+        return new AffineTransformOp(transform, interpolation);
+    }
+
+    /**
+     * Create a translation and scaling transform op.
+     * @param tX The amount to translate in the x direction.
+     * @param tY The amount to translate in the y direction.
+     * @param sX The amount to scale in the x direction.
+     * @param sY The amount to scale in the y direction.
+     * @param smooth Whether to use bilinear smoothing (slower) or nearest neighbor.
+     * @return a BufferedImageOp which applies a scaling and translation to input images.
+     */
+    protected static BufferedImageOp createTranslateAndScaleOp(float tX, float tY, float sX, float sY, boolean smooth) {
+        AffineTransform transform = AffineTransform.getTranslateInstance(tX, tY);
+        transform.scale(sX, sY);
+        int interpolation = smooth ? AffineTransformOp.TYPE_BILINEAR : AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
         return new AffineTransformOp(transform, interpolation);
     }
 
@@ -110,11 +126,6 @@ public abstract class ImageFilterFactory extends XmlAdapter<String, FilteredImag
 
     public void setHeight(int value) {
         height = value;
-    }
-
-    public void getValuesFromFilter(FilteredImageSource filter) {
-        width = filter.getWidth();
-        height = filter.getHeight();
     }
 
     @Override

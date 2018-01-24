@@ -1,26 +1,31 @@
 package org.simbrain.world.imageworld;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import com.sun.scenario.effect.Offset;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
+import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
 /**
- * ImageWorld contains the "logical" contents of this component, the image, and
- * a series of sensor matrices that can be used to convert the image into
- * numbers.
+ * ImageWorld contains the contents of this component: the image and a series of sensor matrices
+ * that can be used to convert the image into numbers.
  */
 public class ImageWorld {
 
     /**
-     * WorldListener receives notifications when the is changed.
+     * Listener receives notifications when the image world is changed.
      */
     public interface Listener {
         /** Called whenever an image source is changed. */
@@ -46,8 +51,11 @@ public class ImageWorld {
     /** Currently selected sensor matrix. */
     private SensorMatrix currentSensorMatrix;
 
-    /** GUI container for the current image or sensor view. */
+    /** Container for the current image or sensor view. */
     private transient ImagePanel imagePanel;
+
+    /** Clipboard for the image world. */
+    private transient ImageClipboard clipboard;
 
     /** List of world listener. */
     private transient List<Listener> listeners;
@@ -62,6 +70,7 @@ public class ImageWorld {
         compositeSource = new CompositeImageSource(staticSource);
         staticSource.loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
         imagePanel = new ImagePanel();
+        clipboard = new ImageClipboard(this);
         sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
 
@@ -69,32 +78,27 @@ public class ImageWorld {
         SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
         sensorMatrices.add(unfiltered);
 
-        SensorMatrix gray75x75 = new SensorMatrix("Color 25x25",
+        SensorMatrix color25x25 = new SensorMatrix("Color 25x25",
                 ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
-        sensorMatrices.add(gray75x75);
-
-        SensorMatrix gray200x200 = new SensorMatrix("Gray 200x200",
-                ImageFilterFactory.createGrayFilter(compositeSource, 200, 200));
-        sensorMatrices.add(gray200x200);
+        sensorMatrices.add(color25x25);
 
         SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10",
                 ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
         sensorMatrices.add(threshold10x10);
 
-        SensorMatrix threshold100x100 = new SensorMatrix("Threshold 100x100",
-                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 100, 100));
-        sensorMatrices.add(threshold100x100);
+        SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100",
+            OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
+        sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
     }
 
     /** Returns a deserialized ImageWorld. */
     public Object readResolve() {
-        // Setup ImageSources
         imagePanel = new ImagePanel();
         listeners = new ArrayList<Listener>();
-
-        setCurrentSensorMatrix(currentSensorMatrix);
+        currentSensorMatrix.getSource().addListener(imagePanel);
+        compositeSource.notifyImageUpdate();
         return this;
     }
 
@@ -108,6 +112,33 @@ public class ImageWorld {
         fireImageSourceChanged(staticSource);
     }
 
+    /**
+     * Save the current image as the specified filename.
+     * @param filename The filename to save to.
+     */
+    public void saveImage(String filename) throws IOException {
+        BufferedImage image = currentSensorMatrix.getSource().getCurrentImage();
+        File file = new File(filename);
+        String[] split = filename.split("\\.");
+        String ext = split[split.length - 1];
+        ImageIO.write(image, ext, file);
+    }
+
+    /** Set an existing buffered image as the current image. */
+    public void setImage(BufferedImage image) {
+        staticSource.setCurrentImage(image);
+    }
+
+    /** Clear the current image from the composite image source. */
+    public void clearImage() {
+        if (isEmitterMatrixSelected()) {
+            emitterMatrix.clear();
+            emitterMatrix.emitImage();
+        } else {
+            staticSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+        }
+    }
+
     /** Switch the CompositeImageSource to the static image. */
     public void selectStaticSource() {
         compositeSource.setImageSource(staticSource);
@@ -115,12 +146,12 @@ public class ImageWorld {
 
     /** Get whether the emitter matrix is using color. */
     public boolean getUseColorEmitter() {
-        return emitterMatrix.isUsingColor();
+        return emitterMatrix.isUsingRGBColor();
     }
 
     /** Set the color mode of the emitter matrix. */
     public void setUseColorEmitter(boolean value) {
-        emitterMatrix.setUsingColor(value);
+        emitterMatrix.setUsingRGBColor(value);
         fireImageSourceChanged(emitterMatrix);
     }
 
@@ -193,9 +224,14 @@ public class ImageWorld {
         }
     }
 
-    /** @return the image panel */
+    /** Return the image panel */
     public ImagePanel getImagePanel() {
         return imagePanel;
+    }
+
+    /** Return the clipboard. */
+    public ImageClipboard getClipboard() {
+        return clipboard;
     }
 
     /**

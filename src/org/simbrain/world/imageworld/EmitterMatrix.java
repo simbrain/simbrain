@@ -1,13 +1,15 @@
 package org.simbrain.world.imageworld;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 
 public class EmitterMatrix extends ImageSourceAdapter {
-    @UserParameter(label="Use Color Integers", description="Sets whether to use coupled integer array as RGB colors.")
-    private boolean usingColor = false;
+    @UserParameter(label="Use RGB Colors", description="Sets whether to couple integer array of RGB colors or" +
+            "separate red, green, and blue channels.")
+    private boolean usingRGBColor = false;
     private double[][] channels;
     private int[] colors;
 
@@ -24,16 +26,16 @@ public class EmitterMatrix extends ImageSourceAdapter {
     }
 
     /** Returns whether the emitter matrix should use int RGB colors or double channels. */
-    public boolean isUsingColor() {
-        return usingColor;
+    public boolean isUsingRGBColor() {
+        return usingRGBColor;
     }
 
     /**
      * Set whether the emitter matrix should use int RGB color values (true) or double channel values (false).
      * Note that the set brightness coupling requires useColor = false.
      */
-    public void setUsingColor(boolean value) {
-        usingColor = value;
+    public void setUsingRGBColor(boolean value) {
+        usingRGBColor = value;
     }
 
     @Consumable
@@ -45,7 +47,7 @@ public class EmitterMatrix extends ImageSourceAdapter {
     }
 
     @Consumable
-    public void setColor(int[] values) {
+    public void setRGBColor(int[] values) {
         int length = Math.min(values.length, getWidth() * getHeight());
         System.arraycopy(values, 0, colors, 0, length);
     }
@@ -84,7 +86,7 @@ public class EmitterMatrix extends ImageSourceAdapter {
      * to integers (0 to 255) and assigned to the corresponding pixels.
      */
     public void emitImage() {
-        if (usingColor) {
+        if (usingRGBColor) {
             BufferedImage image = getCurrentImage();
             for (int y = 0; y < image.getHeight(); ++y) {
                 for (int x = 0; x < image.getWidth(); ++x) {
@@ -104,13 +106,17 @@ public class EmitterMatrix extends ImageSourceAdapter {
                     green = Math.max(Math.min(green, 255), 0);
                     int color = red + blue + green;
                     image.setRGB(x, y, color);
-                    channels[0][y * getWidth() + x] = 0;
-                    channels[1][y * getWidth() + x] = 0;
-                    channels[2][y * getWidth() + x] = 0;
                 }
             }
         }
         notifyImageUpdate();
+    }
+
+    public void clear() {
+        Arrays.fill(channels[0], 0.0);
+        Arrays.fill(channels[1], 0.0);
+        Arrays.fill(channels[2], 0.0);
+        Arrays.fill(colors, 0);
     }
 
     @Override

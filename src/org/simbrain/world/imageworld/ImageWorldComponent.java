@@ -16,7 +16,7 @@ import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
  * pipeline and coupling inputs and outputs within a Simbrain workspace.
  * @author Tim Shea
  */
-public class ImageWorldComponent extends WorkspaceComponent implements ImageWorld.Listener {
+public class ImageWorldComponent extends WorkspaceComponent {
 
     /** Create an xstream from this class. */
     public static XStream getXStream() {
@@ -43,19 +43,16 @@ public class ImageWorldComponent extends WorkspaceComponent implements ImageWorl
 
     /**
      * Construct a new ImageWorldComponent.
-     * @param name The name of the component.
      */
-    public ImageWorldComponent(String name) {
-        super(name);
+    public ImageWorldComponent() {
+        super("");
         world = new ImageWorld();
-        world.addListener(this);
     }
 
     /** Deserialize an ImageWorldComponent. */
     private ImageWorldComponent(String name, ImageWorld world) {
         super(name);
         this.world = world;
-        world.addListener(this);
     }
 
     @Override
@@ -88,20 +85,9 @@ public class ImageWorldComponent extends WorkspaceComponent implements ImageWorl
         }
     }
 
-    /**
-     * @return the world
-     */
+    /** Return a reference to the world owned by this component. */
     public ImageWorld getWorld() {
         return world;
     }
-
-    @Override
-    public void imageSourceChanged(ImageSource source) {}
-
-    @Override
-    public void sensorMatrixAdded(SensorMatrix matrix) {}
-
-    @Override
-    public void sensorMatrixRemoved(SensorMatrix matrix) {}
 
 }

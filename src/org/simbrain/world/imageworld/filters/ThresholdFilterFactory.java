@@ -1,6 +1,5 @@
 package org.simbrain.world.imageworld.filters;
 
-import java.awt.image.BufferedImageOp;
 import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
@@ -39,12 +38,6 @@ public class ThresholdFilterFactory extends ImageFilterFactory {
     public void setDefaultValues() {
         super.setDefaultValues();
         threshold = 0.5;
-    }
-
-    @Override
-    public void getValuesFromFilter(FilteredImageSource filter) {
-        super.getValuesFromFilter(filter);
-        threshold = ((ThresholdOp) filter.getColorOp()).getThreshold();
     }
 
     @Override

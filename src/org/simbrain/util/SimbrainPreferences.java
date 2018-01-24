@@ -56,8 +56,10 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("workspaceSimulationDirectory", "." + FS + "simulations" + FS + "workspaces");
         DEFAULT_MAP.put("workspaceNetworkDirectory", "." + FS + "simulations" + FS + "networks");
         DEFAULT_MAP.put("workspaceOdorWorldDirectory", "." + FS + "simulations" + FS + "worlds");
+        DEFAULT_MAP.put("workspaceImageWorldComponentDirectory", "." + FS + "simulations" + FS + "images");
         DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations" + FS + "tables");
         DEFAULT_MAP.put("workspaceScriptDirectory", "." + FS + "scripts" + FS + "scriptMenu");
+        DEFAULT_MAP.put("imagesDirectory", System.getProperty("user.home"));
         DEFAULT_MAP.put("networkBackgroundColor", Color.WHITE.getRGB());
         DEFAULT_MAP.put("networkLineColor", Color.BLACK.getRGB());
         DEFAULT_MAP.put("networkHotNodeColor", Color.RGBtoHSB(255, 0, 0, null)[0]);

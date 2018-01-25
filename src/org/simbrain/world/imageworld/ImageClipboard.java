@@ -12,7 +12,7 @@ public class ImageClipboard implements ClipboardOwner {
 
         private Image image;
 
-        public TransferableImage(Image image) {
+        TransferableImage(Image image) {
             this.image = image;
         }
 
@@ -25,7 +25,9 @@ public class ImageClipboard implements ClipboardOwner {
         }
 
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[] { DataFlavor.imageFlavor };
+            return new DataFlavor[] {
+                DataFlavor.imageFlavor,
+            };
         }
 
         public boolean isDataFlavorSupported(DataFlavor flavor) {
@@ -42,7 +44,8 @@ public class ImageClipboard implements ClipboardOwner {
     }
 
     @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    }
 
     public void copyImage() {
         BufferedImage image = world.getCurrentSensorMatrix().getSource().getCurrentImage();
@@ -57,7 +60,7 @@ public class ImageClipboard implements ClipboardOwner {
             try {
                 Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
                 BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
-                        BufferedImage.TYPE_INT_RGB);
+                    BufferedImage.TYPE_INT_RGB);
                 Graphics graphics = bufferedImage.getGraphics();
                 graphics.drawImage(image, 0, 0, null);
                 graphics.dispose();

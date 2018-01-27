@@ -52,23 +52,11 @@ public class ThreadViewerPanel extends JPanel {
     /** Thread viewer panel. */
     private JPanel threadViewer = new JPanel(new BorderLayout());
 
-    /** Thread viewer panel. */
-    private JToolBar topStatsPanel = new JToolBar();
-
-    /** List of update types to be used as model for the updater combo box. */
-    private Vector updateTypes = new Vector();
-
-    /** Update types. */
-    private JComboBox updaterComboBox = new JComboBox(updateTypes);
-
     /** List. */
     private JList list = new JList();
 
     /** List model. */
     private ThreadListModel<ListItem> listModel = new ThreadListModel<ListItem>();
-
-    /** Thread viewer scroll pane. */
-    JScrollPane scrollPane;
 
     /** Reference to parent workspace. */
     private Workspace workspace;
@@ -88,14 +76,8 @@ public class ThreadViewerPanel extends JPanel {
 
         // Set up thread viewer
         updateList();
-        scrollPane = new JScrollPane(list);
+        JScrollPane scrollPane = new JScrollPane(list);
         threadViewer.add(scrollPane);
-
-        // Update Type Selector
-        // topStatsPanel.add(new JLabel("Update type:"));
-        // topStatsPanel.add(updatorComboBox);
-        // updatorComboBox.setMaximumSize(new Dimension(150,100));
-        // setUpdatorComboBoxToDefaults();
 
         JButton showUpdateManager = new JButton("Update Manager");
         showUpdateManager.addActionListener(new ActionListener() {
@@ -111,12 +93,13 @@ public class ThreadViewerPanel extends JPanel {
             }
         });
 
-        topStatsPanel.add(showUpdateManager);
+        JToolBar toolBar = new JToolBar();
+        toolBar.add(showUpdateManager);
 
-        topStatsPanel.addSeparator();
-        topStatsPanel.add(new JLabel("Number of Threads: "));
+        toolBar.addSeparator();
+        toolBar.add(new JLabel("Number of Threads: "));
         updaterNumThreads.setMaximumSize(new Dimension(100, 100));
-        topStatsPanel.add(updaterNumThreads);
+        toolBar.add(updaterNumThreads);
         JButton setThreadsButton = new JButton("Set");
         setThreadsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -125,85 +108,61 @@ public class ThreadViewerPanel extends JPanel {
             }
 
         });
-        topStatsPanel.add(setThreadsButton);
-        topStatsPanel.addSeparator();
-        topStatsPanel.add(new JLabel("Number of Processors: "
+        toolBar.add(setThreadsButton);
+        toolBar.addSeparator();
+        toolBar.add(new JLabel("Number of Processors: "
                 + Runtime.getRuntime().availableProcessors()));
         updateStats();
 
         // Add main components to panel
-        this.add("North", topStatsPanel);
+        this.add("North", toolBar);
         this.add("Center", threadViewer);
 
         // Add updater component listener
         workspace.getUpdater().addComponentListener(
                 new ComponentUpdateListener() {
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void finishedComponentUpdate(
-                            WorkspaceComponent component, int update, int thread) {
-                        listModel.getElementAt(thread - 1).setText(
-                                "Thread " + thread + ": finished updating "
-                                        + component.getName());
+                    public void finishedComponentUpdate(WorkspaceComponent component, int update, int thread) {
+                        String text = String.format("Thread %s: Finished updating %s", thread, component.getName());
+                        listModel.getElementAt(thread - 1).setText(text);
                         threadViewer.repaint();
                     }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void startingComponentUpdate(
-                            WorkspaceComponent component, int update, int thread) {
-                        listModel.getElementAt(thread - 1).setText(
-                                "Thread " + thread + ": starting to update"
-                                        + component.getName());
+                    public void startingComponentUpdate(WorkspaceComponent component, int update, int thread) {
+                        String text = String.format("Thread %s: Started updating %s", thread, component.getName());
+                        listModel.getElementAt(thread - 1).setText(text);
                         threadViewer.repaint();
                     }
                 });
 
         // Add updater listener
         workspace.getUpdater().addUpdaterListener(
-                new WorkspaceUpdaterListener() {
+            new WorkspaceUpdaterListener() {
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void updatedCouplings(int update) {
-                        listModel.getElementAt(update - 1).setText(
-                                "Thread " + update + ": updating couplings");
-                        threadViewer.repaint();
-                    }
+                public void updatedCouplings(int update) {
+                    String text = String.format("Thread %s: Updated couplings", update);
+                    listModel.getElementAt(update - 1).setText(text);
+                    threadViewer.repaint();
+                }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void changedUpdateController() {
-                        updateStats();
-                    }
+                public void changedUpdateController() {
+                    updateStats();
+                }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    public void changeNumThreads() {
-                        updateList();
-                    }
+                public void changeNumThreads() {
+                    updateList();
+                }
 
-                    // TODO: Should be some useful graphic thing to do when
-                    // update begins and ends...
-                    public void updatingStarted() {
-                        // TODO Auto-generated method stub
-                    }
+                // TODO: Should be some useful graphic thing to do when update begins and ends...
+                public void updatingStarted() {
+                }
 
-                    public void updatingFinished() {
-                        // TODO Auto-generated method stub
-                    }
+                public void updatingFinished() {
+                }
 
-                    public void workspaceUpdated() {
-                        // TODO Auto-generated method stub
-                    }
+                public void workspaceUpdated() {
+                }
 
-                });
+            });
     }
 
     /**
@@ -220,38 +179,9 @@ public class ThreadViewerPanel extends JPanel {
     }
 
     /**
-     * Re-populate the updater combo box.
-     */
-    private void updateUpdaterComboBox() {
-        // REDO
-        // if (workspace.getUpdater().getType() == WorkspaceUpdater.TYPE.CUSTOM)
-        // {
-        // setUpdaterComboBoxToDefaults();
-        // // String name = workspace.getUpdater().getCurrentUpdaterName();
-        // // updateTypes.add(name);
-        // updaterComboBox.setSelectedItem(name);
-        // } else {
-        // updaterComboBox.setSelectedItem(workspace.getUpdater().getType());
-        // if (updaterComboBox.getItemCount() > 2) {
-        // setUpdaterComboBoxToDefaults();
-        // }
-        // }
-    }
-
-    /**
-     * Remove all items from combo box and add default updater types.
-     */
-    private void setUpdaterComboBoxToDefaults() {
-        updateTypes.removeAllElements();
-        // updateTypes.add(WorkspaceUpdater.TYPE.BUFFERED);
-        // updateTypes.add(WorkspaceUpdater.TYPE.PRIORITY);
-    }
-
-    /**
      * Update various labels and components reflecting update stats.
      */
     private void updateStats() {
-        updateUpdaterComboBox();
         updaterNumThreads.setText("" + workspace.getUpdater().getNumThreads());
     }
 

@@ -139,9 +139,6 @@ public class WorkspaceActionManager {
     /** Global workspace update action. */
     private final Action globalUpdateAction;
 
-    /** Show workspace dialog. */
-    private final Action showPropertyDialogAction;
-
     /** Opens the coupling manager. */
     private final Action openCouplingManagerAction;
 
@@ -187,8 +184,6 @@ public class WorkspaceActionManager {
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
         openImageWorldAction = new OpenComponentAction<>(
                 ImageWorldComponent.class, "Image World", "Camera.png", workspace);
-
-        showPropertyDialogAction = new ShowPropertyDialogAction(workspace);
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);
@@ -554,13 +549,6 @@ public class WorkspaceActionManager {
      */
     public Action getPropertyTabAction() {
         return propertyTabAction;
-    }
-
-    /**
-     * @return the showPropertyDialogAction
-     */
-    public Action getShowPropertyDialogAction() {
-        return showPropertyDialogAction;
     }
 
     /**

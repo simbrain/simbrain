@@ -29,13 +29,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import org.simbrain.util.genericframe.GenericJDialog;
 
@@ -107,10 +101,16 @@ public class StandardDialog extends GenericJDialog {
      * @param parent The parent frame for the dialog.
      * @param title The title to display in the dialog.
      */
-    public StandardDialog(final Frame parent, final String title) {
+    public StandardDialog(Frame parent, String title) {
         super(parent, title);
-
         init();
+    }
+
+    /** Create a modeless StandardDialog as a child of the specified JFrame. */
+    public StandardDialog(JFrame parent, String title) {
+        super(parent, title);
+        init();
+        setModal(false);
     }
 
     /**

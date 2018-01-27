@@ -134,7 +134,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
 
     @Override
     protected void closing() {
-        world.getEngine().stop(true);
+        world.getEngine().stop(false);
     }
 
     @Override

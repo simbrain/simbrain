@@ -127,7 +127,7 @@ import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
- *
+ * <p>
  * Also provides wrappers for GUI elements called from a terminal.
  *
  * @author Matt Watson
@@ -135,22 +135,34 @@ import org.simbrain.world.threedworld.ThreeDWorldComponent;
  */
 public class SimbrainDesktop {
 
-    /** The x offset for popup menus. */
+    /**
+     * The x offset for popup menus.
+     */
     private static final int MENU_X_OFFSET = 5;
 
-    /** The y offset for popup menus. */
+    /**
+     * The y offset for popup menus.
+     */
     private static final int MENU_Y_OFFSET = 53;
 
-    /** The default serial version ID. */
+    /**
+     * The default serial version ID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** Log4j logger. */
+    /**
+     * Log4j logger.
+     */
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
 
-    /** Initial indent of entire workspace. */
+    /**
+     * Initial indent of entire workspace.
+     */
     private static final int WORKSPACE_INSET = 80;
 
-    /** After placing one simbrain window how far away to put the next one. */
+    /**
+     * After placing one simbrain window how far away to put the next one.
+     */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
     /**
@@ -159,7 +171,9 @@ public class SimbrainDesktop {
      */
     private static final Stack<GuiComponent<?>> lastFocusedStack = new Stack<GuiComponent<?>>();
 
-    /** TODO: Create Javadoc comment. */
+    /**
+     * TODO: Create Javadoc comment.
+     */
     private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
 
     // TODO: Review. Part of a hack solution in NeuronGroupNode
@@ -168,46 +182,89 @@ public class SimbrainDesktop {
         return INSTANCES;
     }
 
-    /** Desktop pane. */
+    /**
+     * Desktop pane.
+     */
     private JDesktopPane desktop;
 
-    /** Cached context menu. */
+    /**
+     * Cached context menu.
+     */
     private JPopupMenu contextMenu;
 
-    /** Workspace tool bar. */
+    /**
+     * Workspace tool bar.
+     */
     private JToolBar wsToolBar = new JToolBar();
 
-    /** Whether the bottom dock is visible. */
+    /**
+     * Whether the bottom dock is visible.
+     */
     private boolean dockVisible = true;
 
-    /** the frame that will hold the workspace. */
+    /**
+     * the frame that will hold the workspace.
+     */
     private JFrame frame;
 
-    /** The bottom dock. */
+    /**
+     * The bottom dock.
+     */
     private JTabbedPane bottomDock;
 
-    /** Pane splitter for bottom dock. */
+    /**
+     * Pane splitter for bottom dock.
+     */
     private JSplitPane horizontalSplitter;
 
-    /** The workspace this desktop wraps. */
+    /**
+     * The workspace this desktop wraps.
+     */
     private final Workspace workspace;
 
-    /** Boundary of workspace. */
+    /**
+     * Boundary of workspace.
+     */
     private Rectangle workspaceBounds;
 
-    /** Workspace action manager. */
+    /**
+     * Workspace action manager.
+     */
     private WorkspaceActionManager actionManager;
 
-    /** Interpreter for terminal. */
+    /**
+     * Interpreter for terminal.
+     */
     Interpreter interpreter;
 
-    /** Time indicator. */
+    /**
+     * Time indicator.
+     */
     private JLabel timeLabel = new JLabel();
 
-    /** "Throbber" to indicate a simulation is running. */
+    /**
+     * "Throbber" to indicate a simulation is running.
+     */
     private JLabel runningLabel = new JLabel();
 
-    /** Name to display in Simbrain desktop window. */
+    /**
+     * Update rate for display.
+     */
+    private int updateRate = 0;
+
+    /**
+     * Timer to calculate update rate.
+     */
+    private long lastUpdateTimeMs = 0;
+
+    /**
+     * Timestep at the last update rate calculation.
+     */
+    private int lastTimestep = 0;
+
+    /**
+     * Name to display in Simbrain desktop window.
+     */
     private static String FRAME_TITLE = "Simbrain 3.1 Beta";
 
     /**
@@ -215,7 +272,9 @@ public class SimbrainDesktop {
      */
     private static Map<WorkspaceComponent, GuiComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
 
-    /** Listener on the workspace. */
+    /**
+     * Listener on the workspace.
+     */
     private final WorkspaceListener workspaceListener = new WorkspaceListener() {
 
         /**
@@ -227,6 +286,7 @@ public class SimbrainDesktop {
             desktop.removeAll();
             desktop.repaint();
             frame.setTitle(FRAME_TITLE);
+            lastTimestep = 0;
             updateTimeLabel();
         }
 
@@ -261,54 +321,39 @@ public class SimbrainDesktop {
         @Override
         public void newWorkspaceOpened() {
             frame.setTitle(workspace.getCurrentFile().getName());
+            lastTimestep = 0;
             updateTimeLabel();
         }
 
     };
 
-    /** Listens for workspace updater events. */
+    /**
+     * Listens for workspace updater events.
+     */
     private final WorkspaceUpdaterListener updaterListener = new WorkspaceUpdaterListener() {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void changeNumThreads() {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void changedUpdateController() {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void updatedCouplings(int update) {
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void updatingStarted() {
             StandardDialog.setSimulationRunning(true);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void updatingFinished() {
             StandardDialog.setSimulationRunning(false);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void workspaceUpdated() {
             updateTimeLabel();
@@ -345,34 +390,23 @@ public class SimbrainDesktop {
         // Set the bottom dock to visible or not based on the properties file.
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("showBottomDock")) {
-            dockVisible = Boolean
-                    .parseBoolean(properties.getProperty("showBottomDock"));
+            dockVisible = Boolean.parseBoolean(properties.getProperty("showBottomDock"));
         }
 
         // Set up Desktop
         desktop = new JDesktopPane();
         desktop.addMouseListener(mouseListener);
         desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
-        desktop.setPreferredSize(
-                new Dimension(screenSize.width - (WORKSPACE_INSET * 2),
-                        screenSize.height - (WORKSPACE_INSET * 3)));
+        desktop.setPreferredSize(new Dimension(
+                screenSize.width - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 3)));
 
         // Create the Tabbed Pane for bottom of the desktop
         bottomDock = new JTabbedPane();
-        bottomDock.addTab("Components", null, new ComponentPanel(this),
-                "Show workspace components");
+        bottomDock.addTab("Components", null, new ComponentPanel(this), "Show workspace components");
 
-        // List of current couplings for populating couplings panel.
-        //        Vector<Coupling<?>> couplings = new Vector<Coupling<?>>(
-        //                workspace.getCouplingManager().getCouplings());
-        //        bottomDock.addTab("Couplings", null,
-        //                new CouplingListPanel(this, couplings),
-        //                "Show current couplings");
-        bottomDock.addTab("Terminal", null, this.getTerminalPanel(),
-                "Simbrain terminal");
-        bottomDock.addTab("Updater", null,
-                new ThreadViewerPanel(this.getWorkspace()),
-                "Simbrain thread viewer");
+        bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
+        bottomDock.addTab("Updater", null, new ThreadViewerPanel(this.getWorkspace()), "Simbrain thread viewer");
+
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         horizontalSplitter.setDividerLocation(getDividerLocation());
@@ -381,7 +415,7 @@ public class SimbrainDesktop {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(wsToolBar, "North");
         mainPanel.add(horizontalSplitter, "Center");
-        if (dockVisible == false) {
+        if (!dockVisible) {
             horizontalSplitter.getBottomComponent().setVisible(false);
         }
 
@@ -425,7 +459,9 @@ public class SimbrainDesktop {
         registerComponent(DeviceInteractionComponent.class, DeviceInteractionDesktopComponent.class);
     }
 
-    /** Listener for swing component changes. */
+    /**
+     * Listener for swing component changes.
+     */
     private final ComponentListener componentListener = new ComponentAdapter() {
         /**
          * Responds to component moved events.
@@ -473,7 +509,7 @@ public class SimbrainDesktop {
             if (lastFocused != null) {
                 try {
                     ((JInternalFrame) lastFocused.getParentFrame())
-                    .setSelected(true);
+                            .setSelected(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -587,6 +623,7 @@ public class SimbrainDesktop {
             public void mousePressed(final MouseEvent event) {
                 if (event.getClickCount() == 2) {
                     workspace.getUpdater().resetTime();
+                    lastTimestep = 0;
                     updateTimeLabel();
                 }
             }
@@ -662,7 +699,6 @@ public class SimbrainDesktop {
         fileMenu.add(worldSubMenu);
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getShowUpdaterDialog());
-        fileMenu.add(actionManager.getShowPropertyDialogAction());
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getQuitWorkspaceAction());
         return fileMenu;
@@ -769,7 +805,7 @@ public class SimbrainDesktop {
      * Registers a gui wrapper class association with a component class.
      *
      * @param component The component class.
-     * @param gui The gui class.
+     * @param gui       The gui class.
      */
     private static void registerComponent(
             final Class<? extends WorkspaceComponent> component,
@@ -819,10 +855,14 @@ public class SimbrainDesktop {
      */
     private static class DesktopInternalFrame extends GenericJInternalFrame {
 
-        /** Reference to workspace component. */
+        /**
+         * Reference to workspace component.
+         */
         private WorkspaceComponent workspaceComponent;
 
-        /** Gui Component. */
+        /**
+         * Gui Component.
+         */
         private GuiComponent guiComponent;
 
         /**
@@ -946,7 +986,7 @@ public class SimbrainDesktop {
      * Registers instance of guiComponents.
      *
      * @param workspaceComponent Workspace component
-     * @param guiComponent GUI component
+     * @param guiComponent       GUI component
      */
     public void registerComponentInstance(
             final WorkspaceComponent workspaceComponent,
@@ -986,12 +1026,12 @@ public class SimbrainDesktop {
             componentFrame.setBounds(
                     (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
                             % (desktop.getWidth() - guiComponent
-                                    .getPreferredSize().getWidth())),
-                                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
-                                            % (desktop.getHeight() - guiComponent
-                                                    .getPreferredSize().getHeight())),
-                                                    (int) guiComponent.getPreferredSize().getWidth(),
-                                                    (int) guiComponent.getPreferredSize().getHeight());
+                            .getPreferredSize().getWidth())),
+                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
+                            % (desktop.getHeight() - guiComponent
+                            .getPreferredSize().getHeight())),
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
         }
 
         // Other initialization
@@ -1018,7 +1058,7 @@ public class SimbrainDesktop {
      * Creates an instance of the proper wrapper class around the provided
      * instance.
      *
-     * @param component The component to wrap.
+     * @param component   The component to wrap.
      * @param parentFrame The frame of this component
      * @return A new desktop component wrapping the provided component.
      */
@@ -1209,12 +1249,12 @@ public class SimbrainDesktop {
      * @return the JOptionPane pane result
      */
     private int showHasChangedDialog() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
+        Object[] options = {"Save", "Don't Save", "Cancel"};
         return JOptionPane.showOptionDialog(frame,
                 "The workspace has changed since last save,"
                         + "\nWould you like to save these changes?",
-                        "Workspace Has Changed", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                "Workspace Has Changed", JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
     }
 
     /**
@@ -1241,7 +1281,9 @@ public class SimbrainDesktop {
         }
     }
 
-    /** Listener for mouse presses. */
+    /**
+     * Listener for mouse presses.
+     */
     private final MouseListener mouseListener = new MouseAdapter() {
         /**
          * Responds to mouse events.
@@ -1262,7 +1304,9 @@ public class SimbrainDesktop {
         }
     };
 
-    /** listener for window closing events. */
+    /**
+     * listener for window closing events.
+     */
     private final WindowListener windowListener = new WindowAdapter() {
         /**
          * Responds to window closing events.
@@ -1275,7 +1319,9 @@ public class SimbrainDesktop {
         }
     };
 
-    /** listens to menu events for setting save enabled. */
+    /**
+     * listens to menu events for setting save enabled.
+     */
     private final MenuListener menuListener = new MenuListener() {
         /**
          * Responds to menu selected events.
@@ -1331,13 +1377,20 @@ public class SimbrainDesktop {
      * Update time label.
      */
     public void updateTimeLabel() {
-        timeLabel.setText("Time:" + workspace.getTime());
+        int timestep = workspace.getTime();
+        long updateTimeMs = System.currentTimeMillis();
+        if (updateTimeMs - lastUpdateTimeMs > 1000) {
+            updateRate = timestep - lastTimestep;
+            lastTimestep = timestep;
+            lastUpdateTimeMs = updateTimeMs;
+        }
+
+        String text = String.format("Timestep: %s (%sHz)", timestep, updateRate);
+        timeLabel.setText(text);
         if (workspace.getUpdater().isRunning()) {
             runningLabel.setVisible(true);
-            // SimbrainDesktop.this.desktop.setBackground(Color.red);
         } else {
             runningLabel.setVisible(false);
-            // SimbrainDesktop.this.desktop.setBackground(Color.blue);
         }
     }
 

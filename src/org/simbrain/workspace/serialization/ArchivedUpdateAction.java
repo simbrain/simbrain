@@ -31,8 +31,7 @@ final class ArchivedUpdateAction {
      * @param componentId component id or null if none needed
      * @param couplingId coupling id or null if none needed
      */
-    ArchivedUpdateAction(UpdateAction action, String componentId,
-            String couplingId) {
+    ArchivedUpdateAction(UpdateAction action, String componentId, String couplingId) {
         this.updateAction = action;
         this.componentId = componentId;
         this.couplingId = couplingId;

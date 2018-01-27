@@ -65,7 +65,6 @@ public class ThreeDEngine extends Application {
         super();
 
         AppSettings settings = new AppSettings(true);
-        settings.setFrameRate(30);
         settings.setCustomRenderer(ThreeDContext.class);
         settings.setWidth(600);
         settings.setHeight(400);

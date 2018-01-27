@@ -41,6 +41,7 @@ import org.simbrain.workspace.updater.UpdateAction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.updater.UpdateActionManager;
 
 import javax.swing.*;
 
@@ -286,12 +287,15 @@ public class WorkspaceSerializer {
     }
 
     private void deserializeUpdateActions(ArchivedWorkspace archive, WorkspaceComponentDeserializer deserializer) {
-        workspace.getUpdater().getUpdateManager().clear();
+        UpdateActionManager manager = workspace.getUpdater().getUpdateManager();
+        manager.clear();
         if (archive.getArchivedActions() != null) {
-            for (ArchivedUpdateAction actionRef : archive.getArchivedActions()) {
-                workspace.getUpdater().getUpdateManager().addAction(
-                        archive.createUpdateAction(workspace, deserializer, actionRef));
+            for (ArchivedUpdateAction archivedAction : archive.getArchivedActions()) {
+                manager.addAction(archive.createUpdateAction(workspace, deserializer, archivedAction));
             }
+        }
+        if (!manager.getActionList().contains(workspace.getUpdater().getSyncUpdateAction())) {
+            manager.addAction(workspace.getUpdater().getSyncUpdateAction());
         }
     }
 

@@ -317,16 +317,9 @@ public class Simulation {
 	/**
 	 * Iterate the simulation for the specified number of times.
 	 *
-	 * @param iterations
-	 *            number of iterations
+	 * @param iterations number of iterations
 	 */
 	public void iterate(int iterations) {
-		CountDownLatch latch = new CountDownLatch(1);
-		workspace.iterate(latch, iterations);
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		workspace.iterate(iterations);
 	}
 }

@@ -41,6 +41,29 @@ import org.simbrain.workspace.WorkspaceListener;
 public class UpdateActionManager {
 
     /**
+     * Listen for changes to update manager.
+     */
+    public interface UpdateManagerListener {
+
+        /**
+         * Called whenever an action is added to the update action manager.
+         *
+         * @param action The action that was added.
+         */
+        public void actionAdded(UpdateAction action);
+
+        /**
+         * Called whenever an action is removed from the update action manager.
+         *
+         * @param action The action that was removed.
+         */
+        public void actionRemoved(UpdateAction action);
+
+        /** Called whenever the order of update actions is changed. */
+        public void actionOrderChanged();
+    }
+
+    /**
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single iteration of the workspace.
      */
@@ -60,25 +83,23 @@ public class UpdateActionManager {
      * Keep track of relations between coupling and coupling actions so they can
      * be cleaned up.
      */
-    private HashMap<Coupling<?>, UpdateCoupling> couplingActionMap = new HashMap();
+    private HashMap<Coupling<?>, UpdateCoupling> couplingActionMap = new HashMap<>();
 
     /**
      * Keep track of relations between component and component actions so they
      * can be cleaned up.
      */
-    private HashMap<WorkspaceComponent, UpdateComponent> componentActionMap = new HashMap<WorkspaceComponent, UpdateComponent>();
+    private HashMap<WorkspaceComponent, UpdateComponent> componentActionMap = new HashMap<>();
 
     /**
      * Construct a new update manager.
      *
      * @param workspace reference to workspace updater.
      */
-    public UpdateActionManager(final WorkspaceUpdater workspace) {
+    public UpdateActionManager(WorkspaceUpdater workspace) {
         this.workspaceUpdater = workspace;
-        // Default update method
         setDefaultUpdateActions();
         addListeners();
-
     }
 
     /**
@@ -86,9 +107,6 @@ public class UpdateActionManager {
      */
     public void postAddInit() {
         addListeners();
-        for (UpdateAction action : actionList) {
-            System.out.println(action.getLongDescription());
-        }
     }
 
     /**
@@ -108,49 +126,37 @@ public class UpdateActionManager {
 
             @Override
             public void componentAdded(WorkspaceComponent component) {
-                UpdateComponent componentAction = new UpdateComponent(
-                        workspaceUpdater, component);
+                UpdateComponent componentAction = new UpdateComponent(workspaceUpdater, component);
                 componentActionMap.put(component, componentAction);
-                // System.out.println("Added component " +
-                // componentActionMap.size());
             }
 
             @Override
             public void componentRemoved(WorkspaceComponent component) {
                 removeAction(componentActionMap.remove(component));
-                // System.out.println("Removed component " +
-                // couplingActionMap.size());
             }
 
         });
 
         // Add / remove coupling actions as needed
-        workspaceUpdater.getWorkspace()
-                .addCouplingListener(new CouplingListener() {
-                    @Override
-                    public void couplingAdded(Coupling<?> coupling) {
-                        UpdateCoupling couplingAction = new UpdateCoupling(
-                                coupling);
-                        couplingActionMap.put(coupling, couplingAction);
-                        // System.out.println("Added coupling " +
-                        // couplingActionMap.size());
-                    }
+        workspaceUpdater.getWorkspace().addCouplingListener(new CouplingListener() {
+            @Override
+            public void couplingAdded(Coupling<?> coupling) {
+                UpdateCoupling couplingAction = new UpdateCoupling(coupling);
+                couplingActionMap.put(coupling, couplingAction);
+            }
 
-                    @Override
-                    public void couplingRemoved(Coupling<?> coupling) {
-                        removeAction(couplingActionMap.remove(coupling));
-                        // System.out.println("Removed coupling " +
-                        // couplingActionMap.size());
-                    }
+            @Override
+            public void couplingRemoved(Coupling<?> coupling) {
+                removeAction(couplingActionMap.remove(coupling));
+            }
 
-                    @Override
-                    public void couplingsRemoved(List<Coupling<?>> couplings) {
-                        for (Coupling coupling : couplings) {
-                            removeAction(couplingActionMap.remove(coupling));
-                        }
-                    }
-
-                });
+            @Override
+            public void couplingsRemoved(List<Coupling<?>> couplings) {
+                for (Coupling coupling : couplings) {
+                    removeAction(couplingActionMap.remove(coupling));
+                }
+            }
+        });
     }
 
     /**
@@ -184,8 +190,7 @@ public class UpdateActionManager {
      * @param index1 index of first element
      * @param index2 index of second element
      */
-    public void swapElements(final int index1, final int index2) {
-        // TODO: Handle case where indices don't make sense
+    public void swapElements(int index1, int index2) {
         Collections.swap(actionList, index1, index2);
         for (UpdateManagerListener listener : listeners) {
             listener.actionOrderChanged();
@@ -217,29 +222,6 @@ public class UpdateActionManager {
     }
 
     /**
-     * Listen from changes to update manager.
-     */
-    public interface UpdateManagerListener {
-
-        /**
-         * An action was added.
-         * 
-         * @param action
-         */
-        public void actionAdded(UpdateAction action);
-
-        /**
-         * An action was removed.
-         * 
-         * @param action
-         */
-        public void actionRemoved(UpdateAction action);
-
-        /** The action order was changed. */
-        public void actionOrderChanged();
-    }
-
-    /**
      * Remove all actions completely.
      */
     public void clear() {
@@ -255,6 +237,7 @@ public class UpdateActionManager {
     public void setDefaultUpdateActions() {
         clear();
         addAction(new UpdateAllBuffered(workspaceUpdater));
+        addAction(workspaceUpdater.getSyncUpdateAction());
     }
 
     /**
@@ -300,20 +283,19 @@ public class UpdateActionManager {
      * @return available action list
      */
     public List<UpdateAction> getAvailableActionList() {
-        final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
+        List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
 
         // Default updater
         availableActionList.add(new UpdateAllBuffered(workspaceUpdater));
+        availableActionList.add(new WorkspaceDelayAction(workspaceUpdater.getWorkspace()));
 
         // Add update actions for all components available
         for (WorkspaceComponent component : workspaceUpdater.getComponents()) {
-            availableActionList
-                    .add(new UpdateComponent(workspaceUpdater, component));
+            availableActionList.add(new UpdateComponent(workspaceUpdater, component));
         }
 
         // Add update actions for all components available
-        for (Coupling coupling : workspaceUpdater.getWorkspace()
-                .getCouplings()) {
+        for (Coupling coupling : workspaceUpdater.getWorkspace().getCouplings()) {
             availableActionList.add(new UpdateCoupling(coupling));
         }
 

@@ -141,7 +141,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
     public void postEvent(final AWTEvent event) {
         LOGGER.trace("event posted: " + event);
         if (event instanceof InvocationEvent) {
-            synchronized (lock) {
+            //synchronized (lock) {
                 if (paused) {
                     LOGGER.trace("event queued: " + event);
                     queue.add(new SynchronizingInvocationEvent(
@@ -151,7 +151,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
                     super.postEvent(new SynchronizingInvocationEvent(
                             (InvocationEvent) event, workspace, CompletionSignal.IGNORE));
                 }
-            }
+            //}
         } else {
             super.postEvent(event);
         }

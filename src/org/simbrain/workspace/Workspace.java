@@ -264,41 +264,11 @@ public class Workspace {
      * scripts when making a series of events occur, e.g. set some neurons, run
      * for 50 iterations, set some other neurons, run 20 iterations, etc.
      *
-     * The latch must be initialized with a count of 1 and must be run from a
-     * separate thread. For example:
-     *
-     * <pre>
-     * {@code}
-     *  Executors.newSingleThreadExecutor().execute(new Runnable() {
-     *               public void run() {
-     *                   // Do one thing
-     *                    CountDownLatch latch = new CountDownLatch(1);
-     *                    workspace.iterate(latch, 100);
-     *                    try {
-     *                        latch.await();
-     *                    } catch (InterruptedException e) {
-     *                        e.printStackTrace();
-     *                    }
-     *                    // Do another
-     *                    CountDownLatch latch = new CountDownLatch(1);
-     *                    workspace.iterate(latch, 100);
-     *                    try {
-     *                        latch.await();
-     *                    } catch (InterruptedException e) {
-     *                        e.printStackTrace();
-     *                    }
-     *               }
-     *            });
-     * }
-     * </pre>
-     *
-     * @param latch the latch to wait on
-     * @param numIterations the number of iteration to run while waiting on the
-     *            latch
+     * @param numIterations the number of iteration to run while waiting on the latch.
      */
-    public void iterate(CountDownLatch latch, final int numIterations) {
+    public void iterate(int numIterations) {
         synchronized (updaterLock) {
-            updater.iterate(latch, numIterations);
+            updater.iterate(numIterations);
         }
         updateStopped();
     }

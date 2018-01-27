@@ -42,26 +42,24 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
      * @param desktop parent desktop
      */
     public ShowWorkspaceUpdaterDialog(final SimbrainDesktop desktop) {
-
-        super("Edit Update Sequence...");
+        super("Edit Update Sequence");
         if (desktop == null) {
             throw new IllegalArgumentException("desktop must not be null");
         }
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Sequence.png"));
-
         this.desktop = desktop;
     }
 
     /** @see AbstractAction 
      * @param event
      */
-    public void actionPerformed(final ActionEvent event) {
-        StandardDialog dialog = new StandardDialog();
-        final WorkspaceUpdateManagerPanel updatePanel = new WorkspaceUpdateManagerPanel(
-                desktop.getWorkspace(), dialog);
+    public void actionPerformed(ActionEvent event) {
+        StandardDialog dialog = new StandardDialog(desktop.getFrame(), "Edit Update Sequence");
+        WorkspaceUpdateManagerPanel updatePanel = new WorkspaceUpdateManagerPanel(desktop.getWorkspace(), dialog);
         dialog.setContentPane(updatePanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
+        dialog.setModal(false);
         dialog.setVisible(true);
     }
 }

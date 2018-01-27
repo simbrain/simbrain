@@ -1,6 +1,5 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +10,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import com.sun.scenario.effect.Offset;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.imageworld.filters.FilteredImageSource;
-import org.simbrain.world.imageworld.filters.ImageFilterFactory;
-import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
-import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
+import org.simbrain.world.imageworld.filters.*;
 
 /**
  * ImageWorld contains the contents of this component: the image and a series of sensor matrices

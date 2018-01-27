@@ -19,6 +19,7 @@
 package org.simbrain.workspace.serialization;
 
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,12 +29,7 @@ import java.util.Map;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.updater.UpdateAction;
-import org.simbrain.workspace.updater.UpdateActionCustom;
-import org.simbrain.workspace.updater.UpdateAllBuffered;
-import org.simbrain.workspace.updater.UpdateComponent;
-import org.simbrain.workspace.updater.UpdateCoupling;
-import org.simbrain.workspace.updater.WorkspaceUpdater;
+import org.simbrain.workspace.updater.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -108,14 +104,12 @@ class ArchivedWorkspace {
      * @param action the real update action.
      * @return the archived action.
      */
-    private ArchivedUpdateAction getArchivedAction(final UpdateAction action) {
+    private ArchivedUpdateAction getArchivedAction(UpdateAction action) {
         String component_id = null;
         String coupling_id = null;
-
         // Get a component id if this is an update component action
         if (action instanceof UpdateComponent) {
-            component_id = componentUris
-                    .get(((UpdateComponent) action).getComponent());
+            component_id = componentUris.get(((UpdateComponent) action).getComponent());
         }
         // Get a coupling id, if this is coupling action
         if (action instanceof UpdateCoupling) {
@@ -123,11 +117,9 @@ class ArchivedWorkspace {
             if (coupling != null) {
                 coupling_id = coupling.getId();
             } else {
-                System.err.println("Invalid coupling action found while saving:"
-                        + action.getDescription());
+                System.err.println("Invalid coupling action found while saving:" + action.getDescription());
             }
         }
-
         // Create and return the archived action
         return new ArchivedUpdateAction(action, component_id, coupling_id);
     }
@@ -181,61 +173,52 @@ class ArchivedWorkspace {
      * @param archivedAction the archived action to convert into a real action
      * @return the "real" update action
      */
-    UpdateAction createUpdateAction(final Workspace workspace,
-            final WorkspaceComponentDeserializer componentDeserializer,
-            final ArchivedUpdateAction archivedAction) {
-
-        // Use reflection to create the update action, based on what type of
-        // action was archived. For actions whose constructors require
-        // components or couplings, the archived ids are used to find the
-        // component or coupling.
-        UpdateAction retAction = null;
-        if (archivedAction.getUpdateAction() instanceof UpdateComponent) {
+    UpdateAction createUpdateAction(Workspace workspace, WorkspaceComponentDeserializer componentDeserializer,
+                                    ArchivedUpdateAction archivedAction) {
+        // Use reflection to create the update action, based on what type of action was archived.
+        // For actions whose constructors require components or couplings, the archived ids are
+        // used to find the component or coupling.
+        UpdateAction serializedAction = archivedAction.getUpdateAction();
+        UpdateAction action = null;
+        if (serializedAction instanceof UpdateComponent) {
             try {
-                WorkspaceComponent comp = componentDeserializer
-                        .getComponent(archivedAction.getComponentId());
-                retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { WorkspaceUpdater.class,
-                                WorkspaceComponent.class })
-                        .newInstance(workspace.getUpdater(), comp);
+                WorkspaceComponent component = componentDeserializer.getComponent(archivedAction.getComponentId());
+                Class<? extends UpdateAction> type = serializedAction.getClass();
+                Constructor<? extends UpdateAction> constructor = type.getConstructor(
+                        WorkspaceUpdater.class, WorkspaceComponent.class);
+                action = constructor.newInstance(workspace.getUpdater(), component);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (archivedAction
-                .getUpdateAction() instanceof UpdateAllBuffered) {
+        } else if (serializedAction instanceof UpdateAllBuffered) {
             try {
-                retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { WorkspaceUpdater.class })
-                        .newInstance(workspace.getUpdater());
+                Class<? extends UpdateAction> type = serializedAction.getClass();
+                action = type.getConstructor(WorkspaceUpdater.class).newInstance(workspace.getUpdater());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (archivedAction
-                .getUpdateAction() instanceof UpdateActionCustom) {
+        } else if (serializedAction instanceof UpdateActionCustom) {
             try {
-                String script = ((UpdateActionCustom) archivedAction
-                        .getUpdateAction()).getScriptString();
-                retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { WorkspaceUpdater.class,
-                                String.class })
-                        .newInstance(workspace.getUpdater(), script);
+                String script = ((UpdateActionCustom) archivedAction.getUpdateAction()).getScriptString();
+                Class<? extends UpdateAction> type = serializedAction.getClass();
+                action = type.getConstructor(WorkspaceUpdater.class, String.class).newInstance(
+                        workspace.getUpdater(), script);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
+        } else if (serializedAction instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
                 Coupling<?> coupling = workspace.getCoupling(id);
-                retAction = archivedAction.getUpdateAction().getClass()
-                        .getConstructor(new Class[] { Coupling.class })
-                        .newInstance(coupling);
-
+                Class<? extends UpdateAction> type = serializedAction.getClass();
+                action = type.getConstructor(Coupling.class).newInstance(coupling);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (serializedAction instanceof SynchronizedTaskUpdateAction) {
+            return workspace.getUpdater().getSyncUpdateAction();
         }
-
-        return retAction;
+        return action;
     }
 
     /**

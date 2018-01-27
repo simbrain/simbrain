@@ -15,12 +15,13 @@ import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.world.threedworld.engine.ThreeDContext;
 import org.simbrain.world.threedworld.entities.EditorDialog;
 
 /** ThreeDDesktopComponent is the GUI component for a ThreeDWorld. */
 public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     private static final long serialVersionUID = 8711925427252261845L;
+
+    private ThreeDWorldComponent component;
 
     /**
      * Construct a new ThreeDDesktopComponent to hold a ThreeDWorldComponent in a Frame.
@@ -29,6 +30,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
      */
     public ThreeDDesktopComponent(GenericFrame frame, ThreeDWorldComponent component) {
         super(frame, component);
+        this.component = component;
         setLayout(new BorderLayout());
 
         frame.setJMenuBar(createMenus(component));
@@ -140,6 +142,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     }
 
     @Override
-    protected void closing() {}
+    protected void closing() {
+    }
 
 }

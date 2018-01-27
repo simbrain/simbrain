@@ -47,20 +47,15 @@ class SynchronizingInvocationEvent extends InvocationEvent {
      * @param workspace The workspace used for synchronization.
      * @param signal The signal to call when done.
      */
-    public SynchronizingInvocationEvent(final InvocationEvent event,
-            final Workspace workspace, final CompletionSignal signal) {
-
-        super(event.getSource(), new Runnable() {
-            public void run() {
-                try {
-                    event.dispatch();
-                    signal.done();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+    public SynchronizingInvocationEvent(InvocationEvent event, Workspace workspace, CompletionSignal signal) {
+        super(event.getSource(), () -> {
+            try {
+                event.dispatch();
+                signal.done();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
-
         this.event = event;
     }
 

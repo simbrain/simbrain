@@ -24,15 +24,20 @@ import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 
 /**
  * GUI Interface for vision world.
+ *
  * @author Tim Shea, Jeff Yoshimi
  */
 public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private static final long serialVersionUID = 9019927108869839191L;
 
-    /** Combo box for selecting which sensor matrix to view. */
+    /**
+     * Combo box for selecting which sensor matrix to view.
+     */
     private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<SensorMatrix>();
 
-    /** The image world component . */
+    /**
+     * The image world component .
+     */
     private ImageWorldComponent component;
 
     private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -45,7 +50,8 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
     /**
      * Construct a new ImageDesktopComponent GUI.
-     * @param frame The frame in which to place GUI elements.
+     *
+     * @param frame     The frame in which to place GUI elements.
      * @param component The ImageWorldComponent to interact with.
      */
     public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent component) {
@@ -65,7 +71,8 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
         this.component.getWorld().addListener(new ImageWorld.Listener() {
             @Override
-            public void imageSourceChanged(ImageSource changedSource) {}
+            public void imageSourceChanged(ImageSource changedSource) {
+            }
 
             @Override
             public void sensorMatrixAdded(SensorMatrix addedMatrix) {
@@ -106,7 +113,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenuItem helpItem = new JMenuItem("World Help");
         menuBar.add(helpMenu);
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/ImageWorld/ImageWorld.html");
+            "Pages/Worlds/ImageWorld/ImageWorld.html");
         helpItem.setAction(helpAction);
         helpMenu.add(helpItem);
 
@@ -148,7 +155,8 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     @Override
-    protected void closing() {}
+    protected void closing() {
+    }
 
     private void setupToolbars() {
         JButton selectEmitterButton = new JButton();
@@ -254,7 +262,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         }
     }
 
-    /** Reset the combo box for the sensor panels. */
+    /**
+     * Reset the combo box for the sensor panels.
+     */
     private void updateComboBox() {
         sensorMatrixCombo.removeAllItems();
         SensorMatrix selectedSensorMatrix = component.getWorld().getCurrentSensorMatrix();

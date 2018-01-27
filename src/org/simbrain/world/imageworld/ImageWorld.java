@@ -86,6 +86,7 @@ public class ImageWorld {
         sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
+
     }
 
     /** Returns a deserialized ImageWorld. */
@@ -93,6 +94,7 @@ public class ImageWorld {
         imagePanel = new ImagePanel();
         listeners = new ArrayList<Listener>();
         currentSensorMatrix.getSource().addListener(imagePanel);
+        clipboard = new ImageClipboard(this);
         compositeSource.notifyImageUpdate();
         return this;
     }

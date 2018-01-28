@@ -28,15 +28,17 @@ import org.simbrain.util.UserParameter;
  */
 public class OjaRule extends SynapseUpdateRule {
 
-    /** Learning rate. */
-	@UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", 
-            defaultValue = ".1", order = 1)
+    /**
+     * Learning rate.
+     */
+    @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", defaultValue = ".1", order = 1)
     private double learningRate;
 
-	// TODO: check description
-    /** Normalization factor. */
-	@UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", 
-            defaultValue = "1", order = 1)
+    // TODO: check description
+    /**
+     * Normalization factor.
+     */
+    @UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", defaultValue = "1", order = 1)
     private double normalizationFactor;
 
     @Override
@@ -61,9 +63,7 @@ public class OjaRule extends SynapseUpdateRule {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
 
-        double strength = synapse.getStrength()
-                + (learningRate * ((input * output) - ((output * output * synapse
-                        .getStrength()) / normalizationFactor)));
+        double strength = synapse.getStrength() + (learningRate * ((input * output) - ((output * output * synapse.getStrength()) / normalizationFactor)));
         synapse.setStrength(synapse.clip(strength));
     }
 

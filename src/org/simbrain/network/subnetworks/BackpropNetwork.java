@@ -13,8 +13,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
@@ -22,7 +20,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 
-import javax.swing.*;
+import java.awt.geom.Point2D;
 
 /**
  * Backprop network.
@@ -31,14 +29,16 @@ import javax.swing.*;
  */
 public class BackpropNetwork extends FeedForward implements Trainable {
 
-    /** Training set. */
+    /**
+     * Training set.
+     */
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct a new backprop network.
      *
-     * @param network reference to root network
-     * @param nodesPerLayer number of layers
+     * @param network         reference to root network
+     * @param nodesPerLayer   number of layers
      * @param initialPosition initial position in network
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer, Point2D initialPosition) {
@@ -49,14 +49,14 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     /**
      * Construct a new backprop network with a default location of (0,0).
      *
-     * @param network reference to root network
+     * @param network       reference to root network
      * @param nodesPerLayer number of layers
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer) {
         super(network, nodesPerLayer, new Point2D.Double(1, 1), new Neuron(network, new LinearRule()));
         setLabel("Backprop");
     }
-    
+
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
@@ -68,6 +68,7 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     }
 
     @Override
-    public void initNetwork() {}
+    public void initNetwork() {
+    }
 
 }

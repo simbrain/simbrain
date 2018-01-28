@@ -12,10 +12,14 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class OdorWorldBuilder {
 
-    /** Parent odor world component. */
+    /**
+     * Parent odor world component.
+     */
     private final OdorWorldComponent odorWorldComponent;
 
-    /** Parent odor world. */
+    /**
+     * Parent odor world.
+     */
     private final OdorWorld world;
 
     /**
@@ -29,10 +33,10 @@ public class OdorWorldBuilder {
     /**
      * Add an agent to the odor world.
      *
-     * @param x x location
-     * @param y y location
+     * @param x    x location
+     * @param y    y location
      * @param type what kind of agent it is. Cow, lion, etc. (cf. options in
-     *            RotatingEntity around line 250).
+     *             RotatingEntity around line 250).
      * @return reference to the agent
      */
     public RotatingEntity addAgent(int x, int y, String type) {
@@ -47,8 +51,8 @@ public class OdorWorldBuilder {
     /**
      * Add a static entity.
      *
-     * @param x x location
-     * @param y y location
+     * @param x         x location
+     * @param y         y location
      * @param imageName image for this object. See BasicEntity around line 85.
      * @return reference to the entity
      */
@@ -66,13 +70,12 @@ public class OdorWorldBuilder {
      * @param stimulus the smell source
      * @return the entity
      */
-    public OdorWorldEntity addEntity(int x, int y, String imageName,
-            double[] stimulus) {
+    public OdorWorldEntity addEntity(int x, int y, String imageName, double[] stimulus) {
         BasicEntity entity = (BasicEntity) addEntity(x, y, imageName);
         entity.setSmellSource(new SmellSource(stimulus));
         return entity;
     }
-    
+
     public OdorWorld getWorld() {
         return world;
     }

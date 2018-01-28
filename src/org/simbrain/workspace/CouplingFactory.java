@@ -10,17 +10,22 @@ import java.util.stream.Stream;
  * on Coupling directly so that couplings will be properly managed and serialized.
  */
 public class CouplingFactory {
-    /** The workspace in which the couplings created by this factory will be managed. */
+    /**
+     * The workspace in which the couplings created by this factory will be managed.
+     */
     private Workspace workspace;
 
-    /** Create a new CouplingFactory in the specified workspace. */
+    /**
+     * Create a new CouplingFactory in the specified workspace.
+     */
     public CouplingFactory(Workspace workspace) {
         this.workspace = workspace;
     }
 
-    /** Create a coupling from a producer and consumer of the same type. */
-    public <T> Coupling<T> createCoupling(Producer<T> producer, Consumer<T> consumer)
-            throws MismatchedAttributesException {
+    /**
+     * Create a coupling from a producer and consumer of the same type.
+     */
+    public <T> Coupling<T> createCoupling(Producer<T> producer, Consumer<T> consumer) throws MismatchedAttributesException {
         Coupling<T> coupling = Coupling.create(producer, consumer);
         workspace.addCoupling(coupling);
         return coupling;
@@ -47,22 +52,23 @@ public class CouplingFactory {
     /**
      * Create a coupling from each producer to every consumer of the same type.
      * Will throw an exception if any of the types do not match.
+     *
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
-     * @exception MismatchedAttributesException An exception indicating that a pair of attributes did not match
-     *     types. This will be thrown for the first such pair encountered.
+     * @throws MismatchedAttributesException An exception indicating that a pair of attributes did not match
+     *                                       types. This will be thrown for the first such pair encountered.
      */
-     public void createOneToManyCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers)
-            throws MismatchedAttributesException {
-         for (Producer producer : producers) {
-             for (Consumer consumer : consumers) {
-                 createCoupling(producer, consumer);
-             }
-         }
-     }
+    public void createOneToManyCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) throws MismatchedAttributesException {
+        for (Producer producer : producers) {
+            for (Consumer consumer : consumers) {
+                createCoupling(producer, consumer);
+            }
+        }
+    }
 
     /**
      * Try to create a coupling from each producer to every consumer, but ignore any mismatched types.
+     *
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
      */
@@ -77,13 +83,13 @@ public class CouplingFactory {
     /**
      * Create a coupling from each attribute in the smaller collection to a corresponding attribute.
      * Will throw an exception if any of the types do not match.
+     *
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
-     * @exception MismatchedAttributesException An exception indicating that a pair of attributes did not match
-     *     types. This will be thrown for the first such pair encountered.
+     * @throws MismatchedAttributesException An exception indicating that a pair of attributes did not match
+     *                                       types. This will be thrown for the first such pair encountered.
      */
-    public void createOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers)
-            throws MismatchedAttributesException {
+    public void createOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) throws MismatchedAttributesException {
         Iterator<Consumer<?>> consumerIterator = consumers.iterator();
         for (Producer<?> producer : producers) {
             if (consumerIterator.hasNext()) {
@@ -97,6 +103,7 @@ public class CouplingFactory {
 
     /**
      * Try to create a coupling from each attribute in the smaller collection, but ignore any mismatched types.
+     *
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
      */
@@ -114,6 +121,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential producers for a given WorkspaceComponent.
+     *
      * @param component The component to generate producers from.
      * @return A list of potential producers.
      */
@@ -123,6 +131,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential consumers for a given WorkspaceComponent.
+     *
      * @param component The component to generate consumers from.
      * @return A list of potential consumers.
      */
@@ -132,6 +141,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential producers from a list of model objects.
+     *
      * @param listOfModels A list of models to check for Producibles.
      * @return A list of producers.
      */
@@ -145,6 +155,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential consumers from a list of model objects.
+     *
      * @param listOfModels A list of models to check for Consumables.
      * @return A list of consumers.
      */
@@ -158,6 +169,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential producers from a model object.
+     *
      * @param model The object to check for Producibles.
      * @return A list of producers.
      */
@@ -173,6 +185,7 @@ public class CouplingFactory {
 
     /**
      * Get all the potential consumers from a model object.
+     *
      * @param model The object to check for Consumables.
      * @return A list of consumers.
      */
@@ -188,7 +201,8 @@ public class CouplingFactory {
 
     /**
      * Get a specific consumer from the model object.
-     * @param model The object in which to find the consumable.
+     *
+     * @param model      The object in which to find the consumable.
      * @param methodName The name of the consumable method.
      * @return The consumer.
      */
@@ -198,15 +212,14 @@ public class CouplingFactory {
         if (method.isPresent()) {
             return createConsumer(model, method.get());
         } else {
-            throw new IllegalArgumentException(String.format(
-                    "No consumable method with name %s was found in class %s.",
-                    methodName, model.getClass().getSimpleName()));
+            throw new IllegalArgumentException(String.format("No consumable method with name %s was found in class %s.", methodName, model.getClass().getSimpleName()));
         }
     }
 
     /**
      * Get a specific consumer from the model object and throw an exception if it is not of the specified type.
-     * @param model The object in which to find the consumable.
+     *
+     * @param model      The object in which to find the consumable.
      * @param methodName The name of the consumable method.
      * @return The consumer.
      */
@@ -216,15 +229,14 @@ public class CouplingFactory {
         if (consumer.getType() == type) {
             return (Consumer<T>) consumer;
         } else {
-            throw new NoSuchMethodException(String.format(
-                    "Consumer type %s does not match method value type %s.",
-                    consumer.getType(), type));
+            throw new NoSuchMethodException(String.format("Consumer type %s does not match method value type %s.", consumer.getType(), type));
         }
     }
 
     /**
      * Get a specific producer from the model object.
-     * @param model The object in which to find the producible.
+     *
+     * @param model      The object in which to find the producible.
      * @param methodName The name of the producible method.
      * @return The producer.
      */
@@ -239,7 +251,8 @@ public class CouplingFactory {
 
     /**
      * Get a specific producer from the model object and throw an exception if it is not of the specified type.
-     * @param model The object in which to find the producible.
+     *
+     * @param model      The object in which to find the producible.
      * @param methodName The name of the producible method.
      * @return The producer.
      */
@@ -249,23 +262,27 @@ public class CouplingFactory {
         if (producer.getType().equals(type)) {
             return (Producer<T>) producer;
         } else {
-            throw new NoSuchMethodException(String.format(
-                    "Producer with type %s does not match method return type %s.",
-                    producer.getType(), type));
+            throw new NoSuchMethodException(String.format("Producer with type %s does not match method return type %s.", producer.getType(), type));
         }
     }
 
-    /** Return whether the specified method is producible. */
+    /**
+     * Return whether the specified method is producible.
+     */
     private boolean isProducible(Method method) {
         return method.getAnnotation(Producible.class) != null;
     }
 
-    /** Return whether the specified method is consumable. */
+    /**
+     * Return whether the specified method is consumable.
+     */
     private boolean isConsumable(Method method) {
         return method.getAnnotation(Consumable.class) != null;
     }
 
-    /** Create a producer from the specified method on the model object. */
+    /**
+     * Create a producer from the specified method on the model object.
+     */
     private Producer<?> createProducer(Object model, Method method) {
         Producible annotation = method.getAnnotation(Producible.class);
         if (annotation == null) {
@@ -276,7 +293,9 @@ public class CouplingFactory {
         return new Producer(model, method, description, idMethod);
     }
 
-    /** Create a consumer from the specified method on the model object. */
+    /**
+     * Create a consumer from the specified method on the model object.
+     */
     private Consumer<?> createConsumer(Object model, Method method) {
         Consumable annotation = method.getAnnotation(Consumable.class);
         if (annotation == null) {

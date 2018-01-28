@@ -18,33 +18,42 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.YesNoNull;
 
+import javax.swing.*;
+
 /**
  * <b>AdditiveNeuronPanel</b>. TODO: No implementation... why?
  */
 public class AdditiveRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Random tab. */
+    /**
+     * Random tab.
+     */
     private RandomizerPanel randTab = new RandomizerPanel();
 
-    /** Add noise combo box. */
+    /**
+     * Add noise combo box.
+     */
     private YesNoNull isAddNoise = new YesNoNull();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final AdditiveRule prototypeRule = new AdditiveRule();
 
     /**
@@ -54,12 +63,8 @@ public class AdditiveRulePanel extends AbstractNeuronRulePanel {
         super();
         this.add(tabbedPane);
         // Create text field AND populate an "editor list"
-        JTextField tfLambda = createTextField(
-                (r) -> ((AdditiveRule) r).getLambda(),
-                (r, val) -> ((AdditiveRule) r).setLambda((double) val));
-        JTextField tfResistance = createTextField(
-                (r) -> ((AdditiveRule) r).getResistance(),
-                (r, val) -> ((AdditiveRule) r).setResistance((double) val));
+        JTextField tfLambda = createTextField((r) -> ((AdditiveRule) r).getLambda(), (r, val) -> ((AdditiveRule) r).setLambda((double) val));
+        JTextField tfResistance = createTextField((r) -> ((AdditiveRule) r).getResistance(), (r, val) -> ((AdditiveRule) r).setResistance((double) val));
         mainTab.addItem("Lambda", tfLambda);
         mainTab.addItem("Resistance", tfResistance);
         mainTab.addItem("Add noise", getAddNoise());

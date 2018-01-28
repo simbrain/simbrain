@@ -18,13 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
-import java.awt.FlowLayout;
-import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Neuron;
@@ -33,11 +26,14 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
 /**
  * The <b>AllToAllPanel</b> is panel for editing all to all connections.
  *
  * @author Zoë Tosi
- *
  */
 @SuppressWarnings("serial")
 public class AllToAllPanel extends AbstractConnectionPanel {
@@ -47,7 +43,9 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     private JCheckBox allowSelfConnectChkBx = new JCheckBox();
 
-    /** Panel holding the checkbox. */
+    /**
+     * Panel holding the checkbox.
+     */
     private JPanel allowSelfConnectPanel = new JPanel();
 
     /**
@@ -58,7 +56,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
     /**
      * Construct a new all to all panel.
-     * @param connector the connection object
+     *
+     * @param connector    the connection object
      * @param networkPanel the parent network panel
      */
     public AllToAllPanel(AllToAll connector, NetworkPanel networkPanel) {
@@ -73,8 +72,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
     @Override
     public void fillFieldValues() {
-        allowSelfConnectChkBx.setSelected(((AllToAll) connection)
-                .isSelfConnectionAllowed());
+        allowSelfConnectChkBx.setSelected(((AllToAll) connection).isSelfConnectionAllowed());
     }
 
     @Override
@@ -84,11 +82,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
     }
 
     @Override
-    public List<Synapse> applyConnection(List<Neuron> source,
-            List<Neuron> target) {
-        return AllToAll.connectAllToAll(source, target,
-                Utils.intersects(source, target),
-                connection.isSelfConnectionAllowed(), true);
+    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
+        return AllToAll.connectAllToAll(source, target, Utils.intersects(source, target), connection.isSelfConnectionAllowed(), true);
     }
 
     @Override

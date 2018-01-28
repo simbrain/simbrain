@@ -18,16 +18,15 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JPanel;
-
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.TextTable;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.world.textworld.ReaderWorld;
+
+import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Dialog for editing token to vector dictionary (which associates string tokens
@@ -37,10 +36,14 @@ import org.simbrain.world.textworld.ReaderWorld;
  */
 public class TokenToVectorPanel extends VectorDictionaryPanel implements EditablePanel {
 
-    /** The world to edit. */
+    /**
+     * The world to edit.
+     */
     private final ReaderWorld world;
 
-    /** The table representing the dictionary data. */
+    /**
+     * The table representing the dictionary data.
+     */
     private SimbrainJTable table;
 
     /**
@@ -49,13 +52,9 @@ public class TokenToVectorPanel extends VectorDictionaryPanel implements Editabl
      * @param world the world whose dictionary is being edited.
      */
     public TokenToVectorPanel(final ReaderWorld world) {
-        super("<html><p>These entries produce vector outputs. "
-                + "When they are 'activated', the "
-                + "associated vector is sent to any coupled consumers "
-                + "(e.g. a neuron group).");
+        super("<html><p>These entries produce vector outputs. " + "When they are 'activated', the " + "associated vector is sent to any coupled consumers " + "(e.g. a neuron group).");
         this.world = world;
-        table = SimbrainJTable.createTable(new VectorDictionaryTable(world
-                .getTokenToVectorDict()));
+        table = SimbrainJTable.createTable(new VectorDictionaryTable(world.getTokenToVectorDict()));
         initPanel(table);
     }
 

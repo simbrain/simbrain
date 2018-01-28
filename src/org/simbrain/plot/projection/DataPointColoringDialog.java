@@ -13,88 +13,108 @@
  */
 package org.simbrain.plot.projection;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.projection.DataColoringManager;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * DataPointColoringDialog is a dialog box for making changes to the coloring
  * method in projection plot.
  *
  * @author Lam Nguyen
- *
  */
 
-public class DataPointColoringDialog extends StandardDialog implements
-        ActionListener {
+public class DataPointColoringDialog extends StandardDialog implements ActionListener {
 
-    /** String of coloring methods. */
-    private String[] projectionMethod = { "None", "DecayTrail", "Frequency" };
+    /**
+     * String of coloring methods.
+     */
+    private String[] projectionMethod = {"None", "DecayTrail", "Frequency"};
 
-    /** Projection coloring manager. */
+    /**
+     * Projection coloring manager.
+     */
     private DataColoringManager colorManager;
 
-    /** The projection model. */
+    /**
+     * The projection model.
+     */
     private ProjectionModel projectionModel;
 
-    /** The base color */
+    /**
+     * The base color
+     */
     private Color baseColor;
 
-    /** The hot color. */
+    /**
+     * The hot color.
+     */
     private Color hotColor;
 
-    /** Button to edit base color. */
+    /**
+     * Button to edit base color.
+     */
     private JButton baseColorButton = new JButton("Base color");
 
-    /** Button to edit hot color. */
+    /**
+     * Button to edit hot color.
+     */
     private JButton hotColorButton = new JButton("Hot color");
 
-    /** Base color indicator. */
+    /**
+     * Base color indicator.
+     */
     private JPanel baseColorIndicator = new JPanel();
 
-    /** Hot color indicator. */
+    /**
+     * Hot color indicator.
+     */
     private JPanel hotColorIndicator = new JPanel();
 
-    /** Hot color on/off toggle. */
+    /**
+     * Hot color on/off toggle.
+     */
     private JCheckBox hotPointCheckBox = new JCheckBox();
 
-    /** Text field to edit floor. */
+    /**
+     * Text field to edit floor.
+     */
     private JTextField floor = new JTextField("" + 1);
 
-    /** Text field to edit ceiling. */
+    /**
+     * Text field to edit ceiling.
+     */
     private JTextField ceiling = new JTextField("" + 10);
 
-    /** Text field to edit increment amount. */
+    /**
+     * Text field to edit increment amount.
+     */
     private JTextField incrementAmount = new JTextField("" + .5);
 
-    /** Text field to edit decrement amount. */
+    /**
+     * Text field to edit decrement amount.
+     */
     private JTextField decrementAmount = new JTextField("" + .2);
 
-    /** Combo box to select projection type. */
+    /**
+     * Combo box to select projection type.
+     */
     private JComboBox coloringMethod = new JComboBox(projectionMethod);
 
-    /** Panel for changing parameters based on selected coloring method. */
+    /**
+     * Panel for changing parameters based on selected coloring method.
+     */
     private LabelledItemPanel currentColoringPanel;
 
-    /** Main dialog box. */
+    /**
+     * Main dialog box.
+     */
     private Box mainPanel = Box.createVerticalBox();
 
     /**
@@ -151,10 +171,8 @@ public class DataPointColoringDialog extends StandardDialog implements
         hotColorIndicator.setBackground(hotColor);
         baseColorIndicator.setSize(50, 50);
         hotColorIndicator.setSize(50, 50);
-        baseColorIndicator.setBorder(BorderFactory
-                .createLineBorder(Color.black));
-        hotColorIndicator
-                .setBorder(BorderFactory.createLineBorder(Color.black));
+        baseColorIndicator.setBorder(BorderFactory.createLineBorder(Color.black));
+        hotColorIndicator.setBorder(BorderFactory.createLineBorder(Color.black));
         if (colorManager.getHotPointMode() == true) {
             hotPointCheckBox.setSelected(true);
             hotColorButton.setEnabled(true);
@@ -166,17 +184,14 @@ public class DataPointColoringDialog extends StandardDialog implements
         }
         floor.setText("" + Double.toString(colorManager.getFloor()));
         ceiling.setText("" + Double.toString(colorManager.getCeiling()));
-        incrementAmount.setText(""
-                + Double.toString(colorManager.getIncrementAmount()));
-        decrementAmount.setText(""
-                + Double.toString(colorManager.getDecrementAmount()));
+        incrementAmount.setText("" + Double.toString(colorManager.getIncrementAmount()));
+        decrementAmount.setText("" + Double.toString(colorManager.getDecrementAmount()));
 
         baseColorIndicator.setBackground(colorManager.getBaseColor());
         hotColorIndicator.setBackground(colorManager.getHotColor());
         baseColorButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Color newColor = JColorChooser.showDialog(null,
-                        "Choose base color", colorManager.getBaseColor());
+                Color newColor = JColorChooser.showDialog(null, "Choose base color", colorManager.getBaseColor());
                 if (newColor == null) {
                     newColor = baseColorIndicator.getBackground();
                 }
@@ -186,8 +201,7 @@ public class DataPointColoringDialog extends StandardDialog implements
         });
         hotColorButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Color newColor = JColorChooser.showDialog(null,
-                        "Choose hot color", colorManager.getHotColor());
+                Color newColor = JColorChooser.showDialog(null, "Choose hot color", colorManager.getHotColor());
                 if (newColor == null) {
                     newColor = hotColorIndicator.getBackground();
                 }
@@ -200,8 +214,7 @@ public class DataPointColoringDialog extends StandardDialog implements
         initPanel();
 
         // Set up help button
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/projection.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/projection.html");
         addButton(new JButton(helpAction));
 
         // Assemble color panel
@@ -304,14 +317,12 @@ public class DataPointColoringDialog extends StandardDialog implements
      * warning if not.
      *
      * @param paramName parameter name to display in warning dialog
-     * @param val value to check
+     * @param val       value to check
      * @return true if the value is in range, false otherwise
      */
     private boolean betweenZeroAndOne(final String paramName, final double val) {
         if ((val < 0) || (val > 1)) {
-            JOptionPane.showMessageDialog(null, paramName
-                    + "should be between 0 and 1", "Warning!",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, paramName + "should be between 0 and 1", "Warning!", JOptionPane.WARNING_MESSAGE);
             return false;
         }
         return true;
@@ -364,9 +375,7 @@ public class DataPointColoringDialog extends StandardDialog implements
                 colorManager.setCeiling(ceilingVal);
             }
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "Non-numeric field values:"
-                    + "\nNetwork construction failed.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Non-numeric field values:" + "\nNetwork construction failed.", "Error", JOptionPane.ERROR_MESSAGE);
             nfe.printStackTrace();
         }
 

@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Aligns horizontal.
@@ -38,14 +37,14 @@ public final class AlignHorizontalAction extends ConditionallyEnabledAction {
      */
     public AlignHorizontalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Align Horizontal", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON,
-                ResourceManager.getImageIcon("AlignHorizontal.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignHorizontal.png"));
         putValue(SHORT_DESCRIPTION, "Align selected neurons horizontally");
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.alignHorizontal();

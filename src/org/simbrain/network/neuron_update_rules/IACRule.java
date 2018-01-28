@@ -30,50 +30,67 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
-public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
-        ClippableUpdateRule, NoisyUpdateRule {
+public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
-    /** The Default upper bound. */
+    /**
+     * The Default upper bound.
+     */
     private static final double DEFAULT_CEILING = 1.0;
 
-    /** The Default lower bound. */
+    /**
+     * The Default lower bound.
+     */
     private static final double DEFAULT_FLOOR = -.2;
 
-    /** Neuron decay. */
+    /**
+     * Neuron decay.
+     */
     private double decay = 0.05;
 
-    /** Rest. */
+    /**
+     * Rest.
+     */
     private double rest = .1;
 
-    /** Noise dialog box. */
+    /**
+     * Noise dialog box.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
-    /** Clipping. */
+    /**
+     * Clipping.
+     */
     private boolean clipping = true;
 
-    /** The upper bound of the activity if clipping is used. */
+    /**
+     * The upper bound of the activity if clipping is used.
+     */
     private double ceiling = DEFAULT_CEILING;
 
-    /** The lower bound of the activity if clipping is used. */
+    /**
+     * The lower bound of the activity if clipping is used.
+     */
     private double floor = DEFAULT_FLOOR;
 
-    /** Local variables as class variables for a minor performance gain. */
+    /**
+     * Local variables as class variables for a minor performance gain.
+     */
     private double effect, netInput, act;
 
     /**
-     * @return
-     * {@inheritDoc}
+     * @return {@inheritDoc}
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
     /**
-     * @return
-     * {@inheritDoc}
+     * @return {@inheritDoc}
      */
     public IACRule deepCopy() {
         IACRule iac = new IACRule();
@@ -110,8 +127,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
         }
 
         // Update activation using Euler integration of main ODE
-        act = neuron.getActivation() + neuron.getNetwork().getTimeStep()
-                * (effect - decay * (neuron.getActivation() - rest));
+        act = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (effect - decay * (neuron.getActivation() - rest));
 
         if (addNoise) {
             act += noiseGenerator.getRandom();

@@ -18,30 +18,23 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentAdapter;
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
@@ -50,28 +43,40 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
 
-    /** serial version UID. */
+    /**
+     * serial version UID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** Reference to workspace component. */
+    /**
+     * Reference to workspace component.
+     */
     private E workspaceComponent;
 
-    /** File Chooser. */
+    /**
+     * File Chooser.
+     */
     private final SFileChooser chooser;
 
-    /** Reference to parent frame. */
+    /**
+     * Reference to parent frame.
+     */
     private GenericFrame parentFrame;
 
-    /** Log4j logger. */
+    /**
+     * Log4j logger.
+     */
     private Logger logger = Logger.getLogger(GuiComponent.class);
 
-    /** Reference to parent desktop. */
+    /**
+     * Reference to parent desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
      * Construct a workspace component.
      *
-     * @param frame the parent frame.
+     * @param frame              the parent frame.
      * @param workspaceComponent the component to wrap.
      */
     public GuiComponent(final GenericFrame frame, final E workspaceComponent) {
@@ -102,7 +107,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
-    
+
 
     /**
      * If any initialization is needed after adding this component to workspace.
@@ -126,7 +131,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     }
 
     /**
-     * Perform cleanup after closing. 
+     * Perform cleanup after closing.
      * TODO: Rename to guiClosing since workspace has its own
      */
     protected abstract void closing();
@@ -139,7 +144,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     protected void update() {
         repaint(); // TODO: Is this repaint needed here? Should only be in
-                   // subclasses.
+        // subclasses.
     }
 
     /**
@@ -148,8 +153,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     @SuppressWarnings("unchecked")
     public void showOpenFileDialog() {
 
-        SFileChooser chooser = new SFileChooser(
-                getDefaultDirectory(workspaceComponent.getClass()), null);
+        SFileChooser chooser = new SFileChooser(getDefaultDirectory(workspaceComponent.getClass()), null);
 
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -170,12 +174,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
         E newComponent;
         try {
-            newComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
-                    workspaceComponent.getClass(), name, inputStream, ext);
+            newComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(workspaceComponent.getClass(), name, inputStream, ext);
         } catch (ReflectiveOperationException ex) {
-            String message = String.format(
-                    "Failed to deserialize workspace component %s\nCould not execute open method in class %s.",
-                    name, workspaceComponent.getClass().getSimpleName());
+            String message = String.format("Failed to deserialize workspace component %s\nCould not execute open method in class %s.", name, workspaceComponent.getClass().getSimpleName());
             JOptionPane.showMessageDialog(null, message);
             return;
         }
@@ -222,8 +223,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
             // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
             // .getAbsolutePath());
-            setDefaultDirectory(workspaceComponent
-                    .getClass(), theFile.getParentFile().getAbsolutePath());
+            setDefaultDirectory(workspaceComponent.getClass(), theFile.getParentFile().getAbsolutePath());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }
@@ -239,8 +239,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
             showSaveFileDialog();
         } else {
             try {
-                FileOutputStream stream = new FileOutputStream(
-                        workspaceComponent.getCurrentFile());
+                FileOutputStream stream = new FileOutputStream(workspaceComponent.getCurrentFile());
                 workspaceComponent.save(stream, null);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -255,27 +254,23 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @throws IOException if an IO error occurs
      */
     public void save(final OutputStream ostream) throws IOException {
-        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(),
-                ostream);
+        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(), ostream);
     }
 
     /**
      * Creates a new desktop component from the provided stream.
      *
      * @param component the component to create the desktop component for.
-     * @param istream the inputstream containing the serialized data.
-     * @param name the name of the desktop component.
+     * @param istream   the inputstream containing the serialized data.
+     * @param name      the name of the desktop component.
      * @return a new component.
      */
-    public static GuiComponent<?> open(final WorkspaceComponent component,
-            final InputStream istream, final String name) {
+    public static GuiComponent<?> open(final WorkspaceComponent component, final InputStream istream, final String name) {
 
         // SimbrainDesktop desktop =
         // SimbrainDesktop.getDesktop(component.getWorkspace());
-        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null,
-                component);
-        Rectangle bounds = (Rectangle) new XStream(new DomDriver())
-                .fromXML(istream);
+        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
+        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
 
         dc.setTitle(name);
         dc.setBounds(bounds);
@@ -289,12 +284,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @return true if user cancels
      */
     public boolean showHasChangedDialog() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
-        int s = JOptionPane.showInternalOptionDialog(this,
-                "This component has changed since last save,\n"
-                        + "Would you like to save these changes?",
-                "Component Has Changed", JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        Object[] options = {"Save", "Don't Save", "Cancel"};
+        int s = JOptionPane.showInternalOptionDialog(this, "This component has changed since last save,\n" + "Would you like to save these changes?", "Component Has Changed", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == JOptionPane.OK_OPTION) {
             this.save();
@@ -315,8 +306,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @return the name of underlying component.
      */
     public String getName() {
-        return (workspaceComponent == null) ? "null" : workspaceComponent
-                .getName();
+        return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
     }
 
     /**
@@ -408,7 +398,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * Set the default directory for specific component types.
      *
      * @param componentType the component type
-     * @param dir the directory to set
+     * @param dir           the directory to set
      */
     private void setDefaultDirectory(Class<? extends WorkspaceComponent> componentType, String dir) {
         if (componentType == OdorWorldComponent.class) {

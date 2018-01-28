@@ -18,20 +18,21 @@
  */
 package org.simbrain.network.gui.actions.neuron;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * New activity generator action.
  */
 public final class NewActivityGeneratorAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -51,8 +52,9 @@ public final class NewActivityGeneratorAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.addNeuron(new StochasticRule());

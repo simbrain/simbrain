@@ -1,10 +1,10 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Superclass for particular world configuration, which sets the mouse and
@@ -13,10 +13,14 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 // CHECKSTYLE:OFF
 public abstract class RL_Sim {
 
-    /** Back reference to main simulation object. */
+    /**
+     * Back reference to main simulation object.
+     */
     RL_Sim_Main sim;
 
-    /** Sub-control panel for this RL_Sim. */
+    /**
+     * Sub-control panel for this RL_Sim.
+     */
     ControlPanel controls = new ControlPanel();
 
     /**
@@ -27,7 +31,9 @@ public abstract class RL_Sim {
     int mouse_y;
     int mouse_heading;
 
-    /** Goal entities.  When the agent reaches one of these a trial ends.  */
+    /**
+     * Goal entities.  When the agent reaches one of these a trial ends.
+     */
     List<OdorWorldEntity> goalEntities = new ArrayList<OdorWorldEntity>();
 
     /**

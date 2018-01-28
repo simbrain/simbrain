@@ -18,16 +18,16 @@
  */
 package org.simbrain.plot;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 /**
  * Base class for chart model classes. Maintains listeners.
- *
+ * <p>
  * TODO: Some charts have update happening inside the consumer setVal function.
  * This makes it impossible to "turn the component off". It's also a bit
  * inefficient, since a graphics update fired every time. See projection for a
@@ -44,27 +44,39 @@ public class ChartModel {
         return xstream;
     }
 
-    /** Listeners on this chart. */
+    /**
+     * Listeners on this chart.
+     */
     private transient List<ChartListener> listenerList = new ArrayList<ChartListener>();
 
-    /** Settings Listeners on this chart. */
+    /**
+     * Settings Listeners on this chart.
+     */
     private transient List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
 
-    /** Add a data source to the chart model. */
+    /**
+     * Add a data source to the chart model.
+     */
     public ChartDataSource addDataSource(String description) {
         return null;
     }
 
-    /** Remove the data source from the chart model. */
-    public void removeDataSource(ChartDataSource source) {}
+    /**
+     * Remove the data source from the chart model.
+     */
+    public void removeDataSource(ChartDataSource source) {
+    }
 
-    /** Get the data source with the specified description, if it exists. */
+    /**
+     * Get the data source with the specified description, if it exists.
+     */
     public Optional<? extends ChartDataSource> getDataSource(String description) {
         return Optional.empty();
     }
 
     /**
      * Add a chart listener.
+     *
      * @param listener listener to add.
      */
     public void addListener(ChartListener listener) {
@@ -98,6 +110,7 @@ public class ChartModel {
 
     /**
      * Fire data source added event.
+     *
      * @param source The added data source.
      */
     public void fireDataSourceAdded(ChartDataSource source) {
@@ -108,6 +121,7 @@ public class ChartModel {
 
     /**
      * Fire data source removed event.
+     *
      * @param source The removed data source.
      */
     public void fireDataSourceRemoved(ChartDataSource source) {

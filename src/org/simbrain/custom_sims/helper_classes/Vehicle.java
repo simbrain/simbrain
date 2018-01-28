@@ -14,25 +14,39 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  */
 public class Vehicle {
 
-    /** The simulation object. */
+    /**
+     * The simulation object.
+     */
     private final Simulation sim;
 
-    /** Reference to the network to put the vehicle in. */
+    /**
+     * Reference to the network to put the vehicle in.
+     */
     private final NetBuilder net;
 
-    /** The world with agents and sensors to attach to the vehicle. */
+    /**
+     * The world with agents and sensors to attach to the vehicle.
+     */
     private final OdorWorldBuilder world;
 
-    /** Size of sensor-motor weights. Determines how "sharply" agents turn. */
+    /**
+     * Size of sensor-motor weights. Determines how "sharply" agents turn.
+     */
     private int weightSize = 120;
 
-    /** Size of weights from sensors to straight movement. */
+    /**
+     * Size of weights from sensors to straight movement.
+     */
     private int forwardWeights = 5;
 
-    /** If true connect sensor nodes to straight movement node. */
+    /**
+     * If true connect sensor nodes to straight movement node.
+     */
     private boolean connectSensorToStraightMovement = true;
 
-    /** What type of vehicle to add. */
+    /**
+     * What type of vehicle to add.
+     */
     public enum VehicleType {
         PURSUER, AVOIDER
     }
@@ -42,8 +56,8 @@ public class Vehicle {
      * the network, the world to reference the sensor, and the sim to make the
      * couplings.
      *
-     * @param sim the parent simulation object
-     * @param net the network to add the vehicle subnetworks to
+     * @param sim   the parent simulation object
+     * @param net   the network to add the vehicle subnetworks to
      * @param world the world to link the vehicles to
      */
     public Vehicle(Simulation sim, NetBuilder net, OdorWorldBuilder world) {
@@ -55,18 +69,17 @@ public class Vehicle {
     /**
      * Add a vehicle.
      *
-     * @param x x location
-     * @param y y location
-     * @param agent reference to the agent to couple to
-     * @param type Pursuer, Avoider, etc.
+     * @param x                 x location
+     * @param y                 y location
+     * @param agent             reference to the agent to couple to
+     * @param type              Pursuer, Avoider, etc.
      * @param stimulusDimension which sensory dimension this vehicle responds
-     *            to. Example: if 2, then responds to a vector (0,1,0,0,0),
-     *            since the component 2 is non-zero.
+     *                          to. Example: if 2, then responds to a vector (0,1,0,0,0),
+     *                          since the component 2 is non-zero.
      * @return the resulting neuron group, which will have been added to the
-     *         simulation
+     * simulation
      */
-    public NeuronGroup addVehicle(int x, int y, RotatingEntity agent,
-            VehicleType type, int stimulusDimension) {
+    public NeuronGroup addVehicle(int x, int y, RotatingEntity agent, VehicleType type, int stimulusDimension) {
 
         // Create the network
         NeuronGroup vehicle = new NeuronGroup(net.getNetwork());
@@ -92,15 +105,11 @@ public class Vehicle {
 
         // Set weights here
         if (type == VehicleType.PURSUER) {
-            net.connect(leftInput, leftTurn, weightSize, -2 * weightSize,
-                    2 * weightSize);
-            net.connect(rightInput, rightTurn, weightSize, -2 * weightSize,
-                    2 * weightSize);
+            net.connect(leftInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            net.connect(rightInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
         } else if (type == VehicleType.AVOIDER) {
-            net.connect(leftInput, rightTurn, weightSize, -2 * weightSize,
-                    2 * weightSize);
-            net.connect(rightInput, leftTurn, weightSize, -2 * weightSize,
-                    2 * weightSize);
+            net.connect(leftInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            net.connect(rightInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
         }
 
         if (connectSensorToStraightMovement) {
@@ -109,10 +118,8 @@ public class Vehicle {
         }
 
         // Couple network to agent.
-        sim.couple((SmellSensor) agent.getSensor("Smell-Left"),
-                stimulusDimension, leftInput);
-        sim.couple((SmellSensor) agent.getSensor("Smell-Right"),
-                stimulusDimension, rightInput);
+        sim.couple((SmellSensor) agent.getSensor("Smell-Left"), stimulusDimension, leftInput);
+        sim.couple((SmellSensor) agent.getSensor("Smell-Right"), stimulusDimension, rightInput);
         sim.couple(straight, agent.getEffector("Go-straight"));
         sim.couple(leftTurn, agent.getEffector("Go-left"));
         sim.couple(rightTurn, agent.getEffector("Go-right"));
@@ -123,16 +130,14 @@ public class Vehicle {
     /**
      * Add a pursuer.
      */
-    public NeuronGroup addPursuer(int x, int y, RotatingEntity agent,
-            int stimulusDimension) {
+    public NeuronGroup addPursuer(int x, int y, RotatingEntity agent, int stimulusDimension) {
         return addVehicle(x, y, agent, VehicleType.PURSUER, stimulusDimension);
     }
 
     /**
      * Add an avoider.
      */
-    public NeuronGroup addAvoider(int x, int y, RotatingEntity agent,
-            int stimulusDimension) {
+    public NeuronGroup addAvoider(int x, int y, RotatingEntity agent, int stimulusDimension) {
         return addVehicle(x, y, agent, VehicleType.AVOIDER, stimulusDimension);
     }
 
@@ -140,7 +145,7 @@ public class Vehicle {
      * Helper method to set default value for vehicle nodes.
      *
      * @param neuron the neuron to update.
-     * @param ng the neuron group the node is in.
+     * @param ng     the neuron group the node is in.
      */
     private void setNodeDefaults(Neuron neuron, NeuronGroup ng) {
         neuron.setLowerBound(-10);

@@ -19,21 +19,22 @@
 package org.simbrain.workspace.actions;
 
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.WorkspaceUpdateManagerPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show workspace updater panel.
  */
 public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final SimbrainDesktop desktop;
 
     /**
@@ -50,8 +51,9 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(ActionEvent event) {
         StandardDialog dialog = new StandardDialog(desktop.getFrame(), "Edit Update Sequence");

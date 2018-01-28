@@ -12,15 +12,15 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.util.OrientationComparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Connect each source neuron to a single target.
@@ -32,15 +32,16 @@ public class OneToOne implements ConnectNeurons {
 
     public static boolean DEFAULT_BIDIRECT_PREF;
 
-    public static OrientationComparator DEFAULT_ORIENTATION =
-        OrientationComparator.X_ORDER;
+    public static OrientationComparator DEFAULT_ORIENTATION = OrientationComparator.X_ORDER;
 
     /**
      * If true, synapses are added in both directions.
      */
     private boolean useBidirectionalConnections = false;
 
-    /** Orientation of how to connect neurons. */
+    /**
+     * Orientation of how to connect neurons.
+     */
     private OrientationComparator connectOrientation = DEFAULT_ORIENTATION;
 
     /**
@@ -50,24 +51,18 @@ public class OneToOne implements ConnectNeurons {
      * @param targetNeurons the targeted neurons
      * @return the new synapses
      */
-    public List<Synapse> connectOneToOne(List<Neuron> sourceNeurons,
-        final List<Neuron> targetNeurons) {
-        return connectOneToOne(sourceNeurons, targetNeurons,
-            useBidirectionalConnections, true);
+    public List<Synapse> connectOneToOne(List<Neuron> sourceNeurons, final List<Neuron> targetNeurons) {
+        return connectOneToOne(sourceNeurons, targetNeurons, useBidirectionalConnections, true);
     }
 
     /**
      * Returns a sorted list of neurons, given a comparator.
      *
-     * @param neuronList
-     *            the base list of neurons.
-     * @param comparator
-     *            the comparator.
+     * @param neuronList the base list of neurons.
+     * @param comparator the comparator.
      * @return the sorted list.
      */
-    private static List<Neuron> getSortedNeuronList(
-        final List<Neuron> neuronList,
-        final OrientationComparator comparator) {
+    private static List<Neuron> getSortedNeuronList(final List<Neuron> neuronList, final OrientationComparator comparator) {
         ArrayList<Neuron> list = new ArrayList<Neuron>();
         list.addAll(neuronList);
         Collections.sort(list, comparator);
@@ -78,39 +73,30 @@ public class OneToOne implements ConnectNeurons {
      * {@inheritDoc}
      * Source and target neuron groups must have the same number of neurons.
      * A synapse is created such that every source neuron is connected to
-     * exactly one target neuron (and vice versa if connections are 
-     * bidirectional). 
+     * exactly one target neuron (and vice versa if connections are
+     * bidirectional).
      */
     @Override
     public void connectNeurons(SynapseGroup synGroup) {
-        List<Synapse> syns = connectOneToOne(synGroup.getSourceNeurons(),
-            synGroup.getTargetNeurons(), useBidirectionalConnections, false);
+        List<Synapse> syns = connectOneToOne(synGroup.getSourceNeurons(), synGroup.getTargetNeurons(), useBidirectionalConnections, false);
         for (Synapse s : syns) {
             synGroup.addNewSynapse(s);
         }
     }
 
     /**
-     *
-     * @param sourceNeurons the starting neurons
-     * @param targetNeurons the targeted neurons
+     * @param sourceNeurons               the starting neurons
+     * @param targetNeurons               the targeted neurons
      * @param useBidirectionalConnections the useBidirectionalConnections to set
-     * @param looseSynapses whether loose synapses are being connected
-     * @return array of synpases 
+     * @param looseSynapses               whether loose synapses are being connected
+     * @return array of synpases
      */
-    public static List<Synapse> connectOneToOne(
-        final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons,
-        final boolean useBidirectionalConnections,
-        final boolean looseSynapses) {
+    public static List<Synapse> connectOneToOne(final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons, final boolean useBidirectionalConnections, final boolean looseSynapses) {
 
-        double srcWidth = OrientationComparator.findMaxX(sourceNeurons)
-            - OrientationComparator.findMinX(sourceNeurons);
-        double srcHeight = OrientationComparator.findMaxY(sourceNeurons)
-            - OrientationComparator.findMinY(sourceNeurons);
-        double tarWidth = OrientationComparator.findMaxX(targetNeurons)
-            - OrientationComparator.findMinX(targetNeurons);
-        double tarHeight = OrientationComparator.findMaxY(targetNeurons)
-            - OrientationComparator.findMinY(targetNeurons);
+        double srcWidth = OrientationComparator.findMaxX(sourceNeurons) - OrientationComparator.findMinX(sourceNeurons);
+        double srcHeight = OrientationComparator.findMaxY(sourceNeurons) - OrientationComparator.findMinY(sourceNeurons);
+        double tarWidth = OrientationComparator.findMaxX(targetNeurons) - OrientationComparator.findMinX(targetNeurons);
+        double tarHeight = OrientationComparator.findMaxY(targetNeurons) - OrientationComparator.findMinY(targetNeurons);
 
         // Sort by axis of maximal variance
         boolean srcSortX = srcWidth > srcHeight;
@@ -122,53 +108,33 @@ public class OneToOne implements ConnectNeurons {
         // srcSortX XOR tarSortX means that one should be sorted vertically
         // and the other horizonally.
         if (srcSortX != tarSortX) {
-            double midpointXSrc = OrientationComparator
-                .findMidpointX(sourceNeurons);
-            double midpointXTar = OrientationComparator
-                .findMidpointX(targetNeurons);
-            double midpointYSrc = OrientationComparator
-                .findMidpointY(sourceNeurons);
-            double midpointYTar = OrientationComparator
-                .findMidpointY(targetNeurons);
+            double midpointXSrc = OrientationComparator.findMidpointX(sourceNeurons);
+            double midpointXTar = OrientationComparator.findMidpointX(targetNeurons);
+            double midpointYSrc = OrientationComparator.findMidpointY(sourceNeurons);
+            double midpointYTar = OrientationComparator.findMidpointY(targetNeurons);
 
             if (srcSortX) { // source is horizontal
                 // Go over source in regular or reverse order based on the
                 // relative positions of the source and target midpoints.
-                srcComparator =
-                    midpointXSrc > midpointXTar
-                        ? OrientationComparator.X_REVERSE
-                        : OrientationComparator.X_ORDER;
+                srcComparator = midpointXSrc > midpointXTar ? OrientationComparator.X_REVERSE : OrientationComparator.X_ORDER;
                 // Go over target in regular or reverse order based on the
                 // relative positions of the source and target midpoints.
-                tarComparator =
-                    midpointYSrc > midpointYTar
-                        ? OrientationComparator.Y_ORDER
-                        : OrientationComparator.Y_REVERSE;
+                tarComparator = midpointYSrc > midpointYTar ? OrientationComparator.Y_ORDER : OrientationComparator.Y_REVERSE;
             } else {// source is vertical
-                srcComparator =
-                    midpointYSrc > midpointYTar
-                        ? OrientationComparator.Y_REVERSE
-                        : OrientationComparator.Y_ORDER;
-                tarComparator =
-                    midpointXSrc > midpointXTar
-                        ? OrientationComparator.X_ORDER
-                        : OrientationComparator.X_REVERSE;
+                srcComparator = midpointYSrc > midpointYTar ? OrientationComparator.Y_REVERSE : OrientationComparator.Y_ORDER;
+                tarComparator = midpointXSrc > midpointXTar ? OrientationComparator.X_ORDER : OrientationComparator.X_REVERSE;
             }
         } else {
             // Either we are sorting both vertically or both horizontally...
-            srcComparator = srcSortX ? OrientationComparator.X_ORDER
-                : OrientationComparator.Y_ORDER;
-            tarComparator = tarSortX ? OrientationComparator.X_ORDER
-                : OrientationComparator.Y_ORDER;
+            srcComparator = srcSortX ? OrientationComparator.X_ORDER : OrientationComparator.Y_ORDER;
+            tarComparator = tarSortX ? OrientationComparator.X_ORDER : OrientationComparator.Y_ORDER;
         }
 
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
 
-        Iterator<Neuron> targets = getSortedNeuronList(targetNeurons,
-            tarComparator).iterator();
+        Iterator<Neuron> targets = getSortedNeuronList(targetNeurons, tarComparator).iterator();
 
-        for (Iterator<Neuron> sources = getSortedNeuronList(sourceNeurons,
-            srcComparator).iterator(); sources.hasNext();) {
+        for (Iterator<Neuron> sources = getSortedNeuronList(sourceNeurons, srcComparator).iterator(); sources.hasNext(); ) {
             Neuron source = sources.next();
             if (targets.hasNext()) {
                 Neuron target = targets.next();
@@ -201,11 +167,9 @@ public class OneToOne implements ConnectNeurons {
     }
 
     /**
-     * @param useBidirectionalConnections
-     *            the useBidirectionalConnections to set
+     * @param useBidirectionalConnections the useBidirectionalConnections to set
      */
-    public void setUseBidirectionalConnections(
-        final boolean useBidirectionalConnections) {
+    public void setUseBidirectionalConnections(final boolean useBidirectionalConnections) {
         this.useBidirectionalConnections = useBidirectionalConnections;
     }
 
@@ -217,11 +181,9 @@ public class OneToOne implements ConnectNeurons {
     }
 
     /**
-     * @param connectOrientation
-     *            the connectOrientation to set
+     * @param connectOrientation the connectOrientation to set
      */
-    public void setConnectOrientation(
-        final OrientationComparator connectOrientation) {
+    public void setConnectOrientation(final OrientationComparator connectOrientation) {
         this.connectOrientation = connectOrientation;
     }
 

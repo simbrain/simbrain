@@ -1,7 +1,6 @@
 package org.simbrain.world.midiworld;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * MIDI world.

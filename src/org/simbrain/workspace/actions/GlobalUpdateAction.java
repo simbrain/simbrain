@@ -18,16 +18,14 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Open data world in current workspace.
@@ -38,6 +36,7 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
     /**
      * Create an open data world with the specified workspace.
+     *
      * @param workspace
      */
     public GlobalUpdateAction(Workspace workspace) {
@@ -45,43 +44,42 @@ public final class GlobalUpdateAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
         putValue(SHORT_DESCRIPTION, "Global step network update algorithm");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
 
         // Listen to workspace updater so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getUpdater().addUpdaterListener(
-                new WorkspaceUpdaterListener() {
+        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
 
-                    public void changeNumThreads() {
-                        // TODO Auto-generated method stub
-                    }
+            public void changeNumThreads() {
+                // TODO Auto-generated method stub
+            }
 
-                    public void changedUpdateController() {
-                        // TODO Auto-generated method stub
-                    }
+            public void changedUpdateController() {
+                // TODO Auto-generated method stub
+            }
 
-                    public void updatingStarted() {
-                        GlobalUpdateAction.this.setEnabled(false);
-                    }
+            public void updatingStarted() {
+                GlobalUpdateAction.this.setEnabled(false);
+            }
 
-                    public void updatingFinished() {
-                        GlobalUpdateAction.this.setEnabled(true);
-                    }
+            public void updatingFinished() {
+                GlobalUpdateAction.this.setEnabled(true);
+            }
 
-                    public void updatedCouplings(int update) {
-                    }
+            public void updatedCouplings(int update) {
+            }
 
-                    public void workspaceUpdated() {
-                    }
+            public void workspaceUpdated() {
+            }
 
-                });
+        });
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         workspace.iterate();

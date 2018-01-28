@@ -18,24 +18,23 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.KeyStroke;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Action for showing world preferences.
  */
 public final class ShowWorldPrefsAction extends AbstractAction {
 
-    /** Plot GUI component. */
+    /**
+     * Plot GUI component.
+     */
     private final OdorWorldPanel component;
 
     /**
@@ -46,21 +45,19 @@ public final class ShowWorldPrefsAction extends AbstractAction {
     public ShowWorldPrefsAction(final OdorWorldPanel component) {
         super("World Preferences...");
         if (component == null) {
-            throw new IllegalArgumentException(
-                    "Desktop component must not be null");
+            throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                KeyEvent.VK_P, Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMask()));
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Odor world preferences...");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
-                component.getWorld());
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(component.getWorld());
         JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);

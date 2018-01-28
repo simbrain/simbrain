@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.projection;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * <b>DataPointColored</b> extends DataPoint adding functions for coloring
@@ -28,10 +28,14 @@ import java.awt.Color;
  */
 public class DataPointColored extends DataPoint {
 
-    /** Color of this datapoint. */
+    /**
+     * Color of this datapoint.
+     */
     private Color color = Color.gray;
 
-    /** Default activation level. */
+    /**
+     * Default activation level.
+     */
     public static final double DEFAULT_ACTIVATION = .15;
 
     /**
@@ -46,6 +50,7 @@ public class DataPointColored extends DataPoint {
 
     /**
      * Default constructor for adding datasets.
+     *
      * @param data
      */
     public DataPointColored(double[] data) {
@@ -98,7 +103,7 @@ public class DataPointColored extends DataPoint {
     /**
      * Decrement the activation of this point (for decay trail coloring).
      *
-     * @param base lower bound of activation
+     * @param base            lower bound of activation
      * @param decrementAmount amount by which to decrement
      */
     public void decrementActivation(double base, double decrementAmount) {
@@ -112,7 +117,7 @@ public class DataPointColored extends DataPoint {
     /**
      * Increment the activation of this point (for frequency based coloring).
      *
-     * @param ceiling upper bound of activation
+     * @param ceiling         upper bound of activation
      * @param incrementAmount amount to increment
      */
     public void incrementActivation(double ceiling, double incrementAmount) {

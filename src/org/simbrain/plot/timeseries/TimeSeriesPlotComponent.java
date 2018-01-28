@@ -18,24 +18,26 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.simbrain.plot.ChartCouplingListener;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Represents time series data.
  */
 public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
-    /** The data model. */
+    /**
+     * The data model.
+     */
     private final TimeSeriesModel model;
 
     /**
@@ -53,7 +55,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Creates a new time series component from a specified model. Used in
      * deserializing.
      *
-     * @param name chart name
+     * @param name  chart name
      * @param model chart model
      */
     public TimeSeriesPlotComponent(String name, TimeSeriesModel model) {
@@ -127,15 +129,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /**
      * Opens a saved time series plot.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return bar chart component to be opened
      */
-    public static TimeSeriesPlotComponent open(final InputStream input,
-            final String name, final String format) {
-        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel
-                .getXStream().fromXML(input);
+    public static TimeSeriesPlotComponent open(final InputStream input, final String name, final String format) {
+        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel.getXStream().fromXML(input);
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 
@@ -164,7 +164,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Convenience method for setting the value of a specified time series in the plot. 
+     * Convenience method for setting the value of a specified time series in the plot.
      * Called by external simulations.
      *
      * @param value the current "y-axis" value for the time series

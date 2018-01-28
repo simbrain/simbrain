@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
+
+import java.awt.geom.Point2D;
 
 /**
  * Implements a network to be trained using backprop through time.
@@ -34,7 +34,9 @@ import org.simbrain.network.trainers.TrainingSet;
  */
 public final class BPTTNetwork extends FeedForward implements Trainable {
 
-    /** Number of steps in each trained sequences. */
+    /**
+     * Number of steps in each trained sequences.
+     */
     private int stepsPerSequences = 5;
 
     /**
@@ -45,16 +47,14 @@ public final class BPTTNetwork extends FeedForward implements Trainable {
     /**
      * Constructor specifying root network, and number of nodes in each layer.
      *
-     * @param network underlying network
-     * @param numInputNodes number of nodes in the input layer
-     * @param numHiddenNodes number of nodes in the hidden and context layers
-     * @param numOutputNodes number of output nodes
+     * @param network         underlying network
+     * @param numInputNodes   number of nodes in the input layer
+     * @param numHiddenNodes  number of nodes in the hidden and context layers
+     * @param numOutputNodes  number of output nodes
      * @param initialPosition where to position the network (upper left)
      */
-    public BPTTNetwork(final Network network, int numInputNodes,
-            int numHiddenNodes, int numOutputNodes, Point2D initialPosition) {
-        super(network, new int[] { numInputNodes, numHiddenNodes,
-                numOutputNodes }, initialPosition);
+    public BPTTNetwork(final Network network, int numInputNodes, int numHiddenNodes, int numOutputNodes, Point2D initialPosition) {
+        super(network, new int[]{numInputNodes, numHiddenNodes, numOutputNodes}, initialPosition);
 
         this.getInputLayer().setNeuronType(new LinearRule());
         setLabel("BPTT");

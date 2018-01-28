@@ -23,7 +23,9 @@ package org.simbrain.util.projection;
  */
 public class DataPoint {
 
-    /** The main data vector. */
+    /**
+     * The main data vector.
+     */
     private double[] data;
 
     /**

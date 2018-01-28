@@ -1,14 +1,12 @@
 package org.simbrain.world.threedworld.entities;
 
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
+
+import javax.swing.*;
 
 public class WalkingEffector implements Effector {
     private class WalkingEffectorEditor extends EffectorEditor {
@@ -195,7 +193,7 @@ public class WalkingEffector implements Effector {
         turnAnimSpeed = value;
     }
 
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double getWalking() {
         return walking;
     }
@@ -208,14 +206,14 @@ public class WalkingEffector implements Effector {
         walking = (float) value;
     }
 
-    @Consumable(description="setWalking", idMethod="getId")
+    @Consumable(description = "setWalking", idMethod = "getId")
     public void queueWalking(double value) {
         agent.getEngine().enqueue(() -> {
             setWalking((float) value);
         });
     }
 
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public float getTurning() {
         return turning;
     }
@@ -228,7 +226,7 @@ public class WalkingEffector implements Effector {
         turning = value;
     }
 
-    @Consumable(description="setTurning", idMethod="getId")
+    @Consumable(description = "setTurning", idMethod = "getId")
     public void queueTurning(double value) {
         agent.getEngine().enqueue(() -> {
             setTurning((float) value);

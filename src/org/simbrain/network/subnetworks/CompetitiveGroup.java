@@ -18,19 +18,17 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.Iterator;
-
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+
+import java.util.Iterator;
 
 /**
  * <b>Competitive</b> implements a simple competitive network.
- *
+ * <p>
  * Current implementations include Rummelhart-Zipser (PDP, 151-193), and
  * Alvarez-Squire 1994, PNAS, 7041-7045.
  *
@@ -40,22 +38,34 @@ public class CompetitiveGroup extends NeuronGroup {
 
     // TODO: Add "recall" function as with SOM
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double learningRate = .1;
 
-    /** Winner value. */
+    /**
+     * Winner value.
+     */
     private double winValue = 1;
 
-    /** loser value. */
+    /**
+     * loser value.
+     */
     private double loseValue = 0;
 
-    /** Normalize inputs boolean. */
+    /**
+     * Normalize inputs boolean.
+     */
     private boolean normalizeInputs = true;
 
-    /** Use leaky learning boolean. */
+    /**
+     * Use leaky learning boolean.
+     */
     private boolean useLeakyLearning = false;
 
-    /** Leaky learning rate . */
+    /**
+     * Leaky learning rate .
+     */
     private double leakyLearningRate = learningRate / 4;
 
     /**
@@ -64,13 +74,19 @@ public class CompetitiveGroup extends NeuronGroup {
      */
     private double synpaseDecayPercent = .0008;
 
-    /** Max, value and activation values. */
+    /**
+     * Max, value and activation values.
+     */
     private double max, val, activation;
 
-    /** Winner value. */
+    /**
+     * Winner value.
+     */
     private int winner;
 
-    /** Current update method. */
+    /**
+     * Current update method.
+     */
     private UpdateMethod updateMethod = UpdateMethod.RUMM_ZIPSER;
 
     /**
@@ -102,7 +118,7 @@ public class CompetitiveGroup extends NeuronGroup {
      * Constructs a competitive network with specified number of neurons.
      *
      * @param numNeurons size of this network in neurons
-     * @param root reference to Network.
+     * @param root       reference to Network.
      */
     public CompetitiveGroup(final Network root, final int numNeurons) {
         super(root);
@@ -116,7 +132,7 @@ public class CompetitiveGroup extends NeuronGroup {
      * Copy constructor.
      *
      * @param newRoot new root network
-     * @param oldNet old network.
+     * @param oldNet  old network.
      */
     public CompetitiveGroup(Network newRoot, CompetitiveGroup oldNet) {
         super(newRoot, oldNet);
@@ -199,9 +215,7 @@ public class CompetitiveGroup extends NeuronGroup {
      */
     private void squireAlvarezWeightUpdate(final Neuron neuron) {
         for (Synapse synapse : neuron.getFanIn()) {
-            double deltaw = learningRate * synapse.getTarget().getActivation()
-                    * (synapse.getSource().getActivation()
-                            - synapse.getTarget().getAverageInput());
+            double deltaw = learningRate * synapse.getTarget().getActivation() * (synapse.getSource().getActivation() - synapse.getTarget().getAverageInput());
             synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
         }
     }
@@ -255,8 +269,7 @@ public class CompetitiveGroup extends NeuronGroup {
                     activation = activation / sumOfInputs;
                 }
             }
-            val = incoming.getStrength()
-                    + leakyLearningRate * (activation - incoming.getStrength());
+            val = incoming.getStrength() + leakyLearningRate * (activation - incoming.getStrength());
             incoming.setStrength(val);
         }
     }
@@ -289,12 +302,12 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Randomize all weights coming in to this network.
-     *
+     * <p>
      * TODO: Add gaussian option...
      */
     public void randomizeIncomingWeights() {
 
-        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext();) {
+        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = i.next();
             for (Synapse s : n.getFanIn()) {
                 s.randomize();
@@ -309,7 +322,7 @@ public class CompetitiveGroup extends NeuronGroup {
      */
     private double getSummedIncomingWeights() {
         double ret = 0;
-        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext();) {
+        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = i.next();
             ret += n.getSummedIncomingWeights();
         }
@@ -464,7 +477,7 @@ public class CompetitiveGroup extends NeuronGroup {
      * Convenience method for setting update style from scripts.
      *
      * @param updateMethod string name of method: "RZ" for Rummelhart Zipser;
-     *            "AS" for Alvarez-Squire
+     *                     "AS" for Alvarez-Squire
      */
     public void setUpdateMethod(String updateMethod) {
         if (updateMethod.equalsIgnoreCase("RZ")) {

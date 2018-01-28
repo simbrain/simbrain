@@ -1,15 +1,14 @@
 package org.simbrain.world.threedworld.controllers;
 
+import com.jme3.input.InputManager;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.Agent;
 import org.simbrain.world.threedworld.entities.VisionSensor;
 import org.simbrain.world.threedworld.entities.WalkingEffector;
-
-import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
 
 import static org.simbrain.world.threedworld.controllers.AgentController.Mapping.*;
 
@@ -22,13 +21,11 @@ public class AgentController implements ActionListener {
      * Input mappings used by this controller.
      */
     enum Mapping {
-        TurnLeft,
-        TurnRight,
-        WalkForward,
-        WalkBackward;
+        TurnLeft, TurnRight, WalkForward, WalkBackward;
 
         /**
          * Return whether this mapping has the specified name.
+         *
          * @param name The name to compare.
          * @return Whether the mapping has the specified name.
          */
@@ -43,6 +40,7 @@ public class AgentController implements ActionListener {
 
     /**
      * Construct a new AgentController.
+     *
      * @param world The world in which the agent controller controls agents.
      */
     public AgentController(ThreeDWorld world) {
@@ -90,13 +88,13 @@ public class AgentController implements ActionListener {
     /**
      * Take control of an agent, applying mouse and keyboard input to its walking effector
      * and setting its view as the engine panel source.
+     *
      * @param agent The agent to control.
      */
     public void control(Agent agent) {
         this.agent = agent;
         controlActive = true;
-        world.getEngine().enqueue(
-                () -> agent.getSensor(VisionSensor.class).ifPresent(this::attachAgentVision));
+        world.getEngine().enqueue(() -> agent.getSensor(VisionSensor.class).ifPresent(this::attachAgentVision));
     }
 
     private void attachAgentVision(VisionSensor sensor) {
@@ -111,8 +109,7 @@ public class AgentController implements ActionListener {
         final Agent releasedAgent = agent;
         agent = null;
         controlActive = false;
-        world.getEngine().enqueue(
-                () -> releasedAgent.getSensor(VisionSensor.class).ifPresent(this::releaseAgentVision));
+        world.getEngine().enqueue(() -> releasedAgent.getSensor(VisionSensor.class).ifPresent(this::releaseAgentVision));
     }
 
     private void releaseAgentVision(VisionSensor sensor) {
@@ -125,8 +122,7 @@ public class AgentController implements ActionListener {
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
         if (controlActive) {
-            agent.getEffector(WalkingEffector.class).ifPresent(
-                    effector -> applyKeyboardControl(effector, name, isPressed));
+            agent.getEffector(WalkingEffector.class).ifPresent(effector -> applyKeyboardControl(effector, name, isPressed));
         }
     }
 

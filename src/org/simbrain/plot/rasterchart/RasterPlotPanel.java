@@ -18,17 +18,6 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -39,28 +28,43 @@ import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+
 /**
  * Display a raster plot. This component can be used independently of the
  * raster plot workspace component.
- *
+ * <p>
  * TODO: Make a version that extends this, like network panel case. Then
  * document in UML
  */
 public class RasterPlotPanel extends JPanel {
 
-    /** Chart un-initialized instance. */
+    /**
+     * Chart un-initialized instance.
+     */
     private JFreeChart chart;
 
-    /** Initial size. */
+    /**
+     * Initial size.
+     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /** Panel for chart. */
+    /**
+     * Panel for chart.
+     */
     private ChartPanel chartPanel = new ChartPanel(null);
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private RasterModel model;
 
-    /** Button panel. */
+    /**
+     * Button panel.
+     */
     private JPanel buttonPanel = new JPanel();
 
     /**
@@ -98,7 +102,7 @@ public class RasterPlotPanel extends JPanel {
                 true, // Show Legend
                 true, // Use tooltips
                 false // Configure chart to generate URLs?
-                );
+        );
         XYItemRenderer renderer = ((XYPlot) chart.getPlot()).getRenderer();
         renderer.setSeriesPaint(0, Color.BLACK);
         double size = 1.0;
@@ -146,6 +150,7 @@ public class RasterPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
+     *
      * @return
      */
     public JPanel getButtonPanel() {
@@ -157,8 +162,7 @@ public class RasterPlotPanel extends JPanel {
      */
     public void addAddDeleteButtons() {
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(RasterPlotActions
-                .getRemoveSourceAction(this));
+        deleteButton.setAction(RasterPlotActions.getRemoveSourceAction(this));
         JButton addButton = new JButton("Add");
         addButton.setAction(RasterPlotActions.getAddSourceAction(this));
         buttonPanel.add(deleteButton);
@@ -181,8 +185,7 @@ public class RasterPlotPanel extends JPanel {
     public void addPreferencesButton() {
         JButton prefsButton = new JButton("Prefs");
         prefsButton.setHideActionText(true);
-        prefsButton.setAction(RasterPlotActions
-                .getPropertiesDialogAction(this));
+        prefsButton.setAction(RasterPlotActions.getPropertiesDialogAction(this));
         buttonPanel.add(prefsButton);
     }
 

@@ -18,17 +18,15 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -38,6 +36,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 public class OdorWorldComponent extends WorkspaceComponent {
     /**
      * Recreates an instance of this class from a saved component.
+     *
      * @param input
      * @param name
      * @param format
@@ -48,12 +47,14 @@ public class OdorWorldComponent extends WorkspaceComponent {
         return new OdorWorldComponent(name, newWorld);
     }
 
-    /** Reference to model world. */
+    /**
+     * Reference to model world.
+     */
     private OdorWorld world;
 
     /**
      * Default constructor.
-     * 
+     *
      * @param name
      */
     public OdorWorldComponent(String name) {
@@ -65,7 +66,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     /**
      * Constructor used in deserializing.
      *
-     * @param name name of world
+     * @param name  name of world
      * @param world model world
      */
     public OdorWorldComponent(String name, OdorWorld world) {
@@ -145,40 +146,41 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {  
-        
+    public Object getObjectFromKey(String objectKey) {
+
         //System.out.println("-->" + objectKey);
-        
+
         if (objectKey.startsWith("Entity")) {
             return getWorld().getEntity(objectKey);
         }
         //
 
-//        String[] parsedKey = objectKey.split(":");
-//        String entityName = parsedKey[0];
-//        if (parsedKey.length == 1) {
-//            return getWorld().getEntity(entityName);
-//        } else {
-//            String secondString = parsedKey[1];
-//            if (secondString.equalsIgnoreCase("sensor")) {
-//                return getWorld().getSensor(entityName, parsedKey[2]);
-//            } else if (secondString.equalsIgnoreCase("effector")) {
-//                return getWorld().getEffector(entityName, parsedKey[2]);
-//            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
-//                // Needed to read simulations created before 2/11; remove before
-//                // beta release
-//                int index = Integer.parseInt(parsedKey[3]);
-//                return getWorld().getSensor(entityName, parsedKey[2]);
-//            } else if (secondString.equalsIgnoreCase("smeller")) {
-//                int index = Integer.parseInt(parsedKey[3]);
-//                return getWorld().getSensor(entityName, parsedKey[2]);
-//            }
-//        }
+        //        String[] parsedKey = objectKey.split(":");
+        //        String entityName = parsedKey[0];
+        //        if (parsedKey.length == 1) {
+        //            return getWorld().getEntity(entityName);
+        //        } else {
+        //            String secondString = parsedKey[1];
+        //            if (secondString.equalsIgnoreCase("sensor")) {
+        //                return getWorld().getSensor(entityName, parsedKey[2]);
+        //            } else if (secondString.equalsIgnoreCase("effector")) {
+        //                return getWorld().getEffector(entityName, parsedKey[2]);
+        //            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
+        //                // Needed to read simulations created before 2/11; remove before
+        //                // beta release
+        //                int index = Integer.parseInt(parsedKey[3]);
+        //                return getWorld().getSensor(entityName, parsedKey[2]);
+        //            } else if (secondString.equalsIgnoreCase("smeller")) {
+        //                int index = Integer.parseInt(parsedKey[3]);
+        //                return getWorld().getSensor(entityName, parsedKey[2]);
+        //            }
+        //        }
         return null;
     }
 
     @Override
-    public void closing() {}
+    public void closing() {
+    }
 
     @Override
     public void update() {

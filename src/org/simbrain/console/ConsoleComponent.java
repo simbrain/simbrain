@@ -18,10 +18,10 @@
  */
 package org.simbrain.console;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Workspace component corresponding to a beanshell window.
@@ -30,6 +30,7 @@ public class ConsoleComponent extends WorkspaceComponent {
 
     /**
      * Constructor.
+     *
      * @param name name
      */
     public ConsoleComponent(String name) {
@@ -46,13 +47,12 @@ public class ConsoleComponent extends WorkspaceComponent {
      * there is nothing to persist with a console. This just ensures that a
      * component is created and (in the gui) presented.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return component to be opened
      */
-    public static ConsoleComponent open(InputStream input, final String name,
-            final String format) {
+    public static ConsoleComponent open(InputStream input, final String name, final String format) {
         return new ConsoleComponent(name);
     }
 

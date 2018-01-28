@@ -29,7 +29,9 @@ import org.simbrain.network.core.NetworkUpdateAction;
  */
 public class BufferedUpdate implements NetworkUpdateAction {
 
-    /** Reference to network to update. */
+    /**
+     * Reference to network to update.
+     */
     private Network network;
 
     /**

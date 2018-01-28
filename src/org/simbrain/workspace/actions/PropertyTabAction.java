@@ -18,12 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Open data world in current workspace.
@@ -36,6 +35,7 @@ public final class PropertyTabAction extends AbstractAction {
 
     /**
      * Create an open data world with the specified workspace.
+     *
      * @param desktop
      */
     public PropertyTabAction(SimbrainDesktop desktop) {
@@ -44,8 +44,9 @@ public final class PropertyTabAction extends AbstractAction {
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         desktop.toggleDock();

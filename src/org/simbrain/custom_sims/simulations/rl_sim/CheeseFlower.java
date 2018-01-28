@@ -43,7 +43,7 @@ public class CheeseFlower extends RL_Sim {
         sim.world.addEntity(sim.cheese_1);
 
         // Set up flower
-        sim.flower.setLocation(351,215);
+        sim.flower.setLocation(351, 215);
         sim.flower.getSmellSource().setDispersion(350);
         sim.world.addEntity(sim.flower);
 
@@ -89,10 +89,7 @@ public class CheeseFlower extends RL_Sim {
         sim.world.deleteEntity(otherObject);
 
         // Get mouse in position
-        sim.mouse.setCenterLocation(
-                (float) (objectToPass.getCenterX()
-                        - objectToPass.getSmellSource().getDispersion()),
-                (float) objectToPass.getCenterY());
+        sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - objectToPass.getSmellSource().getDispersion()), (float) objectToPass.getCenterY());
 
         // Run past the object
         sim.mouse.setVelocityX(5);

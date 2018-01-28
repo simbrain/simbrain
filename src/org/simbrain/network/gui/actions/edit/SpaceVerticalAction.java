@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Space vertical.
@@ -38,13 +37,13 @@ public final class SpaceVerticalAction extends ConditionallyEnabledAction {
      */
     public SpaceVerticalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Space Vertical", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON,
-                ResourceManager.getImageIcon("SpaceVertical.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SpaceVertical.png"));
         putValue(SHORT_DESCRIPTION, "Space selected neurons vertically");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.spaceVertical();

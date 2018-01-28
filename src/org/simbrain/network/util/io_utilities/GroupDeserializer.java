@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.util.io_utilities;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.SynapseGroup;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -27,27 +31,21 @@ import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.SynapseGroup;
-
 /**
  * A class for storing static methods for custom deserialization of custom
  * serializations of group objects in Simbrain.
  *
  * @author Zoë Tosi
- *
  */
 public class GroupDeserializer {
 
     /**
      * @param rowCompByteArr the row compressed sparse matrix used to fill the
-     *            synapse group in compressed byte array format.
-     * @param sg the synapse group to populate
+     *                       synapse group in compressed byte array format.
+     * @param sg             the synapse group to populate
      * @return a boolean indicating success or failure of reconstruction.
      */
-    public static boolean reconstructCompressedSynapseStrengths(
-            byte[] rowCompByteArr, SynapseGroup sg) {
+    public static boolean reconstructCompressedSynapseStrengths(byte[] rowCompByteArr, SynapseGroup sg) {
         try {
             // Read in all the data from the file stored in discrete bytes
             ByteBuffer inStream = ByteBuffer.wrap(rowCompByteArr);
@@ -78,7 +76,7 @@ public class GroupDeserializer {
                         usingShorts = true;
                         usingBytes = false;
                         newLine = newLine | index; // keep track of this end
-                                                   // code
+                        // code
                     }
                 }
 
@@ -117,7 +115,7 @@ public class GroupDeserializer {
                             index = (b.getShort() << 16) | inStream.getShort();
                         }
                     } else if (newLine == 0xFFFFFF) { // Byte and short end
-                                                      // codes
+                        // codes
                         // were read
                         // Check that the next byte isn't 0xff
                         byte by = inStream.get();
@@ -160,7 +158,7 @@ public class GroupDeserializer {
                     s.setStrength(inStream.getFloat());
                 }
             } else if (inStream.remaining() == numSyns * 8) { // Float_64
-                                                              // encoding
+                // encoding
                 for (Synapse s : synapses) {
                     s.setStrength(inStream.getDouble());
                 }
@@ -168,10 +166,7 @@ public class GroupDeserializer {
                 // Only 2 precisions available. If there is a mismatch then
                 // there are too little or to many bytes representing weights
                 // given everything we've determined so far
-                throw new InputMismatchException("Byte inconsistency."
-                        + " Remaining bytes in file are inconsistent with"
-                        + " weight values encoded as either 32-bit or 64-bit"
-                        + " floating point values.");
+                throw new InputMismatchException("Byte inconsistency." + " Remaining bytes in file are inconsistent with" + " weight values encoded as either 32-bit or 64-bit" + " floating point values.");
             }
             // Assuming there are no errors, populate the synapse group
             // with the reconstructed synapses.
@@ -180,10 +175,7 @@ public class GroupDeserializer {
             }
         } catch (IndexOutOfBoundsException ob) {
             ob.printStackTrace();
-            System.out
-                    .println("Possible Causes: Source or target group doesn't"
-                            + " have proper number of neurons. Incorrect number of"
-                            + " synapses given as first number in file.");
+            System.out.println("Possible Causes: Source or target group doesn't" + " have proper number of neurons. Incorrect number of" + " synapses given as first number in file.");
             return false;
         } catch (InputMismatchException ime) {
             ime.printStackTrace();
@@ -201,22 +193,20 @@ public class GroupDeserializer {
      * are not of the same size as the source and target groups of the original.
      *
      * @param filename the name of the file storing the synapse values
-     * @param sg the synapse group to populate
+     * @param sg       the synapse group to populate
      * @return a boolean indicating success or failure of reconstruction.
      */
-    public static boolean reconstructCompressedSynapseStrengths(
-            String filename, SynapseGroup sg) {
+    public static boolean reconstructCompressedSynapseStrengths(String filename, SynapseGroup sg) {
         Path p = Paths.get(filename);
         // TODO: Add buffered version to decrease load on RAM for large files
         // with size of Simbrain weight compression files, this shouldn't be
         // an issue until the far future.
         try {
-			return reconstructCompressedSynapseStrengths(Files.readAllBytes(p),
-					sg);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
+            return reconstructCompressedSynapseStrengths(Files.readAllBytes(p), sg);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            return false;
+        }
     }
 
 }

@@ -18,29 +18,27 @@
  */
 package org.simbrain.plot.projection;
 
-import java.awt.EventQueue;
-
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.util.projection.DataPoint;
-import org.simbrain.util.projection.Dataset;
-import org.simbrain.util.projection.NTree;
-import org.simbrain.util.projection.ProjectionMethod;
-import org.simbrain.util.projection.Projector;
-import org.simbrain.util.projection.ProjectorListener;
+import org.simbrain.util.projection.*;
 
-import com.thoughtworks.xstream.XStream;
+import java.awt.*;
 
 /**
  * Main data for a projection chart.
  */
 public class ProjectionModel extends ChartModel {
 
-    /** The underlying projector object. */
+    /**
+     * The underlying projector object.
+     */
     private Projector projector = new Projector();
 
-    /** Scatter Plot Data. */
+    /**
+     * Scatter Plot Data.
+     */
     private XYSeriesCollection dataset;
 
     /**
@@ -49,7 +47,9 @@ public class ProjectionModel extends ChartModel {
      */
     private volatile boolean isRunning = true;
 
-    /** Flag for checking that GUI update is completed. */
+    /**
+     * Flag for checking that GUI update is completed.
+     */
     private volatile boolean isUpdateCompleted;
 
     /**

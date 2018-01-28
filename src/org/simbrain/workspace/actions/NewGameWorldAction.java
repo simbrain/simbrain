@@ -18,12 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.game.GameComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add odor world to workspace.
@@ -34,14 +33,16 @@ public final class NewGameWorldAction extends WorkspaceAction {
 
     /**
      * Create a new odor world action with the specified workspace.
+     *
      * @param workspace
      */
     public NewGameWorldAction(Workspace workspace) {
         super("Game World", workspace);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         GameComponent component = new GameComponent();

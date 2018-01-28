@@ -29,46 +29,71 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
-    ClippableUpdateRule, NoisyUpdateRule {
+public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
-    /** The Default upper bound. */
+    /**
+     * The Default upper bound.
+     */
     private static final double DEFAULT_CEILING = 1.0;
 
-    /** The Default lower bound. */
+    /**
+     * The Default lower bound.
+     */
     private static final double DEFAULT_FLOOR = -1.0;
 
-    /** Relative. */
+    /**
+     * Relative.
+     */
     public static final int RELATIVE = 0;
 
-    /** Absolute. */
+    /**
+     * Absolute.
+     */
     public static final int ABSOLUTE = 1;
 
-    /** Relative absolute. */
+    /**
+     * Relative absolute.
+     */
     private int relAbs = RELATIVE;
 
-    /** Decay amount. */
+    /**
+     * Decay amount.
+     */
     private double decayAmount = .1;
 
-    /** Decay fraction. */
+    /**
+     * Decay fraction.
+     */
     private double decayFraction = .1;
 
-    /** Base line. */
+    /**
+     * Base line.
+     */
     private double baseLine = 0;
 
-    /** Clipping. */
+    /**
+     * Clipping.
+     */
     private boolean clipping = true;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
-    /** The upper bound of the activity if clipping is used. */
+    /**
+     * The upper bound of the activity if clipping is used.
+     */
     private double ceiling = DEFAULT_CEILING;
 
-    /** The lower bound of the activity if clipping is used. */
+    /**
+     * The lower bound of the activity if clipping is used.
+     */
     private double floor = DEFAULT_FLOOR;
 
     @Override

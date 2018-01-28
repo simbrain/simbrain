@@ -18,17 +18,6 @@
  */
 package org.simbrain.util.randomizer.gui;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
@@ -38,6 +27,14 @@ import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
 import org.simbrain.util.widgets.YesNoNull;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+
 /**
  * A panel representing a given probability distribution.
  *
@@ -46,29 +43,44 @@ import org.simbrain.util.widgets.YesNoNull;
  */
 public class ProbDistPanel {
 
-    /** The default number of spaces given to each text field. */
+    /**
+     * The default number of spaces given to each text field.
+     */
     private static final int DEFAULT_TF_SIZE = 10;
 
-    /** Upper bound field. */
+    /**
+     * Upper bound field.
+     */
     private JTextField tfUpBound = new JTextField(DEFAULT_TF_SIZE);
 
-    /** Lower bound field. */
+    /**
+     * Lower bound field.
+     */
     private JTextField tfLowBound = new JTextField(DEFAULT_TF_SIZE);
 
-    /** Mean value field. */
+    /**
+     * Mean value field.
+     */
     private JTextField tfParam1 = new JTextField(DEFAULT_TF_SIZE);
 
-    /** Standard deviation field. */
+    /**
+     * Standard deviation field.
+     */
     private JTextField tfParam2 = new JTextField(DEFAULT_TF_SIZE);
 
-    /** Clipping combo box. */
-    private YesNoNull tsClipping =
-        new YesNoNull();
+    /**
+     * Clipping combo box.
+     */
+    private YesNoNull tsClipping = new YesNoNull();
 
-    /** The panel where all items are placed. */
+    /**
+     * The panel where all items are placed.
+     */
     private JPanel mainPanel = new JPanel();
 
-    /** The probability distribution this panel supports. */
+    /**
+     * The probability distribution this panel supports.
+     */
     private final ProbDistribution pdf;
 
     /**
@@ -77,7 +89,7 @@ public class ProbDistPanel {
     protected ProbDistPanel() {
         pdf = null;
     }
-    
+
     /**
      * Creates a panel within this class that is globally accessible
      * representing an editor for a randomizer with a specific probability
@@ -104,9 +116,7 @@ public class ProbDistPanel {
                 }
 
             });
-            tsClipping.setPreferredSize(new Dimension((int) (tsClipping
-            		.getPreferredSize().width * 1.5), tsClipping
-            		.getPreferredSize().height));
+            tsClipping.setPreferredSize(new Dimension((int) (tsClipping.getPreferredSize().width * 1.5), tsClipping.getPreferredSize().height));
             mainPanel.add(new LabelledItem("Clipping", tsClipping));
         }
         fillDefaultValues();
@@ -116,20 +126,19 @@ public class ProbDistPanel {
     /**
      * Populates the fields with current values.
      *
-     * @param randomizers
-     *            List of randomizers
+     * @param randomizers List of randomizers
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
         Randomizer rand = (Randomizer) randomizers.get(0);
 
-        ParameterGetter<Randomizer,Double> p1Getter = (r) -> ((Randomizer)r).getParam1();
+        ParameterGetter<Randomizer, Double> p1Getter = (r) -> ((Randomizer) r).getParam1();
         if (NetworkUtils.isConsistent(randomizers, p1Getter)) {
             tfParam1.setText(Double.toString(rand.getParam1()));
         } else {
             tfParam1.setText(SimbrainConstants.NULL_STRING);
         }
 
-        ParameterGetter<Randomizer,Double> p2Getter = (r) -> ((Randomizer)r).getParam2();
+        ParameterGetter<Randomizer, Double> p2Getter = (r) -> ((Randomizer) r).getParam2();
         if (NetworkUtils.isConsistent(randomizers, p2Getter)) {
             tfParam2.setText(Double.toString(rand.getParam2()));
         } else {
@@ -137,19 +146,19 @@ public class ProbDistPanel {
         }
 
         if (!pdf.equals(ProbDistribution.UNIFORM)) {
-            ParameterGetter<Randomizer,Double> lbGetter = (r) -> ((Randomizer)r).getLowerBound();
+            ParameterGetter<Randomizer, Double> lbGetter = (r) -> ((Randomizer) r).getLowerBound();
             if (NetworkUtils.isConsistent(randomizers, lbGetter)) {
                 tfLowBound.setText(Double.toString(rand.getLowerBound()));
             } else {
                 tfLowBound.setText(SimbrainConstants.NULL_STRING);
             }
-            ParameterGetter<Randomizer,Double> ubGetter = (r) -> ((Randomizer)r).getUpperBound();
+            ParameterGetter<Randomizer, Double> ubGetter = (r) -> ((Randomizer) r).getUpperBound();
             if (NetworkUtils.isConsistent(randomizers, ubGetter)) {
                 tfUpBound.setText(Double.toString(rand.getUpperBound()));
             } else {
                 tfUpBound.setText(SimbrainConstants.NULL_STRING);
             }
-            ParameterGetter<Randomizer,Boolean> clippingGetter = (r) -> ((Randomizer)r).getClipping();
+            ParameterGetter<Randomizer, Boolean> clippingGetter = (r) -> ((Randomizer) r).getClipping();
             if (NetworkUtils.isConsistent(randomizers, clippingGetter)) {
                 tsClipping.setSelected(rand.getClipping());
             } else {
@@ -192,12 +201,11 @@ public class ProbDistPanel {
     /**
      * Called externally when dialog is being closed.
      *
-     * @param rand
-     *            Random source
+     * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
         rand.setPdf(pdf);
-        
+
         if (pdf == ProbDistribution.NULL) {
             return;
         }
@@ -238,7 +246,7 @@ public class ProbDistPanel {
 
     /**
      * @return the double value of the text in tfParam1; NaN if not double
-     *  parsable
+     * parsable
      */
     public double getParam1FieldVal() {
         return Utils.doubleParsable(tfParam1);
@@ -246,7 +254,7 @@ public class ProbDistPanel {
 
     /**
      * @return the double value of the text in tfParam2; NaN if not double
-     *  parsable
+     * parsable
      */
     public double getParam2FieldVal() {
         return Utils.doubleParsable(tfParam2);
@@ -255,13 +263,12 @@ public class ProbDistPanel {
     /**
      * Sets all the components of this panel to the desired enabled/disabled
      * state.
+     *
      * @param enabled
      */
     public void setEnabled(boolean enabled) {
 
-        boolean boundConditions = enabled
-            && pdf.equals(ProbDistribution.UNIFORM)
-            && tsClipping.isSelected();
+        boolean boundConditions = enabled && pdf.equals(ProbDistribution.UNIFORM) && tsClipping.isSelected();
 
         tfParam1.setEnabled(enabled);
         tfParam2.setEnabled(enabled);
@@ -307,7 +314,6 @@ public class ProbDistPanel {
     }
 
     /**
-     *
      * @param pc
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
@@ -319,7 +325,6 @@ public class ProbDistPanel {
     }
 
     /**
-     * 
      * @param fl
      */
     public void addFocusListenerToFields(FocusListener fl) {
@@ -334,16 +339,12 @@ public class ProbDistPanel {
      * Contains the specific error message that occurs if one tries to use this
      * panel to modify a Randomizer with a different Probability distribution.
      *
-     * @throws an
-     *             IllegalArgumentException if this class is passed a randomizer
-     *             which cannot be altered sensibly by this class because it has
-     *             a different probability distribution function
+     * @throws an IllegalArgumentException if this class is passed a randomizer
+     *            which cannot be altered sensibly by this class because it has
+     *            a different probability distribution function
      */
     private static void throwBadPdfException() {
-        throw new IllegalArgumentException("Random panel was initialized" +
-            " for one type of probability distribution, while a" +
-            " randomizer with a different probability distribution" +
-            " is being used to fill its feilds");
+        throw new IllegalArgumentException("Random panel was initialized" + " for one type of probability distribution, while a" + " randomizer with a different probability distribution" + " is being used to fill its feilds");
     }
 
 }

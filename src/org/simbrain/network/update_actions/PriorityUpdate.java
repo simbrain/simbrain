@@ -25,7 +25,9 @@ import org.simbrain.network.core.NetworkUpdateAction;
  */
 public class PriorityUpdate implements NetworkUpdateAction {
 
-    /** Reference to network to update. */
+    /**
+     * Reference to network to update.
+     */
     private Network network;
 
     /**

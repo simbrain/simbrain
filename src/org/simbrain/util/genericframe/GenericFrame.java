@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.genericframe;
 
-import javax.swing.JMenuBar;
+import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyVetoException;
 

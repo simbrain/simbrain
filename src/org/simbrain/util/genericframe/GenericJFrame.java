@@ -1,8 +1,7 @@
 package org.simbrain.util.genericframe;
 
+import javax.swing.*;
 import java.beans.PropertyVetoException;
-
-import javax.swing.JFrame;
 
 /**
  * JFrame which implements Generic Frame.

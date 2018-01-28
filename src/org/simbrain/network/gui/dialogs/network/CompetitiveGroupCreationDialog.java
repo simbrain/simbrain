@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel.CompetitivePropsPanelType;
@@ -30,34 +25,47 @@ import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+
 /**
  * <b>CompetitiveDialog</b>. Create competitive networks.
  */
 public class CompetitiveGroupCreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
+    /**
+     * Logic panel.
+     */
     private CompetitivePropertiesPanel compPropertiesPanel;
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      *
-     * @param networkPanel
-     *            Network panel
+     * @param networkPanel Network panel
      */
     public CompetitiveGroupCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
@@ -70,9 +78,7 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New Competitive Group");
-        compPropertiesPanel = CompetitivePropertiesPanel
-                .createCompetitivePropertiesPanel(networkPanel,
-                        CompetitivePropsPanelType.CREATE_GROUP);
+        compPropertiesPanel = CompetitivePropertiesPanel.createCompetitivePropertiesPanel(networkPanel, CompetitivePropsPanelType.CREATE_GROUP);
 
         // Set up tab panels
         tabLogic.add(compPropertiesPanel);
@@ -84,8 +90,7 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
         setContentPane(tabbedPane);
 
         // Help action
-        Action helpAction = new ShowHelpAction(
-                compPropertiesPanel.getHelpPath());
+        Action helpAction = new ShowHelpAction(compPropertiesPanel.getHelpPath());
         addButton(new JButton(helpAction));
 
     }
@@ -96,12 +101,10 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         compPropertiesPanel.commitChanges();
-        CompetitiveGroup competitive = (CompetitiveGroup) compPropertiesPanel
-                .getGroup();
+        CompetitiveGroup competitive = (CompetitiveGroup) compPropertiesPanel.getGroup();
         competitive.setLayout(layoutPanel.getCurrentLayout());
         competitive.applyLayout();
-        competitive.offset(networkPanel.getWhereToAdd().getX(), networkPanel
-                .getWhereToAdd().getY());
+        competitive.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();
         networkPanel.repaint();

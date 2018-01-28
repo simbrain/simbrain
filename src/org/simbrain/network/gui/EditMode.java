@@ -18,56 +18,65 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-
 import org.simbrain.resource.ResourceManager;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Typesafe enumeration of edit modes.
  */
 public final class EditMode {
 
-    /** Cursor center point. */
+    /**
+     * Cursor center point.
+     */
     private static final Point CENTER_POINT = new Point(9, 9);
 
-    /** Cursor for this edit mode. */
+    /**
+     * Cursor for this edit mode.
+     */
     private Cursor cursor;
 
-    /** Selection edit mode. */
-    public static final EditMode SELECTION = new EditMode("selection",
-            "Arrow.png");
+    /**
+     * Selection edit mode.
+     */
+    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
 
-    /** Text edit mode. */
+    /**
+     * Text edit mode.
+     */
     public static final EditMode TEXT = new EditMode("text", "Text.png");
 
-    /** Default wand radius. */
+    /**
+     * Default wand radius.
+     */
     private static final int DEFAULT_WAND_RADIUS = 40;
 
-    /** Default wand radius. */
+    /**
+     * Default wand radius.
+     */
     private static final int MINIMUM_WAND_RADIUS = 15;
 
-    /** Wand mode mode. */
-    public static final EditMode WAND = new EditMode("wand",
-            DEFAULT_WAND_RADIUS);
+    /**
+     * Wand mode mode.
+     */
+    public static final EditMode WAND = new EditMode("wand", DEFAULT_WAND_RADIUS);
 
-    /** Radius of wand in wand mode. */
+    /**
+     * Radius of wand in wand mode.
+     */
     private static int wandRadius = DEFAULT_WAND_RADIUS;
 
-    /** The image used for the cursor. */
+    /**
+     * The image used for the cursor.
+     */
     private BufferedImage cursorImage;
 
     /**
      * Create a new edit mode with the specified name.
      *
-     * @param name name of this edit mode
+     * @param name       name of this edit mode
      * @param cursorName cursor name for this edit mode
      */
     private EditMode(final String name, final String cursorName) {
@@ -84,7 +93,7 @@ public final class EditMode {
     /**
      * Construct a "wand" edit mode. TODO: Is this the right place for this?
      *
-     * @param name name of edit mode
+     * @param name   name of edit mode
      * @param radius radius of wand
      */
     private EditMode(String name, int radius) {
@@ -152,8 +161,7 @@ public final class EditMode {
      * Reset the wand cursor (must happen when its size is reset).
      */
     public void resetWandCursor() {
-        cursorImage = new BufferedImage(wandRadius + 1, wandRadius + 1,
-                BufferedImage.TYPE_INT_ARGB);
+        cursorImage = new BufferedImage(wandRadius + 1, wandRadius + 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) cursorImage.getGraphics();
 
         // Draw stroke around wand
@@ -169,12 +177,11 @@ public final class EditMode {
         // Alpha levels do not display properly on modern Windows operating systems.
         // On Windows, values between >0.0f and 1.0f gives the color a different brightness, with 1.0f being the brightest.
         if (System.getProperty("os.name").startsWith("Windows")) {
-        	alpha = 1.0f; // 0.0f is 100% transparent, 0.1f is almost 100% black, and 1.0f is 100% bright.
+            alpha = 1.0f; // 0.0f is 100% transparent, 0.1f is almost 100% black, and 1.0f is 100% bright.
         } else {
-        	alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+            alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
         }
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                alpha));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         g2.fillOval(0, 0, wandRadius, wandRadius);
         // g2.fillRect(0, 0, radius, radius);
 

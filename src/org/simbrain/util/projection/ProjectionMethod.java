@@ -27,10 +27,14 @@ import org.apache.log4j.Logger;
  */
 public abstract class ProjectionMethod {
 
-    /** Logger. */
+    /**
+     * Logger.
+     */
     private Logger logger = Logger.getLogger(ProjectionMethod.class);
 
-    /** Reference to parent projector. */
+    /**
+     * Reference to parent projector.
+     */
     protected final Projector projector;
 
     /**

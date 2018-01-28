@@ -18,35 +18,38 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
-
 import org.piccolo2d.extras.util.PFixedWidthStroke;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.util.Utils;
+
+import java.awt.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Selection marquee node.
  */
 public final class SelectionMarquee extends PPath.Float {
 
-    /** Default paint. */
+    /**
+     * Default paint.
+     */
     private static final Paint DEFAULT_PAINT = Color.WHITE;
 
-    /** Default stroke. */
-    private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(
-            1.0f) : new PFixedWidthStroke(1.0f);
+    /**
+     * Default stroke.
+     */
+    private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
 
-    /** Color of selection marquee. */
+    /**
+     * Color of selection marquee.
+     */
     private static Color marqueeColor = Color.yellow;
 
-    /** Default interior transparency. */
+    /**
+     * Default interior transparency.
+     */
     private static final float DEFAULT_TRANSPARENCY = 0.6f;
 
     /**
@@ -67,7 +70,9 @@ public final class SelectionMarquee extends PPath.Float {
         setTransparency(DEFAULT_TRANSPARENCY);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     protected void paint(final PPaintContext paintContext) {
         Paint p = getPaint();
         Stroke stroke = getStroke();

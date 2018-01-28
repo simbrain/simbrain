@@ -18,34 +18,36 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Build mode action.
  */
 class EditModeAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** Build mode. */
+    /**
+     * Build mode.
+     */
     private final EditMode editMode;
 
     /**
      * Create a new edit mode action with the specified name, network panel, and
      * edit mode.
      *
-     * @param name name
+     * @param name         name
      * @param networkPanel network panel, must not be null
-     * @param editMode edit mode, must not be null
+     * @param editMode     edit mode, must not be null
      */
-    EditModeAction(final String name, final NetworkPanel networkPanel,
-            final EditMode editMode) {
+    EditModeAction(final String name, final NetworkPanel networkPanel, final EditMode editMode) {
 
         super(name);
 
@@ -60,8 +62,9 @@ class EditModeAction extends AbstractAction {
         this.editMode = editMode;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public final void actionPerformed(final ActionEvent event) {
         networkPanel.setEditMode(editMode);

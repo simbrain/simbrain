@@ -1,24 +1,27 @@
 package org.simbrain.world.imageworld;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
 import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ImageWorldComponent provides a model for building an image processing
  * pipeline and coupling inputs and outputs within a Simbrain workspace.
+ *
  * @author Tim Shea
  */
 public class ImageWorldComponent extends WorkspaceComponent {
 
-    /** Create an xstream from this class. */
+    /**
+     * Create an xstream from this class.
+     */
     public static XStream getXStream() {
         XStream stream = new XStream(new DomDriver());
         stream.registerConverter(new BufferedImageConverter());
@@ -28,8 +31,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
 
     /**
      * Open a saved ImageWorldComponent from an XML input stream.
-     * @param input The input stream to read.
-     * @param name The name of the new world component.
+     *
+     * @param input  The input stream to read.
+     * @param name   The name of the new world component.
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ImageWorldComponent.
      */
@@ -38,7 +42,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return new ImageWorldComponent(name, world);
     }
 
-    /** The image world this component displays. */
+    /**
+     * The image world this component displays.
+     */
     private ImageWorld world;
 
     /**
@@ -49,7 +55,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
         world = new ImageWorld();
     }
 
-    /** Deserialize an ImageWorldComponent. */
+    /**
+     * Deserialize an ImageWorldComponent.
+     */
     private ImageWorldComponent(String name, ImageWorld world) {
         super(name);
         this.world = world;
@@ -61,7 +69,8 @@ public class ImageWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    protected void closing() { }
+    protected void closing() {
+    }
 
     @Override
     public List<Object> getModels() {
@@ -100,7 +109,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
         }
     }
 
-    /** Return a reference to the world owned by this component. */
+    /**
+     * Return a reference to the world owned by this component.
+     */
     public ImageWorld getWorld() {
         return world;
     }

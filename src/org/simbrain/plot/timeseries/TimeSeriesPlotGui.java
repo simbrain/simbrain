@@ -18,34 +18,34 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.awt.BorderLayout;
-
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Display a TimeSeriesPlot.
  */
 public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
 
-    /** Plot action manager. */
+    /**
+     * Plot action manager.
+     */
     private PlotActionManager actionManager;
 
-    /** Panel for chart. */
+    /**
+     * Panel for chart.
+     */
     private TimeSeriesPlotPanel timeSeriesPanel;
 
     /**
      * Construct a time series plot gui.
      *
-     * @param frame parent frame
+     * @param frame     parent frame
      * @param component the underlying component
      */
     public TimeSeriesPlotGui(GenericFrame frame, TimeSeriesPlotComponent component) {
@@ -95,9 +95,11 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
     }
 
     @Override
-    public void closing() {}
+    public void closing() {
+    }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
 }

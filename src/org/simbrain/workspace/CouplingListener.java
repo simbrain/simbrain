@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  * Listener for coupling related events.
- *
  */
 public interface CouplingListener {
 
@@ -42,6 +41,7 @@ public interface CouplingListener {
 
     /**
      * Called whenever more than one coupling is removed.
+     *
      * @param couplings the couplings that were removed.
      */
     public void couplingsRemoved(List<Coupling<?>> couplings);

@@ -18,13 +18,13 @@
  */
 package org.simbrain.workspace;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.util.*;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
@@ -33,16 +33,24 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public abstract class WorkspaceComponent {
 
-    /** The workspace that 'owns' this component. */
+    /**
+     * The workspace that 'owns' this component.
+     */
     private Workspace workspace;
 
-    /** Log4j logger. */
+    /**
+     * Log4j logger.
+     */
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
-    /** The set of all WorkspaceComponentListeners on this component. */
+    /**
+     * The set of all WorkspaceComponentListeners on this component.
+     */
     private Collection<WorkspaceComponentListener> listeners;
 
-    /** Whether this component has changed since last save. */
+    /**
+     * Whether this component has changed since last save.
+     */
     private boolean changedSinceLastSave = false;
 
     /**
@@ -54,13 +62,19 @@ public abstract class WorkspaceComponent {
      */
     private boolean guiOn = true;
 
-    /** Whether to update this component. */
+    /**
+     * Whether to update this component.
+     */
     private boolean updateOn = true;
 
-    /** Whether or not this component is being iterated more than just one time.*/
+    /**
+     * Whether or not this component is being iterated more than just one time.
+     */
     private boolean isRunning = false;
-    
-    /** The name of this component. Used in the title, in saving, etc. */
+
+    /**
+     * The name of this component. Used in the title, in saving, etc.
+     */
     private String name = "";
 
     /**
@@ -76,8 +90,7 @@ public abstract class WorkspaceComponent {
      */
     private int serializePriority = 0;
 
-    /** Initializer */
-    {
+    /** Initializer */ {
         listeners = new HashSet<WorkspaceComponentListener>();
     }
 
@@ -109,9 +122,9 @@ public abstract class WorkspaceComponent {
     public List<? extends String> getFormats() {
         return Collections.singletonList(getDefaultFormat());
     }
-    
+
     /**
-     * Fires an event which leads any linked gui components to close, 
+     * Fires an event which leads any linked gui components to close,
      * which calls the haschanged dialog.
      */
     public void tryClosing() {
@@ -119,17 +132,24 @@ public abstract class WorkspaceComponent {
         //TODO: If there is no Gui then close must be called directly
     }
 
-    /** Closes the WorkspaceComponent. */
+    /**
+     * Closes the WorkspaceComponent.
+     */
     public void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
 
-    /** Perform cleanup after closing. */
+    /**
+     * Perform cleanup after closing.
+     */
     protected abstract void closing();
 
-    /** Called by Workspace to update the state of the component. */
-    public void update() {}
+    /**
+     * Called by Workspace to update the state of the component.
+     */
+    public void update() {
+    }
 
     /**
      * Finds objects based on a key. Used in deserializing attributes. Any class
@@ -174,59 +194,78 @@ public abstract class WorkspaceComponent {
         return Collections.singleton(this);
     }
 
-    /** Called by Workspace to notify that updates have stopped. */
-    protected void stopped() {}
+    /**
+     * Called by Workspace to notify that updates have stopped.
+     */
+    protected void stopped() {
+    }
 
-    /** Notify listeners that the component has been updated. */
+    /**
+     * Notify listeners that the component has been updated.
+     */
     public void fireUpdateEvent() {
         for (WorkspaceComponentListener listener : listeners) {
             listener.componentUpdated();
         }
     }
 
-    /** Notify listeners that the gui has been turned on or off. */
+    /**
+     * Notify listeners that the gui has been turned on or off.
+     */
     public void fireGuiToggleEvent() {
         for (WorkspaceComponentListener listener : listeners) {
             listener.guiToggled();
         }
     }
 
-    /** Notify listeners that the component has been turned on or off. */
+    /**
+     * Notify listeners that the component has been turned on or off.
+     */
     public void fireComponentToggleEvent() {
         for (WorkspaceComponentListener listener : listeners) {
             listener.componentOnOffToggled();
         }
     }
 
-    /** Notify listeners that the component is closing. */
+    /**
+     * Notify listeners that the component is closing.
+     */
     public void fireComponentClosing() {
         for (WorkspaceComponentListener listener : listeners) {
             listener.componentClosing();
         }
     }
 
-    /** Notify listeners that a model object has been added to the component. */
+    /**
+     * Notify listeners that a model object has been added to the component.
+     */
     public void fireModelAdded(Object addedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelAdded(addedModel);
         }
     }
 
-    /** Notify listeners that a model object has been removed from the component. */
+    /**
+     * Notify listeners that a model object has been removed from the component.
+     */
     public void fireModelRemoved(Object removedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelRemoved(removedModel);
         }
     }
 
-    /** Notify listeners that a model object has been changed in the component. */
+    /**
+     * Notify listeners that a model object has been changed in the component.
+     */
     public void fireModelChanged(Object removedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelRemoved(removedModel);
         }
     }
 
-    /** Called after a global update ends. */
+    /**
+     * Called after a global update ends.
+     */
     void doStopped() {
         stopped();
     }
@@ -408,22 +447,25 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Sets whether or not this component is marked as currently running... 
+     * Sets whether or not this component is marked as currently running...
      * meant to be false if only doing a one-off update
+     *
      * @param running
      */
     public void setRunning(boolean running) {
-    	this.isRunning = running;
+        this.isRunning = running;
     }
-    
+
     /**
      * @return if this component is marked as running
      */
     public boolean isRunning() {
-    	return isRunning;
+        return isRunning;
     }
 
-    /** Return the serializePriority */
+    /**
+     * Return the serializePriority
+     */
     public int getSerializePriority() {
         return serializePriority;
     }
@@ -440,12 +482,14 @@ public abstract class WorkspaceComponent {
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void start() {}
+    public void start() {
+    }
 
     /**
      * Called when a simulation stops, e.g. when the "stop" button is pressed.
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void stop() {}
+    public void stop() {
+    }
 }

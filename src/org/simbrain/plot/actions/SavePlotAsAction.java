@@ -18,18 +18,19 @@
  */
 package org.simbrain.plot.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.workspace.gui.GuiComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Save plot As Action.
  */
 public final class SavePlotAsAction extends AbstractAction {
 
-    /** Plot GUI component. */
+    /**
+     * Plot GUI component.
+     */
     private final GuiComponent component;
 
     /**
@@ -40,8 +41,7 @@ public final class SavePlotAsAction extends AbstractAction {
     public SavePlotAsAction(final GuiComponent component) {
         super("Save As...");
         if (component == null) {
-            throw new IllegalArgumentException(
-                    "Desktop component must not be null");
+            throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
         // putValue(SMALL_ICON,
@@ -49,7 +49,9 @@ public final class SavePlotAsAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         component.showSaveFileDialog();
     }

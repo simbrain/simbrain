@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.GridLayout;
-import java.awt.Window;
-import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
@@ -38,6 +27,10 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.YesNoNull;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
 /**
  * Manage the clipping, upper bound, and lower bound fields, and their logic. If
  * clipping is on, then bounds are not used, so disable those fields.
@@ -45,13 +38,19 @@ import org.simbrain.util.widgets.YesNoNull;
 @SuppressWarnings("serial")
 public class BoundsClippingPanel extends JPanel implements EditablePanel {
 
-    /** The neurons being modified. */
+    /**
+     * The neurons being modified.
+     */
     private List<Neuron> neuronList;
 
-    /** Upper bound field. */
+    /**
+     * Upper bound field.
+     */
     private final JFormattedTextField tfCeiling = new JFormattedTextField();
 
-    /** Lower bound field. */
+    /**
+     * Lower bound field.
+     */
     private final JFormattedTextField tfFloor = new JFormattedTextField();
 
     /**
@@ -71,16 +70,24 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
      */
     private boolean boundsVisible;
 
-    /** True if the bounds text fields are enabled and clipping turned on. */
+    /**
+     * True if the bounds text fields are enabled and clipping turned on.
+     */
     private boolean boundsEnabled;
 
-    /** Is clipping visible in this panel. */
+    /**
+     * Is clipping visible in this panel.
+     */
     private boolean clippingVisible;
 
-    /** Bounds panel. */
+    /**
+     * Bounds panel.
+     */
     private final JPanel boundsPanel = new JPanel();
 
-    /** Clipping panel. */
+    /**
+     * Clipping panel.
+     */
     private final JPanel clippingPanel = new JPanel();
 
     /**
@@ -88,25 +95,25 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
      * the selected neurons.
      */
     private final YesNoNull clippingDropDown = new YesNoNull();
-    
-    /** Parent reference so pack can be called. */
+
+    /**
+     * Parent reference so pack can be called.
+     */
     private final Window parent;
 
     /**
      * Construct the clipping / bounds panel.
      *
      * @param neuronList the neuron list being edited
-     * @param parent the parent window so it can be packed when needed
+     * @param parent     the parent window so it can be packed when needed
      */
-    public BoundsClippingPanel(final List<Neuron> neuronList,
-            final Window parent) {
+    public BoundsClippingPanel(final List<Neuron> neuronList, final Window parent) {
         this.neuronList = neuronList;
         this.parent = parent;
 
         // Clipping dropdown listener
-        clippingDropDown.addActionListener(e -> setBoundsEnabled(
-                clippingDropDown.getSelectedIndex() == YesNoNull.getTRUE()));
- 
+        clippingDropDown.addActionListener(e -> setBoundsEnabled(clippingDropDown.getSelectedIndex() == YesNoNull.getTRUE()));
+
         // Layout panel
         boundsPanel.setLayout(new BoxLayout(boundsPanel, BoxLayout.Y_AXIS));
         GridLayout gl = new GridLayout(0, 2);
@@ -139,34 +146,26 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
         if (boundsVisible) {
             // Clipping?
             if (!clippingDropDown.isNull() && clippingVisible) {
-                neuronList.stream()
-                        .forEach(n -> ((ClippableUpdateRule) n.getUpdateRule())
-                                .setClipped(clippingDropDown.isSelected()));
+                neuronList.stream().forEach(n -> ((ClippableUpdateRule) n.getUpdateRule()).setClipped(clippingDropDown.isSelected()));
             }
             if (boundsEnabled) {
                 // Upper Bound
                 double ceiling = Utils.doubleParsable(tfCeiling);
                 if (!Double.isNaN(ceiling)) {
-                    neuronList.stream().forEach(
-                            n -> ((BoundedUpdateRule) n.getUpdateRule())
-                                    .setUpperBound(ceiling));
+                    neuronList.stream().forEach(n -> ((BoundedUpdateRule) n.getUpdateRule()).setUpperBound(ceiling));
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfCeiling.getText()
-                            .matches(SimbrainConstants.NULL_STRING);
+                    success &= tfCeiling.getText().matches(SimbrainConstants.NULL_STRING);
                 }
                 // Lower Bound
                 double floor = Utils.doubleParsable(tfFloor);
                 if (!Double.isNaN(floor)) {
-                    neuronList.stream().forEach(
-                            n -> ((BoundedUpdateRule) n.getUpdateRule())
-                                    .setLowerBound(floor));
+                    neuronList.stream().forEach(n -> ((BoundedUpdateRule) n.getUpdateRule()).setLowerBound(floor));
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfFloor.getText()
-                            .matches(SimbrainConstants.NULL_STRING);
+                    success &= tfFloor.getText().matches(SimbrainConstants.NULL_STRING);
                 }
             }
         }
@@ -215,13 +214,10 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
      * @param ruleList the list of rules.
      * @throws ClassCastException
      */
-    private void upBoundConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+    private void upBoundConsistencyCheckAndAssign(List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
-        double upBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                .getUpperBound();
-        boolean upDiscrepancy = ruleList.stream().anyMatch(
-                rule -> upBound != ((BoundedUpdateRule) rule).getUpperBound());
+        double upBound = ((BoundedUpdateRule) neuronRef.getUpdateRule()).getUpperBound();
+        boolean upDiscrepancy = ruleList.stream().anyMatch(rule -> upBound != ((BoundedUpdateRule) rule).getUpperBound());
         if (upDiscrepancy) {
             tfCeiling.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -236,13 +232,10 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
      * @param ruleList list of rules
      * @throws ClassCastException
      */
-    private void lowBoundConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+    private void lowBoundConsistencyCheckAndAssign(List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
-        double lowBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                .getLowerBound();
-        boolean lowDiscrepancy = ruleList.stream().anyMatch(
-                rule -> lowBound != ((BoundedUpdateRule) rule).getLowerBound());
+        double lowBound = ((BoundedUpdateRule) neuronRef.getUpdateRule()).getLowerBound();
+        boolean lowDiscrepancy = ruleList.stream().anyMatch(rule -> lowBound != ((BoundedUpdateRule) rule).getLowerBound());
         if (lowDiscrepancy) {
             tfFloor.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -257,13 +250,10 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
      * @param ruleList list of rules
      * @throws ClassCastException
      */
-    private void clippingConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+    private void clippingConsistencyCheckAndAssign(List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
-        boolean clipped = ((ClippableUpdateRule) neuronRef.getUpdateRule())
-                .isClipped();
-        boolean discrepancy = ruleList.stream().anyMatch(
-                rule -> clipped != ((ClippableUpdateRule) rule).isClipped());
+        boolean clipped = ((ClippableUpdateRule) neuronRef.getUpdateRule()).isClipped();
+        boolean discrepancy = ruleList.stream().anyMatch(rule -> clipped != ((ClippableUpdateRule) rule).isClipped());
         if (discrepancy) {
             clippingDropDown.setNull();
             setBoundsEnabled(false);

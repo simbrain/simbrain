@@ -18,16 +18,13 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Contains actions for use in raster plot
- *
  */
 public class RasterPlotActions {
 
@@ -37,8 +34,7 @@ public class RasterPlotActions {
      * @param rasterPlotPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getPropertiesDialogAction(
-            final RasterPlotPanel rasterPlotPanel) {
+    public static Action getPropertiesDialogAction(final RasterPlotPanel rasterPlotPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -63,8 +59,7 @@ public class RasterPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getClearGraphAction(
-            final RasterPlotPanel timeSeriesPanel) {
+    public static Action getClearGraphAction(final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -89,8 +84,7 @@ public class RasterPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getAddSourceAction(
-            final RasterPlotPanel timeSeriesPanel) {
+    public static Action getAddSourceAction(final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -117,8 +111,7 @@ public class RasterPlotActions {
      * @param rasterPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getRemoveSourceAction(
-            final RasterPlotPanel rasterPanel) {
+    public static Action getRemoveSourceAction(final RasterPlotPanel rasterPanel) {
         return new AbstractAction() {
 
             // Initialize

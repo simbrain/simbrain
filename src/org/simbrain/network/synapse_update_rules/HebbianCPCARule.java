@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
 
 /**
  * <b>HebbianCPCA</b>. TODO: No Doc.
@@ -34,25 +33,29 @@ public class HebbianCPCARule extends SynapseUpdateRule {
      */
     public static final double DEFAULT_M = .5 / .15;
 
-    /** Learning rate. */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb CPCA", 
-            minimumValue = 0, maximumValue = DEFAULT_M, defaultValue = ".005", order = 1)
+    /**
+     * Learning rate.
+     */
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb CPCA", minimumValue = 0, maximumValue = DEFAULT_M, defaultValue = ".005", order = 1)
     private double learningRate;
 
-    /** Max Weight Value. */
-    @UserParameter(label = "m", description = "Max Weight", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "" + DEFAULT_M, order = 1)
+    /**
+     * Max Weight Value.
+     */
+    @UserParameter(label = "m", description = "Max Weight", minimumValue = -10, maximumValue = 10, defaultValue = "" + DEFAULT_M, order = 1)
     private double m;
 
-    /** Weight offset. */
-    @UserParameter(label = "Theta", description = "Weight Offset value", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
+    /**
+     * Weight offset.
+     */
+    @UserParameter(label = "Theta", description = "Weight Offset value", minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
     private double theta;
 
-    /** Lambda. */
-    @UserParameter(label = "Lambda", description = "Sigmomid Function", 
-            minimumValue = -1, maximumValue = 10, defaultValue = "1", order = 1)
-     private double lambda;
+    /**
+     * Lambda.
+     */
+    @UserParameter(label = "Lambda", description = "Sigmomid Function", minimumValue = -1, maximumValue = 10, defaultValue = "1", order = 1)
+    private double lambda;
 
     @Override
     public void init(Synapse synapse) {
@@ -80,8 +83,7 @@ public class HebbianCPCARule extends SynapseUpdateRule {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
 
-        double deltaW = learningRate
-            * ((output * input) - (output * synapse.getStrength())); // Equation
+        double deltaW = learningRate * ((output * input) - (output * synapse.getStrength())); // Equation
         // 4.12
         // deltaW = learningRate * (output * input * (m - strength) + output *
         // (1 - input) * (-strength));

@@ -18,101 +18,95 @@ e * Part of Simbrain--a java-based neural network kit
  */
 package org.simbrain.network.util;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.CopyableGroup;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
  * collections of network objects (neurons, synapses, groups, text objects,
  * etc.).
- *
+ * <p>
  * TODO: Move back to GUI? Why here?
  */
 public class CopyPaste {
-    
-	/**
-	 * Creates a copy of a list of network model elements: neurons, synapses,
-	 * and groups.  This is called first when a copy happens, then again when paste happens
-	 * (Need to be able to have a copy in case the copied object is deleted.   Needs
-	 * to be copied again on paste in case the parent network changes).
-	 *
-	 * @param newParent parent network for these objects. May be a root network
-	 *            or a subnetwork.
-	 * @param items the list of items to copy.
-	 * @return the list of copied items.
-	 */
-	public static ArrayList<?> getCopy(final Network newParent,
-			final ArrayList<?> items) {
 
-		ArrayList<Object> ret = new ArrayList<Object>();
-		// Match new to old neurons for synapse adding
-		Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
-		ArrayList<Synapse> synapses = new ArrayList<Synapse>();
+    /**
+     * Creates a copy of a list of network model elements: neurons, synapses,
+     * and groups.  This is called first when a copy happens, then again when paste happens
+     * (Need to be able to have a copy in case the copied object is deleted.   Needs
+     * to be copied again on paste in case the parent network changes).
+     *
+     * @param newParent parent network for these objects. May be a root network
+     *                  or a subnetwork.
+     * @param items     the list of items to copy.
+     * @return the list of copied items.
+     */
+    public static ArrayList<?> getCopy(final Network newParent, final ArrayList<?> items) {
 
-		for (Object item : items) {
-			if (item instanceof Neuron) {
-				Neuron oldNeuron = ((Neuron) item);
-				Neuron newNeuron = new Neuron(newParent, oldNeuron);
-				ret.add(newNeuron);
-				neuronMappings.put(oldNeuron, newNeuron);
-			} else if (item instanceof Synapse) {
-				if (!isStranded((Synapse) item, items)) {
-					synapses.add((Synapse) item);
-				}
-			} else if (item instanceof NetworkTextObject) {
-				NetworkTextObject text = ((NetworkTextObject) item);
-				NetworkTextObject newText = new NetworkTextObject(newParent,
-						text);
-				ret.add(newText);
-			} else if (item instanceof CopyableGroup) {
-				Object copy = ((CopyableGroup<?>) item).deepCopy(newParent); 
-				ret.add(copy);
-			}
-		}
+        ArrayList<Object> ret = new ArrayList<Object>();
+        // Match new to old neurons for synapse adding
+        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
+        ArrayList<Synapse> synapses = new ArrayList<Synapse>();
 
-		// Copy synapses
-		for (Synapse synapse : synapses) {
-			Synapse newSynapse = new Synapse(newParent, neuronMappings.get(synapse
-					.getSource()), neuronMappings.get(synapse.getTarget()),
-					synapse.getLearningRule().deepCopy(), synapse);
-			ret.add(newSynapse);
-		}
+        for (Object item : items) {
+            if (item instanceof Neuron) {
+                Neuron oldNeuron = ((Neuron) item);
+                Neuron newNeuron = new Neuron(newParent, oldNeuron);
+                ret.add(newNeuron);
+                neuronMappings.put(oldNeuron, newNeuron);
+            } else if (item instanceof Synapse) {
+                if (!isStranded((Synapse) item, items)) {
+                    synapses.add((Synapse) item);
+                }
+            } else if (item instanceof NetworkTextObject) {
+                NetworkTextObject text = ((NetworkTextObject) item);
+                NetworkTextObject newText = new NetworkTextObject(newParent, text);
+                ret.add(newText);
+            } else if (item instanceof CopyableGroup) {
+                Object copy = ((CopyableGroup<?>) item).deepCopy(newParent);
+                ret.add(copy);
+            }
+        }
 
-		return ret;
-	}
+        // Copy synapses
+        for (Synapse synapse : synapses) {
+            Synapse newSynapse = new Synapse(newParent, neuronMappings.get(synapse.getSource()), neuronMappings.get(synapse.getTarget()), synapse.getLearningRule().deepCopy(), synapse);
+            ret.add(newSynapse);
+        }
 
-	/**
-	 * Returns true if this synapse is not connected to two neurons (i.e. is
-	 * "stranded"), false otherwise.
-	 *
-	 * @param synapse synapse to check
-	 * @param allItems includes neurons to check
-	 * @return true if this synapse is stranded, false otherwise
-	 */
-	private static boolean isStranded(final Synapse synapse,
-			final ArrayList<?> allItems) {
+        return ret;
+    }
 
-		// The list of checked neurons should include neurons in the list
-		// as well as all neurons contained in networks in the list
-		ArrayList<Neuron> check = new ArrayList<Neuron>();
-		for (Object object : allItems) {
-			if (object instanceof Neuron) {
-				check.add((Neuron) object);
-			} else if (object instanceof Network) {
-				check.addAll(((Network) object).getFlatNeuronList());
-			}
-		}
+    /**
+     * Returns true if this synapse is not connected to two neurons (i.e. is
+     * "stranded"), false otherwise.
+     *
+     * @param synapse  synapse to check
+     * @param allItems includes neurons to check
+     * @return true if this synapse is stranded, false otherwise
+     */
+    private static boolean isStranded(final Synapse synapse, final ArrayList<?> allItems) {
 
-		if (check.contains(synapse.getSource())
-				&& (check.contains(synapse.getTarget()))) {
-			return false;
-		}
-		return true;
-	}
+        // The list of checked neurons should include neurons in the list
+        // as well as all neurons contained in networks in the list
+        ArrayList<Neuron> check = new ArrayList<Neuron>();
+        for (Object object : allItems) {
+            if (object instanceof Neuron) {
+                check.add((Neuron) object);
+            } else if (object instanceof Network) {
+                check.addAll(((Network) object).getFlatNeuronList());
+            }
+        }
+
+        if (check.contains(synapse.getSource()) && (check.contains(synapse.getTarget()))) {
+            return false;
+        }
+        return true;
+    }
 }

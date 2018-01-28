@@ -1,11 +1,10 @@
 package org.simbrain.world.threedworld;
 
-import java.awt.Graphics;
-
-import javax.swing.JPanel;
-
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.ImageSourceListener;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * ImagePanel is a resizable canvas for displaying images from an ImageSource.
@@ -43,6 +42,7 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
 
     /**
      * Assign the source of the images for this panel.
+     *
      * @param value The new source to use.
      */
     public void setImageSource(ImageSource value) {

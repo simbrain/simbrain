@@ -18,24 +18,6 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.table.SimbrainJTable;
@@ -49,6 +31,13 @@ import org.simbrain.world.textworld.TextListener.TextAdapter;
 import org.simbrain.world.textworld.TextWorld;
 import org.simbrain.world.textworld.TextWorldActions;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * Panel for editing dictionaries which only consist of a list of string tokens,
  * used in scalar couplings.
@@ -57,16 +46,24 @@ import org.simbrain.world.textworld.TextWorldActions;
  */
 public class TokenDictionaryPanel extends JPanel implements EditablePanel {
 
-    /** The display or reader world. */
+    /**
+     * The display or reader world.
+     */
     private final TextWorld world;
 
-    /** The jtable. */
+    /**
+     * The jtable.
+     */
     private SimbrainJTable table;
 
-    /** The scroll panel. */
+    /**
+     * The scroll panel.
+     */
     private final SimbrainJTableScrollPanel scroller;
 
-    /** The text field showing the display threshold. */
+    /**
+     * The text field showing the display threshold.
+     */
     private final JTextField thresholdField;
 
     // todo; factory method since it has listeners?
@@ -80,8 +77,7 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
         super();
         this.world = world;
 
-        table = SimbrainJTable.createTable(new DictionaryTable(
-                ((TextWorld) world).getTokenDictionary()));
+        table = SimbrainJTable.createTable(new DictionaryTable(((TextWorld) world).getTokenDictionary()));
         scroller = new SimbrainJTableScrollPanel(table);
         initTable();
 
@@ -109,14 +105,9 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
             thresholdToolbar.add(new JLabel("Threshold:"));
             thresholdToolbar.add(thresholdField);
             toolbar.add(thresholdToolbar);
-            text = "<html><p>"
-                    + "These entries consume scalar inputs.  When a coupling receives an input (e.g. from a neuron) "
-                    + "above the threshold value, the corresponding token "
-                    + "is produced in the display world.</p>";
+            text = "<html><p>" + "These entries consume scalar inputs.  When a coupling receives an input (e.g. from a neuron) " + "above the threshold value, the corresponding token " + "is produced in the display world.</p>";
         } else {
-            text = "<html><p>" + "These entries produce scalar outputs. "
-                    + "When a dictionary entry is 'activated', a value of 1 "
-                    + "is sent to the coupling's consumer (e.g. a neuron).</p>";
+            text = "<html><p>" + "These entries produce scalar outputs. " + "When a dictionary entry is 'activated', a value of 1 " + "is sent to the coupling's consumer (e.g. a neuron).</p>";
         }
         textLabel.setText(text);
 
@@ -138,8 +129,7 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
 
             @Override
             public void dictionaryChanged() {
-                table = SimbrainJTable.createTable(new DictionaryTable(
-                        ((TextWorld) world).getTokenDictionary()));
+                table = SimbrainJTable.createTable(new DictionaryTable(((TextWorld) world).getTokenDictionary()));
                 initTable();
             }
         });
@@ -173,7 +163,7 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
             super();
             init(set.size(), 1);
             int i = 0;
-            for (Iterator<String> iterator = set.iterator(); iterator.hasNext();) {
+            for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
                 String token = (String) iterator.next();
                 setLogicalValue(i, 0, token, false);
                 i++;
@@ -185,16 +175,14 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
     @Override
     public void fillFieldValues() {
         if (world instanceof DisplayWorld) {
-            thresholdField.setText(""
-                    + ((DisplayWorld) world).getDisplayThreshold());
+            thresholdField.setText("" + ((DisplayWorld) world).getDisplayThreshold());
         }
     }
 
     @Override
     public boolean commitChanges() {
         if (world instanceof DisplayWorld) {
-            ((DisplayWorld) world).setDisplayThreshold(Double
-                    .parseDouble(thresholdField.getText()));
+            ((DisplayWorld) world).setDisplayThreshold(Double.parseDouble(thresholdField.getText()));
         }
         world.loadTokenDictionary(table.getData().asStringArray());
         return true;
@@ -219,21 +207,17 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
                 putValue(NAME, "Extract vector tokens");
-                putValue(SHORT_DESCRIPTION,
-                        "Extract tokens from vectory dictionary.");
+                putValue(SHORT_DESCRIPTION, "Extract tokens from vectory dictionary.");
             }
 
             public void actionPerformed(ActionEvent arg0) {
                 if (theWorld instanceof DisplayWorld) {
-                    for (DataPoint point : ((DisplayWorld) theWorld)
-                            .getVectorToTokenDict().asArrayList()) {
-                        theWorld.addWordToTokenDictionary(((StringDataPoint) point)
-                                .getString());
+                    for (DataPoint point : ((DisplayWorld) theWorld).getVectorToTokenDict().asArrayList()) {
+                        theWorld.addWordToTokenDictionary(((StringDataPoint) point).getString());
                     }
                     theWorld.fireDictionaryChangedEvent();
                 } else {
-                    for (String word : ((ReaderWorld) theWorld)
-                            .getTokenToVectorDict().keySet()) {
+                    for (String word : ((ReaderWorld) theWorld).getTokenToVectorDict().keySet()) {
                         theWorld.addWordToTokenDictionary(word);
                     }
                     theWorld.fireDictionaryChangedEvent();

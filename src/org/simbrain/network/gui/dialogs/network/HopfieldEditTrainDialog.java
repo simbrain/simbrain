@@ -18,15 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
@@ -37,30 +28,41 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  * Dialog for setting the properties of Hopfield networks and training them.
  *
  * @author Jeff Yoshimi
- *
  */
 public class HopfieldEditTrainDialog extends StandardDialog {
 
-    /** The main panel. */
+    /**
+     * The main panel.
+     */
     final HopfieldPropertiesPanel hopfieldPropsPanel;
 
-    /** Main tabbed pane. */
+    /**
+     * Main tabbed pane.
+     */
     protected JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Reference to input data panel. */
+    /**
+     * Reference to input data panel.
+     */
     private DataPanel inputPanel;
 
-    /** Reference to validate inputs panel */
+    /**
+     * Reference to validate inputs panel
+     */
     private TestInputPanel validateInputsPanel;
 
     /**
      * Construct the dialog.
      *
-     * @param np parent network panel
+     * @param np  parent network panel
      * @param hop the hopfield network
      */
     public HopfieldEditTrainDialog(NetworkPanel np, Hopfield hop) {
@@ -79,22 +81,18 @@ public class HopfieldEditTrainDialog extends StandardDialog {
         propsBox.add(hopfieldPropsPanel);
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         propsBox.add(separator);
-        SimpleTrainerControlPanel controlPanel = new SimpleTrainerControlPanel(
-                np, new HopfieldTrainer(hop));
+        SimpleTrainerControlPanel controlPanel = new SimpleTrainerControlPanel(np, new HopfieldTrainer(hop));
         propsBox.add(controlPanel);
         tabbedPane.addTab("Properties", propsBox);
 
 
         // Input data tab
-        inputPanel = new DataPanel(hop.getInputNeurons(),
-                hop.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        inputPanel = new DataPanel(hop.getInputNeurons(), hop.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
-                hop.getInputNeurons(), hop.getTrainingSet()
-                        .getInputDataMatrix());
+        validateInputsPanel = TestInputPanel.createTestInputPanel(np, hop.getInputNeurons(), hop.getTrainingSet().getInputDataMatrix());
         tabbedPane.addTab("Validate", validateInputsPanel);
 
 
@@ -102,8 +100,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
         // If inputs have been loaded
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 if (index == 0) {
                     // When entering training tab, commit table changes
@@ -111,8 +108,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
                     inputPanel.commitChanges();
                 } else if (index == 2) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel
-                                .getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
                     }
                 }
             }

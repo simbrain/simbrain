@@ -18,84 +18,36 @@
  */
 package org.simbrain.network.gui;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JToggleButton;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.gui.actions.GroupAction;
-import org.simbrain.network.gui.actions.SetTextPropertiesAction;
-import org.simbrain.network.gui.actions.ShowDebugAction;
-import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
-import org.simbrain.network.gui.actions.ShowTrainerAction;
-import org.simbrain.network.gui.actions.TestInputAction;
-import org.simbrain.network.gui.actions.UngroupAction;
+import org.simbrain.network.gui.actions.*;
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
-import org.simbrain.network.gui.actions.edit.AlignHorizontalAction;
-import org.simbrain.network.gui.actions.edit.AlignVerticalAction;
-import org.simbrain.network.gui.actions.edit.CopyAction;
-import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
-import org.simbrain.network.gui.actions.edit.EditRandomizerPropertiesAction;
-import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.edit.RandomizeObjectsAction;
-import org.simbrain.network.gui.actions.edit.SelectionEditModeAction;
-import org.simbrain.network.gui.actions.edit.SpaceHorizontalAction;
-import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
-import org.simbrain.network.gui.actions.edit.TextEditModeAction;
-import org.simbrain.network.gui.actions.edit.ToggleAutoZoom;
-import org.simbrain.network.gui.actions.edit.WandEditModeAction;
-import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
-import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
+import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
-import org.simbrain.network.gui.actions.network.IterateNetworkAction;
-import org.simbrain.network.gui.actions.network.RunNetworkAction;
-import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
-import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
-import org.simbrain.network.gui.actions.network.StopNetworkAction;
+import org.simbrain.network.gui.actions.network.*;
 import org.simbrain.network.gui.actions.neuron.NewActivityGeneratorAction;
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
-import org.simbrain.network.gui.actions.selection.SelectAllAction;
-import org.simbrain.network.gui.actions.selection.SelectAllNeuronsAction;
-import org.simbrain.network.gui.actions.selection.SelectAllWeightsAction;
-import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
-import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
-import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
-import org.simbrain.network.gui.actions.synapse.ShowAdjustConnectivityDialog;
-import org.simbrain.network.gui.actions.synapse.ShowAdjustSynapsesDialog;
-import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction;
-import org.simbrain.network.gui.actions.synapse.ShowWeightsAction;
+import org.simbrain.network.gui.actions.selection.*;
+import org.simbrain.network.gui.actions.synapse.*;
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
-import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
-import org.simbrain.network.gui.dialogs.network.CompetitiveGroupCreationDialog;
-import org.simbrain.network.gui.dialogs.network.CompetitiveNetworkCreationDialog;
-import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
-import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
-import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
-import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
-import org.simbrain.network.gui.dialogs.network.SOMGroupCreationDialog;
-import org.simbrain.network.gui.dialogs.network.SOMNetworkCreationDialog;
-import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
-import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
+import org.simbrain.network.gui.dialogs.network.*;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
+
+import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Network action manager.
@@ -107,165 +59,265 @@ import org.simbrain.network.layouts.LineLayout;
  */
 public final class NetworkActionManager {
 
-    /** Selection edit mode action. */
+    /**
+     * Selection edit mode action.
+     */
     private final Action selectionEditModeAction;
 
-    /** Text edit mode action. */
+    /**
+     * Text edit mode action.
+     */
     private final Action textEditModeAction;
 
-    /** Wand edit mode action. */
+    /**
+     * Wand edit mode action.
+     */
     private final Action wandEditModeAction;
 
-    /** Auto-zoom action. */
+    /**
+     * Auto-zoom action.
+     */
     private final Action zoomToFitPageAction;
 
-    /** New neuron action. */
+    /**
+     * New neuron action.
+     */
     private final Action newNeuronAction;
 
-    /** Clear neurons action. */
+    /**
+     * Clear neurons action.
+     */
     private final Action zeroSelectedObjectsAction;
 
-    /** Randomize objects action. */
+    /**
+     * Randomize objects action.
+     */
     private final Action randomizeObjectsAction;
 
-    /** Select all action. */
+    /**
+     * Select all action.
+     */
     private final Action selectAllAction;
 
-    /** Clear action. */
+    /**
+     * Clear action.
+     */
     private final Action deleteAction;
 
-    /** Copy action. */
+    /**
+     * Copy action.
+     */
     private final Action copyAction;
 
-    /** Cut action. */
+    /**
+     * Cut action.
+     */
     private final Action cutAction;
 
-    /** Paste action. */
+    /**
+     * Paste action.
+     */
     private final Action pasteAction;
 
-    /** Iterate network action. */
+    /**
+     * Iterate network action.
+     */
     private final Action iterateNetworkAction;
 
-    /** Run network action. */
+    /**
+     * Run network action.
+     */
     private final Action runNetworkAction;
 
-    /** Stop network action. */
+    /**
+     * Stop network action.
+     */
     private final Action stopNetworkAction;
 
-    /** Show debug. */
+    /**
+     * Show debug.
+     */
     private final Action showDebugAction;
 
-    /** Show network preferences action. */
+    /**
+     * Show network preferences action.
+     */
     private final Action showNetworkPreferencesAction;
 
-    /** Align vertical action. */
+    /**
+     * Align vertical action.
+     */
     private final Action alignVerticalAction;
 
-    /** Align horizontal action. */
+    /**
+     * Align horizontal action.
+     */
     private final Action alignHorizontalAction;
 
-    /** Space vertical action. */
+    /**
+     * Space vertical action.
+     */
     private final Action spaceVerticalAction;
 
-    /** Space horizontal action. */
+    /**
+     * Space horizontal action.
+     */
     private final Action spaceHorizontalAction;
 
-    /** Set auto zoom action. */
+    /**
+     * Set auto zoom action.
+     */
     private final JToggleButton setAutoZoomAction;
 
-    /** Set neuron properties action. */
+    /**
+     * Set neuron properties action.
+     */
     private final Action setNeuronPropertiesAction;
 
-    /** Set synapse properties action. */
+    /**
+     * Set synapse properties action.
+     */
     private final Action setSynapsePropertiesAction;
 
-    /** Select all weights action. */
+    /**
+     * Select all weights action.
+     */
     private final Action selectAllWeightsAction;
 
-    /** Select all neurons action. */
+    /**
+     * Select all neurons action.
+     */
     private final Action selectAllNeuronsAction;
 
-    /** Determines if main tool bar is to be shown. */
+    /**
+     * Determines if main tool bar is to be shown.
+     */
     private final Action showMainToolBarAction;
 
-    /** Determines if edit tool bar is to be shown. */
+    /**
+     * Determines if edit tool bar is to be shown.
+     */
     private final Action showEditToolBarAction;
 
-    /** Determines if run tool bar is to be shown. */
+    /**
+     * Determines if run tool bar is to be shown.
+     */
     private final Action showRunToolBarAction;
 
-    /** Clears the source neurons for neuron connections. */
+    /**
+     * Clears the source neurons for neuron connections.
+     */
     private Action clearSourceNeuronsAction;
 
-    /** Sets the source neurons for neuron connections. */
+    /**
+     * Sets the source neurons for neuron connections.
+     */
     private Action setSourceNeuronsAction;
 
-    /** Create a neuron group. */
+    /**
+     * Create a neuron group.
+     */
     private final Action neuronGroupAction;
 
-    /** Create an activity generator. */
+    /**
+     * Create an activity generator.
+     */
     private final Action activityGeneratorAction;
 
-    /** Connection types. */
-    private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf,
-            oneToOne, oneToOneSelf, radial, radialSelf, sparse, sparseSelf;
+    /**
+     * Connection types.
+     */
+    private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf, oneToOne, oneToOneSelf, radial, radialSelf, sparse, sparseSelf;
 
-    /** Layout types. */
+    /**
+     * Layout types.
+     */
     private Action gridLayout, hexagonalLayout, lineLayout;
 
-    /** Whether weights should be shown or not. */
+    /**
+     * Whether weights should be shown or not.
+     */
     private final JCheckBoxMenuItem showWeightsAction;
 
-    /** Whether neuron priorities should be shown or not. */
+    /**
+     * Whether neuron priorities should be shown or not.
+     */
     private final JCheckBoxMenuItem showPrioritiesAction;
 
-    /** Select all incoming synapses. */
+    /**
+     * Select all incoming synapses.
+     */
     private final Action selectIncomingWeightsAction;
 
-    /** Select all outgoing synapses. */
+    /**
+     * Select all outgoing synapses.
+     */
     private final Action selectOutgoingWeightsAction;
 
-    /** Sets the text object properties. */
+    /**
+     * Sets the text object properties.
+     */
     private final Action setTextPropertiesAction;
 
-    /** Groups selected nodes together. */
+    /**
+     * Groups selected nodes together.
+     */
     private final Action groupAction;
 
-    /** Ungroups selected nodes. */
+    /**
+     * Ungroups selected nodes.
+     */
     private final Action ungroupAction;
 
-    /** Shows a weight matrix panel. */
+    /**
+     * Shows a weight matrix panel.
+     */
     private final Action showWeightMatrixAction;
 
-    /** Shows a trainer dialog. */
+    /**
+     * Shows a trainer dialog.
+     */
     private final Action showTrainerAction;
 
-    /** Shows dialog to edit randomizer properties. */
+    /**
+     * Shows dialog to edit randomizer properties.
+     */
     private final Action setRandomizerPropertiesAction;
 
-    /** Shows dialog to adjust group of synapses. */
+    /**
+     * Shows dialog to adjust group of synapses.
+     */
     private final Action showAdjustSynapsesDialog;
 
-    /** Shows dialog to adjust connectivity. */
+    /**
+     * Shows dialog to adjust connectivity.
+     */
     private final Action showAdjustConnectivityDialog;
 
-    /** Shows dialog to adjust updater. */
+    /**
+     * Shows dialog to adjust updater.
+     */
     private final Action showUpdaterDialog;
 
-    /** Test inputs to selected neurons. */
+    /**
+     * Test inputs to selected neurons.
+     */
     private Action testInputAction;
 
-    /** Add a synapse group between neuron groups. */
+    /**
+     * Add a synapse group between neuron groups.
+     */
     private final Action addSynapseGroupAction;
 
-    /** Reference to NetworkPanel. */
+    /**
+     * Reference to NetworkPanel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * Create a new network action manager for the specified network panel.
      *
-     * @param networkPanel
-     *            networkPanel, must not be null
+     * @param networkPanel networkPanel, must not be null
      */
     NetworkActionManager(final NetworkPanel networkPanel) {
 
@@ -299,8 +351,7 @@ public final class NetworkActionManager {
 
         showDebugAction = new ShowDebugAction(networkPanel);
 
-        showNetworkPreferencesAction = new ShowNetworkPreferencesAction(
-                networkPanel);
+        showNetworkPreferencesAction = new ShowNetworkPreferencesAction(networkPanel);
 
         alignVerticalAction = new AlignVerticalAction(networkPanel);
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
@@ -311,54 +362,43 @@ public final class NetworkActionManager {
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showRunToolBarAction = new ShowRunToolBarAction(networkPanel);
 
-        showWeightsAction = new JCheckBoxMenuItem(new ShowWeightsAction(
-                networkPanel));
-        showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(
-                networkPanel));
+        showWeightsAction = new JCheckBoxMenuItem(new ShowWeightsAction(networkPanel));
+        showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(networkPanel));
 
         setAutoZoomAction = new ToggleAutoZoom(networkPanel);
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
-        selectIncomingWeightsAction = new SelectIncomingWeightsAction(
-                networkPanel);
-        selectOutgoingWeightsAction = new SelectOutgoingWeightsAction(
-                networkPanel);
+        selectIncomingWeightsAction = new SelectIncomingWeightsAction(networkPanel);
+        selectOutgoingWeightsAction = new SelectOutgoingWeightsAction(networkPanel);
 
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
-        setSynapsePropertiesAction = new SetSynapsePropertiesAction(
-                networkPanel);
+        setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
         setTextPropertiesAction = new SetTextPropertiesAction(networkPanel);
 
-        allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(),
-                "All to all");
-        oneToOne = new ApplyConnectionAction(networkPanel, new OneToOne(),
-                "One-to-one");
+        allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(), "All to all");
+        oneToOne = new ApplyConnectionAction(networkPanel, new OneToOne(), "One-to-one");
         radial = new ApplyConnectionAction(networkPanel, new Radial(), "Radial");
         sparse = new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse");
 
         gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
-        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(),
-                networkPanel);
+        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(), networkPanel);
         lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
 
         setSourceNeuronsAction = new SetSourceNeurons(networkPanel);
         clearSourceNeuronsAction = new ClearSourceNeurons(networkPanel);
 
         groupAction = new GroupAction(networkPanel);
-        ungroupAction = new UngroupAction(networkPanel,
-                networkPanel.getViewGroupNode());
+        ungroupAction = new UngroupAction(networkPanel, networkPanel.getViewGroupNode());
 
         neuronGroupAction = new NewNeuronGroupAction(networkPanel);
 
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
 
-        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(
-                networkPanel);
+        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
-        showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(
-                networkPanel);
+        showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
         showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
         testInputAction = new TestInputAction(networkPanel);
         addSynapseGroupAction = new AddSynapseGroupAction(networkPanel);
@@ -388,8 +428,7 @@ public final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List<Action> getNetworkModeActions() {
-        return Arrays.asList(new Action[] { selectionEditModeAction,
-                textEditModeAction, wandEditModeAction });
+        return Arrays.asList(new Action[]{selectionEditModeAction, textEditModeAction, wandEditModeAction});
     }
 
     /**
@@ -398,8 +437,7 @@ public final class NetworkActionManager {
      * @return a list of network control actions
      */
     public List<Action> getNetworkControlActions() {
-        return Arrays
-                .asList(new Action[] { runNetworkAction, stopNetworkAction });
+        return Arrays.asList(new Action[]{runNetworkAction, stopNetworkAction});
     }
 
     /**
@@ -408,8 +446,7 @@ public final class NetworkActionManager {
      * @return a list of clipboard actions
      */
     public List<Action> getClipboardActions() {
-        return Arrays
-                .asList(new Action[] { copyAction, cutAction, pasteAction });
+        return Arrays.asList(new Action[]{copyAction, cutAction, pasteAction});
     }
 
     /**
@@ -418,15 +455,14 @@ public final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List<Action> getNetworkEditingActions() {
-        return Arrays.asList(new Action[] { newNeuronAction, deleteAction });
+        return Arrays.asList(new Action[]{newNeuronAction, deleteAction});
     }
 
     /**
      * @return a list of layout actions
      */
     public List<Action> getLayoutActions() {
-        return Arrays.asList(new Action[] { gridLayout, hexagonalLayout,
-                lineLayout });
+        return Arrays.asList(new Action[]{gridLayout, hexagonalLayout, lineLayout});
     }
 
     /**
@@ -458,8 +494,7 @@ public final class NetworkActionManager {
      * @return connection actions
      */
     public List<Action> getConnectionActions() {
-        return Arrays
-                .asList(new Action[] { allToAll, oneToOne, sparse });
+        return Arrays.asList(new Action[]{allToAll, oneToOne, sparse});
     }
 
     /**
@@ -468,8 +503,7 @@ public final class NetworkActionManager {
      * @return self connect actions
      */
     public List<Action> getSelfConnectionActions() {
-        return Arrays.asList(new Action[] { allToAllSelf, fixedFanoutSelf,
-                oneToOneSelf, sparseSelf });
+        return Arrays.asList(new Action[]{allToAllSelf, fixedFanoutSelf, oneToOneSelf, sparseSelf});
     }
 
     /**
@@ -490,48 +524,14 @@ public final class NetworkActionManager {
      * @return a list of new networks that can be inserted
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays
-                .asList(new Action[] {
-                        new AddGroupAction(networkPanel,
-                                BackpropCreationDialog.class, "Backprop"),
-                        new AddGroupAction(networkPanel,
-                                CompetitiveNetworkCreationDialog.class,
-                                "Competitive Network"),
-                        new AddGroupAction(networkPanel,
-                                ESNCreationDialog.class, "Echo State Network"),
-                        new AddGroupAction(networkPanel,
-                                FeedForwardCreationDialog.class,
-                                "Feed Forward Network"),
-                        new AddGroupAction(networkPanel,
-                                HopfieldCreationDialog.class, "Hopfield"),
-                        new AddGroupAction(networkPanel,
-                                LMSCreationDialog.class,
-                                "LMS (Least Mean Squares)"),
-                        new AddGroupAction(networkPanel,
-                                SOMNetworkCreationDialog.class, "SOM Network"),
-                        new AddGroupAction(networkPanel,
-                                SRNCreationDialog.class,
-                                "SRN (Simple Recurrent Network)") });
+        return Arrays.asList(new Action[]{new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, ESNCreationDialog.class, "Echo State Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
     }
 
     /**
      * @return a list of the new neuron groups that can be inserted
      */
     public List<Action> getNewGroupActions() {
-        return Arrays
-                .asList(new Action[] {
-                        new AddGroupAction(networkPanel,
-                                NeuronGroupCreationDialog.class,
-                                "(Bare) Neuron Group"),
-                        new AddGroupAction(networkPanel,
-                                CompetitiveGroupCreationDialog.class,
-                                "Competitive (Group only)"),
-                        new AddGroupAction(networkPanel,
-                                SOMGroupCreationDialog.class,
-                                "SOM (Group only)"),
-                        new AddGroupAction(networkPanel,
-                                WTACreationDialog.class,
-                                "WTA (Winner take all)") });
+        return Arrays.asList(new Action[]{new AddGroupAction(networkPanel, NeuronGroupCreationDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
     }
 
     /**
@@ -568,7 +568,7 @@ public final class NetworkActionManager {
     public Action getNewNeuronAction() {
         return newNeuronAction;
     }
-    
+
     /**
      * Return the new activity generator
      *
@@ -771,8 +771,7 @@ public final class NetworkActionManager {
      * @return the show edit tool bar menu item
      */
     public JCheckBoxMenuItem getShowEditToolBarMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                showEditToolBarAction);
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showEditToolBarAction);
         actionWrapper.setSelected(networkPanel.getEditToolBar().isVisible());
         return actionWrapper;
     }
@@ -783,8 +782,7 @@ public final class NetworkActionManager {
      * @return the show main tool bar menu item
      */
     public JCheckBoxMenuItem getShowMainToolBarMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                showMainToolBarAction);
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showMainToolBarAction);
         actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
         return actionWrapper;
     }
@@ -795,8 +793,7 @@ public final class NetworkActionManager {
      * @return the run clamp tool bar menu item
      */
     public JCheckBoxMenuItem getShowRunToolBarMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                showRunToolBarAction);
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showRunToolBarAction);
         actionWrapper.setSelected(networkPanel.getRunToolBar().isVisible());
         return actionWrapper;
     }

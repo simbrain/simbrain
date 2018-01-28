@@ -18,18 +18,6 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -39,6 +27,15 @@ import org.simbrain.world.textworld.dictionary.DictionarySelector;
 import org.simbrain.world.textworld.dictionary.TokenDictionaryPanel;
 import org.simbrain.world.textworld.dictionary.TokenToVectorPanel;
 import org.simbrain.world.textworld.dictionary.VectorToTokenPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * Contains actions relating to Text World.
@@ -62,8 +59,7 @@ public class TextWorldActions {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
                 putValue(NAME, "Extract dictionary...");
-                putValue(SHORT_DESCRIPTION,
-                        "Extract dictionary from text file...");
+                putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
                 //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
                 //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 //putValue(ACCELERATOR_KEY, keyStroke);
@@ -88,8 +84,7 @@ public class TextWorldActions {
      */
     private static List<String> extractTextItems() {
         List<String> retList = new ArrayList<String>();
-        SFileChooser chooser = new SFileChooser(
-                getDictionaryDirectory(), "text file", "txt");
+        SFileChooser chooser = new SFileChooser(getDictionaryDirectory(), "text file", "txt");
         chooser.addExtension("rtf"); // (Must do other stuff to support
         // rich text)
         File theFile = chooser.showOpenDialog();
@@ -102,8 +97,7 @@ public class TextWorldActions {
                 try {
                     // first use a Scanner to get each line
                     while (scanner.hasNextLine()) {
-                        Scanner lineScan = new Scanner(
-                                scanner.nextLine());
+                        Scanner lineScan = new Scanner(scanner.nextLine());
                         while (lineScan.hasNext()) {
                             String word = lineScan.next();
                             retList.add(word);
@@ -151,15 +145,11 @@ public class TextWorldActions {
                 TokenDictionaryPanel scalarPanel = new TokenDictionaryPanel(world);
                 DictionarySelector dialog;
                 if (world instanceof ReaderWorld) {
-                    TokenToVectorPanel vectorPanel = new TokenToVectorPanel(
-                            (ReaderWorld) world);
-                    dialog = DictionarySelector.createVectorDictionaryEditor(
-                            scalarPanel, vectorPanel);
+                    TokenToVectorPanel vectorPanel = new TokenToVectorPanel((ReaderWorld) world);
+                    dialog = DictionarySelector.createVectorDictionaryEditor(scalarPanel, vectorPanel);
                 } else {
-                    VectorToTokenPanel vectorPanel = new VectorToTokenPanel(
-                            (DisplayWorld) world);
-                    dialog = DictionarySelector.createVectorDictionaryEditor(
-                            scalarPanel, vectorPanel);
+                    VectorToTokenPanel vectorPanel = new VectorToTokenPanel((DisplayWorld) world);
+                    dialog = DictionarySelector.createVectorDictionaryEditor(scalarPanel, vectorPanel);
                 }
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);

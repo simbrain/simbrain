@@ -25,7 +25,9 @@ import org.simbrain.network.core.Synapse;
  */
 public class Step extends SpikeResponder {
 
-    /** Timer. */
+    /**
+     * Timer.
+     */
     private double timer;
 
     /**
@@ -34,7 +36,9 @@ public class Step extends SpikeResponder {
      */
     private double responseHeight = 1;
 
-    /** Response duration (ms). */
+    /**
+     * Response duration (ms).
+     */
     private double responseDuration = 1;
 
     /**

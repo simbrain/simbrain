@@ -18,51 +18,51 @@
  */
 package org.simbrain.network.desktop;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import javax.swing.AbstractAction;
-
+import bsh.EvalError;
+import bsh.Interpreter;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 
-import bsh.EvalError;
-import bsh.Interpreter;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Run network script.
  */
 public final class RunScriptAction extends AbstractAction {
 
-    /** Reference to Network Panel */
+    /**
+     * Reference to Network Panel
+     */
     private NetworkPanel networkPanel;
 
-    /** Script directory. */
-    private static final String SCRIPT_MENU_DIRECTORY = "."
-            + System.getProperty("file.separator") + "scripts"
-            + System.getProperty("file.separator") + "network";
+    /**
+     * Script directory.
+     */
+    private static final String SCRIPT_MENU_DIRECTORY = "." + System.getProperty("file.separator") + "scripts" + System.getProperty("file.separator") + "network";
 
     /**
      * Create a new script action for the workspace.
+     *
      * @param networkPanel parent panel.
      */
     public RunScriptAction(NetworkPanel networkPanel) {
         super("Run Script...");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Script.png"));
-        putValue(SHORT_DESCRIPTION,
-                "Open and apply a network .bsh script to this network");
+        putValue(SHORT_DESCRIPTION, "Open and apply a network .bsh script to this network");
         this.networkPanel = networkPanel;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY,
-                "Run Script", "bsh");
+        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY, "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();
         if (scriptFile != null) {
             Interpreter interpreter = new Interpreter();

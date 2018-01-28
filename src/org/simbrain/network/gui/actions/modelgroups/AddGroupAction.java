@@ -18,26 +18,27 @@
  */
 package org.simbrain.network.gui.actions.modelgroups;
 
-import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Create a new group using the specified dialog.
  */
 public final class AddGroupAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** Parent dialog. */
+    /**
+     * Parent dialog.
+     */
     private Class<? extends StandardDialog> dialogClass;
 
     /**
@@ -45,11 +46,10 @@ public final class AddGroupAction extends AbstractAction {
      * panel.
      *
      * @param networkPanel networkPanel, must not be null
-     * @param dialogClass the class to be instantiated when this action invoked
-     * @param name string description of this action
+     * @param dialogClass  the class to be instantiated when this action invoked
+     * @param name         string description of this action
      */
-    public AddGroupAction(final NetworkPanel networkPanel,
-            Class<? extends StandardDialog> dialogClass, final String name) {
+    public AddGroupAction(final NetworkPanel networkPanel, Class<? extends StandardDialog> dialogClass, final String name) {
 
         super(name);
         this.dialogClass = dialogClass;
@@ -61,8 +61,7 @@ public final class AddGroupAction extends AbstractAction {
 
         putValue(SHORT_DESCRIPTION, "Add " + name + " group to network");
         if (dialogClass == NeuronGroupCreationDialog.class) {
-            networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                    .put(KeyStroke.getKeyStroke('g'), this);
+            networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('g'), this);
             networkPanel.getActionMap().put(this, this);
         }
     }
@@ -72,9 +71,7 @@ public final class AddGroupAction extends AbstractAction {
         networkPanel.repaint();
         StandardDialog dialog;
         try {
-            dialog = dialogClass
-                    .getDeclaredConstructor(new Class[] { NetworkPanel.class })
-                    .newInstance(networkPanel);
+            dialog = dialogClass.getDeclaredConstructor(new Class[]{NetworkPanel.class}).newInstance(networkPanel);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

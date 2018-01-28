@@ -27,16 +27,20 @@ import org.simbrain.world.odorworld.OdorWorld;
  */
 public class BasicEntity extends OdorWorldEntity {
 
-    /** Static image location. */
+    /**
+     * Static image location.
+     */
     private static final String STATIC_IMAGE_DIR = "static/";
 
-    /** Default image. */
+    /**
+     * Default image.
+     */
     private static final String DEFAULT_IMAGE = STATIC_IMAGE_DIR + "Swiss.gif";
 
     /**
      * Construct a basic entity with a specified animation.
      *
-     * @param anim animation associated with this entity.
+     * @param anim  animation associated with this entity.
      * @param world parent world.
      */
     public BasicEntity(final Animation anim, final OdorWorld world) {
@@ -46,6 +50,7 @@ public class BasicEntity extends OdorWorldEntity {
 
     /**
      * Construct a default entity.
+     *
      * @param world
      */
     public BasicEntity(final OdorWorld world) {
@@ -83,10 +88,7 @@ public class BasicEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Bell.gif", "Fish.gif", "Gouda.gif",
-                        "Poison.gif", "Bluecheese.gif", "Flax.gif",
-                        "Pansy.gif", "Swiss.gif", "Candle.png", "Flower.gif",
-                        "PinkFlower.gif", "Tulip.gif" };
+                return new Object[]{"Bell.gif", "Fish.gif", "Gouda.gif", "Poison.gif", "Bluecheese.gif", "Flax.gif", "Pansy.gif", "Swiss.gif", "Candle.png", "Flower.gif", "PinkFlower.gif", "Tulip.gif"};
             }
         };
     }

@@ -18,20 +18,14 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Top level dialog for displaying dictionary editors.
@@ -40,17 +34,24 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class DictionarySelector extends StandardDialog {
 
-    /** The main card panel that changes depending on the combo box */
+    /**
+     * The main card panel that changes depending on the combo box
+     */
     private final JPanel cardPanel = new JPanel(new CardLayout());
 
-    /** Combo box for selecting ditionary type. */
-    private final JComboBox dictionaryType = new JComboBox(new String[] {
-            "Scalar", "Vector" });
+    /**
+     * Combo box for selecting ditionary type.
+     */
+    private final JComboBox dictionaryType = new JComboBox(new String[]{"Scalar", "Vector"});
 
-    /** The panel for the scalar dictionary editor. */
+    /**
+     * The panel for the scalar dictionary editor.
+     */
     private final JPanel scalarPanel;
 
-    /** The panel for the vector dictionary editor. */
+    /**
+     * The panel for the vector dictionary editor.
+     */
     private final JPanel vectorPanel;
 
     /**
@@ -60,12 +61,9 @@ public class DictionarySelector extends StandardDialog {
      * @param vectorPanel the panel for editing the vector dict.
      * @return the constructed editor
      */
-    public static DictionarySelector createVectorDictionaryEditor(
-            JPanel scalarPanel, JPanel vectorPanel) {
-        DictionarySelector editor = new DictionarySelector(scalarPanel,
-                vectorPanel);
-        editor.addButton(new JButton(new ShowHelpAction(
-                "Pages/Worlds/TextWorld/TextWorld.html")));
+    public static DictionarySelector createVectorDictionaryEditor(JPanel scalarPanel, JPanel vectorPanel) {
+        DictionarySelector editor = new DictionarySelector(scalarPanel, vectorPanel);
+        editor.addButton(new JButton(new ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html")));
         editor.setMinimumSize(new Dimension(300, 400));
         return editor;
     }
@@ -76,8 +74,7 @@ public class DictionarySelector extends StandardDialog {
      * @param scalarPanel the panel for editing the scalar dict.
      * @param vectorPanel the panel for editing the vector dict.
      */
-    private DictionarySelector(final JPanel scalarPanel,
-            final JPanel vectorPanel) {
+    private DictionarySelector(final JPanel scalarPanel, final JPanel vectorPanel) {
         this.scalarPanel = scalarPanel;
         this.vectorPanel = vectorPanel;
         setTitle("Dictionary Editor");

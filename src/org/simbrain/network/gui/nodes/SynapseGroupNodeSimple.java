@@ -18,10 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -29,6 +25,10 @@ import org.simbrain.network.gui.nodes.NeuronGroupNode.Port;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.widgets.DirectedCubicArrow;
 import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * PNode representation of a group of synapses, where the synapses themselves
@@ -38,8 +38,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class SynapseGroupNodeSimple extends SynapseGroupNode implements
-        SynapseGroupArrow {
+public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseGroupArrow {
 
     private static final float DEFAULT_ARROW_THICKNESS = 30;
 
@@ -74,13 +73,10 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     /**
      * Create a Synapse Group PNode.
      *
-     * @param networkPanel
-     *            parent panel
-     * @param group
-     *            the synapse group
+     * @param networkPanel parent panel
+     * @param group        the synapse group
      */
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
-            final SynapseGroup group) {
+    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroup group) {
         super(networkPanel, group);
         this.group = group;
         // this.dbLine = new PPath.Float(new BasicStroke(5,
@@ -89,12 +85,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
         // dbLine.setStrokePaint(Color.BLACK);
         source = group.getSourceNeuronGroup();
         target = group.getTargetNeuronGroup();
-        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
-                .get(group.getSourceNeuronGroup());
-        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
-                .get(group.getTargetNeuronGroup());
-        arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR,
-                0.5f, DEFAULT_ARROW_THICKNESS);
+        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getSourceNeuronGroup());
+        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getTargetNeuronGroup());
+        arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
         this.addChild(arrow);
         Point2D[] corners = source.getFourCorners();
         srcZoneBoundaries[0] = Math.atan2(corners[0].getY(), corners[0].getX());
@@ -105,18 +98,14 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
         // this.addChild(dbLine);
     }
 
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
-            final SynapseGroup group, final float thickness) {
+    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroup group, final float thickness) {
         super(networkPanel, group);
         this.group = group;
         source = group.getSourceNeuronGroup();
         target = group.getTargetNeuronGroup();
-        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
-                .get(group.getSourceNeuronGroup());
-        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
-                .get(group.getTargetNeuronGroup());
-        arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR,
-                0.5f, thickness);
+        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getSourceNeuronGroup());
+        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getTargetNeuronGroup());
+        arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR, 0.5f, thickness);
         this.addChild(arrow);
     }
 
@@ -126,9 +115,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      */
     @Override
     public void layoutChildren() {
-    	if (getNetworkPanel().isRunning()) {
-    		return;
-    	}
+        if (getNetworkPanel().isRunning()) {
+            return;
+        }
         if (halt.get()) {
             return;
         }
@@ -148,14 +137,13 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     *
      * @param pt1
      * @param pt2
      */
     public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
-    	if (getNetworkPanel().isRunning()) {
-    		return;
-    	}
+        if (getNetworkPanel().isRunning()) {
+            return;
+        }
         halt.getAndSet(true);
         if (pt1 == null) {
             if (this.startPt == null) {
@@ -177,14 +165,13 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     *
      * @param src
      * @param tar
      */
     public void layout(Point2D src, Point2D tar) {
-		if (networkPanel.isRunning()) {
-			return;
-		}
+        if (networkPanel.isRunning()) {
+            return;
+        }
         arrow.layoutChildren(src, startPort, tar, endPort);
 
         Point2D.Float bez = arrow.getTemplate().getBez1(src, tar, startPort);
@@ -201,7 +188,6 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     *
      * @param src
      * @param tar
      * @return
@@ -232,24 +218,22 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     // return closest;
     // }
     //
-    
+
     /**
      * Includes start and end of arrow.
      */
     public void determineProperEndPoints() {
-		if (networkPanel.isRunning()) {
-			return;
-		}
+        if (networkPanel.isRunning()) {
+            return;
+        }
         float centerXSrc = (float) source.getCenterX();
         float centerYSrc = (float) source.getCenterY();
         float centerXTar = (float) target.getCenterX();
         float centerYTar = (float) target.getCenterY();
 
-        float distance = (float) Point2D.distance(centerXSrc, centerYSrc,
-                centerXTar, centerYTar);
+        float distance = (float) Point2D.distance(centerXSrc, centerYSrc, centerXTar, centerYTar);
 
-        float theta = (float) Math.atan2(centerYSrc - centerYTar, centerXTar
-                - centerXSrc);
+        float theta = (float) Math.atan2(centerYSrc - centerYTar, centerXTar - centerXSrc);
 
         float zoneModifier = distance * distance / 5000;
 
@@ -276,8 +260,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
                     endPort = Port.WEST;
                 }
             }
-        } else if (theta > srcZoneBoundaries[0]
-                && theta <= srcZoneBoundaries[1]) {
+        } else if (theta > srcZoneBoundaries[0] && theta <= srcZoneBoundaries[1]) {
             startPort = Port.SOUTH;
             if (left || right) {
                 if (left) { // Offset left (I/IIIa)
@@ -305,8 +288,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
                     }
                 }
             }
-        } else if (theta > srcZoneBoundaries[1]
-                || theta <= srcZoneBoundaries[2]) {
+        } else if (theta > srcZoneBoundaries[1] || theta <= srcZoneBoundaries[2]) {
             startPort = Port.WEST;
             if (above || below) {
                 if (above) {
@@ -400,10 +382,8 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      * @return
      */
     public Point2D getOpposingDefaultPosition(NeuronGroup ng) {
-        if (group.getSourceNeuronGroup() != ng
-                && group.getTargetNeuronGroup() != ng) {
-            throw new IllegalArgumentException("Synapse group does not begin"
-                    + " or end in this group.");
+        if (group.getSourceNeuronGroup() != ng && group.getTargetNeuronGroup() != ng) {
+            throw new IllegalArgumentException("Synapse group does not begin" + " or end in this group.");
         }
         NeuronGroup opposite;
         Port opPort;

@@ -18,32 +18,35 @@
  */
 package org.simbrain.network.gui;
 
+import org.piccolo2d.PNode;
+
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.Set;
-
-import org.piccolo2d.PNode;
 
 /**
  * An event object representing a change in network selection.
  */
 public final class NetworkSelectionEvent extends EventObject {
 
-    /** Old selection. */
+    /**
+     * Old selection.
+     */
     private Set<PNode> oldSelection;
 
-    /** Selection. */
+    /**
+     * Selection.
+     */
     private Set<PNode> selection;
 
     /**
      * Create a new network selection event with the specified source.
      *
-     * @param source source of the event
+     * @param source       source of the event
      * @param oldSelection old selection
-     * @param selection selection
+     * @param selection    selection
      */
-    public NetworkSelectionEvent(final NetworkPanel source,
-            final Set<PNode> oldSelection, final Set<PNode> selection) {
+    public NetworkSelectionEvent(final NetworkPanel source, final Set<PNode> oldSelection, final Set<PNode> selection) {
         super(source);
         this.oldSelection = Collections.unmodifiableSet(oldSelection);
         this.selection = Collections.unmodifiableSet(selection);

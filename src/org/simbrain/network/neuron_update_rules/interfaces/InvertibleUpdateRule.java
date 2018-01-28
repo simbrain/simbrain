@@ -20,11 +20,10 @@ package org.simbrain.network.neuron_update_rules.interfaces;
 
 /**
  * Indicates that an update rule is invertible.
- *
+ * <p>
  * Required for LMSOffline training
  *
  * @author ztosi
- *
  */
 public interface InvertibleUpdateRule {
 

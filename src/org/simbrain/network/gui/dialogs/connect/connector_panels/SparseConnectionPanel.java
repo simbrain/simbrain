@@ -18,30 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.beans.PropertyChangeEvent;
-import java.text.NumberFormat;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.Box;
-import javax.swing.JCheckBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
@@ -55,6 +31,20 @@ import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.EditablePanel;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.text.NumberFormat;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+
 /**
  * The <b>SparsityAdjustmentPanel</b> is a sub-panel for other connection panels
  * which adjusts the sparsity of the connection. This panel includes a text
@@ -63,26 +53,25 @@ import org.simbrain.util.widgets.EditablePanel;
  * are equalized. All of these are kept in sync.
  *
  * @author Zoë Tosi
- *
  */
 @SuppressWarnings("serial")
-public class SparseConnectionPanel extends AbstractConnectionPanel implements
-    EditablePanel {
+public class SparseConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
 
-    /** A slider for setting the sparsity of the connections. */
-    private JSlider connectionDensitySlider = new JSlider(JSlider.HORIZONTAL,
-        0, 100, 10);
+    /**
+     * A slider for setting the sparsity of the connections.
+     */
+    private JSlider connectionDensitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
 
-    /** A text field for setting the sparsity of the connections. */
-    private JFormattedTextField densityTf = new JFormattedTextField(
-        NumberFormat.getNumberInstance());
-    
+    /**
+     * A text field for setting the sparsity of the connections.
+     */
+    private JFormattedTextField densityTf = new JFormattedTextField(NumberFormat.getNumberInstance());
+
     /**
      * A text field allowing the user to specify the number of outgoing synapses
      * per source neuron.
      */
-    private JFormattedTextField synsPerSource = new JFormattedTextField(
-        NumberFormat.getNumberInstance());
+    private JFormattedTextField synsPerSource = new JFormattedTextField(NumberFormat.getNumberInstance());
 
     /**
      * A check box for determining if the number of outgoing synapses per source
@@ -95,7 +84,9 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
      */
     private JCheckBox allowSelfConnectChkBx = new JCheckBox();
 
-    /** Panel for self connection check box. */
+    /**
+     * Panel for self connection check box.
+     */
     private JPanel allowSelfConnectPanel = new JPanel();
 
     /**
@@ -128,10 +119,14 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
      */
     private int numTargs;
 
-    /** Whether to allow self connections. */
+    /**
+     * Whether to allow self connections.
+     */
     private boolean allowSelfConnect = false;
 
-    /** Whether to allow recurrent connections. */
+    /**
+     * Whether to allow recurrent connections.
+     */
     private boolean recurrentConnection = false;
 
     /**
@@ -143,14 +138,12 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     /**
      * Create the sparsity based connection panel.
      *
-     * @param connection the connection object to adjust
+     * @param connection   the connection object to adjust
      * @param networkPanel the parent panel
      * @return the constructed panel
      */
-    public static SparseConnectionPanel createSparsityAdjustmentPanel(
-        Sparse connection, NetworkPanel networkPanel) {
-        SparseConnectionPanel sap =
-            new SparseConnectionPanel(connection, networkPanel);
+    public static SparseConnectionPanel createSparsityAdjustmentPanel(Sparse connection, NetworkPanel networkPanel) {
+        SparseConnectionPanel sap = new SparseConnectionPanel(connection, networkPanel);
         sap.fillFieldValues();
         sap.initializeSparseSlider();
         sap.addChangeListeners();
@@ -158,24 +151,20 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         sap.initializeLayout();
         return sap;
     }
-    
+
     /**
      * Constructs a gui panel for adjusting the sparsity of a sparse connect
      * neurons object, and initializes all appropriate listeners.
      *
-     * @param connection
-     *            the connection object this panel will act on
-     * @param numTargs
-     *            the number of target neurons being connected to
+     * @param connection the connection object this panel will act on
+     * @param numTargs   the number of target neurons being connected to
      */
-    private SparseConnectionPanel(Sparse connection,
-            NetworkPanel networkPanel) {
+    private SparseConnectionPanel(Sparse connection, NetworkPanel networkPanel) {
         super();
         editing = connection.getSynapseGroup() != null;
         this.connection = connection;
         if (editing) {
-            numTargs = connection.getSynapseGroup().getTargetNeuronGroup()
-                    .size();
+            numTargs = connection.getSynapseGroup().getTargetNeuronGroup().size();
             setRecurrent(connection.getSynapseGroup().isRecurrent());
             allowSelfConnect = connection.isSelfConnectionAllowed();
         } else {
@@ -184,20 +173,15 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
             try {
                 if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
 
-                    NeuronGroup source = networkPanel.getSourceModelGroups()
-                            .get(0);
-                    NeuronGroup target =
-                            networkPanel.getSelectedModelNeuronGroups().get(0);
+                    NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
+                    NeuronGroup target = networkPanel.getSelectedModelNeuronGroups().get(0);
                     numTargs = target.size();
                     setRecurrent(source.equals(target));
 
                 } else {
                     // Called when Quick Properties (see QuickConnectDialog) is used
-                    Set<Neuron> sources =
-                            new HashSet<Neuron>(networkPanel
-                                    .getSourceModelNeurons());
-                    List<Neuron> targets = networkPanel
-                            .getSelectedModelNeurons();
+                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModelNeurons());
+                    List<Neuron> targets = networkPanel.getSelectedModelNeurons();
                     numTargs = targets.size();
                     int sourcesSize = sources.size();
                     sources.retainAll(targets);
@@ -214,8 +198,8 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                 synsPerSource.setVisible(false);
             }
         }
-        
-        
+
+
     }
 
     /**
@@ -287,8 +271,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         if (recurrentConnection) {
             this.add(allowSelfConnectPanel, gbc);
         } else {
-            this.add(Box.createRigidArea(allowSelfConnectPanel
-                .getPreferredSize()), gbc);
+            this.add(Box.createRigidArea(allowSelfConnectPanel.getPreferredSize()), gbc);
         }
 
         densityTfListener.enable();
@@ -305,8 +288,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         connectionDensitySlider.setMinorTickSpacing(2);
         connectionDensitySlider.setPaintTicks(true);
 
-        Hashtable<Integer, JLabel> labelTable2 =
-            new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
         labelTable2.put(new Integer(0), new JLabel("0%"));
         labelTable2.put(new Integer(100), new JLabel("100%"));
         connectionDensitySlider.setLabelTable(labelTable2);
@@ -317,7 +299,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     /**
      * Adds change listeners specific to sparse panel: Sparsity slider, sparsity
      * text field, and syns/source field.
-     *
+     * <p>
      * Since every field listens to every field, loops are prevented through the
      * use of so-called "switchable listeners", which have fields allowing them
      * to be turned off, and focus listeners. Any field not being interacted
@@ -325,7 +307,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
      * interacted with (which is "in focus") is enabled. This allows all fields
      * to be changed accordingly in response to user input without changes to
      * the out of focus fields themselves firing off events.
-     *
      */
     private void addChangeListeners() {
 
@@ -338,10 +319,8 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                 if (source == connectionDensitySlider && isEnabled()) {
                     densityTfListener.disable();
                     synsPerSourceListener.disable();
-                    int nt = allowSelfConnect || !recurrentConnection
-                        ? numTargs : numTargs - 1;
-                    double val =
-                        (double) (connectionDensitySlider.getValue()) / 100;
+                    int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
+                    double val = (double) (connectionDensitySlider.getValue()) / 100;
                     densityTf.setValue(new Double(val));
                     int sps = (int) (val * nt);
                     synsPerSource.setValue(new Integer(sps));
@@ -373,18 +352,12 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                 if (isEnabled() && evt.getSource() == synsPerSource) {
                     densityTfListener.disable();
                     sliderListener.disable();
-                    int nt =
-                        allowSelfConnect
-                            || !recurrentConnection ? numTargs
-                            : numTargs - 1;
+                    int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
                     Integer sps = Utils.parseInteger(synsPerSource);
                     if (sps != null) {
                         densityTf.setValue(new Double((double) sps / nt));
-                        int sVal =
-                            (int) (((Number) densityTf
-                                .getValue()).doubleValue() * 100);
-                        connectionDensitySlider
-                            .setValue(new Integer(sVal));
+                        int sVal = (int) (((Number) densityTf.getValue()).doubleValue() * 100);
+                        connectionDensitySlider.setValue(new Integer(sVal));
                     }
                 }
             }
@@ -417,19 +390,12 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                     sliderListener.disable();
                     synsPerSourceListener.disable();
                     int sps;
-                    int nt =
-                        allowSelfConnect ? numTargs
-                            : numTargs - 1;
+                    int nt = allowSelfConnect ? numTargs : numTargs - 1;
                     if (densityTf.getValue() != null) {
-                        sps =
-                            (int) (((Number) densityTf
-                                .getValue()).doubleValue() * nt);
+                        sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
                         synsPerSource.setValue(new Integer(sps));
-                        int sVal =
-                            (int) (((Number) densityTf
-                                .getValue()).doubleValue() * 100);
-                        connectionDensitySlider
-                            .setValue(new Integer(sVal));
+                        int sVal = (int) (((Number) densityTf.getValue()).doubleValue() * 100);
+                        connectionDensitySlider.setValue(new Integer(sVal));
                     }
                 }
             }
@@ -483,10 +449,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                 sliderListener.disable();
                 synsPerSourceListener.disable();
 
-                int nt =
-                    allowSelfConnect
-                        || !recurrentConnection ? numTargs
-                        : numTargs - 1;
+                int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
                 double sparsity = Double.parseDouble(densityTf.getText());
                 synsPerSource.setValue(new Integer((int) (sparsity * nt)));
 
@@ -496,13 +459,12 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     }
 
     /**
-     * 
+     *
      */
     @Override
     public void fillFieldValues() {
         double connectivity = connection.getConnectionDensity();
-        equalizeEfferentsChkBx
-            .setSelected(connection.isEqualizeEfferents());
+        equalizeEfferentsChkBx.setSelected(connection.isEqualizeEfferents());
         allowSelfConnectChkBx.setSelected(connection.isSelfConnectionAllowed());
         synsPerSource.setValue((int) (connectivity * numTargs));
         connectionDensitySlider.setValue((int) (connectivity * 100));
@@ -519,9 +481,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     public boolean commitChanges() {
         if (equalizeEfferentsChkBx.isEnabled()) {
             // Should always be disabled if the connection is AllToAll
-            ((Sparse) connection)
-                .setEqualizeEfferents(equalizeEfferentsChkBx
-                    .isSelected());
+            ((Sparse) connection).setEqualizeEfferents(equalizeEfferentsChkBx.isSelected());
         }
         double connectivity = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(connectivity)) {
@@ -538,8 +498,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
             }
         }
         if (allowSelfConnectChkBx.isEnabled()) {
-            connection.setSelfConnectionAllowed(allowSelfConnectChkBx
-                .isSelected());
+            connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
         }
         return true;
     }
@@ -548,24 +507,19 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
      * {@inheritDoc}
      */
     @Override
-    public List<Synapse> applyConnection(List<Neuron> source,
-        List<Neuron> target) {
+    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
-                return AllToAll.connectAllToAll(source, target,
-                    Utils.intersects(source, target), allowSelfConnect, true);
+                return AllToAll.connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect, true);
             } else {
-                return Sparse.connectSparse(source, target, density,
-                    allowSelfConnect, equalizeEfferentsChkBx.isSelected(),
-                    true);
+                return Sparse.connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected(), true);
             }
         }
         return null;
     }
 
     /**
-     *
      * @return
      */
     public boolean isAllowSelfConnect() {
@@ -573,7 +527,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     }
 
     /**
-     *
      * @param allowSelfConnect
      */
     public void setAllowSelfConnect(boolean allowSelfConnect) {
@@ -589,8 +542,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
 
     public void setRecurrent(boolean recurrent) {
         recurrentConnection = recurrent;
-        if (densityTfListener != null && synsPerSourceListener != null
-            && sliderListener != null) {
+        if (densityTfListener != null && synsPerSourceListener != null && sliderListener != null) {
             refresh();
         }
     }
@@ -603,7 +555,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     }
 
     /**
-     *
      * @param numTargs
      */
     public void setNumTargs(int numTargs) {
@@ -614,16 +565,15 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     }
 
     public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	connectionDensitySlider.setEnabled(enabled);
-    	densityTf.setEnabled(enabled);
-    	synsPerSource.setEnabled(enabled);
-    	equalizeEfferentsChkBx.setEnabled(enabled);
-    	allowSelfConnectChkBx.setEnabled(enabled);
+        super.setEnabled(enabled);
+        connectionDensitySlider.setEnabled(enabled);
+        densityTf.setEnabled(enabled);
+        synsPerSource.setEnabled(enabled);
+        equalizeEfferentsChkBx.setEnabled(enabled);
+        allowSelfConnectChkBx.setEnabled(enabled);
     }
-    
+
     /**
-     *
      * @param density
      */
     public void setDensity(double density) {

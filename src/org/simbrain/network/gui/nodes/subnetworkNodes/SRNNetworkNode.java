@@ -18,14 +18,6 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SRNEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
@@ -35,6 +27,9 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.trainers.SRNTrainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of a group of a srn network.
@@ -47,18 +42,16 @@ public class SRNNetworkNode extends SubnetworkNode {
      * Create a layered network.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group        the layered network
      */
-    public SRNNetworkNode(final NetworkPanel networkPanel,
-        final SimpleRecurrentNetwork group) {
+    public SRNNetworkNode(final NetworkPanel networkPanel, final SimpleRecurrentNetwork group) {
         super(networkPanel, group);
         setContextMenu();
     }
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SRNEditorDialog(this.getNetworkPanel(),
-            (SimpleRecurrentNetwork) getSubnetwork());
+        return new SRNEditorDialog(this.getNetworkPanel(), (SimpleRecurrentNetwork) getSubnetwork());
     }
 
     /**
@@ -73,18 +66,12 @@ public class SRNNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         menu.add(clearAction);
         menu.addSeparator();
-        final SimpleRecurrentNetwork network =
-            (SimpleRecurrentNetwork) getSubnetwork();
+        final SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
-            getNetworkPanel(), network));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getInputNeurons(), network.getTrainingSet()
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getOutputNeurons(), network.getTrainingSet()
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(), network.getTrainingSet().getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
 
         setContextMenu(menu);
@@ -104,13 +91,9 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            SimpleRecurrentNetwork network =
-                (SimpleRecurrentNetwork) getSubnetwork();
-            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
-                getNetworkPanel(), new SRNTrainer(network));
-            JDialog frame =
-                getNetworkPanel().displayPanelInWindow(trainingPanel,
-                    "Trainer");
+            SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(getNetworkPanel(), new SRNTrainer(network));
+            JDialog frame = getNetworkPanel().displayPanelInWindow(trainingPanel, "Trainer");
             trainingPanel.setFrame(frame);
         }
     };
@@ -129,11 +112,9 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            SimpleRecurrentNetwork network =
-                (SimpleRecurrentNetwork) getSubnetwork();
+            SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
             network.initNetwork();
-            network.getParentNetwork().fireNeuronsUpdated(
-                network.getFlatNeuronList());
+            network.getParentNetwork().fireNeuronsUpdated(network.getFlatNeuronList());
         }
     };
 

@@ -18,35 +18,36 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Ungroup group.
  */
 public final class UngroupAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** Picked node. */
+    /**
+     * Picked node.
+     */
     private final ViewGroupNode node;
 
     /**
      * Ungroup selected objects.
      *
      * @param networkPanel network panel, must not be null.
-     * @param node the node being modify
+     * @param node         the node being modify
      */
-    public UngroupAction(final NetworkPanel networkPanel,
-            final ViewGroupNode node) {
+    public UngroupAction(final NetworkPanel networkPanel, final ViewGroupNode node) {
         super("Ungroup gui objects");
         this.node = node;
         if (networkPanel == null) {
@@ -55,8 +56,7 @@ public final class UngroupAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_U,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_U, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SHORT_DESCRIPTION, "Ungroup gui objects");
@@ -84,8 +84,9 @@ public final class UngroupAction extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.unGroup(node, true);

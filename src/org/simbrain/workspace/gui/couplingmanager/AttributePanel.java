@@ -18,15 +18,13 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import java.awt.BorderLayout;
+import org.simbrain.workspace.*;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-
-import org.simbrain.workspace.*;
-import org.simbrain.workspace.Producer;
 
 /**
  * Displays a panel with a JComboBox, which the user uses to select a component,
@@ -34,32 +32,44 @@ import org.simbrain.workspace.Producer;
  */
 public class AttributePanel extends JPanel implements ActionListener, MouseListener {
 
-    /** Parent frame. */
+    /**
+     * Parent frame.
+     */
     private JFrame parentFrame = new JFrame();
 
-    /** Drop down box for workspace components. */
+    /**
+     * Drop down box for workspace components.
+     */
     private ComponentDropDownBox componentComboBox;
 
-    /** List of Attributes in a specified Component. */
+    /**
+     * List of Attributes in a specified Component.
+     */
     private JList attributeList;
 
-    /** List model. */
+    /**
+     * List model.
+     */
     private DefaultListModel<Attribute> model;
 
     /* Whether this Panel displays producers or consumers. */
     public enum ProducerOrConsumer {
         Producing, Consuming
-    };
+    }
+
+    ;
 
     private ProducerOrConsumer producerOrConsumer;
 
-    /** Panel for setting visibility of attribute types. */
+    /**
+     * Panel for setting visibility of attribute types.
+     */
     private AttributeTypePanel attributeTypePanel;
 
     /**
      * Creates a new attribute list panel.
      *
-     * @param workspace reference to workspace
+     * @param workspace     reference to workspace
      * @param attributeType
      */
     public AttributePanel(Workspace workspace, ProducerOrConsumer attributeType) {
@@ -161,8 +171,8 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
     }
 
     /**
-     * @see ActionListener
      * @param event
+     * @see ActionListener
      */
     public void actionPerformed(ActionEvent event) {
         // Refresh component list
@@ -205,6 +215,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
     /**
      * Returns selected attributes.
+     *
      * @return list of selected attributes.
      */
     public List getSelectedAttributes() {
@@ -245,18 +256,16 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
     private class AttributeCellRenderer extends DefaultListCellRenderer {
 
         /**
-         * @overrides java.awt.Component
          * @param list
          * @param object
          * @param index
          * @param isSelected
          * @param cellHasFocus
          * @return
+         * @overrides java.awt.Component
          */
-        public java.awt.Component getListCellRendererComponent(JList list, Object object, int index,
-                boolean isSelected, boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(
-                    list, object, index, isSelected, cellHasFocus);
+        public java.awt.Component getListCellRendererComponent(JList list, Object object, int index, boolean isSelected, boolean cellHasFocus) {
+            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             // Set text color based on data type
             Attribute atttribute = (Attribute) object;
             renderer.setForeground(DesktopCouplingManager.getColor(atttribute.getType()));
@@ -270,7 +279,9 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      */
     private class ComponentDropDownBox extends JComboBox implements WorkspaceListener {
 
-        /** Reference to workspace. */
+        /**
+         * Reference to workspace.
+         */
         private Workspace workspace;
 
         /**
@@ -309,6 +320,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
             AttributePanel.this.clearList();
         }
 
-        public void newWorkspaceOpened() {}
+        public void newWorkspaceOpened() {
+        }
     }
 }

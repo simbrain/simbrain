@@ -26,7 +26,6 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  * Adapter for world listener class.
  *
  * @author Jeff Yoshimi
- *
  */
 public class WorldListenerAdapter implements WorldListener {
 

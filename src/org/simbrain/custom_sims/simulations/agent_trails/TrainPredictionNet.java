@@ -9,7 +9,9 @@ import org.simbrain.network.core.Synapse;
  */
 public class TrainPredictionNet implements NetworkUpdateAction {
 
-    /** Reference to simulation object that has all the main variables used. */
+    /**
+     * Reference to simulation object that has all the main variables used.
+     */
     AgentTrails sim;
 
     // TODO
@@ -51,8 +53,7 @@ public class TrainPredictionNet implements NetworkUpdateAction {
         for (Neuron neuron : sim.predictionNet.getNeuronList()) {
             // error = target - actual
             // error = current sensory - last prediction
-            error = sim.sensoryNet.getNeuronList().get(i).getActivation()
-                    - lastPrediction[i];
+            error = sim.sensoryNet.getNeuronList().get(i).getActivation() - lastPrediction[i];
             sumError += error * error;
             // System.out.println(i + ":" + error + ":" + neuron.getId());
             neuron.setAuxValue(error);
@@ -64,9 +65,7 @@ public class TrainPredictionNet implements NetworkUpdateAction {
 
         // Update all value synapses
         for (Synapse synapse : sim.net.getNetwork().getFlatSynapseList()) {
-            double newStrength = synapse.getStrength()
-                    + learningRate * synapse.getSource().getActivation()
-                            * synapse.getTarget().getAuxValue();
+            double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
             synapse.setStrength(newStrength);
             // System.out.println(newStrength);
         }

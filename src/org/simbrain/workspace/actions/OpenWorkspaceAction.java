@@ -18,15 +18,13 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Open a new workspace.
@@ -37,6 +35,7 @@ public final class OpenWorkspaceAction extends DesktopAction {
 
     /**
      * Create an open workspace action with the specified workspace.
+     *
      * @param desktop
      */
     public OpenWorkspaceAction(SimbrainDesktop desktop) {
@@ -44,13 +43,13 @@ public final class OpenWorkspaceAction extends DesktopAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
         putValue(SHORT_DESCRIPTION, "Open workspace (.zip)");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         desktop.openWorkspace();

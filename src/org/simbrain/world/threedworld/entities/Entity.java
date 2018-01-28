@@ -1,11 +1,10 @@
 package org.simbrain.world.threedworld.entities;
 
-import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
-
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 
 /**
  * Entity is an interface for an object in a ThreeDWorld simulation which can apply translations and rotations,
@@ -40,12 +39,13 @@ public interface Entity {
 
     /**
      * @param value Assign the position of the entity during the next 3d engine update. Use this method
-     * when setting position from the main Simbrain thread.
+     *              when setting position from the main Simbrain thread.
      */
     void queuePosition(Vector3f value);
 
     /**
      * Translate the entity by an offset vector.
+     *
      * @param offset The relative offset to apply to the position of the entity.
      */
     void move(Vector3f offset);
@@ -62,12 +62,14 @@ public interface Entity {
 
     /**
      * Set the rotation of the entity during the next engine update.
+     *
      * @param value The quaternion to assign to the entity.
      */
     void queueRotation(Quaternion value);
 
     /**
      * Rotate the entity by a relative quaternion.
+     *
      * @param rotation The quaternion to append to the entity's current rotation.
      */
     void rotate(Quaternion rotation);
@@ -79,6 +81,7 @@ public interface Entity {
 
     /**
      * Update the entity state and the state of any subcomponents.
+     *
      * @param t The current time.
      */
     void update(float t);
@@ -90,6 +93,7 @@ public interface Entity {
 
     /**
      * Construct a property editor customized for this entity.
+     *
      * @return An editor with fields appropriate for the entity.
      */
     Editor getEditor();

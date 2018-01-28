@@ -1,62 +1,76 @@
 package org.simbrain.network.neuron_update_rules;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.randomizer.Randomizer;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * TODO
- *
+ * <p>
  * https://en.wikipedia.org/wiki/Kuramoto_model
- *
+ * <p>
  * K is weight N = number of fan-in nodes
- *
+ * <p>
  * TODO: Contextual increment.  Proper randomize and bounds.
  * Remove un-needed overrides.  Finish GUI.   Include time step in gui.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class KuramotoRule extends NeuronUpdateRule
-        implements BiasedUpdateRule, DifferentiableUpdateRule,
-        BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
-    /** The Default upper bound. */
+    /**
+     * The Default upper bound.
+     */
     private static final double DEFAULT_UPPER_BOUND = 1.0;
 
-    /** The Default lower bound. */
+    /**
+     * The Default lower bound.
+     */
     private static final double DEFAULT_LOWER_BOUND = -1.0;
 
-    /** Default clipping setting. */
+    /**
+     * Default clipping setting.
+     */
     private static final boolean DEFAULT_CLIPPING = true;
 
-    /** Natural Frequency. */
+    /**
+     * Natural Frequency.
+     */
     public double naturalFrequency = 1;
 
-    /** Bias. */
+    /**
+     * Bias.
+     */
     public double bias = 0;
 
-    /** Noise generator. */
+    /**
+     * Noise generator.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
-    /** Clipping. */
+    /**
+     * Clipping.
+     */
     private boolean clipping = DEFAULT_CLIPPING;
 
-    /** The upper bound of the activity if clipping is used. */
+    /**
+     * The upper bound of the activity if clipping is used.
+     */
     private double upperBound = DEFAULT_UPPER_BOUND;
 
-    /** The lower bound of the activity if clipping is used. */
+    /**
+     * The lower bound of the activity if clipping is used.
+     */
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     ///// NEW STUFF ////
@@ -69,15 +83,13 @@ public class KuramotoRule extends NeuronUpdateRule
 
         double sum = 0;
         for (Synapse s : neuron.getFanIn()) {
-            sum += s.getStrength() * Math.sin(
-                    s.getSource().getActivation() - neuron.getActivation());
+            sum += s.getStrength() * Math.sin(s.getSource().getActivation() - neuron.getActivation());
         }
         double N = neuron.getFanIn().size();
         N = (N > 0) ? N : 1;
         double theta_dot = naturalFrequency + sum / N;
 
-        double theta = neuron.getActivation()
-                + (timeStep * theta_dot);
+        double theta = neuron.getActivation() + (timeStep * theta_dot);
         theta = theta % (2 * Math.PI);
 
         // if (addNoise) {

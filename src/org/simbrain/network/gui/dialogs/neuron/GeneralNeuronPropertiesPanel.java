@@ -18,23 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Window;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.DefaultFormatter;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.NeuronUpdateRule.InputType;
@@ -47,36 +30,52 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.YesNoNull;
 
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultFormatter;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+
 /**
  * A panel containing more detailed generic information about neurons. Generally
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- *
+ * <p>
  * Values included are: Activation, upper / lower bounds, label, priority and
  * increment.
  *
  * @author ztosi
  * @author jyoshimi
- *
  */
 @SuppressWarnings("serial")
-public class GeneralNeuronPropertiesPanel extends JPanel
-        implements EditablePanel {
+public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePanel {
 
-    /** The neurons being modified. */
+    /**
+     * The neurons being modified.
+     */
     private List<Neuron> neuronList;
 
-    /** The neuron Id. */
+    /**
+     * The neuron Id.
+     */
     private final JLabel idLabel = new JLabel();
 
-    /** Activation field. */
+    /**
+     * Activation field.
+     */
     private JFormattedTextField tfActivation = new JFormattedTextField();
 
-    /** Label Field. */
+    /**
+     * Label Field.
+     */
     private final JFormattedTextField tfNeuronLabel;
 
-    /** Panel containing fields for upper bound, lower bound, and clipping. */
+    /**
+     * Panel containing fields for upper bound, lower bound, and clipping.
+     */
     private BoundsClippingPanel boundsClippingPanel;
 
     /**
@@ -91,15 +90,20 @@ public class GeneralNeuronPropertiesPanel extends JPanel
      */
     private final JPanel detailPanel = new JPanel();
 
-    /** Increment field. */
+    /**
+     * Increment field.
+     */
     private final JFormattedTextField tfIncrement = new JFormattedTextField();
 
-    /** Priority Field. */
+    /**
+     * Priority Field.
+     */
     private final JFormattedTextField tfPriority = new JFormattedTextField();
 
-    /** Input type dropdown. */
-    private final YesNoNull inputType = new YesNoNull(
-            InputType.WEIGHTED.toString(), InputType.SYNAPTIC.toString());
+    /**
+     * Input type dropdown.
+     */
+    private final YesNoNull inputType = new YesNoNull(InputType.WEIGHTED.toString(), InputType.SYNAPTIC.toString());
 
     /**
      * Whether or not the neuron is clamped (i.e. will not update/change its
@@ -107,7 +111,9 @@ public class GeneralNeuronPropertiesPanel extends JPanel
      */
     private final YesNoNull clamped = new YesNoNull();
 
-    /** Parent reference so pack can be called. */
+    /**
+     * Parent reference so pack can be called.
+     */
     private final Window parent;
 
     /**
@@ -124,17 +130,14 @@ public class GeneralNeuronPropertiesPanel extends JPanel
      * In fact this is probably the only reason to use this factory method over
      * {@link #createBasicNeuronInfoPanel(List, Window)}.
      *
-     * @param neuronList the neurons whose information is being displayed/made
-     *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing
+     * @param neuronList    the neurons whose information is being displayed/made
+     *                      available to edit on this panel
+     * @param parent        the parent window for dynamic resizing
      * @param displayIDInfo whether or not to display ID info
      * @return A basic neuron info panel with the specified parameters
      */
-    public static GeneralNeuronPropertiesPanel createPanel(
-            final List<Neuron> neuronList, final Window parent,
-            final boolean displayIDInfo) {
-        GeneralNeuronPropertiesPanel bnip = new GeneralNeuronPropertiesPanel(
-                neuronList, parent, displayIDInfo);
+    public static GeneralNeuronPropertiesPanel createPanel(final List<Neuron> neuronList, final Window parent, final boolean displayIDInfo) {
+        GeneralNeuronPropertiesPanel bnip = new GeneralNeuronPropertiesPanel(neuronList, parent, displayIDInfo);
         bnip.addListeners();
         return bnip;
     }
@@ -144,32 +147,28 @@ public class GeneralNeuronPropertiesPanel extends JPanel
      * is automatically set based on the state of the neuron list.
      *
      * @param neuronList the neurons whose information is being displayed/made
-     *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing.
+     *                   available to edit on this panel
+     * @param parent     the parent window for dynamic resizing.
      * @return A basic neuron info panel with the specified parameters
      */
-    public static GeneralNeuronPropertiesPanel createPanel(
-            final List<Neuron> neuronList, final Window parent) {
-        return createPanel(neuronList, parent,
-                !(neuronList == null || neuronList.size() != 1));
+    public static GeneralNeuronPropertiesPanel createPanel(final List<Neuron> neuronList, final Window parent) {
+        return createPanel(neuronList, parent, !(neuronList == null || neuronList.size() != 1));
     }
 
     /**
      * Construct the panel.
      *
-     * @param neuronList list of neurons
-     * @param parent parent window
+     * @param neuronList    list of neurons
+     * @param parent        parent window
      * @param displayIDInfo whether to display the id window
      */
-    private GeneralNeuronPropertiesPanel(final List<Neuron> neuronList,
-            final Window parent, final boolean displayIDInfo) {
+    private GeneralNeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
-        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false,
-                "More", "Less", parent);
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More", "Less", parent);
         boundsClippingPanel = new BoundsClippingPanel(neuronList, parent);
-        
+
         DefaultFormatter format = new DefaultFormatter();
         format.setOverwriteMode(false);
         tfNeuronLabel = new JFormattedTextField(format);
@@ -281,12 +280,12 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         }
 
         // Handle ID
-        if(displayIDInfo == true) {
+        if (displayIDInfo == true) {
             idLabel.setText(neuronRef.getId());
         }
 
         // Handle Activation
-        ParameterGetter<Neuron, Double> actGetter = (n) -> ((Neuron)n).getActivation();
+        ParameterGetter<Neuron, Double> actGetter = (n) -> ((Neuron) n).getActivation();
         if (!NetworkUtils.isConsistent(neuronList, actGetter)) {
             tfActivation.setValue(SimbrainConstants.NULL_STRING);
         } else {
@@ -294,7 +293,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         }
 
         // Handle Label
-        ParameterGetter<Neuron, String> lblGetter = (n) -> ((Neuron)n).getLabel();
+        ParameterGetter<Neuron, String> lblGetter = (n) -> ((Neuron) n).getLabel();
         if (!NetworkUtils.isConsistent(neuronList, lblGetter)) {
             tfNeuronLabel.setValue(SimbrainConstants.NULL_STRING);
         } else {
@@ -305,8 +304,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         boundsClippingPanel.fillFieldValues();
 
         // Handle Priority
-        ParameterGetter<Neuron, Integer> priorityGetter = (n) -> ((Neuron) n)
-                .getUpdatePriority();
+        ParameterGetter<Neuron, Integer> priorityGetter = (n) -> ((Neuron) n).getUpdatePriority();
         if (!NetworkUtils.isConsistent(neuronList, priorityGetter)) {
             tfPriority.setValue(SimbrainConstants.NULL_STRING);
         } else {
@@ -314,8 +312,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         }
 
         // Handle Clamped
-        ParameterGetter<Neuron, Boolean> clampedGetter = (n) -> ((Neuron) n)
-                .isClamped();
+        ParameterGetter<Neuron, Boolean> clampedGetter = (n) -> ((Neuron) n).isClamped();
         if (!NetworkUtils.isConsistent(neuronList, clampedGetter)) {
             clamped.setNull();
         } else {
@@ -326,8 +323,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
 
         // Handle Increment
-        ParameterGetter<NeuronUpdateRule, Double> incGeter = (
-                n) -> ((NeuronUpdateRule) n).getIncrement();
+        ParameterGetter<NeuronUpdateRule, Double> incGeter = (n) -> ((NeuronUpdateRule) n).getIncrement();
         if (!NetworkUtils.isConsistent(ruleList, incGeter)) {
             tfIncrement.setValue(SimbrainConstants.NULL_STRING);
         } else {
@@ -335,13 +331,11 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         }
 
         // Handle input type
-        ParameterGetter<NeuronUpdateRule, InputType> itGeter = (
-                n) -> ((NeuronUpdateRule) n).getInputType();
+        ParameterGetter<NeuronUpdateRule, InputType> itGeter = (n) -> ((NeuronUpdateRule) n).getInputType();
         if (!NetworkUtils.isConsistent(ruleList, itGeter)) {
             inputType.setNull();
         } else {
-            inputType
-                    .setSelectedItem(ruleList.get(0).getInputType().toString());
+            inputType.setSelectedItem(ruleList.get(0).getInputType().toString());
         }
     }
 
@@ -358,25 +352,21 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         // Commit activations
         double act = Utils.doubleParsable(tfActivation);
         if (!Double.isNaN(act)) {
-            neuronList.stream().forEach(n -> n.forceSetActivation(
-                    Utils.doubleParsable(tfActivation.getText())));
+            neuronList.stream().forEach(n -> n.forceSetActivation(Utils.doubleParsable(tfActivation.getText())));
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfActivation.getText()
-                    .matches(SimbrainConstants.NULL_STRING);
+            success &= tfActivation.getText().matches(SimbrainConstants.NULL_STRING);
         }
 
         // Label
         if (!tfNeuronLabel.getText().equals(SimbrainConstants.NULL_STRING)) {
-            neuronList.stream()
-                    .forEach(n -> n.setLabel(tfNeuronLabel.getText()));
+            neuronList.stream().forEach(n -> n.setLabel(tfNeuronLabel.getText()));
         }
 
         // Clamped
         if (!clamped.isNull()) {
-            neuronList.stream()
-                    .forEach(n -> n.setClamped(clamped.isSelected()));
+            neuronList.stream().forEach(n -> n.setClamped(clamped.isSelected()));
         }
 
         // Bounds and clipping
@@ -389,8 +379,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfIncrement.getText()
-                    .matches(SimbrainConstants.NULL_STRING);
+            success &= tfIncrement.getText().matches(SimbrainConstants.NULL_STRING);
         }
 
         // Priority
@@ -401,20 +390,15 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfPriority.getText()
-                    .matches(SimbrainConstants.NULL_STRING);
+            success &= tfPriority.getText().matches(SimbrainConstants.NULL_STRING);
         }
 
         // Input type
-        if (((String) inputType.getSelectedItem())
-                .matches(InputType.WEIGHTED.toString())) {
-            neuronList.stream().forEach(
-                    n -> n.getUpdateRule().setInputType(InputType.WEIGHTED));
+        if (((String) inputType.getSelectedItem()).matches(InputType.WEIGHTED.toString())) {
+            neuronList.stream().forEach(n -> n.getUpdateRule().setInputType(InputType.WEIGHTED));
 
-        } else if (((String) inputType.getSelectedItem())
-                .matches(InputType.SYNAPTIC.toString())) {
-            neuronList.stream().forEach(
-                    n -> n.getUpdateRule().setInputType(InputType.SYNAPTIC));
+        } else if (((String) inputType.getSelectedItem()).matches(InputType.SYNAPTIC.toString())) {
+            neuronList.stream().forEach(n -> n.getUpdateRule().setInputType(InputType.SYNAPTIC));
         }
 
         // Update neurons

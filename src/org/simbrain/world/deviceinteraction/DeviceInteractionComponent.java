@@ -1,11 +1,9 @@
 package org.simbrain.world.deviceinteraction;
 
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,10 +34,8 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
         this.world = world;
     }
 
-    public static DeviceInteractionComponent open (
-            InputStream input, final String name, final String format) {
-        KeyboardWorld newWorld = (KeyboardWorld) KeyboardWorld.getXStream()
-                .fromXML(input);
+    public static DeviceInteractionComponent open(InputStream input, final String name, final String format) {
+        KeyboardWorld newWorld = (KeyboardWorld) KeyboardWorld.getXStream().fromXML(input);
         return new DeviceInteractionComponent(name, newWorld);
     }
 
@@ -49,7 +45,8 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     }
 
     @Override
-    protected void closing() {}
+    protected void closing() {
+    }
 
     @Override
     public List<Object> getModels() {

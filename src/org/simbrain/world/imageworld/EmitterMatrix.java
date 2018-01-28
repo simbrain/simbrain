@@ -1,14 +1,13 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+
 public class EmitterMatrix extends ImageSourceAdapter {
-    @UserParameter(label="Use RGB Colors", description="Sets whether to couple integer array of RGB colors or" +
-            "separate red, green, and blue channels.")
+    @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
     private double[][] channels;
     private int[] colors;
@@ -25,7 +24,9 @@ public class EmitterMatrix extends ImageSourceAdapter {
         colors = new int[getWidth() * getHeight()];
     }
 
-    /** Returns whether the emitter matrix should use int RGB colors or double channels. */
+    /**
+     * Returns whether the emitter matrix should use int RGB colors or double channels.
+     */
     public boolean isUsingRGBColor() {
         return usingRGBColor;
     }
@@ -52,19 +53,19 @@ public class EmitterMatrix extends ImageSourceAdapter {
         System.arraycopy(values, 0, colors, 0, length);
     }
 
-    @Consumable(defaultVisibility=false)
+    @Consumable(defaultVisibility = false)
     public void setRed(double[] values) {
         int length = Math.min(values.length, getWidth() * getHeight());
         System.arraycopy(values, 0, channels[0], 0, length);
     }
 
-    @Consumable(defaultVisibility=false)
+    @Consumable(defaultVisibility = false)
     public void setGreen(double[] values) {
         int length = Math.min(values.length, getWidth() * getHeight());
         System.arraycopy(values, 0, channels[1], 0, length);
     }
 
-    @Consumable(defaultVisibility=false)
+    @Consumable(defaultVisibility = false)
     public void setBlue(double[] values) {
         int length = Math.min(values.length, getWidth() * getHeight());
         System.arraycopy(values, 0, channels[2], 0, length);
@@ -78,10 +79,10 @@ public class EmitterMatrix extends ImageSourceAdapter {
 
     /**
      * Update the emitter matrix image from the couplable arrays.
-     *
+     * <p>
      * If the emitter matrix is using color ints, then the new image will simply copy the coupled integer array
      * to the current image.
-     *
+     * <p>
      * If the emitter matrix is using double channels, then each channel of values (0.0 to 1.0) will be translated
      * to integers (0 to 255) and assigned to the corresponding pixels.
      */

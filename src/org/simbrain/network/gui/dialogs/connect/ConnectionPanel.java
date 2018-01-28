@@ -18,20 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.CardLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
@@ -40,54 +26,75 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Panel for editing connection objects when creating new synapse groups.
- *
+ * <p>
  * Very similar to {@link QuickConnectPreferencesPanel} (with some repeated
  * code). Perhaps factor out common code later.
  */
 public final class ConnectionPanel {
 
-    /** Parent frame so pack can be called when combo box changed. */
+    /**
+     * Parent frame so pack can be called when combo box changed.
+     */
     private final Window parentFrame;
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** The main panel holding the connection panels. */
+    /**
+     * The main panel holding the connection panels.
+     */
     private final JPanel mainPanel;
 
-    /** The all to all connector. */
+    /**
+     * The all to all connector.
+     */
     private final AllToAll allToAll = new AllToAll();
 
-    /** The one to one connector. */
+    /**
+     * The one to one connector.
+     */
     private final OneToOne oneToOne = new OneToOne();
 
-    /** The sparse connector. */
+    /**
+     * The sparse connector.
+     */
     private final Sparse sparse = new Sparse();
 
-    /** Select the connection type. */
-    private JComboBox<ConnectNeurons> cbConnectionType = new JComboBox<ConnectNeurons>(
-            new ConnectNeurons[] { allToAll, oneToOne, sparse });
+    /**
+     * Select the connection type.
+     */
+    private JComboBox<ConnectNeurons> cbConnectionType = new JComboBox<ConnectNeurons>(new ConnectNeurons[]{allToAll, oneToOne, sparse});
 
-    /** Panel with card layout showing the different connection panels. */
+    /**
+     * Panel with card layout showing the different connection panels.
+     */
     private JPanel connectPanel = new JPanel();
 
-    /** List of connection panels used to separately set their preferred sizes. */
+    /**
+     * List of connection panels used to separately set their preferred sizes.
+     */
     private AbstractConnectionPanel[] connectorPanels = new AbstractConnectionPanel[3];
 
     /**
      * Construct a connection panel.
      *
-     * @param parent parent window
+     * @param parent       parent window
      * @param networkPanel parent network panel
      * @return constructed connection panel
      */
-    public static ConnectionPanel createConnectionPanel(final Window parent,
-            final NetworkPanel networkPanel) {
+    public static ConnectionPanel createConnectionPanel(final Window parent, final NetworkPanel networkPanel) {
         ConnectionPanel cp = new ConnectionPanel(parent, networkPanel);
         cp.addListeners();
         return cp;
@@ -96,7 +103,7 @@ public final class ConnectionPanel {
     /**
      * Private constructor for the factory method.
      *
-     * @param parent parent window
+     * @param parent       parent window
      * @param networkPanel parent network panel
      */
     private ConnectionPanel(final Window parent, final NetworkPanel networkPanel) {
@@ -113,13 +120,11 @@ public final class ConnectionPanel {
         connectPanel.setLayout(new CardLayout());
         connectorPanels[0] = new AllToAllPanel(allToAll, networkPanel);
         connectorPanels[1] = new OneToOnePanel(oneToOne);
-        connectorPanels[2] = SparseConnectionPanel
-                .createSparsityAdjustmentPanel(sparse, networkPanel);
+        connectorPanels[2] = SparseConnectionPanel.createSparsityAdjustmentPanel(sparse, networkPanel);
         connectPanel.add(connectorPanels[0], AllToAll.getName());
         connectPanel.add(connectorPanels[1], OneToOne.getName());
         connectPanel.add(connectorPanels[2], Sparse.getName());
-        ((CardLayout) connectPanel.getLayout()).show(connectPanel,
-                AllToAll.getName());
+        ((CardLayout) connectPanel.getLayout()).show(connectPanel, AllToAll.getName());
 
         JPanel cbPanel = new JPanel(new FlowLayout());
         cbPanel.add(new JLabel("Connection Manager: "));
@@ -156,16 +161,14 @@ public final class ConnectionPanel {
             }
         });
     }
-    
+
     /**
      * Update state of combo box.
      */
     private void updateComboBox() {
         CardLayout cl = (CardLayout) connectPanel.getLayout();
-        cl.show(connectPanel, cbConnectionType.getSelectedItem()
-                .toString());
-        connectPanel.setPreferredSize(getSelectedPanel()
-                .getPreferredSize());
+        cl.show(connectPanel, cbConnectionType.getSelectedItem().toString());
+        connectPanel.setPreferredSize(getSelectedPanel().getPreferredSize());
         mainPanel.revalidate();
         mainPanel.repaint();
         parentFrame.pack();
@@ -190,7 +193,7 @@ public final class ConnectionPanel {
      * group being created.
      *
      * @param synapseGroup the synapse group whose connection object is to be
-     *            set
+     *                     set
      */
     public void commitChanges(SynapseGroup synapseGroup) {
         AbstractConnectionPanel acp = getSelectedPanel();
@@ -207,7 +210,8 @@ public final class ConnectionPanel {
 
     /**
      * Test the connection panel.
-     * @param args 
+     *
+     * @param args
      */
     public static void main(String[] args) {
         NetworkPanel np = new NetworkPanel(new Network());

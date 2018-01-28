@@ -18,19 +18,19 @@
  */
 package org.simbrain.network.gui.actions.neuron;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show Priorities action.
  */
 public final class ShowPrioritiesAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -48,12 +48,12 @@ public final class ShowPrioritiesAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION,
-                "Show neuron priorities (for use in priority update)");
+        putValue(SHORT_DESCRIPTION, "Show neuron priorities (for use in priority update)");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

@@ -18,14 +18,6 @@
  */
 package org.simbrain.network.desktop;
 
-import java.awt.Color;
-import java.awt.Dialog;
-import java.util.Collection;
-
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -53,10 +45,17 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.CouplingFactory;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.CouplingMenuConsumer;
 import org.simbrain.workspace.gui.CouplingMenuProducer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Collection;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting. This is
@@ -71,19 +70,18 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  */
 public class NetworkPanelDesktop extends NetworkPanel {
 
-    /** Reference to Desktop Component. */
+    /**
+     * Reference to Desktop Component.
+     */
     NetworkDesktopComponent component;
 
     /**
      * Construct the desktop extension of network panel. The main thing
      *
-     * @param component
-     *            the component level representation of the desktop
-     * @param Network
-     *            the neural network model
+     * @param component the component level representation of the desktop
+     * @param Network   the neural network model
      */
-    public NetworkPanelDesktop(final NetworkDesktopComponent component,
-            final Network Network) {
+    public NetworkPanelDesktop(final NetworkDesktopComponent component, final Network Network) {
         super(Network);
         this.component = component;
 
@@ -227,7 +225,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * This version of network dialog allows user to set User Preferences.
      *
      * @param networkPanel network panel
-     *
      * @return superclass version of network dialog, with User Preferences
      */
     public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
@@ -318,15 +315,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public StandardDialog getNeuronGroupDialog(final NeuronGroupNode node) {
         // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
         // only ever be one Simbrain Desktop?
-        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-                .iterator().next();
-        @SuppressWarnings("serial")
-        StandardDialog dialog = new StandardDialog(current.getFrame(),
-                "Neuron Group Dialog") {
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
+        @SuppressWarnings("serial") StandardDialog dialog = new StandardDialog(current.getFrame(), "Neuron Group Dialog") {
             private final NeuronGroupPanel panel;
+
             {
-                panel = NeuronGroupPanel.createNeuronGroupPanel(
-                        node.getNetworkPanel(), node.getNeuronGroup(), this);
+                panel = NeuronGroupPanel.createNeuronGroupPanel(node.getNetworkPanel(), node.getNeuronGroup(), this);
                 setContentPane(panel);
             }
 
@@ -346,34 +340,27 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * SimbrainDesktop.
      */
     @Override
-    public StandardDialog getSynapseGroupDialog(
-            SynapseGroupInteractionBox sgib) {
+    public StandardDialog getSynapseGroupDialog(SynapseGroupInteractionBox sgib) {
         // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
         // only ever be one Simbrain Desktop?
-        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-                .iterator().next();
-        SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(
-                current.getFrame(), this, sgib.getSynapseGroup());
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
+        SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(current.getFrame(), this, sgib.getSynapseGroup());
         sgd.setModalityType(Dialog.ModalityType.MODELESS);
         return sgd;
     }
 
     @Override
     public StandardDialog getNeuronDialog(Collection<NeuronNode> nns) {
-        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-                .iterator().next();
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns,
-                current.getFrame());
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
+        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns, current.getFrame());
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
     }
 
     @Override
     public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {
-        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-                .iterator().next();
-        SynapseDialog dialog = SynapseDialog.createSynapseDialog(sns,
-                current.getFrame());
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(sns, current.getFrame());
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
     }
@@ -410,14 +397,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
             Workspace workspace = component.getWorkspaceComponent().getWorkspace();
             CouplingFactory factory = workspace.getCouplingFactory();
             Producer<?> producer = factory.getProducer(neuronGroup, "getExternalActivations");
-            JMenu producerMenu = new CouplingMenuProducer("Activations",
-                    component.getWorkspaceComponent().getWorkspace(), producer);
+            JMenu producerMenu = new CouplingMenuProducer("Activations", component.getWorkspaceComponent().getWorkspace(), producer);
             topMenu.add(producerMenu);
 
             // Spikes
-            Producer<?> producer2 =  factory.getProducer(neuronGroup, "getSpikeIndexes");
-            JMenu producerMenu2 = new CouplingMenuProducer("Spike Indices",
-                    component.getWorkspaceComponent().getWorkspace(), producer2);
+            Producer<?> producer2 = factory.getProducer(neuronGroup, "getSpikeIndexes");
+            JMenu producerMenu2 = new CouplingMenuProducer("Spike Indices", component.getWorkspaceComponent().getWorkspace(), producer2);
             topMenu.add(producerMenu2);
             return topMenu;
         }

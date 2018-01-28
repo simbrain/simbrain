@@ -18,28 +18,31 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>IACNeuronPanel</b> edits an IAC neuron or group of neurons.
  */
 public class IACRulePanel extends AbstractNeuronRulePanel {
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final IACRule prototypeRule = new IACRule();
 
     /**
@@ -49,11 +52,8 @@ public class IACRulePanel extends AbstractNeuronRulePanel {
         super();
         this.add(tabbedPane);
 
-        JTextField decayField = createTextField(
-                (r) -> ((IACRule) r).getDecay(),
-                (r, val) -> ((IACRule) r).setDecay((double) val));
-        JTextField restField = createTextField((r) -> ((IACRule) r).getRest(),
-                (r, val) -> ((IACRule) r).setRest((double) val));
+        JTextField decayField = createTextField((r) -> ((IACRule) r).getDecay(), (r, val) -> ((IACRule) r).setDecay((double) val));
+        JTextField restField = createTextField((r) -> ((IACRule) r).getRest(), (r, val) -> ((IACRule) r).setRest((double) val));
 
         mainTab.addItem("Decay", decayField);
         mainTab.addItem("Rest", restField);

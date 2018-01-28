@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.layouts;
 
+import org.simbrain.network.core.Neuron;
+
 import java.awt.geom.Point2D;
 import java.util.List;
-
-import org.simbrain.network.core.Neuron;
 
 /**
  * Interface for all neuron layout managers, which arrange a set of neurons in

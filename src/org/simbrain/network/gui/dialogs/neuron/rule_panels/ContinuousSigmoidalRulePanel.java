@@ -18,26 +18,30 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 
+import javax.swing.*;
+
 /**
- *
  * @author Zoë Tosi
- *
  */
 @SuppressWarnings("serial")
 public class ContinuousSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
 
-    /** Time constant field. */
+    /**
+     * Time constant field.
+     */
     private JTextField tfTimeConstant;
 
-    /** Text field for leak constant. */
+    /**
+     * Text field for leak constant.
+     */
     private JTextField tfLeakConstant;
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private static ContinuousSigmoidalRule prototypeRule = new ContinuousSigmoidalRule();
 
     /**
@@ -48,14 +52,8 @@ public class ContinuousSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
     public ContinuousSigmoidalRulePanel() {
         super();
         this.add(tabbedPane);
-        tfTimeConstant = createTextField(
-                (r) -> ((ContinuousSigmoidalRule) r).getTimeConstant(),
-                (r, val) -> ((ContinuousSigmoidalRule) r)
-                        .setTimeConstant((double) val));
-        tfLeakConstant = createTextField(
-                (r) -> ((ContinuousSigmoidalRule) r).getLeakConstant(),
-                (r, val) -> ((ContinuousSigmoidalRule) r)
-                        .setLeakConstant((double) val));
+        tfTimeConstant = createTextField((r) -> ((ContinuousSigmoidalRule) r).getTimeConstant(), (r, val) -> ((ContinuousSigmoidalRule) r).setTimeConstant((double) val));
+        tfLeakConstant = createTextField((r) -> ((ContinuousSigmoidalRule) r).getLeakConstant(), (r, val) -> ((ContinuousSigmoidalRule) r).setLeakConstant((double) val));
         mainTab.addItem("Implementation", cbImplementation);
         mainTab.addItem("Time Constant", tfTimeConstant);
         mainTab.addItem("Leak Constant", tfLeakConstant);

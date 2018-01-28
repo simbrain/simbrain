@@ -32,16 +32,24 @@ public class AdditiveRule extends NeuronUpdateRule {
 
     //TODO: May need clipping and bounds.
 
-    /** Lambda. */
+    /**
+     * Lambda.
+     */
     private double lambda = 1.4;
 
-    /** Resistance. */
+    /**
+     * Resistance.
+     */
     private double resistance = 1;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** For adding noise to the neuron. */
+    /**
+     * For adding noise to the neuron.
+     */
     private boolean addNoise = false;
 
     /**
@@ -79,8 +87,7 @@ public class AdditiveRule extends NeuronUpdateRule {
             }
         }
 
-        double val = neuron.getActivation() + neuron.getNetwork().getTimeStep()
-                * (-neuron.getActivation() / resistance + wtdSum);
+        double val = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (-neuron.getActivation() / resistance + wtdSum);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

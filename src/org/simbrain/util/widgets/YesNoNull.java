@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.Dimension;
+import java.awt.*;
 
 /**
  * <b>YesNoNull</b> creates a combo box that has three states; True, false
@@ -26,15 +26,21 @@ import java.awt.Dimension;
  * the same value, or are inconsistent. (e.g. Multiple selected neurons.)
  */
 @SuppressWarnings("serial")
-public class YesNoNull extends ChoicesWithNull  {
+public class YesNoNull extends ChoicesWithNull {
 
-    /** Integer value for true. */
+    /**
+     * Integer value for true.
+     */
     private static final int TRUE = 0;
 
-    /** Integer value for false. */
+    /**
+     * Integer value for false.
+     */
     private static final int FALSE = 1;
 
-    /** Integer value for null. */
+    /**
+     * Integer value for null.
+     */
     private static final int NULL = 2;
 
     /**

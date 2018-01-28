@@ -18,15 +18,12 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.apache.log4j.Logger;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Iterate network action.
@@ -34,7 +31,9 @@ import org.simbrain.resource.ResourceManager;
 public final class IterateNetworkAction extends AbstractAction {
     Logger LOGGER = Logger.getLogger(IterateNetworkAction.class);
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -51,16 +50,15 @@ public final class IterateNetworkAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-        putValue(SHORT_DESCRIPTION,
-                "Step network update algorithm (\"spacebar\")");
+        putValue(SHORT_DESCRIPTION, "Step network update algorithm (\"spacebar\")");
 
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(' '), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(' '), this);
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         LOGGER.debug("actionPerformed called");

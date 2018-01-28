@@ -18,24 +18,26 @@
  */
 package org.simbrain.plot.barchart;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.simbrain.plot.ChartCouplingListener;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Data for a JFreeChart bar chart.
  */
 public class BarChartComponent extends WorkspaceComponent {
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private BarChartModel model;
 
     /**
@@ -53,7 +55,7 @@ public class BarChartComponent extends WorkspaceComponent {
      * Create new BarChart Component from a specified model. Used in
      * deserializing.
      *
-     * @param name chart name
+     * @param name  chart name
      * @param model chart model
      */
     public BarChartComponent(String name, BarChartModel model) {
@@ -65,7 +67,7 @@ public class BarChartComponent extends WorkspaceComponent {
     /**
      * Initializes a jfreechart with specific number of data sources.
      *
-     * @param name name of component
+     * @param name    name of component
      * @param numBars number of bars in plot
      */
     public BarChartComponent(String name, int numBars) {
@@ -122,8 +124,8 @@ public class BarChartComponent extends WorkspaceComponent {
     /**
      * Opens a saved bar chart.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return bar chart component to be opened
      */

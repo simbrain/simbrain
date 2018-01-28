@@ -18,21 +18,22 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show Trainer object for training selected source and target neurons.
  */
 public final class ShowTrainerAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -66,10 +67,8 @@ public final class ShowTrainerAction extends AbstractAction {
      * neuron.
      */
     private void updateAction() {
-        boolean atLeastOneSourceSelected = (networkPanel
-                .getSourceModelNeurons().size() > 0);
-        boolean atLeastOneTargetSelected = (networkPanel
-                .getSelectedModelElements().size() > 0);
+        boolean atLeastOneSourceSelected = (networkPanel.getSourceModelNeurons().size() > 0);
+        boolean atLeastOneTargetSelected = (networkPanel.getSelectedModelElements().size() > 0);
         if (atLeastOneSourceSelected && atLeastOneTargetSelected) {
             setEnabled(true);
         } else {
@@ -77,8 +76,9 @@ public final class ShowTrainerAction extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         // Trainer trainer = new Trainer(networkPanel.getNetwork(),

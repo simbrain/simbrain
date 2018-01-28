@@ -18,26 +18,23 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.event.InputEvent;
-import java.awt.geom.Point2D;
-
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.gui.NetworkPanel;
 
+import javax.swing.*;
+import java.awt.event.InputEvent;
+import java.awt.geom.Point2D;
+
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,
  * and property dialog, and support. Screen elements are automatically support
  * the primary user interactions in the network panel.
- *
+ * <p>
  * Subclasses of this class must implement the following methods:
- *
+ * <p>
  * <pre>
  * protected abstract boolean isSelectable();
  *
@@ -57,14 +54,17 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * protected abstract JDialog getPropertyDialog();
  * </pre>
- *
  */
 public abstract class ScreenElement extends PPath.Float {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** Is this element a member of a view group?. */
+    /**
+     * Is this element a member of a view group?.
+     */
     private boolean isGrouped = false;
 
     /**
@@ -150,9 +150,9 @@ public abstract class ScreenElement extends PPath.Float {
      * <code>getPickable()</code> method.
      * </p>
      *
+     * @return true if this screen element is selectable
      * @see org.piccolo2d.PNode#getPickable
      * @see org.piccolo2d.PNode#setPickable
-     * @return true if this screen element is selectable
      */
     public abstract boolean isSelectable();
 
@@ -172,10 +172,10 @@ public abstract class ScreenElement extends PPath.Float {
      * <code>isSelectable()</code> method.
      * </p>
      *
+     * @return true if this screen element should show a selection handle
      * @see org.piccolo2d.PNode#getPickable
      * @see org.piccolo2d.PNode#setPickable
      * @see #isSelectable
-     * @return true if this screen element should show a selection handle
      */
     public abstract boolean showSelectionHandle();
 
@@ -193,10 +193,10 @@ public abstract class ScreenElement extends PPath.Float {
      * returns <code>true</code> for its <code>isSelectable()</code> method.
      * </p>
      *
+     * @return true if this screen element is draggable
      * @see org.piccolo2d.PNode#getPickable
      * @see org.piccolo2d.PNode#setPickable
      * @see #isSelectable
-     * @return true if this screen element is draggable
      */
     public abstract boolean isDraggable();
 
@@ -205,8 +205,8 @@ public abstract class ScreenElement extends PPath.Float {
      * this screen element does not have tool tip text, a tool tip event handler
      * will not be registered.
      *
-     * @see #getToolTipText
      * @return true if this screen element has tool tip text
+     * @see #getToolTipText
      */
     protected abstract boolean hasToolTipText();
 
@@ -215,9 +215,9 @@ public abstract class ScreenElement extends PPath.Float {
      * element. Return <code>null</code> if this screen element does not have
      * tool tip text or to temporarily prevent the tool tip from displaying.
      *
-     * @see #hasToolTipText
      * @return a <code>String</code> to use as tool tip text for this screen
-     *         element
+     * element
+     * @see #hasToolTipText
      */
     protected abstract String getToolTipText();
 
@@ -226,8 +226,8 @@ public abstract class ScreenElement extends PPath.Float {
      * this screen element does not have a context menu, a context menu event
      * handler will not be registered.
      *
-     * @see #getContextMenu
      * @return true if this screen element has a context menu.
+     * @see #getContextMenu
      */
     protected abstract boolean hasContextMenu();
 
@@ -235,8 +235,8 @@ public abstract class ScreenElement extends PPath.Float {
      * Return a context menu specific to this screen element. Return
      * <code>null</code> if this screen element does not have a context menu.
      *
-     * @see #hasContextMenu
      * @return a context menu specific to this screen element
+     * @see #hasContextMenu
      */
     protected abstract JPopupMenu getContextMenu();
 
@@ -245,8 +245,8 @@ public abstract class ScreenElement extends PPath.Float {
      * this screen element does not have a property dialog, a property dialog
      * event handler will not be registered.
      *
-     * @see #getPropertyDialog
      * @return true if this screen element has a property dialog
+     * @see #getPropertyDialog
      */
     protected abstract boolean hasPropertyDialog();
 
@@ -254,8 +254,8 @@ public abstract class ScreenElement extends PPath.Float {
      * Return a property dialog for this screen element. Return
      * <code>null</code> if this screen element does not have a property dialog.
      *
-     * @see #hasPropertyDialog
      * @return a property dialog for this screen element
+     * @see #hasPropertyDialog
      */
     protected abstract JDialog getPropertyDialog();
 
@@ -280,7 +280,7 @@ public abstract class ScreenElement extends PPath.Float {
     /**
      * Set the network panel for this screen element to
      * <code>networkPanel</code>.
-     *
+     * <p>
      * <p>
      * This is a bound property.
      * </p>
@@ -291,8 +291,7 @@ public abstract class ScreenElement extends PPath.Float {
 
         NetworkPanel oldNetworkPanel = this.networkPanel;
         this.networkPanel = networkPanel;
-        firePropertyChange(-1, "networkPanel", oldNetworkPanel,
-                this.networkPanel);
+        firePropertyChange(-1, "networkPanel", oldNetworkPanel, this.networkPanel);
     }
 
     /**
@@ -311,12 +310,12 @@ public abstract class ScreenElement extends PPath.Float {
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
             networkPanel.setLastClickedPosition(canvasPosition);
-            contextMenu.show(networkPanel.getCanvas(),
-                    (int) canvasPosition.getX(), (int) canvasPosition.getY());
+            contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
-        /** @see PBasicInputEventHandler 
+        /**
          * @param event
+         * @see PBasicInputEventHandler
          */
         public void mousePressed(final PInputEvent event) {
 
@@ -325,8 +324,9 @@ public abstract class ScreenElement extends PPath.Float {
             }
         }
 
-        /** @see PBasicInputEventHandler 
+        /**
          * @param event
+         * @see PBasicInputEventHandler
          */
         public void mouseReleased(final PInputEvent event) {
 
@@ -356,8 +356,9 @@ public abstract class ScreenElement extends PPath.Float {
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
         }
 
-        /** @see PBasicInputEventHandler 
+        /**
          * @param event
+         * @see PBasicInputEventHandler
          */
         public void mouseClicked(final PInputEvent event) {
 
@@ -366,8 +367,7 @@ public abstract class ScreenElement extends PPath.Float {
                 SwingUtilities.invokeLater(new Runnable() {
                     /** @see Runnable */
                     public void run() {
-                        JDialog propertyDialog = ScreenElement.this
-                                .getPropertyDialog();
+                        JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
                         propertyDialog.pack();
                         propertyDialog.setLocationRelativeTo(null);
                         propertyDialog.setVisible(true);

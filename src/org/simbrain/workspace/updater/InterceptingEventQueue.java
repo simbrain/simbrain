@@ -18,16 +18,15 @@
  */
 package org.simbrain.workspace.updater;
 
-import java.awt.AWTEvent;
-import java.awt.EventQueue;
+import org.apache.log4j.Logger;
+import org.simbrain.workspace.Workspace;
+
+import java.awt.*;
 import java.awt.event.InvocationEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.log4j.Logger;
-import org.simbrain.workspace.Workspace;
 
 /**
  * An event queue implementing the TaskSynchronizationManager interface. When
@@ -40,22 +39,34 @@ import org.simbrain.workspace.Workspace;
  */
 public class InterceptingEventQueue extends EventQueue implements TaskSynchronizationManager {
 
-    /** the static logger for this class. */
+    /**
+     * the static logger for this class.
+     */
     private static final Logger LOGGER = Logger.getLogger(InterceptingEventQueue.class);
 
-    /** The workspace this object is associated with. */
+    /**
+     * The workspace this object is associated with.
+     */
     private final Workspace workspace;
 
-    /** Internal queue for invocation events. */
+    /**
+     * Internal queue for invocation events.
+     */
     private Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
 
-    /** Flag for event queue toggling. */
+    /**
+     * Flag for event queue toggling.
+     */
     private boolean paused = false;
 
-    /** Lock for paused flag access. */
+    /**
+     * Lock for paused flag access.
+     */
     private final Object lock = new Object();
 
-    /** Latch used for tracking when events are done. */
+    /**
+     * Latch used for tracking when events are done.
+     */
     private volatile CompletionSignal signal = null;
 
     /**
@@ -109,7 +120,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
         Collection<AWTEvent> events = new ArrayList<AWTEvent>();
 
         // Add queued events to the list
-        for (AWTEvent event; (event = queue.poll()) != null;) {
+        for (AWTEvent event; (event = queue.poll()) != null; ) {
             events.add(event);
         }
 
@@ -144,12 +155,10 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
             synchronized (lock) {
                 if (paused) {
                     LOGGER.trace("event queued: " + event);
-                    queue.add(new SynchronizingInvocationEvent(
-                            (InvocationEvent) event, workspace, deQueueSignal));
+                    queue.add(new SynchronizingInvocationEvent((InvocationEvent) event, workspace, deQueueSignal));
                 } else {
                     LOGGER.trace("event passed: " + event);
-                    super.postEvent(new SynchronizingInvocationEvent(
-                            (InvocationEvent) event, workspace, CompletionSignal.IGNORE));
+                    super.postEvent(new SynchronizingInvocationEvent((InvocationEvent) event, workspace, CompletionSignal.IGNORE));
                 }
             }
         } else {

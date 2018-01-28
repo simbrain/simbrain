@@ -18,15 +18,12 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Delete action.
@@ -42,18 +39,16 @@ public final class DeleteAction extends ConditionallyEnabledAction {
         super(networkPanel, "Delete", EnablingCondition.ALLITEMS);
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteNeuron.png"));
-        putValue(SHORT_DESCRIPTION,
-                "Delete selected node(s) (\"Backspace\" or \"Delete\")");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke("BACK_SPACE"), this);
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke("DELETE"), this);
+        putValue(SHORT_DESCRIPTION, "Delete selected node(s) (\"Backspace\" or \"Delete\")");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
         networkPanel.getActionMap().put(this, this);
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.deleteSelectedObjects();

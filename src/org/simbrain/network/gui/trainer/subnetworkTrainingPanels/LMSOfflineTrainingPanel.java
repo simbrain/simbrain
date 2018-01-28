@@ -18,18 +18,13 @@
  */
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Combines an LMS Offline control panel and training set panel to provide the
@@ -41,27 +36,34 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
 
-    /** Reference to trainer object. */
+    /**
+     * Reference to trainer object.
+     */
     private LMSOffline trainer;
 
-    /** Reference to the controls panel. */
+    /**
+     * Reference to the controls panel.
+     */
     private final LMSOfflineControlPanel controlPanel;
 
-    /** Reference to training set panel. */
+    /**
+     * Reference to training set panel.
+     */
     private final TrainingSetPanel trainingSetPanel;
 
-    /** Parent frame. */
+    /**
+     * Parent frame.
+     */
     private final Window parentFrame;
 
     /**
      * Build the panel.
      *
-     * @param panel the parent network panel
-     * @param trainer the LMSOffline trainer to represent
+     * @param panel       the parent network panel
+     * @param trainer     the LMSOffline trainer to represent
      * @param parentFrame
      */
-    public LMSOfflineTrainingPanel(final NetworkPanel panel,
-        final LMSOffline trainer, final Window parentFrame) {
+    public LMSOfflineTrainingPanel(final NetworkPanel panel, final LMSOffline trainer, final Window parentFrame) {
         this.parentFrame = parentFrame;
         this.trainer = trainer;
         controlPanel = new LMSOfflineControlPanel(trainer, parentFrame);
@@ -70,8 +72,7 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
 
         // Training Set Panel
-        trainingSetPanel = new TrainingSetPanel(trainer.getTrainableNetwork(),
-            3);
+        trainingSetPanel = new TrainingSetPanel(trainer.getTrainableNetwork(), 3);
         trainingSetPanel.setFrame(parentFrame);
 
         setLayout(new GridBagLayout());

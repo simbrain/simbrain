@@ -18,18 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.util.Vector;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Opens and displays a list of the current couplings.
@@ -38,7 +32,9 @@ public final class OpenCouplingListAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Reference to Simbrain desktop. */
+    /**
+     * Reference to Simbrain desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
@@ -54,8 +50,8 @@ public final class OpenCouplingListAction extends AbstractAction {
     }
 
     /**
-     * @see AbstractAction
      * @param event Action event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Coupling List");

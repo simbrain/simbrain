@@ -2,8 +2,7 @@ package org.simbrain.util;
 
 import java.beans.PropertyChangeListener;
 
-public abstract class SwitchablePropertyChangeListener implements
-    PropertyChangeListener {
+public abstract class SwitchablePropertyChangeListener implements PropertyChangeListener {
 
     private volatile boolean enabled = true;
 

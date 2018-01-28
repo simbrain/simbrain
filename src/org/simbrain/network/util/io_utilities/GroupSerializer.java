@@ -18,14 +18,6 @@
  */
 package org.simbrain.network.util.io_utilities;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -37,21 +29,27 @@ import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class for storing static methods for custom serialization of group objects
  * in Simbrain.
- * 
- * @author Zoë Tosi
  *
+ * @author Zoë Tosi
  */
 public class GroupSerializer {
 
     /**
      * A flag for how decimal values should be serialized and methods for
      * converting doubles or doubles as long bits appropriately.
-     * 
-     * @author Zoë Tosi
      *
+     * @author Zoë Tosi
      */
     public enum Precision {
         FLOAT_32 {
@@ -70,8 +68,7 @@ public class GroupSerializer {
                 return b.array();
             }
 
-        },
-        FLOAT_64 {
+        }, FLOAT_64 {
             @Override
             public byte[] asByteArray(double d) {
                 ByteBuffer b = ByteBuffer.allocate(8);
@@ -100,21 +97,15 @@ public class GroupSerializer {
      * end-code of -1 as an integer or 0xffffffff. Column indexes are stored
      * using the least possible bytes see
      * {@link #rowCompMat2CompByteArray(long[], Precision)}.
-     * 
-     * @param synGrp
-     *            the synapse group to serialize
-     * @param wtPrecision
-     *            the precision (32 or 64 bit) used to store the weight values
-     * @param filename
-     *            the name of the file containing the synapse group information.
+     *
+     * @param synGrp      the synapse group to serialize
+     * @param wtPrecision the precision (32 or 64 bit) used to store the weight values
+     * @param filename    the name of the file containing the synapse group information.
      */
-    public static void serializeCompressedSynGroup(SynapseGroup synGrp,
-            Precision wtPrecision, String filename) {
+    public static void serializeCompressedSynGroup(SynapseGroup synGrp, Precision wtPrecision, String filename) {
         long[] rowCompression = synGrp.getRowCompressedMatrixRepresentation();
-        byte[] byteCompressedRowInds =
-                rowCompMat2CompByteArray(rowCompression, wtPrecision);
-        try (OutputStream out = new BufferedOutputStream(
-                new FileOutputStream(filename))) {
+        byte[] byteCompressedRowInds = rowCompMat2CompByteArray(rowCompression, wtPrecision);
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
             out.write(byteCompressedRowInds);
         } catch (IOException ie) {
             ie.printStackTrace();
@@ -128,16 +119,14 @@ public class GroupSerializer {
      * index has a value less than 255 it is stored in a single byte, otherwise
      * it is stored as a short, and so on if the index is greater than 65535.
      *
-     * @param riCompressedMat
-     *            row compressed matrix where column values are separated by a
-     *            new row code (-1 or 0xffffffff) representing positions in a
-     *            sparse matrix
-     * @param precision           
+     * @param riCompressedMat row compressed matrix where column values are separated by a
+     *                        new row code (-1 or 0xffffffff) representing positions in a
+     *                        sparse matrix
+     * @param precision
      * @return the compressed byte array representation of the row compressed
-     *         matrix riCompressedMat.
+     * matrix riCompressedMat.
      */
-    public static byte[] rowCompMat2CompByteArray(long[] riCompressedMat,
-            Precision precision) {
+    public static byte[] rowCompMat2CompByteArray(long[] riCompressedMat, Precision precision) {
         final byte maxByte = -1;
         List<Byte> preByteArray = new ArrayList<Byte>();
         boolean switchedToShorts = false;
@@ -180,9 +169,7 @@ public class GroupSerializer {
                             preByteArray.add(maxByte);
                         }
                     } else {
-                        preByteArray
-                                .add((byte) (((int) riCompressedMat[i]) << 24
-                                >>> 24));
+                        preByteArray.add((byte) (((int) riCompressedMat[i]) << 24 >>> 24));
                         numNonZero++;
                     }
                 }
@@ -228,25 +215,20 @@ public class GroupSerializer {
 
     /**
      * Test Main
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
 
         Network net = new Network();
         NeuronGroup ng1 = new NeuronGroup(net, 2048);
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY,
-                ProbDistribution.LOGNORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY,
-                ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
         exRand.setParam1(2.5);
         inRand.setParam1(3.5);
 
         Sparse rCon = new Sparse(0.01, false, false);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5,
-                exRand, inRand);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
         System.out.println("Initial Construction complete...\n");
         long start = System.nanoTime();
         System.out.println("Begin Serialization... ");
@@ -259,14 +241,12 @@ public class GroupSerializer {
         }
         System.out.println("SUCCESS!");
         long end = System.nanoTime();
-        System.out.println("\tSerialization Time: " + SimbrainMath.roundDouble(
-                (end - start) / Math.pow(10, 9), 4) + " secs.\n");
+        System.out.println("\tSerialization Time: " + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 4) + " secs.\n");
         System.out.println("Begin Deserialization... ");
         NeuronGroup ng2 = new NeuronGroup(net, 2048);
         SynapseGroup sg2 = new SynapseGroup(ng2, ng2);
         long start2 = System.nanoTime();
-        boolean status = GroupDeserializer
-                .reconstructCompressedSynapseStrengths("./Test1.bin", sg2);
+        boolean status = GroupDeserializer.reconstructCompressedSynapseStrengths("./Test1.bin", sg2);
         end = System.nanoTime();
         if (status) {
             System.out.println("SUCCESS!");
@@ -274,11 +254,8 @@ public class GroupSerializer {
             System.out.println("FAILURE");
             System.exit(1);
         }
-        System.out.println("\tReconstruction Time: "
-                + SimbrainMath.roundDouble(
-                        (end - start2) / Math.pow(10, 9), 4) + " secs.\n");
-        System.out.println("TOTAL Time: " + SimbrainMath.roundDouble(
-                (end - start) / Math.pow(10, 9), 4) + " secs.");
+        System.out.println("\tReconstruction Time: " + SimbrainMath.roundDouble((end - start2) / Math.pow(10, 9), 4) + " secs.\n");
+        System.out.println("TOTAL Time: " + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 4) + " secs.");
         System.out.println("\nValidating Reconstruction...");
         System.out.println("\tOriginal No. Synapses: " + sg.size());
         System.out.println("\tReconstructed No. Synapses: " + sg2.size());
@@ -317,11 +294,9 @@ public class GroupSerializer {
                 }
                 if (s1 != null && s2 != null) {
                     // weightChecks++;
-                    if (Math.abs(s1.getStrength() - s2.getStrength())
-                    > errorTolerance) {
+                    if (Math.abs(s1.getStrength() - s2.getStrength()) > errorTolerance) {
                         System.out.println("\t\tWeight mismatch");
-                        System.out.println(s1.getStrength() + " "
-                                + s2.getStrength());
+                        System.out.println(s1.getStrength() + " " + s2.getStrength());
                         error = true;
                         i = n;
                         break;
@@ -331,8 +306,7 @@ public class GroupSerializer {
         }
         if (!error) {
             System.out.println("\tNo strucutral/positional errors.");
-            System.out.println("\tNo weight mismatches greater than "
-                    + errorTolerance);
+            System.out.println("\tNo weight mismatches greater than " + errorTolerance);
             System.out.println("SUCCESS!");
         } else {
             System.out.println("FAILURE");

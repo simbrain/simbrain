@@ -24,7 +24,7 @@ public class BufferedImageConverter implements Converter {
         BufferedImage image = (BufferedImage) source;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] bytes = new byte[] {};
+        byte[] bytes = new byte[]{};
         try {
             ImageIO.write(image, "png", outputStream);
             bytes = outputStream.toByteArray();

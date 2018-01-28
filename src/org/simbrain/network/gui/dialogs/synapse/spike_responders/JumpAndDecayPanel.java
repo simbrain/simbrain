@@ -18,12 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
@@ -32,21 +26,34 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * <b>JumpAndDecayPanel</b>.
  */
 public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
 
-    /** Jump height field. */
+    /**
+     * Jump height field.
+     */
     private JTextField tfJumpHeight = new JTextField();
 
-    /** Base line field. */
+    /**
+     * Base line field.
+     */
     private JTextField tfBaseLine = new JTextField();
 
-    /** Decay rate field. */
+    /**
+     * Decay rate field.
+     */
     private JTextField tfTimeConstant = new JTextField();
 
-    /** The prototypical jump and decay responder. */
+    /**
+     * The prototypical jump and decay responder.
+     */
     public static final JumpAndDecay PROTOTYPE_RESPONDER = new JumpAndDecay();
 
     /**
@@ -63,13 +70,13 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
      * {@inheritDoc}
      */
     public JumpAndDecayPanel deepCopy() {
-    	JumpAndDecayPanel cpy = new JumpAndDecayPanel();
-    	cpy.tfJumpHeight.setText(this.tfJumpHeight.getText());
-    	cpy.tfBaseLine.setText(this.tfBaseLine.getText());
-    	cpy.tfTimeConstant.setText(this.tfTimeConstant.getText());
-    	return cpy;
+        JumpAndDecayPanel cpy = new JumpAndDecayPanel();
+        cpy.tfJumpHeight.setText(this.tfJumpHeight.getText());
+        cpy.tfBaseLine.setText(this.tfBaseLine.getText());
+        cpy.tfTimeConstant.setText(this.tfTimeConstant.getText());
+        return cpy;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -81,29 +88,24 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle consistency of multiply selections
 
         // Handle Jump Height
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getJumpHeight")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getJumpHeight")) {
             tfJumpHeight.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfJumpHeight
-                    .setText(Double.toString(spikeResponder.getJumpHeight()));
+            tfJumpHeight.setText(Double.toString(spikeResponder.getJumpHeight()));
         }
 
         // Handle Baseline
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getBaseLine")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getBaseLine")) {
             tfBaseLine.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBaseLine.setText(Double.toString(spikeResponder.getBaseLine()));
         }
 
         // Handle Decay Rate
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getTimeConstant")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getTimeConstant")) {
             tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfTimeConstant.setText(Double.toString(spikeResponder
-                    .getTimeConstant()));
+            tfTimeConstant.setText(Double.toString(spikeResponder.getTimeConstant()));
         }
 
     }
@@ -113,11 +115,9 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
      */
     @Override
     public void fillDefaultValues() {
-        tfJumpHeight.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getJumpHeight()));
+        tfJumpHeight.setText(Double.toString(PROTOTYPE_RESPONDER.getJumpHeight()));
         tfBaseLine.setText(Double.toString(PROTOTYPE_RESPONDER.getBaseLine()));
-        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getTimeConstant()));
+        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER.getTimeConstant()));
     }
 
     /**
@@ -159,8 +159,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         double jumpHeight = Utils.doubleParsable(tfJumpHeight);
         if (!Double.isNaN(jumpHeight)) {
             for (Synapse s : synapses) {
-                ((JumpAndDecay) s.getSpikeResponder())
-                        .setJumpHeight(jumpHeight);
+                ((JumpAndDecay) s.getSpikeResponder()).setJumpHeight(jumpHeight);
             }
         }
 
@@ -176,8 +175,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         double timeConstant = Utils.doubleParsable(tfTimeConstant);
         if (!Double.isNaN(timeConstant)) {
             for (Synapse s : synapses) {
-                ((JumpAndDecay) s.getSpikeResponder())
-                        .setTimeConstant(timeConstant);
+                ((JumpAndDecay) s.getSpikeResponder()).setTimeConstant(timeConstant);
             }
         }
 
@@ -197,9 +195,9 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
      */
     @Override
     public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	tfJumpHeight.setEnabled(enabled);
-    	tfBaseLine.setEnabled(enabled);
-    	tfTimeConstant.setEnabled(enabled);
+        super.setEnabled(enabled);
+        tfJumpHeight.setEnabled(enabled);
+        tfBaseLine.setEnabled(enabled);
+        tfTimeConstant.setEnabled(enabled);
     }
 }

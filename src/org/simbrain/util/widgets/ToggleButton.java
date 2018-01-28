@@ -18,24 +18,25 @@
  */
 package org.simbrain.util.widgets;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
 /**
  * Toggle button. Used when a button iterates through a sequence of modes.
  */
 public final class ToggleButton extends JButton {
 
-    /** List of actions. */
+    /**
+     * List of actions.
+     */
     private final List actions;
 
-    /** Index to current action. */
+    /**
+     * Index to current action.
+     */
     private int index;
 
     /**

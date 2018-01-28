@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * JPanels that edit the properties of an object can implement this interface to
@@ -28,11 +28,12 @@ import javax.swing.JPanel;
  * with text).
  *
  * @author ztosi
- *
  */
 public interface EditablePanel {
 
-    /** Initialize the panel with field values. */
+    /**
+     * Initialize the panel with field values.
+     */
     void fillFieldValues();
 
     /**

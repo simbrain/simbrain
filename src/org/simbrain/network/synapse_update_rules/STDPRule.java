@@ -18,57 +18,51 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.UserParameter;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
- *
+ * <p>
  * Only works if source and target neurons are spiking neurons.
- *
+ * <p>
  * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
  * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
  * Spiking Neurons. Also drew on the Scholarpedia article.
- *
  */
 public class STDPRule extends SynapseUpdateRule {
 
-	// TODO: check description
-    /** Time constant for LTD. */
-    @UserParameter(label = "Tau minus", description = "Time constant "
-    		+ "for LTD.", defaultValue = "60", order = 0)
+    // TODO: check description
+    /**
+     * Time constant for LTD.
+     */
+    @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", defaultValue = "60", order = 0)
     protected double tau_minus;
 
-    /** Time constant for LTP. */
-    @UserParameter(label = "Tau plus", description = "Time constant "
-    		+ "for LTP.", 
-            defaultValue = "30", order = 1)
+    /**
+     * Time constant for LTP.
+     */
+    @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", defaultValue = "30", order = 1)
     protected double tau_plus;
-    
+
     /**
      * Learning rate for LTP case. Controls magnitude of LTP changes.
      */
-    @UserParameter(label = "W+", description = "Learning rate for "
-    		+ "LTP case. Controls magnitude of LTP changes.", 
-            defaultValue = "10", order = 2)
+    @UserParameter(label = "W+", description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.", defaultValue = "10", order = 2)
     protected double W_plus;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTD changes.
      */
-    @UserParameter(label = "W-", description = "Learning rate for "
-    		+ "LTP case. Controls magnitude of LTD changes.", 
-            defaultValue = "10", order = 3)
+    @UserParameter(label = "W-", description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.", defaultValue = "10", order = 3)
     protected double W_minus;
 
-    /** General learning rate. */
-    @UserParameter(label = "Learning rate", description = "General learning "
-    		+ "rate.", defaultValue = ".01", order = 4)
+    /**
+     * General learning rate.
+     */
+    @UserParameter(label = "Learning rate", description = "General learning " + "rate.", defaultValue = ".01", order = 4)
     protected double learningRate;
 
     @Override
@@ -101,20 +95,14 @@ public class STDPRule extends SynapseUpdateRule {
         if (synapse.getSource().isSpike() || synapse.getTarget().isSpike()) {
             try {
                 final double str = synapse.getStrength();
-                final double delta_t = ((((SpikingNeuronUpdateRule) synapse
-                        .getSource().getUpdateRule()).getLastSpikeTime())
-                        - ((SpikingNeuronUpdateRule) synapse
-                        .getTarget().getUpdateRule()).getLastSpikeTime())
-                        * (hebbian ? 1 : -1);   // Reverse time window for
-                                                // anti-hebbian
+                final double delta_t = ((((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule()).getLastSpikeTime()) - ((SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule()).getLastSpikeTime()) * (hebbian ? 1 : -1);   // Reverse time window for
+                // anti-hebbian
                 if (delta_t < 0) {
-                    delta_w = W_plus * Math.exp(delta_t / tau_plus)
-                            * learningRate;
+                    delta_w = W_plus * Math.exp(delta_t / tau_plus) * learningRate;
                 } else if (delta_t > 0) {
-                    delta_w = -W_minus * Math.exp(-delta_t / tau_minus)
-                            * learningRate;
+                    delta_w = -W_minus * Math.exp(-delta_t / tau_minus) * learningRate;
                 }
-                if(Math.signum(str) == -1) {
+                if (Math.signum(str) == -1) {
                     synapse.setStrength(str - delta_w);
                 } else {
                     synapse.setStrength(str + delta_w);
@@ -134,8 +122,7 @@ public class STDPRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param tauPlus
-     *            the tau_plus to set
+     * @param tauPlus the tau_plus to set
      */
     public void setTau_plus(double tauPlus) {
         tau_plus = tauPlus;
@@ -149,8 +136,7 @@ public class STDPRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param tauMinus
-     *            the tau_minus to set
+     * @param tauMinus the tau_minus to set
      */
     public void setTau_minus(double tauMinus) {
         tau_minus = tauMinus;
@@ -164,8 +150,7 @@ public class STDPRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param wPlus
-     *            the w_plus to set
+     * @param wPlus the w_plus to set
      */
     public void setW_plus(double wPlus) {
         W_plus = wPlus;
@@ -179,8 +164,7 @@ public class STDPRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param wMinus
-     *            the w_minus to set
+     * @param wMinus the w_minus to set
      */
     public void setW_minus(double wMinus) {
         W_minus = wMinus;
@@ -194,8 +178,7 @@ public class STDPRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param learningRate
-     *            the learningRate to set
+     * @param learningRate the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;

@@ -18,24 +18,24 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.concurrent.Executors;
 
 /**
  * Run network action.
  */
 public final class RunNetworkAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
-    
-//    private final ReentrantLock lock = new ReentrantLock();
+
+    //    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Create a new run network action with the specified network panel.
@@ -44,18 +44,19 @@ public final class RunNetworkAction extends AbstractAction {
      */
     public RunNetworkAction(final NetworkPanel networkPanel) {
         super();
-        
+
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
         this.networkPanel = networkPanel;
-//        networkPanel.getNetwork().setUpdateLock(lock);
+        //        networkPanel.getNetwork().setUpdateLock(lock);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.setRunning(true);
@@ -63,14 +64,14 @@ public final class RunNetworkAction extends AbstractAction {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
                 //networkPanel.getNetwork().setFireUpdates(false);
-//                lock.lock();
+                //                lock.lock();
                 while (networkPanel.isRunning()) {
-//                    lock.unlock();
+                    //                    lock.unlock();
                     networkPanel.getNetwork().setUpdateCompleted(false);
                     networkPanel.getNetwork().update();
-//                    lock.lock();
+                    //                    lock.lock();
                 }
-//                lock.unlock();
+                //                lock.unlock();
                 //networkPanel.getNetwork().setFireUpdates(true);
             }
         });

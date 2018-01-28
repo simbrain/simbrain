@@ -18,46 +18,65 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>IntegrateAndFireNeuronPanel</b> edits an integrate and fire neuron.
  */
 public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Time constant field. */
+    /**
+     * Time constant field.
+     */
     private JTextField tfTimeConstant;
 
-    /** Threshold field. */
+    /**
+     * Threshold field.
+     */
     private JTextField tfThreshold;
 
-    /** Reset field. */
+    /**
+     * Reset field.
+     */
     private JTextField tfReset;
 
-    /** Resistance field. */
+    /**
+     * Resistance field.
+     */
     private JTextField tfResistance;
 
-    /** Refractory priod field. */
+    /**
+     * Refractory priod field.
+     */
     private JTextField tfRefractory;
 
-    /** Resting potential field. */
+    /**
+     * Resting potential field.
+     */
     private JTextField tfRestingPotential;
 
-    /** Background current field. */
+    /**
+     * Background current field.
+     */
     private JTextField tfBackgroundCurrent;
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final IntegrateAndFireRule prototypeRule = new IntegrateAndFireRule();
 
     /**
@@ -67,34 +86,13 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
         super();
         this.add(tabbedPane);
 
-        tfTimeConstant = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getTimeConstant(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setTimeConstant((double) val));
-        tfThreshold = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getThreshold(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setThreshold((double) val));
-        tfReset = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getResetPotential(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setResetPotential((double) val));
-        tfResistance = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getResistance(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setResistance((double) val));
-        tfRefractory = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getRefractoryPeriod(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setRefractoryPeriod((double) val));
-        tfRestingPotential = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getRestingPotential(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setRestingPotential((double) val));
-        tfBackgroundCurrent = createTextField(
-                (r) -> ((IntegrateAndFireRule) r).getBackgroundCurrent(),
-                (r, val) -> ((IntegrateAndFireRule) r)
-                        .setBackgroundCurrent((double) val));
+        tfTimeConstant = createTextField((r) -> ((IntegrateAndFireRule) r).getTimeConstant(), (r, val) -> ((IntegrateAndFireRule) r).setTimeConstant((double) val));
+        tfThreshold = createTextField((r) -> ((IntegrateAndFireRule) r).getThreshold(), (r, val) -> ((IntegrateAndFireRule) r).setThreshold((double) val));
+        tfReset = createTextField((r) -> ((IntegrateAndFireRule) r).getResetPotential(), (r, val) -> ((IntegrateAndFireRule) r).setResetPotential((double) val));
+        tfResistance = createTextField((r) -> ((IntegrateAndFireRule) r).getResistance(), (r, val) -> ((IntegrateAndFireRule) r).setResistance((double) val));
+        tfRefractory = createTextField((r) -> ((IntegrateAndFireRule) r).getRefractoryPeriod(), (r, val) -> ((IntegrateAndFireRule) r).setRefractoryPeriod((double) val));
+        tfRestingPotential = createTextField((r) -> ((IntegrateAndFireRule) r).getRestingPotential(), (r, val) -> ((IntegrateAndFireRule) r).setRestingPotential((double) val));
+        tfBackgroundCurrent = createTextField((r) -> ((IntegrateAndFireRule) r).getBackgroundCurrent(), (r, val) -> ((IntegrateAndFireRule) r).setBackgroundCurrent((double) val));
 
         mainTab.addItem("Threshold (mV)", tfThreshold);
         mainTab.addItem("Resting potential (mV)", tfRestingPotential);

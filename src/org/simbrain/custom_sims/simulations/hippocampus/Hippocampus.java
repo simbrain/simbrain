@@ -1,14 +1,5 @@
 package org.simbrain.custom_sims.simulations.hippocampus;
 
-import java.awt.FlowLayout;
-import java.util.Random;
-import java.util.concurrent.Executors;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -21,6 +12,11 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Random;
+import java.util.concurrent.Executors;
+
 /**
  * Simulation of the Squire Alvarez Hippocampus model (PNAS, 1994). TODO: This
  * model illustrates serious issues with synapse group arrow rendering
@@ -28,15 +24,18 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * @author Jeff Yoshimi
  * @author Jeff Rodny
  * @author Alex Pabst
- *
  */
 // CHECKSTYLE:OFF
 public class Hippocampus extends RegisteredSimulation {
 
-    /** Randomizer for creating new synapse groups. */
+    /**
+     * Randomizer for creating new synapse groups.
+     */
     PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY);
 
-    /** Other variables. */
+    /**
+     * Other variables.
+     */
     NetBuilder net;
     Network network;
     ControlPanel panel;
@@ -46,18 +45,24 @@ public class Hippocampus extends RegisteredSimulation {
     JLabel perfLabel;
     JTextField conslidationField;
 
-    /** References to main neuron and synapse groups. */
+    /**
+     * References to main neuron and synapse groups.
+     */
     AlvarezSquire LC1, LC2, RC1, RC2, hippocampus;
     SynapseGroup HtoLC1, HtoLC2, HtoRC1, HtoRC2, LC1toH, LC2toH, RC1toH, RC2toH;
 
-    /** The four main network patterns. */
-    double[] pattern1 = new double[] { 1, 0, 0, 0 };
-    double[] pattern2 = new double[] { 0, 1, 0, 0 };
-    double[] pattern3 = new double[] { 0, 0, 1, 0 };
-    double[] pattern4 = new double[] { 0, 0, 0, 1 };
-    
-    public Hippocampus(){super();}
-    
+    /**
+     * The four main network patterns.
+     */
+    double[] pattern1 = new double[]{1, 0, 0, 0};
+    double[] pattern2 = new double[]{0, 1, 0, 0};
+    double[] pattern3 = new double[]{0, 0, 1, 0};
+    double[] pattern4 = new double[]{0, 0, 0, 1};
+
+    public Hippocampus() {
+        super();
+    }
+
     /**
      * @param desktop
      */
@@ -81,8 +86,7 @@ public class Hippocampus extends RegisteredSimulation {
         setUpControlPanel();
 
         // Add docviewer
-        sim.addDocViewer(807, 12, 307, 591, "Information",
-                "src/org/simbrain/custom_sims/simulations/hippocampus/Hippocampus.html");
+        sim.addDocViewer(807, 12, 307, 591, "Information", "src/org/simbrain/custom_sims/simulations/hippocampus/Hippocampus.html");
 
     }
 
@@ -120,7 +124,7 @@ public class Hippocampus extends RegisteredSimulation {
         addSynapseGroup(RC1, LC2, "RC1 to LC2");
         addSynapseGroup(RC2, LC1, "RC2 to LC1");
         addSynapseGroup(RC2, LC2, "RC2 to LC2");
-        
+
         // Initialize the synapses
         initWeights();
 
@@ -129,8 +133,7 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Add and properly initialize a competitive neuron group.
      */
-    private AlvarezSquire addCompetitiveGroup(String label, double x,
-            double y) {
+    private AlvarezSquire addCompetitiveGroup(String label, double x, double y) {
         AlvarezSquire cg = new AlvarezSquire(this, 4);
         cg.setLabel(label);
         cg.applyLayout();
@@ -143,12 +146,10 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Add and properly initialize a synapse group.
      */
-    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target,
-            String name) {
+    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target, String name) {
 
         // Initialize with uniform distribution from 0 to .1
-        SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target,
-                SynapseGroup.DEFAULT_CONNECTION_MANAGER, 1);
+        SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target, SynapseGroup.DEFAULT_CONNECTION_MANAGER, 1);
         synGroup.setLabel(name);
         synGroup.setLowerBound(0, Polarity.EXCITATORY);
         synGroup.setUpperBound(1, Polarity.EXCITATORY);
@@ -187,7 +188,7 @@ public class Hippocampus extends RegisteredSimulation {
             error += getError(pattern3);
             test(network, pattern4);
             error += getError(pattern4);
-            error =  SimbrainMath.roundDouble(error, 2);
+            error = SimbrainMath.roundDouble(error, 2);
             errorLabel.setText("" + error);
             double perf = SimbrainMath.roundDouble(8 - error, 2);
             perfLabel.setText("" + (perf > 0 ? perf : 0));
@@ -281,7 +282,7 @@ public class Hippocampus extends RegisteredSimulation {
     }
 
     /**
-     * Initialize weights randomly and uniformly between 0 and .02. 
+     * Initialize weights randomly and uniformly between 0 and .02.
      */
     private void initWeights() {
         for (Synapse synapse : network.getFlatSynapseList()) {
@@ -292,20 +293,20 @@ public class Hippocampus extends RegisteredSimulation {
 
     /**
      * Returns error  for a specific pattern
-     * 
+     *
      * @pattern the pattern to check all cortical areas against
      */
     public double getError(double[] pattern) {
         double retVal = 0;
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             double diff = LC1.getNeuronList().get(i).getActivation() - pattern[i];
-            retVal += diff*diff;
+            retVal += diff * diff;
             diff = LC2.getNeuronList().get(i).getActivation() - pattern[i];
-            retVal += diff*diff;
+            retVal += diff * diff;
             diff = RC1.getNeuronList().get(i).getActivation() - pattern[i];
-            retVal += diff*diff;
+            retVal += diff * diff;
             diff = RC2.getNeuronList().get(i).getActivation() - pattern[i];
-            retVal += diff*diff;
+            retVal += diff * diff;
         }
         return retVal;
     }
@@ -328,7 +329,7 @@ public class Hippocampus extends RegisteredSimulation {
         LC2.forceSetActivations(activations);
         RC1.forceSetActivations(activations);
         RC2.forceSetActivations(activations);
-        hippocampus.forceSetActivations(new double[] { 0, 0, 0, 0 });
+        hippocampus.forceSetActivations(new double[]{0, 0, 0, 0});
 
         // Iterate 3 times
         sim.iterate(3);

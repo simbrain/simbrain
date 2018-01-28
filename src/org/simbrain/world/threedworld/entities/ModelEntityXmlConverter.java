@@ -1,6 +1,5 @@
 package org.simbrain.world.threedworld.entities;
 
-import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.thoughtworks.xstream.converters.Converter;
@@ -8,6 +7,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
 public class ModelEntityXmlConverter implements Converter {
     @Override

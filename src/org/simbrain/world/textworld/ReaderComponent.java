@@ -18,13 +18,12 @@
  */
 package org.simbrain.world.textworld;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * <b>ReaderComponent</b> is the container for the readerworld, which adds
@@ -32,7 +31,9 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class ReaderComponent extends WorkspaceComponent {
 
-    /** Instance of world of type TextWorld. */
+    /**
+     * Instance of world of type TextWorld.
+     */
     private ReaderWorld world;
 
     /**
@@ -49,7 +50,7 @@ public class ReaderComponent extends WorkspaceComponent {
     /**
      * Construct a component from an existing world; used in deserializing.
      *
-     * @param name name of component
+     * @param name     name of component
      * @param newWorld provided world
      */
     public ReaderComponent(String name, ReaderWorld newWorld) {
@@ -76,7 +77,8 @@ public class ReaderComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {}
+    public void closing() {
+    }
 
     @Override
     public void update() {

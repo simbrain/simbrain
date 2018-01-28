@@ -1,14 +1,10 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JToggleButton;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.threedworld.ThreeDWorld;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * ToggleUpdateSyncAction toggles whether ThreeDWorld updates are synchronous with
@@ -21,6 +17,7 @@ public class ToggleUpdateSyncAction extends AbstractAction {
 
     /**
      * Construct a new ToggleUpdateSyncAction.
+     *
      * @param world The world to toggle the update synchronization state for.
      */
     public ToggleUpdateSyncAction(ThreeDWorld world) {
@@ -30,7 +27,8 @@ public class ToggleUpdateSyncAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Synchronize Update to Workspace");
     }
 
-    @Override public void actionPerformed(ActionEvent event) {
+    @Override
+    public void actionPerformed(ActionEvent event) {
         final boolean sync = ((JToggleButton) event.getSource()).isSelected();
         world.getEngine().enqueue(() -> {
             world.getEngine().setUpdateSync(sync);

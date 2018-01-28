@@ -18,11 +18,6 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.DisplayOrder;
@@ -34,6 +29,10 @@ import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parent class for all Odor World objects. Adapted and extended from From
@@ -47,58 +46,94 @@ public abstract class OdorWorldEntity {
      */
     private Animation animation;
 
-    /** Name of this entity. */
+    /**
+     * Name of this entity.
+     */
     private String name;
 
-    /** Id of this entity. */
+    /**
+     * Id of this entity.
+     */
     private String id;
 
-    /** X Position. */
+    /**
+     * X Position.
+     */
     protected float x;
 
-    /** Y Position. */
+    /**
+     * Y Position.
+     */
     protected float y;
 
-    /** X Velocity. */
+    /**
+     * X Velocity.
+     */
     protected float dx;
 
-    /** Y Velocity. */
+    /**
+     * Y Velocity.
+     */
     protected float dy;
 
-    /** Back reference to parent parentWorld. */
+    /**
+     * Back reference to parent parentWorld.
+     */
     private OdorWorld parentWorld;
 
-    /** Sensors. */
+    /**
+     * Sensors.
+     */
     private List<Sensor> sensors = new ArrayList<Sensor>();
 
-    /** Effectors. */
+    /**
+     * Effectors.
+     */
     private List<Effector> effectors = new ArrayList<Effector>();
 
-    /** Behavior. */
+    /**
+     * Behavior.
+     */
     protected Behavior behavior = new StationaryBehavior();
 
-    /** Smell Source (if any). */
+    /**
+     * Smell Source (if any).
+     */
     private SmellSource smellSource;
 
-    /** True if a collision occurred in the last time step. */
+    /**
+     * True if a collision occurred in the last time step.
+     */
     private boolean collision;
 
-    /** Enable sensors. If not the agent is "blind." */
+    /**
+     * Enable sensors. If not the agent is "blind."
+     */
     private boolean sensorsEnabled = true;
 
-    /** Enable effectors. If not the agent is "paralyzed. */
+    /**
+     * Enable effectors. If not the agent is "paralyzed.
+     */
     private boolean effectorsEnabled = true;
 
-    /** If true, show sensors. */
+    /**
+     * If true, show sensors.
+     */
     private boolean showSensors = true;
 
-    /** Entity Id generator. */
+    /**
+     * Entity Id generator.
+     */
     private SimpleId sensorIDGenerator = new SimpleId("Sensor", 1);
 
-    /** Entity Id generator. */
+    /**
+     * Entity Id generator.
+     */
     private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
 
-    /** Things currently being said by talking entities. */
+    /**
+     * Things currently being said by talking entities.
+     */
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
 
     // Un-implemented code for using lifcycle.
@@ -110,7 +145,7 @@ public abstract class OdorWorldEntity {
     /**
      * Construct an entity from an animation.
      *
-     * @param anim animation to use.
+     * @param anim  animation to use.
      * @param world parent world
      */
     public OdorWorldEntity(final Animation anim, OdorWorld world) {
@@ -173,8 +208,10 @@ public abstract class OdorWorldEntity {
     }
 
     // TODO: Say in docs if this is upper right or not (but not center).
+
     /**
      * Gets this OdorWorldEntity's current x position.
+     *
      * @return
      */
     @DisplayOrder(val = 50)
@@ -184,6 +221,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Gets this OdorWorldEntity's current y position.
+     *
      * @return
      */
     @DisplayOrder(val = 60)
@@ -193,15 +231,15 @@ public abstract class OdorWorldEntity {
 
     /**
      * Sets this OdorWorldEntity's current x position.
+     *
      * @param newx
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setX(final float newx) {
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
-                this.x = parentWorld.getWidth()
-                        - (Math.abs(newx) % parentWorld.getWidth());
+                this.x = parentWorld.getWidth() - (Math.abs(newx) % parentWorld.getWidth());
             } else if (newx > parentWorld.getWidth()) {
                 this.x = newx % parentWorld.getWidth();
             } else {
@@ -216,15 +254,15 @@ public abstract class OdorWorldEntity {
 
     /**
      * Sets this OdorWorldEntity's current y position.
+     *
      * @param newy
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setY(final float newy) {
         // System.out.println("y:" + newy);
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
-                this.y = parentWorld.getHeight()
-                        - (Math.abs(newy) % parentWorld.getHeight());
+                this.y = parentWorld.getHeight() - (Math.abs(newy) % parentWorld.getHeight());
             } else if (newy > parentWorld.getHeight()) {
                 this.y = newy % parentWorld.getHeight();
             } else {
@@ -268,6 +306,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's width, based on the size of the current
      * image.
+     *
      * @return
      */
     public int getWidth() {
@@ -280,6 +319,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's height, based on the size of the current
      * image.
+     *
      * @return
      */
     public int getHeight() {
@@ -292,10 +332,11 @@ public abstract class OdorWorldEntity {
     /**
      * Gets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     *
      * @return
      */
-    @DisplayOrder(val = 80) 
-    @Producible(idMethod="getId")
+    @DisplayOrder(val = 80)
+    @Producible(idMethod = "getId")
     public float getVelocityX() {
         return dx;
     }
@@ -303,10 +344,11 @@ public abstract class OdorWorldEntity {
     /**
      * Gets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     *
      * @return
      */
-    @DisplayOrder(val = 90) 
-    @Producible(idMethod="getId")
+    @DisplayOrder(val = 90)
+    @Producible(idMethod = "getId")
     public float getVelocityY() {
         return dy;
     }
@@ -314,9 +356,10 @@ public abstract class OdorWorldEntity {
     /**
      * Sets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     *
      * @param dx
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setVelocityX(final float dx) {
         this.dx = dx;
     }
@@ -324,9 +367,10 @@ public abstract class OdorWorldEntity {
     /**
      * Sets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     *
      * @param dy
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setVelocityY(final float dy) {
         this.dy = dy;
     }
@@ -370,6 +414,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Gets this OdorWorldEntity's current image.
+     *
      * @return
      */
     public Image getImage() {
@@ -439,7 +484,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Get the sensor with the specified label, or null if none found.
-     *
+     * <p>
      * Some common choices: "Smell-Left", "Smell-Center", and "Smell-Right"
      *
      * @param label label to search for
@@ -461,7 +506,7 @@ public abstract class OdorWorldEntity {
      * @return the associated sensor
      */
     public final Effector getEffector(final String label) {
-        for (Effector effector: this.getEffectors()) {
+        for (Effector effector : this.getEffectors()) {
             if (effector.getLabel().equalsIgnoreCase(label)) {
                 return effector;
             }
@@ -516,16 +561,14 @@ public abstract class OdorWorldEntity {
      *
      * @param numTilesX number of rows in grid
      * @param numTilesY number of columns in grid
-     * @param offset offset amount in pixels
+     * @param offset    offset amount in pixels
      */
-    public void addTileSensors(final int numTilesX, final int numTilesY,
-            final int offset) {
+    public void addTileSensors(final int numTilesX, final int numTilesY, final int offset) {
         int tileWidth = parentWorld.getWidth() / numTilesX;
         int tileHeight = parentWorld.getHeight() / numTilesY;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new TileSensor(this, ((i * tileWidth) + offset),
-                        ((j * tileHeight) + offset), tileWidth, tileHeight));
+                addSensor(new TileSensor(this, ((i * tileWidth) + offset), ((j * tileHeight) + offset), tileWidth, tileHeight));
             }
         }
     }
@@ -557,9 +600,9 @@ public abstract class OdorWorldEntity {
      *
      * @return center location of the entity.
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getCenterLocation() {
-        return new double[] { getCenterX(), getCenterY() };
+        return new double[]{getCenterX(), getCenterY()};
     }
 
     /**
@@ -574,7 +617,7 @@ public abstract class OdorWorldEntity {
      *
      * @return center x coordinate.
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public float getCenterX() {
         return x + (getWidth() / 2);
     }
@@ -584,7 +627,7 @@ public abstract class OdorWorldEntity {
      *
      * @return center y coordinate.
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public float getCenterY() {
         return y + (getHeight() / 2);
     }
@@ -605,9 +648,9 @@ public abstract class OdorWorldEntity {
      *
      * @return location of the entity.
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getLocation() {
-        return new double[] { x, y };
+        return new double[]{x, y};
     }
 
     /**
@@ -641,7 +684,7 @@ public abstract class OdorWorldEntity {
      */
     public void postSerializationInit() {
         getAnimation().initializeImages();
-        currentlyHeardPhrases  = new ArrayList<String>();
+        currentlyHeardPhrases = new ArrayList<String>();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
         this.collision = false;
@@ -806,7 +849,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void moveNorth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -821,7 +864,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void moveSouth(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -836,7 +879,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void moveEast(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {
@@ -851,7 +894,7 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void moveWest(double amount) {
         if (!isBlocked() && (amount != 0)) {
             if (this instanceof RotatingEntity) {

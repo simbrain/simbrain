@@ -1,13 +1,5 @@
 package org.simbrain.custom_sims.simulations.mpfs_som;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
@@ -21,6 +13,12 @@ import org.simbrain.network.trainers.SOMTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Self-organizing map represents the moral political family scale...
@@ -56,19 +54,16 @@ public class MpfsSOM extends RegisteredSimulation {
         // Build network
         netWrapper = sim.addNetwork2(144, 11, 550, 680, "Moral-Political SOM");
         network = netWrapper.getNetwork();
-        som = new SOMNetwork(network, numSOMNodes, 29,
-                new Point2D.Double(0, 0));
+        som = new SOMNetwork(network, numSOMNodes, 29, new Point2D.Double(0, 0));
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
         som.getSom().applyLayout();
         network.addGroup(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout();
 
-        data = Utils.getDoubleMatrix(new File(
-                "./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_data.csv"));
+        data = Utils.getDoubleMatrix(new File("./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_data.csv"));
 
-        affiliations = Utils.getDoubleMatrix(new File(
-                "./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_self_affiliations.csv"));
+        affiliations = Utils.getDoubleMatrix(new File("./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_self_affiliations.csv"));
 
         // TODO: Better to shuffle?
         //Collections.reverse(Arrays.asList(data));
@@ -129,10 +124,10 @@ public class MpfsSOM extends RegisteredSimulation {
             for (int i = 0; i < 100; i++) {
                 try {
                     trainer.apply();
-                     //System.out.println("Neighborhood size: "
-                     //+ som.getSom().getNeighborhoodSize());
-                     //System.out.println(
-                     //"Learning rate: " + som.getSom().getAlpha());
+                    //System.out.println("Neighborhood size: "
+                    //+ som.getSom().getNeighborhoodSize());
+                    //System.out.println(
+                    //"Learning rate: " + som.getSom().getAlpha());
                 } catch (DataNotInitializedException e) {
                     e.printStackTrace();
                 }
@@ -163,18 +158,15 @@ public class MpfsSOM extends RegisteredSimulation {
                     numberOfWins.put(winner, numWins);
                 }
                 if (averagePoliticalAffiliation.get(winner) == null) {
-                    averagePoliticalAffiliation.put(winner,
-                            (Double) affiliations[i][0]);
+                    averagePoliticalAffiliation.put(winner, (Double) affiliations[i][0]);
                 } else {
                     Double current = averagePoliticalAffiliation.get(winner);
-                    averagePoliticalAffiliation.put(winner,
-                            (current + (Double) affiliations[i][0]));
+                    averagePoliticalAffiliation.put(winner, (current + (Double) affiliations[i][0]));
                 }
             }
             for (Neuron neuron : averagePoliticalAffiliation.keySet()) {
 
-                Double average = averagePoliticalAffiliation.get(neuron)
-                        / numberOfWins.get(neuron);
+                Double average = averagePoliticalAffiliation.get(neuron) / numberOfWins.get(neuron);
                 averagePoliticalAffiliation.put(neuron, average);
             }
 
@@ -186,8 +178,7 @@ public class MpfsSOM extends RegisteredSimulation {
                     continue;
                 }
 
-                float val = averagePoliticalAffiliation.get(neuron)
-                        .floatValue();
+                float val = averagePoliticalAffiliation.get(neuron).floatValue();
                 neuron.setLabel("" + Utils.round(val, 2));
 
                 if ((val < .1) && (val > -.1)) {
@@ -211,7 +202,9 @@ public class MpfsSOM extends RegisteredSimulation {
 
     public MpfsSOM() {
         super();
-    };
+    }
+
+    ;
 
     @Override
     public String getName() {

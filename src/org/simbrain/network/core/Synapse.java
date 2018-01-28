@@ -18,12 +18,6 @@
  */
 package org.simbrain.network.core;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
@@ -34,6 +28,12 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
  * (grow or weaken) based on various factors, including the activation level of
@@ -41,20 +41,27 @@ import org.simbrain.workspace.Producible;
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
- *
  */
 public class Synapse implements EditableObject {
 
-    /** A default update rule for the synapse. */
+    /**
+     * A default update rule for the synapse.
+     */
     private static final SynapseUpdateRule DEFAULT_LEARNING_RULE = new StaticSynapseRule();
 
-    /** A default spike responder. */
+    /**
+     * A default spike responder.
+     */
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
 
-    /** Default upper bound. */
+    /**
+     * Default upper bound.
+     */
     private static double DEFAULT_UPPER_BOUND = 100;
 
-    /** Default lower bound. */
+    /**
+     * Default lower bound.
+     */
     private static double DEFAULT_LOWER_BOUND = -100;
 
     /**
@@ -63,10 +70,14 @@ public class Synapse implements EditableObject {
      */
     private Network parentNetwork;
 
-    /** Neuron activation will come from. */
+    /**
+     * Neuron activation will come from.
+     */
     private Neuron source;
 
-    /** Neuron to which the synapse is attached. */
+    /**
+     * Neuron to which the synapse is attached.
+     */
     private Neuron target;
 
     /**
@@ -75,44 +86,59 @@ public class Synapse implements EditableObject {
      */
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
-    /** Only used of source neuron is a spiking neuron. */
+    /**
+     * Only used of source neuron is a spiking neuron.
+     */
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
-    /** Synapse id. */
+    /**
+     * Synapse id.
+     */
     private String id = "";
 
-    /** The maximum number of digits to display in the tool tip. */
+    /**
+     * The maximum number of digits to display in the tool tip.
+     */
     private static final int MAX_DIGITS = 2;
 
-    /** Strength of synapse. */
-    @UserParameter(label = "Strength", description = "Weight Strength", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "01", order = 1)
+    /**
+     * Strength of synapse.
+     */
+    @UserParameter(label = "Strength", description = "Weight Strength", minimumValue = -10, maximumValue = 10, defaultValue = "01", order = 1)
     private double strength = 0;
 
-    /** Post-Synaptic Response */
+    /**
+     * Post-Synaptic Response
+     */
     private double psr;
 
-    /** Amount to increment the neuron. */
-    @UserParameter(label = "Increment", description = "Strength Increment", 
-            minimumValue = 0, maximumValue = 100, defaultValue = "1", order = 2)
+    /**
+     * Amount to increment the neuron.
+     */
+    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0, maximumValue = 100, defaultValue = "1", order = 2)
     private double increment = 1;
 
-    /** Upper limit of synapse. */
-    @UserParameter(label = "Upper bound", description = "Upper bound", 
-            minimumValue = 0, maximumValue = 100, defaultValue = "10", order = 3)
+    /**
+     * Upper limit of synapse.
+     */
+    @UserParameter(label = "Upper bound", description = "Upper bound", minimumValue = 0, maximumValue = 100, defaultValue = "10", order = 3)
     private double upperBound = DEFAULT_UPPER_BOUND;
 
-    /** Lower limit of synapse. */
-    @UserParameter(label = "Lower bound", description = "Lower bound", 
-            minimumValue = -100, maximumValue = 0, defaultValue = "10", order = 4)
+    /**
+     * Lower limit of synapse.
+     */
+    @UserParameter(label = "Lower bound", description = "Lower bound", minimumValue = -100, maximumValue = 0, defaultValue = "10", order = 4)
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
-    /** Time to delay sending activation to target neuron. */
-    @UserParameter(label = "Delay", description = "delay", 
-            minimumValue = 0, maximumValue = 100, defaultValue = "0", order = 5)
+    /**
+     * Time to delay sending activation to target neuron.
+     */
+    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, maximumValue = 100, defaultValue = "0", order = 5)
     private int delay;
 
-    /** Parent group, if any (null if none). */
+    /**
+     * Parent group, if any (null if none).
+     */
     private SynapseGroup parentGroup;
 
     /**
@@ -126,11 +152,12 @@ public class Synapse implements EditableObject {
      * Boolean flag, indicating whether or not this synapse's strength can be
      * changed by any means other than direct user intervention.
      */
-    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", 
-            defaultValue = "False", order = 6)
+    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", defaultValue = "False", order = 6)
     private boolean frozen;
 
-    /** Manages synaptic delay */
+    /**
+     * Manages synaptic delay
+     */
     private double[] delayManager;
 
     /**
@@ -139,7 +166,9 @@ public class Synapse implements EditableObject {
      */
     private int dlyPtr = 0;
 
-    /** The value {@link #dlyPtr} points to in the delay manager. */
+    /**
+     * The value {@link #dlyPtr} points to in the delay manager.
+     */
     private double dlyVal = 0;
 
     /**
@@ -157,13 +186,11 @@ public class Synapse implements EditableObject {
     static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("weightUpperBound")) {
-            DEFAULT_UPPER_BOUND = Double
-                    .parseDouble(properties.getProperty("weightUpperBound"));
+            DEFAULT_UPPER_BOUND = Double.parseDouble(properties.getProperty("weightUpperBound"));
 
         }
         if (properties.containsKey("weightLowerBound")) {
-            DEFAULT_LOWER_BOUND = Double
-                    .parseDouble(properties.getProperty("weightLowerBound"));
+            DEFAULT_LOWER_BOUND = Double.parseDouble(properties.getProperty("weightLowerBound"));
 
         }
 
@@ -189,8 +216,8 @@ public class Synapse implements EditableObject {
     /**
      * Construct a synapse with a specified initial strength.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param source          source neuron
+     * @param target          target neuron
      * @param initialStrength initial strength for synapse
      */
     public Synapse(Neuron source, Neuron target, double initialStrength) {
@@ -202,13 +229,12 @@ public class Synapse implements EditableObject {
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule and parent network
      *
-     * @param newParent new parent network for this synapse.
-     * @param source source neuron
-     * @param target target neuron
+     * @param newParent    new parent network for this synapse.
+     * @param source       source neuron
+     * @param target       target neuron
      * @param learningRule update rule for this synapse
      */
-    public Synapse(Network newParent, Neuron source, Neuron target,
-            SynapseUpdateRule learningRule) {
+    public Synapse(Network newParent, Neuron source, Neuron target, SynapseUpdateRule learningRule) {
         setSourceAndTarget(source, target);
         initSpikeResponder();
         setLearningRule(learningRule);
@@ -221,12 +247,11 @@ public class Synapse implements EditableObject {
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param source       source neuron
+     * @param target       target neuron
      * @param learningRule update rule for this synapse
      */
-    public Synapse(Neuron source, Neuron target,
-            SynapseUpdateRule learningRule) {
+    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule) {
         this(source.getNetwork(), source, target, learningRule);
     }
 
@@ -235,15 +260,14 @@ public class Synapse implements EditableObject {
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
      *
-     * @param newParent new parent network for this synapse. Used when copying
-     *            and pasting to new network.
-     * @param source source neuron
-     * @param target target neuron
-     * @param learningRule update rule for this synapse
+     * @param newParent       new parent network for this synapse. Used when copying
+     *                        and pasting to new network.
+     * @param source          source neuron
+     * @param target          target neuron
+     * @param learningRule    update rule for this synapse
      * @param templateSynapse synapse with parameters to copy
      */
-    public Synapse(Network newParent, Neuron source, Neuron target,
-            SynapseUpdateRule learningRule, Synapse templateSynapse) {
+    public Synapse(Network newParent, Neuron source, Neuron target, SynapseUpdateRule learningRule, Synapse templateSynapse) {
         this(templateSynapse); // invoke the copy constructor
         setSourceAndTarget(source, target);
         initSpikeResponder();
@@ -255,13 +279,12 @@ public class Synapse implements EditableObject {
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param source       source neuron
+     * @param target       target neuron
      * @param learningRule update rule for this synapse
-     * @param parent parent network for this synapse.
+     * @param parent       parent network for this synapse.
      */
-    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule,
-            Network parent) {
+    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule, Network parent) {
         setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         initSpikeResponder();
@@ -273,7 +296,7 @@ public class Synapse implements EditableObject {
      * Copy a synapse with a specified new parent.
      *
      * @param newParent new parent network
-     * @param synapse synapse to copy
+     * @param synapse   synapse to copy
      */
     public Synapse(final Network newParent, Synapse synapse) {
         this(synapse);
@@ -307,8 +330,7 @@ public class Synapse implements EditableObject {
      */
     public static Synapse copyTemplateSynapse(Synapse s) {
         if (s.getSource() != null || s.getTarget() != null) {
-            throw new IllegalArgumentException(
-                    "Synapse is not template" + " synapse.");
+            throw new IllegalArgumentException("Synapse is not template" + " synapse.");
         }
         return new Synapse(s);
     }
@@ -414,8 +436,7 @@ public class Synapse implements EditableObject {
      * @param newSource the source neuron to the synapse
      * @param newTarget the target neuron to the synapse
      */
-    private void setSourceAndTarget(final Neuron newSource,
-            final Neuron newTarget) {
+    private void setSourceAndTarget(final Neuron newSource, final Neuron newTarget) {
         if (this.source != null) {
             this.source.removeEfferent(this);
         }
@@ -440,7 +461,7 @@ public class Synapse implements EditableObject {
     /**
      * @return Strength of synapse.
      */
-    @Producible(idMethod="getId", defaultVisibility=false)
+    @Producible(idMethod = "getId", defaultVisibility = false)
     public final double getStrength() {
         return strength;
     }
@@ -450,7 +471,7 @@ public class Synapse implements EditableObject {
      *
      * @param wt Strength value
      */
-    @Consumable(idMethod="getId", defaultVisibility=false)
+    @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setStrength(final double wt) {
         if (isTemplate) {
             forceSetStrength(wt);
@@ -462,7 +483,6 @@ public class Synapse implements EditableObject {
     }
 
     /**
-     *
      * @param wt the value to set the strength of the synapse to
      */
     public void forceSetStrength(final double wt) {
@@ -591,8 +611,7 @@ public class Synapse implements EditableObject {
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "(" + id + ") Strength: "
-                + Utils.round(this.getStrength(), MAX_DIGITS);
+        return "(" + id + ") Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
     }
 
     /**
@@ -608,8 +627,7 @@ public class Synapse implements EditableObject {
      * Randomize this weight to a value between its upper and lower bounds.
      */
     public void randomize() {
-        strength = (getUpperBound() - getLowerBound()) * Math.random()
-                + getLowerBound();
+        strength = (getUpperBound() - getLowerBound()) * Math.random() + getLowerBound();
         if (getNetwork() != null && !isTemplate)
             getNetwork().fireSynapseChanged(this);
     }
@@ -762,11 +780,7 @@ public class Synapse implements EditableObject {
     public String toString() {
         String ret = new String();
         ret += ("Synapse [" + getId() + "]: " + getStrength());
-        ret += ("  Connects neuron "
-                + (getSource() == null ? "[null]" : getSource().getId())
-                + " to neuron "
-                + (getTarget() == null ? "[null]" : getTarget().getId())
-                + "\n");
+        ret += ("  Connects neuron " + (getSource() == null ? "[null]" : getSource().getId()) + " to neuron " + (getTarget() == null ? "[null]" : getTarget().getId()) + "\n");
         return ret;
     }
 
@@ -862,7 +876,6 @@ public class Synapse implements EditableObject {
      * Returns a "template" synapse.
      *
      * @return the template synapse.
-     * @see instantiateTemplateSynapse
      */
     public static Synapse getTemplateSynapse() {
         return new Synapse(null, null, new StaticSynapseRule(), (Network) null);
@@ -873,7 +886,6 @@ public class Synapse implements EditableObject {
      *
      * @param rule the learning rule.
      * @return the template synapse
-     * @see instantiateTemplateSynapse
      */
     public static Synapse getTemplateSynapse(SynapseUpdateRule rule) {
         Synapse synapse = getTemplateSynapse();
@@ -900,14 +912,12 @@ public class Synapse implements EditableObject {
      * collection, if that collection supports a consistent order.
      *
      * @param synapseCollection The collection of synapses whose update rules we
-     *            want to query.
+     *                          want to query.
      * @return Returns a list of synapse update rules associated with the group
-     *         of synapses
+     * of synapses
      */
-    public static List<SynapseUpdateRule> getRuleList(
-            Collection<Synapse> synapseCollection) {
-        ArrayList<SynapseUpdateRule> ruleList = new ArrayList<SynapseUpdateRule>(
-                synapseCollection.size());
+    public static List<SynapseUpdateRule> getRuleList(Collection<Synapse> synapseCollection) {
+        ArrayList<SynapseUpdateRule> ruleList = new ArrayList<SynapseUpdateRule>(synapseCollection.size());
         for (Synapse s : synapseCollection) {
             ruleList.add(s.getLearningRule());
 
@@ -924,10 +934,9 @@ public class Synapse implements EditableObject {
      * @param target target neuron
      * @param parent parent network
      * @return a new synapse with these references and the base synapse's
-     *         properties
+     * properties
      */
-    public Synapse instantiateTemplateSynapse(Neuron source, Neuron target,
-            Network parent) {
+    public Synapse instantiateTemplateSynapse(Neuron source, Neuron target, Network parent) {
         this.source = source;
         this.target = target;
         this.parentNetwork = parent;

@@ -13,30 +13,37 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import javax.swing.*;
 
 /**
  * Panel to add a turning effector to an entity or to modify an existing one.
  *
  * @author Lam Nguyen
- *
  */
 public class TurningEffectorPanel extends AbstractEffectorPanel {
 
-    /** Text field to edit label. */
+    /**
+     * Text field to edit label.
+     */
     private JTextField label = new JTextField();
 
-    /** Text field to edit direction. */
+    /**
+     * Text field to edit direction.
+     */
     private JTextField direction = new JTextField();
 
-    /** Text field to edit amount. */
+    /**
+     * Text field to edit amount.
+     */
     private JTextField amount = new JTextField();
 
-    /** Entity to which a turning effector is being added. */
+    /**
+     * Entity to which a turning effector is being added.
+     */
     private RotatingEntity entity;
 
     /**
@@ -45,7 +52,9 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
      */
     private Turning turningEffector;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -65,7 +74,7 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
     /**
      * Constructor for the case where an effector is being edited.
      *
-     * @param entity parent entity
+     * @param entity   parent entity
      * @param effector effector to edit
      */
     public TurningEffectorPanel(OdorWorldEntity entity, Turning effector) {
@@ -81,12 +90,10 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addEffector(new Turning(entity, label.getText(), Double
-                    .parseDouble(direction.getText())));
+            entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText())));
         } else {
             turningEffector.setLabel(label.getText());
-            turningEffector
-                    .setDirection(Double.parseDouble(direction.getText()));
+            turningEffector.setDirection(Double.parseDouble(direction.getText()));
             turningEffector.setAmount(Double.parseDouble(amount.getText()));
         }
     }

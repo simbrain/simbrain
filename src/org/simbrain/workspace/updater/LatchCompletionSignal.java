@@ -9,7 +9,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class LatchCompletionSignal implements CompletionSignal {
 
-    /** The underlying latch. */
+    /**
+     * The underlying latch.
+     */
     private volatile CountDownLatch latch;
 
     /**

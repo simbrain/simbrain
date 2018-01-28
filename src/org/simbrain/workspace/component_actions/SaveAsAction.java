@@ -18,19 +18,20 @@
  */
 package org.simbrain.workspace.component_actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Save as action.
  */
 public final class SaveAsAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final GuiComponent guiComponent;
 
     /**
@@ -52,8 +53,9 @@ public final class SaveAsAction extends AbstractAction {
         this.guiComponent = guiComponent;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         guiComponent.showSaveFileDialog();

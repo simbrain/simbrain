@@ -29,10 +29,11 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuronRule extends NeuronUpdateRule implements
-        BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
+public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
 
-    /** Noise source. */
+    /**
+     * Noise source.
+     */
     private Randomizer randomizer = new Randomizer();
 
     private double ceiling = 1.0;
@@ -112,7 +113,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
     public void setLowerBound(double floor) {
         this.floor = floor;
     }
-    
+
     @Override
     public Randomizer getNoiseGenerator() {
         return randomizer;
@@ -120,7 +121,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
 
     @Override
     public void setNoiseGenerator(Randomizer rand) {
-        randomizer = rand;        
+        randomizer = rand;
     }
 
     @Override

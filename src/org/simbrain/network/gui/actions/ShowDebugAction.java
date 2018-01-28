@@ -18,19 +18,19 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Prints debug information to standard output.
  */
 public final class ShowDebugAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -49,8 +49,9 @@ public final class ShowDebugAction extends AbstractAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         System.out.println("--- Network Panel ----");

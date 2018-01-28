@@ -18,9 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -32,6 +29,9 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
+import java.awt.geom.Point2D;
+import java.util.List;
+
 /**
  * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
  * group. An input layer and input data have been added so that the SOM can be
@@ -41,26 +41,31 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
  */
 public class CompetitiveNetwork extends Subnetwork implements Trainable {
 
-    /** The competitive network. */
+    /**
+     * The competitive network.
+     */
     private final CompetitiveGroup competitive;
 
-    /** The input layer. */
+    /**
+     * The input layer.
+     */
     private final NeuronGroup inputLayer;
 
-    /** Training set. */
+    /**
+     * Training set.
+     */
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct an SOM Network.
      *
-     * @param net parent network Set to null when this is used simply as a
-     *            holder for param values.
+     * @param net                   parent network Set to null when this is used simply as a
+     *                              holder for param values.
      * @param numCompetitiveNeurons number of neurons in the Competitive layer
-     * @param numInputNeurons number of neurons in the input layer
-     * @param initialPosition bottom corner where network will be placed.
+     * @param numInputNeurons       number of neurons in the input layer
+     * @param initialPosition       bottom corner where network will be placed.
      */
-    public CompetitiveNetwork(Network net, int numCompetitiveNeurons,
-            int numInputNeurons, Point2D initialPosition) {
+    public CompetitiveNetwork(Network net, int numCompetitiveNeurons, int numInputNeurons, Point2D initialPosition) {
         super(net);
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
@@ -93,8 +98,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
      */
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive,
-                Direction.NORTH, 200);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 200);
     }
 
     @Override

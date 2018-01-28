@@ -9,7 +9,9 @@ import org.simbrain.workspace.updater.UpdateAction;
  */
 public class ColorPlot implements UpdateAction {
 
-    /** Reference to simulation object that has all the main variables used. */
+    /**
+     * Reference to simulation object that has all the main variables used.
+     */
     AgentTrails sim;
 
     /**
@@ -33,8 +35,7 @@ public class ColorPlot implements UpdateAction {
     @Override
     public void invoke() {
         double[] predictedState = sim.predictionNet.getActivations();
-        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
-                predictedState, (float)sim.errorNeuron.getActivation());
+        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(), predictedState, (float) sim.errorNeuron.getActivation());
     }
 
 }

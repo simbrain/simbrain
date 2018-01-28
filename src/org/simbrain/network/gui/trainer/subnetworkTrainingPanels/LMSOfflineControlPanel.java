@@ -18,30 +18,6 @@
  */
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
@@ -49,6 +25,10 @@ import org.simbrain.network.trainers.TrainerListener;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Control panel (buttons etc.) for least mean squares offline trainers. Used in
@@ -60,26 +40,37 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 @SuppressWarnings("serial")
 public class LMSOfflineControlPanel extends JPanel {
 
-    /** Reference to trainer object. */
+    /**
+     * Reference to trainer object.
+     */
     private LMSOffline trainer;
 
-    /** The button which starts training. */
+    /**
+     * The button which starts training.
+     */
     private JButton applyButton = new JButton("Start");
 
-    /** The progress bar, tracking the progress of training. */
+    /**
+     * The progress bar, tracking the progress of training.
+     */
     private final JProgressBar progressBar = new JProgressBar();
 
-    /** A combo box containing the supported solution types. */
-    private final JComboBox<SolutionType> solutionTypes =
-        new JComboBox<SolutionType>(SolutionType.values());
+    /**
+     * A combo box containing the supported solution types.
+     */
+    private final JComboBox<SolutionType> solutionTypes = new JComboBox<SolutionType>(SolutionType.values());
 
     // This is flashy a checkbox could do the work... but this is more pretty...
-    /** A button regulating the use of ridge regression. */
+    /**
+     * A button regulating the use of ridge regression.
+     */
     private JButton regSwitch = new JButton("Off");
 
     private JCheckBox ridgeRegChkBx = new JCheckBox();
 
-    /** A flag for whether or not regression is being used. */
+    /**
+     * A flag for whether or not regression is being used.
+     */
     private boolean regressionActive;
 
     // Initialize pretty button...
@@ -87,7 +78,9 @@ public class LMSOfflineControlPanel extends JPanel {
         regSwitch.setForeground(Color.red);
     }
 
-    /** A text field containing the alpha value. */
+    /**
+     * A text field containing the alpha value.
+     */
     private JTextField alpha = new JTextField(" 0.5 ", 10);
 
     {
@@ -100,7 +93,9 @@ public class LMSOfflineControlPanel extends JPanel {
 
     private JCheckBox noiseChkBx = new JCheckBox();
 
-    /** Parent frame. */
+    /**
+     * Parent frame.
+     */
     private final Window frame;
 
     /**
@@ -121,7 +116,7 @@ public class LMSOfflineControlPanel extends JPanel {
     /**
      * Build the panel.
      *
-     * @param frame the parent network panel
+     * @param frame   the parent network panel
      * @param trainer the LMSOffline trainer to represent
      */
     public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {
@@ -258,12 +253,10 @@ public class LMSOfflineControlPanel extends JPanel {
                 }
 
                 // Sets the solution type in LMSOffline
-                trainer.setSolutionType((SolutionType) solutionTypes
-                    .getSelectedItem());
+                trainer.setSolutionType((SolutionType) solutionTypes.getSelectedItem());
 
                 // Disables/enabled ridge regression based on selected solution
-                if (solutionTypes.getSelectedItem()
-                == LMSOffline.SolutionType.MOORE_PENROSE) {
+                if (solutionTypes.getSelectedItem() == LMSOffline.SolutionType.MOORE_PENROSE) {
                     ridgeRegChkBx.setSelected(false);
                     ridgeRegChkBx.setEnabled(false);
                     alpha.setEnabled(false);
@@ -331,8 +324,7 @@ public class LMSOfflineControlPanel extends JPanel {
             }
 
             @Override
-            public void progressUpdated(String progressUpdate,
-                int percentComplete) {
+            public void progressUpdated(String progressUpdate, int percentComplete) {
                 // System.out.println(progressUpdate + " -- " + percentComplete
                 // + "%");
                 progressBar.setValue(percentComplete);
@@ -361,9 +353,7 @@ public class LMSOfflineControlPanel extends JPanel {
                 try {
                     trainer.apply();
                 } catch (DataNotInitializedException e) {
-                    JOptionPane.showOptionDialog(null, e.getMessage(),
-                        "Warning", JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
                 }
                 return null;
             }

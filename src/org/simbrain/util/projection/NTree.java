@@ -18,16 +18,9 @@
  */
 package org.simbrain.util.projection;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
+
+import java.util.*;
 
 /**
  * An n-dimensional generalization of a simple QuadTree structure. This is a
@@ -39,13 +32,13 @@ import org.apache.log4j.Logger;
  * new leaves attached to a new branch that replaces the old leaf. In splitting
  * a leaf, a mid-point is determined which places approximately half of the
  * points from the old leaf elements in each new leaf.
- *
+ * <p>
  * <p>
  * In searching for an element, the mid-point of each branch is used to
  * determine the path through the tree. When the point to be searched is closer
  * than the given tolerance to the midpoint, the other branch is also followed
  * for correctness.
- *
+ * <p>
  * <p>
  * A couple of other standard collections are used to provide efficient
  * index-based access and for reverse lookups of leafs.
@@ -54,33 +47,51 @@ import org.apache.log4j.Logger;
  */
 public class NTree implements Iterable<DataPoint> {
 
-    /** The number of elements to allow in a leaf before splitting */
+    /**
+     * The number of elements to allow in a leaf before splitting
+     */
     static final int MAX = 50; /*
-                                * determined ad hoc testing and hand-waving
-                                * optimization theories
-                                */
+     * determined ad hoc testing and hand-waving
+     * optimization theories
+     */
 
-    /** The static logger for this class */
+    /**
+     * The static logger for this class
+     */
     private static final Logger LOGGER = Logger.getLogger(NTree.class);
 
-    /** An instance specific logger */
+    /**
+     * An instance specific logger
+     */
     private Logger logger = LOGGER;
 
-    /** An enumeration for quick switching on the node type */
+    /**
+     * An enumeration for quick switching on the node type
+     */
     private enum Type {
         branch, leaf
-    };
+    }
 
-    /** The root node, initialized to a leaf */
+    ;
+
+    /**
+     * The root node, initialized to a leaf
+     */
     private Node root = new Leaf();
 
-    /** The number of dimensions this structure supports */
+    /**
+     * The number of dimensions this structure supports
+     */
     public final int dimensions;
 
-    /** Indexed list of all elements */
+    /**
+     * Indexed list of all elements
+     */
     private List<DataPoint> list = new ArrayList<DataPoint>();
 
-    /** Map of all elements mapped to their leafs */
+    /**
+     * Map of all elements mapped to their leafs
+     */
     private Map<DataPoint, Leaf> all = new LinkedHashMap<DataPoint, Leaf>();
 
     /**
@@ -172,8 +183,7 @@ public class NTree implements Iterable<DataPoint> {
              * the leaf has more elements than the threshold. The leaf will be
              * split
              */
-            int splitOn = parent == null ? 0 : (parent.splitDimension + 1)
-                    % dimensions;
+            int splitOn = parent == null ? 0 : (parent.splitDimension + 1) % dimensions;
             if (logger.isDebugEnabled())
                 logger.debug("splitting leaf on dimension: " + splitOn);
 
@@ -260,7 +270,9 @@ public class NTree implements Iterable<DataPoint> {
      */
     private static final class PointComparator implements Comparator<DataPoint> {
 
-        /** The dimension to compare on */
+        /**
+         * The dimension to compare on
+         */
         final int dimension;
 
         /**
@@ -274,6 +286,7 @@ public class NTree implements Iterable<DataPoint> {
 
         /**
          * compares two points on one dimension
+         *
          * @param o1
          * @param o2
          * @return
@@ -291,7 +304,6 @@ public class NTree implements Iterable<DataPoint> {
     }
 
     /**
-     *
      * @param index of element to return.
      * @return Array of element at index location
      */
@@ -303,22 +315,22 @@ public class NTree implements Iterable<DataPoint> {
      * Checks whether the given point already exists in the tree with the
      * specified tolerance.
      *
-     * @param point the point to search for
+     * @param point     the point to search for
      * @param tolerance the tolerance for determining uniqueness
-     * @return the matching datapoint if it exists, null if the datapoint is unique 
+     * @return the matching datapoint if it exists, null if the datapoint is unique
      */
     public DataPoint isUnique(final DataPoint point, final double tolerance) {
         return isUnique(root, point, tolerance);
     }
 
     //TODO: Confusing names.   rename or add methods that return booleans?
-    
+
     /**
      * Checks whether the given point already exists in the tree with the
      * specified tolerance.
      *
-     * @param from the node to start from
-     * @param point the point to search for
+     * @param from      the node to start from
+     * @param point     the point to search for
      * @param tolerance the tolerance for determining uniqueness
      * @return the matching datapoint if it exists, null if the datapoint is unique
      */
@@ -341,8 +353,7 @@ public class NTree implements Iterable<DataPoint> {
              */
             if (Math.abs(d - branch.midPoint) < tolerance) {
                 if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch
-                            + " - recursing both paths");
+                    logger.debug("at branch : " + branch + " - recursing both paths");
                 DataPoint leftCheck = isUnique(branch.left, point, tolerance);
                 DataPoint rightCheck = isUnique(branch.right, point, tolerance);
                 if ((leftCheck == null) && (rightCheck == null)) {
@@ -398,14 +409,11 @@ public class NTree implements Iterable<DataPoint> {
      *
      * @param a First point of distance
      * @param b Second point of distance
-     *
      * @return the Euclidean distance between points 1 and 2
      */
     public static double getDistance(final DataPoint a, final DataPoint b) {
         if (a.getDimension() != b.getDimension()) {
-            throw new IllegalArgumentException(
-                    "points of different dimensions cannot be compared: "
-                            + a.getDimension() + ", " + b.getDimension());
+            throw new IllegalArgumentException("points of different dimensions cannot be compared: " + a.getDimension() + ", " + b.getDimension());
         }
 
         double sum = 0;
@@ -423,7 +431,7 @@ public class NTree implements Iterable<DataPoint> {
      * determine is specified by the number argument
      *
      * @param number the number of points to collect
-     * @param point the point to find points close to
+     * @param point  the point to find points close to
      * @return the closest points
      */
     public List<DataPoint> getClosestPoints(int number, DataPoint point) {
@@ -441,13 +449,12 @@ public class NTree implements Iterable<DataPoint> {
      * Gets the closest points to the passed in point. The amount of points to
      * determine is specified by the number argument
      *
-     * @param from the node to start from
+     * @param from   the node to start from
      * @param number the number of points to collect
-     * @param point the point to find points close to
+     * @param point  the point to find points close to
      * @return the closest points
      */
-    private List<DistancePoint> getClosestPoints(Node from, int number,
-            DataPoint point) {
+    private List<DistancePoint> getClosestPoints(Node from, int number, DataPoint point) {
         List<DistancePoint> points;
 
         /*
@@ -466,19 +473,15 @@ public class NTree implements Iterable<DataPoint> {
             boolean left = d < branch.midPoint;
 
             /* Recurse on branch determined above */
-            points = getClosestPoints(left ? branch.left : branch.right,
-                    number, point);
+            points = getClosestPoints(left ? branch.left : branch.right, number, point);
 
             /*
              * Determine whether to recurse on the other path. if the farthest
              * out point from the main branch is less than the distance to the
              * split, get the n points from the other branch
              */
-            if (points.size() < number
-                    || points.get(number - 1).distance > Math.abs(d
-                            - branch.midPoint)) {
-                points.addAll(getClosestPoints(left ? branch.right
-                        : branch.left, number, point));
+            if (points.size() < number || points.get(number - 1).distance > Math.abs(d - branch.midPoint)) {
+                points.addAll(getClosestPoints(left ? branch.right : branch.left, number, point));
 
                 /* combine the points and sort */
                 Collections.sort(points, new Comparator<DistancePoint>() {
@@ -527,7 +530,7 @@ public class NTree implements Iterable<DataPoint> {
 
         /**
          * @param distance the distance to the given point
-         * @param point a point
+         * @param point    a point
          */
         DistancePoint(final double distance, final DataPoint point) {
             this.distance = distance;
@@ -577,7 +580,8 @@ public class NTree implements Iterable<DataPoint> {
 
     /**
      * Returns an iterator over this tree
-     * @return 
+     *
+     * @return
      */
     public Iterator<DataPoint> iterator() {
         return list.iterator();

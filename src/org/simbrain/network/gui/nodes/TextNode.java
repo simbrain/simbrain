@@ -19,18 +19,6 @@
 
 package org.simbrain.network.gui.nodes;
 
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.NetworkPanel;
@@ -40,22 +28,32 @@ import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 
+import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  * An editable text element, which wraps a PStyledText object.
  */
 public class TextNode extends ScreenElement implements PropertyChangeListener {
 
-    /** The text object. */
+    /**
+     * The text object.
+     */
     private final PStyledText pStyledText;
 
-    /** Underlying model text object. */
+    /**
+     * Underlying model text object.
+     */
     private final NetworkTextObject textObject;
 
     /**
      * Construct text object at specified location.
      *
      * @param netPanel reference to networkPanel
-     * @param text the network text object
+     * @param text     the network text object
      */
     public TextNode(final NetworkPanel netPanel, final NetworkTextObject text) {
         super(netPanel);
@@ -78,7 +76,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         return true;
     }
 
-    @Override 
+    @Override
     public boolean isDraggable() {
         return true;
     }
@@ -152,11 +150,8 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      */
     public void update() {
         try {
-            AttributeSet as = TextNode.createAttributeSet(
-                    textObject.getFontName(), textObject.getFontSize(),
-                    textObject.isItalic(), textObject.isBold());
-            pStyledText.getDocument().remove(0,
-                    pStyledText.getDocument().getLength());
+            AttributeSet as = TextNode.createAttributeSet(textObject.getFontName(), textObject.getFontSize(), textObject.isItalic(), textObject.isBold());
+            pStyledText.getDocument().remove(0, pStyledText.getDocument().getLength());
             pStyledText.getDocument().insertString(0, textObject.getText(), as);
             pStyledText.syncWithDocument();
             pullViewPositionFromModel();
@@ -193,23 +188,21 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * text object.
      */
     private void pullViewPositionFromModel() {
-        Point2D p = new Point2D.Double(getTextObject().getX(), getTextObject()
-                .getY());
+        Point2D p = new Point2D.Double(getTextObject().getX(), getTextObject().getY());
         this.setGlobalTranslation(p);
     }
 
     /**
      * Creates an attribute set of the specified kind.
      *
-     * @author Aaron Dixon
      * @param fontName name of font in attribute set
      * @param fontSize size of font in attribute set
-     * @param italic italic or not
-     * @param bold  bold or not
+     * @param italic   italic or not
+     * @param bold     bold or not
      * @return the resulting attribute set
+     * @author Aaron Dixon
      */
-    public static SimpleAttributeSet createAttributeSet(String fontName,
-            int fontSize, boolean italic, boolean bold) {
+    public static SimpleAttributeSet createAttributeSet(String fontName, int fontSize, boolean italic, boolean bold) {
         SimpleAttributeSet as = new SimpleAttributeSet();
         as.addAttribute(StyleConstants.CharacterConstants.FontFamily, fontName);
         as.addAttribute(StyleConstants.CharacterConstants.FontSize, fontSize);

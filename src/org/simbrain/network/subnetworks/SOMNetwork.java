@@ -18,9 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
@@ -31,6 +28,9 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
+import java.awt.geom.Point2D;
+import java.util.List;
+
 /**
  * <b>SOMNetwork</b> is a small network encompassing an SOM group. An input
  * layer and input data have been added so that the SOM can be easily trained
@@ -38,28 +38,33 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
  *
  * @author Jeff Yoshimi
  */
-public class SOMNetwork  extends Subnetwork implements Trainable {
+public class SOMNetwork extends Subnetwork implements Trainable {
 
-    /** The self organizing map. */
+    /**
+     * The self organizing map.
+     */
     private final SOMGroup som;
 
-    /** The input layer. */
+    /**
+     * The input layer.
+     */
     private final NeuronGroup inputLayer;
 
-    /** Training set. */
+    /**
+     * Training set.
+     */
     private final TrainingSet trainingSet = new TrainingSet();
-    
+
     /**
      * Construct an SOM Network.
      *
-     * @param net parent network. Set to null when this is used simply as a
-     *            holder for param values.
-     * @param numSOMNeurons number of neurons in the SOM layer
+     * @param net             parent network. Set to null when this is used simply as a
+     *                        holder for param values.
+     * @param numSOMNeurons   number of neurons in the SOM layer
      * @param numInputNeurons number of neurons in the input layer
      * @param initialPosition bottom corner where network will be placed.
      */
-    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons,
-            Point2D initialPosition) {
+    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons, Point2D initialPosition) {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
@@ -78,7 +83,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
         this.connectNeuronGroups(inputLayer, som);
-        
+
         layoutNetwork();
     }
 
@@ -87,8 +92,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
      */
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, som,
-                Direction.NORTH, 250);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
     }
 
     @Override

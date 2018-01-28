@@ -18,24 +18,23 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Set synapse properties.
  */
 public final class SetSynapsePropertiesAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -51,12 +50,9 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('e'), this);
-        putValue(SHORT_DESCRIPTION,
-                "Set the properties of selected synapses");
+        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('e'), this);
+        putValue(SHORT_DESCRIPTION, "Set the properties of selected synapses");
 
         this.networkPanel = networkPanel;
         updateAction();
@@ -78,9 +74,7 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
         int numSynapses = networkPanel.getSelectedSynapses().size();
 
         if (numSynapses > 0) {
-            String text = new String(
-                    ("Edit " + numSynapses + ((numSynapses > 1) ? " Selected Synapses"
-                            : " Selected Synapse")));
+            String text = new String(("Edit " + numSynapses + ((numSynapses > 1) ? " Selected Synapses" : " Selected Synapse")));
             putValue(NAME, text);
             setEnabled(true);
         } else {
@@ -89,8 +83,9 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

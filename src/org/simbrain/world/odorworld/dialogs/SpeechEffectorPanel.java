@@ -13,31 +13,37 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import javax.swing.*;
 
 /**
  * Panel to add a speech effector to an entity.
  *
  * @author Lam Nguyen
- *
  */
 public class SpeechEffectorPanel extends AbstractEffectorPanel {
 
-    /** Text field to edit uttered phrase. */
+    /**
+     * Text field to edit uttered phrase.
+     */
     private JTextField phrase = new JTextField();
 
-    /** Text field to edit threshold above which effector is activated. */
+    /**
+     * Text field to edit threshold above which effector is activated.
+     */
     private JTextField threshold = new JTextField();
 
-    /** Entity to which a speech effector is being added. */
+    /**
+     * Entity to which a speech effector is being added.
+     */
     private RotatingEntity entity;
 
-    /** Maximum characters currently allowed for a phrase. */
+    /**
+     * Maximum characters currently allowed for a phrase.
+     */
     private static final int MAX_PHRASE_LENGTH = 10;
 
     /**
@@ -45,7 +51,9 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
      */
     private Speech speechEffector;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -64,11 +72,10 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
     /**
      * Constructor for the case where an effector is being edited.
      *
-     * @param entity parent entity
+     * @param entity   parent entity
      * @param effector effector to edit
      */
-    public SpeechEffectorPanel(final OdorWorldEntity entity,
-            final Speech effector) {
+    public SpeechEffectorPanel(final OdorWorldEntity entity, final Speech effector) {
         this.entity = (RotatingEntity) entity;
         this.speechEffector = effector;
         isCreationPanel = false;
@@ -80,8 +87,7 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addEffector(new Speech(entity, phrase.getText(), Double
-                    .parseDouble(threshold.getText())));
+            entity.addEffector(new Speech(entity, phrase.getText(), Double.parseDouble(threshold.getText())));
             if (phrase.getText().length() > MAX_PHRASE_LENGTH) {
                 checkPhrase();
             }
@@ -89,10 +95,8 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         } else {
             speechEffector.setPhrase(phrase.getText());
             speechEffector.setLabel("Say: \"" + phrase.getText() + "\"");
-            speechEffector
-                    .setThreshold(Double.parseDouble(threshold.getText()));
-            speechEffector.getParent().getParentWorld()
-                    .fireEntityChanged(speechEffector.getParent());
+            speechEffector.setThreshold(Double.parseDouble(threshold.getText()));
+            speechEffector.getParent().getParentWorld().fireEntityChanged(speechEffector.getParent());
             if (phrase.getText().length() > MAX_PHRASE_LENGTH) {
                 checkPhrase();
             }
@@ -113,13 +117,11 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         }
     }
 
-    /** Displays message when utterance is above MAX_PHRASE_LENGTH char. */
+    /**
+     * Displays message when utterance is above MAX_PHRASE_LENGTH char.
+     */
     private void checkPhrase() {
-        JOptionPane.showOptionDialog(null, "Speech utterance is greater than"
-                + MAX_PHRASE_LENGTH
-                + "chars! Not guaranteed to render correctly.", "Warning",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                null, null);
+        JOptionPane.showOptionDialog(null, "Speech utterance is greater than" + MAX_PHRASE_LENGTH + "chars! Not guaranteed to render correctly.", "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 
 }

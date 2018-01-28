@@ -1,37 +1,31 @@
 package org.simbrain.custom_sims.helper_classes;
 
-import java.awt.BorderLayout;
-import java.util.concurrent.Executors;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.concurrent.Executors;
 
 /**
  * Utility for setting up a control panel in an internal frame.
  *
  * @author Jeff Yoshimi
- *
  */
 public class ControlPanel extends JPanel {
 
-    /** The internal frame all components are placed in. */
+    /**
+     * The internal frame all components are placed in.
+     */
     private JInternalFrame internalFrame;
 
-    /** Allows for multiple labeled item panels in separate tabs. */
+    /**
+     * Allows for multiple labeled item panels in separate tabs.
+     */
     private JTabbedPane tabbedPane;
 
-    /** Main panel, in case where there are not tabs. */
+    /**
+     * Main panel, in case where there are not tabs.
+     */
     private LabelledItemPanel mainPanel;
 
     /**
@@ -57,7 +51,7 @@ public class ControlPanel extends JPanel {
     /**
      * Add an item to the current tab.
      *
-     * @param text the text to display next to the component
+     * @param text      the text to display next to the component
      * @param component the component to display
      */
     public void addItem(String text, JComponent component) {
@@ -72,8 +66,8 @@ public class ControlPanel extends JPanel {
      * Add a button to the control panel.
      *
      * @param buttonText name for the button itself
-     * @param task the task to run when the button is pressed
-     * @return 
+     * @param task       the task to run when the button is pressed
+     * @return
      */
     public JButton addButton(String buttonText, Runnable task) {
         return addButton("", buttonText, task);
@@ -82,12 +76,11 @@ public class ControlPanel extends JPanel {
     /**
      * Add a button to the control panel and text next to the button.
      *
-     * @param buttonText text for the button itself
+     * @param buttonText  text for the button itself
      * @param buttonLabel text in the panel to the left of the button
-     * @param task the task to run when the button is pressed
+     * @param task        the task to run when the button is pressed
      */
-    public JButton addButton(String buttonText, String buttonLabel,
-            Runnable task) {
+    public JButton addButton(String buttonText, String buttonLabel, Runnable task) {
         JButton button = new JButton(buttonLabel);
         button.addActionListener(e -> {
             Executors.newSingleThreadExecutor().execute(task);
@@ -101,7 +94,7 @@ public class ControlPanel extends JPanel {
      * Add a text field to the panel.
      *
      * @param fieldLabel text in the panel to the left of the field
-     * @param initText initial text in the textfield
+     * @param initText   initial text in the textfield
      * @return the text field
      */
     public JTextField addTextField(String fieldLabel, String initText) {
@@ -115,7 +108,7 @@ public class ControlPanel extends JPanel {
      * Add a label to the panel.
      *
      * @param fieldLabel text in the panel to the left of the label
-     * @param initText initial text in the label
+     * @param initText   initial text in the label
      * @return the label
      */
     public JLabel addLabel(String fieldLabel, String initText) {
@@ -128,9 +121,9 @@ public class ControlPanel extends JPanel {
     /**
      * Add a checkbox to the panel.
      *
-     * @param label text in the panel to the left of the field
+     * @param label   text in the panel to the left of the field
      * @param checked whether the box should initially be checked
-     * @param task task to run when clicking on the checkbox
+     * @param task    task to run when clicking on the checkbox
      * @return the checkbox
      */
     public JCheckBox addCheckBox(String label, boolean checked, Runnable task) {
@@ -173,15 +166,13 @@ public class ControlPanel extends JPanel {
     /**
      * Embed a controlpanel in an internal frame and get a reference to it.
      *
-     * @param sim reference to parent simulation
+     * @param sim  reference to parent simulation
      * @param name title to display in panel frame
-     * @param x x coordinate of frame
-     * @param y y coordinate of frame
-     *
+     * @param x    x coordinate of frame
+     * @param y    y coordinate of frame
      * @return the internal frame
      */
-    public static ControlPanel makePanel(Simulation sim, String name, int x,
-            int y) {
+    public static ControlPanel makePanel(Simulation sim, String name, int x, int y) {
         ControlPanel panel = new ControlPanel();
         panel.internalFrame = new JInternalFrame(name, true, true);
         // Set up Frame

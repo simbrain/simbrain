@@ -18,29 +18,35 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
-import java.util.List;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import java.util.List;
 
 /**
  * Abstract class for Odor World effectors.
  */
 public abstract class Effector {
 
-    /** Reference to parent entity. */
+    /**
+     * Reference to parent entity.
+     */
     protected OdorWorldEntity parent;
 
-    /** The id of this smell effector. */
+    /**
+     * The id of this smell effector.
+     */
     private String id;
 
-    /** Public label of this effector. */
+    /**
+     * Public label of this effector.
+     */
     private String label;
 
     /**
      * Construct the effector.
      *
      * @param parent the parent entity
-     * @param label a label for this effector
+     * @param label  a label for this effector
      */
     public Effector(OdorWorldEntity parent, String label) {
         super();
@@ -103,7 +109,7 @@ public abstract class Effector {
     public void setLabel(String label) {
         this.label = label;
     }
-    
+
     //TODO
     public String getMixedId() {
         return this.getParent().getId() + ":" + this.getId();

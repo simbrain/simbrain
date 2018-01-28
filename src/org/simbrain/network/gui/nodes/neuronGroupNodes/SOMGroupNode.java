@@ -18,17 +18,13 @@
  */
 package org.simbrain.network.gui.nodes.neuronGroupNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of Self-Organizing Map.
@@ -41,7 +37,7 @@ public class SOMGroupNode extends NeuronGroupNode {
      * Create a SOM Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the SOM network
+     * @param group        the SOM network
      */
     public SOMGroupNode(final NetworkPanel networkPanel, final SOMGroup group) {
         super(networkPanel, group);
@@ -62,52 +58,46 @@ public class SOMGroupNode extends NeuronGroupNode {
 
         @Override
         protected String getToolTipText() {
-            return "Current learning rate: "
-                    + Utils.round(((SOMGroup) getNeuronGroup()).getAlpha(), 2)
-                    + "  Current neighborhood size: "
-                    + Utils.round(
-                            ((SOMGroup) getNeuronGroup()).getNeighborhoodSize(),
-                            2);
+            return "Current learning rate: " + Utils.round(((SOMGroup) getNeuronGroup()).getAlpha(), 2) + "  Current neighborhood size: " + Utils.round(((SOMGroup) getNeuronGroup()).getNeighborhoodSize(), 2);
         }
 
         @Override
         protected boolean hasToolTipText() {
             return true;
         }
-    };
+    }
+
+    ;
 
     @Override
     public void updateText() {
         SOMGroup group = (SOMGroup) getNeuronGroup();
-        group.setStateInfo("Learning rate (" + Utils.round(group.getAlpha(), 2)
-                + ") N-size (" + Utils.round(group.getNeighborhoodSize(), 2)
-                + ")");
+        group.setStateInfo("Learning rate (" + Utils.round(group.getAlpha(), 2) + ") N-size (" + Utils.round(group.getNeighborhoodSize(), 2) + ")");
         getInteractionBox().setText(group.getStateInfo());
         getInteractionBox().updateText();
-    };
+    }
+
+    ;
 
     /**
      * Sets custom menu for SOM node.
      */
     protected void setCustomMenuItems() {
-        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-                "Reset SOM Network") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction("Reset SOM Network") {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.reset();
                 group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
-        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-                "Recall SOM Memory") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction("Recall SOM Memory") {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.recall();
                 group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
-        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-                "Randomize SOM Weights") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction("Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.randomizeIncomingWeights();

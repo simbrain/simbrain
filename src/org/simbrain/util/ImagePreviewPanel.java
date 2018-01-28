@@ -1,16 +1,10 @@
 package org.simbrain.util;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
 public class ImagePreviewPanel extends JPanel implements PropertyChangeListener {
 
@@ -42,10 +36,7 @@ public class ImagePreviewPanel extends JPanel implements PropertyChangeListener 
              * Make reasonably sure we have an image format that AWT can handle
              * so we don't try to draw something silly.
              */
-            if ((name != null) && name.toLowerCase().endsWith(".jpg")
-                    || name.toLowerCase().endsWith(".jpeg")
-                    || name.toLowerCase().endsWith(".gif")
-                    || name.toLowerCase().endsWith(".png")) {
+            if ((name != null) && name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".jpeg") || name.toLowerCase().endsWith(".gif") || name.toLowerCase().endsWith(".png")) {
                 icon = new ImageIcon(name);
                 image = icon.getImage();
                 scaleImage();
@@ -95,8 +86,7 @@ public class ImagePreviewPanel extends JPanel implements PropertyChangeListener 
          * JFileChooser.
          */
         g.fillRect(0, 0, ACCSIZE, getHeight());
-        g.drawImage(image, getWidth() / 2 - width / 2 + 5, getHeight() / 2
-                - height / 2, this);
+        g.drawImage(image, getWidth() / 2 - width / 2 + 5, getHeight() / 2 - height / 2, this);
     }
 
 }

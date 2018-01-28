@@ -14,10 +14,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Producible {
 
-    /** The description to use for this producible instead of the method name. */
+    /**
+     * The description to use for this producible instead of the method name.
+     */
     String description() default "";
 
-    /** The name of a method that returns a custom id for the base object of this producible. */
+    /**
+     * The name of a method that returns a custom id for the base object of this producible.
+     */
     String idMethod() default "";
 
     /**

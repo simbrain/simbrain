@@ -18,16 +18,16 @@
  */
 package org.simbrain.workspace.updater;
 
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingListener;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingListener;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
 
 /**
  * Maintain a list of workspace update actions. When the workspace is iterated
@@ -59,7 +59,9 @@ public class UpdateActionManager {
          */
         public void actionRemoved(UpdateAction action);
 
-        /** Called whenever the order of update actions is changed. */
+        /**
+         * Called whenever the order of update actions is changed.
+         */
         public void actionOrderChanged();
     }
 
@@ -243,7 +245,7 @@ public class UpdateActionManager {
     /**
      * Returns an update action matching the provided name, or null if none is
      * found.
-     * 
+     *
      * @param toFind name of action to find
      * @return the matching update action, or null if none found
      */
@@ -259,7 +261,7 @@ public class UpdateActionManager {
     /**
      * Returns an update action whose description corresponds to the provided
      * string (case is ignored).
-     *
+     * <p>
      * TODO: This facilitates access to update actions, but not in a very pretty
      * way. It is used by ElmanPhonemes.bsh and ElmanSentences.bsh. Probably
      * need to add some kind of id field or something to UpdateAction so that

@@ -18,20 +18,13 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Simple trainer control panel for cases where the trainer just involves an
@@ -41,20 +34,23 @@ import org.simbrain.resource.ResourceManager;
  */
 public class SimpleTrainerControlPanel extends JPanel {
 
-    /** Reference to trainer object. */
+    /**
+     * Reference to trainer object.
+     */
     private Trainer trainer;
 
-    /** Reference to network panel. */
+    /**
+     * Reference to network panel.
+     */
     private final NetworkPanel panel;
 
     /**
      * Construct the panel with a trainer specified.
      *
      * @param networkPanel the parent network panel
-     * @param trainer the trainer this panel represents
+     * @param trainer      the trainer this panel represents
      */
-    public SimpleTrainerControlPanel(final NetworkPanel networkPanel,
-            final Trainer trainer) {
+    public SimpleTrainerControlPanel(final NetworkPanel networkPanel, final Trainer trainer) {
 
         this.trainer = trainer;
         this.panel = networkPanel;
@@ -97,9 +93,7 @@ public class SimpleTrainerControlPanel extends JPanel {
             try {
                 trainer.apply();
             } catch (DataNotInitializedException e) {
-                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
 
         }

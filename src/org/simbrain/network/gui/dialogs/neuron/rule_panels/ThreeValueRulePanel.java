@@ -18,12 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>ThreeValuedNeuronPanel</b> creates a dialog for setting preferences of
@@ -31,58 +31,60 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class ThreeValueRulePanel extends AbstractNeuronRulePanel {
 
-    /** Threshold for this neuron. */
+    /**
+     * Threshold for this neuron.
+     */
     private JTextField tfLowerThreshold;
 
-    /** Upper threshold field. */
+    /**
+     * Upper threshold field.
+     */
     private JTextField tfUpperThreshold;
 
-    /** Bias for this neuron. */
+    /**
+     * Bias for this neuron.
+     */
     private JTextField tfBias;
 
-    /** Lower value field. */
+    /**
+     * Lower value field.
+     */
     private JTextField tfLowerValue;
 
-    /** Middle value field. */
+    /**
+     * Middle value field.
+     */
     private JTextField tfMiddleValue;
 
-    /** Upper value field. */
+    /**
+     * Upper value field.
+     */
     private JTextField tfUpperValue;
 
-    /** Main tab for neuron prefernces. */
+    /**
+     * Main tab for neuron prefernces.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private static final ThreeValueRule prototypeRule = new ThreeValueRule();
 
     //TODO: Make the panel wider. Reuse bounds?
-    
+
     /**
      * Creates binary neuron preferences panel.
      */
     public ThreeValueRulePanel() {
         super();
         this.add(mainTab);
-        tfBias = createTextField(
-                (r) -> ((ThreeValueRule) r).getBias(),
-                (r, val) -> ((ThreeValueRule) r).setBias((double) val));
-        tfLowerThreshold = createTextField(
-                (r) -> ((ThreeValueRule) r).getLowerThreshold(),
-                (r, val) -> ((ThreeValueRule) r)
-                        .setLowerThreshold((double) val));
-        tfUpperThreshold = createTextField(
-                (r) -> ((ThreeValueRule) r).getUpperThreshold(),
-                (r, val) -> ((ThreeValueRule) r)
-                        .setUpperThreshold((double) val));
-        tfLowerValue = createTextField(
-                (r) -> ((ThreeValueRule) r).getLowerValue(),
-                (r, val) -> ((ThreeValueRule) r).setLowerValue((double) val));
-        tfMiddleValue = createTextField(
-                (r) -> ((ThreeValueRule) r).getMiddleValue(),
-                (r, val) -> ((ThreeValueRule) r).setMiddleValue((double) val));
-        tfUpperValue = createTextField(
-                (r) -> ((ThreeValueRule) r).getUpperValue(),
-                (r, val) -> ((ThreeValueRule) r).setUpperValue((double) val));
+        tfBias = createTextField((r) -> ((ThreeValueRule) r).getBias(), (r, val) -> ((ThreeValueRule) r).setBias((double) val));
+        tfLowerThreshold = createTextField((r) -> ((ThreeValueRule) r).getLowerThreshold(), (r, val) -> ((ThreeValueRule) r).setLowerThreshold((double) val));
+        tfUpperThreshold = createTextField((r) -> ((ThreeValueRule) r).getUpperThreshold(), (r, val) -> ((ThreeValueRule) r).setUpperThreshold((double) val));
+        tfLowerValue = createTextField((r) -> ((ThreeValueRule) r).getLowerValue(), (r, val) -> ((ThreeValueRule) r).setLowerValue((double) val));
+        tfMiddleValue = createTextField((r) -> ((ThreeValueRule) r).getMiddleValue(), (r, val) -> ((ThreeValueRule) r).setMiddleValue((double) val));
+        tfUpperValue = createTextField((r) -> ((ThreeValueRule) r).getUpperValue(), (r, val) -> ((ThreeValueRule) r).setUpperValue((double) val));
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Lower threshold", tfLowerThreshold);
         mainTab.addItem("Upper threshold", tfUpperThreshold);

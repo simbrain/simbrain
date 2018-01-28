@@ -13,26 +13,6 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -47,10 +27,18 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
  * neuron type and a layout.
- *
+ * <p>
  * TODO: Merge this and NeuronDialog? They're almost the same class and we could
  * just add a Creation/Editing enum to tell it whether or not to display certain
  * fields.
@@ -60,22 +48,34 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class AddNeuronsDialog extends StandardDialog {
 
-    /** Default. */
+    /**
+     * Default.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The default layout. */
+    /**
+     * The default layout.
+     */
     private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
-    /** The default neuron. */
+    /**
+     * The default neuron.
+     */
     private static final NeuronUpdateRule DEFAULT_NEURON = new LinearRule();
 
-    /** Default number of neurons. */
+    /**
+     * Default number of neurons.
+     */
     private static final int DEFAULT_NUM_NEURONS = 25;
 
-    /** The network panel neurons will be added to. */
+    /**
+     * The network panel neurons will be added to.
+     */
     private final NetworkPanel networkPanel;
 
-    /** The base neuron to copy. */
+    /**
+     * The base neuron to copy.
+     */
     private Neuron baseNeuron;
 
     /**
@@ -84,15 +84,20 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private final JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. The action executed by the help button */
+    /**
+     * Show Help Action. The action executed by the help button
+     */
     private ShowHelpAction helpAction;
 
-    /** Item panel where options will be displayed. */
+    /**
+     * Item panel where options will be displayed.
+     */
     private final Box addNeuronsPanel = Box.createVerticalBox();
 
-    /** Text field where desired number of neurons is entered. */
-    private final JTextField numNeurons = new JTextField(""
-            + DEFAULT_NUM_NEURONS);
+    /**
+     * Text field where desired number of neurons is entered.
+     */
+    private final JTextField numNeurons = new JTextField("" + DEFAULT_NUM_NEURONS);
 
     /**
      * The panel containing basic information on the neurons as well as options
@@ -100,7 +105,9 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private NeuronPropertiesPanel combinedNeuronInfoPanel;
 
-    /** A panel where layout settings can be edited. */
+    /**
+     * A panel where layout settings can be edited.
+     */
     private MainLayoutPanel selectLayout;
 
     /**
@@ -108,36 +115,30 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private NeuronGroupPanelLite groupPanel;
 
-    /** A List of the neurons being added to the network. */
+    /**
+     * A List of the neurons being added to the network.
+     */
     private final List<Neuron> addedNeurons = new ArrayList<Neuron>();
 
     /**
      * A factory method that creates an AddNeuronsDialog to prevent references
      * to "this" from escaping during construction.
      *
-     * @param networkPanel
-     *            the network panel neurons will be added to.
+     * @param networkPanel the network panel neurons will be added to.
      * @return an AddNeuronsDialog
      */
-    public static AddNeuronsDialog createAddNeuronsDialog(
-            final NetworkPanel networkPanel) {
+    public static AddNeuronsDialog createAddNeuronsDialog(final NetworkPanel networkPanel) {
         final AddNeuronsDialog addND = new AddNeuronsDialog(networkPanel);
-        addND.combinedNeuronInfoPanel = NeuronPropertiesPanel
-                .createNeuronPropertiesPanel(
-                        Collections.singletonList(addND.baseNeuron), addND,
-                        false);
+        addND.combinedNeuronInfoPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(Collections.singletonList(addND.baseNeuron), addND, false);
         addND.init();
-        addND.combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType()
-                .addActionListener(e -> SwingUtilities
-                        .invokeLater(() -> addND.updateHelp()));
+        addND.combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> addND.updateHelp()));
         return addND;
     }
 
     /**
      * Constructs the dialog.
      *
-     * @param networkPanel
-     *            the panel the neurons are being added to.
+     * @param networkPanel the panel the neurons are being added to.
      */
     private AddNeuronsDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
@@ -200,8 +201,7 @@ public class AddNeuronsDialog extends StandardDialog {
             for (int i = 0; i < number; i++) {
                 addedNeurons.add(new Neuron(net, baseNeuron));
             }
-            networkPanel.addNeuronsToPanel(addedNeurons,
-                    selectLayout.getCurrentLayout());
+            networkPanel.addNeuronsToPanel(addedNeurons, selectLayout.getCurrentLayout());
         }
     }
 
@@ -248,14 +248,11 @@ public class AddNeuronsDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
-        if (combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType()
-                .getSelectedItem() == SimbrainConstants.NULL_STRING) {
+        if (combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
-            String name = (String) combinedNeuronInfoPanel.getUpdateRulePanel()
-                    .getCbNeuronType().getSelectedItem();
-            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
-                    + ".html");
+            String name = (String) combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
+            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }
@@ -271,15 +268,18 @@ public class AddNeuronsDialog extends StandardDialog {
      * name from here.
      *
      * @author ztosi
-     *
      */
     @SuppressWarnings("serial")
     private class NeuronGroupPanelLite extends JPanel {
 
-        /** Select whether or not to add the neurons in a neuron group. */
+        /**
+         * Select whether or not to add the neurons in a neuron group.
+         */
         private JCheckBox addToGroup = new JCheckBox();
 
-        /** A label for the neuron group name. */
+        /**
+         * A label for the neuron group name.
+         */
         private JLabel tfNameLabel = new JLabel("Name: ");
 
         /**
@@ -290,8 +290,7 @@ public class AddNeuronsDialog extends StandardDialog {
         /**
          * Creates the neuron group sub-panel
          *
-         * @param np
-         *            a reference to the network panel.
+         * @param np a reference to the network panel.
          */
         public NeuronGroupPanelLite(NetworkPanel np) {
             addListeners();
@@ -320,8 +319,7 @@ public class AddNeuronsDialog extends StandardDialog {
                 public void actionPerformed(ActionEvent arg0) {
 
                     tfGroupName.setEnabled(addToGroup.isSelected());
-                    String dName = networkPanel.getNetwork()
-                            .getGroupIdGenerator().getId();
+                    String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
                     tfGroupName.setText(dName);
 
                 }

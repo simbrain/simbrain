@@ -29,10 +29,11 @@ import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticRule extends NeuronUpdateRule implements
-        BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
+public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
 
-    /** Growth rate. */
+    /**
+     * Growth rate.
+     */
     private double growthRate = 3.9;
 
     private double ceiling = 10.0;
@@ -52,20 +53,23 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     /**
      * {@inheritDoc}
+     *
      * @return the discrete time type
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
+
     /**
      * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
-     *              set of neurons, {@link #init(Neuron) init} must be called to
-     *              ensure rational behavior for an activity generator. The
-     *              {@link RandomNeuronRule#RandomNeuronRule(RandomNeuronRule, Neuron) copy
-     *              constructor} is the preferred method of copying because
-     *              {@link #init(Neuron) init} is called on the neuron parameter
-     *              automatically. 
-     * @return a copy of this node         
+     * set of neurons, {@link #init(Neuron) init} must be called to
+     * ensure rational behavior for an activity generator. The
+     * {@link RandomNeuronRule#RandomNeuronRule(RandomNeuronRule, Neuron) copy
+     * constructor} is the preferred method of copying because
+     * {@link #init(Neuron) init} is called on the neuron parameter
+     * automatically.
+     *
+     * @return a copy of this node
      */
     public LogisticRule deepCopy() {
         LogisticRule ln = new LogisticRule();
@@ -77,6 +81,7 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     /**
      * {@inheritDoc}
+     *
      * @param neuron
      */
     public void update(Neuron neuron) {

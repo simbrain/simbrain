@@ -18,33 +18,31 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel;
 import org.simbrain.resource.ResourceManager;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
  * Show synapse adjustment dialog.
  */
 public final class ShowAdjustSynapsesDialog extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * Construct the action.
      *
-     * @param networkPanel
-     *            networkPanel, must not be null
+     * @param networkPanel networkPanel, must not be null
      */
     public ShowAdjustSynapsesDialog(final NetworkPanel networkPanel) {
 
@@ -54,8 +52,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         }
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
-            toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
 
         this.networkPanel = networkPanel;
@@ -75,8 +72,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
      * Only enable the action if there is at least one synapse selected.
      */
     private void updateAction() {
-        boolean atLeastOneSynapseSelected = (networkPanel
-            .getSelectedModelSynapses().size() > 0);
+        boolean atLeastOneSynapseSelected = (networkPanel.getSelectedModelSynapses().size() > 0);
         if (atLeastOneSynapseSelected) {
             setEnabled(true);
         } else {
@@ -84,14 +80,13 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
-                .createSynapseAdjustmentPanel(networkPanel,
-                        networkPanel.getSelectedModelSynapses());
+        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel.createSynapseAdjustmentPanel(networkPanel, networkPanel.getSelectedModelSynapses());
         JDialog dialog = new JDialog();
         dialog.setTitle("Adjust selected synapses");
         dialog.setContentPane(synapsePanel);

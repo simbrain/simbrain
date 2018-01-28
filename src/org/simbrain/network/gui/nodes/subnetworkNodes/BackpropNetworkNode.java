@@ -18,15 +18,14 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
 
 /**
  * PNode representation of a group of a backprop network.
@@ -39,7 +38,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * Create a layered network.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group        the layered network
      */
     public BackpropNetworkNode(NetworkPanel networkPanel, BackpropNetwork group) {
         super(networkPanel, group);
@@ -60,10 +59,8 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(),
-                network.getTrainingSet().getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(),
-                network.getTrainingSet().getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(), network.getTrainingSet().getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
         setContextMenu(menu);
     }

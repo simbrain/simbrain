@@ -13,29 +13,21 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.LinkedHashMap;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.LinkedHashMap;
 
 /**
  * All the functions of a layout selector in one panel. MainLayoutPanel lets the
@@ -44,37 +36,41 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * easily be added to any panel/dialog in Simbrain.
  *
  * @author ztosi
- *
  */
 @SuppressWarnings("serial")
 public class MainLayoutPanel extends JPanel {
 
-    /** Default Visibility of layout parameters. */
+    /**
+     * Default Visibility of layout parameters.
+     */
     private static final boolean DEFAULT_DP_TRIANGLE_VISIBILITY = true;
 
-    /** Default starting layout (Grid Layout). */
+    /**
+     * Default starting layout (Grid Layout).
+     */
     private static final Layout DEFAULT_INITIAL_LAYOUT = new GridLayout();
 
-    /** A holder for the currently displayed panel. */
+    /**
+     * A holder for the currently displayed panel.
+     */
     private AbstractLayoutPanel layoutPanel;
 
-    /** A map tying layout panels to their names for use in a combo box . */
-    private final LinkedHashMap<String, AbstractLayoutPanel> panelMap =
-            new LinkedHashMap<String, AbstractLayoutPanel>();
+    /**
+     * A map tying layout panels to their names for use in a combo box .
+     */
+    private final LinkedHashMap<String, AbstractLayoutPanel> panelMap = new LinkedHashMap<String, AbstractLayoutPanel>();
 
     {
         // Populate the panel map
-        panelMap.put(new GridLayout().getDescription(), new GridLayoutPanel(
-                new GridLayout()));
-        panelMap.put(new HexagonalGridLayout().getDescription(),
-                new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
-        panelMap.put(new LineLayout().getDescription(), new LineLayoutPanel(
-                new LineLayout()));
+        panelMap.put(new GridLayout().getDescription(), new GridLayoutPanel(new GridLayout()));
+        panelMap.put(new HexagonalGridLayout().getDescription(), new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
+        panelMap.put(new LineLayout().getDescription(), new LineLayoutPanel(new LineLayout()));
     }
 
-    /** A combo box for selecting the type of layout. */
-    private final JComboBox<String> layoutCb = new JComboBox<String>(panelMap
-            .keySet().toArray(new String[panelMap.size()]));
+    /**
+     * A combo box for selecting the type of layout.
+     */
+    private final JComboBox<String> layoutCb = new JComboBox<String>(panelMap.keySet().toArray(new String[panelMap.size()]));
 
     /**
      * A drop-down triangle for showing or hiding the layout parameters.
@@ -110,6 +106,7 @@ public class MainLayoutPanel extends JPanel {
 
     /**
      * Creates the main layout panel with default values.
+     *
      * @param parent the parent window, used for resizing
      */
     public MainLayoutPanel(Window parent) {
@@ -121,8 +118,8 @@ public class MainLayoutPanel extends JPanel {
      * where the reveal option can be set.
      *
      * @param revealOption if false, then everything shows up; if true then it's
-     *            hidden with a drop-down triangle to reveal
-     * @param parent the parent window, used for resizing
+     *                     hidden with a drop-down triangle to reveal
+     * @param parent       the parent window, used for resizing
      */
     public MainLayoutPanel(boolean revealOption, Window parent) {
         this(DEFAULT_INITIAL_LAYOUT, revealOption, parent);
@@ -132,16 +129,14 @@ public class MainLayoutPanel extends JPanel {
      * Creates the main layout panel.
      *
      * @param initialLayout the initially selected layout
-     * @param revealOption whether or not displaying layout parameters is
-     *            optional
-     * @param parent the parent window, used for resizing
+     * @param revealOption  whether or not displaying layout parameters is
+     *                      optional
+     * @param parent        the parent window, used for resizing
      */
-    public MainLayoutPanel(Layout initialLayout, boolean revealOption,
-            Window parent) {
+    public MainLayoutPanel(Layout initialLayout, boolean revealOption, Window parent) {
         this.revealOption = revealOption;
         this.parent = parent;
-        layoutParameterReveal = new DropDownTriangle(UpDirection.LEFT, false,
-                "Settings", "Settings", parent);
+        layoutParameterReveal = new DropDownTriangle(UpDirection.LEFT, false, "Settings", "Settings", parent);
         layoutCb.setSelectedItem(initialLayout.getDescription());
         layoutPanel = panelMap.get(initialLayout.getDescription());
         layoutPanel.setNeuronLayout(initialLayout);
@@ -294,10 +289,9 @@ public class MainLayoutPanel extends JPanel {
      * null.
      *
      * @param useApplyButton the useApplyButton to set
-     * @param action the action to invoke when pressing the button
+     * @param action         the action to invoke when pressing the button
      */
-    public void setUseApplyButton(boolean useApplyButton,
-            final ActionListener action) {
+    public void setUseApplyButton(boolean useApplyButton, final ActionListener action) {
         this.useApplyButton = useApplyButton;
         if (action != null) {
             applyButton.addActionListener(action);

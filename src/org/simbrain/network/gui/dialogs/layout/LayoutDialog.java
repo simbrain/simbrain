@@ -23,16 +23,24 @@ import org.simbrain.util.StandardDialog;
  */
 public class LayoutDialog extends StandardDialog {
 
-    /** serialVersionUID */
+    /**
+     * serialVersionUID
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The default initial layout. */
+    /**
+     * The default initial layout.
+     */
     private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     private MainLayoutPanel mainPanel;
 
-    /** The network panel where layout will occur. */
+    /**
+     * The network panel where layout will occur.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -47,7 +55,7 @@ public class LayoutDialog extends StandardDialog {
     /**
      * Constructor for creating independent dialog.
      *
-     * @param layout the layout to show
+     * @param layout       the layout to show
      * @param networkPanel the networkPanel where layout will occur
      */
     public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
@@ -62,14 +70,14 @@ public class LayoutDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-        mainPanel.getCurrentLayout().setInitialLocation(
-                networkPanel.getLastClickedPosition()); //TODO: Think
-        mainPanel.getCurrentLayout().layoutNeurons(
-                networkPanel.getSelectedModelNeurons());
+        mainPanel.getCurrentLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
+        mainPanel.getCurrentLayout().layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
     }
 
-    /** @see AbstractLayoutPanel */
+    /**
+     * @see AbstractLayoutPanel
+     */
     public void commitChanges() {
         mainPanel.commitChanges();
     }

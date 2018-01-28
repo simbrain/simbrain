@@ -18,19 +18,15 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.listeners.GroupAdapter;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.update_actions.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.simbrain.network.groups.Group;
-import org.simbrain.network.listeners.GroupAdapter;
-import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.network.update_actions.BufferedUpdate;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
-import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.network.update_actions.PriorityUpdate;
-import org.simbrain.network.update_actions.UpdateGroup;
 
 /**
  * Manage network updates. Maintains a list of actions that are updated in the
@@ -41,15 +37,23 @@ import org.simbrain.network.update_actions.UpdateGroup;
  */
 public class NetworkUpdateManager {
 
-    /** Listener for changes to a NetworkUpdateManager. */
+    /**
+     * Listener for changes to a NetworkUpdateManager.
+     */
     public interface Listener {
-        /** Fired when an action is added to the update manager. */
+        /**
+         * Fired when an action is added to the update manager.
+         */
         void actionAdded(NetworkUpdateAction action);
 
-        /** Fired when an action is removed from the update manager. */
+        /**
+         * Fired when an action is removed from the update manager.
+         */
         void actionRemoved(NetworkUpdateAction action);
 
-        /** Fired when the update action order is changed. */
+        /**
+         * Fired when the update action order is changed.
+         */
         void actionOrderChanged();
     }
 
@@ -59,10 +63,14 @@ public class NetworkUpdateManager {
      */
     private final List<NetworkUpdateAction> actionList = new ArrayList<>();
 
-    /** List of listeners on this update manager. */
+    /**
+     * List of listeners on this update manager.
+     */
     private List<Listener> listeners = new ArrayList<>();
 
-    /** Reference to parent network. */
+    /**
+     * Reference to parent network.
+     */
     private final Network network;
 
     /**
@@ -186,13 +194,16 @@ public class NetworkUpdateManager {
         listeners.remove(listener);
     }
 
-    /** Return the list of update actions. */
+    /**
+     * Return the list of update actions.
+     */
     public List<NetworkUpdateAction> getActionList() {
         return actionList;
     }
 
     /**
      * Swap elements at the specified location.
+     *
      * @param index1 index of first element
      * @param index2 index of second element
      */
@@ -203,7 +214,9 @@ public class NetworkUpdateManager {
         }
     }
 
-    /** Add the specified action to the update manager. */
+    /**
+     * Add the specified action to the update manager.
+     */
     public void addAction(NetworkUpdateAction action) {
         actionList.add(action);
         for (Listener listener : listeners) {
@@ -211,7 +224,9 @@ public class NetworkUpdateManager {
         }
     }
 
-    /** Remove the specified action from the update manager. */
+    /**
+     * Remove the specified action from the update manager.
+     */
     public void removeAction(NetworkUpdateAction action) {
         actionList.remove(action);
         for (Listener listener : listeners) {
@@ -219,7 +234,9 @@ public class NetworkUpdateManager {
         }
     }
 
-    /** Remove all actions completely. */
+    /**
+     * Remove all actions completely.
+     */
     public void clear() {
         for (NetworkUpdateAction action : actionList) {
             for (Listener l : listeners) {

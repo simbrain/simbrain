@@ -18,13 +18,13 @@
  */
 package org.simbrain.workspace.updater;
 
+import org.apache.log4j.Logger;
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-
-import org.apache.log4j.Logger;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * This is the default action for all workspace updates.
@@ -34,13 +34,19 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class UpdateAllAction implements UpdateAction {
 
-    /** Provides access to workspace updater. */
+    /**
+     * Provides access to workspace updater.
+     */
     private transient WorkspaceUpdater updater;
 
-    /** The static logger for the class. */
+    /**
+     * The static logger for the class.
+     */
     static Logger LOGGER = Logger.getLogger(UpdateAllAction.class);
 
-    /** The executor service for doing the component updates. */
+    /**
+     * The executor service for doing the component updates.
+     */
     private transient ExecutorService componentUpdateExecutor;
 
     /**
@@ -53,8 +59,7 @@ public class UpdateAllAction implements UpdateAction {
 
         // In some cases components can be updated in parallel. So
         // a thread pool with a configurable number of threads is used
-        componentUpdateExecutor = Executors.newFixedThreadPool(updater.getNumThreads(),
-                new UpdaterThreadFactory());
+        componentUpdateExecutor = Executors.newFixedThreadPool(updater.getNumThreads(), new UpdaterThreadFactory());
 
         // TODO: the executor needs to be reinitialized when
         // updater.setNumThreads is called
@@ -91,10 +96,9 @@ public class UpdateAllAction implements UpdateAction {
      * Update the provided workspace component.
      *
      * @param component the component to update.
-     * @param signal completion signal
+     * @param signal    completion signal
      */
-    public void updateComponent(final WorkspaceComponent component,
-            final CompletionSignal signal) {
+    public void updateComponent(final WorkspaceComponent component, final CompletionSignal signal) {
 
         // If update is turned off on this component, return
         if (!component.getUpdateOn()) {
@@ -139,7 +143,9 @@ public class UpdateAllAction implements UpdateAction {
      */
     private class UpdaterThreadFactory implements ThreadFactory {
 
-        /** Numbers the threads sequentially. */
+        /**
+         * Numbers the threads sequentially.
+         */
         private int nextThread = 1;
 
         /**

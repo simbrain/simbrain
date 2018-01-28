@@ -42,8 +42,8 @@ public interface TrainerListener {
      * Called for updates on the progress of a trainer. Used currently for
      * progress bars.
      *
-     * @param progressUpdate a string message about the current progress on an
-     *            update.
+     * @param progressUpdate  a string message about the current progress on an
+     *                        update.
      * @param percentComplete how far along an operation is.
      */
     public void progressUpdated(String progressUpdate, int percentComplete);

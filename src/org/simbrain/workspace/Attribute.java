@@ -3,7 +3,6 @@ package org.simbrain.workspace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.function.Function;
 
 public abstract class Attribute {
     protected Object baseObject;
@@ -17,27 +16,38 @@ public abstract class Attribute {
      */
     protected Object key;
 
-    /** Default constructor */
-    public Attribute() {}
+    /**
+     * Default constructor
+     */
+    public Attribute() {
+    }
 
-    /** Initializing constructor */
+    /**
+     * Initializing constructor
+     */
     public Attribute(Object baseObject, Method method) {
         this(baseObject, method, method.getName());
     }
 
-    /** Initializing constructor */
+    /**
+     * Initializing constructor
+     */
     public Attribute(Object baseObject, Method method, String description) {
         this.baseObject = baseObject;
         this.method = method;
         this.description = description;
     }
 
-    /** Initializing constructor */
+    /**
+     * Initializing constructor
+     */
     public Attribute(Object baseObject, Method method, Method idMethod) {
         this(baseObject, method, method.getName(), idMethod);
     }
 
-    /** Initializing constructor */
+    /**
+     * Initializing constructor
+     */
     public Attribute(Object baseObject, Method method, String description, Method idMethod) {
         this.baseObject = baseObject;
         this.method = method;
@@ -68,7 +78,9 @@ public abstract class Attribute {
         return getId() + " " + method.getName() + " (" + getTypeName() + ")";
     }
 
-    /** Return the nicely formatted type name of this attribute. */
+    /**
+     * Return the nicely formatted type name of this attribute.
+     */
     public String getTypeName() {
         if (((Class<?>) getType()).isArray()) {
             return ((Class<?>) getType()).getComponentType().getSimpleName() + " array";
@@ -77,22 +89,30 @@ public abstract class Attribute {
         }
     }
 
-    /** @return the description */
+    /**
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
-    /** @param description the description to set */
+    /**
+     * @param description the description to set
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    /** @return the object on which the method will be invoked. */
+    /**
+     * @return the object on which the method will be invoked.
+     */
     public Object getBaseObject() {
         return baseObject;
     }
 
-    /** @return the method to invoke to get or set this attribute. */
+    /**
+     * @return the method to invoke to get or set this attribute.
+     */
     public Method getMethod() {
         return method;
     }

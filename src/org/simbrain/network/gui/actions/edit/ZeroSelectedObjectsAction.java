@@ -18,17 +18,14 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Clear selected neurons action.
@@ -45,15 +42,14 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
         super(networkPanel, "Set selected objects to zero", EnablingCondition.ALLITEMS);
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-        putValue(SHORT_DESCRIPTION,
-                "Set selected neurons and synapses to zero (c)");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('c'), this);
+        putValue(SHORT_DESCRIPTION, "Set selected neurons and synapses to zero (c)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         for (NeuronNode node : networkPanel.getSelectedNeurons()) {
@@ -62,9 +58,7 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
         }
-        networkPanel.getNetwork().fireSynapsesUpdated(
-                networkPanel.getSelectedModelSynapses());
-        networkPanel.getNetwork().fireNeuronsUpdated(
-                networkPanel.getSelectedModelNeurons());
+        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModelSynapses());
+        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModelNeurons());
     }
 }

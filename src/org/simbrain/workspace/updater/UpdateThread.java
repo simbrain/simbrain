@@ -11,18 +11,19 @@ class UpdateThread extends Thread {
 
     private final WorkspaceUpdater updater;
 
-    /** The thread number. */
+    /**
+     * The thread number.
+     */
     final int thread;
 
     /**
      * Creates a new instance with the given runnable and thread.
      *
-     * @param updater The updater for to notify
+     * @param updater  The updater for to notify
      * @param runnable The runnable instance.
-     * @param thread The thread number.
+     * @param thread   The thread number.
      */
-    UpdateThread(final WorkspaceUpdater updater, final Runnable runnable,
-            final int thread) {
+    UpdateThread(final WorkspaceUpdater updater, final Runnable runnable, final int thread) {
         super(runnable);
         this.updater = updater;
         this.thread = thread;

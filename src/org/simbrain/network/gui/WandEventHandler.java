@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.event.InputEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.util.Collection;
-
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PLayer;
 import org.piccolo2d.PNode;
@@ -33,20 +28,30 @@ import org.piccolo2d.util.PNodeFilter;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
 
+import java.awt.event.InputEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.util.Collection;
+
 /**
  * Wand event handler. Change activation when dragging over neurons.
  */
 final class WandEventHandler extends PDragSequenceEventHandler {
 
-    /** Bounds filter. */
+    /**
+     * Bounds filter.
+     */
     private final BoundsFilter boundsFilter;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * Create a new selection event handler.
-     * @param networkPanel 
+     *
+     * @param networkPanel
      */
     public WandEventHandler(NetworkPanel networkPanel) {
         super();
@@ -55,8 +60,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         this.networkPanel = networkPanel;
     }
 
-    /** @see PDragSequenceEventHandler 
+    /**
      * @param event
+     * @see PDragSequenceEventHandler
      */
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
@@ -66,8 +72,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    /** @see PDragSequenceEventHandler 
+    /**
      * @param event
+     * @see PDragSequenceEventHandler
      */
     public void mouseClicked(final PInputEvent event) {
 
@@ -83,12 +90,16 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    /** @see PDragSequenceEventHandler */
+    /**
+     * @see PDragSequenceEventHandler
+     */
     protected void startDrag(final PInputEvent event) {
         super.startDrag(event);
     }
 
-    /** @see PDragSequenceEventHandler */
+    /**
+     * @see PDragSequenceEventHandler
+     */
     protected void drag(final PInputEvent event) {
 
         super.drag(event);
@@ -97,12 +108,10 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
         // Create elliptical bounds
         Point2D position = event.getPosition();
-        Ellipse2D.Double ellipse = new Ellipse2D.Double(position.getX()
-                - radius / 2, position.getY() - radius / 2, radius, radius);
+        Ellipse2D.Double ellipse = new Ellipse2D.Double(position.getX() - radius / 2, position.getY() - radius / 2, radius, radius);
         boundsFilter.setEllipse(ellipse);
 
-        Collection highlightedNodes = networkPanel.getCanvas().getLayer()
-                .getRoot().getAllNodes(boundsFilter, null);
+        Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
 
         // Auto-highlighter mode
         for (Object node : highlightedNodes) {
@@ -114,7 +123,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
     }
 
-    /** @see PDragSequenceEventHandler */
+    /**
+     * @see PDragSequenceEventHandler
+     */
     protected void endDrag(final PInputEvent event) {
         super.endDrag(event);
     }
@@ -135,7 +146,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
      */
     private class BoundsFilter implements PNodeFilter {
 
-        /** Bounds. */
+        /**
+         * Bounds.
+         */
         private Ellipse2D.Double ellipse;
 
         /**
@@ -147,23 +160,24 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             this.ellipse = ellipse;
         }
 
-        /** @see PNodeFilter 
+        /**
          * @param node
          * @return
+         * @see PNodeFilter
          */
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
-            boolean boundsIntersects = ellipse.intersects(node
-                    .getGlobalBounds());
+            boolean boundsIntersects = ellipse.intersects(node.getGlobalBounds());
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
 
             return (isPickable && boundsIntersects && !isLayer && !isCamera);
         }
 
-        /** @see PNodeFilter 
+        /**
          * @param node
          * @return
+         * @see PNodeFilter
          */
         public boolean acceptChildrenOf(final PNode node) {
             boolean areChildrenPickable = node.getChildrenPickable();
@@ -186,10 +200,11 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /** @see PInputEventFilter 
+        /**
          * @param event
          * @param type
-         * @return 
+         * @return
+         * @see PInputEventFilter
          */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 

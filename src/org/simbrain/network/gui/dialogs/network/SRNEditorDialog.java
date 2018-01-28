@@ -18,14 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.trainers.SRNTrainer;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
 
 /**
  * Creates a GUI dialog to set the parameters for and then build a simple
@@ -35,10 +34,14 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class SRNEditorDialog extends SupervisedTrainingDialog {
 
-    /** Reference to the SRN network being edited. */
+    /**
+     * Reference to the SRN network being edited.
+     */
     private SimpleRecurrentNetwork srn;
 
-    /** The SRN Trainer. */
+    /**
+     * The SRN Trainer.
+     */
     private SRNTrainer trainer;
 
     /**
@@ -63,13 +66,11 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
 
         // Trainer tab
         trainer = new SRNTrainer(srn);
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-            networkPanel, trainer);
+        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
         addTab("Train", iterativeControls);
 
         // Set up help
-        Action helpAction = new ShowHelpAction(
-            "Pages/Network/network/srn.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/srn.html");
         addButton(new JButton(helpAction));
     }
 

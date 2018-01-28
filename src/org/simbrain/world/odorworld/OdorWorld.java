@@ -18,11 +18,8 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -35,8 +32,10 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Core model class of Odor World, which contains a list of entities in the
@@ -44,16 +43,24 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class OdorWorld {
 
-    /** List of odor world entities. */
+    /**
+     * List of odor world entities.
+     */
     private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
 
-    /** Listeners on this odor world. */
+    /**
+     * Listeners on this odor world.
+     */
     private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
-    /** Sum of lengths of smell vectors for all smelly objects in the world. */
+    /**
+     * Sum of lengths of smell vectors for all smelly objects in the world.
+     */
     private double totalSmellVectorLength;
 
-    /** Whether or not sprites wrap around or are halted at the borders */
+    /**
+     * Whether or not sprites wrap around or are halted at the borders
+     */
     private boolean wrapAround = true;
 
     /**
@@ -62,16 +69,24 @@ public class OdorWorld {
      */
     private boolean objectsBlockMovement = true;
 
-    /** Height of world. */
+    /**
+     * Height of world.
+     */
     private int height = 450;
 
-    /** Width of world. */
+    /**
+     * Width of world.
+     */
     private int width = 450;
 
-    /** Entity Id generator. */
+    /**
+     * Entity Id generator.
+     */
     private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
 
-    /** Agent Name generator. */
+    /**
+     * Agent Name generator.
+     */
     private SimpleId agentNameGenerator = new SimpleId("Agent", 1);
 
     /**
@@ -139,19 +154,14 @@ public class OdorWorld {
         if (entity instanceof RotatingEntity) {
 
             // Add default effectors
-            entity.addEffector(new StraightMovement((RotatingEntity) entity,
-                    "Go-straight"));
-            entity.addEffector(new Turning((RotatingEntity) entity, "Go-left",
-                    Turning.LEFT));
-            entity.addEffector(new Turning((RotatingEntity) entity, "Go-right",
-                    Turning.RIGHT));
+            entity.addEffector(new StraightMovement((RotatingEntity) entity, "Go-straight"));
+            entity.addEffector(new Turning((RotatingEntity) entity, "Go-left", Turning.LEFT));
+            entity.addEffector(new Turning((RotatingEntity) entity, "Go-right", Turning.RIGHT));
 
             // Add default sensors
-            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8,
-                    50));
+            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
             entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
-            entity.addSensor(new SmellSensor(entity, "Smell-Right",
-                    -Math.PI / 8, 50));
+            entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
         }
         addEntity(entity);
     }
@@ -203,7 +213,7 @@ public class OdorWorld {
     /**
      * Returns the effector with the given id, or null if none is found.
      *
-     * @param entityId entity id
+     * @param entityId   entity id
      * @param effectorId sensor id
      * @return effector if found
      */
@@ -258,8 +268,7 @@ public class OdorWorld {
         totalSmellVectorLength = 0;
         for (OdorWorldEntity entity : entityList) {
             if (entity.getSmellSource() != null) {
-                totalSmellVectorLength += SimbrainMath.getVectorNorm(entity
-                        .getSmellSource().getStimulusVector());
+                totalSmellVectorLength += SimbrainMath.getVectorNorm(entity.getSmellSource().getStimulusVector());
             }
         }
     }
@@ -333,8 +342,7 @@ public class OdorWorld {
             if (entity == otherEntity) {
                 continue;
             }
-            if (otherEntity.getReducedBounds().intersects(
-                    entity.getReducedBounds())) {
+            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
                 otherEntity.setHasCollided(true);
             }
         }
@@ -362,7 +370,7 @@ public class OdorWorld {
      * Handle collisions in x directions.
      *
      * @param entityToCheck
-     * @param xCheck position to check
+     * @param xCheck        position to check
      * @return whether or not a collision occurred.
      */
     private boolean xCollission(OdorWorldEntity entityToCheck, float xCheck) {
@@ -378,9 +386,7 @@ public class OdorWorld {
             if (entity == entityToCheck) {
                 continue;
             }
-            if ((entityToCheck.getX() > entity.getX())
-                    && (entityToCheck.getX() < (entity.getX() + entity
-                            .getWidth()))) {
+            if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
                 return true;
             }
         }
@@ -391,7 +397,7 @@ public class OdorWorld {
      * Handle collisions in y directions.
      *
      * @param entityToCheck
-     * @param yCheck position to check
+     * @param yCheck        position to check
      * @return whether or not a collision occurred.
      */
     private boolean yCollission(OdorWorldEntity entityToCheck, float yCheck) {
@@ -408,9 +414,7 @@ public class OdorWorld {
                 continue;
             }
 
-            if ((entityToCheck.getY() > sprite.getY())
-                    && (entityToCheck.getY() < (sprite.getY() + sprite
-                            .getHeight()))) {
+            if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
                 return true;
             }
         }
@@ -547,7 +551,7 @@ public class OdorWorld {
     /**
      * Set width.
      *
-     * @param newWidth new width
+     * @param newWidth  new width
      * @param fireEvent whether to fire a property changed event
      */
     public void setWidth(int newWidth, boolean fireEvent) {

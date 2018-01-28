@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
@@ -30,27 +25,41 @@ import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
  */
 public class SOMGroupCreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** SOM properties panel. */
+    /**
+     * SOM properties panel.
+     */
     private SOMPropertiesPanel somPanel;
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -70,8 +79,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New SOM Group");
-        somPanel = new SOMPropertiesPanel(networkPanel,
-                SOMPropsPanelType.CREATE_GROUP);
+        somPanel = new SOMPropertiesPanel(networkPanel, SOMPropsPanelType.CREATE_GROUP);
 
         // Set up tab panels
         tabLogic.add(somPanel);
@@ -98,8 +106,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());
         som.applyLayout();
-        som.offset(networkPanel.getWhereToAdd().getX(), networkPanel
-                .getWhereToAdd().getY());
+        som.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(som);
         super.closeDialogOk();
 

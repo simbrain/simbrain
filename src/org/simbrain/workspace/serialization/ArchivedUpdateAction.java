@@ -1,8 +1,7 @@
 package org.simbrain.workspace.serialization;
 
-import org.simbrain.workspace.updater.UpdateAction;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.simbrain.workspace.updater.UpdateAction;
 
 /**
  * A persistable form of update action that can be used to recreate the
@@ -13,7 +12,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("ArchivedUpdateAction")
 final class ArchivedUpdateAction {
 
-    /** Reference to the action itself. */
+    /**
+     * Reference to the action itself.
+     */
     private final UpdateAction updateAction;
 
     /**
@@ -21,15 +22,17 @@ final class ArchivedUpdateAction {
      */
     private final String componentId;
 
-    /** Reference to the coupling id for this action, or null if not needed. */
+    /**
+     * Reference to the coupling id for this action, or null if not needed.
+     */
     private final String couplingId;
 
     /**
      * Construct the archived update action.
      *
-     * @param action reference to the update action itself.
+     * @param action      reference to the update action itself.
      * @param componentId component id or null if none needed
-     * @param couplingId coupling id or null if none needed
+     * @param couplingId  coupling id or null if none needed
      */
     ArchivedUpdateAction(UpdateAction action, String componentId, String couplingId) {
         this.updateAction = action;

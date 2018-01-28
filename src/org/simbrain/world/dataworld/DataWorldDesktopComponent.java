@@ -18,20 +18,6 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -43,6 +29,13 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw
  * data to input nodes.
@@ -51,35 +44,48 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private static final long serialVersionUID = 1L;
 
-    /** World scroll pane. */
+    /**
+     * World scroll pane.
+     */
     private SimbrainJTableScrollPanel scroller;
 
-    /** Data world. */
+    /**
+     * Data world.
+     */
     private DesktopJTable table;
 
-    /** Menu bar. */
+    /**
+     * Menu bar.
+     */
     private JMenuBar mb;
 
-    /** File menu. */
+    /**
+     * File menu.
+     */
     private JMenu fileItem = new JMenu("File  ");
 
-    /** Save menu item. */
+    /**
+     * Save menu item.
+     */
     private JMenuItem saveItem = new JMenuItem("Save");
 
-    /** Determines whether table is in iteration mode. */
-    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem(
-            "Iteration mode");
+    /**
+     * Determines whether table is in iteration mode.
+     */
+    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
 
-    /** Component. */
+    /**
+     * Component.
+     */
     private final DataWorldComponent component;
 
     /**
      * Default constructor.
+     *
      * @param frame
      * @param component reference to model component
      */
-    public DataWorldDesktopComponent(final GenericFrame frame,
-            final DataWorldComponent component) {
+    public DataWorldDesktopComponent(final GenericFrame frame, final DataWorldComponent component) {
 
         super(frame, component);
         this.component = component;
@@ -129,8 +135,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         JMenu editMenu = table.getMenuEdit();
         iterationMode.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                component.getDataModel().setIterationMode(
-                        iterationMode.getState());
+                component.getDataModel().setIterationMode(iterationMode.getState());
             }
         });
         editMenu.add(table.getMenuFill());
@@ -144,8 +149,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         // Help menu
         JMenu helpMenu = new JMenu("Help");
         JMenuItem helpItem = new JMenuItem("Help");
-        helpItem.setAction(new ShowHelpAction(
-                "Pages/Worlds/DataWorld/DataWorld.html"));
+        helpItem.setAction(new ShowHelpAction("Pages/Worlds/DataWorld/DataWorld.html"));
         helpMenu.add(helpItem);
         mb.add(helpMenu);
 
@@ -182,7 +186,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     public void closing() {
     }
 
-    /** @see javax.swing.JFrame */
+    /**
+     * @see javax.swing.JFrame
+     */
     public void pack() {
         getParentFrame().pack();
         // Set max size somehow?

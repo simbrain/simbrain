@@ -18,35 +18,37 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Superclass for all trainer classes, which trains a trainable object,
  * typically a network.
  *
  * @author jeffyoshimi
- *
  */
 public abstract class Trainer {
 
-    /** Listener list. */
+    /**
+     * Listener list.
+     */
     private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
 
-    /** The trainable object to be trained. */
+    /**
+     * The trainable object to be trained.
+     */
     protected final Trainable network;
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.
      *
-     * @param network
-     *            the network to be trained
+     * @param network the network to be trained
      */
     public Trainer(Trainable network) {
         this.network = network;
@@ -55,16 +57,14 @@ public abstract class Trainer {
     /**
      * Apply the algorithm.
      *
-     * @throws DataNotInitializedException
-     *             when input or target data have not been set.
+     * @throws DataNotInitializedException when input or target data have not been set.
      */
     public abstract void apply() throws DataNotInitializedException;
 
     /**
      * Add a trainer listener.
      *
-     * @param trainerListener
-     *            the listener to add
+     * @param trainerListener the listener to add
      */
     public void addListener(final TrainerListener trainerListener) {
         if (listeners == null) {
@@ -76,8 +76,7 @@ public abstract class Trainer {
     /**
      * Remove a trainer listener.
      *
-     * @param trainerListener
-     *            the listener to add
+     * @param trainerListener the listener to add
      */
     public void removeListener(final TrainerListener trainerListener) {
         if (listeners != null) {
@@ -114,10 +113,8 @@ public abstract class Trainer {
      * Notify listeners of an update in training progress. Used by GUI progress
      * bars.
      *
-     * @param progressUpdate
-     *            string description of current state
-     * @param percentComplete
-     *            how far along the training is.
+     * @param progressUpdate  string description of current state
+     * @param percentComplete how far along the training is.
      */
     public void fireProgressUpdate(String progressUpdate, int percentComplete) {
         for (TrainerListener listener : getListeners()) {
@@ -137,13 +134,11 @@ public abstract class Trainer {
      * been initialized.
      *
      * @author jyoshimi
-     *
      */
     public class DataNotInitializedException extends Exception {
 
         /**
-         * @param message
-         *            error message
+         * @param message error message
          */
         public DataNotInitializedException(final String message) {
             super(message);
@@ -157,8 +152,7 @@ public abstract class Trainer {
      */
     public void revalidateSynapseGroups() {
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
-            for (SynapseGroup group : ((Subnetwork) getTrainableNetwork()
-                    .getNetwork()).getSynapseGroupList()) {
+            for (SynapseGroup group : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {
                 if (group != null) {
                     group.revalidateSynapseSets();
                 }
@@ -169,29 +163,31 @@ public abstract class Trainer {
     /**
      * Utility method for creating a trainable object.
      *
-     * @param trainedGroup the subnet or synapse group being trained.
-     * @param inputNeurons the input neurons
+     * @param trainedGroup  the subnet or synapse group being trained.
+     * @param inputNeurons  the input neurons
      * @param outputNeurons the output neurons
-     * @param inputData the input data
-     * @param targetData the target data
+     * @param inputData     the input data
+     * @param targetData    the target data
      * @return the trainable object
      */
-    public static Trainable getTrainable(final Group trainedGroup, final List<Neuron> inputNeurons,
-            final List<Neuron> outputNeurons, final double[][] inputData,
-            final double[][] targetData) {
+    public static Trainable getTrainable(final Group trainedGroup, final List<Neuron> inputNeurons, final List<Neuron> outputNeurons, final double[][] inputData, final double[][] targetData) {
         Trainable newTrainer = new Trainable() {
             public Group getNetwork() {
                 return trainedGroup;
             }
+
             public List<Neuron> getInputNeurons() {
                 return inputNeurons;
             }
+
             public List<Neuron> getOutputNeurons() {
                 return outputNeurons;
             }
+
             public TrainingSet getTrainingSet() {
                 return new TrainingSet(inputData, targetData);
             }
+
             public void initNetwork() {
             }
         };

@@ -1,31 +1,29 @@
 package org.simbrain.network.neuron_update_rules;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TimedAccumulatorRule extends SpikingThresholdRule {
 
     public static final double DEFAULT_KAPPA = 0.9;
-    
+
     private int maxState = 10;
-    
+
     private int currentState;
-    
+
     private double baseProb = 0.00001;
-    
+
     private double b = 1.6;
-    
+
     private double kappa = DEFAULT_KAPPA;
-    
+
     private double expSum = 0;
-    
+
     private int fanInSize = 0;
-    
+
     @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -56,8 +54,7 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
                 // Using the exp weight value stored in the PSR from before
                 // divide that by the exp sum to get the softmax value
                 // then set this to a 1 state from a 0 with that probability.
-                if (ThreadLocalRandom.current().nextDouble() < kappa
-                		* neuron.getFanIn().get(i).getPsr() / expSum) {
+                if (ThreadLocalRandom.current().nextDouble() < kappa * neuron.getFanIn().get(i).getPsr() / expSum) {
                     currentState++;
                     neuron.setBuffer(1);
                     neuron.setSpkBuffer(true);
@@ -70,9 +67,9 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
         neuron.setSpkBuffer(false);
         setHasSpiked(false, neuron);
     }
-    
+
     public void init(Neuron neuron) {
-    	fanInSize = neuron.getFanIn().size();
+        fanInSize = neuron.getFanIn().size();
         // Obtain the exponential sum for the denominator
         for (Synapse s : neuron.getFanIn()) {
             double expVal = Math.exp(-s.getStrength() * b);

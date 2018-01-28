@@ -1,35 +1,40 @@
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
+import org.piccolo2d.util.PBounds;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.UngroupAction;
+
+import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
-
-import org.piccolo2d.PNode;
-import org.piccolo2d.util.PBounds;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.UngroupAction;
-
 /**
  * A group of screen elements.
  */
-public class ViewGroupNode extends ScreenElement implements
-        PropertyChangeListener {
+public class ViewGroupNode extends ScreenElement implements PropertyChangeListener {
 
-    /** Reference to grouped objects. */
+    /**
+     * Reference to grouped objects.
+     */
     private ArrayList<ScreenElement> groupedObjects = new ArrayList<ScreenElement>();
 
-    /** For computing offsets. */
+    /**
+     * For computing offsets.
+     */
     private Point2D.Double oldPosition = new Point2D.Double();
 
-    /** For computing offsets. */
+    /**
+     * For computing offsets.
+     */
     private double xOffset = 0;
 
-    /** For computing offsets. */
+    /**
+     * For computing offsets.
+     */
     private double yOffset = 0;
 
     /**
@@ -38,8 +43,7 @@ public class ViewGroupNode extends ScreenElement implements
      * @param netPanel reference to networkPanel
      * @param elements the styled text
      */
-    public ViewGroupNode(final NetworkPanel netPanel,
-            final ArrayList<ScreenElement> elements) {
+    public ViewGroupNode(final NetworkPanel netPanel, final ArrayList<ScreenElement> elements) {
         super(netPanel);
         PBounds bounds = new PBounds();
         for (ScreenElement element : elements) {
@@ -55,7 +59,7 @@ public class ViewGroupNode extends ScreenElement implements
      * Update synapse node positions.
      */
     private void updateSynapseNodePositions() {
-        for (Iterator i = getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;

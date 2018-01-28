@@ -1,10 +1,9 @@
 package org.simbrain.world.threedworld;
 
-import com.jme3.scene.Node;
-import org.simbrain.world.threedworld.engine.ThreeDEngine;
-
 import com.jme3.light.Light;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
 /**
  * ThreeDScene encapsulate scene loading and unloading behavior from the ThreeDWorld class.
@@ -22,6 +21,7 @@ public class ThreeDScene {
 
     /**
      * Construct a new ThreeDScene from the given name.
+     *
      * @param name The name of the scene to load.
      */
     public ThreeDScene(String name) {
@@ -30,6 +30,7 @@ public class ThreeDScene {
 
     /**
      * Load the scene specified by name, unloading the current scene if necessary.
+     *
      * @param engine The engine to use to load the scene.
      */
     public void load(ThreeDEngine engine) {
@@ -54,6 +55,7 @@ public class ThreeDScene {
 
     /**
      * Unload the current scene, detaching all geometry and physical bodies from the engine.
+     *
      * @param engine The engine to unload the scene from.
      */
     public void unload(ThreeDEngine engine) {
@@ -80,7 +82,9 @@ public class ThreeDScene {
         name = value;
     }
 
-    /** Return the node which serves as the root for the loaded scene. */
+    /**
+     * Return the node which serves as the root for the loaded scene.
+     */
     public Node getNode() {
         return node;
     }

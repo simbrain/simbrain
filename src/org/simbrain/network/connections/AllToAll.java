@@ -12,14 +12,13 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Connect every source neuron to every target neuron.
@@ -79,11 +78,8 @@ public class AllToAll implements ConnectNeurons {
      * @param targetNeurons the target neurons
      * @return the new synapses
      */
-    public List<Synapse> connectAllToAll(List<Neuron> sourceNeurons,
-        List<Neuron> targetNeurons) {
-        return connectAllToAll(sourceNeurons, targetNeurons,
-                Utils.intersects(sourceNeurons, targetNeurons),
-            selfConnectionAllowed, true);
+    public List<Synapse> connectAllToAll(List<Neuron> sourceNeurons, List<Neuron> targetNeurons) {
+        return connectAllToAll(sourceNeurons, targetNeurons, Utils.intersects(sourceNeurons, targetNeurons), selfConnectionAllowed, true);
     }
 
     /**
@@ -93,22 +89,18 @@ public class AllToAll implements ConnectNeurons {
      * aren't allowed. Will produce n^2 synapses if self connections are allowed
      * and n(n-1) if they are not.
      *
-     * @param sourceNeurons the source neurons
-     * @param targetNeurons the target neurons
-     * @param recurrent whether the source and target neurons overlap. Some
-     *            classes know ahead of time if the connection will be recurrent
-     *            and knowing this allows a slight performance improvement.
+     * @param sourceNeurons       the source neurons
+     * @param targetNeurons       the target neurons
+     * @param recurrent           whether the source and target neurons overlap. Some
+     *                            classes know ahead of time if the connection will be recurrent
+     *                            and knowing this allows a slight performance improvement.
      * @param allowSelfConnection whether to allow self-connections
-     * @param looseSynapses whether the synapses being connected are loose or in
-     *            a synapse group
+     * @param looseSynapses       whether the synapses being connected are loose or in
+     *                            a synapse group
      * @return the synapses created.
      */
-    public static List<Synapse> connectAllToAll(
-            final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons,
-            final boolean recurrent, final boolean allowSelfConnection,
-            final boolean looseSynapses) {
-        ArrayList<Synapse> syns = new ArrayList<Synapse>(
-                (int) (targetNeurons.size() * sourceNeurons.size()));
+    public static List<Synapse> connectAllToAll(final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons, final boolean recurrent, final boolean allowSelfConnection, final boolean looseSynapses) {
+        ArrayList<Synapse> syns = new ArrayList<Synapse>((int) (targetNeurons.size() * sourceNeurons.size()));
         // Optimization: separately handle case where we have to worry about
         // avoiding self-connections, so an equals check is required.
         if (recurrent && !allowSelfConnection) {
@@ -147,16 +139,13 @@ public class AllToAll implements ConnectNeurons {
      * group is the target neuron group and self-connections are not allowed.
      *
      * @param synGroup the synapse group to which the synapses created by this
-     *            connection class will be added.
+     *                 connection class will be added.
      */
     public void connectNeurons(SynapseGroup synGroup) {
-        List<Synapse> syns = connectAllToAll(synGroup.getSourceNeurons(),
-                synGroup.getTargetNeurons(), synGroup.isRecurrent(),
-                selfConnectionAllowed, false);
+        List<Synapse> syns = connectAllToAll(synGroup.getSourceNeurons(), synGroup.getTargetNeurons(), synGroup.isRecurrent(), selfConnectionAllowed, false);
         // Set the capacity of the synapse group's list to accommodate the
         // synapses this group will add.
-        synGroup.preAllocateSynapses(synGroup.getSourceNeuronGroup().size()
-                * synGroup.getTargetNeuronGroup().size());
+        synGroup.preAllocateSynapses(synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
         for (Synapse s : syns) {
             synGroup.addNewSynapse(s);
         }
@@ -164,8 +153,8 @@ public class AllToAll implements ConnectNeurons {
 
     /**
      * @return if neurons are allowed to connect to themselves i.e. a synapse
-     *         where the source and target neuron are the same neuron is
-     *         allowed.
+     * where the source and target neuron are the same neuron is
+     * allowed.
      */
     public static boolean isSelfConnectionAllowed() {
         return selfConnectionAllowed;

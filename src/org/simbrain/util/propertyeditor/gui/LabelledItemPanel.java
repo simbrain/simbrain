@@ -18,13 +18,8 @@
  */
 package org.simbrain.util.propertyeditor.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * <b>LabelledItemPanel</b> provides a panel for laying out labelled elements
@@ -36,7 +31,9 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class LabelledItemPanel extends JPanel {
 
-    /** The row to add the next labelled item to. */
+    /**
+     * The row to add the next labelled item to.
+     */
     private int myNextItemRow = 0;
 
     /**
@@ -73,7 +70,7 @@ public class LabelledItemPanel extends JPanel {
      * row below the last item added.
      *
      * @param labelText The label text for the item.
-     * @param item The item to be added.
+     * @param item      The item to be added.
      */
     public void addItem(final String labelText, final JComponent item) {
         // Create the label and its constraints
@@ -109,7 +106,7 @@ public class LabelledItemPanel extends JPanel {
      * argument.
      *
      * @param label Label to be added
-     * @param item SimbrainComponent to be added
+     * @param item  SimbrainComponent to be added
      */
     public void addItemLabel(final JLabel label, final JComponent item) {
         GridBagConstraints labelConstraints = new GridBagConstraints();

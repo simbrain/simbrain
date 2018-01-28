@@ -13,34 +13,35 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.*;
-import java.io.File;
-
-import javax.swing.*;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.*;
+import org.simbrain.workspace.updater.SynchronizedTaskUpdateAction;
+import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
+import org.simbrain.workspace.updater.WorkspaceDelayAction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.*;
+import java.io.File;
 
 /**
  * Panel for display and ordering of workspace update actions.
  *
  * @author Jeff Yoshimi
- *
  */
 public class WorkspaceUpdateManagerPanel extends JPanel {
 
-    /** UpdateListener updates the action sequence whenever changes are made or an update is completed. */
+    /**
+     * UpdateListener updates the action sequence whenever changes are made or an update is completed.
+     */
     private class UpdateListener implements UpdateManagerListener {
 
         @Override
@@ -60,7 +61,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
     }
 
-    /** Provides drag and drop support for reordering update actions in the list. */
+    /**
+     * Provides drag and drop support for reordering update actions in the list.
+     */
     private class DragAndDropHandler extends TransferHandler {
         @Override
         public boolean canImport(TransferHandler.TransferSupport info) {
@@ -95,19 +98,24 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         }
     }
 
-    /** Script directory for custom workspace updates. */
-    private static final String SCRIPT_DIR = "."
-            + System.getProperty("file.separator") + "scripts"
-            + System.getProperty("file.separator") + "updateScripts"
-            + System.getProperty("file.separator") + "workspaceUpdate";
+    /**
+     * Script directory for custom workspace updates.
+     */
+    private static final String SCRIPT_DIR = "." + System.getProperty("file.separator") + "scripts" + System.getProperty("file.separator") + "updateScripts" + System.getProperty("file.separator") + "workspaceUpdate";
 
-    /** The JList which represents current actions. */
+    /**
+     * The JList which represents current actions.
+     */
     private final JList<UpdateAction> currentActionJList = new JList<>();
 
-    /** The model object for current actions. */
+    /**
+     * The model object for current actions.
+     */
     private final DefaultListModel<UpdateAction> currentActionListModel = new DefaultListModel<>();
 
-    /** Reference to workspace. */
+    /**
+     * Reference to workspace.
+     */
     private final Workspace workspace;
 
     /**
@@ -115,7 +123,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
      */
     private UpdateListener listener = new UpdateListener();
 
-    /** Action which deletes selected actions. */
+    /**
+     * Action which deletes selected actions.
+     */
     Action deleteActionsAction = new AbstractAction() {
         // Initialize
         {
@@ -133,7 +143,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         }
     };
 
-    /** Add a preset action. */
+    /**
+     * Add a preset action.
+     */
     Action addPresetAction = new AbstractAction() {
         // Initialize
         {
@@ -148,7 +160,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         }
     };
 
-    /** Action which allows for creation of custom action. */
+    /**
+     * Action which allows for creation of custom action.
+     */
     Action addCustomAction = new AbstractAction() {
         // Initialize
         {
@@ -166,7 +180,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     /**
      * Construct workspace update manager panel.
      *
-     * @param workspace parent workspace
+     * @param workspace    parent workspace
      * @param parentDialog dialog containing this panel
      */
     public WorkspaceUpdateManagerPanel(Workspace workspace, StandardDialog parentDialog) {
@@ -213,8 +227,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
         JButton downFullButton = new JButton(ResourceManager.getImageIcon("DownFull.png"));
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
-        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(
-                currentActionListModel.getSize() - currentActionJList.getSelectedIndex()));
+        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - currentActionJList.getSelectedIndex()));
         buttonPanel.add(downFullButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -256,9 +269,10 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         });
     }
 
-    /** Return a component based on the provided action in the list. */
-    private Component getUpdateActionCell(JList list, Object value, int index,
-                                          boolean isSelected, boolean cellHasFocus) {
+    /**
+     * Return a component based on the provided action in the list.
+     */
+    private Component getUpdateActionCell(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         UpdateAction action = (UpdateAction) value;
         String text = (index + 1) + ": " + action.getDescription();
         JLabel label = new JLabel(text);
@@ -338,10 +352,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     }
 
     private void showCustomUpdateActionDialog() {
-        File defaultScript = new File(System.getProperty("user.dir")
-                + "/etc/customWorkspaceUpdateTemplate.bsh");
-        ScriptEditor panel = new ScriptEditor(
-                Utils.readFileContents(defaultScript), SCRIPT_DIR);
+        File defaultScript = new File(System.getProperty("user.dir") + "/etc/customWorkspaceUpdateTemplate.bsh");
+        ScriptEditor panel = new ScriptEditor(Utils.readFileContents(defaultScript), SCRIPT_DIR);
         panel.setScriptFile(defaultScript);
         StandardDialog dialog = panel.getDialog(panel);
         // Setting script file to null prevents the template script from being saved. Forces "save as"
@@ -351,8 +363,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
         if (!dialog.hasUserCancelled()) {
-            UpdateActionCustom updateAction = new UpdateActionCustom(
-                    workspace.getUpdater(), panel.getTextArea().getText());
+            UpdateActionCustom updateAction = new UpdateActionCustom(workspace.getUpdater(), panel.getTextArea().getText());
             workspace.getUpdater().getUpdateManager().addAction(updateAction);
         }
     }
@@ -365,8 +376,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         availableActionJList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    UpdateAction action = (UpdateAction) availableActionJList.getModel().getElementAt(
-                            availableActionJList.locationToIndex(e.getPoint()));
+                    UpdateAction action = (UpdateAction) availableActionJList.getModel().getElementAt(availableActionJList.locationToIndex(e.getPoint()));
                     if (action instanceof UpdateActionCustom) {
                         openScriptEditorPanel((UpdateActionCustom) action);
                     }

@@ -18,34 +18,37 @@
  */
 package org.simbrain.workspace.updater;
 
-import java.awt.event.InvocationEvent;
-import java.util.concurrent.Callable;
-
 import org.simbrain.workspace.Workspace;
+
+import java.awt.event.InvocationEvent;
 
 /**
  * Class used to wrap InvocationEvents such that they are synchronized when
  * executed.
- * 
+ * <p>
  * See https://docs.oracle.com/javase/7/docs/api/java/awt/event/InvocationEvent.html
  *
  * @author Matt Watson
  */
 class SynchronizingInvocationEvent extends InvocationEvent {
 
-    /** Default serial version uid. */
+    /**
+     * Default serial version uid.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The event to synchronize. */
+    /**
+     * The event to synchronize.
+     */
     private final InvocationEvent event;
 
     /**
      * Creates an invocation event for the provided event using the workspace
      * for synchronization and calling signal.done() when finished.
      *
-     * @param event The 'real' invocation event.
+     * @param event     The 'real' invocation event.
      * @param workspace The workspace used for synchronization.
-     * @param signal The signal to call when done.
+     * @param signal    The signal to call when done.
      */
     public SynchronizingInvocationEvent(InvocationEvent event, Workspace workspace, CompletionSignal signal) {
         super(event.getSource(), () -> {

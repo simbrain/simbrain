@@ -18,27 +18,19 @@
  */
 package org.simbrain.util;
 
-import java.awt.FileDialog;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
+import java.util.*;
 
 /**
  * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic
  * adding of file extensions, memory of file-locations, and checks to prevent
  * file-overwrites.
- *
+ * <p>
  * 2008-10-09 Matt Watson - modified to support new serialization approach more
  * easily.
  */
@@ -63,21 +55,26 @@ public class SFileChooser {
      */
     private String description;
 
-    /** A memory of the last directory this FileChooser was in. */
+    /**
+     * A memory of the last directory this FileChooser was in.
+     */
     private String currentDirectory;
 
-    /** Use the image viewer to preview image files. */
+    /**
+     * Use the image viewer to preview image files.
+     */
     private boolean useViewer = false;
 
-    /** File separator. */
+    /**
+     * File separator.
+     */
     private static final String FS = System.getProperty("file.separator");
 
     /** Static initializer */
     static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("useNativeFileChooser")) {
-            useNativeFileChooser = Boolean.parseBoolean(properties
-                    .getProperty("useNativeFileChooser"));
+            useNativeFileChooser = Boolean.parseBoolean(properties.getProperty("useNativeFileChooser"));
         }
 
     }
@@ -86,7 +83,7 @@ public class SFileChooser {
      * Creates file chooser dialog.
      *
      * @param currentDirectory Open and save directory
-     * @param description the description for the full set of extensions
+     * @param description      the description for the full set of extensions
      */
     public SFileChooser(final String currentDirectory, final String description) {
         this.currentDirectory = currentDirectory;
@@ -98,11 +95,10 @@ public class SFileChooser {
      * extension is supported.
      *
      * @param currentDirectory Open and save directory
-     * @param description a description of the extension
-     * @param extension File type extension for open and save
+     * @param description      a description of the extension
+     * @param extension        File type extension for open and save
      */
-    public SFileChooser(final String currentDirectory,
-            final String description, final String extension) {
+    public SFileChooser(final String currentDirectory, final String description, final String extension) {
         this.currentDirectory = currentDirectory;
         this.description = description;
 
@@ -116,7 +112,7 @@ public class SFileChooser {
     /**
      * Adds an extension with the provided description to the filenamefilter.
      *
-     * @param extension the extension
+     * @param extension   the extension
      * @param description the description
      */
     public void addExtension(final String description, final String extension) {
@@ -142,15 +138,16 @@ public class SFileChooser {
         Map<String, ExtensionFileFilter> filters = new HashMap<String, ExtensionFileFilter>();
 
         for (Map.Entry<String, String> entry : exts.entrySet()) {
-            ExtensionFileFilter filter = new ExtensionFileFilter(
-                    entry.getKey(), entry.getValue());
+            ExtensionFileFilter filter = new ExtensionFileFilter(entry.getKey(), entry.getValue());
             filters.put(entry.getKey(), filter);
             chooser.addChoosableFileFilter(filter);
         }
         return filters;
     }
 
-    /** Set the description used by this file chooser. */
+    /**
+     * Set the description used by this file chooser.
+     */
     public void setDescription(String value) {
         description = value;
     }
@@ -264,16 +261,12 @@ public class SFileChooser {
      * @return the saved file, or null if cancel, etc.
      */
     private File showSaveDialogNative(final File file) {
-        FileDialog chooser = new FileDialog(new JFrame(), "Save",
-                FileDialog.SAVE);
+        FileDialog chooser = new FileDialog(new JFrame(), "Save", FileDialog.SAVE);
         chooser.setDirectory(getCurrentLocation());
         if (file != null) {
             if (exts.size() >= 1) {
-                chooser.setFilenameFilter(new ExtensionSetFileFilter(exts
-                        .keySet(), description));
-                chooser.setFile(addExtension(file,
-                        new ExtensionSetFileFilter(exts.keySet(), description))
-                            .getName());
+                chooser.setFilenameFilter(new ExtensionSetFileFilter(exts.keySet(), description));
+                chooser.setFile(addExtension(file, new ExtensionSetFileFilter(exts.keySet(), description)).getName());
             } else {
                 chooser.setFile(file.getName());
             }
@@ -320,8 +313,7 @@ public class SFileChooser {
             return null;
         }
 
-        File tmpFile = addExtension(chooser.getSelectedFile(),
-                chooser.getFileFilter());
+        File tmpFile = addExtension(chooser.getSelectedFile(), chooser.getFileFilter());
         if (tmpFile.exists() && !confirmOverwrite(tmpFile)) {
             return null;
         }
@@ -336,14 +328,11 @@ public class SFileChooser {
      * @return whether the user selected "yes"
      */
     public boolean confirmOverwrite(final File file) {
-        String message = "The file \"" + file.getName()
-                + "\" already exists. Overwrite?";
+        String message = "The file \"" + file.getName() + "\" already exists. Overwrite?";
 
-        Object[] options = { "OK", "Cancel" };
+        Object[] options = {"OK", "Cancel"};
 
-        return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                message, "Warning", JOptionPane.DEFAULT_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, message, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
     }
 
     /**
@@ -368,19 +357,22 @@ public class SFileChooser {
     /**
      * File-filter.
      */
-    private class ExtensionFileFilter extends FileFilter implements
-            FilenameFilter {
+    private class ExtensionFileFilter extends FileFilter implements FilenameFilter {
 
-        /** Extension to filter. */
+        /**
+         * Extension to filter.
+         */
         private final String extension;
 
-        /** Human readable description of extension. */
+        /**
+         * Human readable description of extension.
+         */
         private final String description;
 
         /**
          * Construct a file filter.
          *
-         * @param extension extension
+         * @param extension   extension
          * @param description description
          */
         ExtensionFileFilter(final String extension, final String description) {
@@ -407,6 +399,7 @@ public class SFileChooser {
 
         /**
          * Implements file name filter for native file dialog.
+         *
          * @param dir
          * @param name
          * @return
@@ -423,16 +416,20 @@ public class SFileChooser {
      */
     private class ExtensionSetFileFilter extends FileFilter implements FilenameFilter {
 
-        /** A collection of extension names. */
+        /**
+         * A collection of extension names.
+         */
         private final Collection<String> extensions;
 
-        /** A human readable description for the set of extensions. */
+        /**
+         * A human readable description for the set of extensions.
+         */
         private final String description;
 
         /**
          * Construct the file set filter.
          *
-         * @param extensions extension
+         * @param extensions  extension
          * @param description description
          */
         ExtensionSetFileFilter(Collection<String> extensions, String description) {
@@ -460,7 +457,7 @@ public class SFileChooser {
 
             StringBuilder builder = new StringBuilder();
 
-            for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
+            for (Iterator<String> i = extensions.iterator(); i.hasNext(); ) {
                 builder.append("*.");
                 builder.append(i.next());
                 if (i.hasNext())
@@ -472,9 +469,10 @@ public class SFileChooser {
 
         /**
          * Implements file name filter for native file dialog.
+         *
          * @param dir
          * @param name
-         * @return 
+         * @return
          */
         public boolean accept(File dir, String name) {
             return extensions.contains(getExtension(name));
@@ -484,7 +482,7 @@ public class SFileChooser {
     /**
      * Returns whether the given file has the given extension
      *
-     * @param theFile the file to check
+     * @param theFile   the file to check
      * @param extension the extension to look for
      * @return whether the given file has the given extension
      */
@@ -521,7 +519,7 @@ public class SFileChooser {
      * Check to see if the file has the extension, and if not, add it.
      *
      * @param theFile File to add extension to
-     * @param filter Extension to add to file
+     * @param filter  Extension to add to file
      * @return The file name with the correct extension
      */
     private File addExtension(final File theFile, final FileFilter filter) {
@@ -541,8 +539,7 @@ public class SFileChooser {
             return theFile;
         } else {
             // TODO JMW - this seems strange.
-            File output = new File(theFile.getAbsolutePath().concat(
-                    "." + extension));
+            File output = new File(theFile.getAbsolutePath().concat("." + extension));
 
             if (theFile.exists()) {
                 theFile.renameTo(output);

@@ -23,7 +23,7 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork;
 /**
  * A trainer for SOM Networks. Just goes through input data sets input node and
  * updates the SOM Group, which has the training code built in.
- *
+ * <p>
  * TODO: Possibly refactor to an "unsupervised trainer" class for use by
  * competitive too, which is similar.
  *
@@ -31,13 +31,19 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork;
  */
 public class CompetitiveTrainer extends Trainer {
 
-    /** Reference to trainable network. */
+    /**
+     * Reference to trainable network.
+     */
     private final CompetitiveNetwork network;
 
-    /** Flag used for iterative training methods. */
+    /**
+     * Flag used for iterative training methods.
+     */
     private boolean updateCompleted = true;
 
-    /** Iteration number. An epoch. */
+    /**
+     * Iteration number. An epoch.
+     */
     private int iteration = 0;
 
     /**

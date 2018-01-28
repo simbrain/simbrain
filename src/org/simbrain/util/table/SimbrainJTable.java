@@ -18,42 +18,25 @@
  */
 package org.simbrain.util.table;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
+import org.jdesktop.swingx.JXTable;
 
-import javax.swing.CellEditor;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.JTextComponent;
-
-import org.jdesktop.swingx.JXTable;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
 
 /**
  * <b>SimbrainJTable</b> is a version of a JXTable (itself an improved JTable
  * from SwingLabs) which provides GUI access to a SimbrainDataTable. Provides
  * various features that are useful in simbrain, e.g. ability to set row and
  * column headings.
- *
+ * <p>
  * The first column of all tables is a special header column that displays row
  * number or other information. Calls to the underlying SimbrainDataTable model
  * thus must either be offset by 1 as necessary, or can call special methods
@@ -66,7 +49,9 @@ import org.jdesktop.swingx.JXTable;
  */
 public class SimbrainJTable extends JXTable {
 
-    /** The data to be displayed in the jtable. */
+    /**
+     * The data to be displayed in the jtable.
+     */
     private SimbrainDataTable<?> data;
 
     /**
@@ -75,13 +60,19 @@ public class SimbrainJTable extends JXTable {
      */
     private List<String> rowHeadings;
 
-    /** Point selected. */
+    /**
+     * Point selected.
+     */
     private Point selectedPoint;
 
-    /** Grid Color. */
+    /**
+     * Grid Color.
+     */
     private Color gridColor = Color.LIGHT_GRAY;
 
-    /** Whether to display the default popup menu. */
+    /**
+     * Whether to display the default popup menu.
+     */
     private boolean displayPopUpMenu = true;
 
     /**
@@ -90,7 +81,9 @@ public class SimbrainJTable extends JXTable {
      */
     private boolean hasChangedSinceLastSave = false;
 
-    /** Flags for popup menus. */
+    /**
+     * Flags for popup menus.
+     */
     private boolean showInsertRowPopupMenu = true;
     private boolean showInsertColumnPopupMenu = true;
     private boolean showDeleteRowPopupMenu = true;
@@ -157,8 +150,7 @@ public class SimbrainJTable extends JXTable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.isControlDown() || (e.getButton() == 1)) {
-                    final int column = convertColumnIndexToModel(
-                            columnAtPoint(e.getPoint()));
+                    final int column = convertColumnIndexToModel(columnAtPoint(e.getPoint()));
                     if (e.isShiftDown()) {
                         for (int i = 1; i < getRowCount(); i++) {
                             changeSelection(i, column, true, true);
@@ -185,8 +177,7 @@ public class SimbrainJTable extends JXTable {
                 }
                 if (e.isPopupTrigger() && displayPopUpMenu) {
                     JPopupMenu menu = buildPopupMenu();
-                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
-                            (int) selectedPoint.getY());
+                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
                 }
             }
 
@@ -203,8 +194,7 @@ public class SimbrainJTable extends JXTable {
                 }
                 if (e.isPopupTrigger() && displayPopUpMenu) {
                     JPopupMenu menu = buildPopupMenu();
-                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
-                            (int) selectedPoint.getY());
+                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
                 }
             }
         });
@@ -233,8 +223,7 @@ public class SimbrainJTable extends JXTable {
                     SimbrainJTable.this.getCellEditor().stopCellEditing();
                     // Fire an event so that listeners can commit the changes
                     // if need be
-                    SimbrainJTable.this.firePropertyChange("hasChanged",
-                            hasChangedSinceLastSave, true);
+                    SimbrainJTable.this.firePropertyChange("hasChanged", hasChangedSinceLastSave, true);
                     hasChangedSinceLastSave = true;
                 }
             }
@@ -354,27 +343,20 @@ public class SimbrainJTable extends JXTable {
     /**
      * Return a toolbar with buttons for opening from and saving to .csv files.
      *
-     * @param allowRowChanges whether to allow number of rows to change
+     * @param allowRowChanges    whether to allow number of rows to change
      * @param allowColumnChanges whether to allow number of columns to change
      * @return the csv toolbar
      */
-    public JToolBar getToolbarCSV(final boolean allowRowChanges,
-            final boolean allowColumnChanges) {
+    public JToolBar getToolbarCSV(final boolean allowRowChanges, final boolean allowColumnChanges) {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(TableActionManager.getOpenCSVAction(
-                    (NumericTable) getData(), allowRowChanges,
-                    allowColumnChanges));
-            toolbar.add(TableActionManager
-                    .getSaveCSVAction((NumericTable) getData()));
+            toolbar.add(TableActionManager.getOpenCSVAction((NumericTable) getData(), allowRowChanges, allowColumnChanges));
+            toolbar.add(TableActionManager.getSaveCSVAction((NumericTable) getData()));
             return toolbar;
         } else if (getData() instanceof TextTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(
-                    TableActionManager.getOpenCSVAction((TextTable) getData(),
-                            allowRowChanges, allowColumnChanges));
-            toolbar.add(
-                    TableActionManager.getSaveCSVAction((TextTable) getData()));
+            toolbar.add(TableActionManager.getOpenCSVAction((TextTable) getData(), allowRowChanges, allowColumnChanges));
+            toolbar.add(TableActionManager.getSaveCSVAction((TextTable) getData()));
             return toolbar;
         }
         return null;
@@ -423,8 +405,7 @@ public class SimbrainJTable extends JXTable {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
             toolbar.add(TableActionManager.getRandomizeAction(this));
-            toolbar.add(TableActionManager
-                    .getSetTableBoundsAction((NumericTable) getData()));
+            toolbar.add(TableActionManager.getSetTableBoundsAction((NumericTable) getData()));
             return toolbar;
         }
         return null;
@@ -445,27 +426,20 @@ public class SimbrainJTable extends JXTable {
     /**
      * Return a menu with items for opening from and saving to .csv files.
      *
-     * @param allowRowChanges whether to allow number of rows to change
+     * @param allowRowChanges    whether to allow number of rows to change
      * @param allowColumnChanges whether to allow number of columns to change
      * @return the csv menu
      */
-    public JMenu getMenuCSV(final boolean allowRowChanges,
-            final boolean allowColumnChanges) {
+    public JMenu getMenuCSV(final boolean allowRowChanges, final boolean allowColumnChanges) {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Import / Export .csv");
-            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(
-                    (NumericTable) getData(), allowRowChanges,
-                    allowColumnChanges)));
-            menu.add(new JMenuItem(TableActionManager
-                    .getSaveCSVAction((NumericTable) getData())));
+            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction((NumericTable) getData(), allowRowChanges, allowColumnChanges)));
+            menu.add(new JMenuItem(TableActionManager.getSaveCSVAction((NumericTable) getData())));
             return menu;
         } else if (getData() instanceof TextTable) {
             JMenu menu = new JMenu("Import / Export .csv");
-            menu.add(new JMenuItem(
-                    TableActionManager.getOpenCSVAction((TextTable) getData(),
-                            allowRowChanges, allowColumnChanges)));
-            menu.add(new JMenuItem(TableActionManager
-                    .getSaveCSVAction((TextTable) getData())));
+            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction((TextTable) getData(), allowRowChanges, allowColumnChanges)));
+            menu.add(new JMenuItem(TableActionManager.getSaveCSVAction((TextTable) getData())));
             return menu;
         }
         return null;
@@ -480,8 +454,7 @@ public class SimbrainJTable extends JXTable {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Randomize");
             menu.add(TableActionManager.getRandomizeAction(this));
-            menu.add(TableActionManager
-                    .getSetTableBoundsAction((NumericTable) getData()));
+            menu.add(TableActionManager.getSetTableBoundsAction((NumericTable) getData()));
             return menu;
         }
         return null;
@@ -582,9 +555,7 @@ public class SimbrainJTable extends JXTable {
         /**
          * {@inheritDoc}
          */
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean selected, boolean focused, int row,
-                int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focused, int row, int column) {
 
             if (column == 0) {
                 JLabel label = new JLabel();
@@ -606,8 +577,7 @@ public class SimbrainJTable extends JXTable {
                     return label;
                 }
 
-                return super.getTableCellRendererComponent(table, value,
-                        selected, focused, row, column);
+                return super.getTableCellRendererComponent(table, value, selected, focused, row, column);
             }
         }
     }
@@ -689,8 +659,7 @@ public class SimbrainJTable extends JXTable {
     /**
      * @param showInsertColumnPopupMenu the showInsertColumnPopupMenu to set
      */
-    public void setShowInsertColumnPopupMenu(
-            boolean showInsertColumnPopupMenu) {
+    public void setShowInsertColumnPopupMenu(boolean showInsertColumnPopupMenu) {
         this.showInsertColumnPopupMenu = showInsertColumnPopupMenu;
     }
 
@@ -704,8 +673,7 @@ public class SimbrainJTable extends JXTable {
     /**
      * @param showDeleteColumnPopupMenu the showDeleteColumnPopupMenu to set
      */
-    public void setShowDeleteColumnPopupMenu(
-            boolean showDeleteColumnPopupMenu) {
+    public void setShowDeleteColumnPopupMenu(boolean showDeleteColumnPopupMenu) {
         this.showDeleteColumnPopupMenu = showDeleteColumnPopupMenu;
     }
 
@@ -750,8 +718,7 @@ public class SimbrainJTable extends JXTable {
     public void normalize() {
         if (data instanceof NumericTable) {
             for (int i = 0; i < this.getSelectedColumns().length; i++) {
-                ((NumericTable) data)
-                        .normalizeColumn(getSelectedColumns()[i] - 1);
+                ((NumericTable) data).normalizeColumn(getSelectedColumns()[i] - 1);
             }
         }
     }
@@ -782,10 +749,14 @@ public class SimbrainJTable extends JXTable {
      */
     class CellIndex {
 
-        /** Row index. */
+        /**
+         * Row index.
+         */
         public int row;
 
-        /** Column Index. */
+        /**
+         * Column Index.
+         */
         public int col;
 
         /**
@@ -837,8 +808,7 @@ public class SimbrainJTable extends JXTable {
     public boolean editCellAt(int row, int column, EventObject e) {
         boolean result = super.editCellAt(row, column, e);
 
-        if (isSelectAllForMouseEvent || isSelectAllForActionEvent
-                || isSelectAllForKeyEvent) {
+        if (isSelectAllForMouseEvent || isSelectAllForActionEvent || isSelectAllForKeyEvent) {
             selectAll(e);
         }
 

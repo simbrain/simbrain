@@ -1,9 +1,5 @@
 package org.simbrain.custom_sims.simulations.cortex_simple;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -20,14 +16,18 @@ import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model of canonical cortex (Douglas and Martin, 2004) using rat barrel cortex
  * as a reference (Lefort, Tomm, Sarria and Petersen, 2009). Users should be
  * able to inject current and see it propagate consistently with empirical
  * studies.
- * 
+ * <p>
  * Also see Haeusler and Mass, 2007.
- * 
+ *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
@@ -54,8 +54,7 @@ public class CortexSimple extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(10, 10, 550, 800,
-                "Cortical Simulation");
+        NetBuilder net = sim.addNetwork(10, 10, 550, 800, "Cortical Simulation");
         network = net.getNetwork();
         buildNetwork();
 
@@ -77,13 +76,9 @@ public class CortexSimple extends RegisteredSimulation {
         int btwnLayerSpacing = 150;
         NeuronGroup layer_23 = buildLayer(10, 10, 100, -71.5, 29, -38.4, 190);
         layer_23.setLabel("Layer 2/3");
-        NeuronGroup layer_4 = buildLayer(-500,
-                (int) layer_23.getMaxY() + btwnLayerSpacing, 100, -66, 35,
-                -39.7, 302-50);
+        NeuronGroup layer_4 = buildLayer(-500, (int) layer_23.getMaxY() + btwnLayerSpacing, 100, -66, 35, -39.7, 302 - 50);
         layer_4.setLabel("Layer 4");
-        NeuronGroup layer_56 = buildLayer(10,
-                (int) layer_4.getMaxY() + btwnLayerSpacing, 100, -62.8, 28, -40,
-                200);
+        NeuronGroup layer_56 = buildLayer(10, (int) layer_4.getMaxY() + btwnLayerSpacing, 100, -62.8, 28, -40, 200);
         layer_56.setLabel("Layer 5/6");
 
         // Connect layers
@@ -100,16 +95,12 @@ public class CortexSimple extends RegisteredSimulation {
 
         // Use concurrent buffered update
         network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(network));
+        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
     }
 
-    private NeuronGroup buildLayer(int x, int y, int numNeurons,
-            double restingPotential, double timeConstant, double threshold,
-            double resistance) {
+    private NeuronGroup buildLayer(int x, int y, int numNeurons, double restingPotential, double timeConstant, double threshold, double resistance) {
 
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
-                (int) Math.sqrt(numNeurons));
+        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
         List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(network);
@@ -121,7 +112,7 @@ public class CortexSimple extends RegisteredSimulation {
             rule.setBackgroundCurrent(0);
             rule.setResetPotential(restingPotential);
             neuron.setUpdateRule(rule);
-            neuron.setLowerBound(restingPotential-10);
+            neuron.setLowerBound(restingPotential - 10);
             neuron.setUpperBound(threshold);
             neurons.add(neuron);
         }
@@ -132,22 +123,18 @@ public class CortexSimple extends RegisteredSimulation {
         return ng;
     }
 
-    private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar,
-            double sparsity) {
+    private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar, double sparsity) {
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
         exRand.setParam1(location);
         exRand.setParam2(scale);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
         inRand.setParam1(location);
         inRand.setParam2(scale);
 
         Sparse con = new Sparse(sparsity, false, false);
 
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.5,
-                exRand, inRand);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.5, exRand, inRand);
         sg.setLabel("Synapses");
 
         sg.setUpperBound(1, Polarity.EXCITATORY);
@@ -167,7 +154,9 @@ public class CortexSimple extends RegisteredSimulation {
 
     public CortexSimple() {
         super();
-    };
+    }
+
+    ;
 
     @Override
     public String getName() {

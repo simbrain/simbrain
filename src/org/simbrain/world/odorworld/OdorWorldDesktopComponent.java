@@ -18,16 +18,15 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -38,14 +37,19 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     private static final long serialVersionUID = 1L;
 
-    /** Odor world to be in frame. */
+    /**
+     * Odor world to be in frame.
+     */
     private OdorWorldPanel worldPanel;
 
-    /** Odor world frame menu. */
+    /**
+     * Odor world frame menu.
+     */
     private OdorWorldFrameMenu menu;
 
     /**
      * Default constructor.
+     *
      * @param frame
      * @param component
      */
@@ -58,7 +62,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu.setUpMenus();
         setGuiSizeToWorldSize();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
-                                            // class?
+        // class?
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
         // //TODO: Think then Remove
 
@@ -139,7 +143,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
-                                            // class?
+        // class?
         getParentFrame().pack(); // Force a repaint
     }
 

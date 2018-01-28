@@ -6,9 +6,13 @@ package org.simbrain.world.game;
  * @author Matt Watson
  */
 public abstract class GameModel {
-    /** the size (width and height). */
+    /**
+     * the size (width and height).
+     */
     private final int size;
-    /** the name of the game. */
+    /**
+     * the name of the game.
+     */
     private String name;
 
     /**
@@ -45,7 +49,6 @@ public abstract class GameModel {
      *
      * @param x the x coordinate
      * @param y the y coordinate
-     *
      * @return the value of the given cell.
      */
     public abstract double get(int x, int y);
@@ -53,10 +56,9 @@ public abstract class GameModel {
     /**
      * Sets the value of the cell at the given coordinates.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
+     * @param x     the x coordinate
+     * @param y     the y coordinate
      * @param value the value set
-     *
      * @return whether the move is allowed.
      */
     public abstract boolean set(int x, int y, double value);

@@ -18,17 +18,19 @@
  */
 package org.simbrain.workspace.gui;
 
+import org.simbrain.workspace.Workspace;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
-import org.simbrain.workspace.Workspace;
 
 /**
  * Workspace key adapter.
  */
 class WorkspaceKeyAdapter extends KeyAdapter {
 
-    /** Reference to workspace. */
+    /**
+     * Reference to workspace.
+     */
     private final Workspace workspace;
 
     /**
@@ -48,11 +50,11 @@ class WorkspaceKeyAdapter extends KeyAdapter {
     public void keyPressed(final KeyEvent e) {
         int keycode = e.getKeyCode();
         switch (keycode) {
-        case KeyEvent.VK_U:
-            workspace.iterate();
-            break;
-        default:
-            break;
+            case KeyEvent.VK_U:
+                workspace.iterate();
+                break;
+            default:
+                break;
         }
     }
 

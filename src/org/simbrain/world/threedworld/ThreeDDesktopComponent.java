@@ -1,12 +1,5 @@
 package org.simbrain.world.threedworld;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.util.Arrays;
-
-import javax.swing.*;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.util.widgets.ToggleButton;
@@ -17,7 +10,13 @@ import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.threedworld.entities.EditorDialog;
 
-/** ThreeDDesktopComponent is the GUI component for a ThreeDWorld. */
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+
+/**
+ * ThreeDDesktopComponent is the GUI component for a ThreeDWorld.
+ */
 public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     private static final long serialVersionUID = 8711925427252261845L;
 
@@ -25,7 +24,8 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
 
     /**
      * Construct a new ThreeDDesktopComponent to hold a ThreeDWorldComponent in a Frame.
-     * @param frame The frame in which to create GUI elements.
+     *
+     * @param frame     The frame in which to create GUI elements.
      * @param component The workspace component which hold the ThreeDWorld.
      */
     public ThreeDDesktopComponent(GenericFrame frame, ThreeDWorldComponent component) {
@@ -43,6 +43,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
 
     /**
      * Create a JMenuBar to hold the World, Entities, and Help menu items.
+     *
      * @param component The workspace component from which to build the menus.
      * @return The instantiated JMenuBar.
      */
@@ -83,6 +84,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
 
     /**
      * Create a toolbar to hold ThreeDWorld action buttons.
+     *
      * @param component The workspace component from which to build the buttons.
      * @return The instantiated toolbar.
      */
@@ -97,9 +99,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
         }
 
         JToolBar editToolbar = new JToolBar();
-        editToolbar.add(new ToggleButton(Arrays.asList(
-                component.getWorld().getAction("Control Agent"),
-                component.getWorld().getAction("Release Agent"))));
+        editToolbar.add(new ToggleButton(Arrays.asList(component.getWorld().getAction("Control Agent"), component.getWorld().getAction("Release Agent"))));
         editToolbar.add(component.getWorld().getAction("Camera Home"));
         editToolbar.add(createToggleButton(component.getWorld().getAction("Snap Transforms"), true));
         JComboBox<String> rotationAxisCombo = new JComboBox<String>();
@@ -129,7 +129,8 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
 
     /**
      * Create a toggle button from a standard action.
-     * @param action The action to attach to the toggle button.
+     *
+     * @param action   The action to attach to the toggle button.
      * @param selected Whether the initial state of the toggle button is selected.
      * @return The instantiated toggle button.
      */

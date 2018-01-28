@@ -18,18 +18,16 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 
+import java.awt.*;
+
 /**
  * A node that draws an outline around its children nodes. To use create an
  * instance and then add children directly to it using addChild().
- *
+ * <p>
  * Adapted from an example in the piccolo 1.3 source by Lance Good.
  *
  * @author Lance Good
@@ -49,19 +47,29 @@ public class OutlinedObjects extends PPath.Float {
      */
     private boolean drawOutline = true;
 
-    /** What outline color to use. */
+    /**
+     * What outline color to use.
+     */
     private Color lineColor = Color.gray;
 
-    /** Whether to fill the background around grouped objects or not. */
+    /**
+     * Whether to fill the background around grouped objects or not.
+     */
     private boolean fillBackground = true;
 
-    /** What background color to use. */
+    /**
+     * What background color to use.
+     */
     private Color backgroundColor = Color.white;
 
-    /** Indentation amount around drawn outline. */
+    /**
+     * Indentation amount around drawn outline.
+     */
     private int outlinePadding = 10;
 
-    /** Cache of children bounds. For use in validating bounds, */
+    /**
+     * Cache of children bounds. For use in validating bounds,
+     */
     private PBounds cachedChildBounds = new PBounds();
 
     /**
@@ -92,19 +100,12 @@ public class OutlinedObjects extends PPath.Float {
 
             if (fillBackground) {
                 g2.setPaint(backgroundColor);
-                g2.fillRect((int) bounds.getX() - outlinePadding,
-                        (int) bounds.getY() - outlinePadding,
-                        (int) bounds.getWidth() + 2 * outlinePadding,
-                        (int) bounds.getHeight() + 2 * outlinePadding);
+                g2.fillRect((int) bounds.getX() - outlinePadding, (int) bounds.getY() - outlinePadding, (int) bounds.getWidth() + 2 * outlinePadding, (int) bounds.getHeight() + 2 * outlinePadding);
             }
 
             if (drawOutline) {
                 g2.setPaint(lineColor);
-                g2.drawRoundRect((int) bounds.getX() - outlinePadding,
-                        (int) bounds.getY() - outlinePadding,
-                        (int) bounds.getWidth() + 2 * outlinePadding,
-                        (int) bounds.getHeight() + 2 * outlinePadding,
-                        ROUNDING_WIDTH_HEIGHT, ROUNDING_WIDTH_HEIGHT);
+                g2.drawRoundRect((int) bounds.getX() - outlinePadding, (int) bounds.getY() - outlinePadding, (int) bounds.getWidth() + 2 * outlinePadding, (int) bounds.getHeight() + 2 * outlinePadding, ROUNDING_WIDTH_HEIGHT, ROUNDING_WIDTH_HEIGHT);
             }
             // if (backgroundColor != null) {
             // g2.setPaint(backgroundColor);
@@ -126,9 +127,7 @@ public class OutlinedObjects extends PPath.Float {
         final PBounds result = getUnionOfChildrenBounds(dstBounds);
 
         cachedChildBounds.setRect(result);
-        result.setRect(result.getX() - outlinePadding, result.getY()
-                - outlinePadding, result.getWidth() + 2 * outlinePadding,
-                result.getHeight() + 2 * outlinePadding);
+        result.setRect(result.getX() - outlinePadding, result.getY() - outlinePadding, result.getWidth() + 2 * outlinePadding, result.getHeight() + 2 * outlinePadding);
         localToParent(result);
         return result;
     }
@@ -139,17 +138,17 @@ public class OutlinedObjects extends PPath.Float {
      */
     @Override
     public boolean validateFullBounds() {
-    	try {
-    		if (comparisonBounds == null) {
-    			System.out.println("Im null before.");
-    		}
-    		comparisonBounds = getUnionOfChildrenBounds(comparisonBounds);
-    		if (comparisonBounds == null) {
-    			System.out.println("Im null after.");
-    		}
-    	} catch (NullPointerException npe) {
-    		npe.printStackTrace();
-    	}
+        try {
+            if (comparisonBounds == null) {
+                System.out.println("Im null before.");
+            }
+            comparisonBounds = getUnionOfChildrenBounds(comparisonBounds);
+            if (comparisonBounds == null) {
+                System.out.println("Im null after.");
+            }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
 
         if (!cachedChildBounds.equals(comparisonBounds)) {
             setPaintInvalid(true);

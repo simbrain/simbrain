@@ -29,25 +29,36 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
  */
-public class SinusoidalRule extends NeuronUpdateRule implements
-        BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
+public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
 
-    /** Phase. */
+    /**
+     * Phase.
+     */
     private double phase = 1;
 
-    /** Frequency. */
+    /**
+     * Frequency.
+     */
     private double frequency = .1;
 
-    /** The upper boundary of the activation. */
+    /**
+     * The upper boundary of the activation.
+     */
     private double ceiling = 1.0;
 
-    /** The lower boundary of the activation. */
+    /**
+     * The lower boundary of the activation.
+     */
     private double floor = -1.0;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
     @Override
@@ -71,9 +82,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements
         double upperBound = getUpperBound();
         double lowerBound = getLowerBound();
         double range = upperBound - lowerBound;
-        double val = ((range / 2) * Math.sin(frequency
-                * neuron.getNetwork().getTime() + phase))
-                + ((upperBound + lowerBound) / 2);
+        double val = ((range / 2) * Math.sin(frequency * neuron.getNetwork().getTime() + phase)) + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -157,8 +166,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements
     public double getRandomValue() {
         double rand = (2 * Math.PI) * Math.random();
         double range = getUpperBound() - getLowerBound();
-        return ((range / 2) * Math.sin(frequency * rand + phase))
-                + ((getUpperBound() + getLowerBound()) / 2);
+        return ((range / 2) * Math.sin(frequency * rand + phase)) + ((getUpperBound() + getLowerBound()) / 2);
     }
 
     @Override

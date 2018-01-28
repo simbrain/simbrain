@@ -18,21 +18,22 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkUpdateManagerPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show network updater panel.
  */
 public final class ShowNetworkUpdaterDialog extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -52,14 +53,14 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
         this.networkPanel = networkPanel;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 
         StandardDialog dialog = new StandardDialog();
-        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(
-                networkPanel.getNetwork(), dialog);
+        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(networkPanel.getNetwork(), dialog);
         dialog.setContentPane(updatePanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

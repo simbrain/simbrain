@@ -1,6 +1,5 @@
 package org.simbrain.world.threedworld.controllers;
 
-import org.simbrain.world.threedworld.ThreeDWorld;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -11,6 +10,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import org.simbrain.world.threedworld.ThreeDWorld;
 
 import static org.simbrain.world.threedworld.controllers.CameraController.Mapping.*;
 
@@ -23,19 +23,7 @@ public class CameraController implements AnalogListener, ActionListener {
      * The set of input mappings used by this controller.
      */
     enum Mapping {
-        MouseLook,
-        YawLeft,
-        YawRight,
-        PitchUp,
-        PitchDown,
-        ZoomIn,
-        ZoomOut,
-        MoveLeft,
-        MoveRight,
-        MoveForward,
-        MoveBackward,
-        MoveUp,
-        MoveDown;
+        MouseLook, YawLeft, YawRight, PitchUp, PitchDown, ZoomIn, ZoomOut, MoveLeft, MoveRight, MoveForward, MoveBackward, MoveUp, MoveDown;
 
         /**
          * @param name The name to compare.
@@ -58,13 +46,14 @@ public class CameraController implements AnalogListener, ActionListener {
     private float rotateSpeed = 10f;
     private float zoomSpeed = 1f;
     private Vector3f homePosition = Vector3f.UNIT_Y.mult(2.5f);
-    private float[] homeRotation = new float[] {0, 0, 0};
+    private float[] homeRotation = new float[]{0, 0, 0};
     private float homeZoom = 80;
     private Vector3f yawAxis = Vector3f.UNIT_Y.clone();
     private BoundingBox cameraBounds = new BoundingBox(new Vector3f(0, 17, 0), 64, 16, 64);
 
     /**
      * Construct a new CameraController in the provided ThreeDWorld.
+     *
      * @param world The world in which to control the camera.
      */
     public CameraController(ThreeDWorld world) {
@@ -92,7 +81,7 @@ public class CameraController implements AnalogListener, ActionListener {
     }
 
     private void updateCameraFrustum() {
-        camera.setFrustumPerspective(fieldOfView, camera.getWidth() / (float)camera.getHeight(), nearClip, farClip);
+        camera.setFrustumPerspective(fieldOfView, camera.getWidth() / (float) camera.getHeight(), nearClip, farClip);
     }
 
     public Vector3f getPosition() {
@@ -122,47 +111,47 @@ public class CameraController implements AnalogListener, ActionListener {
     public void setYawAxis(Vector3f value) {
         yawAxis = value.clone();
     }
-    
+
     public float getMoveSpeed() {
         return moveSpeed;
     }
-    
+
     public void setMoveSpeed(float value) {
         moveSpeed = value;
     }
-    
+
     public float getRotateSpeed() {
         return rotateSpeed;
     }
-    
+
     public void setRotateSpeed(float value) {
         rotateSpeed = value;
     }
-    
+
     public float getZoomSpeed() {
         return zoomSpeed;
     }
-    
+
     public void setZoomSpeed(float value) {
         zoomSpeed = value;
     }
-    
+
     public boolean isMouseLookActive() {
         return mouseLookActive;
     }
-    
+
     public void setMouseLookActive(boolean value) {
         mouseLookActive = value;
     }
-    
+
     public Vector3f getHomePosition() {
         return homePosition;
     }
-    
+
     public void setHomePosition(Vector3f value) {
         homePosition = value;
     }
-    
+
     public float[] getHomeRotation() {
         return homeRotation;
     }
@@ -233,8 +222,9 @@ public class CameraController implements AnalogListener, ActionListener {
 
     /**
      * Move the camera by the specified value along axis.
+     *
      * @param value The distance to move.
-     * @param axis The axis along which to move.
+     * @param axis  The axis along which to move.
      */
     protected void moveCamera(float value, Vector3f axis) {
         Vector3f velocity = axis;
@@ -260,8 +250,9 @@ public class CameraController implements AnalogListener, ActionListener {
 
     /**
      * Rotate the camera by the specified value around the axis.
+     *
      * @param value The angular distance to rotate in arbitrary units.
-     * @param axis The axis around which to rotate.
+     * @param axis  The axis around which to rotate.
      */
     protected void rotateCamera(float value, Vector3f axis) {
         if (!mouseLookActive) {
@@ -296,6 +287,7 @@ public class CameraController implements AnalogListener, ActionListener {
 
     /**
      * Zoom the camera by the specified value.
+     *
      * @param value The amount to zoom.
      */
     protected void zoomCamera(float value) {
@@ -358,9 +350,6 @@ public class CameraController implements AnalogListener, ActionListener {
      * @return Whether the selection controller or agent controller is currently active.
      */
     private boolean otherControllerIsActive() {
-        return world.getSelectionController().isTransformActive()
-                || world.getSelectionController().isMoveActive()
-                || world.getSelectionController().isRotateActive()
-                || world.getAgentController().isControlActive();
+        return world.getSelectionController().isTransformActive() || world.getSelectionController().isMoveActive() || world.getSelectionController().isRotateActive() || world.getAgentController().isControlActive();
     }
 }

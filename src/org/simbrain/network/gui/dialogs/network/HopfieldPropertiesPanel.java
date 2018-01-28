@@ -18,18 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
@@ -37,51 +25,65 @@ import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the
  * properties of a discrete Hopfield network. Can be used in creation or
  * editing.
  */
-public class HopfieldPropertiesPanel extends JPanel implements
-        GroupPropertiesPanel {
+public class HopfieldPropertiesPanel extends JPanel implements GroupPropertiesPanel {
 
-    /** Parent Network Panel. */
+    /**
+     * Parent Network Panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** Number of neurons field. */
+    /**
+     * Number of neurons field.
+     */
     private JTextField tfNumNeurons = new JTextField();
 
-    /** Network type combo box. */
-    private JComboBox<String> cbUpdateOrder = new JComboBox<String>(
-            HopfieldUpdate.getUpdateFuncNames());
+    /**
+     * Network type combo box.
+     */
+    private JComboBox<String> cbUpdateOrder = new JComboBox<String>(HopfieldUpdate.getUpdateFuncNames());
 
     private JCheckBox priorityChkBx = new JCheckBox();
 
     private JCheckBox shuffleUpdateOrder = new JCheckBox();
 
     {
-        shuffleUpdateOrder.setToolTipText("Randomizes the order of the neuron"
-                + " updates: \nThis random seqence is the same for \neach"
-                + " update.");
+        shuffleUpdateOrder.setToolTipText("Randomizes the order of the neuron" + " updates: \nThis random seqence is the same for \neach" + " update.");
     }
 
-    /** The model subnetwork. */
+    /**
+     * The model subnetwork.
+     */
     private Hopfield hopfield;
 
-    /** Help Button. */
+    /**
+     * Help Button.
+     */
     private JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. */
+    /**
+     * Show Help Action.
+     */
     private ShowHelpAction helpAction;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
      * Constructor for creating Hopfield networks.
      *
-     * @param np
-     *            parent network panel
+     * @param np parent network panel
      */
     public HopfieldPropertiesPanel(final NetworkPanel np) {
         this.networkPanel = np;
@@ -92,10 +94,8 @@ public class HopfieldPropertiesPanel extends JPanel implements
     /**
      * Constructor for editing.
      *
-     * @param np
-     *            parent network panel
-     * @param hop
-     *            network being modified.
+     * @param np  parent network panel
+     * @param hop network being modified.
      */
     public HopfieldPropertiesPanel(final NetworkPanel np, final Hopfield hop) {
         this.networkPanel = np;
@@ -117,8 +117,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
      * @return the update order.
      */
     public HopfieldUpdate getUpdateType() {
-        return HopfieldUpdate.getUpdateFuncFromName((String) cbUpdateOrder
-                .getSelectedItem());
+        return HopfieldUpdate.getUpdateFuncFromName((String) cbUpdateOrder.getSelectedItem());
     }
 
     private void repaintPanel() {
@@ -141,20 +140,20 @@ public class HopfieldPropertiesPanel extends JPanel implements
         add(new JLabel("Update Order"));
         add(cbUpdateOrder);
         switch (getUpdateType()) {
-        case SEQ:
-            add(new JLabel("By Priority"));
-            add(priorityChkBx);
-            add(new JLabel("Shuffle Order"));
-            add(shuffleUpdateOrder);
-            break;
-        case SYNC:
-            // No extra items needed
-            break;
-        case RAND:
-            // No extra items needed
-            break;
-        default:
-            throw new IllegalArgumentException("No such update function.");
+            case SEQ:
+                add(new JLabel("By Priority"));
+                add(priorityChkBx);
+                add(new JLabel("Shuffle Order"));
+                add(shuffleUpdateOrder);
+                break;
+            case SYNC:
+                // No extra items needed
+                break;
+            case RAND:
+                // No extra items needed
+                break;
+            default:
+                throw new IllegalArgumentException("No such update function.");
         }
     }
 
@@ -195,8 +194,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
     public boolean commitChanges() {
         try {
             if (isCreationPanel) {
-                hopfield = new Hopfield(networkPanel.getNetwork(),
-                        Integer.parseInt(tfNumNeurons.getText()));
+                hopfield = new Hopfield(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()));
             }
             hopfield.setUpdateFunc(getUpdateType());
             if (getUpdateType().equals(HopfieldUpdate.SEQ)) {

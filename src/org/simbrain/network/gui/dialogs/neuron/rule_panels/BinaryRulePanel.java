@@ -18,12 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.BoxLayout;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
@@ -31,10 +30,14 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class BinaryRulePanel extends AbstractNeuronRulePanel {
 
-    /** Main tab for neuron preferences. */
+    /**
+     * Main tab for neuron preferences.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private static final BinaryRule prototypeRule = new BinaryRule();
 
     /**
@@ -44,20 +47,12 @@ public class BinaryRulePanel extends AbstractNeuronRulePanel {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JTextField biasField = createTextField(
-                (r) -> ((BinaryRule) r).getBias(),
-                (r, val) -> ((BinaryRule) r).setBias((double) val));
-        JTextField lowerBoundField = createTextField(
-                (r) -> ((BinaryRule) r).getLowerBound(),
-                (r, val) -> ((BinaryRule) r).setLowerBound((double) val));
+        JTextField biasField = createTextField((r) -> ((BinaryRule) r).getBias(), (r, val) -> ((BinaryRule) r).setBias((double) val));
+        JTextField lowerBoundField = createTextField((r) -> ((BinaryRule) r).getLowerBound(), (r, val) -> ((BinaryRule) r).setLowerBound((double) val));
 
-        JTextField upperBoundField = createTextField(
-                (r) -> ((BinaryRule) r).getUpperBound(),
-                (r, val) -> ((BinaryRule) r).setUpperBound((double) val));
+        JTextField upperBoundField = createTextField((r) -> ((BinaryRule) r).getUpperBound(), (r, val) -> ((BinaryRule) r).setUpperBound((double) val));
 
-        JTextField thresholdField = createTextField(
-                (r) -> ((BinaryRule) r).getThreshold(),
-                (r, val) -> ((BinaryRule) r).setThreshold((double) val));
+        JTextField thresholdField = createTextField((r) -> ((BinaryRule) r).getThreshold(), (r, val) -> ((BinaryRule) r).setThreshold((double) val));
 
         mainTab.addItem("Threshold", thresholdField);
         mainTab.addItem("On Value", upperBoundField);

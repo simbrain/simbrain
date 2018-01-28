@@ -1,9 +1,9 @@
 package org.simbrain.world.game;
 
-import java.io.OutputStream;
-
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.game.tictactoe.TicTacToeModel;
+
+import java.io.OutputStream;
 
 /**
  * Component type for board games.
@@ -11,7 +11,9 @@ import org.simbrain.world.game.tictactoe.TicTacToeModel;
  * @author Matt Watson
  */
 public class GameComponent extends WorkspaceComponent {
-    /** The game model. */
+    /**
+     * The game model.
+     */
     private final TicTacToeModel model = new TicTacToeModel();
 
     /**

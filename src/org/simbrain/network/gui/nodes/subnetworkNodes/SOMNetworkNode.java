@@ -18,18 +18,14 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of SOM Network.
@@ -42,7 +38,7 @@ public class SOMNetworkNode extends SubnetworkNode {
      * Create a SOM Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the SOM network
+     * @param group        the SOM network
      */
     public SOMNetworkNode(NetworkPanel networkPanel, SOMNetwork group) {
         super(networkPanel, group);
@@ -51,8 +47,7 @@ public class SOMNetworkNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(),
-                (SOMNetwork) getSubnetwork());
+        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getSubnetwork());
     }
 
     /**

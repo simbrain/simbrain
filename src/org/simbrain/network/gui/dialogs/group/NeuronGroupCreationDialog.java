@@ -28,17 +28,20 @@ import org.simbrain.util.StandardDialog;
 @SuppressWarnings("serial")
 public class NeuronGroupCreationDialog extends StandardDialog {
 
-    /** The panel representing the neuron group to be created. */
+    /**
+     * The panel representing the neuron group to be created.
+     */
     private final NeuronGroupPanel neuronGroupPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      *
-     * @param panel
-     *            the parent network panel
+     * @param panel the parent network panel
      */
     public NeuronGroupCreationDialog(final NetworkPanel panel) {
         this.networkPanel = panel;

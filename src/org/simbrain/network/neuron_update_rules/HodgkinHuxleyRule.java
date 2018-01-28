@@ -26,41 +26,58 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Hodgkin-Huxley Neuron.
- *
+ * <p>
  * Adapted from software written by Anthony Fodor, with help from Jonathan
  * Vickrey.
  */
-public class HodgkinHuxleyRule extends NeuronUpdateRule
-        implements NoisyUpdateRule {
+public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRule {
 
-    /** Sodium Channels */
+    /**
+     * Sodium Channels
+     */
     private float perNaChannels = 100f;
 
-    /** Potassium */
+    /**
+     * Potassium
+     */
     private float perKChannels = 100f;
 
-    /** Resting Membrane Potential */
+    /**
+     * Resting Membrane Potential
+     */
     private double resting_v = 65;
 
     /** */
     private double dv;
 
-    /** Membrane Capacitance */
+    /**
+     * Membrane Capacitance
+     */
     private double cm;
 
-    /** Constant leak permeabilities */
+    /**
+     * Constant leak permeabilities
+     */
     private double gk, gna, gl;
 
-    /** voltage-dependent gating parameters */
+    /**
+     * voltage-dependent gating parameters
+     */
     private double n, m, h;
 
-    /** corresponding deltas */
+    /**
+     * corresponding deltas
+     */
     private double dn, dm, dh;
 
-    /** // rate constants */
+    /**
+     * // rate constants
+     */
     private double an, bn, am, bm, ah, bh;
 
-    /** Ek-Er, Ena - Er, Eleak - Er */
+    /**
+     * Ek-Er, Ena - Er, Eleak - Er
+     */
     private double vk, vna, vl;
 
     /** */
@@ -69,10 +86,14 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
     /** */
     private double m3h;
 
-    /** Sodium current */
+    /**
+     * Sodium current
+     */
     private double na_current;
 
-    /** Potassium current */
+    /**
+     * Potassium current
+     */
     private double k_current;
 
     /** */
@@ -84,10 +105,14 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
     /** */
     float vClampValue = convertV(0F);
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
     @Override
@@ -112,8 +137,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
         na_current = gna * m3h * (v - vna);
         k_current = gk * n4 * (v - vk);
 
-        dv = -1 * neuron.getNetwork().getTimeStep()
-                * (k_current + na_current + gl * (v - vl)) / cm;
+        dv = -1 * neuron.getNetwork().getTimeStep() * (k_current + na_current + gl * (v - vl)) / cm;
 
         neuron.setBuffer(-1 * (v + dv + resting_v));
         h += dh;
@@ -126,9 +150,9 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
         // getV() converts the model's v to present day convention
 
     }
-    
+
     // Initializer quickly hacked from old init. Zoë this is in your hands to fix! :)
-     {
+    {
         cm = 1.0;
         double v = -70; // Arbitrary starting voltage
         double dv = .001; // Arbitrary starting dv.  Not sure how to set.
@@ -252,7 +276,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
     /**
      * Converts a voltage from the modern convention to the convention used by
      * the program.
-     * 
+     *
      * @param voltage
      * @return
      */

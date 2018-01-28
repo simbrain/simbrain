@@ -18,14 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
+import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Quit the application.
@@ -34,18 +32,19 @@ public final class QuitWorkspaceAction extends DesktopAction {
 
     /**
      * Create a clear workspace action with the specified workspace.
+     *
      * @param desktop
      */
     public QuitWorkspaceAction(SimbrainDesktop desktop) {
         super("Quit", desktop);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         desktop.quit(false);

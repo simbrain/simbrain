@@ -18,16 +18,15 @@
  */
 package org.simbrain.network.update_actions;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkUpdateAction;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 
 /**
  * Update using a custom action saved as a beanshell script.
@@ -36,10 +35,14 @@ import bsh.Interpreter;
  */
 public class CustomUpdate implements NetworkUpdateAction {
 
-    /** Reference to parent network. */
+    /**
+     * Reference to parent network.
+     */
     private Network network;
 
-    /** The custom update script in persistable string form. */
+    /**
+     * The custom update script in persistable string form.
+     */
     private String scriptString;
 
     /**
@@ -48,14 +51,16 @@ public class CustomUpdate implements NetworkUpdateAction {
      */
     private Interpreter interpreter = new Interpreter();
 
-    /** Custom update action. */
+    /**
+     * Custom update action.
+     */
     private NetworkUpdateAction theAction;
 
     /**
      * Create a new custom update action.
      *
      * @param network network to update
-     * @param script script to use in invoking the update action
+     * @param script  script to use in invoking the update action
      */
     public CustomUpdate(final Network network, final String script) {
         this.network = network;
@@ -68,7 +73,7 @@ public class CustomUpdate implements NetworkUpdateAction {
      * script.
      *
      * @param network network to update
-     * @param file file containing custom code
+     * @param file    file containing custom code
      */
     public CustomUpdate(final Network network, final File file) {
         this.network = network;

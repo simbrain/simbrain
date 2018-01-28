@@ -18,60 +18,55 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.BorderLayout;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingListener;
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingListener;
-import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
-
 /**
  * Displays a list of the current couplings in the network.
- *
  */
 public class CouplingListPanel extends JPanel implements CouplingListener {
 
-    /** List of network couplings. */
+    /**
+     * List of network couplings.
+     */
     private JList couplings = new JList();
 
-    /** Instance of parent frame. */
+    /**
+     * Instance of parent frame.
+     */
     private JFrame couplingFrame = new JFrame();
 
-    /** Simbrain desktop reference. */
+    /**
+     * Simbrain desktop reference.
+     */
     private SimbrainDesktop desktop;
 
-    /** List of couplings. */
+    /**
+     * List of couplings.
+     */
     private List<Coupling<?>> couplingList = new ArrayList<Coupling<?>>();
 
-    /** Action which deletes current couplings. */
+    /**
+     * Action which deletes current couplings.
+     */
     Action deleteCouplingsAction = new AbstractAction() {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
             putValue(NAME, "Delete couplings");
             putValue(SHORT_DESCRIPTION, "Delete selected couplings");
-            CouplingListPanel.this.getInputMap(
-                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                    KeyStroke.getKeyStroke("BACK_SPACE"), this);
-            CouplingListPanel.this.getInputMap(
-                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                    KeyStroke.getKeyStroke("DELETE"), this);
+            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
+            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
             CouplingListPanel.this.getActionMap().put(this, this);
         }
 
@@ -87,7 +82,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * Creates a new coupling list panel using the applicable desktop and
      * coupling lists.
      *
-     * @param desktop Reference to simbrain desktop
+     * @param desktop      Reference to simbrain desktop
      * @param couplingList list of couplings to be shown in window
      */
     public CouplingListPanel(SimbrainDesktop desktop, List<Coupling<?>> couplingList) {
@@ -166,11 +161,8 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * Custom attribute renderer for JList.
      */
     private class CouplingCellRenderer extends DefaultListCellRenderer {
-        public java.awt.Component getListCellRendererComponent(
-                final JList list, final Object object, final int index,
-                final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(
-                    list, object, index, isSelected, cellHasFocus);
+        public java.awt.Component getListCellRendererComponent(final JList list, final Object object, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Coupling<?> coupling = (Coupling<?>) object;
 
             // Set text color based on data type

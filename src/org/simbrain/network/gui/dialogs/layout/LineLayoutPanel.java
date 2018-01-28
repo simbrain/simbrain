@@ -13,27 +13,29 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+
+import javax.swing.*;
 
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
 public class LineLayoutPanel extends AbstractLayoutPanel {
 
-    /** Spacing field. */
+    /**
+     * Spacing field.
+     */
     private JTextField tfSpacing = new JTextField();
 
-    /** Layout style selected. */
-    private JComboBox<LineOrientation> cbLayouts = new JComboBox<LineOrientation>(
-            new LineOrientation[] { LineOrientation.HORIZONTAL,
-                    LineOrientation.VERTICAL });
+    /**
+     * Layout style selected.
+     */
+    private JComboBox<LineOrientation> cbLayouts = new JComboBox<LineOrientation>(new LineOrientation[]{LineOrientation.HORIZONTAL, LineOrientation.VERTICAL});
 
     /**
      * Default constructor.
+     *
      * @param layout
      */
     public LineLayoutPanel(LineLayout layout) {
@@ -48,10 +50,8 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
      */
     @Override
     public void commitChanges() {
-        ((LineLayout) layout).setOrientation((LineOrientation) cbLayouts
-                .getSelectedItem());
-        ((LineLayout) layout)
-                .setSpacing(Double.parseDouble(tfSpacing.getText()));
+        ((LineLayout) layout).setOrientation((LineOrientation) cbLayouts.getSelectedItem());
+        ((LineLayout) layout).setSpacing(Double.parseDouble(tfSpacing.getText()));
     }
 
     /**

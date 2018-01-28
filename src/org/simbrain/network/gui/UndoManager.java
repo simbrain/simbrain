@@ -31,7 +31,9 @@ public class UndoManager {
     // Todo: implement a cap on max-undo.
     // Todo: prevent or constraint very large memory undaoble actions?
 
-    /** All actions that can be undone are pushed to this stack. */
+    /**
+     * All actions that can be undone are pushed to this stack.
+     */
     private final Stack<UndoableAction> undoStack = new Stack<UndoableAction>();
 
     /**
@@ -95,10 +97,14 @@ public class UndoManager {
      */
     public interface UndoableAction {
 
-        /** Undo this action. */
+        /**
+         * Undo this action.
+         */
         void undo();
 
-        /** Redo this action. */
+        /**
+         * Redo this action.
+         */
         void redo();
 
     }

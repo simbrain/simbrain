@@ -24,14 +24,16 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 /**
  * <b>SigmoidalRulePanel</b>. A rule panel for editing neurons which use a
  * discrete sigmoid squashing function as their update rule.
- * 
+ *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
 public class DiscreteSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private static SigmoidalRule prototypeRule = new SigmoidalRule();
 
     /**

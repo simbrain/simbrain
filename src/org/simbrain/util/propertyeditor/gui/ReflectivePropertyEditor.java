@@ -18,36 +18,22 @@
  */
 package org.simbrain.util.propertyeditor.gui;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor.DisplayOrder;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
 
 /**
  * ReflectivePropertyEditor.
@@ -61,7 +47,9 @@ public class ReflectivePropertyEditor extends JPanel {
     // - Better documenation / readme
     // - Deal with redundant get and is case (then two fields are added)
 
-    /** Getting rid of warning. */
+    /**
+     * Getting rid of warning.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -69,19 +57,29 @@ public class ReflectivePropertyEditor extends JPanel {
      */
     private Object toEdit;
 
-    /** Main item panel. */
+    /**
+     * Main item panel.
+     */
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
 
-    /** List of methods that can be edited. Used when committing changes. */
+    /**
+     * List of methods that can be edited. Used when committing changes.
+     */
     private List<Method> editableMethods = new ArrayList<>();
 
-    /** Map from property names for Color objects to selected selectedColor. */
+    /**
+     * Map from property names for Color objects to selected selectedColor.
+     */
     private HashMap<String, Color> selectedColor = new HashMap<>();
 
-    /** List of methods to exclude from the dialog, listed by name. */
-    private String[] excludeList = new String[] {};
+    /**
+     * List of methods to exclude from the dialog, listed by name.
+     */
+    private String[] excludeList = new String[]{};
 
-    /** If true, use superclass methods. */
+    /**
+     * If true, use superclass methods.
+     */
     private boolean useSuperclass = true;
 
     /**
@@ -142,13 +140,16 @@ public class ReflectivePropertyEditor extends JPanel {
         };
     }
 
-    /** Return the object to edit. */
+    /**
+     * Return the object to edit.
+     */
     public Object getObjectToEdit() {
         return toEdit;
     }
 
     /**
      * Set object to edit. For use with no argument constructor.
+     *
      * @param value The object to edit
      */
     public void setObjectToEdit(Object value) {
@@ -183,11 +184,11 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Set up the main panel.
-     *
+     * <p>
      * The items in the underlying java class can be ordered using an annotation
      *
      * @DisplayOrder(val = 1) For an example see
-     *                   org.simbrain.util.projection.DataColoringManager
+     * org.simbrain.util.projection.DataColoringManager
      */
     private void initPanel() {
 
@@ -220,8 +221,7 @@ public class ReflectivePropertyEditor extends JPanel {
             boolean skipMethod = !useSuperclass & inSuperClass;
 
             if (!skipMethod && !inExcludeList(method)) {
-                boolean isGetter = (method.getName().startsWith("get") || method
-                        .getName().startsWith("is"));
+                boolean isGetter = (method.getName().startsWith("get") || method.getName().startsWith("is"));
                 if (isGetter) {
                     if (hasMatchingSetter(method)) {
 
@@ -252,9 +252,7 @@ public class ReflectivePropertyEditor extends JPanel {
                             colorButton.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent arg0) {
                                     // TODO: Alignment is wrong
-                                    Color theColor = JColorChooser.showDialog(
-                                            itemPanel, "Choose Color",
-                                            selectedColor.get(propertyName));
+                                    Color theColor = JColorChooser.showDialog(itemPanel, "Choose Color", selectedColor.get(propertyName));
                                     colorIndicator.setBackground(theColor);
                                     selectedColor.remove(propertyName);
                                     selectedColor.put(propertyName, theColor);
@@ -265,20 +263,16 @@ public class ReflectivePropertyEditor extends JPanel {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
                             itemPanel.addItem(formattedPropertyName, theTextField);
-                        }
-
-                        else if (method.getReturnType() == double[].class) {
+                        } else if (method.getReturnType() == double[].class) {
                             JTable table = new JTable();
                             table.setGridColor(Color.gray);
                             double[] value = (double[]) getGetterValue(method);
-                            DefaultTableModel model = new DefaultTableModel(
-                                    value.length, 1);
+                            DefaultTableModel model = new DefaultTableModel(value.length, 1);
                             for (int i = 0; i < value.length; i++) {
                                 model.setValueAt(value[i], i, 0);
                             }
                             table.setModel(model);
-                            table.setBorder(BorderFactory
-                                    .createLineBorder(Color.black));
+                            table.setBorder(BorderFactory.createLineBorder(Color.black));
                             componentMap.put(propertyName, table);
                             itemPanel.addItem(formattedPropertyName, table);
                             // JList jList = new JList();
@@ -312,28 +306,23 @@ public class ReflectivePropertyEditor extends JPanel {
                         else if (method.getReturnType() == Integer.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         } else if (method.getReturnType() == Double.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         } else if (method.getReturnType() == Float.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         } else if (method.getReturnType() == Long.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         } else if (method.getReturnType() == Short.class) {
                             JTextField theTextField = getInitializedTextField(method);
                             componentMap.put(propertyName, theTextField);
-                            itemPanel.addItem(formattedPropertyName,
-                                    theTextField);
+                            itemPanel.addItem(formattedPropertyName, theTextField);
                         }
 
                         // Primitive number types
@@ -394,8 +383,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
             // Combo Box
             if (argumentType == ComboBoxWrapper.class) {
-                final Object selectedObject = ((JComboBox) componentMap
-                        .get(propertyName)).getSelectedItem();
+                final Object selectedObject = ((JComboBox) componentMap.get(propertyName)).getSelectedItem();
                 ComboBoxWrapper boxedObject = new ComboBoxWrapper() {
                     public Object getCurrentObject() {
                         return selectedObject;
@@ -414,8 +402,7 @@ public class ReflectivePropertyEditor extends JPanel {
                 double[] data = new double[table.getRowCount()];
                 for (int i = 0; i < table.getRowCount(); i++) {
                     if (table.getValueAt(i, 0).getClass() == String.class) {
-                        data[i] = Double.parseDouble((String) table.getValueAt(
-                                i, 0));
+                        data[i] = Double.parseDouble((String) table.getValueAt(i, 0));
                     } else {
                         data[i] = (Double) table.getValueAt(i, 0);
                     }
@@ -432,65 +419,52 @@ public class ReflectivePropertyEditor extends JPanel {
 
             // Booleans
             else if (argumentType == Boolean.class) {
-                Boolean newVal = ((JCheckBox) componentMap.get(propertyName))
-                        .isSelected();
+                Boolean newVal = ((JCheckBox) componentMap.get(propertyName)).isSelected();
                 setSetterValue(m, argumentType, newVal);
             } else if (argumentType == boolean.class) {
-                boolean newVal = ((JCheckBox) componentMap.get(propertyName))
-                        .isSelected();
+                boolean newVal = ((JCheckBox) componentMap.get(propertyName)).isSelected();
                 setSetterValue(m, Boolean.class, new Boolean(newVal));
             }
 
             // Strings
             else if (argumentType == String.class) {
-                String newVal = ((JTextField) componentMap.get(propertyName))
-                        .getText();
+                String newVal = ((JTextField) componentMap.get(propertyName)).getText();
                 setSetterValue(m, argumentType, newVal);
             }
 
             // Object numbers (TODO)
             else if (argumentType == Integer.class) {
-                Integer newVal = Integer.parseInt(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Integer newVal = Integer.parseInt(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, argumentType, newVal);
             } else if (argumentType == Double.class) {
-                Double newVal = Double.parseDouble(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Double newVal = Double.parseDouble(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, argumentType, newVal);
             } else if (argumentType == Float.class) {
-                Float newVal = Float.parseFloat(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Float newVal = Float.parseFloat(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, argumentType, newVal);
             } else if (argumentType == Long.class) {
-                Long newVal = Long.parseLong(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Long newVal = Long.parseLong(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, argumentType, newVal);
             } else if (argumentType == Short.class) {
-                Short newVal = Short.parseShort(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Short newVal = Short.parseShort(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, argumentType, newVal);
             }
 
             // Primitive Numbers
             else if (argumentType == int.class) {
-                Integer newVal = Integer.parseInt(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Integer newVal = Integer.parseInt(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, Integer.class, new Integer(newVal));
             } else if (argumentType == double.class) {
-                Double newVal = Double.parseDouble(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Double newVal = Double.parseDouble(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, Double.class, new Double(newVal));
             } else if (argumentType == float.class) {
-                Float newVal = Float.parseFloat(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Float newVal = Float.parseFloat(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, Float.class, new Float(newVal));
             } else if (argumentType == long.class) {
-                Long newVal = Long.parseLong(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Long newVal = Long.parseLong(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, Long.class, new Long(newVal));
             } else if (argumentType == short.class) {
-                Short newVal = Short.parseShort(((JTextField) componentMap
-                        .get(propertyName)).getText());
+                Short newVal = Short.parseShort(((JTextField) componentMap.get(propertyName)).getText());
                 setSetterValue(m, Short.class, new Short(newVal));
             }
         }
@@ -506,8 +480,7 @@ public class ReflectivePropertyEditor extends JPanel {
      * @return the property name
      */
     private String getPropertyName(Method method) {
-        return method.getName().startsWith("is") ? method.getName()
-                .substring(2) : method.getName().substring(3);
+        return method.getName().startsWith("is") ? method.getName().substring(2) : method.getName().substring(3);
     }
 
     /**
@@ -552,9 +525,7 @@ public class ReflectivePropertyEditor extends JPanel {
                 // Assume just one parameter for a setter
                 // System.out.println(possibleSetter.getParameterTypes()[0].getName()
                 // + " =? " + getter.getReturnType().getName());
-                if (possibleSetter.getParameterTypes()[0].getName() == getter
-                        .getReturnType().getName()
-                        && (possibleSetter.getParameterTypes().length == 1)) {
+                if (possibleSetter.getParameterTypes()[0].getName() == getter.getReturnType().getName() && (possibleSetter.getParameterTypes().length == 1)) {
                     // At this point set the list of setter methods for use in
                     // commit
                     editableMethods.add(possibleSetter);
@@ -568,7 +539,7 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Format a string by inserting spaces and capitalizing. This makes the item
      * labels more appealing.
-     *
+     * <p>
      * Example: convert "heightInPixels" to "Height In Pixels."
      *
      * @param toFormat the String to format, retrieved from a getter or setter.
@@ -594,8 +565,7 @@ public class ReflectivePropertyEditor extends JPanel {
      * @param theMethod
      * @param theVal
      */
-    private void setSetterValue(final Method theMethod, Class<?> type,
-            Object theVal) {
+    private void setSetterValue(final Method theMethod, Class<?> type, Object theVal) {
         try {
             theMethod.invoke(toEdit, type.cast(theVal));
         } catch (IllegalArgumentException e) {
@@ -623,7 +593,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Set an exclude list.
-     *
+     * <p>
      * TODO: Brittle. Only works when the argument-less constructor + setObjectToEdit
      * is used. Make it so that if the panel is already initialized when this is
      * called, relevant items are removed.

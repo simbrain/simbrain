@@ -13,18 +13,6 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Window;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
@@ -32,6 +20,13 @@ import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
 import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A data table used to represent input or target data for a group of neurons in
@@ -41,50 +36,60 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 public class DataPanel extends JPanel implements EditablePanel {
 
-    /** Scrollpane. */
+    /**
+     * Scrollpane.
+     */
     protected SimbrainJTableScrollPanel scroller;
 
-    /** JTable contained in scroller. */
+    /**
+     * JTable contained in scroller.
+     */
     protected SimbrainJTable table;
 
-    /** Default number of rows to open new table with. */
+    /**
+     * Default number of rows to open new table with.
+     */
     private static final int DEFAULT_NUM_ROWS = 5;
 
-    /** Parent frame. */
+    /**
+     * Parent frame.
+     */
     private Window parentFrame;
 
-    /** The external object that has the data being edited. */
+    /**
+     * The external object that has the data being edited.
+     */
     protected NumericMatrix dataHolder;
 
-    /** The neurons that this data will be sent as input to. */
+    /**
+     * The neurons that this data will be sent as input to.
+     */
     protected final List<Neuron> inputNeurons;
 
-    /** The toolbar panel. */
+    /**
+     * The toolbar panel.
+     */
     protected JPanel toolbars;
 
     /**
      * Panel which represents input or target data. Can be created without data
      * initially, in which case a default dataset is created.
      *
-     * @param neurons neurons corresponding to columns
-     * @param dataHolder the numerical data
+     * @param neurons           neurons corresponding to columns
+     * @param dataHolder        the numerical data
      * @param numVisibleColumns how many columns to try to make visible
-     * @param name name for panel
+     * @param name              name for panel
      */
-    public DataPanel(final List<Neuron> neurons,
-        final NumericMatrix dataHolder, final int numVisibleColumns,
-        final String name) {
+    public DataPanel(final List<Neuron> neurons, final NumericMatrix dataHolder, final int numVisibleColumns, final String name) {
 
         this.dataHolder = dataHolder;
         this.inputNeurons = neurons;
 
         // If no data exists, create it!
         if (dataHolder.getData() == null) {
-            table = SimbrainJTable.createTable(new NumericTable(
-                DEFAULT_NUM_ROWS, neurons.size()));
+            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, neurons.size()));
         } else {
-            table = SimbrainJTable.createTable(new NumericTable(dataHolder
-                .getData()));
+            table = SimbrainJTable.createTable(new NumericTable(dataHolder.getData()));
         }
 
         // Set up column headings
@@ -112,8 +117,7 @@ public class DataPanel extends JPanel implements EditablePanel {
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
         fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
-        fileToolBar.add(TableActionManager
-            .getSaveCSVAction((NumericTable) table.getData()));
+        fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
         toolbars.add(fileToolBar);
 
         // Edit tools
@@ -146,8 +150,7 @@ public class DataPanel extends JPanel implements EditablePanel {
     public boolean commitChanges() {
         //System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
-            dataHolder
-                .setData(((NumericTable) table.getData()).asDoubleArray());
+            dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
             // Set has changed to false, so that the data only re-committed if
             // the data have changed.
             table.setHasChangedSinceLastSave(false);
@@ -161,12 +164,9 @@ public class DataPanel extends JPanel implements EditablePanel {
      */
     private void resizePanel() {
         if (parentFrame != null) {
-            int additionalParentHeight =
-                (parentFrame.getBounds().height - scroller
-                    .getHeight());
+            int additionalParentHeight = (parentFrame.getBounds().height - scroller.getHeight());
             scroller.resize();
-            int newHeight = scroller.getPreferredSize().height
-                + additionalParentHeight;
+            int newHeight = scroller.getPreferredSize().height + additionalParentHeight;
             // Reset height of parent frame
             if (newHeight > 300) {
                 //                parentFrame.setPreferredSize(new Dimension(parentFrame

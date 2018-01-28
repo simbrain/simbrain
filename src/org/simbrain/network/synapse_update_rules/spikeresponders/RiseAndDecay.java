@@ -25,13 +25,19 @@ import org.simbrain.network.core.Synapse;
  */
 public class RiseAndDecay extends SpikeResponder {
 
-    /** Maximum response value. */
+    /**
+     * Maximum response value.
+     */
     private double maximumResponse = 1;
 
-    /** The time constant of decay and recovery (ms). */
+    /**
+     * The time constant of decay and recovery (ms).
+     */
     private double timeConstant = 3;
 
-    /** Recovery value. */
+    /**
+     * Recovery value.
+     */
     private double recovery;
 
     /**
@@ -55,8 +61,7 @@ public class RiseAndDecay extends SpikeResponder {
         }
 
         recovery += ((timeStep / timeConstant) * (-recovery));
-        value += ((timeStep / timeConstant) * ((Math.E * maximumResponse
-                * recovery * (1 - value)) - value));
+        value += ((timeStep / timeConstant) * ((Math.E * maximumResponse * recovery * (1 - value)) - value));
 
         s.setPsr(value * s.getStrength());
 

@@ -26,26 +26,30 @@ import org.simbrain.util.UserParameter;
  * <b>HebbianThresholdSynapse</b>.
  */
 public class HebbianThresholdRule extends SynapseUpdateRule {
-	
-	// TODO: check description
-    /** Learning rate. */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb threshold rule", 
-            defaultValue = ".1", order = 1)
+
+    // TODO: check description
+    /**
+     * Learning rate.
+     */
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb threshold rule", defaultValue = ".1", order = 1)
     private double learningRate;
-    
-    /** Output threshold. */
-    @UserParameter(label = "Threshold", description = "Output threshold for Hebb threshold rule", 
-            defaultValue = ".5", order = 1)
+
+    /**
+     * Output threshold.
+     */
+    @UserParameter(label = "Threshold", description = "Output threshold for Hebb threshold rule", defaultValue = ".5", order = 1)
     private double outputThreshold = .5;
 
-    /** Output threshold momentum. */
-    @UserParameter(label = "Threshold Momentum", description = "Output threshold momentum for Hebb threshold rule", 
-            defaultValue = ".1", order = 1)
+    /**
+     * Output threshold momentum.
+     */
+    @UserParameter(label = "Threshold Momentum", description = "Output threshold momentum for Hebb threshold rule", defaultValue = ".1", order = 1)
     private double outputThresholdMomentum = .1;
 
-    /** Use sliding output threshold. */
-    @UserParameter(label = "Sliding Threshold", description = "Use sliding output threshold for Hebb threshold rule", 
-            defaultValue = "false", order = 1)
+    /**
+     * Use sliding output threshold.
+     */
+    @UserParameter(label = "Sliding Threshold", description = "Use sliding output threshold for Hebb threshold rule", defaultValue = "false", order = 1)
     private boolean useSlidingOutputThreshold = false;
 
     @Override
@@ -75,8 +79,7 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
         if (useSlidingOutputThreshold) {
             outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold));
         }
-        double strength = synapse.getStrength()
-                + (learningRate * input * output * (output - outputThreshold));
+        double strength = synapse.getStrength() + (learningRate * input * output * (output - outputThreshold));
         synapse.setStrength(synapse.clip(strength));
     }
 
@@ -118,8 +121,7 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
     /**
      * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
      */
-    public void setUseSlidingOutputThreshold(
-            final boolean useSlidingOutputThreshold) {
+    public void setUseSlidingOutputThreshold(final boolean useSlidingOutputThreshold) {
         this.useSlidingOutputThreshold = useSlidingOutputThreshold;
     }
 

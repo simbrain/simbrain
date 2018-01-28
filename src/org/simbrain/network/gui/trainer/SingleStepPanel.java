@@ -13,15 +13,11 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import org.simbrain.network.trainers.Trainer;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.simbrain.network.trainers.Trainer;
 
 /**
  * Component for training a network using current data only.
@@ -32,6 +28,7 @@ public class SingleStepPanel extends JPanel {
 
     /**
      * Construct panel.
+     *
      * @param trainer
      */
     public SingleStepPanel(final Trainer trainer) {

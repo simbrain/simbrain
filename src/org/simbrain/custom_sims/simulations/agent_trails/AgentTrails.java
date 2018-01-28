@@ -1,12 +1,5 @@
 package org.simbrain.custom_sims.simulations.agent_trails;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -19,6 +12,13 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Todo Stop button.
@@ -105,16 +105,13 @@ public class AgentTrails extends RegisteredSimulation {
         world.getWorld().setObjectsBlockMovement(false);
         mouse = world.addAgent(120, 245, "Mouse");
         mouse.setHeading(90);
-        
+
         // Set up world
-        cheese = world.addEntity(120, 180, "Swiss.gif",
-                new double[] { 1, 0, 0 });
+        cheese = world.addEntity(120, 180, "Swiss.gif", new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(65);
-        flower = world.addEntity(200, 100, "Pansy.gif",
-                new double[] { 0, 1, 0 });
+        flower = world.addEntity(200, 100, "Pansy.gif", new double[]{0, 1, 0});
         cheese.getSmellSource().setDispersion(65);
-        fish = world.addEntity(50, 100, "Fish.gif", 
-                new double[] { 0, 0, 1 });
+        fish = world.addEntity(50, 100, "Fish.gif", new double[]{0, 0, 1});
         cheese.getSmellSource().setDispersion(65);
 
         // Couple network to agent
@@ -123,23 +120,18 @@ public class AgentTrails extends RegisteredSimulation {
         sim.couple(leftNeuron, mouse.getEffector("Go-right"));
 
         // Couple agent to network
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
-                cheeseNeuron);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1,
-                flowerNeuron);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2,
-                fishNeuron);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0, cheeseNeuron);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1, flowerNeuron);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2, fishNeuron);
 
         setUpControlPanel();
 
         // Set up Plot
         // Create a time series plot
-        plot = sim.addProjectionPlot(194, 312, 441, 308,
-                "Sensory states + Predictions");
+        plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states + Predictions");
 
         plot.getProjectionModel().init(3);
-        sim.couple(net.getNetworkComponent(), sensoryNet,
-                plot.getProjectionPlotComponent());
+        sim.couple(net.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
         //TODO:Below gets reset as soon as the system runs
         plot.getProjectionModel().getProjector().setTolerance(.01);
 

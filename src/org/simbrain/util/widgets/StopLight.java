@@ -18,24 +18,20 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-
-import org.simbrain.resource.ResourceManager;
 
 /**
  * A custom status light component for use in GUI dialogs. StopLight couples to
  * some other component and can be used to indicate to the user whether or
  * whatever that component represents is ready. Can also be used for internal
  * checks.
- *
+ * <p>
  * TODO: implement null and/or yellow warning status. Change name to status
  * light and rename greenlight?
  *
@@ -49,16 +45,24 @@ public class StopLight extends JPanel implements ActionListener {
      */
     private ArrayList<Image> imgs = new ArrayList<Image>();
 
-    /** Default greenlight image. */
+    /**
+     * Default greenlight image.
+     */
     private ImageIcon go = ResourceManager.getImageIcon("GreenCheck.png");
 
-    /** Default redlight image. */
+    /**
+     * Default redlight image.
+     */
     private ImageIcon stop = ResourceManager.getImageIcon("RedX.png");
 
-    /** The current image. */
+    /**
+     * The current image.
+     */
     private Image img;
 
-    /** A boolean tied to the current status. */
+    /**
+     * A boolean tied to the current status.
+     */
     private boolean greenlight;
 
     /**
@@ -84,7 +88,7 @@ public class StopLight extends JPanel implements ActionListener {
      * the starting status.
      *
      * @param greenlight boolean representing whether or not the initial status
-     *            of the stoplight is green.
+     *                   of the stoplight is green.
      */
     public StopLight(boolean greenlight) {
         this.greenlight = greenlight;
@@ -135,7 +139,7 @@ public class StopLight extends JPanel implements ActionListener {
      * Set the current state of the stoplight.
      *
      * @param greenlight the desired state of the stop light: green -&#62; true
-     *            false -&#62; red
+     *                   false -&#62; red
      */
     public void setState(boolean greenlight) {
         this.greenlight = greenlight;

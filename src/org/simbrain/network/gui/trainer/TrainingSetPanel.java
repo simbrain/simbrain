@@ -13,20 +13,14 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Window;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 /**
  * Display input data and target data.
@@ -35,31 +29,32 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 public class TrainingSetPanel extends JPanel implements EditablePanel {
 
-    /** Representation of input data. */
+    /**
+     * Representation of input data.
+     */
     private DataPanel inputPanel;
 
-    /** Representation of target data. */
+    /**
+     * Representation of target data.
+     */
     private DataPanel targetPanel;
 
-    /** Parent frame. */
+    /**
+     * Parent frame.
+     */
     private Window parentFrame;
 
     /**
      * Construct a new pane for displaying training sets.
      *
-     * @param trainable the parent trainable object.
+     * @param trainable                 the parent trainable object.
      * @param numVisibleColumnsPerTable number of columns to make visible in the
-     *            input and target data tables.
+     *                                  input and target data tables.
      */
-    public TrainingSetPanel(final Trainable trainable,
-        final int numVisibleColumnsPerTable) {
+    public TrainingSetPanel(final Trainable trainable, final int numVisibleColumnsPerTable) {
 
-        inputPanel = new DataPanel(trainable.getInputNeurons(), trainable
-            .getTrainingSet().getInputDataMatrix(),
-            numVisibleColumnsPerTable, "Input data");
-        targetPanel = new DataPanel(trainable.getOutputNeurons(), trainable
-            .getTrainingSet().getTargetDataMatrix(),
-            numVisibleColumnsPerTable, "Target data");
+        inputPanel = new DataPanel(trainable.getInputNeurons(), trainable.getTrainingSet().getInputDataMatrix(), numVisibleColumnsPerTable, "Input data");
+        targetPanel = new DataPanel(trainable.getOutputNeurons(), trainable.getTrainingSet().getTargetDataMatrix(), numVisibleColumnsPerTable, "Target data");
         init();
 
     }
@@ -68,20 +63,16 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
      * For data that is not embedded in traineable, so that all the data must be
      * specified.
      *
-     * @param inputNeurons the input neurons
-     * @param inputData the input data
-     * @param targetNeurons the output neurons
-     * @param targetData target data
+     * @param inputNeurons              the input neurons
+     * @param inputData                 the input data
+     * @param targetNeurons             the output neurons
+     * @param targetData                target data
      * @param numVisibleColumnsPerTable number of columns to make visible in the
-     *            input and target data tables.
+     *                                  input and target data tables.
      */
-    public TrainingSetPanel(List<Neuron> inputNeurons, NumericMatrix inputData,
-        List<Neuron> targetNeurons, NumericMatrix targetData,
-        int numVisibleColumnsPerTable) {
-        inputPanel = new DataPanel(inputNeurons, inputData,
-            numVisibleColumnsPerTable, "Input data");
-        targetPanel = new DataPanel(targetNeurons, targetData,
-            numVisibleColumnsPerTable, "Target data");
+    public TrainingSetPanel(List<Neuron> inputNeurons, NumericMatrix inputData, List<Neuron> targetNeurons, NumericMatrix targetData, int numVisibleColumnsPerTable) {
+        inputPanel = new DataPanel(inputNeurons, inputData, numVisibleColumnsPerTable, "Input data");
+        targetPanel = new DataPanel(targetNeurons, targetData, numVisibleColumnsPerTable, "Target data");
 
         init();
     }

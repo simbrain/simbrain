@@ -20,17 +20,18 @@ package org.simbrain.workspace.updater;
 
 /**
  * Convenience class for cleaner use of update actions.
- * 
+ * <p>
  * TODO: Do something similar for network actions
  *
  * @author Jeff Yoshimi
- *
  */
 public class UpdateActionAdapter implements UpdateAction {
 
-    /** A description string to be used in both short and long descriptions. */
+    /**
+     * A description string to be used in both short and long descriptions.
+     */
     private String description;
-    
+
     /**
      * Construct the action with a description string.
      *

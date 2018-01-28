@@ -18,13 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
@@ -32,41 +25,64 @@ import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.EditablePanel;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * winner take all network.
  */
-public class WTAPropertiesPanel extends JPanel implements
-    GroupPropertiesPanel, EditablePanel {
+public class WTAPropertiesPanel extends JPanel implements GroupPropertiesPanel, EditablePanel {
 
-    /** Default number of neurons. */
+    /**
+     * Default number of neurons.
+     */
     private static final int DEFAULT_NUM_NEURONS = 5;
 
-    /** Parent Network Panel. */
+    /**
+     * Parent Network Panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** Number of neurons field. */
+    /**
+     * Number of neurons field.
+     */
     private JTextField tfNumNeurons = new JTextField();
 
-    /** Main Panel. */
+    /**
+     * Main Panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** Winner value field. */
+    /**
+     * Winner value field.
+     */
     private JTextField winnerValue = new JTextField();
 
-    /** Loser value field. */
+    /**
+     * Loser value field.
+     */
     private JTextField loserValue = new JTextField();
 
-    /** Checkbox for using random method. */
+    /**
+     * Checkbox for using random method.
+     */
     private JCheckBox useRandomBox = new JCheckBox();
 
-    /** Probability of using random field. */
+    /**
+     * Probability of using random field.
+     */
     private JTextField randomProb = new JTextField();
 
-    /** The model subnetwork. */
+    /**
+     * The model subnetwork.
+     */
     private WinnerTakeAll wta;
 
-    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel.  Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -84,7 +100,7 @@ public class WTAPropertiesPanel extends JPanel implements
     /**
      * Default constructor.
      *
-     * @param np parent network panel
+     * @param np  parent network panel
      * @param wta WinnerTakeAll network being modified.
      */
     public WTAPropertiesPanel(final NetworkPanel np, final WinnerTakeAll wta) {
@@ -103,10 +119,8 @@ public class WTAPropertiesPanel extends JPanel implements
 
         mainPanel.addItem("Winner Value", winnerValue);
         mainPanel.addItem("Loser Value", loserValue);
-        mainPanel.addItem("Set winner randomly (with some probability)",
-                useRandomBox);
-        mainPanel
-        .addItem("Probability of choosing a random winner", randomProb);
+        mainPanel.addItem("Set winner randomly (with some probability)", useRandomBox);
+        mainPanel.addItem("Probability of choosing a random winner", randomProb);
 
         // Enable / disable random prob box based on state of use random
         // checkbox
@@ -124,8 +138,7 @@ public class WTAPropertiesPanel extends JPanel implements
     public boolean commitChanges() {
         try {
             if (isCreationPanel) {
-                wta = new WinnerTakeAll(networkPanel.getNetwork(),
-                        Integer.parseInt(tfNumNeurons.getText()));
+                wta = new WinnerTakeAll(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()));
             }
             wta.setWinValue(Double.parseDouble(winnerValue.getText()));
             wta.setLoseValue(Double.parseDouble(loserValue.getText()));

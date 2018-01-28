@@ -1,16 +1,10 @@
 package org.simbrain.world.game.tictactoe;
 
-import java.awt.Color;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 /**
  * Interface for a tic-tac-toe (naughts and crosses) game.
@@ -18,21 +12,35 @@ import javax.swing.JPanel;
  * @author Matt Watson
  */
 public class TicTacToeGui {
-    /** The default board size. */
+    /**
+     * The default board size.
+     */
     private static final int DEFAULT_BOARD_SIZE = 3;
 
-    /** The icon for an empty square. */
+    /**
+     * The icon for an empty square.
+     */
     private final ImageIcon blank = new ImageIcon("docs/Images/blank.gif");
-    /** The icon for an 'X' square. */
+    /**
+     * The icon for an 'X' square.
+     */
     private final ImageIcon ecks = new ImageIcon("docs/Images/ecks.gif");
-    /** The icon for an 'O' square. */
+    /**
+     * The icon for an 'O' square.
+     */
     private final ImageIcon ouh = new ImageIcon("docs/Images/ouh.gif");
-    /** The size of the game board. */
+    /**
+     * The size of the game board.
+     */
     private final int size = DEFAULT_BOARD_SIZE;
 
-    /** The listeners on this gui. */
+    /**
+     * The listeners on this gui.
+     */
     private List<Listener> listeners = new ArrayList<Listener>();
-    /** The array of labels. */
+    /**
+     * The array of labels.
+     */
     private JLabel[][] labels = new JLabel[size][size];
 
     /**
@@ -72,17 +80,17 @@ public class TicTacToeGui {
                 final ImageIcon icon;
 
                 switch (model.getState(i, j)) {
-                case EMPTY:
-                    icon = blank;
-                    break;
-                case ECKS:
-                    icon = ecks;
-                    break;
-                case OUH:
-                    icon = ouh;
-                    break;
-                default:
-                    throw new IllegalStateException("unknown state");
+                    case EMPTY:
+                        icon = blank;
+                        break;
+                    case ECKS:
+                        icon = ecks;
+                        break;
+                    case OUH:
+                        icon = ouh;
+                        break;
+                    default:
+                        throw new IllegalStateException("unknown state");
                 }
 
                 labels[i][j].setIcon(icon);
@@ -96,11 +104,17 @@ public class TicTacToeGui {
      * @author Matt Watson
      */
     private class Selected extends AbstractAction {
-        /** The default serial version ID. */
+        /**
+         * The default serial version ID.
+         */
         private static final long serialVersionUID = 1L;
-        /** The x coordinate. */
+        /**
+         * The x coordinate.
+         */
         final int x;
-        /** The y coordinate. */
+        /**
+         * The y coordinate.
+         */
         final int y;
 
         /**

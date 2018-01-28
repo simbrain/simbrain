@@ -18,9 +18,12 @@
  */
 package org.simbrain.workspace.gui;
 
-import javax.swing.*;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Workspace;
 
-import org.simbrain.workspace.*;
+import javax.swing.*;
 
 /**
  * A menu item corresponding to a potential coupling. When the menuitem is
@@ -28,25 +31,33 @@ import org.simbrain.workspace.*;
  */
 public class CouplingMenuItem extends JMenuItem {
 
-    /** The default serial version ID. */
+    /**
+     * The default serial version ID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** Reference to producing attribute. */
+    /**
+     * Reference to producing attribute.
+     */
     private Producer producer;
 
-    /** Reference to consuming attribute. */
+    /**
+     * Reference to consuming attribute.
+     */
     private Consumer consumer;
 
-    /** The workspace this object belongs to. */
+    /**
+     * The workspace this object belongs to.
+     */
     private Workspace workspace;
 
     /**
      * Creates a new instance.
      *
-     * @param workspace The parent workspace.
+     * @param workspace   The parent workspace.
      * @param description The description of the menu item.
-     * @param producer The producer for the coupling.
-     * @param consumer The consumer for the coupling.
+     * @param producer    The producer for the coupling.
+     * @param consumer    The consumer for the coupling.
      */
     public CouplingMenuItem(Workspace workspace, String description, Producer producer, Consumer consumer) {
         super(description);

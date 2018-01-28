@@ -1,20 +1,17 @@
 package org.simbrain.world.imageworld.filters;
 
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
 /**
  * ThresholdOp is a BufferedImageOp for converting an RGB image to a binary
  * (black and white) image based on a constant luminance threshold applied to each
  * pixel.
+ *
  * @author Tim Shea
  */
 public class ThresholdOp implements BufferedImageOp {
@@ -27,8 +24,9 @@ public class ThresholdOp implements BufferedImageOp {
      * Construct a new ThresholdOp which maps the luminance of each pixel onto
      * either white or black output. Note that luminance is a standard weighted
      * combination of RGB values for the pixel which returns a float between 0 and 1.
+     *
      * @param threshold pixels with greater than or equal luminance will be mapped
-     * to white, all others will be mapped to black
+     *                  to white, all others will be mapped to black
      */
     public ThresholdOp(double threshold) {
         this.threshold = threshold;

@@ -7,19 +7,29 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  */
 public class LifeCycle {
 
-    /** Whether it's dead or not. */
+    /**
+     * Whether it's dead or not.
+     */
     private boolean isDead = false;
 
-    /** Number of bites to eat edible item. */
+    /**
+     * Number of bites to eat edible item.
+     */
     private int bitesToDie = 200;
 
-    /** Number of bites on stimulus. */
+    /**
+     * Number of bites on stimulus.
+     */
     private int bites = 0;
 
-    /** Likelihood eaten item will return. */
+    /**
+     * Likelihood eaten item will return.
+     */
     private double resurrectionProb = .01;
 
-    /** Parent entity. */
+    /**
+     * Parent entity.
+     */
     OdorWorldEntity parent;
 
     /**

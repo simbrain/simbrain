@@ -18,16 +18,6 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -37,6 +27,11 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
  * creatures and entities within a world environment.
@@ -45,25 +40,39 @@ public class EntityDialog extends StandardDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
-    /** The dimension for the combobox renderer. */
+    /**
+     * The dimension for the combobox renderer.
+     */
     private final int cbRendererDimension = 35;
 
-    /** The entity for which this dialog is called. */
+    /**
+     * The entity for which this dialog is called.
+     */
     private OdorWorldEntity entityRef;
 
-    /** The text field containing the name of the entity. */
+    /**
+     * The text field containing the name of the entity.
+     */
     private JTextField tfEntityName = new JTextField();
 
-    /** The Combobox from which to choose the entity image. */
+    /**
+     * The Combobox from which to choose the entity image.
+     */
     private JComboBox cbImageName = new JComboBox();
 
-    /** The renderer to display the combobox. */
+    /**
+     * The renderer to display the combobox.
+     */
     private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 
-    /** The panel containing item-specific information not in other panels. */
+    /**
+     * The panel containing item-specific information not in other panels.
+     */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
-    /** Property editor for main entity properties. */
+    /**
+     * Property editor for main entity properties.
+     */
     private ReflectivePropertyEditor mainEditor;
 
     /**
@@ -72,23 +81,31 @@ public class EntityDialog extends StandardDialog implements ActionListener {
      */
     private JTextField bitesToDie = new JTextField();
 
-    /** The checkbox identifying whether or not the item is edible. */
+    /**
+     * The checkbox identifying whether or not the item is edible.
+     */
     private JCheckBox edible = new JCheckBox();
 
-    /** The probability of a resurrection each turn. */
+    /**
+     * The probability of a resurrection each turn.
+     */
     private JTextField resurrectionProb = new JTextField();
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Editor panel for smell source. */
+    /**
+     * Editor panel for smell source.
+     */
     SmellSourcePanel smellPanel;
 
     /**
      * Create and show the world entity dialog box.
      *
      * @param we reference to the world entity whose smell signature is being
-     *            adjusted
+     *           adjusted
      */
     public EntityDialog(final OdorWorldEntity we) {
         entityRef = we;
@@ -110,10 +127,9 @@ public class EntityDialog extends StandardDialog implements ActionListener {
         // TODO: For now rotating entities are the only agents. As noted
         // elsewhere the concept of an agent needs to be made explicit.
         if (entityRef instanceof RotatingEntity) {
-            mainEditor.setExcludeList(new String[] { "entityType", "id" });
+            mainEditor.setExcludeList(new String[]{"entityType", "id"});
         } else {
-            mainEditor.setExcludeList(new String[] { "entityType", "id",
-                    "showSensors", "sensorsEnabled", "effectorsEnabled" });
+            mainEditor.setExcludeList(new String[]{"entityType", "id", "showSensors", "sensorsEnabled", "effectorsEnabled"});
         }
         mainEditor.setObjectToEdit(entityRef);
         tabbedPane.addTab("Main", mainEditor);
@@ -132,8 +148,7 @@ public class EntityDialog extends StandardDialog implements ActionListener {
         }
 
         // [Below not currently used]
-        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
-                cbRendererDimension));
+        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension, cbRendererDimension));
         cbImageName.setRenderer(cbRenderer);
         // mainPanel.addItem("Image", cbImageName);
 
@@ -148,11 +163,9 @@ public class EntityDialog extends StandardDialog implements ActionListener {
         // tabbedPane.addTab("LifeCycle", lifeCycleEditor);
         ShowHelpAction helpAction;
         if (entityRef instanceof RotatingEntity) {
-            helpAction = new ShowHelpAction(
-                    "Pages/Worlds/OdorWorld/agents.html");
+            helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/agents.html");
         } else {
-            helpAction = new ShowHelpAction(
-                    "Pages/Worlds/OdorWorld/objects.html");
+            helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
         }
         addButton(new JButton(helpAction));
         setContentPane(tabbedPane);

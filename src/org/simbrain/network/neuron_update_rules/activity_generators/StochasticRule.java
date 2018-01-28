@@ -27,18 +27,21 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
  * value of the upper bound if a random variable is above a specified firing
  * probability, and the lower bound otherwise. Ignores inputs.
- * 
+ * <p>
  * TODO: Separate spiking from non-spiking version?
  */
-public class StochasticRule extends SpikingNeuronUpdateRule implements
-         ActivityGenerator {
+public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityGenerator {
 
-    /** The default firing probability for the Neuron. */
+    /**
+     * The default firing probability for the Neuron.
+     */
     private static final double DEFAULT_FIRING_PROBABILITY = .05;
 
-    /** Probability the neuron will fire. */
+    /**
+     * Probability the neuron will fire.
+     */
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -58,7 +61,7 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
     @Override
     public void update(Neuron neuron) {
         double rand = Math.random();
-        if (rand > 1-firingProbability) {
+        if (rand > 1 - firingProbability) {
             neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
             neuron.setBuffer(1);

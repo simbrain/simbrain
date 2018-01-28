@@ -1,18 +1,11 @@
 package org.simbrain.world.threedworld.entities;
 
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.io.File;
-
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * ModelEditor wraps the properties of a ModelEntity in an Editor form.
@@ -41,6 +34,7 @@ public class ModelEditor extends EntityEditor {
 
     /**
      * Construct a new ModelEditor from the given model.
+     *
      * @param model The model from which to read and write values.
      */
     public ModelEditor(ModelEntity model) {

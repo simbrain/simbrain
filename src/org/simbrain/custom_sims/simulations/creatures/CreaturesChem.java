@@ -5,9 +5,9 @@ package org.simbrain.custom_sims.simulations.creatures;
  * time, with a decay dynamic. They never disappear they just go to zero. When
  * reactions happen pre-existing chemicals increase their value. Value
  * represents how much is in the system.
- * 
+ * <p>
  * There are (roughly) four lists of things "inside" the creature
- * 
+ * <p>
  * <ul>
  * <li>Chemicals: see above</li>
  * <li>Emitters: increase values of chemicals</li>
@@ -15,20 +15,25 @@ package org.simbrain.custom_sims.simulations.creatures;
  * <li>Reactors: if reactants get high enough, the reaction occurs, which
  * decreases values of reactants and increases the values of products.</li>
  * </ul>
- * 
+ * <p>
  * So for example a receptor might watch level of some chemical the creature
  * has, and if that goes above or below a threshold it will kill the creature.
- *
  */
 public class CreaturesChem {
 
-    /** The name of the chemical */
+    /**
+     * The name of the chemical
+     */
     private String name;
 
-    /** The id of the chemical */
+    /**
+     * The id of the chemical
+     */
     private String id;
 
-    /** The amount of this chemical currently in the creature's body */
+    /**
+     * The amount of this chemical currently in the creature's body
+     */
     private double amount;
 
     // Half-Life Reference:
@@ -40,8 +45,7 @@ public class CreaturesChem {
      */
     private double halfLife;
 
-    public CreaturesChem(String name, String id, double amount,
-            double halfLife) {
+    public CreaturesChem(String name, String id, double amount, double halfLife) {
         this.name = name;
         this.id = id;
         this.amount = amount;

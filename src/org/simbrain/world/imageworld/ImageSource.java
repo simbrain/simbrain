@@ -1,7 +1,5 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.util.propertyeditor2.EditableObject;
-
 import java.awt.image.BufferedImage;
 
 /**
@@ -29,12 +27,14 @@ public interface ImageSource {
 
     /**
      * Add a listener to be notified of new images and resizes.
+     *
      * @param listener The listener to add.
      */
     void addListener(ImageSourceListener listener);
 
     /**
      * Remove a listener to stop being notified.
+     *
      * @param listener The listener to remove.
      */
     void removeListener(ImageSourceListener listener);

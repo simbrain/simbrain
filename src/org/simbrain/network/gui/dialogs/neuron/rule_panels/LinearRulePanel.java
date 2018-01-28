@@ -18,26 +18,31 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>LinearNeuronPanel</b> edits a linear rule neuron.
  */
 public class LinearRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final LinearRule prototypeRule = new LinearRule();
 
     /**
@@ -45,19 +50,15 @@ public class LinearRulePanel extends AbstractNeuronRulePanel {
      */
     public LinearRulePanel() {
         this.add(tabbedPane);
-        JTextField slopeField = createTextField(
-                (r) -> ((LinearRule) r).getSlope(),
-                (r, val) -> ((LinearRule) r).setSlope((double) val));
-        JTextField biasField = createTextField(
-                (r) -> ((LinearRule) r).getBias(),
-                (r, val) -> ((LinearRule) r).setBias((double) val));
+        JTextField slopeField = createTextField((r) -> ((LinearRule) r).getSlope(), (r, val) -> ((LinearRule) r).setSlope((double) val));
+        JTextField biasField = createTextField((r) -> ((LinearRule) r).getBias(), (r, val) -> ((LinearRule) r).setBias((double) val));
         mainTab.addItem("Slope", slopeField);
         mainTab.addItem("Bias", biasField);
         mainTab.addItem("Add noise", this.getAddNoise());
         tabbedPane.add(mainTab, "Main");
-        
+
         tabbedPane.add(getNoisePanel(), "Noise");
-       
+
     }
 
     @Override

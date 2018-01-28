@@ -39,39 +39,48 @@ import java.util.concurrent.ThreadLocalRandom;
  * <b>BoltzmannMachine</b> An input layer and input data
  * have been added so that the Boltzmann Machine can be easily trained
  * using existing Simbrain GUI tools
- *
+ * <p>
  * TODO: Review and correct comments.
  *
  * @author Jeff Yoshimi
  */
-public class BoltzmannMachine  extends Subnetwork implements Trainable {
+public class BoltzmannMachine extends Subnetwork implements Trainable {
 
-    /** Default initial temperature */
+    /**
+     * Default initial temperature
+     */
     public static final double DEFAULT_INIT_SIZE = 10;
 
-    /** Temperature */
+    /**
+     * Temperature
+     */
     private double temperature = DEFAULT_INIT_SIZE;
 
-    /** The input layer. */
+    /**
+     * The input layer.
+     */
     private final NeuronGroup hiddenUnits;
 
-    /** The input layer. */
+    /**
+     * The input layer.
+     */
     private final NeuronGroup visibleUnits;
 
-    /** Training set. */
+    /**
+     * Training set.
+     */
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct a Boltzmann Machine Network.
      *
-     * @param net parent network. Set to null when this is used simply as a
-     *            holder for param values.
+     * @param net               parent network. Set to null when this is used simply as a
+     *                          holder for param values.
      * @param numVisibleNeurons number of neurons in the input layer
-     * @param numHiddenNeurons number of neurons in the Boltzmann layer.
-     * @param initialPosition bottom corner where network will be placed.
+     * @param numHiddenNeurons  number of neurons in the Boltzmann layer.
+     * @param initialPosition   bottom corner where network will be placed.
      */
-    public BoltzmannMachine(Network net, int numVisibleNeurons, int numHiddenNeurons,
-                      Point2D initialPosition) {
+    public BoltzmannMachine(Network net, int numVisibleNeurons, int numHiddenNeurons, Point2D initialPosition) {
         super(net);
         this.setLabel("Boltzmann Machine");
 
@@ -88,8 +97,7 @@ public class BoltzmannMachine  extends Subnetwork implements Trainable {
         visibleUnits.setLabel("Visible Units");
 
         // Layout groups
-        NetworkLayoutManager.offsetNeuronGroup(visibleUnits, hiddenUnits,
-                Direction.EAST, 100);
+        NetworkLayoutManager.offsetNeuronGroup(visibleUnits, hiddenUnits, Direction.EAST, 100);
 
         // Wire up network
         AllToAll recurrentHidden = new AllToAll();
@@ -108,7 +116,7 @@ public class BoltzmannMachine  extends Subnetwork implements Trainable {
     }
 
     @Override
-    public void update(){
+    public void update() {
 
         // TODO: Not sure about this
         visibleUnits.update();
@@ -117,15 +125,12 @@ public class BoltzmannMachine  extends Subnetwork implements Trainable {
         //hiddenUnits.clearActivations();
 
         // Choose randomly
-        Neuron chosenNode = hiddenUnits.getNeuronList()
-                .get(ThreadLocalRandom.current().nextInt(0,
-                        hiddenUnits.getNeuronList().size()));
+        Neuron chosenNode = hiddenUnits.getNeuronList().get(ThreadLocalRandom.current().nextInt(0, hiddenUnits.getNeuronList().size()));
 
         int summedFanIn = 0;
 
         for (Synapse fanInWeight : chosenNode.getFanIn()) {
-            summedFanIn += fanInWeight.getStrength()
-                    * fanInWeight.getSource().getActivation();
+            summedFanIn += fanInWeight.getStrength() * fanInWeight.getSource().getActivation();
         }
 
         double delta_c = 1 - 2 * chosenNode.getActivation() + summedFanIn;
@@ -169,7 +174,7 @@ public class BoltzmannMachine  extends Subnetwork implements Trainable {
         return visibleUnits;
     }
 
-    public NeuronGroup getHiddenUnits(){
+    public NeuronGroup getHiddenUnits() {
         return hiddenUnits;
     }
 

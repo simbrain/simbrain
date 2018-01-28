@@ -34,16 +34,24 @@ public class Speech extends Effector {
     // TODO: Possibly add a radius of influence
     // Possibly encapsulate phrase String in an utterance class
 
-    /** Default phrase. */
+    /**
+     * Default phrase.
+     */
     public static final String DEFAULT_PHRASE = "Hi!";
 
-    /** The thing this speech effector says. */
+    /**
+     * The thing this speech effector says.
+     */
     private String phrase = DEFAULT_PHRASE;
 
-    /** Default threshold. */
+    /**
+     * Default threshold.
+     */
     public static final double DEFAULT_THRESHOLD = .01;
 
-    /** Threshold above which to "the message. */
+    /**
+     * Threshold above which to "the message.
+     */
     private double threshold = DEFAULT_THRESHOLD;
 
     /**
@@ -60,8 +68,8 @@ public class Speech extends Effector {
     /**
      * Construct the speech effector.
      *
-     * @param parent parent entity
-     * @param phrase the phrase associated with this effector
+     * @param parent    parent entity
+     * @param phrase    the phrase associated with this effector
      * @param threshold
      */
     public Speech(OdorWorldEntity parent, String phrase, double threshold) {
@@ -79,8 +87,7 @@ public class Speech extends Effector {
             activated = false;
         }
         if (activated) {
-            for (OdorWorldEntity entity : parent.getParentWorld()
-                    .getObjectList()) {
+            for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
 
                 // TODO: Can add radius check here later
 

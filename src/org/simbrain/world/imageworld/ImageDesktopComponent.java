@@ -1,13 +1,5 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -19,8 +11,17 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.MultiCouplingMenu;
-import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
+import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * GUI Interface for vision world.
@@ -112,8 +113,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenu helpMenu = new JMenu("Help");
         JMenuItem helpItem = new JMenuItem("World Help");
         menuBar.add(helpMenu);
-        ShowHelpAction helpAction = new ShowHelpAction(
-            "Pages/Worlds/ImageWorld/ImageWorld.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/ImageWorld.html");
         helpItem.setAction(helpAction);
         helpMenu.add(helpItem);
 

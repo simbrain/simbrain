@@ -18,13 +18,6 @@
  */
 package org.simbrain.network.desktop;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -32,30 +25,39 @@ import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.WorkspaceComponentAdapter;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Network desktop component. An extension of the Gui component for this class
  * which is used in the Simbrain desktop.
  */
-public final class NetworkDesktopComponent extends
-        GuiComponent<NetworkComponent> {
+public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent> {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanelDesktop networkPanel;
 
-    /** Menu bar. */
+    /**
+     * Menu bar.
+     */
     private JMenuBar menuBar;
 
-    /** Default height. */
+    /**
+     * Default height.
+     */
     private static final int DEFAULT_HEIGHT = 450;
 
-    /** Default width. */
+    /**
+     * Default width.
+     */
     private static final int DEFAULT_WIDTH = 450;
 
     /**
@@ -66,11 +68,11 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Create a new network frame.
-     * @param frame frame of network
+     *
+     * @param frame     frame of network
      * @param component network component
      */
-    public NetworkDesktopComponent(final GenericFrame frame,
-            final NetworkComponent component) {
+    public NetworkDesktopComponent(final GenericFrame frame, final NetworkComponent component) {
         super(frame, component);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
@@ -89,10 +91,10 @@ public final class NetworkDesktopComponent extends
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"
         component.addListener(new WorkspaceComponentAdapter() {
-                @Override
-                public void guiToggled() {
-                    networkPanel.setGuiOn(getWorkspaceComponent().isGuiOn());
-                }
+            @Override
+            public void guiToggled() {
+                networkPanel.setGuiOn(getWorkspaceComponent().isGuiOn());
+            }
         });
     }
 
@@ -106,8 +108,7 @@ public final class NetworkDesktopComponent extends
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
-        menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this
-                .getNetworkPanel()));
+        menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
         // menuBar.add(createAttributeMenu());
         menuBar.add(networkPanel.createHelpMenu());
         getParentFrame().setJMenuBar(menuBar);
@@ -115,7 +116,7 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Create and return a new File menu for this Network panel.
-     * 
+     *
      * @return a new File menu for this Network panel
      */
     JMenu createFileMenu() {
@@ -145,8 +146,7 @@ public final class NetworkDesktopComponent extends
         // TODO: Below only needs to happen when opening; but currently it
         // happens also when creating a new network
         networkPanel.clearPanel();
-        if (networkPanel.getNetwork() != this.getWorkspaceComponent()
-                .getNetwork()) {
+        if (networkPanel.getNetwork() != this.getWorkspaceComponent().getNetwork()) {
             networkPanel.setNetwork(this.getWorkspaceComponent().getNetwork());
         }
         networkPanel.syncToModel();
@@ -155,7 +155,7 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Return the network panel for this network frame.
-     * 
+     *
      * @return the network panel for this network frame
      */
     public NetworkPanel getNetworkPanel() {
@@ -184,9 +184,9 @@ public final class NetworkDesktopComponent extends
     /**
      * If at least one synapse group has a large number of synapses that are not
      * going to be saved using compression, show the user a warning.
-     * 
+     *
      * @return true if the save operation should proceed, false if the save
-     *         operation should be cancelled.
+     * operation should be cancelled.
      */
     private boolean showUncompressedSynapseGroupWarning() {
         boolean showPanel = false;
@@ -198,15 +198,7 @@ public final class NetworkDesktopComponent extends
             }
         }
         if (showPanel) {
-            int n = JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. "
-                                    + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that "
-                                    + "their weight matrices are compressed.   Otherwise the save will take a "
-                                    + "long time and the saved file will be large. Click Cancel to go ahead with the save, "
-                                    + "and OK to return to the network and change settings.</body></html>",
-                            "Save Warning", JOptionPane.OK_CANCEL_OPTION);
+            int n = JOptionPane.showConfirmDialog(null, "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>", "Save Warning", JOptionPane.OK_CANCEL_OPTION);
             if (n == JOptionPane.OK_OPTION) {
                 return false;
             }

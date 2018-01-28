@@ -18,50 +18,61 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JComboBox;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
 
+import javax.swing.*;
+
 /**
  * <b>PointNeuronPanel</b> TODO:Excitatory
  * normalization was removed because it was both unused and had no accessor
  * methods in PointNeuronRule.
- * 
+ * <p>
  * TODO: Not yet wired up in the new style (since it's not visible in the GUI right now)
  */
 public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
 
-    /** Excitatory Reversal field. */
+    /**
+     * Excitatory Reversal field.
+     */
     private JTextField tfER = new JTextField();
 
-    /** Inhibitory Reversal field. */
+    /**
+     * Inhibitory Reversal field.
+     */
     private JTextField tfIR = new JTextField();
 
-    /** Leak Reversal field. */
+    /**
+     * Leak Reversal field.
+     */
     private JTextField tfLR = new JTextField();
 
-    /** Leak Conductance field. */
+    /**
+     * Leak Conductance field.
+     */
     private JTextField tfLC = new JTextField();
 
-    /** Output function. */
-    private JComboBox cbOutputFunction = new JComboBox(new OutputFunction[] {
-            OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR,
-            OutputFunction.NOISY_RATE_CODE, OutputFunction.NONE,
-            OutputFunction.RATE_CODE, });
+    /**
+     * Output function.
+     */
+    private JComboBox cbOutputFunction = new JComboBox(new OutputFunction[]{OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR, OutputFunction.NOISY_RATE_CODE, OutputFunction.NONE, OutputFunction.RATE_CODE,});
 
-    /** Threshold for output function. */
+    /**
+     * Threshold for output function.
+     */
     private JTextField tfThreshold = new JTextField();
 
-    /** Gain for output function. */
+    /**
+     * Gain for output function.
+     */
     private JTextField tfGain = new JTextField();
 
-    /** Bias for excitatory inputs. */
+    /**
+     * Bias for excitatory inputs.
+     */
     private JTextField tfBias = new JTextField();
 
     /**
@@ -71,19 +82,29 @@ public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
      */
     private JTextField tfTimeAveraging = new JTextField();
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Inputs tab. */
+    /**
+     * Inputs tab.
+     */
     private LabelledItemPanel inputsTab = new LabelledItemPanel();
 
-    /** Output Function tab. */
+    /**
+     * Output Function tab.
+     */
     private LabelledItemPanel outputFunctionTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final PointNeuronRule prototypeRule = new PointNeuronRule();
 
     /**

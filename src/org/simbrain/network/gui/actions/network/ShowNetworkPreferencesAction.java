@@ -18,24 +18,23 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Show network preferences action.
  */
 public final class ShowNetworkPreferencesAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -54,16 +53,14 @@ public final class ShowNetworkPreferencesAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMask()));
-        putValue(SHORT_DESCRIPTION,
-                "Show the network preference dialog");
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        putValue(SHORT_DESCRIPTION, "Show the network preference dialog");
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 
@@ -71,8 +68,7 @@ public final class ShowNetworkPreferencesAction extends AbstractAction {
 
             /** @see Runnable */
             public void run() {
-                NetworkDialog dialog = networkPanel
-                        .getNetworkDialog(networkPanel);
+                NetworkDialog dialog = networkPanel.getNetworkDialog(networkPanel);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);

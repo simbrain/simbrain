@@ -1,13 +1,5 @@
 package org.simbrain.world.threedworld.engine;
 
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.File;
-import java.util.concurrent.Future;
-
-import org.simbrain.world.threedworld.ThreeDImagePanel;
-
 import com.jme3.app.Application;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioContext;
@@ -15,8 +7,14 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
+import org.simbrain.world.threedworld.ThreeDImagePanel;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.File;
+import java.util.concurrent.Future;
 
 /**
  * ThreeDEngine is a modification of jme3 SimpleApplication to provide
@@ -113,8 +111,8 @@ public class ThreeDEngine extends Application {
 
     /**
      * @param value Set a new engine state the next time queued engine events are processed.
-     * @param wait Whether to wait for the state to be applied before returning. If false,
-     * the state change is asynchronous.
+     * @param wait  Whether to wait for the state to be applied before returning. If false,
+     *              the state change is asynchronous.
      */
     public void queueState(State value, boolean wait) {
         enqueue(() -> {
@@ -124,24 +122,24 @@ public class ThreeDEngine extends Application {
 
     /**
      * @param value Set a new engine state immediately. This should not be called outside the
-     * jme thread to avoid inconsistent update cycles.
+     *              jme thread to avoid inconsistent update cycles.
      */
     protected void setState(State value) {
         state = value;
         switch (state) {
-        case RunAll:
-            timer.reset();
-            paused = false;
-            bulletAppState.setEnabled(true);
-            break;
-        case RenderOnly:
-            paused = false;
-            bulletAppState.setEnabled(false);
-            break;
-        case SystemPause:
-            paused = true;
-            bulletAppState.setEnabled(false);
-            break;
+            case RunAll:
+                timer.reset();
+                paused = false;
+                bulletAppState.setEnabled(true);
+                break;
+            case RenderOnly:
+                paused = false;
+                bulletAppState.setEnabled(false);
+                break;
+            case SystemPause:
+                paused = true;
+                bulletAppState.setEnabled(false);
+                break;
         }
     }
 
@@ -167,6 +165,7 @@ public class ThreeDEngine extends Application {
     /**
      * Add a runnable to the engine thread queue. The runnable will run during the next
      * engine update, even if the engine is paused.
+     *
      * @param runnable The runnable to add to the queue.
      */
     public void enqueue(Runnable runnable) {
@@ -176,9 +175,10 @@ public class ThreeDEngine extends Application {
     /**
      * Add a runnable to the engine thread queue and optionally wait for it to be
      * executed.
+     *
      * @param runnable The runnable to add to the queue.
-     * @param wait Whether to wait for the runnable to run before returning. If false
-     * the call is asynchronous.
+     * @param wait     Whether to wait for the runnable to run before returning. If false
+     *                 the call is asynchronous.
      */
     public void enqueue(Runnable runnable, boolean wait) {
         Future<Object> future = enqueue(() -> {
@@ -189,8 +189,7 @@ public class ThreeDEngine extends Application {
             try {
                 future.get();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null,
-                        "An exception occurred while waiting for queued action in 3D World.");
+                JOptionPane.showMessageDialog(null, "An exception occurred while waiting for queued action in 3D World.");
             }
         }
     }
@@ -213,7 +212,7 @@ public class ThreeDEngine extends Application {
 
     /**
      * @param value Duration in seconds of each update in workspace sync'ed mode.
-     * Default value is 1/60 s.
+     *              Default value is 1/60 s.
      */
     public void setFixedTimeStep(float value) {
         fixedTimeStep = value;
@@ -232,8 +231,7 @@ public class ThreeDEngine extends Application {
             String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
             getAssetManager().registerLocator(rootDirectory, FileLocator.class);
 
-            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets"
-                    : "src/org/simbrain/world/threedworld/threedassets/assets");
+            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets" : "src/org/simbrain/world/threedworld/threedassets/assets");
             getAssetManager().registerLocator(assetDirectory, FileLocator.class);
 
             renderSource = new ThreeDRenderSource(getViewPort(), true);
@@ -316,7 +314,8 @@ public class ThreeDEngine extends Application {
      */
     public void updateSync() {
         while (updateSync && !paused) {
-            enqueue(() -> { }, true);
+            enqueue(() -> {
+            }, true);
         }
         paused = false;
     }

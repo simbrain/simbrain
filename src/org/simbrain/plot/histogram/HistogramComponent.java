@@ -18,14 +18,14 @@
  */
 package org.simbrain.plot.histogram;
 
+import org.simbrain.plot.ChartDataSource;
+import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * The Component representation of a histogram. Contains attributes that allow
@@ -33,7 +33,9 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class HistogramComponent extends WorkspaceComponent {
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private HistogramModel model;
 
     /**
@@ -51,7 +53,7 @@ public class HistogramComponent extends WorkspaceComponent {
      * Create new Histogram Component from a specified model. Used in
      * deserializing.
      *
-     * @param name chart name
+     * @param name  chart name
      * @param model chart model
      */
     public HistogramComponent(final String name, final HistogramModel model) {
@@ -93,8 +95,8 @@ public class HistogramComponent extends WorkspaceComponent {
     /**
      * Opens a saved bar chart.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return bar chart component to be opened
      */

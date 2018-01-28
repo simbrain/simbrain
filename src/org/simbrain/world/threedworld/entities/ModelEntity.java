@@ -1,17 +1,16 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.util.Collection;
-import java.util.Collections;
-
+import com.jme3.animation.AnimChannel;
+import com.jme3.animation.AnimControl;
+import com.jme3.bounding.BoundingBox;
+import com.jme3.scene.Node;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 
-import com.jme3.animation.AnimChannel;
-import com.jme3.animation.AnimControl;
-import com.jme3.bounding.BoundingBox;
-import com.jme3.scene.Node;
+import java.util.Collection;
+import java.util.Collections;
 
 public class ModelEntity extends PhysicalEntity {
 
@@ -46,6 +45,7 @@ public class ModelEntity extends PhysicalEntity {
 
     /**
      * Load a new model for this entity.
+     *
      * @param fileName The filename of the model to load.
      */
     public void reload(String fileName) {
@@ -80,7 +80,7 @@ public class ModelEntity extends PhysicalEntity {
         return getAnimations().contains(name);
     }
 
-    @Producible(idMethod="getName")
+    @Producible(idMethod = "getName")
     public String getAnimation() {
         AnimControl animator = getAnimator();
         if (animator == null || animator.getNumChannels() == 0) {
@@ -91,7 +91,7 @@ public class ModelEntity extends PhysicalEntity {
         }
     }
 
-    @Consumable(idMethod="getName")
+    @Consumable(idMethod = "getName")
     public void setAnimation(String name) {
         setAnimation(name, 1);
     }

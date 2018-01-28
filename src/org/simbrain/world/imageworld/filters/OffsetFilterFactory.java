@@ -37,8 +37,7 @@ public class OffsetFilterFactory extends ImageFilterFactory {
         ImageFilterFactory.putFactory("Offset Filter", new OffsetFilterFactory());
     }
 
-    public static FilteredImageSource createOffsetFilter(
-            ImageSource source, int xOffset, int yOffset, int width, int height) {
+    public static FilteredImageSource createOffsetFilter(ImageSource source, int xOffset, int yOffset, int width, int height) {
         return new OffsetFilterSource(source, xOffset, yOffset, width, height);
     }
 

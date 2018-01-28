@@ -18,20 +18,18 @@
  */
 package org.simbrain.network.desktop;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Overrides the network dialog box to add features that don't work on applets,
@@ -39,11 +37,12 @@ import org.simbrain.util.SimbrainPreferences;
  * preferences.
  *
  * @author Jeff Yoshimi
- *
  */
 public class DesktopNetworkDialog extends NetworkDialog {
 
-    /** Restore defaults button. */
+    /**
+     * Restore defaults button.
+     */
     private JButton defaultButton = new JButton("Restore defaults");
 
     /**
@@ -60,8 +59,7 @@ public class DesktopNetworkDialog extends NetworkDialog {
                 restoreDefaults();
             }
         });
-        defaultButton
-                .setToolTipText("Restore properties (currently only on main panel) to their default values");
+        defaultButton.setToolTipText("Restore properties (currently only on main panel) to their default values");
     }
 
     /**
@@ -72,10 +70,8 @@ public class DesktopNetworkDialog extends NetworkDialog {
         SimbrainPreferences.restoreDefaultSetting("networkWandRadius");
         SimbrainPreferences.restoreDefaultSetting("networkHotNodeColor");
         SimbrainPreferences.restoreDefaultSetting("networkCoolNodeColor");
-        SimbrainPreferences
-                .restoreDefaultSetting("networkExcitatorySynapseColor");
-        SimbrainPreferences
-                .restoreDefaultSetting("networkInhibitorySynapseColor");
+        SimbrainPreferences.restoreDefaultSetting("networkExcitatorySynapseColor");
+        SimbrainPreferences.restoreDefaultSetting("networkInhibitorySynapseColor");
         SimbrainPreferences.restoreDefaultSetting("networkSpikingColor");
         SimbrainPreferences.restoreDefaultSetting("networkZeroWeightColor");
         SimbrainPreferences.restoreDefaultSetting("networkSynapseMaxSize");
@@ -99,32 +95,19 @@ public class DesktopNetworkDialog extends NetworkDialog {
      * before this all dialog values will have been applied via commitChanges.
      */
     public void setDefaults() {
-        SimbrainPreferences.putInt("networkBackgroundColor", NetworkPanel
-                .getBackgroundColor().getRGB());
-        SimbrainPreferences.putDouble("networkNudgeAmount",
-                NetworkPanel.getNudgeAmount());
-        SimbrainPreferences.putInt("networkSynapseVisibilityThreshold",
-                Network.getSynapseVisibilityThreshold());
-        SimbrainPreferences.putInt("networkWandRadius",
-                EditMode.getWandRadius());
-        SimbrainPreferences.putFloat("networkHotNodeColor",
-                NeuronNode.getHotColor());
-        SimbrainPreferences.putFloat("networkCoolNodeColor",
-                NeuronNode.getCoolColor());
-        SimbrainPreferences.putInt("networkSpikingColor", NeuronNode
-                .getSpikingColor().getRGB());
-        SimbrainPreferences.putInt("networkExcitatorySynapseColor",
-                SynapseNode.getExcitatoryColor().getRGB());
-        SimbrainPreferences.putInt("networkInhibitorySynapseColor",
-                SynapseNode.getInhibitoryColor().getRGB());
-        SimbrainPreferences.putInt("networkZeroWeightColor", SynapseNode
-                .getZeroWeightColor().getRGB());
-        SimbrainPreferences.putInt("networkSynapseMinSize",
-                SynapseNode.getMinDiameter());
-        SimbrainPreferences.putInt("networkSynapseMaxSize",
-                SynapseNode.getMaxDiameter());
-        SimbrainPreferences.putBoolean("selfConnectionAllowed",
-                AllToAll.isSelfConnectionAllowed());
+        SimbrainPreferences.putInt("networkBackgroundColor", NetworkPanel.getBackgroundColor().getRGB());
+        SimbrainPreferences.putDouble("networkNudgeAmount", NetworkPanel.getNudgeAmount());
+        SimbrainPreferences.putInt("networkSynapseVisibilityThreshold", Network.getSynapseVisibilityThreshold());
+        SimbrainPreferences.putInt("networkWandRadius", EditMode.getWandRadius());
+        SimbrainPreferences.putFloat("networkHotNodeColor", NeuronNode.getHotColor());
+        SimbrainPreferences.putFloat("networkCoolNodeColor", NeuronNode.getCoolColor());
+        SimbrainPreferences.putInt("networkSpikingColor", NeuronNode.getSpikingColor().getRGB());
+        SimbrainPreferences.putInt("networkExcitatorySynapseColor", SynapseNode.getExcitatoryColor().getRGB());
+        SimbrainPreferences.putInt("networkInhibitorySynapseColor", SynapseNode.getInhibitoryColor().getRGB());
+        SimbrainPreferences.putInt("networkZeroWeightColor", SynapseNode.getZeroWeightColor().getRGB());
+        SimbrainPreferences.putInt("networkSynapseMinSize", SynapseNode.getMinDiameter());
+        SimbrainPreferences.putInt("networkSynapseMaxSize", SynapseNode.getMaxDiameter());
+        SimbrainPreferences.putBoolean("selfConnectionAllowed", AllToAll.isSelfConnectionAllowed());
     }
 
     /**

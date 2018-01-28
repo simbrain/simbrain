@@ -18,15 +18,6 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
@@ -34,6 +25,9 @@ import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.trainers.BPTTTrainer;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of a group of a BPTT network.
@@ -46,7 +40,7 @@ public class BPTTNode extends SubnetworkNode {
      * Create a layered network.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group        the layered network
      */
     public BPTTNode(final NetworkPanel networkPanel, final BPTTNetwork group) {
         super(networkPanel, group);
@@ -65,15 +59,10 @@ public class BPTTNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainAction));
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
-            getNetworkPanel(), network));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getInputNeurons(), network.getTrainingSet()
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getOutputNeurons(), network.getTrainingSet()
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(), network.getTrainingSet().getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
 
         setContextMenu(menu);
@@ -94,10 +83,8 @@ public class BPTTNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             BPTTNetwork network = (BPTTNetwork) getSubnetwork();
-            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
-                getNetworkPanel(), new BPTTTrainer(network));
-            JDialog frame = getNetworkPanel().displayPanelInWindow(
-                trainingPanel, "Trainer");
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(getNetworkPanel(), new BPTTTrainer(network));
+            JDialog frame = getNetworkPanel().displayPanelInWindow(trainingPanel, "Trainer");
             trainingPanel.setFrame(frame);
         }
     };

@@ -13,13 +13,6 @@
  */
 package org.simbrain.network.util;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
@@ -28,6 +21,9 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+
+import java.awt.geom.Point2D;
+import java.util.*;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
@@ -43,19 +39,17 @@ public class SimnetUtils {
      * target neurons. That is, each row of the matrix corresponds to a source
      * neuron's fan-out weight vector.
      *
-     * @param srcLayer source layer
+     * @param srcLayer    source layer
      * @param targetLayer target layer
      * @return weight matrix
      */
-    public static double[][] getWeights(List<Neuron> srcLayer,
-            List<Neuron> targetLayer) {
+    public static double[][] getWeights(List<Neuron> srcLayer, List<Neuron> targetLayer) {
 
         double[][] ret = new double[srcLayer.size()][targetLayer.size()];
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = Network.getSynapse(srcLayer.get(i),
-                        targetLayer.get(j));
+                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s.getStrength();
@@ -77,10 +71,9 @@ public class SimnetUtils {
      *
      * @param src the list of source neurons
      * @param tar the list of target neurons
-     * @param w the new weight values for the network.
+     * @param w   the new weight values for the network.
      */
-    public static void setWeights(final List<Neuron> src,
-            final List<Neuron> tar, final double[][] w) {
+    public static void setWeights(final List<Neuron> src, final List<Neuron> tar, final double[][] w) {
         for (int i = 0; i < src.size(); i++) {
             for (int j = 0; j < tar.size(); j++) {
                 Synapse s = Network.getSynapse(src.get(i), tar.get(j));
@@ -99,19 +92,17 @@ public class SimnetUtils {
      * Gets a matrix of Synapse objects, formatted like the getWeights method.
      * Non-existence synapses are given a null value.
      *
-     * @param srcLayer source neurons
+     * @param srcLayer    source neurons
      * @param targetLayer target neurons
      * @return the matrix of synapses.
      */
-    public static Synapse[][] getWeightMatrix(List<Neuron> srcLayer,
-            List<Neuron> targetLayer) {
+    public static Synapse[][] getWeightMatrix(List<Neuron> srcLayer, List<Neuron> targetLayer) {
 
         Synapse[][] ret = new Synapse[srcLayer.size()][targetLayer.size()];
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = Network.getSynapse(srcLayer.get(i),
-                        targetLayer.get(j));
+                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s;
@@ -128,18 +119,16 @@ public class SimnetUtils {
     /**
      * Scales weights connecting source and target lists.
      *
-     * @param src source neurons
-     * @param tar target neurons
+     * @param src    source neurons
+     * @param tar    target neurons
      * @param scalar scalar value which is multiplied by the weight matrix
      */
-    public static void scaleWeights(List<Neuron> src, List<Neuron> tar,
-            double scalar) {
+    public static void scaleWeights(List<Neuron> src, List<Neuron> tar, double scalar) {
         for (Neuron source : src) {
             for (Neuron target : tar) {
                 Synapse weight = Network.getSynapse(source, target);
                 if (weight != null) {
-                    Network.getSynapse(source, target).forceSetStrength(
-                            weight.getStrength() * scalar);
+                    Network.getSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
                 }
             }
         }
@@ -149,15 +138,14 @@ public class SimnetUtils {
      * Find the largest eigenvalue for the provided matrix.
      *
      * @param weightMatrix a matrix representation of the weights for use in
-     *            linear algebraic operations
+     *                     linear algebraic operations
      * @return the largest eigenvalue of this matrix by absolute value
      */
     public static double findMaxEig(double[][] weightMatrix) {
 
         Factory<?> mf = PrimitiveMatrix.FACTORY;
 
-        Builder<?> tmpBuilder = mf.getBuilder(weightMatrix.length,
-                weightMatrix[0].length);
+        Builder<?> tmpBuilder = mf.getBuilder(weightMatrix.length, weightMatrix[0].length);
         for (int i = 0; i < tmpBuilder.countRows(); i++) {
             for (int j = 0; j < tmpBuilder.countColumns(); j++) {
                 tmpBuilder.set(i, j, weightMatrix[i][j]);
@@ -179,13 +167,12 @@ public class SimnetUtils {
     }
 
     /**
-     * @param src list of source neurons
-     * @param tar list of target neurons
+     * @param src          list of source neurons
+     * @param tar          list of target neurons
      * @param desiredEigen : the new max eig or spectral radius for the weight
-     *            matrix
+     *                     matrix
      */
-    public static void scaleEigenvalue(List<Neuron> src, List<Neuron> tar,
-            double desiredEigen) {
+    public static void scaleEigenvalue(List<Neuron> src, List<Neuron> tar, double desiredEigen) {
         double maxEigen = findMaxEig(getWeights(src, tar));
         scaleWeights(src, tar, desiredEigen / maxEigen);
     }
@@ -237,13 +224,12 @@ public class SimnetUtils {
      * found then a list containing only the source and target layers is
      * returned.
      *
-     * @param network the neural network
+     * @param network     the neural network
      * @param sourceLayer the source neurons
      * @param targetLayer the target neurons
      * @return the resulting list of layers
      */
-    public static List<List<Neuron>> getIntermedateLayers(Network network,
-            List<Neuron> sourceLayer, List<Neuron> targetLayer) {
+    public static List<List<Neuron>> getIntermedateLayers(Network network, List<Neuron> sourceLayer, List<Neuron> targetLayer) {
 
         List<List<Neuron>> layers = new ArrayList<List<Neuron>>();
         layers.add(targetLayer);
@@ -258,13 +244,12 @@ public class SimnetUtils {
      * Helper method for getIntermedateLayers. Add the "next layer down" in the
      * hierarchy.
      *
-     * @param layers the current set of layers
-     * @param sourceLayer the source layer
+     * @param layers       the current set of layers
+     * @param sourceLayer  the source layer
      * @param layerToCheck the current layer. Look for previous layers and if
-     *            one is found add it to the layers.
+     *                     one is found add it to the layers.
      */
-    private static void addPreviousLayer(List<List<Neuron>> layers,
-            List<Neuron> sourceLayer, List<Neuron> layerToCheck) {
+    private static void addPreviousLayer(List<List<Neuron>> layers, List<Neuron> sourceLayer, List<Neuron> layerToCheck) {
 
         // Stop adding layers when the number of layers exceeds this. Here
         // to prevent infinite recursions that result when invalid networks
@@ -290,9 +275,7 @@ public class SimnetUtils {
             }
         }
 
-        if ((theNextLayerIsTheSourceLayer) || (newLayerTemp.size() == 0)
-                || (layers.size() > MAXLAYERS))
-        {
+        if ((theNextLayerIsTheSourceLayer) || (newLayerTemp.size() == 0) || (layers.size() > MAXLAYERS)) {
             // We're done. We found the source layer or there was a problem. Add
             // the source layer and move on.
             layers.add(sourceLayer);
@@ -314,8 +297,7 @@ public class SimnetUtils {
      */
     public static void printLayers(List<List<Neuron>> layers) {
         for (List<Neuron> layer : layers) {
-            System.out.println("Layer " + layers.indexOf(layer) + " has "
-                    + layer.size() + " elements");
+            System.out.println("Layer " + layers.indexOf(layer) + " has " + layer.size() + " elements");
         }
     }
 

@@ -27,20 +27,14 @@ package org.simbrain.workspace.gui;
  *
  * This software is in the public domain.
  */
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
-import java.awt.Window;
+
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
  * <b>SplashWindow</b>
- *
+ * <p>
  * <p>
  * Usage: MyApplication is your application class. Create a Splasher class which
  * opens the splash window, invokes the main method of your Application class,
@@ -48,7 +42,7 @@ import java.awt.event.MouseEvent;
  * the Splasher class and the SplashWindow class as small as possible. The less
  * code and the less classes must be loaded into the JVM to open the splash
  * screen, the faster it will appear. </p>
- *
+ * <p>
  * <pre>
  * class Splasher {
  *     public static void main(String[] args) {
@@ -59,18 +53,20 @@ import java.awt.event.MouseEvent;
  * }
  * </pre>
  *
- * 
- *
  * @author Werner Randelshofer
  * @version 2.1 2005-04-03 Revised.
  */
 public final class SplashWindow extends Window {
     private static final long serialVersionUID = 1L;
 
-    /** The current instance of the splash window. (Singleton design pattern). */
+    /**
+     * The current instance of the splash window. (Singleton design pattern).
+     */
     private static SplashWindow instance;
 
-    /** The splash image which is displayed on the splash window. */
+    /**
+     * The splash image which is displayed on the splash window.
+     */
     private Image image;
 
     /**
@@ -90,7 +86,7 @@ public final class SplashWindow extends Window {
      * Creates a new instance.
      *
      * @param parent the parent of the window.
-     * @param image the splash image.
+     * @param image  the splash image.
      */
     private SplashWindow(final Frame parent, final Image image) {
         super(parent);
@@ -111,8 +107,7 @@ public final class SplashWindow extends Window {
         setSize(imgWidth, imgHeight);
 
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((screenDim.width - imgWidth) / 2,
-                (screenDim.height - imgHeight) / 2);
+        setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
 
         // Users shall be able to close the splash window by
         // clicking on its display area. This mouse listener
@@ -189,8 +184,7 @@ public final class SplashWindow extends Window {
             // called at least once by the AWT event dispatcher thread.
             // If more than one processor is available, we don't wait,
             // and maximize CPU throughput instead.
-            if (!EventQueue.isDispatchThread()
-                    && (Runtime.getRuntime().availableProcessors() == 1)) {
+            if (!EventQueue.isDispatchThread() && (Runtime.getRuntime().availableProcessors() == 1)) {
                 synchronized (instance) {
                     while (!instance.paintCalled) {
                         try {
@@ -217,16 +211,13 @@ public final class SplashWindow extends Window {
      * Invokes the main method of the provided class name.
      *
      * @param className Name of class to be invoked
-     * @param args the command line arguments
+     * @param args      the command line arguments
      */
     public static void invokeMain(final String className, final String[] args) {
         try {
-            Class.forName(className)
-                    .getMethod("main", new Class[] { String[].class })
-                    .invoke(null, new Object[] { args });
+            Class.forName(className).getMethod("main", new Class[]{String[].class}).invoke(null, new Object[]{args});
         } catch (Exception e) {
-            InternalError error = new InternalError(
-                    "Failed to invoke main method");
+            InternalError error = new InternalError("Failed to invoke main method");
             error.initCause(e);
             throw error;
         }

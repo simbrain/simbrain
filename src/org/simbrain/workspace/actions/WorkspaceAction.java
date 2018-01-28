@@ -1,8 +1,8 @@
 package org.simbrain.workspace.actions;
 
-import javax.swing.AbstractAction;
-
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
 
 public abstract class WorkspaceAction extends AbstractAction {
     protected final Workspace workspace;

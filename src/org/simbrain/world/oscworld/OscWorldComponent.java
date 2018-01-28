@@ -18,41 +18,46 @@
  */
 package org.simbrain.world.oscworld;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.simbrain.workspace.WorkspaceComponent;
-
 /**
  * OSC world component.
- *
+ * <p>
  * TODO: For this and MIDI make sure to note that consumer, producer classes
  * removed
  */
 public final class OscWorldComponent extends WorkspaceComponent {
 
-//    /** OSC port in. */
-//    private final OSCPortIn oscPortIn;
-//
-//    /** OSC port out. */
-//    private final OSCPortOut oscPortOut;
+    //    /** OSC port in. */
+    //    private final OSCPortIn oscPortIn;
+    //
+    //    /** OSC port out. */
+    //    private final OSCPortOut oscPortOut;
 
-    /** Default OSC out host. */
+    /**
+     * Default OSC out host.
+     */
     private static final InetAddress DEFAULT_OSC_OUT_HOST;
 
-    /** Default OSC in port. */
+    /**
+     * Default OSC in port.
+     */
     private static final int DEFAULT_OSC_IN_PORT = 9998;
 
-    /** Default OSC out port. */
+    /**
+     * Default OSC out port.
+     */
     private static final int DEFAULT_OSC_OUT_PORT = 9999;
 
     static {
         try {
             DEFAULT_OSC_OUT_HOST = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            throw new RuntimeException("could not create default OSC out host",
-                    e);
+            throw new RuntimeException("could not create default OSC out host", e);
         }
     }
 
@@ -63,40 +68,47 @@ public final class OscWorldComponent extends WorkspaceComponent {
      */
     public OscWorldComponent(final String name) {
         super(name);
-//        try {
-//            oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
-//            oscPortIn.startListening();
-//        } catch (SocketException e) {
-//            throw new RuntimeException("could not create OSC port in", e);
-//        }
-//        try {
-//            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST,
-//                    DEFAULT_OSC_OUT_PORT);
-//        } catch (SocketException e) {
-//            throw new RuntimeException("could not create OSC port out", e);
-//        }
+        //        try {
+        //            oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
+        //            oscPortIn.startListening();
+        //        } catch (SocketException e) {
+        //            throw new RuntimeException("could not create OSC port in", e);
+        //        }
+        //        try {
+        //            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST,
+        //                    DEFAULT_OSC_OUT_PORT);
+        //        } catch (SocketException e) {
+        //            throw new RuntimeException("could not create OSC port out", e);
+        //        }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void closing() {
-//        oscPortIn.stopListening();
-//        // TODO: always throws SocketException; wrote email to JavaOSC author
-//        oscPortIn.close();
-//        oscPortOut.close();
-//        // TODO: remove list event listeners
+        //        oscPortIn.stopListening();
+        //        // TODO: always throws SocketException; wrote email to JavaOSC author
+        //        oscPortIn.close();
+        //        oscPortOut.close();
+        //        // TODO: remove list event listeners
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void save(final OutputStream outputStream, final String format) {
         // empty
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void update() {
         // empty
     }
 
     // TODO: make these bound properties
+
     /**
      * Return the OSC in host name.
      *
@@ -133,23 +145,23 @@ public final class OscWorldComponent extends WorkspaceComponent {
         return DEFAULT_OSC_OUT_PORT;
     }
 
-//    /**
-//     * Return the OSC port in for this OSC world component.
-//     *
-//     * @return the OSC port in for this OSC world component
-//     */
-//    OSCPortIn getOscPortIn() {
-//        return oscPortIn;
-//    }
-//
-//    /**
-//     * Return the OSC port out for this OSC world component.
-//     *
-//     * @return the OSC port out for this OSC world component
-//     */
-//    OSCPortOut getOscPortOut() {
-//        return oscPortOut;
-//    }
+    //    /**
+    //     * Return the OSC port in for this OSC world component.
+    //     *
+    //     * @return the OSC port in for this OSC world component
+    //     */
+    //    OSCPortIn getOscPortIn() {
+    //        return oscPortIn;
+    //    }
+    //
+    //    /**
+    //     * Return the OSC port out for this OSC world component.
+    //     *
+    //     * @return the OSC port out for this OSC world component
+    //     */
+    //    OSCPortOut getOscPortOut() {
+    //        return oscPortOut;
+    //    }
 
     // TODO: Moving consumer, producer lists to top level breaks this stuff
     // which uses glazed lists..
@@ -199,7 +211,7 @@ public final class OscWorldComponent extends WorkspaceComponent {
      * Add a new OSC in message with the specified address.
      *
      * @param address OSC in message address, must not be null and must start
-     *            with <code>'/'</code> character
+     *                with <code>'/'</code> character
      */
     public void addInMessage(final String address) {
         // OscMessageProducer producer = new OscMessageProducer(address, this);
@@ -210,7 +222,7 @@ public final class OscWorldComponent extends WorkspaceComponent {
      * Add a new OSC out message with the specified address.
      *
      * @param address OSC out message address, must not be null and must start
-     *            with <code>'/'</code> character
+     *                with <code>'/'</code> character
      */
     public void addOutMessage(final String address) {
         // OscMessageConsumer consumer = new OscMessageConsumer(address, this);

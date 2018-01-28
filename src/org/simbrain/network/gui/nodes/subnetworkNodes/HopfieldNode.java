@@ -18,18 +18,15 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of Hopfield Network.
@@ -42,7 +39,7 @@ public class HopfieldNode extends SubnetworkNode {
      * Create a Hopfield Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the Hopfield network
+     * @param group        the Hopfield network
      */
     public HopfieldNode(NetworkPanel networkPanel, Hopfield group) {
         super(networkPanel, group);
@@ -53,8 +50,7 @@ public class HopfieldNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new HopfieldEditTrainDialog(
-            getNetworkPanel(), (Hopfield) getSubnetwork());
+        return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
     }
 
     /**
@@ -75,18 +71,15 @@ public class HopfieldNode extends SubnetworkNode {
         };
         menu.add(trainNet);
         menu.addSeparator();
-        Action randomizeNet = new AbstractAction(
-            "Randomize synapses symmetrically") {
+        Action randomizeNet = new AbstractAction("Randomize synapses symmetrically") {
             public void actionPerformed(final ActionEvent event) {
                 ((Hopfield) getSubnetwork()).randomize();
             }
         };
         menu.add(randomizeNet);
-        Action clearWeights = new AbstractAction(
-            "Set weights to zero") {
+        Action clearWeights = new AbstractAction("Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrength(0,
-                    Polarity.BOTH);
+                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrength(0, Polarity.BOTH);
                 ;
             }
         };

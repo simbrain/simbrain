@@ -18,36 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
@@ -67,16 +37,19 @@ import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
 /**
- *
  * A panel for creating and setting the parameters of an arbitrary Echo-State
  * Network.
- *
+ * <p>
  * TODO: Include initial scaling factors of terms. TODO: Consider using
  * simplified continuous time ESN where only leak is important
  *
  * @author Zoë Tosi
- *
  */
 @SuppressWarnings("serial")
 public class ESNCreationDialog extends StandardDialog {
@@ -95,11 +68,14 @@ public class ESNCreationDialog extends StandardDialog {
 
     public static final int DEFAULT_OUTPUT_POPULATION = 1;
 
-    /** A combo box containing the two possible time types an ESN can have. */
-    private JComboBox<TimeType> cbTimeType = new JComboBox<TimeType>(
-            TimeType.values());
+    /**
+     * A combo box containing the two possible time types an ESN can have.
+     */
+    private JComboBox<TimeType> cbTimeType = new JComboBox<TimeType>(TimeType.values());
 
-    /** The main panel to which all non-dialog specific components are added. */
+    /**
+     * The main panel to which all non-dialog specific components are added.
+     */
     private Box mainPanel = Box.createVerticalBox();
 
     /**
@@ -114,17 +90,24 @@ public class ESNCreationDialog extends StandardDialog {
      */
     private JPanel inputLayerPanel = new JPanel();
 
-    /** The population (# neurons) in the input layer field. */
+    /**
+     * The population (# neurons) in the input layer field.
+     */
     private JTextField tfInputLayerPop = new JTextField(5);
+
     {
         // Aesthetic choice...
         tfInputLayerPop.setHorizontalAlignment(JTextField.RIGHT);
     }
 
-    /** The neuron layer panel corresponding to the reservoir. */
+    /**
+     * The neuron layer panel corresponding to the reservoir.
+     */
     private NeuronLayerPanel reservoirPanel;
 
-    /** The neuron layer panel corresponding to the output layer. */
+    /**
+     * The neuron layer panel corresponding to the output layer.
+     */
     private NeuronLayerPanel outputPanel;
 
     /**
@@ -145,7 +128,9 @@ public class ESNCreationDialog extends StandardDialog {
      */
     private CondensedConnectionPanel outToResPanel;
 
-    /** The tabbed pane containing the connection panels. */
+    /**
+     * The tabbed pane containing the connection panels.
+     */
     private final JTabbedPane connectionPanels = new JTabbedPane();
 
     /**
@@ -156,7 +141,7 @@ public class ESNCreationDialog extends StandardDialog {
 
     /**
      * Whether or not to create a connection from the output to the reservoir.
-     * */
+     */
     private final JCheckBox allowOutToRes = new JCheckBox();
 
     /**
@@ -173,7 +158,9 @@ public class ESNCreationDialog extends StandardDialog {
      */
     private final JCheckBox directInputToOutput = new JCheckBox();
 
-    /** The network panel where this is all taking place. */
+    /**
+     * The network panel where this is all taking place.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -287,23 +274,17 @@ public class ESNCreationDialog extends StandardDialog {
      */
     private void initConnectionPanels() {
         // Create panels
-        inToResPanel = new CondensedConnectionPanel(networkPanel, this,
-                DEFAULT_RESERVOIR_POPULATION);
+        inToResPanel = new CondensedConnectionPanel(networkPanel, this, DEFAULT_RESERVOIR_POPULATION);
         inToResPanel.getConnectorPanel().setRecurrent(false);
-        resToResPanel = new CondensedConnectionPanel(networkPanel, this,
-                DEFAULT_RESERVOIR_POPULATION);
+        resToResPanel = new CondensedConnectionPanel(networkPanel, this, DEFAULT_RESERVOIR_POPULATION);
         resToResPanel.getConnectorPanel().setRecurrent(true);
-        outToResPanel = new CondensedConnectionPanel(networkPanel, this,
-                DEFAULT_RESERVOIR_POPULATION);
+        outToResPanel = new CondensedConnectionPanel(networkPanel, this, DEFAULT_RESERVOIR_POPULATION);
         outToResPanel.getConnectorPanel().setRecurrent(false);
 
         // Create aesthetic borders
-        ((Box) inToResPanel.getMainPanel()).setBorder(BorderFactory
-                .createEmptyBorder(10, 5, 5, 5));
-        ((Box) resToResPanel.getMainPanel()).setBorder(BorderFactory
-                .createEmptyBorder(10, 5, 5, 5));
-        ((Box) outToResPanel.getMainPanel()).setBorder(BorderFactory
-                .createEmptyBorder(10, 5, 5, 5));
+        ((Box) inToResPanel.getMainPanel()).setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+        ((Box) resToResPanel.getMainPanel()).setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+        ((Box) outToResPanel.getMainPanel()).setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
     }
 
     /**
@@ -311,8 +292,7 @@ public class ESNCreationDialog extends StandardDialog {
      */
     private void init() {
 
-        globalESNSettingsPanel.setBorder(BorderFactory
-                .createTitledBorder("Global Settings"));
+        globalESNSettingsPanel.setBorder(BorderFactory.createTitledBorder("Global Settings"));
         mainPanel.add(globalESNSettingsPanel);
 
         //mainPanel.add(Box.createVerticalStrut(5));
@@ -339,20 +319,15 @@ public class ESNCreationDialog extends StandardDialog {
         insetPanel.setBorder(BorderFactory.createTitledBorder("Input"));
         neuronLayerPanels.add(insetPanel);
 
-        reservoirPanel = NeuronLayerPanel.createNeuronLayerPanel(this,
-                (TimeType) cbTimeType.getSelectedItem(),
-                DEFAULT_INITIAL_FUNCTION, DEFAULT_RESERVOIR_POPULATION);
+        reservoirPanel = NeuronLayerPanel.createNeuronLayerPanel(this, (TimeType) cbTimeType.getSelectedItem(), DEFAULT_INITIAL_FUNCTION, DEFAULT_RESERVOIR_POPULATION);
         reservoirPanel.setBorder(BorderFactory.createTitledBorder("Reservoir"));
         neuronLayerPanels.add(reservoirPanel);
 
-        outputPanel = NeuronLayerPanel.createNeuronLayerPanel(this,
-                (TimeType) cbTimeType.getSelectedItem(),
-                DEFAULT_INITIAL_FUNCTION, DEFAULT_OUTPUT_POPULATION);
+        outputPanel = NeuronLayerPanel.createNeuronLayerPanel(this, (TimeType) cbTimeType.getSelectedItem(), DEFAULT_INITIAL_FUNCTION, DEFAULT_OUTPUT_POPULATION);
         outputPanel.setBorder(BorderFactory.createTitledBorder("Output"));
         neuronLayerPanels.add(outputPanel);
 
-        neuronLayerPanels.setBorder(BorderFactory.createTitledBorder(
-                "Neuron Layer Settings"));
+        neuronLayerPanels.setBorder(BorderFactory.createTitledBorder("Neuron Layer Settings"));
         //neuronLayerPanels.add(Box.createVerticalStrut(10));
 
         // The jpanel set to the dialog's background color addresses
@@ -365,8 +340,7 @@ public class ESNCreationDialog extends StandardDialog {
 
         connectionPanels.add(inToResPanel.getMainPanel(), "Input \u2192 Res.");
         connectionPanels.add(resToResPanel.getMainPanel(), "Res. \u2192 Res.");
-        connectionPanels.setBorder(BorderFactory
-                .createTitledBorder("Synaptic Connection Settings"));
+        connectionPanels.setBorder(BorderFactory.createTitledBorder("Synaptic Connection Settings"));
 
         JPanel connectionPanelHolder = new JPanel();
         connectionPanelHolder.setBackground(this.getBackground());
@@ -381,8 +355,7 @@ public class ESNCreationDialog extends StandardDialog {
 
         // Add a help button
         JButton helpButton = new JButton("Help");
-        Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/echostatenetwork.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/echostatenetwork.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
 
@@ -399,8 +372,7 @@ public class ESNCreationDialog extends StandardDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (allowOutToRes.isSelected()) {
-                    connectionPanels.add(outToResPanel.getMainPanel(),
-                            "Out \u2192 Res.");
+                    connectionPanels.add(outToResPanel.getMainPanel(), "Out \u2192 Res.");
                 } else {
                     connectionPanels.remove(outToResPanel.getMainPanel());
                 }
@@ -414,8 +386,7 @@ public class ESNCreationDialog extends StandardDialog {
         ttCb.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reservoirPanel.setTimeType((TimeType) cbTimeType
-                        .getSelectedItem());
+                reservoirPanel.setTimeType((TimeType) cbTimeType.getSelectedItem());
             }
         });
 
@@ -428,8 +399,7 @@ public class ESNCreationDialog extends StandardDialog {
 
             @Override
             public void focusLost(FocusEvent e) {
-                Integer numTargs = Utils.parseInteger(reservoirPanel
-                        .getTfPopulation());
+                Integer numTargs = Utils.parseInteger(reservoirPanel.getTfPopulation());
                 if (numTargs == null) {
                     return;
                 }
@@ -470,28 +440,24 @@ public class ESNCreationDialog extends StandardDialog {
         // ((NoisyUpdateRule) n.getUpdateRule()).setAddNoise(true);
         // }
         if (reservoirLayer.size() > reservoirLayer.getGridThreshold()) {
-            reservoirLayer
-                    .setLayout(new org.simbrain.network.layouts.GridLayout());
+            reservoirLayer.setLayout(new org.simbrain.network.layouts.GridLayout());
         }
         reservoirLayer.applyLayout();
 
         // Reservoir's synapse group must be initialized alongside the reservoir
         // neuron group
-        SynapseGroup resSynapses = resToResPanel.createSynapseGroup(
-                reservoirLayer, reservoirLayer);
+        SynapseGroup resSynapses = resToResPanel.createSynapseGroup(reservoirLayer, reservoirLayer);
         resSynapses.setLabel("Res \u2192 Res");
 
         // Output layer
         NeuronGroup outputLayer = outputPanel.createLayerFromData();
         outputLayer.applyLayout();
         if (outputLayer.size() > outputLayer.getGridThreshold()) {
-            outputLayer
-                    .setLayout(new org.simbrain.network.layouts.GridLayout());
+            outputLayer.setLayout(new org.simbrain.network.layouts.GridLayout());
         }
 
         // Make a bare ESN (no neuron or synapse groups)
-        EchoStateNetwork esn = new EchoStateNetwork(net,
-                networkPanel.getLastClickedPosition());
+        EchoStateNetwork esn = new EchoStateNetwork(net, networkPanel.getLastClickedPosition());
 
         // Set gloabl ESN settings
         esn.setBackWeights(allowOutToRes.isSelected());
@@ -509,30 +475,25 @@ public class ESNCreationDialog extends StandardDialog {
         esn.initializeOutput(outputLayer);
 
         // Initialize Synapse Groups
-        SynapseGroup itr = inToResPanel.createSynapseGroup(inputLayer,
-                reservoirLayer);
+        SynapseGroup itr = inToResPanel.createSynapseGroup(inputLayer, reservoirLayer);
         itr.setLabel("In \u2192 Res");
         esn.addSynapseGroup(itr);
 
-        SynapseGroup rto = SynapseGroup.createSynapseGroup(reservoirLayer,
-                outputLayer, 0.5);
+        SynapseGroup rto = SynapseGroup.createSynapseGroup(reservoirLayer, outputLayer, 0.5);
         rto.setLabel("Res \u2192 Out");
         esn.addSynapseGroup(rto);
         if (allowRecurrentOutputs.isSelected()) {
-            SynapseGroup oto = SynapseGroup.createSynapseGroup(outputLayer,
-                    outputLayer, 0.5);
+            SynapseGroup oto = SynapseGroup.createSynapseGroup(outputLayer, outputLayer, 0.5);
             oto.setLabel("Out \u2192 Out");
             esn.addSynapseGroup(oto);
         }
         if (allowOutToRes.isSelected()) {
-            SynapseGroup otr = outToResPanel.createSynapseGroup(outputLayer,
-                    reservoirLayer);
+            SynapseGroup otr = outToResPanel.createSynapseGroup(outputLayer, reservoirLayer);
             otr.setLabel("Out \u2192 Res.");
             esn.addSynapseGroup(otr);
         }
         if (directInputToOutput.isSelected()) {
-            SynapseGroup ito = SynapseGroup.createSynapseGroup(inputLayer,
-                    outputLayer, 0.5);
+            SynapseGroup ito = SynapseGroup.createSynapseGroup(inputLayer, outputLayer, 0.5);
             ito.setLabel("In \u2192 Out");
             esn.addSynapseGroup(ito);
         }
@@ -557,21 +518,16 @@ public class ESNCreationDialog extends StandardDialog {
             ex.printStackTrace();
             // Something went wrong... user probably put a non-sensical value
             // in one of the fields.
-            JOptionPane.showMessageDialog(new JFrame(), "BUILD FAILURE:"
-                    + "\nOne or more entered parameters are invalid. "
-                    + "\nCheck all fields for invalid variable assignments.",
-                    "Network Creation Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), "BUILD FAILURE:" + "\nOne or more entered parameters are invalid. " + "\nCheck all fields for invalid variable assignments.", "Network Creation Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     *
      * A panel for creating neuron layers appropriate for ESNs... that is ones
      * which only specify a population and constrain the update rule to be
      * sigmoidal. Here as a convenience.
      *
      * @author Zoë Tosi
-     *
      */
     private static class NeuronLayerPanel extends JPanel {
 
@@ -587,7 +543,9 @@ public class ESNCreationDialog extends StandardDialog {
             tfPopulation.setHorizontalAlignment(JTextField.RIGHT);
         }
 
-        /** The label that displays the type of squashing function being used. */
+        /**
+         * The label that displays the type of squashing function being used.
+         */
         private JLabel typeLabel;
 
         /**
@@ -596,25 +554,25 @@ public class ESNCreationDialog extends StandardDialog {
          */
         private DropDownTriangle editTriangle;
 
-        /** The sigmoidal rule panel: either discrete or continuous. */
+        /**
+         * The sigmoidal rule panel: either discrete or continuous.
+         */
         private AbstractSigmoidalRulePanel rulePanel;
 
-        /** The parent dialog for resizing. */
+        /**
+         * The parent dialog for resizing.
+         */
         private final ESNCreationDialog parent;
 
         /**
-         *
          * @param parent
          * @param timeType
          * @param initialFunc
          * @param initPop
          * @return
          */
-        public static NeuronLayerPanel createNeuronLayerPanel(
-                ESNCreationDialog parent, TimeType timeType,
-                SquashingFunction initialFunc, int initPop) {
-            NeuronLayerPanel nlp = new NeuronLayerPanel(parent, timeType,
-                    initialFunc, initPop);
+        public static NeuronLayerPanel createNeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunction initialFunc, int initPop) {
+            NeuronLayerPanel nlp = new NeuronLayerPanel(parent, timeType, initialFunc, initPop);
             nlp.setTimeType(timeType);
             nlp.rulePanel.getCbImplementation().setSelectedItem(initialFunc);
             nlp.initListeners();
@@ -625,18 +583,15 @@ public class ESNCreationDialog extends StandardDialog {
         }
 
         /**
-         *
          * @param parent
          * @param timeType
          * @param initialFunc
          * @param initPop
          */
-        private NeuronLayerPanel(ESNCreationDialog parent, TimeType timeType,
-                SquashingFunction initialFunc, int initPop) {
+        private NeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunction initialFunc, int initPop) {
             this.parent = parent;
             tfPopulation.setText(Integer.toString(initPop));
-            editTriangle = new DropDownTriangle(UpDirection.LEFT, false,
-                    "Edit", "Edit", parent);
+            editTriangle = new DropDownTriangle(UpDirection.LEFT, false, "Edit", "Edit", parent);
 
         }
 
@@ -653,8 +608,7 @@ public class ESNCreationDialog extends StandardDialog {
             JPanel basicPanel = new JPanel(gl);
             basicPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 5));
             basicPanel.add(new JLabel("Neuron Type: "));
-            typeLabel = new JLabel(rulePanel.getCbImplementation()
-                    .getSelectedItem().toString());
+            typeLabel = new JLabel(rulePanel.getCbImplementation().getSelectedItem().toString());
             JPanel tSub = new JPanel(new FlowLayout());
             tSub.add(typeLabel);
             basicPanel.add(tSub);
@@ -666,8 +620,7 @@ public class ESNCreationDialog extends StandardDialog {
 
             // Add the drop-down triangle
             JPanel editWrapper = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-            editWrapper
-                    .setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 15));
+            editWrapper.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 15));
             editWrapper.add(editTriangle);
             this.add(editWrapper, BorderLayout.CENTER);
 
@@ -681,7 +634,6 @@ public class ESNCreationDialog extends StandardDialog {
         }
 
         /**
-         *
          * @return
          */
         public JTextField getTfPopulation() {
@@ -727,8 +679,7 @@ public class ESNCreationDialog extends StandardDialog {
          */
         public void resetLabelColors() {
             JComboBox impCb = rulePanel.getCbImplementation();
-            SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb
-                    .getSelectedIndex());
+            SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb.getSelectedIndex());
             typeLabel.setText(func.toString());
             // TODO: Cleanup/generalize
             if (func == SquashingFunction.TANH) {
@@ -743,16 +694,13 @@ public class ESNCreationDialog extends StandardDialog {
         }
 
         /**
-         *
          * @return
          * @throws IllegalArgumentException
          */
-        public NeuronGroup createLayerFromData()
-                throws IllegalArgumentException {
+        public NeuronGroup createLayerFromData() throws IllegalArgumentException {
             Integer numNeurons = Utils.parseInteger(tfPopulation);
             if (numNeurons == null) {
-                throw new IllegalArgumentException("Non-number population"
-                        + " value.");
+                throw new IllegalArgumentException("Non-number population" + " value.");
             }
             ArrayList<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
             for (int i = 0; i < numNeurons; i++) {
@@ -780,8 +728,7 @@ public class ESNCreationDialog extends StandardDialog {
             impCb.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SquashingFunction func = SquashingFunction
-                            .getFunctionFromIndex(impCb.getSelectedIndex());
+                    SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb.getSelectedIndex());
                     typeLabel.setText(func.toString());
                     // TODO: Cleanup/generalize
                     resetLabelColors();
@@ -798,11 +745,11 @@ public class ESNCreationDialog extends StandardDialog {
 
     /**
      * Main function to test dialog.
+     *
      * @param args
      */
     public static void main(String[] args) {
-        ESNCreationDialog dialog = ESNCreationDialog
-                .createESNDialog(new NetworkPanel(new Network()));
+        ESNCreationDialog dialog = ESNCreationDialog.createESNDialog(new NetworkPanel(new Network()));
         dialog.setLocationRelativeTo(null);
         dialog.pack();
         dialog.setVisible(true);

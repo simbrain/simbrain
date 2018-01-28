@@ -32,7 +32,9 @@ import org.simbrain.network.groups.SynapseGroup;
  */
 public class UpdateGroup implements NetworkUpdateAction {
 
-    /** Reference to group. */
+    /**
+     * Reference to group.
+     */
     private final Group group;
 
     /**
@@ -51,17 +53,13 @@ public class UpdateGroup implements NetworkUpdateAction {
     public String getDescription() {
         String groupUpdateDescription = group.getUpdateMethodDesecription();
         if (group instanceof Subnetwork) {
-            return "Subnetwork:" + group.getLabel() + " ("
-                    + groupUpdateDescription + ")";
+            return "Subnetwork:" + group.getLabel() + " (" + groupUpdateDescription + ")";
         } else if (group instanceof NeuronGroup) {
-            return "NeuronGroup:" + group.getLabel() + " ("
-                    + groupUpdateDescription + ")";
+            return "NeuronGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
         } else if (group instanceof SynapseGroup) {
-            return "SynapseGroup:" + group.getLabel() + " ("
-                    + groupUpdateDescription + ")";
+            return "SynapseGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
         } else {
-            return "Group:" + group.getLabel() + " (" + groupUpdateDescription
-                    + ")";
+            return "Group:" + group.getLabel() + " (" + groupUpdateDescription + ")";
         }
     }
 

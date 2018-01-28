@@ -1,10 +1,7 @@
 package org.simbrain.workspace.serialization;
 
-import org.simbrain.workspace.Attribute;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -16,17 +13,24 @@ import org.simbrain.workspace.WorkspaceComponent;
 @XStreamAlias("ArchivedAttribute")
 public final class ArchivedAttribute {
 
-    /** The id of the workspace component. */
+    /**
+     * The id of the workspace component.
+     */
     private String componentId;
 
-    /** The id of the couplable object. */
+    /**
+     * The id of the couplable object.
+     */
     private String id;
 
-    /** The method name. */
+    /**
+     * The method name.
+     */
     private String methodName;
 
     /**
      * Creates a new ArchivedAttribute.
+     *
      * @param component The component which owns this attribute.
      * @param attribute The attribute.
      */

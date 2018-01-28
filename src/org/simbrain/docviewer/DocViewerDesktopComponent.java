@@ -18,36 +18,6 @@
  */
 package org.simbrain.docviewer;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -59,37 +29,58 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+
 /**
  * A very simple component which displays html and allows it to be edited. Uses
  * a JEditorPane to display html and an RSSyntaxTextArea to edit it.
- *
+ * <p>
  * Examples of html code for local links and images:
- *
+ * <p>
  * <img src = "file:docs/Images/World.gif" alt="world">
  * <a href = "file:docs/SimbrainDocs.html">Local link</a>.
- *
  */
 public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> {
 
-    /** Main text area. */
+    /**
+     * Main text area.
+     */
     private final JEditorPane textArea = new JEditorPane();
 
-    /** Menu Bar. */
+    /**
+     * Menu Bar.
+     */
     private JMenuBar menuBar = new JMenuBar();
 
-    /** File menu for saving and opening world files. */
+    /**
+     * File menu for saving and opening world files.
+     */
     private JMenu file = new JMenu("File");
 
-    /** Main text area. */
+    /**
+     * Main text area.
+     */
     private final RSyntaxTextArea htmlEditor = new RSyntaxTextArea();
 
     /**
      * Constructor the gui component.
-     * @param frame frame of doc viewer
+     *
+     * @param frame     frame of doc viewer
      * @param component workspace component
      */
-    public DocViewerDesktopComponent(GenericFrame frame,
-            DocViewerComponent component) {
+    public DocViewerDesktopComponent(GenericFrame frame, DocViewerComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
         setLayout(new BorderLayout());
@@ -112,12 +103,10 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                         InputStream fis;
                         BufferedReader br;
                         fis = new FileInputStream(f);
-                        br = new BufferedReader(new InputStreamReader(fis,
-                                Charset.forName("UTF-8")));
+                        br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
                         htmlEditor.read(br, null);
                         textArea.setText(htmlEditor.getText());
-                        DocViewerDesktopComponent.this.getWorkspaceComponent()
-                                .setText(htmlEditor.getText());
+                        DocViewerDesktopComponent.this.getWorkspaceComponent().setText(htmlEditor.getText());
                         htmlEditor.setCaretPosition(0);
                     } catch (IOException ioex) {
                         System.out.println(e);
@@ -141,8 +130,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         textArea.setContentType("text/html");
         textArea.setEditable(false);
-        textArea.setText(((DocViewerComponent) this.getWorkspaceComponent())
-                .getText());
+        textArea.setText(((DocViewerComponent) this.getWorkspaceComponent()).getText());
 
         final JScrollPane sp = new JScrollPane(textArea);
 
@@ -165,14 +153,12 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
         // when changes occur
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 // Assumes index of view tab is 0
                 if (index == 0) {
                     textArea.setText(htmlEditor.getText());
-                    DocViewerDesktopComponent.this.getWorkspaceComponent()
-                            .setText(htmlEditor.getText());
+                    DocViewerDesktopComponent.this.getWorkspaceComponent().setText(htmlEditor.getText());
                 }
             }
         };
@@ -187,8 +173,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                     try {
                         if (e.getURL() != null) {
                             //System.out.println(e.getURL().toURI());
-                            Desktop.getDesktop().browse(
-                                    processLocalFiles(e.getURL().toURI()));
+                            Desktop.getDesktop().browse(processLocalFiles(e.getURL().toURI()));
                         }
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -213,8 +198,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
     private URI processLocalFiles(URI uri) {
         String uriStr = uri.toString();
         if (uriStr.startsWith("file:")) {
-            uriStr = "file:" + System.getProperty("user.dir") + "/"
-                    + uriStr.substring(5);
+            uriStr = "file:" + System.getProperty("user.dir") + "/" + uriStr.substring(5);
             URL url;
             try {
                 url = new URL(uriStr);

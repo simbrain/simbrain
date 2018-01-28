@@ -18,126 +18,166 @@
  */
 package org.simbrain.util.environment;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.environment.SmellSource.DecayFunction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * <b>PanelStimulus</b> is a panel used to adjust the "smell signatures" (arrays
  * of doubles representing the effect an object has on the input nodes of the
  * network of non-creature entities in the world.
  */
-public class SmellSourcePanel extends LabelledItemPanel implements
-        ActionListener {
+public class SmellSourcePanel extends LabelledItemPanel implements ActionListener {
 
-    /** Smell source. */
+    /**
+     * Smell source.
+     */
     private SmellSource smellSource;
 
-    /** Value array. */
+    /**
+     * Value array.
+     */
     private double[] valArray = null;
 
-    /** Random number generator upper limit. */
+    /**
+     * Random number generator upper limit.
+     */
     private double randomUpper;
 
-    /** Random number generator lower limit. */
+    /**
+     * Random number generator lower limit.
+     */
     private double randomLower;
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Values panel. */
+    /**
+     * Values panel.
+     */
     private LabelledItemPanel valuesPanel = new LabelledItemPanel();
 
-    /** Dispersion panel. */
+    /**
+     * Dispersion panel.
+     */
     private LabelledItemPanel dispersionPanel = new LabelledItemPanel();
 
-    /** Stimulus values field. */
+    /**
+     * Stimulus values field.
+     */
     private JTextField[] stimulusVals;
 
-    /** Number of stimulus field. */
+    /**
+     * Number of stimulus field.
+     */
     private JTextField tfStimulusNum = new JTextField();
 
-    /** Change number of stimulus button. */
+    /**
+     * Change number of stimulus button.
+     */
     private JButton stimulusButton = new JButton("Change");
 
-    /** Random number upper limit field. */
+    /**
+     * Random number upper limit field.
+     */
     private JTextField tfRandomUpper = new JTextField();
 
-    /** Random number lower limit field. */
+    /**
+     * Random number lower limit field.
+     */
     private JTextField tfRandomLower = new JTextField();
 
-    /** Upper label. */
+    /**
+     * Upper label.
+     */
     private JLabel upperLabel = new JLabel("Upper: ");
 
-    /** Lower label. */
+    /**
+     * Lower label.
+     */
     private JLabel lowerLabel = new JLabel("Lower: ");
 
-    /** Randomize button. */
+    /**
+     * Randomize button.
+     */
     private JButton randomizeButton = new JButton("Randomize");
 
-    /** Stimulus panel. */
+    /**
+     * Stimulus panel.
+     */
     private JPanel addStimulusPanel = new JPanel();
 
-    /** Grid bag layout constraints. */
+    /**
+     * Grid bag layout constraints.
+     */
     private GridBagConstraints con = new GridBagConstraints();
 
-    /** Random sub panel upper. */
+    /**
+     * Random sub panel upper.
+     */
     private JPanel randomSubPanelUpper = new JPanel();
 
-    /** Random sub panel lower. */
+    /**
+     * Random sub panel lower.
+     */
     private JPanel randomSubPanelLower = new JPanel();
 
-    /** Random main panel. */
+    /**
+     * Random main panel.
+     */
     private JPanel randomMainPanel = new JPanel();
 
-    /** Stimulus panel. */
+    /**
+     * Stimulus panel.
+     */
     private JPanel stimulusPanel = new JPanel();
 
-    /** Stimulus scroller. */
+    /**
+     * Stimulus scroller.
+     */
     private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
-    /** Peak field. */
+    /**
+     * Peak field.
+     */
     private JTextField tfPeak = new JTextField();
 
-    /** Decay function combo box. */
-    private JComboBox cbDecayFunction = new JComboBox(
-            SmellSource.DecayFunction.values());
+    /**
+     * Decay function combo box.
+     */
+    private JComboBox cbDecayFunction = new JComboBox(SmellSource.DecayFunction.values());
 
-    /** Dispersion field. */
+    /**
+     * Dispersion field.
+     */
     private JTextField tfDispersion = new JTextField();
 
-    /** Maximum size. */
+    /**
+     * Maximum size.
+     */
     private final int maxSize = 100;
 
-    /** Noise level slider. */
+    /**
+     * Noise level slider.
+     */
     private JSlider jsNoiseLevel = new JSlider(0, maxSize, maxSize / 2);
 
-    /** Add noise radio button. */
+    /**
+     * Add noise radio button.
+     */
     private JRadioButton rbAddNoise = new JRadioButton();
 
     /**
      * Create and populate the stimulus panel.
      *
      * @param source we reference to the world entity whose smell signature is being
-     *            adjusted.
+     *               adjusted.
      */
     public SmellSourcePanel(final SmellSource source) {
         smellSource = source;
@@ -257,8 +297,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
 
         smellSource.setStimulusVector(valArray);
         smellSource.setDispersion(Double.parseDouble(tfDispersion.getText()));
-        smellSource.setDecayFunction((DecayFunction) cbDecayFunction
-                .getSelectedItem());
+        smellSource.setDecayFunction((DecayFunction) cbDecayFunction.getSelectedItem());
         smellSource.setPeak(Double.parseDouble(tfPeak.getText()));
 
         smellSource.setAddNoise(rbAddNoise.isSelected());
@@ -329,9 +368,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
      */
     private void randomizeStimulus() {
         if (randomLower >= randomUpper) {
-            JOptionPane.showMessageDialog(null,
-                    "Upper and lower  values out of bounds.", "Warning",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Upper and lower  values out of bounds.", "Warning", JOptionPane.ERROR_MESSAGE);
 
             return;
         }
@@ -339,9 +376,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
         stimulusPanel.removeAll();
 
         for (int i = 0; i < valArray.length; i++) {
-            stimulusVals[i] = new JTextField(
-                    ""
-                            + (((randomUpper - randomLower) * Math.random()) + randomLower));
+            stimulusVals[i] = new JTextField("" + (((randomUpper - randomLower) * Math.random()) + randomLower));
             int lbl = i + 1;
             JLabel tmp = new JLabel(lbl + ":");
             con.weightx = 0.3;

@@ -1,10 +1,10 @@
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.imageworld.ImageWorldComponent;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Add ImageWorld to workspace.
@@ -14,6 +14,7 @@ public class NewImageWorldAction extends WorkspaceAction {
 
     /**
      * Create a new ImageWorld action with the specified workspace.
+     *
      * @param workspace The workspace which will own new ImageWorlds.
      */
     public NewImageWorldAction(Workspace workspace) {

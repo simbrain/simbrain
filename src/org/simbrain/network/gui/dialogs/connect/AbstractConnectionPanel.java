@@ -13,15 +13,14 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.BorderLayout;
-import java.util.List;
-
-import javax.swing.JPanel;
-
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 /**
  * <b>AbstractConnectionPanel</b> is the abstract panel for all specific panels
@@ -30,7 +29,9 @@ import org.simbrain.util.LabelledItemPanel;
 @SuppressWarnings("serial")
 public abstract class AbstractConnectionPanel extends JPanel {
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /**
@@ -62,8 +63,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
      * @param target the target neurons
      * @return the newly created synapses
      */
-    public abstract List<Synapse> applyConnection(List<Neuron> source,
-            List<Neuron> target);
+    public abstract List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target);
 
     /**
      * Get the underlying connection object.

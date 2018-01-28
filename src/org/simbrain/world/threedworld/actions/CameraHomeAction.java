@@ -1,10 +1,10 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.threedworld.ThreeDWorld;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class CameraHomeAction extends AbstractAction {
     private static final long serialVersionUID = 3114294781479510819L;

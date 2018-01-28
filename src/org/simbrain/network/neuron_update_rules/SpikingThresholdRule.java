@@ -18,27 +18,32 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import java.util.Random;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
+import java.util.Random;
+
 /**
  * A simple spiking neuron that fires when weighted inputs exceed a threshold.
  * TODO: Has no documentation.
  */
-public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements
-    NoisyUpdateRule {
+public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
-    /** Threshold. */
+    /**
+     * Threshold.
+     */
     private double threshold = .5;
 
-    /** The noise generating randomizer. */
+    /**
+     * The noise generating randomizer.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Whether or not to add noise to the inputs .*/
+    /**
+     * Whether or not to add noise to the inputs .
+     */
     private boolean addNoise;
 
     @Override
@@ -50,8 +55,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements
 
     @Override
     public void update(Neuron neuron) {
-        final double input = inputType.getInput(neuron)
-                + (addNoise ? noiseGenerator.getRandom() : 0);
+        final double input = inputType.getInput(neuron) + (addNoise ? noiseGenerator.getRandom() : 0);
         if (input >= threshold) {
             neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);

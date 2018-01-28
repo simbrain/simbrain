@@ -17,26 +17,19 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.ESNOfflineTrainingPanel;
-import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericJDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of an Echo State Network.
@@ -46,10 +39,8 @@ public class ESNNetworkNode extends SubnetworkNode {
     /**
      * Create an ESN network.
      *
-     * @param networkPanel
-     *            parent panel
-     * @param group
-     *            the ESN
+     * @param networkPanel parent panel
+     * @param group        the ESN
      */
     public ESNNetworkNode(NetworkPanel networkPanel, EchoStateNetwork group) {
         super(networkPanel, group);
@@ -67,23 +58,17 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.add(removeAction);
         menu.addSeparator();
         final EchoStateNetwork esn = (EchoStateNetwork) getSubnetwork();
-        final TrainingSet trainingSet = new TrainingSet(esn.getInputData(),
-            esn.getTargetData());
+        final TrainingSet trainingSet = new TrainingSet(esn.getInputData(), esn.getTargetData());
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            esn.getInputLayer().getNeuronList(),
-            trainingSet.getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            esn.getOutputLayer().getNeuronList(),
-            trainingSet.getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn.getInputLayer().getNeuronList(), trainingSet.getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn.getOutputLayer().getNeuronList(), trainingSet.getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
         setContextMenu(menu);
     }
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new ESNTrainingDialog(getNetworkPanel(),
-                (EchoStateNetwork) getSubnetwork());
+        return new ESNTrainingDialog(getNetworkPanel(), (EchoStateNetwork) getSubnetwork());
     }
 
 
@@ -104,9 +89,7 @@ public class ESNNetworkNode extends SubnetworkNode {
             GenericJDialog frame = new GenericJDialog();
             frame.setTitle("Trainer");
             EchoStateNetwork network = (EchoStateNetwork) getSubnetwork();
-            ESNOfflineTrainingPanel trainingPanel =
-                new ESNOfflineTrainingPanel(
-                    getNetworkPanel(), network, frame);
+            ESNOfflineTrainingPanel trainingPanel = new ESNOfflineTrainingPanel(getNetworkPanel(), network, frame);
             frame.setContentPane(trainingPanel);
             frame.setVisible(true);
             frame.pack();

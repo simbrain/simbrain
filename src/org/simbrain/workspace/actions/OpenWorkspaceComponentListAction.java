@@ -18,14 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Opens and displays a list of the current workspace components.
@@ -34,7 +31,9 @@ public final class OpenWorkspaceComponentListAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Reference to Simbrain desktop. */
+    /**
+     * Reference to Simbrain desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
@@ -50,8 +49,8 @@ public final class OpenWorkspaceComponentListAction extends AbstractAction {
     }
 
     /**
-     * @see AbstractAction
      * @param event Action event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Component List");

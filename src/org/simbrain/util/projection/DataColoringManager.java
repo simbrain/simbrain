@@ -18,10 +18,10 @@
  */
 package org.simbrain.util.projection;
 
-import java.awt.Color;
-
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.DisplayOrder;
+
+import java.awt.*;
 
 /**
  * Manage the coloring of datapoints.
@@ -33,7 +33,9 @@ public class DataColoringManager {
      */
     private enum ColoringMethod {
 
-        /** No special coloring. All points colored the base color. */
+        /**
+         * No special coloring. All points colored the base color.
+         */
         None,
 
         /**
@@ -47,15 +49,23 @@ public class DataColoringManager {
          * its color representation increases.
          */
         Frequency
-    };
+    }
 
-    /** How to color points. */
+    ;
+
+    /**
+     * How to color points.
+     */
     private ColoringMethod coloringMethod = ColoringMethod.None;
 
-    /** The "hot color" to be used for the current point. */
+    /**
+     * The "hot color" to be used for the current point.
+     */
     private Color hotColor = Color.red;
 
-    /** The base color to be used for all points besides the current point. */
+    /**
+     * The base color to be used for all points besides the current point.
+     */
     private Color baseColor = Color.green;
 
     /**
@@ -87,11 +97,14 @@ public class DataColoringManager {
      */
     private double decrementAmount = .02;
 
-    /** Reference to parent projector. */
+    /**
+     * Reference to parent projector.
+     */
     private final Projector projector;
 
     /**
      * Construct a data coloring manager.
+     *
      * @param projector
      */
     public DataColoringManager(Projector projector) {
@@ -124,8 +137,7 @@ public class DataColoringManager {
             }
         } else if (coloringMethod == ColoringMethod.DecayTrail) {
             if (point == projector.getCurrentPoint()) {
-                if (point == projector.getCurrentPoint()
-                        && hotPointMode == true) {
+                if (point == projector.getCurrentPoint() && hotPointMode == true) {
                     point.setColor(hotColor);
                 } else {
                     point.setColor(baseColor);
@@ -137,8 +149,7 @@ public class DataColoringManager {
             }
         } else if (coloringMethod == ColoringMethod.Frequency) {
             if (point == projector.getCurrentPoint()) {
-                if (point == projector.getCurrentPoint()
-                        && hotPointMode == true) {
+                if (point == projector.getCurrentPoint() && hotPointMode == true) {
                     point.setColor(hotColor);
                 } else {
                     point.setColor(baseColor);
@@ -168,6 +179,7 @@ public class DataColoringManager {
 
     /**
      * Set the coloring method.
+     *
      * @param selectedMethod
      */
     public void setColoringMethod(String selectedMethod) {
@@ -272,6 +284,7 @@ public class DataColoringManager {
 
     /**
      * Set hot point coloring mode to on (true) or off (false).
+     *
      * @param hotPointMode
      */
     public void setHotPointMode(boolean hotPointMode) {

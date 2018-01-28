@@ -8,50 +8,57 @@
 <!-- TODO: Include picture of original network and of their graph  -->
 
 <body>
-    <h1>Hippocampus model</h1>
-    <p> Based on Alvarez and Squire (1994). Implementation by Jeff Yoshimi, Jeff Rodny, Yang Lu, and Alex Pabst.
-    </p>
-    <h2>Background</h2>
-    <p>This model illustrates the idea that the hippocampus encodes information in to the cortex via memory consolidation.</p>
-    <p>The model has two cortical areas and a hippocampus</p>
-    <p>The model is trained on the following four patterns:
-        <ul style="list-style: none;">
-            <li>1,0,0,0 > 1,0,0,0</li>
-            <li>1,0,0,0 > 1,0,0,0</li>
-        </ul>
-        <ul style="list-style: none;">
-            <li>0,1,0,0 > 0,1,0,0</li>
-            <li>0,1,0,0 > 0,1,0,0</li>
-        </ul>
-        <ul style="list-style: none;">
-            <li>0,0,1,0 > 0,0,1,0</li>
-            <li>0,0,1,0 > 0,0,1,0</li>
-        </ul>
-        <ul style="list-style: none;">
-            <li>0,0,0,1 > 0,0,0,1</li>
-            <li>0,0,0,1 > 0,0,0,1</li>
-        </ul>
-    </p>
-    <h2>Normal Learning</h2>
-    <p>To see what happens when new information is learned and the hippocampus is intact:</p>
-    <ol>
-        <li><b>Train</b> the model on the four cortical patterns by pressing the <b>train all</b> button. </li>
-        <li><b>Test</b> the model by pressing <b>test all</b> (error shows up in the error field on the control panel), or by testing individuals patterns with the <b>test</b> buttons.</li>
-    </ol>
-    <h2>Consolidatiation or "Sleeping"</h2>
-    <p>In this model "consolidation" corresponds to setting the hippocampus to a random value.  This is like what happens with theta rhythyms during sleep (though consolidation also occurs while awake).   If it helps, think of each each press of the "consolidation" button as one full day passing (Alvarez and Squire refer to these as "conslidation units" but do not specify what amount of time they correspond to). </p>
-    <h2>Normal Forgetting</h2>
-    <p>To model normal forgetting train on all the patterns, sleep a bunch, then test. Error should rise and then flatten out.</p>
-    <ul style="list-style: none;">
-        <li>Train > Sleep <i>n</i> times > Test</li>
-    </ul>
-    <h2>Retrograde Amnesia</h2>
-    <p>To model retrograde amnesia sleep a bunch of times, <b>lesion</b>, then test.</p>
-    <!-- Whatever memories remain are what's left. -->
-    <!-- <p>Todo: Show that recent memories are lost.</p> -->
-    <ul style="list-style: none;">
-        <li>Train > Sleep <i>n</i> times > Lesion > Test</li>
-    </ul>
+<h1>Hippocampus model</h1>
+<p> Based on Alvarez and Squire (1994). Implementation by Jeff Yoshimi, Jeff Rodny, Yang Lu, and Alex Pabst.
+</p>
+<h2>Background</h2>
+<p>This model illustrates the idea that the hippocampus encodes information in to the cortex via memory
+    consolidation.</p>
+<p>The model has two cortical areas and a hippocampus</p>
+<p>The model is trained on the following four patterns:
+<ul style="list-style: none;">
+    <li>1,0,0,0 > 1,0,0,0</li>
+    <li>1,0,0,0 > 1,0,0,0</li>
+</ul>
+<ul style="list-style: none;">
+    <li>0,1,0,0 > 0,1,0,0</li>
+    <li>0,1,0,0 > 0,1,0,0</li>
+</ul>
+<ul style="list-style: none;">
+    <li>0,0,1,0 > 0,0,1,0</li>
+    <li>0,0,1,0 > 0,0,1,0</li>
+</ul>
+<ul style="list-style: none;">
+    <li>0,0,0,1 > 0,0,0,1</li>
+    <li>0,0,0,1 > 0,0,0,1</li>
+</ul>
+</p>
+<h2>Normal Learning</h2>
+<p>To see what happens when new information is learned and the hippocampus is intact:</p>
+<ol>
+    <li><b>Train</b> the model on the four cortical patterns by pressing the <b>train all</b> button.</li>
+    <li><b>Test</b> the model by pressing <b>test all</b> (error shows up in the error field on the control panel), or
+        by testing individuals patterns with the <b>test</b> buttons.
+    </li>
+</ol>
+<h2>Consolidatiation or "Sleeping"</h2>
+<p>In this model "consolidation" corresponds to setting the hippocampus to a random value. This is like what happens
+    with theta rhythyms during sleep (though consolidation also occurs while awake). If it helps, think of each each
+    press of the "consolidation" button as one full day passing (Alvarez and Squire refer to these as "conslidation
+    units" but do not specify what amount of time they correspond to). </p>
+<h2>Normal Forgetting</h2>
+<p>To model normal forgetting train on all the patterns, sleep a bunch, then test. Error should rise and then flatten
+    out.</p>
+<ul style="list-style: none;">
+    <li>Train > Sleep <i>n</i> times > Test</li>
+</ul>
+<h2>Retrograde Amnesia</h2>
+<p>To model retrograde amnesia sleep a bunch of times, <b>lesion</b>, then test.</p>
+<!-- Whatever memories remain are what's left. -->
+<!-- <p>Todo: Show that recent memories are lost.</p> -->
+<ul style="list-style: none;">
+    <li>Train > Sleep <i>n</i> times > Lesion > Test</li>
+</ul>
 </body>
 
 </html>

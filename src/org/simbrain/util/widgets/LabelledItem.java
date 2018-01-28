@@ -18,12 +18,8 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.Dimension;
-
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Simple utility for making rows with a label and a component.
@@ -33,10 +29,8 @@ public class LabelledItem extends JPanel {
     /**
      * Construct the labelled item.
      *
-     * @param labelText
-     *            the text for the label
-     * @param component
-     *            the labelled component
+     * @param labelText the text for the label
+     * @param component the labelled component
      */
     public LabelledItem(String labelText, JComponent component) {
         Box itemBox = Box.createHorizontalBox();

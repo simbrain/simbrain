@@ -25,7 +25,6 @@ import org.simbrain.util.randomizer.Randomizer;
  * a randomizer to provide noise.
  *
  * @author Zoë
- *
  */
 public interface NoisyUpdateRule {
 

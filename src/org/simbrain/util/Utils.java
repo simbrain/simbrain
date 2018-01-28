@@ -18,52 +18,41 @@
  */
 package org.simbrain.util;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.Ostermiller.util.CSVParser;
+import com.Ostermiller.util.CSVPrinter;
+import org.apache.log4j.Logger;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
-import org.apache.log4j.Logger;
-
-import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
+import java.util.*;
 
 /**
  * <b>Utils</b>. Utility class for simbrain package.
  */
 public class Utils {
-    /** Logger. */
+    /**
+     * Logger.
+     */
     private static Logger logger = Logger.getLogger(Utils.class);
 
-    /** File system separator. */
+    /**
+     * File system separator.
+     */
     private static final String FS = System.getProperty("file.separator");
 
     /**
      * Helper method that returns the date and time in a format that can be used
      * to create filenames.
-     * 
+     *
      * @return the formatted time string
      */
     public static String getTimeString() {
-        return new SimpleDateFormat("MM-dd-YY_k-mm")
-                .format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat("MM-dd-YY_k-mm").format(Calendar.getInstance().getTime());
     }
 
     /**
@@ -100,19 +89,14 @@ public class Utils {
 
         try {
             // # is a comment delimeter in net files
-            theParser = new CSVParser(new FileInputStream(theFile), "", "",
-                    "#");
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null,
-                    "Could not find the file \n" + theFile, "Warning",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Could not find the file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 
             return null;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "There was a problem opening the file \n" + theFile,
-                    "Warning", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
             return null;
@@ -124,7 +108,7 @@ public class Utils {
     /**
      * Write a matrix of doubles to a file.
      *
-     * @param data the matrix of doubles to write
+     * @param data    the matrix of doubles to write
      * @param theFile the file to write to
      */
     public static void writeMatrix(final double[][] data, final File theFile) {
@@ -134,7 +118,7 @@ public class Utils {
     /**
      * Save data as CSV (comma-separated-value) file.
      *
-     * @param data Data to be written
+     * @param data    Data to be written
      * @param theFile File to be written to
      */
     public static void writeMatrix(final String[][] data, final File theFile) {
@@ -168,21 +152,19 @@ public class Utils {
      * saved, and converts file-separators into forward slashes, which are used
      * for saving simulation files.
      *
-     * @param baseDir absolute path of the local simbrain directory.
+     * @param baseDir      absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
      * @return the relative path from the local directory to the file to be
-     *         saved
+     * saved
      */
-    public static String getRelativePath(final String baseDir,
-            final String absolutePath) {
+    public static String getRelativePath(final String baseDir, final String absolutePath) {
         int localLength = baseDir.length();
         int totalLength = absolutePath.length();
         int diff = totalLength - localLength;
         String relativePath = absolutePath.substring(totalLength - diff);
         relativePath = relativePath.replaceAll("/./", "/");
-        relativePath.replace('/',
-                System.getProperty("file.separator").charAt(0)); // For windows
-                                                                 // machines..
+        relativePath.replace('/', System.getProperty("file.separator").charAt(0)); // For windows
+        // machines..
         relativePath = new String("." + relativePath);
 
         return relativePath;
@@ -207,9 +189,7 @@ public class Utils {
      * @return the extracted directory path
      */
     public static String getDir(final File theFile) {
-        return theFile.getAbsolutePath().substring(0,
-                theFile.getAbsolutePath().length()
-                        - theFile.getName().length());
+        return theFile.getAbsolutePath().substring(0, theFile.getAbsolutePath().length() - theFile.getName().length());
     }
 
     /**
@@ -221,16 +201,15 @@ public class Utils {
      * in the case that the string is not parsable.
      *
      * @param tField The text field to read from and test if its text can be
-     *            parsed into a double value
+     *               parsed into a double value
      * @return Either the double value of the String in the text field, if it
-     *         can be parsed, or NaN, as a flag, if it cannot be.
+     * can be parsed, or NaN, as a flag, if it cannot be.
      */
     public static double doubleParsable(JTextField tField) {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).doubleValue();
-        } catch (NullPointerException | NumberFormatException
-                | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
             return Double.NaN;
         }
     }
@@ -240,8 +219,7 @@ public class Utils {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).floatValue();
-        } catch (NullPointerException | NumberFormatException
-                | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
             return Float.NaN;
         }
     }
@@ -257,8 +235,7 @@ public class Utils {
         try {
             text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).doubleValue();
-        } catch (NullPointerException | NumberFormatException
-                | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
             return Double.NaN;
         }
     }
@@ -273,14 +250,13 @@ public class Utils {
      *
      * @param tField the text field containing the String to be parsed.
      * @return the integer value of the string or null if the String cannot be
-     *         parsed into a <b>Number</b>
+     * parsed into a <b>Number</b>
      */
     public static Integer parseInteger(JTextField tField) {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
-        } catch (NullPointerException | NumberFormatException
-                | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
             return null;
         }
     }
@@ -296,8 +272,7 @@ public class Utils {
         try {
             text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
-        } catch (NullPointerException | NumberFormatException
-                | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
             return null;
         }
     }
@@ -305,35 +280,31 @@ public class Utils {
     /**
      * Convert an array of doubles into a String.
      *
-     * @param theVec the array of doubles to convert
+     * @param theVec    the array of doubles to convert
      * @param delimiter the delimeter
      * @return the String representation of the array
      */
-    public static String getVectorString(final double[] theVec,
-            final String delimiter) {
+    public static String getVectorString(final double[] theVec, final String delimiter) {
         return getVectorString(theVec, delimiter, 1);
     }
 
     /**
      * Convert an array of doubles into a String, represented to some specified
      * precision.
-     * 
-     * @param theVec the array of doubles to convert
+     *
+     * @param theVec    the array of doubles to convert
      * @param delimiter the delimiter
      * @param precision how many decimal places to include in the string
      * @return the String representation of the array
      */
-    public static String getVectorString(final double[] theVec,
-            final String delimiter, int precision) {
+    public static String getVectorString(final double[] theVec, final String delimiter, int precision) {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
-            retString = retString
-                    .concat("" + round(theVec[i], precision) + delimiter);
+            retString = retString.concat("" + round(theVec[i], precision) + delimiter);
         }
         // Don't use the delimeter for the last component.
-        retString = retString
-                .concat("" + round(theVec[theVec.length - 1], precision));
+        retString = retString.concat("" + round(theVec[theVec.length - 1], precision));
 
         return retString;
     }
@@ -342,12 +313,11 @@ public class Utils {
      * Convert a delimited string of doubles into an array of doubles. Undoes
      * String getVectorString.
      *
-     * @param theVec string version of vector
+     * @param theVec    string version of vector
      * @param delimiter delimiter used in that string
      * @return the corresponding array of doubles
      */
-    public static double[] getVectorString(final String theVec,
-            final String delimiter) {
+    public static double[] getVectorString(final String theVec, final String delimiter) {
         StringTokenizer st = new StringTokenizer(theVec, delimiter);
         double[] ret = new double[st.countTokens()];
         int i = 0;
@@ -398,8 +368,7 @@ public class Utils {
      * @param matrix the matrix of doubles
      * @return the matrix of Strings
      */
-    public static String[][] doubleMatrixToStringMatrix(
-            final double[][] matrix) {
+    public static String[][] doubleMatrixToStringMatrix(final double[][] matrix) {
         String[][] ret = new String[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
             ret[i] = doubleArrayToStringArray(matrix[i]);
@@ -449,7 +418,7 @@ public class Utils {
     /**
      * Returns a string rounded to the desired precision.
      *
-     * @param num double to convert
+     * @param num       double to convert
      * @param precision number of decimal places
      * @return string representation of rounded decimal
      */
@@ -470,8 +439,7 @@ public class Utils {
      * @param helpPage Help page
      */
     public static void showHelpPage(final String helpPage) {
-        String url = new String(
-                System.getProperty("user.dir") + FS + "docs" + FS + helpPage);
+        String url = new String(System.getProperty("user.dir") + FS + "docs" + FS + helpPage);
         displayLocalHtmlInBrowser(url);
 
     }
@@ -508,19 +476,18 @@ public class Utils {
      * @return Hue, saturation and brightness
      */
     public static float colorToFloat(final Color clr) {
-        return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(),
-                null)[0];
+        return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
     }
 
     /**
      * Sets the alpha of the color represented by rgBInt to the value specified
      * in alpha and returns the resulting color.
      *
-     * @param alpha an opacity value on [0, 255]
+     * @param alpha       an opacity value on [0, 255]
      * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *            blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
+     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
      * @return the color expressed as an integer with the specified alpha and
-     *         all other bits the same.
+     * all other bits the same.
      */
     public static int setAlpha(int alpha, int rgbIntColor) {
         int mask = 16777215;
@@ -532,11 +499,11 @@ public class Utils {
      * Sets the red value of the color represented by rgbIntColor to the value
      * specified by red and returns the resulting color.
      *
-     * @param red a red value on [0, 255]
+     * @param red         a red value on [0, 255]
      * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *            blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
+     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
      * @return the color expressed as an integer with the specified red and all
-     *         other bits the same.
+     * other bits the same.
      */
     public static int setRed(int red, int rgbIntColor) {
         int mask = (255 << 24) | 65535;
@@ -549,11 +516,11 @@ public class Utils {
      * Sets the green value of the color represented by rgbIntColor to the value
      * specified by green and returns the resulting color.
      *
-     * @param green a green value on [0, 255]
+     * @param green       a green value on [0, 255]
      * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *            blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
+     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
      * @return the color expressed as an integer with the specified green and
-     *         all other bits the same.
+     * all other bits the same.
      */
     public static int setGreen(int green, int rgbIntColor) {
         int mask = (65535 << 16) | 255;
@@ -566,11 +533,11 @@ public class Utils {
      * Sets the blue value of the color represented by rgbIntColor to the value
      * specified by blue and returns the resulting color.
      *
-     * @param blue a blue value on [0, 255]
+     * @param blue        a blue value on [0, 255]
      * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *            blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
+     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
      * @return the color expressed as an integer with the specified blue and all
-     *         other bits the same.
+     * other bits the same.
      */
     public static int setBlue(int blue, int rgbIntColor) {
         int mask = 16777215 << 8;
@@ -627,11 +594,10 @@ public class Utils {
      * org.apache.commons.collections.CollectionUtils.
      *
      * @param selection the collection to filter
-     * @param filter the predicate to be used in filtering.
+     * @param filter    the predicate to be used in filtering.
      * @return those members of the selection to which the predicate applies
      */
-    public static Collection select(final Collection selection,
-            final Predicate filter) {
+    public static Collection select(final Collection selection, final Predicate filter) {
         Collection ret = new ArrayList();
         for (Object object : selection) {
             if (filter.evaluate(object)) {
@@ -664,8 +630,7 @@ public class Utils {
      * @param b Collection
      * @return intersection of two collections
      */
-    public static Collection intersection(final Collection a,
-            final Collection b) {
+    public static Collection intersection(final Collection a, final Collection b) {
         Collection ret = new ArrayList();
         for (Object object : a) {
             if (b.contains(object)) {
@@ -687,8 +652,7 @@ public class Utils {
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             } else {
-                logger.info("Could not find properties file at "
-                        + file.getAbsolutePath());
+                logger.info("Could not find properties file at " + file.getAbsolutePath());
             }
             return properties;
         } catch (IOException ex) {
@@ -725,17 +689,15 @@ public class Utils {
      * Nicolas https://chocolatapp.com/
      *
      * @param <T> type of the arrays to concatenate
-     * @param A first array
-     * @param B second array
+     * @param A   first array
+     * @param B   second array
      * @return A + B array consisting of first followed by second.
      */
     public static <T> T[] concatenate(final T[] A, final T[] B) {
         int aLen = A.length;
         int bLen = B.length;
 
-        @SuppressWarnings("unchecked")
-        T[] C = (T[]) Array.newInstance(A.getClass().getComponentType(),
-                aLen + bLen);
+        @SuppressWarnings("unchecked") T[] C = (T[]) Array.newInstance(A.getClass().getComponentType(), aLen + bLen);
         System.arraycopy(A, 0, C, 0, aLen);
         System.arraycopy(B, 0, C, aLen, bLen);
 
@@ -747,8 +709,8 @@ public class Utils {
      * false otherwise.
      *
      * @param <T>
-     * @param A first collection
-     * @param B second collection
+     * @param A   first collection
+     * @param B   second collection
      * @return A intersects B
      */
     public static <T> boolean intersects(Collection<T> A, Collection<T> B) {

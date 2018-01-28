@@ -23,22 +23,26 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Very simple bump sensor. Holding off on more sophisticated "touch" sensors in
  * case an existing library can provide it.
- *
+ * <p>
  * TODO: Implement once collisions are implemented. At that point can rename to
  * collision sensor? Can also give the sensor a location and make it visible.
  */
 public class BumpSensor extends Sensor {
 
-    /** Whether it was bumped. */
+    /**
+     * Whether it was bumped.
+     */
     private boolean wasBumped = false;
 
-    /** Value to produce when bumped. */
+    /**
+     * Value to produce when bumped.
+     */
     private double bumpValue = 0;
 
     /**
      * Construct bump sensor.
      *
-     * @param parent parent entity
+     * @param parent  parent entity
      * @param bumpVal value
      */
     public BumpSensor(OdorWorldEntity parent, double bumpVal) {

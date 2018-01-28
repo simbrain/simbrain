@@ -18,16 +18,6 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JToolBar;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
@@ -36,54 +26,83 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 /**
  * <b>DisplayComponentDesktopGui</b> is the container for the display component.
  */
 public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
 
-    /** Default height. */
+    /**
+     * Default height.
+     */
     private static final int DEFAULT_HEIGHT = 250;
 
-    /** Default width. */
+    /**
+     * Default width.
+     */
     private static final int DEFAULT_WIDTH = 400;
 
-    /** Menu Bar. */
+    /**
+     * Menu Bar.
+     */
     private JMenuBar menuBar = new JMenuBar();
 
-    /** File menu for saving and opening world files. */
+    /**
+     * File menu for saving and opening world files.
+     */
     private JMenu file = new JMenu("File");
 
-    /** Edit menu Item. */
+    /**
+     * Edit menu Item.
+     */
     private JMenu edit = new JMenu("Edit");
 
-    /** Opens user preferences dialog. */
+    /**
+     * Opens user preferences dialog.
+     */
     private JMenuItem preferences = new JMenuItem("Preferences");
 
-    /** Opens the dialog to define TextWorld Dictionary. */
+    /**
+     * Opens the dialog to define TextWorld Dictionary.
+     */
     private JMenuItem loadDictionary = new JMenuItem("Load dictionary");
 
-    /** Show dictionary. */
+    /**
+     * Show dictionary.
+     */
     private JMenuItem showDictionary = new JMenuItem("Show dictionary");
 
-    /** Opens the help dialog for TextWorld. */
+    /**
+     * Opens the help dialog for TextWorld.
+     */
     private JMenu help = new JMenu("Help");
 
-    /** Help menu item. */
+    /**
+     * Help menu item.
+     */
     private JMenuItem helpItem = new JMenuItem("Dislay Help");
 
-    /** The pane representing the text world. */
+    /**
+     * The pane representing the text world.
+     */
     private DisplayPanel panel;
 
-    /** The text world. */
+    /**
+     * The text world.
+     */
     private DisplayWorld world;
 
     /**
      * Creates a new frame of type TextWorld.
+     *
      * @param frame
      * @param component
      */
-    public DisplayComponentDesktopGui(GenericFrame frame,
-            DisplayComponent component) {
+    public DisplayComponentDesktopGui(GenericFrame frame, DisplayComponent component) {
         super(frame, component);
 
         world = component.getWorld();
@@ -101,8 +120,7 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
             @Override
             public void componentResized(ComponentEvent e) {
                 Component component = e.getComponent();
-                panel.setPreferredSize(new Dimension(component.getWidth(),
-                        component.getHeight()));
+                panel.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
                 panel.revalidate();
             }
         });
@@ -131,11 +149,9 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
         file.add(new CloseAction(this.getWorkspaceComponent()));
 
         // Edit Menu
-        loadDictionary.setAction(TextWorldActions
-                .getExtractDictionaryAction(world));
+        loadDictionary.setAction(TextWorldActions.getExtractDictionaryAction(world));
         showDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
-        preferences.setAction(TextWorldActions
-                .getShowPreferencesDialogAction(world));
+        preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);
         edit.add(showDictionary);
         edit.addSeparator();
@@ -144,8 +160,7 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
 
         // Help Menu
         menuBar.add(help);
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/TextWorld/TextWorld.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html");
         helpItem.setAction(helpAction);
         help.add(helpItem);
 

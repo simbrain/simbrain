@@ -18,22 +18,23 @@
  */
 package org.simbrain.plot.piechart;
 
+import org.simbrain.plot.ChartDataSource;
+import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.plot.ChartModel;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Pie chart component.
  */
 public class PieChartComponent extends WorkspaceComponent {
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private PieChartModel model;
 
     /**
@@ -50,10 +51,10 @@ public class PieChartComponent extends WorkspaceComponent {
 
     /**
      * Initializes a pie chart with a model.
-     *
+     * <p>
      * Used in deserializing.
      *
-     * @param name name of component
+     * @param name  name of component
      * @param model to use for the plot
      */
     public PieChartComponent(final String name, final PieChartModel model) {
@@ -92,15 +93,13 @@ public class PieChartComponent extends WorkspaceComponent {
     /**
      * Streams file data for opening saved charts.
      *
-     * @param input stream
-     * @param name file name
+     * @param input  stream
+     * @param name   file name
      * @param format format
      * @return component to be opened
      */
-    public static PieChartComponent open(final InputStream input,
-            final String name, final String format) {
-        PieChartModel dataModel = (PieChartModel) PieChartModel.getXStream()
-                .fromXML(input);
+    public static PieChartComponent open(final InputStream input, final String name, final String format) {
+        PieChartModel dataModel = (PieChartModel) PieChartModel.getXStream().fromXML(input);
         return new PieChartComponent(name, dataModel);
     }
 
@@ -122,7 +121,8 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {}
+    public void closing() {
+    }
 
     @Override
     public void update() {

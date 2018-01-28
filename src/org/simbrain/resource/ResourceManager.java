@@ -18,10 +18,9 @@
  */
 package org.simbrain.resource;
 
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.net.URL;
-
-import javax.swing.ImageIcon;
 
 /**
  * <b>ResourceManager</b> provides resources (stored in the same directory) to
@@ -48,7 +47,6 @@ public class ResourceManager {
      * Retrieve an ImageIcon based on its file name.
      *
      * @param name name of the image file to retrieve
-     *
      * @return the ImageIcon which can be used with Swing components, etc
      */
     public static ImageIcon getImageIcon(final String name) {
@@ -60,14 +58,14 @@ public class ResourceManager {
 
     /**
      * Load an ImageIcon from the resources directory and scale it if necessary.
+     *
      * @param name The name of the icon to load within the resources directory.
      * @return Returns a scaled ImageIcon.
      */
     public static ImageIcon getSmallIcon(final String name) {
         URL url = ResourceManager.class.getResource(name);
         ImageIcon imageIcon = new ImageIcon(url);
-        Image image = imageIcon.getImage().getScaledInstance(
-                smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
+        Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
         imageIcon.setImage(image);
         return imageIcon;
     }
@@ -76,7 +74,6 @@ public class ResourceManager {
      * Retrieve an Image based on its file name.
      *
      * @param name name of the image file to retrieve
-     *
      * @return the Image which can be used with Swing components, etc
      */
     public static Image getImage(final String name) {

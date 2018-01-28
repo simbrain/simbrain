@@ -18,14 +18,13 @@
  */
 package org.simbrain.workspace.actions.chart;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.plot.histogram.HistogramComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add histogram chart component to workspace.
@@ -43,8 +42,9 @@ public final class NewHistogramAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Histogram");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         HistogramComponent plot = new HistogramComponent("");

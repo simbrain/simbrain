@@ -1,20 +1,15 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.awt.event.ActionEvent;
-import java.util.*;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import net.miginfocom.swing.MigLayout;
-
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AgentEditor extends ModelEditor {
     private static Map<String, Class<? extends Sensor>> sensorTypes = new HashMap<>();

@@ -18,42 +18,42 @@
  */
 package org.simbrain.plot.histogram;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Display a Histogram in the Simbrain Desktop.
  */
 public class HistogramGui extends GuiComponent<HistogramComponent> {
 
-    /** Plot action manager. */
+    /**
+     * Plot action manager.
+     */
     private PlotActionManager actionManager;
 
-    /** Preferred frame size. */
+    /**
+     * Preferred frame size.
+     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /** The histogram panel. This panel contains most of the GUI code. */
+    /**
+     * The histogram panel. This panel contains most of the GUI code.
+     */
     private HistogramPanel cPanel;
 
     /**
      * Construct the GUI.
      *
-     * @param frame Generic Frame
+     * @param frame     Generic Frame
      * @param component Histogram component
      */
-    public HistogramGui(final GenericFrame frame,
-            final HistogramComponent component) {
+    public HistogramGui(final GenericFrame frame, final HistogramComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
@@ -83,8 +83,7 @@ public class HistogramGui extends GuiComponent<HistogramComponent> {
         editMenu.add(preferences);
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/histogram.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/histogram.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 

@@ -30,46 +30,71 @@ import org.simbrain.util.randomizer.Randomizer;
  * model spike rates of real neurons. It is used extensively in Hugh Wilson's
  * Spikes, Decisions, and Action.
  */
-public class NakaRushtonRule extends NeuronUpdateRule implements
-    BoundedUpdateRule, NoisyUpdateRule {
+public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRule, NoisyUpdateRule {
 
-    /** The default activation ceiling. */
+    /**
+     * The default activation ceiling.
+     */
     public static final int DEFAULT_UPPER_BOUND = 100;
 
-    /** Steepness. */
+    /**
+     * Steepness.
+     */
     private double steepness = 2;
 
-    /** Semi saturation constant. */
+    /**
+     * Semi saturation constant.
+     */
     private double semiSaturationConstant = 120;
 
-    /** Time constant of spike rate adaptation. */
+    /**
+     * Time constant of spike rate adaptation.
+     */
     private double adaptationTimeConstant = 1;
 
-    /** Parameter of spike rate adaptation. */
+    /**
+     * Parameter of spike rate adaptation.
+     */
     private double adaptationParameter = .7;
 
-    /** Whether to use spike rate adaptation or not. */
+    /**
+     * Whether to use spike rate adaptation or not.
+     */
     private boolean useAdaptation = false;
 
-    /** Time constant. */
+    /**
+     * Time constant.
+     */
     private double timeConstant = 1;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to neuron. */
+    /**
+     * Add noise to neuron.
+     */
     private boolean addNoise = false;
 
-    /** Local variable. */
+    /**
+     * Local variable.
+     */
     private double s = 0;
 
-    /** Local variable. */
+    /**
+     * Local variable.
+     */
     private double a = 0;
 
-    /** The upper bound of the activity. */
+    /**
+     * The upper bound of the activity.
+     */
     private double upperBound = DEFAULT_UPPER_BOUND;
 
-    /** The lower bound of the activity. */
+    /**
+     * The lower bound of the activity.
+     */
     private double lowerBound = 0;
 
     /**
@@ -113,27 +138,21 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant)
-                * (adaptationParameter * val - a);
+            a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
         } else {
             a = 0;
         }
 
         if (p > 0) {
-            s = (getUpperBound() * Math.pow(p, steepness))
-                / (Math.pow(semiSaturationConstant + a, steepness) + Math
-                    .pow(p, steepness));
+            s = (getUpperBound() * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness) + Math.pow(p, steepness));
         } else {
             s = 0;
         }
 
         if (addNoise) {
-            val +=
-                (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
-                    .getRandom()));
+            val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
         } else {
-            val +=
-                (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         neuron.setBuffer(val);

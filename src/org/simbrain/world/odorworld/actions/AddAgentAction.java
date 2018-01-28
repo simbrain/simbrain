@@ -18,12 +18,11 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add agent action.
@@ -49,11 +48,12 @@ public final class AddAgentAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
-        entity.setLocation(worldPanel.getSelectedPoint().x,
-                worldPanel.getSelectedPoint().y);
+        entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
         worldPanel.getWorld().addAgent(entity);
     }
 }

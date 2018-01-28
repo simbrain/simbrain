@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.List;
-import java.util.Random;
-import java.util.ArrayList;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * <b>WinnerTakeAll</b>.The neuron with the highest weighted input in a
@@ -35,32 +35,46 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  */
 public class WinnerTakeAll extends NeuronGroup {
 
-    /** Default initial number of units. */
+    /**
+     * Default initial number of units.
+     */
     private static final int DEFAULT_NUM_UNITS = 5;
 
-    /** Number of neurons. */
+    /**
+     * Number of neurons.
+     */
     private int numUnits = DEFAULT_NUM_UNITS;
 
-    /** Winning value. */
+    /**
+     * Winning value.
+     */
     private double winValue = 1;
 
-    /** Losing value. */
+    /**
+     * Losing value.
+     */
     private double loseValue = 0;
 
-    /** If true, sometimes set the winner randomly. */
+    /**
+     * If true, sometimes set the winner randomly.
+     */
     private boolean useRandom;
 
-    /** Probability of setting the winner randomly, when useRandom is true. */
+    /**
+     * Probability of setting the winner randomly, when useRandom is true.
+     */
     private double randomProb = .1;
 
-    /** Random number generator. */
+    /**
+     * Random number generator.
+     */
     private static Random rand = new Random();
 
     /**
      * Copy constructor.
      *
      * @param newRoot new root net
-     * @param oldNet old network
+     * @param oldNet  old network
      */
     public WinnerTakeAll(Network newRoot, WinnerTakeAll oldNet) {
         super(newRoot, oldNet);
@@ -74,7 +88,7 @@ public class WinnerTakeAll extends NeuronGroup {
     /**
      * Creates a new winner take all network.
      *
-     * @param root the network containing this subnetwork
+     * @param root       the network containing this subnetwork
      * @param numNeurons Number of neurons in new network
      */
     public WinnerTakeAll(final Network root, final int numNeurons) {
@@ -101,8 +115,7 @@ public class WinnerTakeAll extends NeuronGroup {
         Neuron winner = getWinner();
         if (useRandom) {
             if (Math.random() < randomProb) {
-                winner = getNeuronList()
-                        .get(rand.nextInt(getNeuronList().size()));
+                winner = getNeuronList().get(rand.nextInt(getNeuronList().size()));
             }
         }
         for (Neuron neuron : getNeuronList()) {
@@ -138,13 +151,12 @@ public class WinnerTakeAll extends NeuronGroup {
      * Returns the neuron in the provided list with the greatest net input or
      * activation (or a randomly chosen neuron among those that "win").
      *
-     * @param neuronList the list to check
+     * @param neuronList     the list to check
      * @param useActivations if true, use activations instead of net input to
-     *            determine winner
+     *                       determine winner
      * @return the neuron with the highest net input
      */
-    public static Neuron getWinner(List<Neuron> neuronList,
-            boolean useActivations) {
+    public static Neuron getWinner(List<Neuron> neuronList, boolean useActivations) {
 
         if (neuronList.isEmpty()) {
             return null;
@@ -154,10 +166,8 @@ public class WinnerTakeAll extends NeuronGroup {
         Neuron winner = neuronList.get(0);
         winners.add(winner);
         for (Neuron n : neuronList) {
-            double winnerVal = useActivations ? winner.getActivation()
-                    : winner.getWeightedInputs();
-            double val = useActivations ? n.getActivation()
-                    : n.getWeightedInputs();
+            double winnerVal = useActivations ? winner.getActivation() : winner.getWeightedInputs();
+            double val = useActivations ? n.getActivation() : n.getWeightedInputs();
             if (val == winnerVal) {
                 winners.add(n);
             } else if (val > winnerVal) {

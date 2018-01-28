@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action to construct a test input panel. The user of this class provides the
@@ -33,9 +33,11 @@ import org.simbrain.resource.ResourceManager;
  * @author Jeff Yoshimi
  * @author Lam Nguyen
  */
-public class TestInputAction extends ConditionallyEnabledAction{
+public class TestInputAction extends ConditionallyEnabledAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -45,10 +47,8 @@ public class TestInputAction extends ConditionallyEnabledAction{
      */
     public TestInputAction(NetworkPanel networkPanel) {
 
-        super(networkPanel, "Create Input Table...",
-                EnablingCondition.NEURONS);
-        putValue(SHORT_DESCRIPTION,
-                "Create a table whose rows provide input to selected neurons");
+        super(networkPanel, "Create Input Table...", EnablingCondition.NEURONS);
+        putValue(SHORT_DESCRIPTION, "Create a table whose rows provide input to selected neurons");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
 
         this.networkPanel = networkPanel;
@@ -57,6 +57,7 @@ public class TestInputAction extends ConditionallyEnabledAction{
 
     /**
      * Initialize and display the test input panel.
+     *
      * @param event
      */
     public void actionPerformed(ActionEvent event) {

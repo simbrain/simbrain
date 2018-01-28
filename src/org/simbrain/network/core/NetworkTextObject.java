@@ -25,36 +25,52 @@ package org.simbrain.network.core;
  */
 public class NetworkTextObject {
 
-    /** Reference to parent root network of this text object. */
+    /**
+     * Reference to parent root network of this text object.
+     */
     private final Network parent;
 
-    /** x-coordinate of this object in 2-space. */
+    /**
+     * x-coordinate of this object in 2-space.
+     */
     private double x;
 
-    /** y-coordinate of this object in 2-space. */
+    /**
+     * y-coordinate of this object in 2-space.
+     */
     private double y;
 
-    /** The main text data. */
+    /**
+     * The main text data.
+     */
     private String text = "";
 
-    /** Name of Font for this text. */
+    /**
+     * Name of Font for this text.
+     */
     private String fontName = "Helvetica";
 
-    /** Font size. */
+    /**
+     * Font size.
+     */
     private int fontSize = 12;
 
-    /** Is this text italic or not. */
+    /**
+     * Is this text italic or not.
+     */
     private boolean italic;
 
-    /** Is this text bold or not. */
+    /**
+     * Is this text bold or not.
+     */
     private boolean bold;
 
     /**
      * Construct the text object.
      *
      * @param parent root network
-     * @param x x position
-     * @param y y position
+     * @param x      x position
+     * @param y      y position
      */
     public NetworkTextObject(Network parent, double x, double y) {
         this.parent = parent;
@@ -65,13 +81,12 @@ public class NetworkTextObject {
     /**
      * Construct the text object with initial text.
      *
-     * @param parent root network
-     * @param x x position
-     * @param y y position
+     * @param parent      root network
+     * @param x           x position
+     * @param y           y position
      * @param initialText text for the text object
      */
-    public NetworkTextObject(Network parent, double x, double y,
-            String initialText) {
+    public NetworkTextObject(Network parent, double x, double y, String initialText) {
         this(parent, x, y);
         this.setText(initialText);
     }
@@ -80,7 +95,7 @@ public class NetworkTextObject {
      * Copy constructor.
      *
      * @param parent parent network for this text object
-     * @param text text object to copy
+     * @param text   text object to copy
      */
     public NetworkTextObject(Network parent, NetworkTextObject text) {
         this.parent = parent;

@@ -7,13 +7,16 @@ public class UpdateActionTimer {
 
     /**
      * Create a new UpdateActionTimer.
+     *
      * @param timedAction The update action to be timed.
      */
     public UpdateActionTimer(UpdateAction timedAction) {
         this.timedAction = timedAction;
     }
 
-    /** Invoke the timed update action and update the duration. */
+    /**
+     * Invoke the timed update action and update the duration.
+     */
     public void invokeTimedAction() {
         long startTime = System.nanoTime();
         timedAction.invoke();

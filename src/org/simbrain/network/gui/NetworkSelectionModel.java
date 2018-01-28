@@ -18,23 +18,26 @@
  */
 package org.simbrain.network.gui;
 
+import javax.swing.event.EventListenerList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.swing.event.EventListenerList;
-
 /**
  * Network selection model.
  */
 final class NetworkSelectionModel {
 
-    /** Listener list. */
+    /**
+     * Listener list.
+     */
     private final EventListenerList listenerList;
 
-    /** Source of selection events. */
+    /**
+     * Source of selection events.
+     */
     private final NetworkPanel networkPanel;
 
     // NOTE: selection used to be a HashSet. CopyOnWriteArraySet is slower,
@@ -42,10 +45,14 @@ final class NetworkSelectionModel {
     // small groups of neurons and weights so far. Without this,
     // ConcurrentModificationException when deleting synapses or nodes and
     // calling remove(Object) in this class.
-    /** Set of selected elements. */
+    /**
+     * Set of selected elements.
+     */
     private final CopyOnWriteArraySet selection;
 
-    /** Adjusting. */
+    /**
+     * Adjusting.
+     */
     private boolean adjusting;
 
     /**
@@ -223,7 +230,7 @@ final class NetworkSelectionModel {
      * changes.
      *
      * @return true if ths model will be adjusting over a series of rapid
-     *         changes
+     * changes
      */
     public boolean isAdjusting() {
         return adjusting;
@@ -234,7 +241,7 @@ final class NetworkSelectionModel {
      * changes.
      *
      * @param adjusting true if this model will be adjusting over a series of
-     *            rapid changes
+     *                  rapid changes
      */
     public void setAdjusting(final boolean adjusting) {
         this.adjusting = adjusting;
@@ -245,7 +252,7 @@ final class NetworkSelectionModel {
      * selection listeners.
      *
      * @param oldSelection old selection
-     * @param selection selection
+     * @param selection    selection
      */
     public void fireSelectionChanged(final Set oldSelection, final Set selection) {
         if (isAdjusting()) {
@@ -258,11 +265,9 @@ final class NetworkSelectionModel {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == NetworkSelectionListener.class) {
                 if (e == null) {
-                    e = new NetworkSelectionEvent(networkPanel, oldSelection,
-                            selection);
+                    e = new NetworkSelectionEvent(networkPanel, oldSelection, selection);
                 }
-                ((NetworkSelectionListener) listeners[i + 1])
-                        .selectionChanged(e);
+                ((NetworkSelectionListener) listeners[i + 1]).selectionChanged(e);
             }
         }
     }

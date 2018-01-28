@@ -13,33 +13,41 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
+
+import javax.swing.*;
 
 /**
  * Panel to add a hearing sensor to an entity.
  *
  * @author Lam Nguyen
- *
  */
 public class HearingSensorPanel extends AbstractSensorPanel {
 
-    /** Text field to edit phrase this sensor listens for. */
+    /**
+     * Text field to edit phrase this sensor listens for.
+     */
     private JTextField phrase = new JTextField();
 
-    /** Texxt field to edit output amount */
+    /**
+     * Texxt field to edit output amount
+     */
     private JTextField outputAmount = new JTextField();
 
-    /** Entity to which a hearing sensor is being added. */
+    /**
+     * Entity to which a hearing sensor is being added.
+     */
     private OdorWorldEntity entity;
 
-    /** Reference to hearing sensor. Initially null if this is a creation panel. */
+    /**
+     * Reference to hearing sensor. Initially null if this is a creation panel.
+     */
     private Hearing hearingSensor;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -73,18 +81,15 @@ public class HearingSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addSensor(new Hearing((entity), phrase.getText(), Double
-                    .parseDouble(outputAmount.getText())));
+            entity.addSensor(new Hearing((entity), phrase.getText(), Double.parseDouble(outputAmount.getText())));
             if (phrase.getText().length() > 10) {
                 checkPhrase();
             }
         } else {
             hearingSensor.setPhrase(phrase.getText());
             hearingSensor.setLabel("Hear: \"" + phrase.getText() + "\"");
-            hearingSensor.setOutputAmount(Double.parseDouble(outputAmount
-                    .getText()));
-            hearingSensor.getParent().getParentWorld()
-                    .fireEntityChanged(hearingSensor.getParent());
+            hearingSensor.setOutputAmount(Double.parseDouble(outputAmount.getText()));
+            hearingSensor.getParent().getParentWorld().fireEntityChanged(hearingSensor.getParent());
             if (phrase.getText().length() > 10) {
                 checkPhrase();
             }
@@ -104,13 +109,10 @@ public class HearingSensorPanel extends AbstractSensorPanel {
         }
     }
 
-    /** Displays message when utterance is above 10 char. */
+    /**
+     * Displays message when utterance is above 10 char.
+     */
     private void checkPhrase() {
-        JOptionPane
-                .showOptionDialog(
-                        null,
-                        "Heard utterance is greater than 10 chars! Not guaranteed to render correctly.",
-                        "Warning", JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+        JOptionPane.showOptionDialog(null, "Heard utterance is greater than 10 chars! Not guaranteed to render correctly.", "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 }

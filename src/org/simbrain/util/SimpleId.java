@@ -23,17 +23,21 @@ package org.simbrain.util;
  */
 public class SimpleId {
 
-    /** The base name of the id. */
+    /**
+     * The base name of the id.
+     */
     private String rootName;
 
-    /** The starting index. */
+    /**
+     * The starting index.
+     */
     private int index;
 
     /**
      * Construct simpleId.
      *
      * @param rootName root name.
-     * @param index beginning index.
+     * @param index    beginning index.
      */
     public SimpleId(final String rootName, final int index) {
         this.rootName = rootName;
@@ -53,6 +57,7 @@ public class SimpleId {
     /**
      * Returns what the simple identifier would be if a hypothetical construct
      * requiring such an id were constructed and put into the network.
+     *
      * @return a hypothetical unique identification
      */
     public String getHypotheticalId() {

@@ -18,21 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the
@@ -42,19 +36,29 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class NetworkDialog extends StandardDialog {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     protected NetworkPanel networkPanel;
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main properties panel. */
+    /**
+     * Main properties panel.
+     */
     protected NetworkPropertiesPanel networkPropertiesPanel;
 
-    /** Connection preferences panel. */
+    /**
+     * Connection preferences panel.
+     */
     protected QuickConnectPreferencesPanel quickConnectPanel;
 
-    /** Random panel. */
+    /**
+     * Random panel.
+     */
     private NetworkRandomizerPanel randomPanel;
 
     /**
@@ -95,8 +99,7 @@ public class NetworkDialog extends StandardDialog {
 
         // Add help button
         JButton helpButton = new JButton("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Network/network_prefs.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/network_prefs.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
     }
@@ -120,26 +123,33 @@ public class NetworkDialog extends StandardDialog {
      */
     private class NetworkRandomizerPanel extends JPanel {
 
-        /** Selects which randomizer to edit. */
+        /**
+         * Selects which randomizer to edit.
+         */
         private JComboBox comboBox;
 
-        /** Panel which holds the randomizer panel. */
+        /**
+         * Panel which holds the randomizer panel.
+         */
         private JPanel randomizerHolder = new JPanel();
 
-        /** The activation randomizer panel. */
+        /**
+         * The activation randomizer panel.
+         */
         private RandomizerPanel activationRandomizer;
 
-        /** The weight randomizer panel. */
+        /**
+         * The weight randomizer panel.
+         */
         private RandomizerPanel weightRandomizer;
 
         /**
          * Construct the panel.
          */
         public NetworkRandomizerPanel() {
-            Box  mainPanel = Box.createVerticalBox();
+            Box mainPanel = Box.createVerticalBox();
             mainPanel.add(Box.createVerticalStrut(10));
-            comboBox = new JComboBox(new String[] { "Activation Randomizer",
-                    "Weight Randomizer" });
+            comboBox = new JComboBox(new String[]{"Activation Randomizer", "Weight Randomizer"});
             comboBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

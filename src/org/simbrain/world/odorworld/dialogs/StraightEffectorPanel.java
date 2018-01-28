@@ -13,28 +13,33 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import javax.swing.*;
 
 /**
  * Panel to add a straight movement effector to an entity or to modify and
  * existing one.
  *
  * @author Lam Nguyen
- *
  */
 public class StraightEffectorPanel extends AbstractEffectorPanel {
 
-    /** Text field to edit label. */
+    /**
+     * Text field to edit label.
+     */
     private JTextField label = new JTextField();
 
-    /** Text field to edit the base movement rate. */
+    /**
+     * Text field to edit the base movement rate.
+     */
     private JTextField bma = new JTextField();
 
-    /** Entity to which a straight movement effector is being added. */
+    /**
+     * Entity to which a straight movement effector is being added.
+     */
     private RotatingEntity entity;
 
     /**
@@ -43,7 +48,9 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
      */
     private StraightMovement straightEffector;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -61,11 +68,11 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
 
     /**
      * Constructor for the case where an effector is being edited.
-     * @param entity the entity to which a straight movement effector is added.
+     *
+     * @param entity   the entity to which a straight movement effector is added.
      * @param effector
      */
-    public StraightEffectorPanel(OdorWorldEntity entity,
-            StraightMovement effector) {
+    public StraightEffectorPanel(OdorWorldEntity entity, StraightMovement effector) {
         this.entity = (RotatingEntity) entity;
         this.straightEffector = effector;
         addItem("Label", label);
@@ -80,8 +87,7 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
             entity.addEffector(new StraightMovement(entity, bma.getText()));
         } else {
             straightEffector.setLabel(label.getText());
-            straightEffector
-                    .setScalingFactor(Double.parseDouble(bma.getText()));
+            straightEffector.setScalingFactor(Double.parseDouble(bma.getText()));
         }
     }
 

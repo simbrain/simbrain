@@ -18,27 +18,26 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
 import org.simbrain.workspace.Consumable;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>DisplayWorld</b> intuitively models "speaking", though it can also be
  * useful as a diagnostic component. Any time it's useful to see text output in
  * Simbrain, a display world can be used.
- *
+ * <p>
  * Numbers and vectors from (mainly) neural networks are converted into text
  * that is displayed in the display world. Display world is used in conjunction
  * with couplings (links between components in Simbrain), via consumers. When
  * the workspace is updated, consumers are activated, and corresponding text is
  * displayed.
- *
+ * <p>
  * The display world can be thought of as containing a set of "buttons" (one for
  * each consumer). When a given button is activated by a coupling, the
  * corresponding text is displayed. As with reader world, there are scalar and
@@ -52,11 +51,12 @@ import com.thoughtworks.xstream.XStream;
  * "vector dictionary". When a vector comes in, the closest vector in the
  * dictionary is found, and the corresponding token is displayed.</li>
  * </ul>
- *
  */
 public class DisplayWorld extends TextWorld {
 
-    /** Tree associating vectors with tokens. */
+    /**
+     * Tree associating vectors with tokens.
+     */
     private NTree vectorToTokenDict = new NTree(3);
 
     /**
@@ -67,12 +67,14 @@ public class DisplayWorld extends TextWorld {
     // Initialize vectorToTokenDict dictionary with sample entries
     {
 
-        this.addVectorTokenPair("mouse", new double[] { 1, 0, 0 });
-        this.addVectorTokenPair("cheese", new double[] { 0, 1, 0 });
-        this.addVectorTokenPair("flower", new double[] { 0, 0, 1 });
+        this.addVectorTokenPair("mouse", new double[]{1, 0, 0});
+        this.addVectorTokenPair("cheese", new double[]{0, 1, 0});
+        this.addVectorTokenPair("flower", new double[]{0, 0, 1});
     }
 
-    /** Threshold for displaying text. */
+    /**
+     * Threshold for displaying text.
+     */
     private double displayThreshold = .5;
 
     /**
@@ -123,13 +125,13 @@ public class DisplayWorld extends TextWorld {
      * by consumers reading data from (e.g) neural networks. If node activation
      * &#62; threshold then display a particular word.
      *
-     * @param value value to check against threshold
+     * @param value  value to check against threshold
      * @param string text to add
      */
     public void addTextIfAboveThreshold(final double value, final String string) {
         if (value > displayThreshold) {
             addText(string + " "); // TODO: Replace space with user-specified
-                                   // "buffer" string
+            // "buffer" string
         }
     }
 
@@ -222,7 +224,7 @@ public class DisplayWorld extends TextWorld {
      * Add an entry to the vector-token dictionary.
      *
      * @param token the String to add
-     * @param vec the vector
+     * @param vec   the vector
      */
     public void addVectorTokenPair(String token, double[] vec) {
         //System.out.println(token + "-->" + Arrays.toString(vec));
@@ -236,13 +238,15 @@ public class DisplayWorld extends TextWorld {
      */
     public class StringDataPoint extends DataPoint {
 
-        /** The associated string. */
+        /**
+         * The associated string.
+         */
         private final String string;
 
         /**
          * Construct the string data point.
          *
-         * @param data the double vector
+         * @param data   the double vector
          * @param string the string
          */
         public StringDataPoint(double[] data, String string) {

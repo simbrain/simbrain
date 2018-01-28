@@ -20,7 +20,7 @@ package org.simbrain.util;
 
 /**
  * Re-implementation of same interface from org.apache.commons.collections.
- *
+ * <p>
  * Introduced to lean out jars for applet versions of network.
  */
 public interface Predicate {

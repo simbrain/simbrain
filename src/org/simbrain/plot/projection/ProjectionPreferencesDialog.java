@@ -13,34 +13,39 @@
  */
 package org.simbrain.plot.projection;
 
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.projection.ProjectCoordinate;
 import org.simbrain.util.projection.Projector;
 
+import javax.swing.*;
+
 /**
  * A dialog box for setting general projector preferences.
  *
  * @author Jeff Yoshimi
- *
  */
 
 public class ProjectionPreferencesDialog extends StandardDialog {
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** Text field to edit tolerance. */
+    /**
+     * Text field to edit tolerance.
+     */
     private JTextField tolerance = new JTextField("");
 
-    /** Checkbox for auto-find mode. */
+    /**
+     * Checkbox for auto-find mode.
+     */
     private JCheckBox autoFind = new JCheckBox();
 
-    /** Reference to projector being represented. */
+    /**
+     * Reference to projector being represented.
+     */
     private final Projector projector;
 
     /**
@@ -50,8 +55,7 @@ public class ProjectionPreferencesDialog extends StandardDialog {
      */
     public ProjectionPreferencesDialog(Projector projector) {
         this.projector = projector;
-        String toleranceToolTip = "Only add a new datapoint if it is at least this "
-                + "far from an existing datapoint in the high-dim space";
+        String toleranceToolTip = "Only add a new datapoint if it is at least this " + "far from an existing datapoint in the high-dim space";
         JLabel toleranceLabel = new JLabel("New datapoint tolerance");
         tolerance.setToolTipText(toleranceToolTip);
         toleranceLabel.setToolTipText(toleranceToolTip);
@@ -69,8 +73,7 @@ public class ProjectionPreferencesDialog extends StandardDialog {
     private void fillFieldValues() {
         tolerance.setText("" + projector.getTolerance());
         if (projector.getProjectionMethod() instanceof ProjectCoordinate) {
-            autoFind.setSelected(((ProjectCoordinate) projector
-                    .getProjectionMethod()).isAutoFind());
+            autoFind.setSelected(((ProjectCoordinate) projector.getProjectionMethod()).isAutoFind());
         }
     }
 
@@ -78,8 +81,7 @@ public class ProjectionPreferencesDialog extends StandardDialog {
     protected void closeDialogOk() {
         projector.setTolerance(Double.parseDouble(tolerance.getText()));
         if (projector.getProjectionMethod() instanceof ProjectCoordinate) {
-            ((ProjectCoordinate) projector.getProjectionMethod())
-                    .setAutoFind(autoFind.isSelected());
+            ((ProjectCoordinate) projector.getProjectionMethod()).setAutoFind(autoFind.isSelected());
         }
         super.closeDialogOk();
     }

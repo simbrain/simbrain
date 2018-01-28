@@ -27,7 +27,9 @@ import org.simbrain.workspace.Coupling;
  */
 public class UpdateCoupling implements UpdateAction {
 
-    /** of couplings to update. */
+    /**
+     * of couplings to update.
+     */
     private final transient Coupling<?> coupling;
 
     /**

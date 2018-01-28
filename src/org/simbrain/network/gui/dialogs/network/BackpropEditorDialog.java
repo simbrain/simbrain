@@ -18,27 +18,33 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.*;
+import org.simbrain.network.trainers.BackpropTrainer;
+import org.simbrain.network.trainers.BackpropTrainer2;
+import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.Trainer;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
  */
 public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
-    /** Reference to the backprop network being edited. */
+    /**
+     * Reference to the backprop network being edited.
+     */
     private BackpropNetwork backprop;
 
-    /** An update action to update the backprop trainer when the network is updated. */
+    /**
+     * An update action to update the backprop trainer when the network is updated.
+     */
     private NetworkUpdateAction updater = new NetworkUpdateAction() {
         @Override
         public void invoke() {
@@ -56,8 +62,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
         @Override
         public String getLongDescription() {
-            return "Applies one training step (usually one epoch) of the currently opened trainer dialog to the" +
-                   "associated BackpropNetwork.";
+            return "Applies one training step (usually one epoch) of the currently opened trainer dialog to the" + "associated BackpropNetwork.";
         }
     };
 
@@ -73,7 +78,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * Default constructor.
      *
      * @param networkPanel parent panel
-     * @param backprop edited network
+     * @param backprop     edited network
      */
     public BackpropEditorDialog(NetworkPanel networkPanel, BackpropNetwork backprop) {
         super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, backprop);
@@ -114,7 +119,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
             currentTrainer.commitChanges();
         }
     }
-    
+
     @Override
     void updateData() {
         currentTrainer.initData();

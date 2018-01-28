@@ -1,10 +1,9 @@
 package org.simbrain.world.threedworld.entities;
 
-import org.simbrain.workspace.Producible;
-
 import com.jme3.bullet.collision.PhysicsCollisionGroupListener;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.control.RigidBodyControl;
+import org.simbrain.workspace.Producible;
 
 public class CollisionSensor implements Sensor, PhysicsCollisionGroupListener {
     private Agent agent;

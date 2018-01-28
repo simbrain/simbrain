@@ -18,24 +18,16 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.Arrays;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+
 /**
  * Superclass for VectorToTokenPanel and TokenToVectorPanel.
- *
+ * <p>
  * Todo: Note that both vectorToTokenPanel and TokenToVectorPanel use a table
  * that encodes vectors in a somewhat unusual fashion, as strings, rather than
  * individual cells. This is because SimbrainJTable does not (as of 9/14)
@@ -46,7 +38,9 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  */
 public class VectorDictionaryPanel extends JPanel {
 
-    /** Description of the vector dictionary displayed in the panel. */
+    /**
+     * Description of the vector dictionary displayed in the panel.
+     */
     private final String infoText;
 
     /**
@@ -71,8 +65,7 @@ public class VectorDictionaryPanel extends JPanel {
         table.setShowInsertColumnPopupMenu(false);
         table.setShowEditInPopupMenu(false);
         table.setColumnHeadings(Arrays.asList("Token", "Vector"));
-        SimbrainJTableScrollPanel vectorScroller = new SimbrainJTableScrollPanel(
-                table);
+        SimbrainJTableScrollPanel vectorScroller = new SimbrainJTableScrollPanel(table);
         // vectorScroller.setPreferredSize(new Dimension(300, 200));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.getColumnModel().getColumn(0).setMaxWidth(50);

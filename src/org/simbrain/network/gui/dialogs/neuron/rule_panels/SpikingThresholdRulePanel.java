@@ -18,14 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>. TODO: Deactivated until discussion
@@ -33,13 +31,19 @@ import org.simbrain.util.widgets.YesNoNull;
  */
 public class SpikingThresholdRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private static final SpikingThresholdRule prototypeRule = new SpikingThresholdRule();
 
     /**
@@ -47,10 +51,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronRulePanel {
      */
     public SpikingThresholdRulePanel() {
         super();
-        JTextField thresholdField = createTextField(
-                (r) -> ((SpikingThresholdRule) r).getThreshold(),
-                (r, val) -> ((SpikingThresholdRule) r)
-                        .setThreshold((double) val));
+        JTextField thresholdField = createTextField((r) -> ((SpikingThresholdRule) r).getThreshold(), (r, val) -> ((SpikingThresholdRule) r).setThreshold((double) val));
         this.add(tabbedPane);
         mainTab.addItem("Threshold", thresholdField);
         mainTab.addItem("Add noise", getAddNoise());

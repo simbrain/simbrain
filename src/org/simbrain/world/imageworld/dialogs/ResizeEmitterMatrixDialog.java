@@ -1,12 +1,11 @@
 package org.simbrain.world.imageworld.dialogs;
 
-import javax.swing.*;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageWorld;
 
+import javax.swing.*;
 import java.text.NumberFormat;
 
 public class ResizeEmitterMatrixDialog extends StandardDialog {
@@ -21,6 +20,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
 
     /**
      * Construct a new ResizeEmitterMatrixDialog.
+     *
      * @param world The ImageWorld which holds the EmitterMatrix.
      */
     public ResizeEmitterMatrixDialog(ImageWorld world) {
@@ -50,7 +50,9 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
         heightField.setValue(world.getEmitterHeight());
     }
 
-    /** Called externally when the dialog is closed, to commit any changes made. */
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         boolean useColor = useColorCheckBox.isSelected();
         int width = Integer.parseInt(widthField.getText());

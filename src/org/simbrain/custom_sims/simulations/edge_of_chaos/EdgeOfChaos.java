@@ -1,11 +1,5 @@
 package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JTextField;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -29,6 +23,11 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+
+import javax.swing.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Demonstration of representational capacities of recurrent networks based on
@@ -68,8 +67,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Projection plot
         PlotBuilder plot = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(net.getNetworkComponent(), reservoir,
-                plot.getProjectionPlotComponent());
+        sim.couple(net.getNetworkComponent(), reservoir, plot.getProjectionPlotComponent());
 
         // Odor world sim
         buildOdorWorld();
@@ -86,8 +84,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
             // Update variance of weight strengths
             double new_variance = Double.parseDouble(tf_stdev.getText());
             for (Synapse synapse : sgReservoir.getAllSynapses()) {
-                synapse.setStrength(
-                        synapse.getStrength() * (new_variance / variance));
+                synapse.setStrength(synapse.getStrength() * (new_variance / variance));
             }
             variance = new_variance;
         });
@@ -108,8 +105,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Use concurrent buffered update
         network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(network));
+        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
     }
 
     private void buildSensorNodes() {
@@ -125,18 +121,14 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
-        cheeseToRes = sensorConnections(sensorNodes, reservoir,
-                new int[] { 0, 1, 2 }, .8, 1);
+        cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[]{0, 1, 2}, .8, 1);
         network.addGroup(cheeseToRes);
-        flowersToRes = sensorConnections(sensorNodes, reservoir,
-                new int[] { 3, 4, 5 }, .8, 3);
+        flowersToRes = sensorConnections(sensorNodes, reservoir, new int[]{3, 4, 5}, .8, 3);
         network.addGroup(flowersToRes);
     }
 
-    static NeuronGroup createReservoir(Network parentNet, int x, int y,
-            int numNeurons) {
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
-                (int) Math.sqrt(numNeurons));
+    static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
+        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
         List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(parentNet);
@@ -154,19 +146,15 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY, ProbDistribution.NORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY, ProbDistribution.NORMAL);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.NORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.NORMAL);
         exRand.setParam1(0);
         exRand.setParam2(Math.sqrt(variance));
         inRand.setParam1(0);
         inRand.setParam2(Math.sqrt(variance));
 
-        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(kIn,
-                (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
-                0.5, exRand, inRand);
+        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(kIn, (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
+        SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con, 0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addGroup(reservoir);
 
@@ -179,18 +167,18 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     // Possibly export this to a utility class
+
     /**
      * Connect a set of source neurons to a quadrant of the reservoir.
      *
-     * @param src inputs
-     * @param tar reservoir
+     * @param src            inputs
+     * @param tar            reservoir
      * @param srcNodeIndices which input nodes to connect
-     * @param sparsity sparsity
+     * @param sparsity       sparsity
      * @param quadrantNumber 1,2,3 or 4 from upper-left clockwise
      * @return the resulting synapse group
      */
-    private SynapseGroup sensorConnections(NeuronGroup src, NeuronGroup tar,
-            int[] srcNodeIndices, double sparsity, int quadrantNumber) {
+    private SynapseGroup sensorConnections(NeuronGroup src, NeuronGroup tar, int[] srcNodeIndices, double sparsity, int quadrantNumber) {
 
         double xStart, yStart, xEnd, yEnd;
 
@@ -219,10 +207,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 if ((x >= xStart) && (x < xEnd)) {
                     for (int j = 0; j < srcNodeIndices.length; j++) {
                         if (Math.random() < sparsity) {
-                            Synapse syn = new Synapse(
-                                    src.getNeuronListUnsafe()
-                                            .get(srcNodeIndices[j]),
-                                    tarNList.get(ii));
+                            Synapse syn = new Synapse(src.getNeuronListUnsafe().get(srcNodeIndices[j]), tarNList.get(ii));
                             syn.setStrength(1);
                             src2Res.addSynapseUnsafe(syn);
                         }
@@ -243,18 +228,12 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Set up world
         double dispersion = 65;
-        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif",
-                new double[] { 1, 0, 0, 0, 0, 0 });
-        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif",
-                new double[] { 0, 1, 0, 0, 0, 0 });
-        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif",
-                new double[] { 1, 0, 1, 0, 0, 0 });
-        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif",
-                new double[] { 0, 0, 0, 0, 0, 1 });
-        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif",
-                new double[] { 0, 0, 0, 0, 0, 1 });
-        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif",
-                new double[] { 0, 0, 0, 0, 0, 1 });
+        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif", new double[]{1, 0, 0, 0, 0, 0});
+        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif", new double[]{0, 1, 0, 0, 0, 0});
+        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif", new double[]{1, 0, 1, 0, 0, 0});
+        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif", new double[]{0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif", new double[]{0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif", new double[]{0, 0, 0, 0, 0, 1});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);
@@ -278,7 +257,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     public EdgeOfChaos() {
         super();
-    };
+    }
+
+    ;
 
     @Override
     public String getName() {

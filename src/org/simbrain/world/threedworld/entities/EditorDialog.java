@@ -1,34 +1,22 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
+import org.simbrain.world.threedworld.ThreeDDesktopComponent;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.text.DecimalFormat;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
-import org.simbrain.world.threedworld.ThreeDDesktopComponent;
 
 public class EditorDialog {
     public interface Editor {
         JComponent layoutFields();
-        
+
         void readValues();
-        
+
         void writeValues();
-        
+
         void close();
     }
 
@@ -72,7 +60,8 @@ public class EditorDialog {
     };
     private JButton cancelButton = new JButton(cancelAction);
 
-    public EditorDialog() {}
+    public EditorDialog() {
+    }
 
     public void showEditor(Editor editor) {
         if (dialog != null)

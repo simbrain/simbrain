@@ -18,24 +18,30 @@
  */
 package org.simbrain.plot.scatterplot;
 
+import org.simbrain.plot.ChartDataSource;
+import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.*;
 
 /**
  * Data for a JFreeChart ScatterPlot.
  */
 public class ScatterPlotComponent extends WorkspaceComponent {
 
-    /** Data Model. */
+    /**
+     * Data Model.
+     */
     private ScatterPlotModel model;
 
-    /** Objects which can be used to set the scatter plot. */
+    /**
+     * Objects which can be used to set the scatter plot.
+     */
     private List<ScatterPlotSetter> setterList = new ArrayList<ScatterPlotSetter>();
 
     /**
@@ -52,10 +58,10 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     /**
      * Create new Scatter Plot Component from a specified model.
-     *
+     * <p>
      * Used in deserializing.
      *
-     * @param name chart name
+     * @param name  chart name
      * @param model chart model
      */
     public ScatterPlotComponent(final String name, final ScatterPlotModel model) {
@@ -67,7 +73,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     /**
      * Initializes a jfreechart with specific number of data sources.
      *
-     * @param name name of component
+     * @param name           name of component
      * @param numDataSources number of data sources to initialize plot with
      */
     public ScatterPlotComponent(final String name, final int numDataSources) {
@@ -114,7 +120,9 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         setterList.add(new ScatterPlotSetter(i));
     }
 
-    /** Add chart listener to model. */
+    /**
+     * Add chart listener to model.
+     */
     private void initModelListener() {
         model.addListener(new ChartListener() {
             public void dataSourceAdded(ChartDataSource source) {
@@ -145,10 +153,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
     }
 
-    public static ScatterPlotComponent open(final InputStream input,
-            final String name, final String format) {
-        ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel
-                .getXStream().fromXML(input);
+    public static ScatterPlotComponent open(final InputStream input, final String name, final String format) {
+        ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel.getXStream().fromXML(input);
         return new ScatterPlotComponent(name, dataModel);
     }
 
@@ -189,8 +195,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             if (!model.isShowHistory()) {
                 model.getDataset().getSeries(index).clear();
             }
-            model.getDataset().getSeries(index)
-                    .add(setter.getX(), setter.getY());
+            model.getDataset().getSeries(index).add(setter.getX(), setter.getY());
         }
     }
 
@@ -199,13 +204,19 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      */
     public class ScatterPlotSetter {
 
-        /** Index. */
+        /**
+         * Index.
+         */
         private Integer index;
 
-        /** X Value. */
+        /**
+         * X Value.
+         */
         private double xval;
 
-        /** Y Value. */
+        /**
+         * Y Value.
+         */
         private double yval;
 
         /**

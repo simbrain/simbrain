@@ -18,14 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.Window;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
+
+import java.util.List;
 
 /**
  * A panel specifically for the randomizers used by neurons... a higher level
@@ -34,7 +33,6 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * being edited the <b>same</b> Randomizer object as an optimization.
  *
  * @author Zoë Tosi
- *
  */
 public class NoiseGeneratorPanel extends RandomizerPanel {
 
@@ -47,14 +45,11 @@ public class NoiseGeneratorPanel extends RandomizerPanel {
      * randomizers, since any time any neurons are singled out, they will
      * receive a brand new randomizer.
      *
-     * @param noisyNeurons
-     *            the neurons
-     * @exception ClassCastException
+     * @param noisyNeurons the neurons
+     * @throws ClassCastException
      */
-    public void commitRandom(List<Neuron> noiseyNeurons)
-        throws ClassCastException {
-         if (!getCbDistribution().getSelectedItem().toString()
-            .equals(SimbrainConstants.NULL_STRING)) {
+    public void commitRandom(List<Neuron> noiseyNeurons) throws ClassCastException {
+        if (!getCbDistribution().getSelectedItem().toString().equals(SimbrainConstants.NULL_STRING)) {
             Randomizer rand = new Randomizer();
             super.commitRandom(rand);
             for (Neuron n : noiseyNeurons) {

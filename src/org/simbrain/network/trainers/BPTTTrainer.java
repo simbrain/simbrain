@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.subnetworks.BPTTNetwork;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Trainer for backprop through time Networks. As a test use the "Walker"
@@ -35,38 +35,55 @@ import org.simbrain.network.subnetworks.BPTTNetwork;
  */
 public class BPTTTrainer extends IterableTrainer {
 
-    /** Reference to bptt being trained. */
+    /**
+     * Reference to bptt being trained.
+     */
     private final BPTTNetwork bptt;
 
-    /** Current error. */
+    /**
+     * Current error.
+     */
     private double mse;
 
-    /** Default learning rate. */
+    /**
+     * Default learning rate.
+     */
     private static final double DEFAULT_LEARNING_RATE = .25;
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /** Default momentum. */
+    /**
+     * Default momentum.
+     */
     private static final double DEFAULT_MOMENTUM = .9;
 
-    /** Momentum. Must be between 0 and 1. */
+    /**
+     * Momentum. Must be between 0 and 1.
+     */
     private double momentum = DEFAULT_MOMENTUM;
 
-    /** For storing current error contribution of each neuron. */
+    /**
+     * For storing current error contribution of each neuron.
+     */
     private HashMap<Neuron, Double> errorMap;
 
-    /** For storing weight deltas. */
+    /**
+     * For storing weight deltas.
+     */
     private HashMap<Synapse, Double> weightDeltaMap;
 
-    /** For storing bias deltas. */
+    /**
+     * For storing bias deltas.
+     */
     private HashMap<Neuron, Double> biasDeltaMap;
 
     /**
      * Construct the SRN trainer.
      *
-     * @param bptt
-     *            the simple recurrent network
+     * @param bptt the simple recurrent network
      */
     public BPTTTrainer(BPTTNetwork bptt) {
         super(bptt);
@@ -96,8 +113,7 @@ public class BPTTTrainer extends IterableTrainer {
                 // System.out.println("First in set:" + iteration);
                 // For new patterns begin with a regular forward propagation
                 bptt.initNetwork();
-                bptt.getInputLayer().setActivations(
-                        network.getTrainingSet().getInputData()[row]);
+                bptt.getInputLayer().setActivations(network.getTrainingSet().getInputData()[row]);
                 // bptt.getInputLayer().printActivations();
                 bptt.getHiddenLayer().update();
                 bptt.getOutputLayer().update();
@@ -119,18 +135,13 @@ public class BPTTTrainer extends IterableTrainer {
                     // System.out.println(synapse.getId() + ":"
                     // + Utils.round(synapse.getStrength(), 2) + " + "
                     // + Utils.round(weightDeltaMap.get(synapse), 2));
-                    synapse.setStrength(synapse.getStrength()
-                            + weightDeltaMap.get(synapse)
-                            / bptt.getStepsPerSequences());
+                    synapse.setStrength(synapse.getStrength() + weightDeltaMap.get(synapse) / bptt.getStepsPerSequences());
                 }
 
                 // Update biases
                 for (Neuron neuron : biasDeltaMap.keySet()) {
-                    BiasedUpdateRule biasedNeuron = (BiasedUpdateRule) (neuron
-                            .getUpdateRule());
-                    biasedNeuron.setBias(biasedNeuron.getBias()
-                            + biasDeltaMap.get(neuron)
-                            / bptt.getStepsPerSequences());
+                    BiasedUpdateRule biasedNeuron = (BiasedUpdateRule) (neuron.getUpdateRule());
+                    biasedNeuron.setBias(biasedNeuron.getBias() + biasDeltaMap.get(neuron) / bptt.getStepsPerSequences());
                 }
             }
             incrementIteration();
@@ -157,15 +168,13 @@ public class BPTTTrainer extends IterableTrainer {
      * @return true if last pattern in a set.
      */
     private boolean lastPatternInSet() {
-        return ((getIteration() % bptt.getStepsPerSequences()) == (bptt
-                .getStepsPerSequences() - 1));
+        return ((getIteration() % bptt.getStepsPerSequences()) == (bptt.getStepsPerSequences() - 1));
     }
 
     /**
      * Compute error contribution for all nodes using backprop algorithm.
      *
-     * @param row
-     *            current row of training data
+     * @param row current row of training data
      */
     private void backpropagateStoreError(Trainable network, int row) {
 
@@ -182,8 +191,7 @@ public class BPTTTrainer extends IterableTrainer {
             double sumFanOutErrors = 0;
             for (Synapse synapse : neuron.getFanOut().values()) {
                 Neuron nextLayerNeuron = synapse.getTarget();
-                sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse
-                        .getStrength());
+                sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse.getStrength());
             }
             // Compute errors and deltas for previous layer
             storeErrorAndDeltas(neuron, sumFanOutErrors);
@@ -194,19 +202,16 @@ public class BPTTTrainer extends IterableTrainer {
      * Store the error value, bias delta, and fan-in weight deltas for this
      * neuron.
      *
-     * @param neuron
-     *            neuron whose activation function's derivative is used
-     * @param error
-     *            simple error for outputs, sum of errors in fan-out, times
-     *            weights for hidden units
+     * @param neuron neuron whose activation function's derivative is used
+     * @param error  simple error for outputs, sum of errors in fan-out, times
+     *               weights for hidden units
      */
     private void storeErrorAndDeltas(Neuron neuron, double error) {
 
         // Store error signal for this neuron
         double errorSignal = 0;
         if (neuron.getUpdateRule() instanceof DifferentiableUpdateRule) {
-            double derivative = ((DifferentiableUpdateRule) neuron
-                    .getUpdateRule()).getDerivative(neuron.getWeightedInputs());
+            double derivative = ((DifferentiableUpdateRule) neuron.getUpdateRule()).getDerivative(neuron.getWeightedInputs());
             errorSignal = error * derivative;
             errorMap.put(neuron, errorSignal);
         }
@@ -217,15 +222,12 @@ public class BPTTTrainer extends IterableTrainer {
             if (weightDeltaMap.get(synapse) != null) {
                 lastWeightDelta = weightDeltaMap.get(synapse);
             }
-            double weightDelta = learningRate * errorSignal
-                    * synapse.getSource().getActivation() + momentum
-                    * lastWeightDelta;
+            double weightDelta = learningRate * errorSignal * synapse.getSource().getActivation() + momentum * lastWeightDelta;
             // Add up weight deltas
             if (weightDeltaMap.get(synapse) == null) {
                 weightDeltaMap.put(synapse, weightDelta);
             } else {
-                weightDeltaMap.put(synapse, weightDeltaMap.get(synapse)
-                        + weightDelta);
+                weightDeltaMap.put(synapse, weightDeltaMap.get(synapse) + weightDelta);
             }
         }
 
@@ -257,8 +259,7 @@ public class BPTTTrainer extends IterableTrainer {
     /**
      * Randomize the specified layer.
      *
-     * @param layer
-     *            the layer to randomize
+     * @param layer the layer to randomize
      */
     private void randomize(List<Neuron> layer) {
         for (Neuron neuron : layer) {
@@ -276,8 +277,7 @@ public class BPTTTrainer extends IterableTrainer {
     }
 
     /**
-     * @param learningRate
-     *            the learningRate to set
+     * @param learningRate the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
@@ -291,8 +291,7 @@ public class BPTTTrainer extends IterableTrainer {
     }
 
     /**
-     * @param momentum
-     *            the momentum to set
+     * @param momentum the momentum to set
      */
     public void setMomentum(double momentum) {
         this.momentum = momentum;

@@ -18,27 +18,30 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>IzhikevichNeuronPanel</b> edits an Izhekevich neuron.
  */
 public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final IzhikevichRule prototypeRule = new IzhikevichRule();
 
     /**
@@ -47,17 +50,11 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
     public IzhikevichRulePanel() {
         super();
         this.add(tabbedPane);
-        JTextField tfA = createTextField((r) -> ((IzhikevichRule) r).getA(),
-                (r, val) -> ((IzhikevichRule) r).setA((double) val));
-        JTextField tfB = createTextField((r) -> ((IzhikevichRule) r).getB(),
-                (r, val) -> ((IzhikevichRule) r).setB((double) val));
-        JTextField tfC = createTextField((r) -> ((IzhikevichRule) r).getC(),
-                (r, val) -> ((IzhikevichRule) r).setC((double) val));
-        JTextField tfD = createTextField((r) -> ((IzhikevichRule) r).getD(),
-                (r, val) -> ((IzhikevichRule) r).setD((double) val));
-        JTextField tfIBg = createTextField(
-                (r) -> ((IzhikevichRule) r).getiBg(),
-                (r, val) -> ((IzhikevichRule) r).setiBg((double) val));
+        JTextField tfA = createTextField((r) -> ((IzhikevichRule) r).getA(), (r, val) -> ((IzhikevichRule) r).setA((double) val));
+        JTextField tfB = createTextField((r) -> ((IzhikevichRule) r).getB(), (r, val) -> ((IzhikevichRule) r).setB((double) val));
+        JTextField tfC = createTextField((r) -> ((IzhikevichRule) r).getC(), (r, val) -> ((IzhikevichRule) r).setC((double) val));
+        JTextField tfD = createTextField((r) -> ((IzhikevichRule) r).getD(), (r, val) -> ((IzhikevichRule) r).setD((double) val));
+        JTextField tfIBg = createTextField((r) -> ((IzhikevichRule) r).getiBg(), (r, val) -> ((IzhikevichRule) r).setiBg((double) val));
         mainTab.addItem("A", tfA);
         mainTab.addItem("B", tfB);
         mainTab.addItem("C", tfC);
@@ -66,8 +63,7 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
         mainTab.addItem("Add noise", getAddNoise());
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(getNoisePanel(), "Noise");
-        this.addBottomText("<html>For a list of useful parameter settings<p>"
-                + "press the \"Help\" Button.</html>");
+        this.addBottomText("<html>For a list of useful parameter settings<p>" + "press the \"Help\" Button.</html>");
     }
 
     @Override

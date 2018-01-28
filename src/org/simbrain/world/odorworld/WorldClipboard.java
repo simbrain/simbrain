@@ -18,10 +18,10 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Point;
-
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import java.awt.*;
 
 /**
  * <b>WorldClipboard</b> is a static clipboard utility class.
@@ -29,7 +29,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * @author RJB
  */
 public final class WorldClipboard {
-    /** Clipboard entity. */
+    /**
+     * Clipboard entity.
+     */
     private static OdorWorldEntity clipboardEntity;
 
     /**
@@ -49,10 +51,9 @@ public final class WorldClipboard {
      * Cuts an object from a world.
      *
      * @param selectedEntity Selected entity
-     * @param parent Parent world
+     * @param parent         Parent world
      */
-    public static void cutItem(final OdorWorldEntity selectedEntity,
-            final OdorWorldPanel parent) {
+    public static void cutItem(final OdorWorldEntity selectedEntity, final OdorWorldPanel parent) {
         setClipboardEntity(selectedEntity);
         // parent.getWorld().getEntityList().remove(selectedEntity);
         parent.repaint();
@@ -61,7 +62,7 @@ public final class WorldClipboard {
     /**
      * Paste an object to a world.
      *
-     * @param p Point to paste object
+     * @param p      Point to paste object
      * @param parent Parent world
      */
     public static void pasteItem(final Point p, final OdorWorldPanel parent) {

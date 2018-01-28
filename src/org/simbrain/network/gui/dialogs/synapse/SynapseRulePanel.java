@@ -18,45 +18,27 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
-import org.simbrain.network.synapse_update_rules.HebbianRule;
-import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
-import org.simbrain.network.synapse_update_rules.OjaRule;
-import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule;
-import org.simbrain.network.synapse_update_rules.STDPRule;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A panel for setting the synapse type and changing the parameters of the
@@ -88,8 +70,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     /**
      * Synapse type combo box.
      */
-    private final JComboBox<String> cbSynapseType = new JComboBox<String>(
-        RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
+    private final JComboBox<String> cbSynapseType = new JComboBox<String>(RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
 
     /**
      * Panel for editing synapses.
@@ -124,25 +105,16 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
      * Add new synapse rules here.
      */
     static {
-        RULE_MAP.put(new StaticSynapseRule().getName(),
-            new AnnotatedPropertyEditor(new StaticSynapseRule()));
-        RULE_MAP.put(new HebbianRule().getName(),
-            new AnnotatedPropertyEditor(new HebbianRule()));
-        RULE_MAP.put(new HebbianCPCARule().getName(),
-            new AnnotatedPropertyEditor(new HebbianCPCARule()));
-        RULE_MAP.put(new HebbianThresholdRule().getName(),
-            new AnnotatedPropertyEditor(new HebbianThresholdRule()));
-        RULE_MAP.put(new OjaRule().getName(),
-            new AnnotatedPropertyEditor(new OjaRule()));
-        RULE_MAP.put(new PfisterGerstner2006Rule().getName(),
-            new AnnotatedPropertyEditor(new PfisterGerstner2006Rule()));
+        RULE_MAP.put(new StaticSynapseRule().getName(), new AnnotatedPropertyEditor(new StaticSynapseRule()));
+        RULE_MAP.put(new HebbianRule().getName(), new AnnotatedPropertyEditor(new HebbianRule()));
+        RULE_MAP.put(new HebbianCPCARule().getName(), new AnnotatedPropertyEditor(new HebbianCPCARule()));
+        RULE_MAP.put(new HebbianThresholdRule().getName(), new AnnotatedPropertyEditor(new HebbianThresholdRule()));
+        RULE_MAP.put(new OjaRule().getName(), new AnnotatedPropertyEditor(new OjaRule()));
+        RULE_MAP.put(new PfisterGerstner2006Rule().getName(), new AnnotatedPropertyEditor(new PfisterGerstner2006Rule()));
         // RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
         // new ShortTermPlasticityRulePanel());
-        RULE_MAP.put(new STDPRule().getName(),
-            new AnnotatedPropertyEditor(new STDPRule()));
-        RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
-            new AnnotatedPropertyEditor(
-                new SubtractiveNormalizationRule()));
+        RULE_MAP.put(new STDPRule().getName(), new AnnotatedPropertyEditor(new STDPRule()));
+        RULE_MAP.put(new SubtractiveNormalizationRule().getName(), new AnnotatedPropertyEditor(new SubtractiveNormalizationRule()));
     }
 
     /**
@@ -151,8 +123,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
      * @param synapseList the list of synapses being edited
      * @param parent      parent window referenced for resizing via "Pack"
      */
-    public SynapseRulePanel(Collection<Synapse> synapseList,
-                            final Window parent) {
+    public SynapseRulePanel(Collection<Synapse> synapseList, final Window parent) {
         this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
 
@@ -164,12 +135,10 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
      * @param startingState whether or not the dropdown showing rule parameters
      *                      should be visible by default.
      */
-    public SynapseRulePanel(Collection<Synapse> synapseList,
-                            final Window parent, boolean startingState) {
+    public SynapseRulePanel(Collection<Synapse> synapseList, final Window parent, boolean startingState) {
         this.synapseCollection = synapseList;
         this.parent = parent;
-        displaySPTriangle = new DropDownTriangle(UpDirection.LEFT,
-            startingState, "Settings", "Settings", parent);
+        displaySPTriangle = new DropDownTriangle(UpDirection.LEFT, startingState, "Settings", "Settings", parent);
         initSynapseType();
         startingPanel = synapsePanel;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -219,9 +188,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         // same type or not
         boolean discrepancy = false;
         while (synIter.hasNext()) {
-            if (!synapseRef.getLearningRule().getClass()
-                .equals(synIter.next().getLearningRule().getClass()))
-            {
+            if (!synapseRef.getLearningRule().getClass().equals(synIter.next().getLearningRule().getClass())) {
                 discrepancy = true;
                 break;
             }
@@ -239,8 +206,7 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             // to the rules
             String synapseName = synapseRef.getLearningRule().getName();
             synapsePanel = RULE_MAP.get(synapseName);
-            List<EditableObject> ruleList = synapseCollection.stream()
-                .map(Synapse::getLearningRule).collect(Collectors.toList());
+            List<EditableObject> ruleList = synapseCollection.stream().map(Synapse::getLearningRule).collect(Collectors.toList());
             synapsePanel.fillFieldValues(ruleList);
             cbSynapseType.setSelectedItem(synapseName);
         }
@@ -308,16 +274,13 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
             // editing multiple rules with different parameter values which
             // have not been set those values will be replaced with the
             // default).
-            if (!s.getLearningRule().getClass()
-                .equals(selectedRule.getClass()))
-            {
+            if (!s.getLearningRule().getClass().equals(selectedRule.getClass())) {
                 s.setLearningRule(selectedRule.deepCopy());
             }
         }
 
         // TODO: Think about this in relation to above
-        List<EditableObject> ruleList = synapseCollection.stream()
-            .map(Synapse::getLearningRule).collect(Collectors.toList());
+        List<EditableObject> ruleList = synapseCollection.stream().map(Synapse::getLearningRule).collect(Collectors.toList());
         synapsePanel.commitChanges(ruleList);
         return true;
     }

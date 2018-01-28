@@ -18,24 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -43,6 +25,14 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.FeedForward;
 import org.simbrain.util.math.SquashingFunction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Panel for creating a feed-forward layered network.
@@ -52,19 +42,29 @@ import org.simbrain.util.math.SquashingFunction;
 
 public class LayeredNetworkCreationPanel extends JPanel {
 
-    /** Parent window. */
+    /**
+     * Parent window.
+     */
     private Window parent;
 
-    /** Main display panel. */
+    /**
+     * Main display panel.
+     */
     private Box mainPanel = Box.createVerticalBox();
 
-    /** Text field for number of layers in network. */
+    /**
+     * Text field for number of layers in network.
+     */
     private JTextField layersTF = new JTextField();
 
-    /** Panel containing the variable number of layer edit rows. */
+    /**
+     * Panel containing the variable number of layer edit rows.
+     */
     private Box layerPanel = Box.createVerticalBox();
 
-    /** List of swing components that describe the layers of the network. */
+    /**
+     * List of swing components that describe the layers of the network.
+     */
     private List<LayerCreationPanel> layerList = new ArrayList<LayerCreationPanel>();
 
     /**
@@ -91,10 +91,9 @@ public class LayeredNetworkCreationPanel extends JPanel {
      * recurrent network.
      *
      * @param initialNumLayers the initial number of layers
-     * @param parent the parent dialog
+     * @param parent           the parent dialog
      */
-    public LayeredNetworkCreationPanel(final int initialNumLayers,
-            final Window parent) {
+    public LayeredNetworkCreationPanel(final int initialNumLayers, final Window parent) {
         this.parent = parent;
 
         // Set up header
@@ -134,20 +133,16 @@ public class LayeredNetworkCreationPanel extends JPanel {
         for (int i = numLayers; i > 0; i--) {
             LayerCreationPanel layer;
             if (i == 1) {
-                layer = new LayerCreationPanel(
-                        DEFAULT_NEURON_TYPES, "Input Layer", 5);
+                layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Input Layer", 5);
                 layer.setComboBox("Linear");
             } else if (i == numLayers) {
-                layer = new LayerCreationPanel(
-                        DEFAULT_NEURON_TYPES, "Output Layer", 5);
-                
+                layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Output Layer", 5);
+
             } else {
                 if (numLayers == 3) {
-                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES,
-                            "Hidden Layer", 5);                    
+                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden Layer", 5);
                 } else {
-                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES,
-                            "Hidden Layer " + (i - 1), 5);
+                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden Layer " + (i - 1), 5);
                 }
                 layer.setComboBox("Logistic");
             }
@@ -163,8 +158,8 @@ public class LayeredNetworkCreationPanel extends JPanel {
      * Create the layered network.
      *
      * @param panel network panel to create the network in.
-     * @param type what type of feed forward network to create. Current options
-     *            are "Backprop" and "FeedForward".
+     * @param type  what type of feed forward network to create. Current options
+     *              are "Backprop" and "FeedForward".
      */
     public void commit(final NetworkPanel panel, final String type) {
         // Set topology
@@ -178,18 +173,15 @@ public class LayeredNetworkCreationPanel extends JPanel {
         // Create network
         FeedForward net;
         switch (type) {
-        case "Backprop":
-            net = new BackpropNetwork(panel.getNetwork(), topology,
-                    panel.getWhereToAdd());
-            break;
-        case "FeedForward":
-            net = new FeedForward(panel.getNetwork(), topology,
-                    panel.getWhereToAdd());
-            break;
-        default:
-            net = new FeedForward(panel.getNetwork(), topology,
-                    panel.getWhereToAdd());
-            break;
+            case "Backprop":
+                net = new BackpropNetwork(panel.getNetwork(), topology, panel.getWhereToAdd());
+                break;
+            case "FeedForward":
+                net = new FeedForward(panel.getNetwork(), topology, panel.getWhereToAdd());
+                break;
+            default:
+                net = new FeedForward(panel.getNetwork(), topology, panel.getWhereToAdd());
+                break;
         }
 
         // Set neuron types
@@ -213,25 +205,29 @@ public class LayeredNetworkCreationPanel extends JPanel {
      */
     public static class LayerCreationPanel extends JPanel {
 
-        /** Number of neurons in this layer. */
+        /**
+         * Number of neurons in this layer.
+         */
         private final JTextField numNeuronsField;
 
-        /** Update rule for this layer. */
+        /**
+         * Update rule for this layer.
+         */
         private final JComboBox<String> neuronTypeComboBox;
 
-        /** Mapping from string descriptions of rules to neuron update rules. */
+        /**
+         * Mapping from string descriptions of rules to neuron update rules.
+         */
         private final HashMap<String, NeuronUpdateRule> neuronTypeMap;
 
         /**
          * Construct a layer creation panel.
          *
          * @param neuronTypeMap the neuron types to allow
-         * @param label the label for the text field
-         * @param numNeurons initial number of neurons
+         * @param label         the label for the text field
+         * @param numNeurons    initial number of neurons
          */
-        public LayerCreationPanel(
-                final HashMap<String, NeuronUpdateRule> neuronTypeMap,
-                final String label, final int numNeurons) {
+        public LayerCreationPanel(final HashMap<String, NeuronUpdateRule> neuronTypeMap, final String label, final int numNeurons) {
 
             this.neuronTypeMap = neuronTypeMap;
 
@@ -241,8 +237,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
             numNeuronsField.setText("" + numNeurons);
 
             // Set up combo box
-            neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet()
-                    .toArray(new String[neuronTypeMap.size()]));
+            neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet().toArray(new String[neuronTypeMap.size()]));
 
             // Lay out all components horizontally
             Box component = Box.createHorizontalBox();
@@ -269,7 +264,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
         /**
          * Construct a layer creation panel using default neuron types.
          *
-         * @param label the label for the text field
+         * @param label      the label for the text field
          * @param numNeurons initial number of neurons
          */
         public LayerCreationPanel(String label, int numNeurons) {

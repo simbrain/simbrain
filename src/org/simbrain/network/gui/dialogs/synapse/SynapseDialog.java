@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
@@ -36,12 +25,22 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * The <b>SynapseDialog</b> is a dialog for setting the properties of synapses.
  */
 public final class SynapseDialog extends StandardDialog {
 
-    /** The synapses being modified. */
+    /**
+     * The synapses being modified.
+     */
     private final List<Synapse> synapseList;
 
     /**
@@ -55,18 +54,19 @@ public final class SynapseDialog extends StandardDialog {
      */
     private final JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. The action executed by the help button */
+    /**
+     * Show Help Action. The action executed by the help button
+     */
     private ShowHelpAction helpAction;
 
     /**
      * Creates a synapse dialog from a collection of SynapseNodes. No frame
      * available.
-     * 
+     *
      * @param selectedSynapses the nodes
      * @return the dialog.
      */
-    public static SynapseDialog createSynapseDialog(
-            final Collection<SynapseNode> selectedSynapses) {
+    public static SynapseDialog createSynapseDialog(final Collection<SynapseNode> selectedSynapses) {
         SynapseDialog sd = createSynapseDialog(getSynapses(selectedSynapses));
         return sd;
     }
@@ -76,14 +76,11 @@ public final class SynapseDialog extends StandardDialog {
      * specified.
      *
      * @param selectedSynapses synapses to edit.
-     * @param parent the parent frame
+     * @param parent           the parent frame
      * @return the dialog.
      */
-    public static SynapseDialog createSynapseDialog(
-            final Collection<SynapseNode> selectedSynapses,
-            final Frame parent) {
-        SynapseDialog sd = new SynapseDialog(getSynapses(selectedSynapses),
-                parent);
+    public static SynapseDialog createSynapseDialog(final Collection<SynapseNode> selectedSynapses, final Frame parent) {
+        SynapseDialog sd = new SynapseDialog(getSynapses(selectedSynapses), parent);
         sd.addListeners();
         return sd;
     }
@@ -94,8 +91,7 @@ public final class SynapseDialog extends StandardDialog {
      * @param selectedSynapses the synapses
      * @return the dialog.
      */
-    public static SynapseDialog createSynapseDialog(
-            final List<Synapse> selectedSynapses) {
+    public static SynapseDialog createSynapseDialog(final List<Synapse> selectedSynapses) {
         SynapseDialog sd = new SynapseDialog(selectedSynapses);
         sd.addListeners();
         return sd;
@@ -103,28 +99,26 @@ public final class SynapseDialog extends StandardDialog {
 
     /**
      * Private constructor without frame.
-     * 
+     *
      * @param synapseList the logical synapses being adjusted
      */
     private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        synapseEditingPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(synapseList, this);
+        synapseEditingPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(synapseList, this);
         initializeLayout();
         updateHelp();
     }
 
     /**
      * Private constructor with frame.
-     * 
+     *
      * @param synapseList
      * @param parent
      */
     private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        synapseEditingPanel = SynapsePropertiesPanel
-                .createSynapsePropertiesPanel(synapseList, this);
+        synapseEditingPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(synapseList, this);
         initializeLayout();
         updateHelp();
     }
@@ -152,24 +146,19 @@ public final class SynapseDialog extends StandardDialog {
      * update rule.
      */
     private void addListeners() {
-        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType()
-                .addActionListener(
-                        e -> SwingUtilities.invokeLater(() -> updateHelp()));
+        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     /**
      * Set the help page based on the currently selected synapse type.
      */
     public void updateHelp() {
-        if (synapseEditingPanel.getSynapseRulePanel().getCbSynapseType()
-                .getSelectedItem() == SimbrainConstants.NULL_STRING) {
+        if (synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else {
-            String name = (String) synapseEditingPanel.getSynapseRulePanel()
-                    .getCbSynapseType().getSelectedItem();
+            String name = (String) synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem();
             name = name.replaceAll("\\s", ""); // Remove white space
-            helpAction = new ShowHelpAction(
-                    "Pages/Network/synapse/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }
@@ -214,8 +203,7 @@ public final class SynapseDialog extends StandardDialog {
         }
         for (Synapse s : synapses) {
             if (s.getTarget() != null) {
-                if (s.getTarget().getUpdateRule()
-                        .getInputType() == InputType.SYNAPTIC) {
+                if (s.getTarget().getUpdateRule().getInputType() == InputType.SYNAPTIC) {
                     return true;
                 }
             }
@@ -229,10 +217,8 @@ public final class SynapseDialog extends StandardDialog {
      * @param selectedSynapses the selected Synapse Node gui objects
      * @return the synapses contained within the selected synapse nodes
      */
-    private static List<Synapse> getSynapses(
-            final Collection<SynapseNode> selectedSynapses) {
-        return selectedSynapses.stream().map(SynapseNode::getSynapse)
-                .collect(Collectors.toList());
+    private static List<Synapse> getSynapses(final Collection<SynapseNode> selectedSynapses) {
+        return selectedSynapses.stream().map(SynapseNode::getSynapse).collect(Collectors.toList());
     }
 
 }

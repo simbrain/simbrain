@@ -18,28 +18,22 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
-import org.simbrain.network.gui.nodes.NeuronGroupNode.NeuronGroupInteractionBox;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -52,23 +46,31 @@ import org.simbrain.util.StandardDialog;
  */
 public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyChangeListener {
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** Reference to the subnet being represented. */
+    /**
+     * Reference to the subnet being represented.
+     */
     private final Subnetwork subnetwork;
 
-    /** The interaction box for this neuron group. */
+    /**
+     * The interaction box for this neuron group.
+     */
     private SubnetworkNodeInteractionBox interactionBox;
 
-    /** The outlined objects (neuron and synapse groups) for this node. */
+    /**
+     * The outlined objects (neuron and synapse groups) for this node.
+     */
     private final OutlinedObjects outlinedObjects;
 
     /**
      * Create a subnetwork node.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group        the layered network
      */
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
         this.networkPanel = networkPanel;
@@ -93,11 +95,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
      */
     @Override
     public void layoutChildren() {
-        interactionBox.setOffset(
-                outlinedObjects.getFullBounds().getX()
-                        + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2,
-                outlinedObjects.getFullBounds().getY()
-                        - interactionBox.getFullBounds().getHeight() + 1);
+        interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2, outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
     }
 
     /**
@@ -116,8 +114,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     /**
      * Set a custom interaction box.
      *
-     * @param newBox
-     *            the newBox to set.
+     * @param newBox the newBox to set.
      */
     protected void setInteractionBox(SubnetworkNodeInteractionBox newBox) {
         this.removeChild(interactionBox);
@@ -133,7 +130,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     public void updateText() {
         interactionBox.setText(subnetwork.getLabel());
         interactionBox.updateText();
-    };
+    }
+
+    ;
 
     /**
      * @return the networkPanel
@@ -161,7 +160,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         updateSynapseNodePositions();
-    };
+    }
+
+    ;
 
     /**
      * Call update synapse node positions on all constituent neuron group nodes,
@@ -196,7 +197,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
             return true;
         }
 
-    };
+    }
+
+    ;
 
     /**
      * Helper class to create the subnetwork dialog. Subclasses override this
@@ -208,9 +211,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
 
         StandardDialog dialog = new StandardDialog() {
             private final SubnetworkPanel panel;
+
             {
-                panel = new SubnetworkPanel(getNetworkPanel(),
-                        (Subnetwork) SubnetworkNode.this.getSubnetwork(), this);
+                panel = new SubnetworkPanel(getNetworkPanel(), (Subnetwork) SubnetworkNode.this.getSubnetwork(), this);
                 setContentPane(panel);
             }
 
@@ -261,11 +264,12 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         }
     };
 
-    /** Action for editing the group name. */
+    /**
+     * Action for editing the group name.
+     */
     protected Action renameAction = new AbstractAction("Rename...") {
         public void actionPerformed(final ActionEvent event) {
-            String newName = JOptionPane.showInputDialog("Name:",
-                    subnetwork.getLabel());
+            String newName = JOptionPane.showInputDialog("Name:", subnetwork.getLabel());
             subnetwork.setLabel(newName);
         }
     };
@@ -317,11 +321,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if (subnetwork instanceof Trainable) {
-                TestInputPanel testInputPanel =  TestInputPanel
-                		.createTestInputPanel(getNetworkPanel(),
-                        ((Trainable) subnetwork).getInputNeurons(),
-                        ((Trainable) subnetwork).getTrainingSet()
-                                .getInputDataMatrix());
+                TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), ((Trainable) subnetwork).getInputNeurons(), ((Trainable) subnetwork).getTrainingSet().getInputDataMatrix());
                 getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
 
             }
@@ -335,13 +335,13 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
                 ((GroupNode) object).updateConstituentNodes();
             }
         }
-//        for (SynapseGroup sg : this.getSubnetwork().getSynapseGroupList()) {
-//            if (sg.isDisplaySynapses()) {
-//                SynapseGroupNodeFull sgf = (SynapseGroupNodeFull) networkPanel
-//                        .getObjectNodeMap().get(sg);
-//                sgf.updateConstituentNodes();
-//            }
-//        }
+        //        for (SynapseGroup sg : this.getSubnetwork().getSynapseGroupList()) {
+        //            if (sg.isDisplaySynapses()) {
+        //                SynapseGroupNodeFull sgf = (SynapseGroupNodeFull) networkPanel
+        //                        .getObjectNodeMap().get(sg);
+        //                sgf.updateConstituentNodes();
+        //            }
+        //        }
     }
 
 

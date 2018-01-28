@@ -18,39 +18,40 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Action for showing a dialog to edit a smell source.
  */
 public final class EditSmellSourceAction extends AbstractAction {
 
-    /** Plot GUI component. */
+    /**
+     * Plot GUI component.
+     */
     private final OdorWorldPanel component;
 
-    /** Entity to edit. */
+    /**
+     * Entity to edit.
+     */
     private final OdorWorldEntity entity;
 
     /**
      * Create a new open plot action.
+     *
      * @param component GUI component, must not be null.
      * @param entity
      */
-    public EditSmellSourceAction(final OdorWorldPanel component,
-            OdorWorldEntity entity) {
+    public EditSmellSourceAction(final OdorWorldPanel component, OdorWorldEntity entity) {
         super("Edit smell source...");
         this.entity = entity;
         if (component == null) {
-            throw new IllegalArgumentException(
-                    "Desktop component must not be null");
+            throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
         // this.putValue(this.ACCELERATOR_KEY,
@@ -60,10 +61,11 @@ public final class EditSmellSourceAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "View / Edit smell stimulus...");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
-        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
-                entity.getSmellSource()));
+        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(entity.getSmellSource()));
         JDialog dialog = editor.getDialog();
         // JDialog dialog = new JDialog();
         // dialog.setContentPane(new SmellSourcePanel(entity.getSmellSource()));

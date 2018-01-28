@@ -18,32 +18,22 @@
  */
 package org.simbrain.docviewer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import org.simbrain.workspace.WorkspaceComponent;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
-
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Component corresponding to a Document Viewer.
  */
 public class DocViewerComponent extends WorkspaceComponent {
 
-    /** Default string. */
-    private String text = "<html>\n<body>\nUse this text to explain how a simulation works,\n"
-            + "and save it with the workspace so that\n"
-            + "when it is re-opened other users will know how to use it.\n<br><br>\n"
-            + "Uses simple html for formatting, e.g. <b>bold text</b>.\n Click on the "
-            + "Edit tab to edit the html \n or import from pre-edited html "
-            + "using the File menu.<br><br>"
-            + "Example of a local image: <img src = \"file:docs/Images/simbrainlogo.gif\"><br><br>\n"
-            + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a>\n"
-            + " \n</body>\n</html>\n";
+    /**
+     * Default string.
+     */
+    private String text = "<html>\n<body>\nUse this text to explain how a simulation works,\n" + "and save it with the workspace so that\n" + "when it is re-opened other users will know how to use it.\n<br><br>\n" + "Uses simple html for formatting, e.g. <b>bold text</b>.\n Click on the " + "Edit tab to edit the html \n or import from pre-edited html " + "using the File menu.<br><br>" + "Example of a local image: <img src = \"file:docs/Images/simbrainlogo.gif\"><br><br>\n" + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a>\n" + " \n</body>\n</html>\n";
 
     /**
      * Construct a new document viewer component.
@@ -66,17 +56,15 @@ public class DocViewerComponent extends WorkspaceComponent {
      * there is nothing to persist with a console. This just ensures that a
      * component is created and (in the gui) presented.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return component to be opened
      */
-    public static DocViewerComponent open(InputStream input, final String name,
-            final String format) {
+    public static DocViewerComponent open(InputStream input, final String name, final String format) {
         DocViewerComponent comp = new DocViewerComponent(name);
         BufferedReader br;
-        br = new BufferedReader(new InputStreamReader(input,
-                Charset.forName("UTF-8")));
+        br = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
         String line;
         String text = new String();
         try {

@@ -18,18 +18,14 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.FlowLayout;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete Hopfield
@@ -37,22 +33,34 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class HopfieldCreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
+    /**
+     * Logic panel.
+     */
     private HopfieldPropertiesPanel hopPropertiesPanel;
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -102,8 +110,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = (Hopfield) hopPropertiesPanel.getGroup();
         layoutPanel.commitChanges();
-        layoutPanel.getCurrentLayout().setInitialLocation(
-                networkPanel.getWhereToAdd());
+        layoutPanel.getCurrentLayout().setInitialLocation(networkPanel.getWhereToAdd());
         hopfield.getNeuronGroup().setLayout(layoutPanel.getCurrentLayout());
         hopfield.getNeuronGroup().applyLayout();
         networkPanel.getNetwork().addGroup(hopfield);

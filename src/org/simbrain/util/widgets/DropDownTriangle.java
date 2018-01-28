@@ -18,34 +18,22 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Window;
+import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.simbrain.resource.ResourceManager;
 
 /**
  * A drop down triangle that can be used to hide information that is only
  * revealed when the triangle is clicked. Note that this is just the triangle.
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
- * 
+ * <p>
  * Good example of use: GeneralNeuronPropertiesPanel around line 243
  *
  * @author Zoë Tosi
- *
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
@@ -53,18 +41,26 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         LEFT, RIGHT;
     }
 
-    /** The label for the triangle when it is in the "up" state. */
+    /**
+     * The label for the triangle when it is in the "up" state.
+     */
     private final JLabel upTriLabel;
 
-    /** The label for the triangle when it is in the down state. */
+    /**
+     * The label for the triangle when it is in the down state.
+     */
     private final JLabel downTriLabel;
 
     private JLabel label;
 
-    /** The clickable triangle. */
+    /**
+     * The clickable triangle.
+     */
     private final ClickableTriangle ddTriangle;
 
-    /** Whether or not the triangle is pointing down. */
+    /**
+     * Whether or not the triangle is pointing down.
+     */
     private boolean down;
 
     /**
@@ -78,17 +74,13 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      * Creates an unlabeled drop down triangle pointing either left or right in
      * the "up" state and starting either "up" or down.
      *
-     * @param upState
-     *            The direction the triangle points when in the "up" state
-     * @param down
-     *            Whether or not the triangle is initialized in the "up" or down
-     *            state
-     * @param parent
-     *            The parent window, allowing this component to ensure it fits
-     *            in its container.
+     * @param upState The direction the triangle points when in the "up" state
+     * @param down    Whether or not the triangle is initialized in the "up" or down
+     *                state
+     * @param parent  The parent window, allowing this component to ensure it fits
+     *                in its container.
      */
-    public DropDownTriangle(UpDirection upState, boolean down,
-        final Window parent) {
+    public DropDownTriangle(UpDirection upState, boolean down, final Window parent) {
         this(upState, down, "", "", parent);
     }
 
@@ -98,21 +90,15 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      * triangle points either left or right in the "up" state and starts out
      * either "up" or down.
      *
-     * @param upState
-     *            The direction the triangle points when in the "up" state
-     * @param down
-     *            Whether or not the triangle is initialized in the "up" or down
-     *            state
-     * @param upLabel
-     *            The label displayed when the triangle is in the "up" state
-     * @param downLabel
-     *            The label displayed when the triangle is in the down state.
-     * @param parent
-     *            The parent window, allowing this component to ensure it fits
-     *            in its container.
+     * @param upState   The direction the triangle points when in the "up" state
+     * @param down      Whether or not the triangle is initialized in the "up" or down
+     *                  state
+     * @param upLabel   The label displayed when the triangle is in the "up" state
+     * @param downLabel The label displayed when the triangle is in the down state.
+     * @param parent    The parent window, allowing this component to ensure it fits
+     *                  in its container.
      */
-    public DropDownTriangle(final UpDirection upState, final boolean down,
-        final String upLabel, final String downLabel, final Window parent) {
+    public DropDownTriangle(final UpDirection upState, final boolean down, final String upLabel, final String downLabel, final Window parent) {
         ddTriangle = new ClickableTriangle(upState, down);
         upTriLabel = new JLabel(upLabel);
         downTriLabel = new JLabel(downLabel);
@@ -212,6 +198,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed when the triangle is in the "up" state
+     *
      * @param upText
      */
     public void setUpText(String upText) {
@@ -220,6 +207,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed when the triangle is in the down state
+     *
      * @param downText
      */
     public void setDownText(String downText) {
@@ -228,6 +216,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed next to the triangle.
+     *
      * @param upText
      * @param downText
      */
@@ -238,23 +227,24 @@ public class DropDownTriangle extends JPanel implements MouseListener {
     }
 
     /**
-     *
      * @author Zoë
-     *
      */
     private class ClickableTriangle extends JPanel {
 
-        /** The image icon for the triangle in it's down pointing state. */
-        private ImageIcon downTriangle = ResourceManager
-            .getImageIcon("DownTriangle.png");
+        /**
+         * The image icon for the triangle in it's down pointing state.
+         */
+        private ImageIcon downTriangle = ResourceManager.getImageIcon("DownTriangle.png");
 
-        /** The image icon for the triangle in it's left pointing state. */
-        private ImageIcon leftTriangle = ResourceManager
-            .getImageIcon("LeftTriangle.png");
+        /**
+         * The image icon for the triangle in it's left pointing state.
+         */
+        private ImageIcon leftTriangle = ResourceManager.getImageIcon("LeftTriangle.png");
 
-        /** The image icon for the triangle in it's left pointing state. */
-        private ImageIcon rightTriangle = ResourceManager
-            .getImageIcon("RightTriangle.png");
+        /**
+         * The image icon for the triangle in it's left pointing state.
+         */
+        private ImageIcon rightTriangle = ResourceManager.getImageIcon("RightTriangle.png");
 
         /**
          * The image icon for the triangle in it's "up" pointing state
@@ -262,11 +252,12 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          */
         private ImageIcon upTriangle;
 
-        /** The currently displayed triangle image. */
+        /**
+         * The currently displayed triangle image.
+         */
         private Image triangle;
 
         /**
-         *
          * @param upState
          * @param down
          */
@@ -288,8 +279,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          * Sets the size of the panel to fit the triangle image.
          */
         private void setSize() {
-            Dimension size = new Dimension((int) triangle.getWidth(null),
-                (int) triangle.getHeight(null));
+            Dimension size = new Dimension((int) triangle.getWidth(null), (int) triangle.getHeight(null));
             setPreferredSize(size);
             setMaximumSize(size);
             setMinimumSize(size);
@@ -300,11 +290,10 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          * Sets the state of the triangle, to either the "up" position (Left or
          * Right) or the down position.
          *
-         * @param down
-         *            the desired state of the triangle. False, puts the
-         *            triangle in the "up" position: pointing left or right,
-         *            specified at the time of creation, true points the
-         *            triangle down.
+         * @param down the desired state of the triangle. False, puts the
+         *             triangle in the "up" position: pointing left or right,
+         *             specified at the time of creation, true points the
+         *             triangle down.
          */
         public void setState(boolean down) {
             triangle = down ? downTriangle.getImage() : upTriangle.getImage();
@@ -325,8 +314,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     public static void main(String[] args) {
         JFrame f = new JFrame();
-        DropDownTriangle ddt = new DropDownTriangle(UpDirection.LEFT, false,
-            "X", "Y", f);
+        DropDownTriangle ddt = new DropDownTriangle(UpDirection.LEFT, false, "X", "Y", f);
         f.setContentPane(ddt);
         f.pack();
         f.setVisible(true);

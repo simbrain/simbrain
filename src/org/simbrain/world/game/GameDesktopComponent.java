@@ -1,9 +1,5 @@
 package org.simbrain.world.game;
 
-import java.awt.GridLayout;
-
-import javax.swing.SwingUtilities;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.game.tictactoe.TicTacToeGui;
@@ -11,23 +7,27 @@ import org.simbrain.world.game.tictactoe.TicTacToeGui.Listener;
 import org.simbrain.world.game.tictactoe.TicTacToeModel;
 import org.simbrain.world.game.tictactoe.TicTacToeModel.State;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Desktop Component for board games.
  *
  * @author Matt Watson
  */
 public class GameDesktopComponent extends GuiComponent<GameComponent> {
-    /** The game gui. */
+    /**
+     * The game gui.
+     */
     private final TicTacToeGui gui = new TicTacToeGui();
 
     /**
      * Creates a new desktop component.
      *
-     * @param frame parent frame
+     * @param frame     parent frame
      * @param component the game component
      */
-    public GameDesktopComponent(final GenericFrame frame,
-            final GameComponent component) {
+    public GameDesktopComponent(final GenericFrame frame, final GameComponent component) {
         super(frame, component);
 
         final TicTacToeModel model = component.getModel();
@@ -57,7 +57,9 @@ public class GameDesktopComponent extends GuiComponent<GameComponent> {
         });
     }
 
-    /** Default serial id. */
+    /**
+     * Default serial id.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

@@ -29,49 +29,79 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
 
     // TODO: Enum
 
-    /** STD. */
+    /**
+     * STD.
+     */
     private static final int STD = 0;
 
-    /** Plasticity type. */
+    /**
+     * Plasticity type.
+     */
     public static final int DEFAULT_PLASTICITY_TYPE = STD;
 
-    /** Pseudo spike threshold. */
+    /**
+     * Pseudo spike threshold.
+     */
     public static final double DEFAULT_FIRING_THRESHOLD = 0;
 
-    /** Base line strength. */
+    /**
+     * Base line strength.
+     */
     public static final double DEFAULT_BASE_LINE_STRENGTH = 1;
 
-    /** Input threshold. */
+    /**
+     * Input threshold.
+     */
     public static final double DEFAULT_INPUT_THRESHOLD = 0;
 
-    /** Bump rate. */
+    /**
+     * Bump rate.
+     */
     public static final double DEFAULT_BUMP_RATE = .5;
 
-    /** Rate at which the synapse will decay. */
+    /**
+     * Rate at which the synapse will decay.
+     */
     public static final double DEFAULT_DECAY_RATE = .2;
 
-    /** Activated. */
+    /**
+     * Activated.
+     */
     public static final boolean DEFAULT_ACTIVATED = false;
 
-    /** Plasticity type. */
+    /**
+     * Plasticity type.
+     */
     private int plasticityType = STD;
 
-    /** Pseudo spike threshold. */
+    /**
+     * Pseudo spike threshold.
+     */
     private double firingThreshold = DEFAULT_FIRING_THRESHOLD;
 
-    /** Base line strength. */
+    /**
+     * Base line strength.
+     */
     private double baseLineStrength = DEFAULT_BASE_LINE_STRENGTH;
 
-    /** Input threshold. */
+    /**
+     * Input threshold.
+     */
     private double inputThreshold = DEFAULT_INPUT_THRESHOLD;
 
-    /** Bump rate. */
+    /**
+     * Bump rate.
+     */
     private double bumpRate = DEFAULT_BUMP_RATE;
 
-    /** Rate at which the synapse will decay. */
+    /**
+     * Rate at which the synapse will decay.
+     */
     private double decayRate = DEFAULT_DECAY_RATE;
 
-    /** Activated. */
+    /**
+     * Activated.
+     */
     private boolean activated = DEFAULT_ACTIVATED;
 
     @Override

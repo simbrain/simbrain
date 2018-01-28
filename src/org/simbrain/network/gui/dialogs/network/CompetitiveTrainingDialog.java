@@ -18,15 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
@@ -37,39 +28,54 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 /**
  * Dialog for training a Competitive network.
  *
  * @author Jeff Yoshimi
- *
  */
 public class CompetitiveTrainingDialog extends StandardDialog {
 
-    /** Main tabbed pane. */
+    /**
+     * Main tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Panel for setting properties of the competitive network. */
+    /**
+     * Panel for setting properties of the competitive network.
+     */
     private CompetitivePropertiesPanel competitivePropsPanel;
 
-    /** Reference to network panel. */
+    /**
+     * Reference to network panel.
+     */
     private NetworkPanel panel;
 
-    /** Reference to the Competitive Network. */
+    /**
+     * Reference to the Competitive Network.
+     */
     private CompetitiveNetwork network;
 
-    /** Reference to input data panel. */
+    /**
+     * Reference to input data panel.
+     */
     private DataPanel inputPanel;
 
-    /** Reference to validate inputs panel */
+    /**
+     * Reference to validate inputs panel
+     */
     private TestInputPanel validateInputsPanel;
 
     /**
      * Construct the dialog.
      *
-     * @param np
-     *            parent network panel
-     * @param network
-     *            the Competitive network
+     * @param np      parent network panel
+     * @param network the Competitive network
      */
     public CompetitiveTrainingDialog(NetworkPanel np, CompetitiveNetwork network) {
 
@@ -82,33 +88,27 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         setModalityType(ModalityType.MODELESS);
 
         // Set up properties tab
-        competitivePropsPanel = CompetitivePropertiesPanel
-                .createCompetitivePropertiesPanel(np, network.getCompetitive());
+        competitivePropsPanel = CompetitivePropertiesPanel.createCompetitivePropertiesPanel(np, network.getCompetitive());
         tabbedPane.addTab("Network Properties", competitivePropsPanel);
 
         // Set up training tab
-        final CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(
-                panel, new CompetitiveTrainer(network), network);
+        final CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(panel, new CompetitiveTrainer(network), network);
         tabbedPane.addTab("Train Network", controlPanel);
 
         // Input data tab
-        inputPanel = new DataPanel(network.getInputNeurons(),
-                network.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        inputPanel = new DataPanel(network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
-                network.getInputNeurons(), network.getTrainingSet()
-                        .getInputDataMatrix());
+        validateInputsPanel = TestInputPanel.createTestInputPanel(np, network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix());
         tabbedPane.addTab("Validate", validateInputsPanel);
 
         // Listen for tab changed events. Load inputs to test tab
         // If inputs have been loaded
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 if (index == 1) {
                     // When entering training tab, commit table changes
@@ -116,8 +116,7 @@ public class CompetitiveTrainingDialog extends StandardDialog {
                     competitivePropsPanel.commitChanges();
                 } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel
-                                .getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
                     }
                 }
             }
@@ -125,8 +124,7 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         tabbedPane.addChangeListener(changeListener);
 
         // Set up help
-        Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/competitivenetwork.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/competitivenetwork.html");
         addButton(new JButton(helpAction));
 
         // Finish configuration

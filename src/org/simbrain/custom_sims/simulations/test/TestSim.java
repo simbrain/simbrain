@@ -1,10 +1,5 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.connections.RadialSimpleConstrainedKIn;
@@ -21,6 +16,11 @@ import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Playground for testing new features. A lot of stuff is commented out but
  * should work.
@@ -28,8 +28,12 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 public class TestSim extends RegisteredSimulation {
 
 
-    public TestSim(){super();};
-    
+    public TestSim() {
+        super();
+    }
+
+    ;
+
     /**
      * @param desktop
      */
@@ -111,8 +115,7 @@ public class TestSim extends RegisteredSimulation {
 
         // Build Network
         network.setTimeStep(0.5);
-        HexagonalGridLayout layout = new HexagonalGridLayout(GRID_SPACE,
-                GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+        HexagonalGridLayout layout = new HexagonalGridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
         layout.setInitialLocation(new Point(10, 10));
         List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
         List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
@@ -134,19 +137,15 @@ public class TestSim extends RegisteredSimulation {
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0, 0.0));
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY, ProbDistribution.UNIFORM);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.UNIFORM);
         exRand.setParam1(2);
         exRand.setParam2(1);
         inRand.setParam1(1.5);
         inRand.setParam2(3);
 
-        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN,
-                RADIUS);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0,
-                exRand, inRand);
+        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0, exRand, inRand);
         sg.setLabel("Recurrent Synapses");
         network.addGroup(sg);
         for (Neuron n : ng1.getNeuronList()) {
@@ -160,8 +159,7 @@ public class TestSim extends RegisteredSimulation {
         sg.setLowerBound(-200, Polarity.INHIBITORY);
         sg.setUpperBound(0, Polarity.INHIBITORY);
         network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(network));
+        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
 
     }
 

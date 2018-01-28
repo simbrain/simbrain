@@ -9,7 +9,9 @@ import org.simbrain.workspace.updater.UpdateAction;
  */
 public class ColorPlot implements UpdateAction {
 
-    /** Reference to simulation object that has all the main variables used. */
+    /**
+     * Reference to simulation object that has all the main variables used.
+     */
     RL_Sim_Main sim;
 
     /**
@@ -33,7 +35,6 @@ public class ColorPlot implements UpdateAction {
     @Override
     public void invoke() {
         double[] predictedState = sim.getCombinedPredicted();
-        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
-                predictedState, (float) sim.preditionError);
+        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(), predictedState, (float) sim.preditionError);
     }
 }

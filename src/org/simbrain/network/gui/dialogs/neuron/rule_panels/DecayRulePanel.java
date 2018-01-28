@@ -18,34 +18,41 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.ChoicesWithNull;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>DecayNeuronPanel</b> represents a decay neuron.
  */
 public class DecayRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final DecayRule prototypeRule = new DecayRule();
 
-    /** Decay fraction text field. */
+    /**
+     * Decay fraction text field.
+     */
     JTextField decayFraction;
 
-    /** Decay amount text field. */
+    /**
+     * Decay amount text field.
+     */
     JTextField decayAmount;
 
     /**
@@ -56,19 +63,12 @@ public class DecayRulePanel extends AbstractNeuronRulePanel {
 
         this.add(tabbedPane);
 
-        ChoicesWithNull dropdown = createDropDown(
-                (r) -> ((DecayRule) r).getRelAbs(),
-                (r, val) -> ((DecayRule) r).setRelAbs((int) val));
-        JTextField baseLine = createTextField(
-                (r) -> ((DecayRule) r).getBaseLine(),
-                (r, val) -> ((DecayRule) r).setBaseLine((double) val));
-        decayAmount = createTextField((r) -> ((DecayRule) r).getDecayAmount(),
-                (r, val) -> ((DecayRule) r).setDecayAmount((double) val));
-        decayFraction = createTextField(
-                (r) -> ((DecayRule) r).getDecayFraction(),
-                (r, val) -> ((DecayRule) r).setDecayFraction((double) val));
+        ChoicesWithNull dropdown = createDropDown((r) -> ((DecayRule) r).getRelAbs(), (r, val) -> ((DecayRule) r).setRelAbs((int) val));
+        JTextField baseLine = createTextField((r) -> ((DecayRule) r).getBaseLine(), (r, val) -> ((DecayRule) r).setBaseLine((double) val));
+        decayAmount = createTextField((r) -> ((DecayRule) r).getDecayAmount(), (r, val) -> ((DecayRule) r).setDecayAmount((double) val));
+        decayFraction = createTextField((r) -> ((DecayRule) r).getDecayFraction(), (r, val) -> ((DecayRule) r).setDecayFraction((double) val));
 
-        dropdown.setItems(new String[] { "Relative", "Absolute" });
+        dropdown.setItems(new String[]{"Relative", "Absolute"});
         dropdown.addActionListener(e -> {
             checkBounds(dropdown.getSelectedIndex());
 

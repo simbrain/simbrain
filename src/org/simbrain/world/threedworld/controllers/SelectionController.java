@@ -1,15 +1,5 @@
 package org.simbrain.world.threedworld.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import com.jme3.scene.Spatial;
-import org.simbrain.world.threedworld.ThreeDWorld;
-import org.simbrain.world.threedworld.engine.ThreeDEngine;
-import org.simbrain.world.threedworld.entities.Agent;
-import org.simbrain.world.threedworld.entities.Entity;
-import org.simbrain.world.threedworld.entities.EditorDialog;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.collision.CollisionResult;
@@ -17,21 +7,21 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.controls.*;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
+import com.jme3.math.*;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.debug.WireBox;
+import org.simbrain.world.threedworld.ThreeDWorld;
+import org.simbrain.world.threedworld.engine.ThreeDEngine;
+import org.simbrain.world.threedworld.entities.EditorDialog;
+import org.simbrain.world.threedworld.entities.Entity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.simbrain.world.threedworld.controllers.SelectionController.Mapping.*;
 
@@ -56,8 +46,7 @@ public class SelectionController implements ActionListener, AnalogListener {
     }
 
     public static Vector3f snapToGrid(Vector3f value, float gridSize) {
-        return new Vector3f(snapToGrid(value.x, gridSize), snapToGrid(value.y, gridSize),
-                snapToGrid(value.z, gridSize));
+        return new Vector3f(snapToGrid(value.x, gridSize), snapToGrid(value.y, gridSize), snapToGrid(value.z, gridSize));
     }
 
     private ThreeDWorld world;
@@ -89,9 +78,7 @@ public class SelectionController implements ActionListener, AnalogListener {
         input.addMapping(Append.toString(), new KeyTrigger(KeyInput.KEY_LSHIFT));
         input.addMapping(Delete.toString(), new KeyTrigger(KeyInput.KEY_DELETE));
         input.addMapping(Delete.toString(), new KeyTrigger(KeyInput.KEY_BACK));
-        input.addMapping(MoveCursor.toString(), new MouseAxisTrigger(MouseInput.AXIS_X, false),
-                new MouseAxisTrigger(MouseInput.AXIS_X, true), new MouseAxisTrigger(MouseInput.AXIS_Y, false),
-                new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        input.addMapping(MoveCursor.toString(), new MouseAxisTrigger(MouseInput.AXIS_X, false), new MouseAxisTrigger(MouseInput.AXIS_X, true), new MouseAxisTrigger(MouseInput.AXIS_Y, false), new MouseAxisTrigger(MouseInput.AXIS_Y, true));
         input.addListener(this, Append.toString());
         input.addListener(this, Transform.toString());
         input.addListener(this, Select.toString());
@@ -165,8 +152,7 @@ public class SelectionController implements ActionListener, AnalogListener {
         Vector3f boundsOffset = bounds.getCenter().subtract(node.getLocalTranslation());
         selectionBox.setLocalTranslation(boundsOffset);
         selectionBox.setQueueBucket(Bucket.Transparent);
-        Material selectionMaterial = new Material(world.getEngine().getAssetManager(),
-                "Common/MatDefs/Misc/Unshaded.j3md");
+        Material selectionMaterial = new Material(world.getEngine().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         selectionMaterial.setColor("Color", ColorRGBA.Green);
         selectionMaterial.getAdditionalRenderState().setDepthTest(false);
         selectionBox.setMaterial(selectionMaterial);
@@ -292,8 +278,7 @@ public class SelectionController implements ActionListener, AnalogListener {
             setTransformActive(false);
             return;
         }
-        if (isPressed && (Transform.isName(name) || Append.isName(name)
-                || Select.isName(name) || Context.isName(name) || Scroll.isName(name))) {
+        if (isPressed && (Transform.isName(name) || Append.isName(name) || Select.isName(name) || Context.isName(name) || Scroll.isName(name))) {
             world.getContextMenu().hide();
         }
         if (Transform.isName(name)) {
@@ -404,25 +389,25 @@ public class SelectionController implements ActionListener, AnalogListener {
             Vector3f target = contact.getContactPoint().subtract(entity.getPosition());
             Vector3f axis;
             switch (rotationAxis) {
-            case "Pitch":
-                axis = Vector3f.UNIT_X.clone();
-                break;
-            case "Yaw":
-                axis = Vector3f.UNIT_Y.clone();
-                break;
-            case "Roll":
-                axis = Vector3f.UNIT_Z.clone();
-                break;
-            case "Camera":
-                Vector2f click2d = world.getEngine().getInputManager().getCursorPosition();
-                Vector3f origin = world.getEngine().getCamera().getWorldCoordinates(click2d, 0f);
-                axis = world.getEngine().getCamera().getWorldCoordinates(click2d, 1f);
-                axis.subtractLocal(origin);
-                axis.normalizeLocal();
-                break;
-            default:
-                axis = Vector3f.UNIT_Y.clone();
-                break;
+                case "Pitch":
+                    axis = Vector3f.UNIT_X.clone();
+                    break;
+                case "Yaw":
+                    axis = Vector3f.UNIT_Y.clone();
+                    break;
+                case "Roll":
+                    axis = Vector3f.UNIT_Z.clone();
+                    break;
+                case "Camera":
+                    Vector2f click2d = world.getEngine().getInputManager().getCursorPosition();
+                    Vector3f origin = world.getEngine().getCamera().getWorldCoordinates(click2d, 0f);
+                    axis = world.getEngine().getCamera().getWorldCoordinates(click2d, 1f);
+                    axis.subtractLocal(origin);
+                    axis.normalizeLocal();
+                    break;
+                default:
+                    axis = Vector3f.UNIT_Y.clone();
+                    break;
             }
             target = target.subtract(axis.mult(target.dot(axis)));
             Quaternion rotation = entity.getRotation();

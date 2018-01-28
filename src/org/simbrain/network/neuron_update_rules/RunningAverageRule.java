@@ -25,16 +25,20 @@ import org.simbrain.network.core.NeuronUpdateRule;
 /**
  * <b>RunningAverageNeuron</b> keeps a running average of current and past
  * activity.
- *
+ * <p>
  * TODO: Currently explodes. Fix and improve. See
  * http://en.wikipedia.org/wiki/Moving_average
  */
 public class RunningAverageRule extends NeuronUpdateRule {
 
-    /** Rate constant variable. */
+    /**
+     * Rate constant variable.
+     */
     private double rateConstant = .5;
 
-    /** Last activation. */
+    /**
+     * Last activation.
+     */
     private double val = 0;
 
     /**
@@ -46,6 +50,7 @@ public class RunningAverageRule extends NeuronUpdateRule {
 
     /**
      * {@inheritDoc}
+     *
      * @param neuron
      */
     public void init(Neuron neuron) {
@@ -66,8 +71,7 @@ public class RunningAverageRule extends NeuronUpdateRule {
      */
     public void update(Neuron neuron) {
         // "val" on right is activation at last time step
-        val = rateConstant * inputType.getInput(neuron) + (1 - rateConstant)
-            * val;
+        val = rateConstant * inputType.getInput(neuron) + (1 - rateConstant) * val;
         neuron.setBuffer(val);
     }
 

@@ -18,10 +18,9 @@
  */
 package org.simbrain.world.odorworld.resources;
 
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.net.URL;
-
-import javax.swing.ImageIcon;
 
 /**
  * <b>OdorWorldResourceManager</b> provides resources (stored in the same
@@ -33,7 +32,6 @@ public class OdorWorldResourceManager {
      * Retrieve an ImageIcon based on its file name.
      *
      * @param name name of the image file to retrieve
-     *
      * @return the ImageIcon which can be used with Swing components, etc
      */
     public static ImageIcon getImageIcon(final String name) {
@@ -50,7 +48,6 @@ public class OdorWorldResourceManager {
      * Retrieve an Image based on its file name.
      *
      * @param name name of the image file to retrieve
-     *
      * @return the Image which can be used with Swing components, etc
      */
     public static Image getImage(final String name) {

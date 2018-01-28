@@ -3,13 +3,11 @@ package org.simbrain.workspace;
 import java.lang.reflect.Type;
 
 public class Coupling<T> {
-    static <S> Coupling<S> create(Producer<S> producer, Consumer<S> consumer)
-            throws MismatchedAttributesException {
+    static <S> Coupling<S> create(Producer<S> producer, Consumer<S> consumer) throws MismatchedAttributesException {
         if (producer.getType() == consumer.getType()) {
             return new Coupling<S>(producer, consumer);
         } else {
-            throw new MismatchedAttributesException(String.format("Producer type %s does not match consumer type %s",
-                    producer.getType(), consumer.getType()));
+            throw new MismatchedAttributesException(String.format("Producer type %s does not match consumer type %s", producer.getType(), consumer.getType()));
         }
     }
 

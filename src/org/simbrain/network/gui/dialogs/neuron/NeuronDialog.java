@@ -18,15 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.Frame;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
@@ -34,13 +25,21 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * <b>NeuronDialog</b> is a dialog box for setting the properties of neurons.
  */
 @SuppressWarnings("serial")
 public final class NeuronDialog extends StandardDialog {
 
-    /** The neurons being modified. */
+    /**
+     * The neurons being modified.
+     */
     private final List<Neuron> neuronList;
 
     /**
@@ -54,61 +53,57 @@ public final class NeuronDialog extends StandardDialog {
      */
     private final JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. The action executed by the help button */
+    /**
+     * Show Help Action. The action executed by the help button
+     */
     private ShowHelpAction helpAction;
 
     /**
-     * Creates a neuron dialog from a collection of NeuronNodes. 
+     * Creates a neuron dialog from a collection of NeuronNodes.
      * No frame available.
      *
      * @param selectedNeurons the neurons to edit
      * @return the dialog.
      */
-    public static NeuronDialog createNeuronDialog(
-            final Collection<NeuronNode> selectedNeurons) {
+    public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel
-                .createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
         return nd;
     }
-    
+
     // Can't recall what having vs. not having a frame implies.  
     // If someone remembers, document it!  (JKY 1/16)
-    
-    
+
+
     /**
      * Creates a neuron dialog from a collection of NeuronNodes with a frame
      * specified.
      *
      * @param selectedNeurons neurons to edit.
-     * @param parent the parent frame
+     * @param parent          the parent frame
      * @return the dialog.
      */
-    public static NeuronDialog createNeuronDialog(
-            final Collection<NeuronNode> selectedNeurons, final Frame parent) {
+    public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons, final Frame parent) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons, parent);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel
-                .createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
         return nd;
     }
-    
+
     /**
      * Create a neuron dialog for a list of logical neurons.
      *
      * @param neurons the neurons to edit
      * @return the dialog
      */
-    public static NeuronDialog createNeuronDialog(
-            final List<Neuron> neurons) {
+    public static NeuronDialog createNeuronDialog(final List<Neuron> neurons) {
         NeuronDialog nd = new NeuronDialog(neurons);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel
-                .createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
@@ -123,7 +118,7 @@ public final class NeuronDialog extends StandardDialog {
     private NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
         neuronList = getNeuronList(selectedNeurons);
     }
-    
+
     /**
      * Construct a dialog for a set of neurons.
      *
@@ -132,15 +127,14 @@ public final class NeuronDialog extends StandardDialog {
     private NeuronDialog(final List<Neuron> neurons) {
         neuronList = neurons;
     }
-    
+
     /**
      * Construct the dialog object with a frame.
      *
      * @param selectedNeurons neurons to edit
-     * @param parent parent frame
+     * @param parent          parent frame
      */
-    private NeuronDialog(final Collection<NeuronNode> selectedNeurons,
-            final Frame parent) {
+    private NeuronDialog(final Collection<NeuronNode> selectedNeurons, final Frame parent) {
         super(parent, "Neuron Dialog");
         neuronList = getNeuronList(selectedNeurons);
     }
@@ -148,13 +142,11 @@ public final class NeuronDialog extends StandardDialog {
     /**
      * Get the logical neurons from the NeuronNodes.
      *
-     * @param selectedNeurons
-     *            the selected gui neurons (pnodes) from which the neuron model
-     *            objects will be extracted and then edited by this panel
+     * @param selectedNeurons the selected gui neurons (pnodes) from which the neuron model
+     *                        objects will be extracted and then edited by this panel
      * @return the neuron model objects represented by the selected pnodes
      */
-    private static List<Neuron> getNeuronList(
-            final Collection<NeuronNode> selectedNeurons) {
+    private static List<Neuron> getNeuronList(final Collection<NeuronNode> selectedNeurons) {
         return selectedNeurons.stream().map(NeuronNode::getNeuron).collect(Collectors.toList());
     }
 
@@ -169,16 +161,14 @@ public final class NeuronDialog extends StandardDialog {
         this.addButton(helpButton);
     }
 
-    
+
     /**
      * Add listeners to the components of the dialog. Specifically alters the
      * destination of the help button to reflect the currently selected neuron
      * update rule.
      */
     private void addListeners() {
-        neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType()
-                .addActionListener(e -> SwingUtilities.invokeLater(() ->
-                                updateHelp()));
+        neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     @Override
@@ -191,29 +181,25 @@ public final class NeuronDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
-        
-        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType()
-                .getSelectedItem() == SimbrainConstants.NULL_STRING) {
+
+        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
-            
+
             // Use combo box label (with spaces removed) for doc page.
-            String name = (String) neuronPropertiesPanel.getUpdateRulePanel()
-                    .getCbNeuronType().getSelectedItem();
+            String name = (String) neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
             name = name.replaceAll("\\s", ""); // Remove white space
-            
+
             // Docs are in different places for activity generators and neurons
             String docFolder = "";
-            if (neuronList.get(0)
-                    .getUpdateRule() instanceof ActivityGenerator) {
+            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
                 docFolder = "activity_generator";
             } else {
                 docFolder = "neuron";
             }
-            
+
             // Create the help action
-            helpAction = new ShowHelpAction(
-                    "Pages/Network/" + docFolder + "/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }

@@ -3,7 +3,6 @@ package org.simbrain.workspace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.function.Function;
 
 public class Producer<V> extends Attribute {
 
@@ -20,7 +19,7 @@ public class Producer<V> extends Attribute {
             if (key == null) {
                 return (V) method.invoke(baseObject);
             } else {
-                return (V) method.invoke(baseObject, new Object[] { key });
+                return (V) method.invoke(baseObject, new Object[]{key});
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Should never happen

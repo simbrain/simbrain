@@ -18,16 +18,14 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Add network to workspace.
@@ -38,6 +36,7 @@ public final class NewNetworkAction extends WorkspaceAction {
 
     /**
      * Create a new network action with the specified workspace.
+     *
      * @param workspace
      */
     public NewNetworkAction(Workspace workspace) {
@@ -45,13 +44,13 @@ public final class NewNetworkAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New network");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction 
-     * @param event 
+    /**
+     * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         workspace.addWorkspaceComponent(new NetworkComponent(""));

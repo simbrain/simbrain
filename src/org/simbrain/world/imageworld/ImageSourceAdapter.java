@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Abstract helper class which provides basic listener and image management for
  * an {@link ImageSource}
-
+ * <p>
  * Whenever the private current image is updated, the adapter compares it to previous
  * image and decides which events need to be called.
  *
@@ -19,7 +19,9 @@ public abstract class ImageSourceAdapter implements ImageSource {
     private BufferedImage currentImage;
     private transient List<ImageSourceListener> listeners;
 
-    /** Construct a new ImageSourceAdapter and initialize the current image. */
+    /**
+     * Construct a new ImageSourceAdapter and initialize the current image.
+     */
     public ImageSourceAdapter() {
         currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         listeners = new CopyOnWriteArrayList<>();
@@ -27,6 +29,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
 
     /**
      * Construct a new ImageSourceAdapter with the specified currentImage.
+     *
      * @param currentImage the image to provide from the source
      */
     public ImageSourceAdapter(BufferedImage currentImage) {
@@ -34,7 +37,9 @@ public abstract class ImageSourceAdapter implements ImageSource {
         listeners = new CopyOnWriteArrayList<>();
     }
 
-    /** Return a deserialized ImageSourceAdapter. */
+    /**
+     * Return a deserialized ImageSourceAdapter.
+     */
     public Object readResolve() {
         listeners = new CopyOnWriteArrayList<>();
         return this;
@@ -50,7 +55,9 @@ public abstract class ImageSourceAdapter implements ImageSource {
         enabled = value;
     }
 
-    /** Notify ImageSourceListeners that a new image is available. */
+    /**
+     * Notify ImageSourceListeners that a new image is available.
+     */
     protected void notifyImageUpdate() {
         if (isEnabled()) {
             for (ImageSourceListener listener : listeners) {
@@ -64,10 +71,11 @@ public abstract class ImageSourceAdapter implements ImageSource {
         return currentImage;
     }
 
-    /** @param value The image to assign to the current image. */
+    /**
+     * @param value The image to assign to the current image.
+     */
     protected void setCurrentImage(BufferedImage value) {
-        boolean resized = value.getWidth() != currentImage.getWidth()
-                       || value.getHeight() != currentImage.getHeight();
+        boolean resized = value.getWidth() != currentImage.getWidth() || value.getHeight() != currentImage.getHeight();
         currentImage = value;
         if (resized) {
             notifyResize();

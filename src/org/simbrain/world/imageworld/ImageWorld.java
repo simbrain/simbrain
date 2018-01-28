@@ -1,17 +1,19 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.world.imageworld.filters.FilteredImageSource;
+import org.simbrain.world.imageworld.filters.ImageFilterFactory;
+import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
+import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
-
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.imageworld.filters.*;
 
 /**
  * ImageWorld contains the contents of this component: the image and a series of sensor matrices
@@ -23,13 +25,19 @@ public class ImageWorld {
      * Listener receives notifications when the image world is changed.
      */
     public interface Listener {
-        /** Called whenever an image source is changed. */
+        /**
+         * Called whenever an image source is changed.
+         */
         void imageSourceChanged(ImageSource changedSource);
 
-        /** Called whenever a sensor matrix is added. */
+        /**
+         * Called whenever a sensor matrix is added.
+         */
         void sensorMatrixAdded(SensorMatrix addedMatrix);
 
-        /** Called whenever a sensor matrix is removed. */
+        /**
+         * Called whenever a sensor matrix is removed.
+         */
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
@@ -37,22 +45,34 @@ public class ImageWorld {
 
     private EmitterMatrix emitterMatrix;
 
-    /** Helper so that it's easy to switch between images sources. */
+    /**
+     * Helper so that it's easy to switch between images sources.
+     */
     private CompositeImageSource compositeSource;
 
-    /** List of sensor matrices associated with this world. */
+    /**
+     * List of sensor matrices associated with this world.
+     */
     private List<SensorMatrix> sensorMatrices;
 
-    /** Currently selected sensor matrix. */
+    /**
+     * Currently selected sensor matrix.
+     */
     private SensorMatrix currentSensorMatrix;
 
-    /** Container for the current image or sensor view. */
+    /**
+     * Container for the current image or sensor view.
+     */
     private transient ImagePanel imagePanel;
 
-    /** Clipboard for the image world. */
+    /**
+     * Clipboard for the image world.
+     */
     private transient ImageClipboard clipboard;
 
-    /** List of world listener. */
+    /**
+     * List of world listener.
+     */
     private transient List<Listener> listeners;
 
     /**
@@ -73,23 +93,22 @@ public class ImageWorld {
         SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
         sensorMatrices.add(unfiltered);
 
-        SensorMatrix color25x25 = new SensorMatrix("Color 25x25",
-                ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
+        SensorMatrix color25x25 = new SensorMatrix("Color 25x25", ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
         sensorMatrices.add(color25x25);
 
-        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10",
-                ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
+        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
         sensorMatrices.add(threshold10x10);
 
-        SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100",
-            OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
+        SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
         sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
 
     }
 
-    /** Returns a deserialized ImageWorld. */
+    /**
+     * Returns a deserialized ImageWorld.
+     */
     public Object readResolve() {
         imagePanel = new ImagePanel();
         listeners = new ArrayList<Listener>();
@@ -101,6 +120,7 @@ public class ImageWorld {
 
     /**
      * Load image from specified filename.
+     *
      * @param filename path to image
      * @throws IOException thrown if the requested file is not available
      */
@@ -111,6 +131,7 @@ public class ImageWorld {
 
     /**
      * Save the current image as the specified filename.
+     *
      * @param filename The filename to save to.
      */
     public void saveImage(String filename) throws IOException {
@@ -121,12 +142,16 @@ public class ImageWorld {
         ImageIO.write(image, ext, file);
     }
 
-    /** Set an existing buffered image as the current image. */
+    /**
+     * Set an existing buffered image as the current image.
+     */
     public void setImage(BufferedImage image) {
         staticSource.setCurrentImage(image);
     }
 
-    /** Clear the current image from the composite image source. */
+    /**
+     * Clear the current image from the composite image source.
+     */
     public void clearImage() {
         if (isEmitterMatrixSelected()) {
             emitterMatrix.clear();
@@ -136,49 +161,67 @@ public class ImageWorld {
         }
     }
 
-    /** Switch the CompositeImageSource to the static image. */
+    /**
+     * Switch the CompositeImageSource to the static image.
+     */
     public void selectStaticSource() {
         compositeSource.setImageSource(staticSource);
     }
 
-    /** Get whether the emitter matrix is using color. */
+    /**
+     * Get whether the emitter matrix is using color.
+     */
     public boolean getUseColorEmitter() {
         return emitterMatrix.isUsingRGBColor();
     }
 
-    /** Set the color mode of the emitter matrix. */
+    /**
+     * Set the color mode of the emitter matrix.
+     */
     public void setUseColorEmitter(boolean value) {
         emitterMatrix.setUsingRGBColor(value);
         fireImageSourceChanged(emitterMatrix);
     }
 
-    /** Get the width of the emitter matrix. */
+    /**
+     * Get the width of the emitter matrix.
+     */
     public int getEmitterWidth() {
         return emitterMatrix.getWidth();
     }
 
-    /** Get the height of the emitter matrix. */
+    /**
+     * Get the height of the emitter matrix.
+     */
     public int getEmitterHeight() {
         return emitterMatrix.getHeight();
     }
 
-    /** Set the size of the emitter matrix. */
+    /**
+     * Set the size of the emitter matrix.
+     */
     public void resizeEmitterMatrix(int width, int height) {
         emitterMatrix.setSize(width, height);
         fireImageSourceChanged(emitterMatrix);
     }
 
-    /** Returns whether the emitter matrix is the current source for the image world. */
+    /**
+     * Returns whether the emitter matrix is the current source for the image world.
+     */
     public boolean isEmitterMatrixSelected() {
         return compositeSource.getImageSource() == emitterMatrix;
     }
 
-    /** Switch the CompositeImageSource to the emitter matrix. */
+    /**
+     * Switch the CompositeImageSource to the emitter matrix.
+     */
     public void selectEmitterMatrix() {
         compositeSource.setImageSource(emitterMatrix);
     }
 
-    /** Update the emitter matrix image. */
+    /**
+     * Update the emitter matrix image.
+     */
     public void emitImage() {
         emitterMatrix.emitImage();
     }
@@ -204,9 +247,7 @@ public class ImageWorld {
         if (sensorMatrix.getName().equalsIgnoreCase("Unfiltered")) {
             return;
         }
-        int dialogResult = JOptionPane.showConfirmDialog(
-                null, "Are you sure you want to delete sensor panel \"" + sensorMatrix.getName() + "\" ?",
-                "Warning", JOptionPane.YES_NO_OPTION);
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete sensor panel \"" + sensorMatrix.getName() + "\" ?", "Warning", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             int index = sensorMatrices.indexOf(sensorMatrix);
             setCurrentSensorMatrix(sensorMatrices.get(index - 1));
@@ -221,12 +262,16 @@ public class ImageWorld {
         }
     }
 
-    /** Return the image panel */
+    /**
+     * Return the image panel
+     */
     public ImagePanel getImagePanel() {
         return imagePanel;
     }
 
-    /** Return the clipboard. */
+    /**
+     * Return the clipboard.
+     */
     public ImageClipboard getClipboard() {
         return clipboard;
     }
@@ -253,12 +298,16 @@ public class ImageWorld {
         return compositeSource.getImageSource();
     }
 
-    /** @return the currentSensorPanel */
+    /**
+     * @return the currentSensorPanel
+     */
     public SensorMatrix getCurrentSensorMatrix() {
         return currentSensorMatrix;
     }
 
-    /** @param sensorMatrix the currentSensorMatrix to set */
+    /**
+     * @param sensorMatrix the currentSensorMatrix to set
+     */
     public void setCurrentSensorMatrix(SensorMatrix sensorMatrix) {
         if (sensorMatrix == currentSensorMatrix) {
             return;
@@ -270,31 +319,41 @@ public class ImageWorld {
         currentSensorMatrix = sensorMatrix;
     }
 
-    /** @return a list of sensor matrices */
+    /**
+     * @return a list of sensor matrices
+     */
     public List<SensorMatrix> getSensorMatrices() {
         return sensorMatrices;
     }
 
-    /** @param listener the listener to add. */
+    /**
+     * @param listener the listener to add.
+     */
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
 
-    /** Notify listeners that an image source was changed. */
+    /**
+     * Notify listeners that an image source was changed.
+     */
     protected void fireImageSourceChanged(ImageSource source) {
         for (Listener listener : listeners) {
             listener.imageSourceChanged(source);
         }
     }
 
-    /** Notify listeners that a sensor matrix was added to the image world. */
+    /**
+     * Notify listeners that a sensor matrix was added to the image world.
+     */
     protected void fireSensorMatrixAdded(SensorMatrix matrix) {
         for (Listener listener : listeners) {
             listener.sensorMatrixAdded(matrix);
         }
     }
 
-    /** Notify listeners that a sensor matrix was removed from the image world. */
+    /**
+     * Notify listeners that a sensor matrix was removed from the image world.
+     */
     protected void fireSensorMatrixRemoved(SensorMatrix matrix) {
         for (Listener listener : listeners) {
             listener.sensorMatrixRemoved(matrix);

@@ -18,14 +18,14 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Color;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>TextWorld</b> is an environment for modeling speech and reading and other
@@ -36,22 +36,34 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public abstract class TextWorld {
 
-    /** The main text in the text world. */
+    /**
+     * The main text in the text world.
+     */
     private String text = "";
 
-    /** The current item of text (letter, word, etc.) */
+    /**
+     * The current item of text (letter, word, etc.)
+     */
     private TextItem currentItem;
 
-    /** What the current position in the text is. */
+    /**
+     * What the current position in the text is.
+     */
     private int position = 0;
 
-    /** Last position in the text. */
+    /**
+     * Last position in the text.
+     */
     private int lastPosition = 0;
 
-    /** List of listeners on this world. */
+    /**
+     * List of listeners on this world.
+     */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
 
-    /** Highlight color. */
+    /**
+     * Highlight color.
+     */
     private Color highlightColor = Color.GRAY;
 
     /**
@@ -168,6 +180,7 @@ public abstract class TextWorld {
 
     /**
      * Notify listeners that the caret position has changed.
+     *
      * @param newItem
      */
     public void fireCurrentItemChanged(TextItem newItem) {
@@ -193,7 +206,7 @@ public abstract class TextWorld {
     /**
      * Set text, and fire an event if the fireEvent flag is set.
      *
-     * @param text the text to set
+     * @param text      the text to set
      * @param fireEvent whether or not to fire an event
      */
     public void setText(final String text, final boolean fireEvent) {
@@ -221,7 +234,7 @@ public abstract class TextWorld {
      * Set position. Fire event only if specified.
      *
      * @param newPosition new position to set
-     * @param fireEvent whether to fire event
+     * @param fireEvent   whether to fire event
      */
     public void setPosition(final int newPosition, final boolean fireEvent) {
         if (newPosition <= text.length()) {
@@ -344,13 +357,19 @@ public abstract class TextWorld {
      */
     public class TextItem {
 
-        /** Initial position in main text. */
+        /**
+         * Initial position in main text.
+         */
         private final int beginPosition;
 
-        /** Final position in main text. */
+        /**
+         * Final position in main text.
+         */
         private final int endPosition;
 
-        /** The item text. */
+        /**
+         * The item text.
+         */
         private final String text;
 
         /**

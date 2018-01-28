@@ -1,12 +1,11 @@
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add 3d world to workspace.
@@ -18,6 +17,7 @@ public class NewThreeDWorldAction extends WorkspaceAction {
 
     /**
      * Construct a new NewThreeDWorldAction.
+     *
      * @param workspace The workspace in which the action will create ThreeDWorlds
      */
     public NewThreeDWorldAction(Workspace workspace) {

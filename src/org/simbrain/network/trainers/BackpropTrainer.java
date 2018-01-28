@@ -18,15 +18,15 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Backprop trainer. An implementation of the backpropagation learning
@@ -36,40 +36,56 @@ import org.simbrain.network.subnetworks.BackpropNetwork;
  */
 public class BackpropTrainer extends IterableTrainer {
 
-    /** Current error. */
+    /**
+     * Current error.
+     */
     private double mse;
 
-    /** Default learning rate. */
+    /**
+     * Default learning rate.
+     */
     private static final double DEFAULT_LEARNING_RATE = .25;
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /** Default momentum. */
+    /**
+     * Default momentum.
+     */
     private static final double DEFAULT_MOMENTUM = .9;
 
-    /** Momentum. Must be between 0 and 1. */
+    /**
+     * Momentum. Must be between 0 and 1.
+     */
     private double momentum = DEFAULT_MOMENTUM;
 
-    /** For storing current error contribution of each neuron. */
+    /**
+     * For storing current error contribution of each neuron.
+     */
     private HashMap<Neuron, Double> errorMap;
 
-    /** For storing weight deltas. */
+    /**
+     * For storing weight deltas.
+     */
     private HashMap<Synapse, Double> weightDeltaMap;
 
-    /** For storing bias deltas. */
+    /**
+     * For storing bias deltas.
+     */
     private HashMap<Neuron, Double> biasDeltaMap;
 
-    /** Internal representation of network. */
+    /**
+     * Internal representation of network.
+     */
     private List<List<Neuron>> layers;
 
     /**
      * Construct the backprop trainer.
      *
-     * @param network
-     *            the network
-     * @param layers
-     *            the layers to train
+     * @param network the network
+     * @param layers  the layers to train
      */
     public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
         super(network);
@@ -81,7 +97,7 @@ public class BackpropTrainer extends IterableTrainer {
         mse = 0;
         // SimnetUtils.printLayers(layers);
     }
-    
+
     /**
      * Create a backprop trainer for a backrop net.
      *
@@ -117,10 +133,7 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Set activations on input layer
             for (int i = 0; i < numInputs; i++) {
-                network.getInputNeurons()
-                        .get(i)
-                        .forceSetActivation(
-                                network.getTrainingSet().getInputData()[row][i]);
+                network.getInputNeurons().get(i).forceSetActivation(network.getTrainingSet().getInputData()[row][i]);
             }
 
             // Update network
@@ -134,16 +147,13 @@ public class BackpropTrainer extends IterableTrainer {
                 // System.out.println(synapse.getId() + ":"
                 // + Utils.round(synapse.getStrength(), 2) + " + "
                 // + Utils.round(weightDeltaMap.get(synapse), 2));
-                synapse.setStrength(synapse.getStrength()
-                        + weightDeltaMap.get(synapse));
+                synapse.setStrength(synapse.getStrength() + weightDeltaMap.get(synapse));
             }
 
             // Update biases
             for (Neuron neuron : biasDeltaMap.keySet()) {
-                BiasedUpdateRule biasedNeuron = (BiasedUpdateRule) (neuron
-                        .getUpdateRule());
-                biasedNeuron.setBias(biasedNeuron.getBias()
-                        + biasDeltaMap.get(neuron));
+                BiasedUpdateRule biasedNeuron = (BiasedUpdateRule) (neuron.getUpdateRule());
+                biasedNeuron.setBias(biasedNeuron.getBias() + biasDeltaMap.get(neuron));
             }
 
         }
@@ -157,8 +167,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Compute error contribution for all nodes using backprop algorithm.
      *
-     * @param row
-     *            current row of training data
+     * @param row current row of training data
      */
     private void backpropagateError(Trainable network, int row) {
         int numOutputs = network.getOutputNeurons().size();
@@ -173,10 +182,8 @@ public class BackpropTrainer extends IterableTrainer {
             if (i == layers.size() - 1) {
                 for (int j = 0; j < numOutputs; j++) {
                     Neuron outputNeuron = network.getOutputNeurons().get(j);
-                    double targetValue = network.getTrainingSet()
-                            .getTargetData()[row][j];
-                    double outputError = targetValue
-                            - outputNeuron.getActivation();
+                    double targetValue = network.getTrainingSet().getTargetData()[row][j];
+                    double outputError = targetValue - outputNeuron.getActivation();
                     storeErrorAndDeltas(outputNeuron, outputError);
                     mse += Math.pow(outputError, 2);
                 }
@@ -185,14 +192,12 @@ public class BackpropTrainer extends IterableTrainer {
 
                     // Compute sum of fan-out errors on this neuron
                     double sumFanOutErrors = 0;
-                    for (Synapse synapse : hiddenLayerNeuron.getFanOut()
-                            .values()) {
+                    for (Synapse synapse : hiddenLayerNeuron.getFanOut().values()) {
                         Neuron nextLayerNeuron = synapse.getTarget();
                         // TODO: Why do I need this check?
                         // Happens on 2 layer case?
                         if (errorMap.get(nextLayerNeuron) != null) {
-                            sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse
-                                    .getStrength());
+                            sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse.getStrength());
                         }
                     }
                     // Compute errors and deltas for previous layer
@@ -206,19 +211,16 @@ public class BackpropTrainer extends IterableTrainer {
      * Store the error value, bias delta, and fan-in weight deltas for this
      * neuron.
      *
-     * @param neuron
-     *            neuron whose activation function's derivative is used
-     * @param error
-     *            simple error for outputs, sum of errors in fan-out, times
-     *            weights for hidden units
+     * @param neuron neuron whose activation function's derivative is used
+     * @param error  simple error for outputs, sum of errors in fan-out, times
+     *               weights for hidden units
      */
     private void storeErrorAndDeltas(Neuron neuron, double error) {
 
         // Store error signal for this neuron
         double errorSignal = 0;
         if (neuron.getUpdateRule() instanceof DifferentiableUpdateRule) {
-            double derivative = ((DifferentiableUpdateRule) neuron
-                    .getUpdateRule()).getDerivative(neuron.getWeightedInputs());
+            double derivative = ((DifferentiableUpdateRule) neuron.getUpdateRule()).getDerivative(neuron.getWeightedInputs());
             errorSignal = error * derivative;
             errorMap.put(neuron, errorSignal);
         }
@@ -229,9 +231,7 @@ public class BackpropTrainer extends IterableTrainer {
             if (weightDeltaMap.get(synapse) != null) {
                 lastWeightDelta = weightDeltaMap.get(synapse);
             }
-            double weightDelta = learningRate * errorSignal
-                    * synapse.getSource().getActivation() + momentum
-                    * lastWeightDelta;
+            double weightDelta = learningRate * errorSignal * synapse.getSource().getActivation() + momentum * lastWeightDelta;
             weightDeltaMap.put(synapse, weightDelta);
         }
 
@@ -256,8 +256,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Randomize the specified layer.
      *
-     * @param layer
-     *            the layer to randomize
+     * @param layer the layer to randomize
      */
     protected void randomize(List<Neuron> layer) {
         for (Neuron neuron : layer) {
@@ -267,8 +266,7 @@ public class BackpropTrainer extends IterableTrainer {
             for (Synapse synapse : neuron.getFanIn()) {
                 synapse.setStrength(.1 * Math.random() - .05);
             }
-            ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(.1 * Math
-                    .random() - .05);
+            ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(.1 * Math.random() - .05);
         }
         revalidateSynapseGroups();
     }
@@ -299,8 +297,7 @@ public class BackpropTrainer extends IterableTrainer {
     }
 
     /**
-     * @param learningRate
-     *            the learningRate to set
+     * @param learningRate the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
@@ -424,8 +421,7 @@ public class BackpropTrainer extends IterableTrainer {
     }
 
     /**
-     * @param momentum
-     *            the momentum to set
+     * @param momentum the momentum to set
      */
     public void setMomentum(double momentum) {
         this.momentum = momentum;

@@ -18,18 +18,15 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.BoltzmannTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.BoltzmannMachine;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of SOM Network.
@@ -42,7 +39,7 @@ public class BoltzmannNode extends SubnetworkNode {
      * Create a Boltzmann Network PNode.
      *
      * @param networkPanel parent panel
-     * @param subnet the Boltzmann network
+     * @param subnet       the Boltzmann network
      */
     public BoltzmannNode(NetworkPanel networkPanel, BoltzmannMachine subnet) {
         super(networkPanel, subnet);
@@ -52,8 +49,7 @@ public class BoltzmannNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new BoltzmannTrainingDialog(getNetworkPanel(),
-                (BoltzmannMachine) getSubnetwork());
+        return new BoltzmannTrainingDialog(getNetworkPanel(), (BoltzmannMachine) getSubnetwork());
     }
 
     /**
@@ -69,18 +65,18 @@ public class BoltzmannNode extends SubnetworkNode {
         menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-//                SOMNetwork net = ((SOMNetwork) getSubnetwork());
-//                net.update();
-//                net.getParentNetwork().fireGroupUpdated(net);
+                //                SOMNetwork net = ((SOMNetwork) getSubnetwork());
+                //                net.update();
+                //                net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
         menu.addSeparator();
         Action randomizeNet = new AbstractAction("Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-//                SOMNetwork net = ((SOMNetwork) getSubnetwork());
-//                net.getSom().randomizeIncomingWeights();
-//                net.getParentNetwork().fireGroupUpdated(net);
+                //                SOMNetwork net = ((SOMNetwork) getSubnetwork());
+                //                net.getSom().randomizeIncomingWeights();
+                //                net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(randomizeNet);
@@ -97,53 +93,55 @@ public class BoltzmannNode extends SubnetworkNode {
 
         @Override
         protected String getToolTipText() {
-            return "Temperature: "
-                    + Utils.round(((BoltzmannMachine) getSubnetwork()).getTemperature(), 2);
+            return "Temperature: " + Utils.round(((BoltzmannMachine) getSubnetwork()).getTemperature(), 2);
         }
 
         @Override
         protected boolean hasToolTipText() {
             return true;
         }
-    };
+    }
+
+    ;
 
     @Override
     public void updateText() {
         BoltzmannMachine bm = (BoltzmannMachine) getSubnetwork();
-        bm.setStateInfo("Temperature: " + Utils.round(
-                ((BoltzmannMachine) getSubnetwork()).getTemperature(), 2));
+        bm.setStateInfo("Temperature: " + Utils.round(((BoltzmannMachine) getSubnetwork()).getTemperature(), 2));
         getInteractionBoxes().get(0).setText(bm.getStateInfo());
         getInteractionBoxes().get(0).updateText();
-    };
+    }
 
-//    /**
-//     * Sets custom menu for SOM node.
-//     */
-//    protected void setCustomMenuItems() {
-//        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-//                "Reset SOM Network") {
-//            public void actionPerformed(final ActionEvent event) {
-//                SOMGroup group = ((SOMGroup) getNeuronGroup());
-//                group.reset();
-//                group.getParentNetwork().fireGroupUpdated(group);
-//            }
-//        }));
-//        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-//                "Recall SOM Memory") {
-//            public void actionPerformed(final ActionEvent event) {
-//                SOMGroup group = ((SOMGroup) getNeuronGroup());
-//                group.recall();
-//                group.getParentNetwork().fireGroupUpdated(group);
-//            }
-//        }));
-//        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-//                "Randomize SOM Weights") {
-//            public void actionPerformed(final ActionEvent event) {
-//                SOMGroup group = ((SOMGroup) getNeuronGroup());
-//                group.randomizeIncomingWeights();
-//                group.getParentNetwork().fireGroupUpdated(group);
-//            }
-//        }));
-//    }
+    ;
+
+    //    /**
+    //     * Sets custom menu for SOM node.
+    //     */
+    //    protected void setCustomMenuItems() {
+    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+    //                "Reset SOM Network") {
+    //            public void actionPerformed(final ActionEvent event) {
+    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
+    //                group.reset();
+    //                group.getParentNetwork().fireGroupUpdated(group);
+    //            }
+    //        }));
+    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+    //                "Recall SOM Memory") {
+    //            public void actionPerformed(final ActionEvent event) {
+    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
+    //                group.recall();
+    //                group.getParentNetwork().fireGroupUpdated(group);
+    //            }
+    //        }));
+    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+    //                "Randomize SOM Weights") {
+    //            public void actionPerformed(final ActionEvent event) {
+    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
+    //                group.randomizeIncomingWeights();
+    //                group.getParentNetwork().fireGroupUpdated(group);
+    //            }
+    //        }));
+    //    }
 
 }

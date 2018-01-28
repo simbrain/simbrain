@@ -27,18 +27,21 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class UpdateComponent implements UpdateAction {
 
-    /** Reference to component. */
+    /**
+     * Reference to component.
+     */
     private final transient WorkspaceComponent component;
 
-    /** Provides access to update controls. */
+    /**
+     * Provides access to update controls.
+     */
     private final transient WorkspaceUpdater updater;
 
     /**
      * @param updater
      * @param component component to update
      */
-    public UpdateComponent(WorkspaceUpdater updater,
-            WorkspaceComponent component) {
+    public UpdateComponent(WorkspaceUpdater updater, WorkspaceComponent component) {
         this.updater = updater;
         this.component = component;
     }
@@ -48,10 +51,10 @@ public class UpdateComponent implements UpdateAction {
      */
     public void invoke() {
         // TODO: Is the below needed? Would component.update() suffice?
-//        LatchCompletionSignal latch = new LatchCompletionSignal(1);
-//        updater.updateComponent(component, latch);
-//        latch.await();
-    	component.update();
+        //        LatchCompletionSignal latch = new LatchCompletionSignal(1);
+        //        updater.updateComponent(component, latch);
+        //        latch.await();
+        component.update();
     }
 
     /**

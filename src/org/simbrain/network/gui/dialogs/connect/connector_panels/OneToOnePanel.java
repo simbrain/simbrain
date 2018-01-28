@@ -13,14 +13,13 @@
  */
 package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
-import java.util.List;
-
-import javax.swing.JCheckBox;
-
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
+
+import javax.swing.*;
+import java.util.List;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
@@ -29,21 +28,25 @@ import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 @SuppressWarnings("serial")
 public class OneToOnePanel extends AbstractConnectionPanel {
 
-    /** Sets whether connections are bidirectional. */
+    /**
+     * Sets whether connections are bidirectional.
+     */
     private JCheckBox bidirectionalConnection = new JCheckBox();
 
-    /** The connection object to be edited. */
+    /**
+     * The connection object to be edited.
+     */
     private OneToOne connection;
 
     /**
      * Default constructor.
+     *
      * @param connection
      */
     public OneToOnePanel(final OneToOne connection) {
         super();
         this.connection = connection;
-        mainPanel.addItem("Bidirectional Connections: ",
-            bidirectionalConnection);
+        mainPanel.addItem("Bidirectional Connections: ", bidirectionalConnection);
         fillFieldValues();
     }
 
@@ -52,8 +55,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      */
     @Override
     public void fillFieldValues() {
-        bidirectionalConnection.setSelected(((OneToOne) connection)
-            .isUseBidirectionalConnections());
+        bidirectionalConnection.setSelected(((OneToOne) connection).isUseBidirectionalConnections());
     }
 
     /**
@@ -69,8 +71,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      */
     @Override
     public boolean commitChanges() {
-        connection.setUseBidirectionalConnections(bidirectionalConnection
-            .isSelected());
+        connection.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
         return true;
 
     }
@@ -79,10 +80,8 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     @Override
-    public List<Synapse> applyConnection(List<Neuron> source,
-        List<Neuron> target) {
-        return OneToOne.connectOneToOne(source, target,
-            bidirectionalConnection.isSelected(), true);
+    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
+        return OneToOne.connectOneToOne(source, target, bidirectionalConnection.isSelected(), true);
     }
 
 }

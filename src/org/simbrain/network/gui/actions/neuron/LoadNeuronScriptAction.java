@@ -18,31 +18,34 @@
  */
 package org.simbrain.network.gui.actions.neuron;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.core.Neuron;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * :oad custom update script. Obviously not done yet.
  */
 public final class LoadNeuronScriptAction extends AbstractAction {
 
-    /** Reference to neuron. */
+    /**
+     * Reference to neuron.
+     */
     private Neuron theNeuron;
 
     /**
      * Load a custom neuron script.
-     * @param neuron 
+     *
+     * @param neuron
      */
     public LoadNeuronScriptAction(final Neuron neuron) {
         super("Load...");
         theNeuron = neuron;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         // SFileChooser chooser = new SFileChooser(".", "bsh");

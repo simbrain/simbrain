@@ -41,10 +41,8 @@ public class NewtonianBouncer implements Behavior {
 
     @Override
     public void apply(int time) {
-        parentEntity.setX(parentEntity.getX() + parentEntity.getVelocityX()
-                * time);
-        parentEntity.setY(parentEntity.getY() + parentEntity.getVelocityY()
-                * time);
+        parentEntity.setX(parentEntity.getX() + parentEntity.getVelocityX() * time);
+        parentEntity.setY(parentEntity.getY() + parentEntity.getVelocityY() * time);
     }
 
     @Override

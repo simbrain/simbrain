@@ -30,37 +30,54 @@ import org.simbrain.util.randomizer.Randomizer;
  * based on perturbations.
  *
  * @author Zoë Tosi
- *
+ * <p>
  * TODO: Add custom tooltip
  */
-public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
-    NoisyUpdateRule {
+public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
-    /** Resistance (M ohms). */
+    /**
+     * Resistance (M ohms).
+     */
     private double resistance = 1;
 
-    /** Time constant (ms) */
+    /**
+     * Time constant (ms)
+     */
     private double timeConstant = 30;
 
-    /** Threshold (mV) */
+    /**
+     * Threshold (mV)
+     */
     private double threshold = 15;
 
-    /** Reset potential (mV) */
+    /**
+     * Reset potential (mV)
+     */
     private double resetPotential = 13.5;
 
-    /** Resting potential (mV) Default: 0.0 */
+    /**
+     * Resting potential (mV) Default: 0.0
+     */
     private double restingPotential;
 
-    /** Background Current (nA) . */
+    /**
+     * Background Current (nA) .
+     */
     private double backgroundCurrent = 13.5;
 
-    /** Refractor Period (ms) . */
+    /**
+     * Refractor Period (ms) .
+     */
     private double refractoryPeriod = 3;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to neuron. */
+    /**
+     * Add noise to neuron.
+     */
     private boolean addNoise;
 
     /**
@@ -93,8 +110,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
         // Incoming current is 0 during the refractory period, otherwise it's
         // equal to input and background current
-        double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 
-                0 : inputType.getInput(neuron) + backgroundCurrent;
+        double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 0 : inputType.getInput(neuron) + backgroundCurrent;
 
         if (addNoise) {
             synCurrent += noiseGenerator.getRandom();
@@ -116,15 +132,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
          * constant Vreset: reset potential theta: threshold
          */
 
-        double dVm =
-            timeStep
-                * (-(memPotential - restingPotential) + resistance * synCurrent)
-                / timeConstant;
+        double dVm = timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant;
 
         memPotential += dVm;
 
-        if ((memPotential >= threshold) && (neuron.getNetwork()
-                .getTime() > (getLastSpikeTime() + refractoryPeriod))) {
+        if ((memPotential >= threshold) && (neuron.getNetwork().getTime() > (getLastSpikeTime() + refractoryPeriod))) {
             neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
             memPotential = resetPotential;
@@ -143,8 +155,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     public double getRandomValue() {
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
-        return 2 * (threshold - restingPotential) * Math.random()
-            + restingPotential;
+        return 2 * (threshold - restingPotential) * Math.random() + restingPotential;
     }
 
     /**
@@ -155,8 +166,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param restingPotential
-     *            The restingPotential to set.
+     * @param restingPotential The restingPotential to set.
      */
     public void setRestingPotential(final double restingPotential) {
         this.restingPotential = restingPotential;
@@ -170,8 +180,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param resistance
-     *            The resistance to set.
+     * @param resistance The resistance to set.
      */
     public void setResistance(final double resistance) {
         this.resistance = resistance;
@@ -185,16 +194,14 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param addNoise
-     *            The addNoise to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
     /**
-     * @param noise
-     *            The noise to set.
+     * @param noise The noise to set.
      */
     public void setAddNoise(final Randomizer noise) {
         this.noiseGenerator = noise;
@@ -208,8 +215,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param noiseGenerator
-     *            The noiseGenerator to set.
+     * @param noiseGenerator The noiseGenerator to set.
      */
     public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
@@ -223,8 +229,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param resetPotential
-     *            The resetPotential to set.
+     * @param resetPotential The resetPotential to set.
      */
     public void setResetPotential(final double resetPotential) {
         this.resetPotential = resetPotential;
@@ -238,8 +243,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param backgroundCurrent
-     *            The background current to set
+     * @param backgroundCurrent The background current to set
      */
     public void setBackgroundCurrent(double backgroundCurrent) {
         this.backgroundCurrent = backgroundCurrent;
@@ -253,8 +257,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param threshold
-     *            The threshold to set.
+     * @param threshold The threshold to set.
      */
     public void setThreshold(final double threshold) {
         this.threshold = threshold;
@@ -268,8 +271,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @param timeConstant
-     *            The timeConstant to set.
+     * @param timeConstant The timeConstant to set.
      */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;

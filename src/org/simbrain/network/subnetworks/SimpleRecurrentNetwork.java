@@ -18,10 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -37,6 +33,10 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991). While the
  * SRN behavior could be implemented more efficiently by using a recurrent
@@ -47,8 +47,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public final class SimpleRecurrentNetwork extends Subnetwork implements
-    Trainable {
+public final class SimpleRecurrentNetwork extends Subnetwork implements Trainable {
 
     /**
      * A layer consisting of a copy of the hidden layer from a previous time
@@ -56,16 +55,24 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
      */
     private NeuronGroup contextLayer;
 
-    /** Reference to the input layer. */
+    /**
+     * Reference to the input layer.
+     */
     private final NeuronGroup inputLayer;
 
-    /** Reference to the hidden layer. */
+    /**
+     * Reference to the hidden layer.
+     */
     private final NeuronGroup hiddenLayer;
 
-    /** Reference to the output layer. */
+    /**
+     * Reference to the output layer.
+     */
     private final NeuronGroup outputLayer;
 
-    /** space between layers */
+    /**
+     * space between layers
+     */
     private int betweenLayerInterval = 300;
 
     /**
@@ -76,44 +83,27 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     /**
      * Build an SRN with default activation rules and initial position.
      *
-     * @param network
-     *            underlying network
-     * @param numInputNodes
-     *            number of nodes in the input layer
-     * @param numHiddenNodes
-     *            number of nodes in the hidden and context layers
-     * @param numOutputNodes
-     *            number of output nodes
+     * @param network        underlying network
+     * @param numInputNodes  number of nodes in the input layer
+     * @param numHiddenNodes number of nodes in the hidden and context layers
+     * @param numOutputNodes number of output nodes
      */
-    public SimpleRecurrentNetwork(final Network network, int numInputNodes,
-        int numHiddenNodes, int numOutputNodes) {
-        this(network, numInputNodes, numHiddenNodes, numOutputNodes,
-            new SigmoidalRule(), new SigmoidalRule(), new Point2D.Double(0,
-                0));
+    public SimpleRecurrentNetwork(final Network network, int numInputNodes, int numHiddenNodes, int numOutputNodes) {
+        this(network, numInputNodes, numHiddenNodes, numOutputNodes, new SigmoidalRule(), new SigmoidalRule(), new Point2D.Double(0, 0));
     }
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
      *
-     * @param network
-     *            underlying network
-     * @param numInputNodes
-     *            number of nodes in the input layer
-     * @param numHiddenNodes
-     *            number of nodes in the hidden and context layers
-     * @param numOutputNodes
-     *            number of output nodes
-     * @param hiddenNeuronType
-     *            update rule for hidden nodes
-     * @param outputNeuronType
-     *            update rule for hidden nodes
-     * @param initialPosition
-     *            where to position the network (upper left)
+     * @param network          underlying network
+     * @param numInputNodes    number of nodes in the input layer
+     * @param numHiddenNodes   number of nodes in the hidden and context layers
+     * @param numOutputNodes   number of output nodes
+     * @param hiddenNeuronType update rule for hidden nodes
+     * @param outputNeuronType update rule for hidden nodes
+     * @param initialPosition  where to position the network (upper left)
      */
-    public SimpleRecurrentNetwork(final Network network, int numInputNodes,
-        int numHiddenNodes, int numOutputNodes,
-        NeuronUpdateRule hiddenNeuronType,
-        NeuronUpdateRule outputNeuronType, Point2D initialPosition) {
+    public SimpleRecurrentNetwork(final Network network, int numInputNodes, int numHiddenNodes, int numOutputNodes, NeuronUpdateRule hiddenNeuronType, NeuronUpdateRule outputNeuronType, Point2D initialPosition) {
         super(network);
 
         setLabel("SRN");
@@ -144,8 +134,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
         hiddenLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
-            Direction.NORTH, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991). TODO
@@ -154,24 +143,19 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         contextLayer.setLabel("Context Layer");
         addNeuronGroup(contextLayer);
         contextLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
-            Direction.EAST, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
 
         // Output layer
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
         outputLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
-            Direction.NORTH, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
 
         // Connect the layers
-        SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer,
-            hiddenLayer, new AllToAll(false), 0.5);
-        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer,
-            hiddenLayer, new AllToAll(false), 0.5);
-        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer,
-            outputLayer, new AllToAll(false), 0.5);
+        SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer, hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer, hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer, outputLayer, new AllToAll(false), 0.5);
 
         addAndLabelSynapseGroup(inToHid);
         addAndLabelSynapseGroup(contToHid);
@@ -186,15 +170,11 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
      * Helper method to initialize a layer by adding the desired number of
      * neurons with the desired neuron update rule.
      *
-     * @param layer
-     *            the list of neurons
-     * @param nodeType
-     *            the desired neuron update rule
-     * @param nodes
-     *            the desired number of nodes
+     * @param layer    the list of neurons
+     * @param nodeType the desired neuron update rule
+     * @param nodes    the desired number of nodes
      */
-    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
-        int nodes) {
+    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType, int nodes) {
 
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);

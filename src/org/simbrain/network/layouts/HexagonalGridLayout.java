@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.layouts;
 
+import org.simbrain.network.core.Neuron;
+
 import java.awt.geom.Point2D;
 import java.util.List;
-
-import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a hexagonal grid.
@@ -30,45 +30,64 @@ import org.simbrain.network.core.Neuron;
  */
 public class HexagonalGridLayout implements Layout {
 
-    /** The default number of columns if manual columns are allowed. */
+    /**
+     * The default number of columns if manual columns are allowed.
+     */
     public static final int DEFAULT_NUM_COLUMNS = 3;
 
-    /** The default horizontal spacing. */
+    /**
+     * The default horizontal spacing.
+     */
     public static final double DEFAULT_H_SPACING = 50;
 
-    /** The default vertical spacing. */
+    /**
+     * The default vertical spacing.
+     */
     public static final double DEFAULT_V_SPACING = 50;
 
-    /** The default allowed state for manual cols. */
+    /**
+     * The default allowed state for manual cols.
+     */
     public static final boolean DEFAULT_MANUAL_COLS = false;
 
-    /** Initial x position of line of neurons. */
+    /**
+     * Initial x position of line of neurons.
+     */
     private double initialX;
 
-    /** Initial y position of line of neurons. */
+    /**
+     * Initial y position of line of neurons.
+     */
     private double initialY;
 
-    /** Number of columns in the layout. */
+    /**
+     * Number of columns in the layout.
+     */
     private int numColumns = DEFAULT_NUM_COLUMNS;
 
-    /** Horizontal spacing between neurons. */
+    /**
+     * Horizontal spacing between neurons.
+     */
     private double hSpacing = DEFAULT_H_SPACING;
 
-    /** Vertical spacing between neurons. */
+    /**
+     * Vertical spacing between neurons.
+     */
     private double vSpacing = DEFAULT_V_SPACING;
 
-    /** Manually set number of columns in grid. */
+    /**
+     * Manually set number of columns in grid.
+     */
     private boolean manualColumns = DEFAULT_MANUAL_COLS;
 
     /**
      * Create a layout.
      *
-     * @param hSpacing horizontal spacing between neurons
-     * @param vSpacing vertical spacing between neurons
+     * @param hSpacing   horizontal spacing between neurons
+     * @param vSpacing   vertical spacing between neurons
      * @param numColumns number of columns of neurons
      */
-    public HexagonalGridLayout(final double hSpacing, final double vSpacing,
-            final int numColumns) {
+    public HexagonalGridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;

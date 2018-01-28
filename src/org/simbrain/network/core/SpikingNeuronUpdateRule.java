@@ -28,7 +28,6 @@ import org.simbrain.network.core.Network.TimeType;
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
- *
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
@@ -36,7 +35,9 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
         inputType = InputType.SYNAPTIC;
     }
 
-    /** Time of last spike. */
+    /**
+     * Time of last spike.
+     */
     private double lastSpikeTime;
 
     /**
@@ -64,10 +65,8 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     public abstract void update(Neuron neuron);
 
     /**
-     * @param hasSpiked
-     *            the hasSpiked to set
-     * @param neuron
-     *            the neuron which has (or has not) spiked.
+     * @param hasSpiked the hasSpiked to set
+     * @param neuron    the neuron which has (or has not) spiked.
      */
     public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
         if (hasSpiked) {
@@ -83,8 +82,7 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     }
 
     /**
-     * @param lastSpikeTime
-     *            the lastSpikeTime to set
+     * @param lastSpikeTime the lastSpikeTime to set
      */
     public void setLastSpikeTime(double lastSpikeTime) {
         this.lastSpikeTime = lastSpikeTime;
@@ -98,7 +96,7 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      * GUI components which are separate from the logical code.
      *
      * @return TRUE: Any subclass of SpikingNeuronUpdate rule, must by
-     *         definition be a spiking neuron.
+     * definition be a spiking neuron.
      */
     @Override
     public final boolean isSpikingNeuron() {
@@ -118,8 +116,9 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      * directly setting the activation. It is much more practical for spiking
      * neurons for which it makes much more sense to inject current as input
      * since the update rule is in charge of whether or not the neuron spikes.
+     *
      * @param appliedInput the background stimulation being applied or
-     *  "injected" into this neuron.
+     *                     "injected" into this neuron.
      */
     public void setAppliedInput(double appliedInput) {
         this.appliedInput = appliedInput;

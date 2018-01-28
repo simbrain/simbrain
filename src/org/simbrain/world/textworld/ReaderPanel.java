@@ -18,33 +18,18 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
+import org.simbrain.world.textworld.TextWorld.TextItem;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
-
-import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
-import org.simbrain.world.textworld.TextWorld.TextItem;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Display panel for reading data from user and showing text world's state.
@@ -53,22 +38,34 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
  */
 public class ReaderPanel extends JPanel {
 
-    /** Underlying model text world. */
+    /**
+     * Underlying model text world.
+     */
     private final ReaderWorld world;
 
-    /** Text area for inputting text into networks. */
+    /**
+     * Text area for inputting text into networks.
+     */
     private JTextArea textArea = new JTextArea();
 
-    /** The main scroll panel. */
+    /**
+     * The main scroll panel.
+     */
     final JScrollPane inputScrollPane;
 
-    /** Displays the current parse style and allows it to be set. */
+    /**
+     * Displays the current parse style and allows it to be set.
+     */
     private final ButtonGroup parseStyle = new ButtonGroup();
 
-    /** Parse style is word-based. */
+    /**
+     * Parse style is word-based.
+     */
     private final JRadioButton wordButton = new JRadioButton("Word");
 
-    /** Parse style is character based. */
+    /**
+     * Parse style is character based.
+     */
     private final JRadioButton charButton = new JRadioButton("Character");
 
     /**
@@ -82,11 +79,10 @@ public class ReaderPanel extends JPanel {
      * constructor).
      *
      * @param theWorld the world
-     * @param toolbar pass in open / close toolbar
+     * @param toolbar  pass in open / close toolbar
      * @return the constructed panel
      */
-    public static ReaderPanel createReaderPanel(ReaderWorld theWorld,
-            JToolBar toolbar) {
+    public static ReaderPanel createReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
         ReaderPanel panel = new ReaderPanel(theWorld, toolbar);
         panel.initListeners();
         return panel;
@@ -109,7 +105,7 @@ public class ReaderPanel extends JPanel {
      * Initialize the panel with an open / close toolbar.
      *
      * @param theWorld the reader world to display
-     * @param toolbar the openClose toolbar.
+     * @param toolbar  the openClose toolbar.
      */
     private ReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
@@ -118,9 +114,7 @@ public class ReaderPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-        inputScrollPane = new JScrollPane(textArea,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        inputScrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(inputScrollPane);
 
         // Add toolbars
@@ -130,8 +124,7 @@ public class ReaderPanel extends JPanel {
             topToolbarPanel.add(openCloseToolBar);
         }
         JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar.add(TextWorldActions
-                .showDictionaryEditor(world));
+        dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
 
         add(topToolbarPanel, BorderLayout.NORTH);
@@ -185,9 +178,7 @@ public class ReaderPanel extends JPanel {
             @Override
             public void componentResized(ComponentEvent e) {
                 // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
-                inputScrollPane.setPreferredSize(new Dimension(ReaderPanel.this
-                        .getPreferredSize().width - 25, ReaderPanel.this
-                        .getPreferredSize().height - 25));
+                inputScrollPane.setPreferredSize(new Dimension(ReaderPanel.this.getPreferredSize().width - 25, ReaderPanel.this.getPreferredSize().height - 25));
                 // inputScrollPane.revalidate();
             }
         });
@@ -211,8 +202,7 @@ public class ReaderPanel extends JPanel {
                 if (world.getCurrentItem().getText().equalsIgnoreCase("")) {
                     removeHighlights(textArea);
                 } else {
-                    highlight(world.getCurrentItem().getBeginPosition(), world
-                            .getCurrentItem().getEndPosition());
+                    highlight(world.getCurrentItem().getBeginPosition(), world.getCurrentItem().getEndPosition());
                 }
             }
 
@@ -244,12 +234,11 @@ public class ReaderPanel extends JPanel {
      * <code>end</code>.
      *
      * @param begin offset of beginning of highlight
-     * @param end offset of end of highlight
+     * @param end   offset of end of highlight
      */
     public void highlight(final int begin, final int end) {
         // An instance of the private subclass of the default highlight painter
-        Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(
-                world.getHighlightColor());
+        Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(world.getHighlightColor());
         removeHighlights(textArea);
         try {
             Highlighter hilite = textArea.getHighlighter();

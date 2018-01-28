@@ -18,19 +18,15 @@
  */
 package org.simbrain.util;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.simbrain.util.math.ProbDistribution;
+
+import java.lang.annotation.*;
 
 /**
  * Annotation for user-configurable parameter fields that provides for
  * specifying meta-data such as label, description, and validation criteria.
  * This information may be used by dialog builders to construct input fields.
- * 
+ *
  * @author O. J. Coleman
  */
 @Documented

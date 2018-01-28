@@ -18,18 +18,16 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.geom.Point2D;
-
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 
+import java.awt.geom.Point2D;
+
 /**
- *
  * An interface that any synapse group node which uses a curved arrow (not an
  * arc) should implement.
  *
  * @author Zoë Tosi
- *
  */
 public interface SynapseGroupArrow {
 
@@ -39,6 +37,7 @@ public interface SynapseGroupArrow {
      * implemented by a PNode, this method should be called in LayoutChildren.
      * It is also expected that {@link #layoutChildrenQuiet(Point2D, Point2D)}
      * should call this method.
+     *
      * @param pt1
      * @param pt2
      */
@@ -51,19 +50,21 @@ public interface SynapseGroupArrow {
      * how this is accomplished varies according to specific implementation.
      * If either pt1 or pt2 are null (or both), this method should use
      * the already existing start and end points as appropriate.
+     *
      * @param pt1 the start point, if null should be replaced by the arrow's
-     * current start point. If the arrow doesn't have a start point yet,
-     * {@link #getOpposingDefaultPosition(NeuronGroup)} should be called using
-     * the neuron group opposite to this point.
+     *            current start point. If the arrow doesn't have a start point yet,
+     *            {@link #getOpposingDefaultPosition(NeuronGroup)} should be called using
+     *            the neuron group opposite to this point.
      * @param pt2 pt1 the end point, if null should be replaced by the arrow's
-     * current end point. If the arrow doesn't have an end point yet,
-     * {@link #getOpposingDefaultPosition(NeuronGroup)} should be called using
-     * the neuron group opposite to this point.
+     *            current end point. If the arrow doesn't have an end point yet,
+     *            {@link #getOpposingDefaultPosition(NeuronGroup)} should be called using
+     *            the neuron group opposite to this point.
      */
     void layoutChildrenQuiet(Point2D pt1, Point2D pt2);
 
     /**
      * Returns the midpoint for for
+     *
      * @param src the first point
      * @param tar the second point
      * @return the midpoint between pt1 and pt2
@@ -81,6 +82,7 @@ public interface SynapseGroupArrow {
      * default opposing position. Used when one of the end-points of this arrow
      * has been determined, but the other remains undetermined, so that the
      * arrow can be laid out in the meantime.
+     *
      * @param ng the neuron group for the known endpoint
      * @return a default position for the end opposite the neuron group
      */

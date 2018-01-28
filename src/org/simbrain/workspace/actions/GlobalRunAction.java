@@ -18,12 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Run network action.
@@ -43,8 +42,9 @@ public final class GlobalRunAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "Global iterate network update algorithm");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         workspace.run();

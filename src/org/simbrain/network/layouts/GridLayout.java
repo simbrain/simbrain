@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.layouts;
 
+import org.simbrain.network.core.Neuron;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a grid.
@@ -33,45 +33,64 @@ import org.simbrain.network.core.Neuron;
  */
 public class GridLayout implements Layout {
 
-    /** The default number of columns if manual columns are allowed. */
+    /**
+     * The default number of columns if manual columns are allowed.
+     */
     public static final int DEFAULT_NUM_COLUMNS = 3;
 
-    /** The default horizontal spacing. */
+    /**
+     * The default horizontal spacing.
+     */
     public static final double DEFAULT_H_SPACING = 50;
 
-    /** The default vertical spacing. */
+    /**
+     * The default vertical spacing.
+     */
     public static final double DEFAULT_V_SPACING = 50;
 
-    /** The default allowed state for manual cols. */
+    /**
+     * The default allowed state for manual cols.
+     */
     public static final boolean DEFAULT_MANUAL_COLS = false;
 
-    /** Initial x position of line of neurons. */
+    /**
+     * Initial x position of line of neurons.
+     */
     private double initialX;
 
-    /** Initial y position of line of neurons. */
+    /**
+     * Initial y position of line of neurons.
+     */
     private double initialY;
 
-    /** Number of columns in the layout. */
+    /**
+     * Number of columns in the layout.
+     */
     private int numColumns = DEFAULT_NUM_COLUMNS;
 
-    /** Horizontal spacing between neurons. */
+    /**
+     * Horizontal spacing between neurons.
+     */
     private double hSpacing = DEFAULT_H_SPACING;
 
-    /** Vertical spacing between neurons. */
+    /**
+     * Vertical spacing between neurons.
+     */
     private double vSpacing = DEFAULT_V_SPACING;
 
-    /** Manually set number of columns in grid. */
+    /**
+     * Manually set number of columns in grid.
+     */
     private boolean manualColumns = DEFAULT_MANUAL_COLS;
 
     /**
      * Create a grid layout with a specific number of columns.
      *
-     * @param hSpacing horizontal spacing between neurons
-     * @param vSpacing vertical spacing between neurons
+     * @param hSpacing   horizontal spacing between neurons
+     * @param vSpacing   vertical spacing between neurons
      * @param numColumns number of columns of neurons
      */
-    public GridLayout(final double hSpacing, final double vSpacing,
-            final int numColumns) {
+    public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;
@@ -125,17 +144,15 @@ public class GridLayout implements Layout {
     /**
      * Returns a list of columns corresponding to a set of neurons assumed to be
      * in the form of a grid. Utility method currently used in scripts.
-     *
+     * <p>
      * TODO: Possibly move this method to a utility class for determining the
      * locations of neurons and other network elements.
-     *
      *
      * @param neurons the list of neurons
      * @param numRows the number of rows in the grid
      * @return the list of columns, ordered by x-direction
      */
-    public static List<List<Neuron>> getColumnList(final List<Neuron> neurons,
-            int numRows) {
+    public static List<List<Neuron>> getColumnList(final List<Neuron> neurons, int numRows) {
         // Sort by x value
         ArrayList<Neuron> neuronList = new ArrayList<Neuron>(neurons);
         Collections.sort(neuronList, new Comparator<Neuron>() {

@@ -18,13 +18,13 @@
  */
 package org.simbrain.workspace.serialization;
 
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Class used to assist with deserializing workspace components.
@@ -33,7 +33,9 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class WorkspaceComponentDeserializer {
 
-    /** A map used to retrieve workspace components given their uris. */
+    /**
+     * A map used to retrieve workspace components given their uris.
+     */
     private final Map<String, WorkspaceComponent> componentKeys = new HashMap<String, WorkspaceComponent>();
 
     /**
@@ -49,12 +51,12 @@ public class WorkspaceComponentDeserializer {
     /**
      * Deserializes a workspace component using the information from the
      * provided component and input stream.
+     *
      * @param archivedComponent The component entry from the archive contents.
-     * @param input The input stream to read data from.
+     * @param input             The input stream to read data from.
      * @return The deserialized WorkspaceComponent.
      */
-    WorkspaceComponent deserializeWorkspaceComponent(ArchivedWorkspaceComponent archivedComponent, InputStream input)
-            throws ReflectiveOperationException {
+    WorkspaceComponent deserializeWorkspaceComponent(ArchivedWorkspaceComponent archivedComponent, InputStream input) throws ReflectiveOperationException {
         Class<?> componentClass = Class.forName(archivedComponent.getClassName());
         WorkspaceComponent wc = deserializeWorkspaceComponent(componentClass, archivedComponent.getName(), input, null);
         componentKeys.put(archivedComponent.getUri(), wc);
@@ -64,14 +66,14 @@ public class WorkspaceComponentDeserializer {
 
     /**
      * Deserialized a component for the given class, input and input format.
+     *
      * @param componentClass the class of the component
-     * @param name the name of the component
-     * @param input the input stream
-     * @param format the format of the data
+     * @param name           the name of the component
+     * @param input          the input stream
+     * @param format         the format of the data
      * @return a new component
      */
-    public static WorkspaceComponent deserializeWorkspaceComponent(Class<?> componentClass, String name,
-            InputStream input, String format) throws ReflectiveOperationException {
+    public static WorkspaceComponent deserializeWorkspaceComponent(Class<?> componentClass, String name, InputStream input, String format) throws ReflectiveOperationException {
         Method method = componentClass.getMethod("open", InputStream.class, String.class, String.class);
         Object obj = method.invoke(null, input, name, format);
         if (obj instanceof WorkspaceComponent) {
@@ -85,14 +87,14 @@ public class WorkspaceComponentDeserializer {
 
     /**
      * Deserializes a desktop component given a class, input stream and name.
+     *
      * @param className The class name for the DesktopComponent
      * @param component The desktop component entry for the desktop component.
-     * @param input The input stream.
-     * @param name The name of the desktop component.
+     * @param input     The input stream.
+     * @param name      The name of the desktop component.
      * @return The deserialized desktop component.
      */
-    GuiComponent<?> deserializeDesktopComponent(String className, WorkspaceComponent component,
-            InputStream input, String name) throws ReflectiveOperationException {
+    GuiComponent<?> deserializeDesktopComponent(String className, WorkspaceComponent component, InputStream input, String name) throws ReflectiveOperationException {
         Class<?> clazz = Class.forName(className);
         Method method = clazz.getMethod("open", WorkspaceComponent.class, InputStream.class, String.class);
         return (GuiComponent<?>) method.invoke(null, component, input, name);

@@ -1,44 +1,44 @@
 package org.simbrain.util;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import org.piccolo2d.PNode;
+import org.piccolo2d.PRoot;
+import org.piccolo2d.util.PBounds;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-
-import org.piccolo2d.PNode;
-import org.piccolo2d.PRoot;
-import org.piccolo2d.util.PBounds;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * Piccolo scene graph browser component.
  */
 public class SceneGraphBrowser extends JPanel {
 
-    /** Root node. */
+    /**
+     * Root node.
+     */
     private final PRoot root;
 
-    /** Number format. */
+    /**
+     * Number format.
+     */
     private final NumberFormat nf;
 
-    /** Refresh action. */
+    /**
+     * Refresh action.
+     */
     private final Action refresh;
 
-    /** The main JTree. */
+    /**
+     * The main JTree.
+     */
     private final JTree tree = new JTree();
 
     /**
@@ -104,12 +104,11 @@ public class SceneGraphBrowser extends JPanel {
          * Format bounds with the specified label to the specified string
          * buffer.
          *
-         * @param sb string buffer
-         * @param label bounds label
+         * @param sb     string buffer
+         * @param label  bounds label
          * @param bounds bounds
          */
-        private void formatBounds(final StringBuffer sb, final String label,
-                final PBounds bounds) {
+        private void formatBounds(final StringBuffer sb, final String label, final PBounds bounds) {
             sb.append(" ");
             sb.append(label);
             sb.append("=[");
@@ -123,7 +122,7 @@ public class SceneGraphBrowser extends JPanel {
             sb.append("]");
         }
 
-        /** @see DefaultTreeCellRenderer 
+        /**
          * @param tree
          * @param value
          * @param isSelected
@@ -132,19 +131,15 @@ public class SceneGraphBrowser extends JPanel {
          * @param row
          * @param hasFocus
          * @return
+         * @see DefaultTreeCellRenderer
          */
-        public Component getTreeCellRendererComponent(final JTree tree,
-                final Object value, final boolean isSelected,
-                final boolean isExpanded, final boolean isLeaf, final int row,
-                final boolean hasFocus) {
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean isSelected, final boolean isExpanded, final boolean isLeaf, final int row, final boolean hasFocus) {
 
-            JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value,
-                    isSelected, isExpanded, isLeaf, row, hasFocus);
+            JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded, isLeaf, row, hasFocus);
             PNode node = (PNode) value;
             PBounds bounds = null;
             StringBuffer sb = new StringBuffer();
-            sb.append(node.getClass().getName()
-                    .substring(node.getClass().getName().lastIndexOf(".") + 1));
+            sb.append(node.getClass().getName().substring(node.getClass().getName().lastIndexOf(".") + 1));
 
             formatBounds(sb, "bounds", node.getBoundsReference());
             formatBounds(sb, "fullBounds", node.getFullBoundsReference());
@@ -163,7 +158,9 @@ public class SceneGraphBrowser extends JPanel {
      */
     private class Model implements TreeModel {
 
-        /** Listener list. */
+        /**
+         * Listener list.
+         */
         private EventListenerList listenerList;
 
         /**
@@ -173,67 +170,74 @@ public class SceneGraphBrowser extends JPanel {
             listenerList = new EventListenerList();
         }
 
-        /** @see TreeModel 
+        /**
          * @param parent
          * @param index
          * @return
+         * @see TreeModel
          */
         public Object getChild(final Object parent, final int index) {
             return ((PNode) parent).getChild(index);
         }
 
-        /** @see TreeModel
+        /**
          * @param parent
          * @return
+         * @see TreeModel
          */
         public int getChildCount(final Object parent) {
             return ((PNode) parent).getChildrenCount();
         }
 
-        /** @see TreeModel 
+        /**
          * @param parent
          * @param child
          * @return
+         * @see TreeModel
          */
         public int getIndexOfChild(final Object parent, final Object child) {
             return -1;
         }
 
-        /** @see TreeModel
+        /**
          * @return
+         * @see TreeModel
          */
         public Object getRoot() {
             return root;
         }
 
-        /** @see TreeModel 
+        /**
          * @param node
          * @return
+         * @see TreeModel
          */
         public boolean isLeaf(final Object node) {
             return (getChildCount(node) == 0);
         }
 
-        /** @see TreeModel 
-         @param l
+        /**
+         * @param l
+         * @see TreeModel
          */
         public void addTreeModelListener(final TreeModelListener l) {
             listenerList.add(TreeModelListener.class, l);
         }
 
-        /** @see TreeModel 
+        /**
          * @param l
+         * @see TreeModel
          */
         public void removeTreeModelListener(final TreeModelListener l) {
             listenerList.remove(TreeModelListener.class, l);
         }
 
-        /** @see TreeModel
+        /**
          * @param path
          * @param newValue
+         * @see TreeModel
          */
-        public void valueForPathChanged(final TreePath path,
-                final Object newValue) {
+        public void valueForPathChanged(final TreePath path, final Object newValue) {
             // empty
         }
 
@@ -248,10 +252,9 @@ public class SceneGraphBrowser extends JPanel {
             for (int i = (listeners.length - 2); i >= 0; i -= 2) {
                 if (listeners[i] == TreeModelListener.class) {
                     if (e == null) {
-                        e = new TreeModelEvent(this, new Object[] { root });
+                        e = new TreeModelEvent(this, new Object[]{root});
                     }
-                    ((TreeModelListener) listeners[i + 1])
-                            .treeStructureChanged(e);
+                    ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
                 }
             }
         }

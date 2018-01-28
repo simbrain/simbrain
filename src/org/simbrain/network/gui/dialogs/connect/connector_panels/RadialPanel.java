@@ -13,54 +13,63 @@
  */
 package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 
+import javax.swing.*;
+import java.util.List;
+
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
  * connections.
- *
+ * <p>
  * TODO: Currently not implemented pending refactor of Radial.java
- *
  */
 @SuppressWarnings("serial")
 public class RadialPanel extends AbstractConnectionPanel {
 
-    /** Excitatory Probability. */
+    /**
+     * Excitatory Probability.
+     */
     private JTextField tfExciteProbability = new JTextField();
 
-    /** Excitatory Radius. */
+    /**
+     * Excitatory Radius.
+     */
     private JTextField tfExciteRadius = new JTextField();
 
-    /** Inhibitory Probability. */
+    /**
+     * Inhibitory Probability.
+     */
     private JTextField tfInhibitProbability = new JTextField();
 
-    /** Inhibitory Radius. */
+    /**
+     * Inhibitory Radius.
+     */
     private JTextField tfInhibitRadius = new JTextField();
 
-    /** Allow self connections check box. */
+    /**
+     * Allow self connections check box.
+     */
     private JCheckBox allowSelfConnect = new JCheckBox();
 
-    /** Set the inhibitory synapse type. */
+    /**
+     * Set the inhibitory synapse type.
+     */
     private JButton setInhibitorySynapseType = new JButton();
 
-    /** Set the excitatory synapse type. */
+    /**
+     * Set the excitatory synapse type.
+     */
     private JButton setExcitatorySynapseType = new JButton();
 
     /**
      * This method is the default constructor.
      *
-     * @param connection
-     *            type
+     * @param connection type
      */
     public RadialPanel(final Radial connection) {
     }

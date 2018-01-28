@@ -28,14 +28,17 @@ import org.simbrain.util.math.ProbDistribution;
  * the sign of the output is wholly determined by the polarity.
  *
  * @author Zoë Tosi
- *
  */
 public class PolarizedRandomizer extends Randomizer {
 
-    /** Default polarity for this randomizer. */
+    /**
+     * Default polarity for this randomizer.
+     */
     public static final Polarity DEFAULT_POLARITY = Polarity.EXCITATORY;
 
-    /** Is this randomizer exciatory, inhibitory, or both. */
+    /**
+     * Is this randomizer exciatory, inhibitory, or both.
+     */
     public Polarity polarity;
 
     /**
@@ -59,9 +62,9 @@ public class PolarizedRandomizer extends Randomizer {
     /**
      * Construct a randomizer with a specified polarity and probability
      * distribution.
-     * 
+     *
      * @param polarity the polarity
-     * @param pdf the prob. distribution
+     * @param pdf      the prob. distribution
      */
     public PolarizedRandomizer(Polarity polarity, ProbDistribution pdf) {
         super();
@@ -85,8 +88,8 @@ public class PolarizedRandomizer extends Randomizer {
 
     /**
      * Checks to make sure that there are no negative parameters.
-     * 
-     * @return 
+     *
+     * @return
      */
     public String checkParamsNonNegative() {
         String ret = "";

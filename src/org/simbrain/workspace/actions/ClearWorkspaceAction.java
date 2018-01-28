@@ -18,11 +18,10 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Clear the current workspace.
@@ -36,6 +35,7 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
 
     /**
      * Create a clear workspace action with the specified workspace.
+     *
      * @param desktop
      */
     public ClearWorkspaceAction(SimbrainDesktop desktop) {
@@ -43,8 +43,9 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         desktop.clearDesktop();

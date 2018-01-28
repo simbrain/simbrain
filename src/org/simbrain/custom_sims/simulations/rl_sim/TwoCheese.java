@@ -38,7 +38,7 @@ public class TwoCheese extends RL_Sim {
 
         // Update the world
         sim.world.fireUpdateEvent();
-        
+
         // Set goal states
         goalEntities.clear();
         goalEntities.add(sim.cheese_1);

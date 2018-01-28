@@ -18,24 +18,18 @@
  */
 package org.simbrain.workspace;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -46,21 +40,27 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
  * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  *
  * @see Coupling
- *
  */
 public class Workspace {
 
-    /** The static logger for this class. */
+    /**
+     * The static logger for this class.
+     */
     private static transient final Logger LOGGER = Logger.getLogger(Workspace.class);
 
-    /** List of workspace components. */
-    private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(
-            new ArrayList<WorkspaceComponent>());
+    /**
+     * List of workspace components.
+     */
+    private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(new ArrayList<WorkspaceComponent>());
 
-    /** Flag to indicate workspace has been changed since last save. */
+    /**
+     * Flag to indicate workspace has been changed since last save.
+     */
     private transient boolean workspaceChanged = false;
 
-    /** Current workspace file. */
+    /**
+     * Current workspace file.
+     */
     private transient File currentFile = null;
 
     /**
@@ -92,10 +92,14 @@ public class Workspace {
      */
     private int updateDelay = 0;
 
-    /** The updater used to manage component updates. */
+    /**
+     * The updater used to manage component updates.
+     */
     private transient WorkspaceUpdater updater;
 
-    /** The CouplingFactory for this workspace. */
+    /**
+     * The CouplingFactory for this workspace.
+     */
     private transient CouplingFactory couplingFactory = new CouplingFactory(this);
 
     /**
@@ -189,8 +193,7 @@ public class Workspace {
                 int index = componentNameIndices.get(component.getClass());
                 componentNameIndices.put(component.getClass(), index + 1);
             }
-            component.setName(component.getSimpleName()
-                    + componentNameIndices.get(component.getClass()));
+            component.setName(component.getSimpleName() + componentNameIndices.get(component.getClass()));
         }
 
         fireWorkspaceComponentAdded(component);
@@ -227,7 +230,7 @@ public class Workspace {
     /**
      * Iterates all couplings on all components until halted by user.
      */
-    public void run() {        
+    public void run() {
         for (WorkspaceComponent wc : getComponentList()) {
             wc.start();
         }
@@ -345,8 +348,7 @@ public class Workspace {
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {
-        SimbrainPreferences.putString("workspaceSimulationDirectory",
-                currentDirectory);
+        SimbrainPreferences.putString("workspaceSimulationDirectory", currentDirectory);
     }
 
     /**
@@ -393,20 +395,17 @@ public class Workspace {
      *
      * @param manager
      */
-    public void setTaskSynchronizationManager(
-            final TaskSynchronizationManager manager) {
+    public void setTaskSynchronizationManager(final TaskSynchronizationManager manager) {
         updater.setTaskSynchronizationManager(manager);
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder(
-                "Number of components: " + componentList.size() + "\n");
+        StringBuilder builder = new StringBuilder("Number of components: " + componentList.size() + "\n");
         int i = 0;
         synchronized (componentList) {
             for (WorkspaceComponent component : componentList) {
-                builder.append(
-                        "Component " + ++i + ":" + component.getName() + "\n");
+                builder.append("Component " + ++i + ":" + component.getName() + "\n");
             }
         }
         return builder.toString();
@@ -527,7 +526,9 @@ public class Workspace {
         updater.getUpdateManager().addAction(action);
     }
 
-    /** All couplings for the workspace. */
+    /**
+     * All couplings for the workspace.
+     */
     private final transient List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
     public void addCoupling(Coupling<?> coupling) {
@@ -546,7 +547,9 @@ public class Workspace {
         fireCouplingRemoved(coupling);
     }
 
-    /** List of listeners to fire updates when couplings are changed. */
+    /**
+     * List of listeners to fire updates when couplings are changed.
+     */
     private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
 
     /**
@@ -588,7 +591,7 @@ public class Workspace {
             listeners.couplingRemoved(coupling);
         }
     }
-    
+
     private void fireCouplingsRemoved(List<Coupling<?>> couplings) {
         for (CouplingListener listeners : couplingListeners) {
             listeners.couplingsRemoved(couplings);
@@ -608,14 +611,16 @@ public class Workspace {
         this.fireCouplingsRemoved(couplings);
     }
 
-    /** Return a coupling in the workspace by the coupling id. */
+    /**
+     * Return a coupling in the workspace by the coupling id.
+     */
     public Coupling<?> getCoupling(String id) {
-        return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id))
-                .findFirst().get();
+        return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id)).findFirst().get();
     }
 
     /**
      * Convenience method for updating a set of couplings.
+     *
      * @param couplingList the list of couplings to be updated
      */
     public void updateCouplings(List<Coupling<?>> couplingList) {

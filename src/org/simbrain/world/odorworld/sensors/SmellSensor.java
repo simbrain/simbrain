@@ -18,15 +18,15 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
@@ -35,22 +35,34 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class SmellSensor extends Sensor {
 
-    /** Default label. */
+    /**
+     * Default label.
+     */
     public static final String DEFAULT_LABEL = "SmellSensor";
 
-    /** Angle of whisker in radians. */
+    /**
+     * Angle of whisker in radians.
+     */
     public static double DEFAULT_THETA = Math.PI / 4;
 
-    /** Initial length of mouse whisker. */
+    /**
+     * Initial length of mouse whisker.
+     */
     public static final double DEFAULT_RADIUS = 23;
 
-    /** Relative location of the sensor in polar coordinates. */
+    /**
+     * Relative location of the sensor in polar coordinates.
+     */
     private double theta = DEFAULT_THETA;
 
-    /** Relative location of the sensor in polar coordinates. */
+    /**
+     * Relative location of the sensor in polar coordinates.
+     */
     private double radius = DEFAULT_RADIUS;
 
-    /** Current value of this sensor, as an array of doubles. */
+    /**
+     * Current value of this sensor, as an array of doubles.
+     */
     // TODO: Settable numDims!
     private double[] currentValue = new double[10];
 
@@ -58,12 +70,11 @@ public class SmellSensor extends Sensor {
      * Construct a smell sensor.
      *
      * @param parent parent
-     * @param label label for this sensor (entity name will be added)
-     * @param theta offset from straight in degrees radians
+     * @param label  label for this sensor (entity name will be added)
+     * @param theta  offset from straight in degrees radians
      * @param radius length of "whisker"
      */
-    public SmellSensor(final OdorWorldEntity parent, final String label,
-            double theta, double radius) {
+    public SmellSensor(final OdorWorldEntity parent, final String label, double theta, double radius) {
         super(parent, label);
         this.parent = parent;
         this.theta = theta;
@@ -78,11 +89,9 @@ public class SmellSensor extends Sensor {
         // only,
         // or relax the code so that it will work for non-rotating entities
         RotatingEntity parent = (RotatingEntity) this.getParent();
-        double x = parent.getCenterLocation()[0]
-                + (radius * Math.cos(parent.getHeadingRadians() + theta));
-        double y = parent.getCenterLocation()[1]
-                - (radius * Math.sin(parent.getHeadingRadians() + theta));
-        return new double[] { x, y };
+        double x = parent.getCenterLocation()[0] + (radius * Math.cos(parent.getHeadingRadians() + theta));
+        double y = parent.getCenterLocation()[1] - (radius * Math.sin(parent.getHeadingRadians() + theta));
+        return new double[]{x, y};
     }
 
     @Override
@@ -94,9 +103,7 @@ public class SmellSensor extends Sensor {
             if (entity != parent) {
                 SmellSource smell = entity.getSmellSource();
                 if (smell != null) {
-                    temp = SimbrainMath.addVector(temp, smell
-                            .getStimulus(SimbrainMath.distance(getLocation(),
-                                    entity.getCenterLocation())));
+                    temp = SimbrainMath.addVector(temp, smell.getStimulus(SimbrainMath.distance(getLocation(), entity.getCenterLocation())));
                 }
             }
         }
@@ -106,19 +113,19 @@ public class SmellSensor extends Sensor {
     /**
      * @return the currentValue
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getCurrentValues() {
         return currentValue;
     }
 
     //TODO. Rename...
     public List<Integer> getDimensionList() {
-        return IntStream.range(1, this.getCurrentValues().length).boxed()
-                .collect(Collectors.toList());
+        return IntStream.range(1, this.getCurrentValues().length).boxed().collect(Collectors.toList());
     }
 
     /**
      * The current value at an index.
+     *
      * @param index
      * @return the currentValue
      */

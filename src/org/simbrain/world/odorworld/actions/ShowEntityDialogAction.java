@@ -18,20 +18,21 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.odorworld.dialogs.EntityDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Action for showing an entity dialog.
  */
 public final class ShowEntityDialogAction extends AbstractAction {
 
-    /** Entity to edit. */
+    /**
+     * Entity to edit.
+     */
     private final OdorWorldEntity entity;
 
     /**
@@ -49,11 +50,12 @@ public final class ShowEntityDialogAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Edit entity...");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         EntityDialog dialog = new EntityDialog(entity);
-        dialog.setTitle("Edit " + entity.getName() + " (" + entity.getId()
-                + ")");
+        dialog.setTitle("Edit " + entity.getName() + " (" + entity.getId() + ")");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

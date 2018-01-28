@@ -13,47 +13,56 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
  *
  * @author Lam Nguyen
- *
  */
 
 public class AddSensorDialog extends StandardDialog implements ActionListener {
 
-    /** String of Sensor types. */
-    private String[] sensors = { "SmellSensor", "TileSensor", "Tile Set",
-            "Hearing" };
+    /**
+     * String of Sensor types.
+     */
+    private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set", "Hearing"};
 
-    /** Entity to which sensor is being added. */
+    /**
+     * Entity to which sensor is being added.
+     */
     private OdorWorldEntity entity;
 
-    /** Select sensor type. */
+    /**
+     * Select sensor type.
+     */
     private JComboBox sensorType = new JComboBox(sensors);
 
-    /** Panel that changes to a specific sensor panel. */
+    /**
+     * Panel that changes to a specific sensor panel.
+     */
     private AbstractSensorPanel currentSensorPanel;
 
-    /** Main dialog box. */
+    /**
+     * Main dialog box.
+     */
     private Box mainPanel = Box.createVerticalBox();
 
-    /** Panel for setting sensor type. */
+    /**
+     * Panel for setting sensor type.
+     */
     private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-    /** Sensor Dialog add sensor constructor. 
+    /**
+     * Sensor Dialog add sensor constructor.
+     *
      * @param entity
      */
     public AddSensorDialog(OdorWorldEntity entity) {
@@ -69,8 +78,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         sensorType.addActionListener(this);
         typePanel.addItem("Sensor Type", sensorType);
         sensorType.setSelectedItem("SmellSensor");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld/sensors.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
@@ -123,7 +131,6 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     *
      * @param e Action event.
      */
     public void actionPerformed(final ActionEvent e) {

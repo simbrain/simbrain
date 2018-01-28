@@ -17,19 +17,6 @@
  */
 package org.simbrain.network.groups;
 
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -43,6 +30,14 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
@@ -67,32 +62,41 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     public static final int DEFAULT_GROUP_SIZE = 10;
 
-    /** The description of the update rule governing the group. */
+    /**
+     * The description of the update rule governing the group.
+     */
     private String updateRule;
- 
+
     /**
      * Mostly here for backwards compatibility {@link #recordAsSpikes} is
      * ultimately the more important variable.
      */
     private boolean isSpikingNeuronGroup = false;
 
-    /** The neurons in this group. */
+    /**
+     * The neurons in this group.
+     */
     private List<Neuron> neuronList = new ArrayList<Neuron>(500);
 
-    /** Default layout for neuron groups. */
-    public static final Layout DEFAULT_LAYOUT = new LineLayout(50,
-            LineOrientation.HORIZONTAL);
+    /**
+     * Default layout for neuron groups.
+     */
+    public static final Layout DEFAULT_LAYOUT = new LineLayout(50, LineOrientation.HORIZONTAL);
 
-    /** The layout for the neurons in this group. */
+    /**
+     * The layout for the neurons in this group.
+     */
     private Layout layout = DEFAULT_LAYOUT;
 
-    /** Set of incoming synapse groups. */
-    private final HashSet<SynapseGroup> incomingSgs =
-            new HashSet<SynapseGroup>();
+    /**
+     * Set of incoming synapse groups.
+     */
+    private final HashSet<SynapseGroup> incomingSgs = new HashSet<SynapseGroup>();
 
-    /** Set of outgoing synapse groups. */
-    private final HashSet<SynapseGroup> outgoingSgs =
-            new HashSet<SynapseGroup>();
+    /**
+     * Set of outgoing synapse groups.
+     */
+    private final HashSet<SynapseGroup> outgoingSgs = new HashSet<SynapseGroup>();
 
     /**
      * In method setLayoutBasedOnSize, this is used as the threshold number of
@@ -101,10 +105,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     private int gridThreshold = 10;
 
-    /** Space between neurons within a layer. */
+    /**
+     * Space between neurons within a layer.
+     */
     private int betweenNeuronInterval = 50;
 
-    /** Data (input vectors) for testing the network. */
+    /**
+     * Data (input vectors) for testing the network.
+     */
     private double[][] testData;
 
     /**
@@ -113,10 +121,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     private boolean recordAsSpikes;
 
-    /** The output stream which writes activation values to a file.*/
+    /**
+     * The output stream which writes activation values to a file.
+     */
     private PrintWriter valueWriter;
 
-    /** Whether or not this group is in a state that allows recording. */
+    /**
+     * Whether or not this group is in a state that allows recording.
+     */
     private boolean recording;
 
     /**
@@ -138,19 +150,21 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * been called so as to determine when to flush the output stream.
      */
     private int writeCounter = 0;
-    
-    /** Indices used with subsampling. */
+
+    /**
+     * Indices used with subsampling.
+     */
     private int[] subsamplingIndices;
-    
+
     /**
      * Reset the indices used for subsampling.
      */
     public void resetSubsamplingIndices() {
         if (neuronList != null) {
-            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());   
+            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
         }
     }
-    
+
     /**
      * This used to be how neuron group recordings were labeled. This is now
      * only here for backwards compatibility.
@@ -161,10 +175,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Construct a new neuron group from a list of neurons.
      *
-     * @param net
-     *            the network
-     * @param neurons
-     *            the neurons
+     * @param net     the network
+     * @param neurons the neurons
      */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
@@ -181,10 +193,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Construct a new neuron group with a specified number of neurons.
      *
-     * @param net
-     *            parent network
-     * @param numNeurons
-     *            how many neurons it will have
+     * @param net        parent network
+     * @param numNeurons how many neurons it will have
      */
     public NeuronGroup(final Network net, final int numNeurons) {
         this(net, new Point2D.Double(0, 0), numNeurons);
@@ -193,15 +203,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Construct a new neuron group with a specified number of neurons.
      *
-     * @param net
-     *            parent network
-     * @param initialPosition
-     *            initial location of the group
-     * @param numNeurons
-     *            how many neurons it will have
+     * @param net             parent network
+     * @param initialPosition initial location of the group
+     * @param numNeurons      how many neurons it will have
      */
-    public NeuronGroup(final Network net, Point2D initialPosition,
-            final int numNeurons) {
+    public NeuronGroup(final Network net, Point2D initialPosition, final int numNeurons) {
         super(net);
         neuronList = new ArrayList<Neuron>(numNeurons);
         for (int i = 0; i < numNeurons; i++) {
@@ -219,11 +225,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Create a neuron group without any initial neurons and an initial
      * position.
      *
-     * @param network
-     *            parent network
-     * @param initialPosition
-     *            the starting position from which to lay-out the neurons in the
-     *            group whenever they are added.
+     * @param network         parent network
+     * @param initialPosition the starting position from which to lay-out the neurons in the
+     *                        group whenever they are added.
      */
     public NeuronGroup(final Network network, Point2D initialPosition) {
         super(network);
@@ -234,8 +238,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Create a neuron group without any initial neurons.
      *
-     * @param network
-     *            parent network
+     * @param network parent network
      */
     public NeuronGroup(final Network network) {
         super(network);
@@ -245,10 +248,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Copy constructor. pass in network for cases where a group is pasted from
      * one network to another
      *
-     * @param network
-     *            parent network
-     * @param toCopy
-     *            the neuron group this will become a (deep) copy of.
+     * @param network parent network
+     * @param toCopy  the neuron group this will become a (deep) copy of.
      */
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
@@ -290,7 +291,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * Updates all the neurons in the neuron group according to their 
+     * Updates all the neurons in the neuron group according to their
      * NeuronUpdateRule(s). If the group is in input mode reads in the next
      * set of values from the input table and sets the neuron values
      * accordingly.
@@ -299,9 +300,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public void update() {
         if (inputMode) {
             if (testData == null) {
-                throw new NullPointerException("Test data variable is null,"
-                        + " but neuron group " + getLabel() + " is in input"
-                        + " mode.");
+                throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
             }
             // Surrounded by checks, so actually safe.
             readNextInputUnsafe();
@@ -312,7 +311,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             writeActsToFile();
         }
     }
-    
+
     /**
      * A forwarding method surrounding {@link #readNextInputUnsafe()} in the
      * appropriate checks to make it safe. This allows outside classes to
@@ -322,29 +321,26 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public void readNextInputs() {
         if (inputMode) {
             if (testData == null) {
-                throw new NullPointerException("Test data variable is null,"
-                        + " but neuron group " + getLabel() + " is in input"
-                        + " mode.");
+                throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
             }
             // Surrounded by checks, so actually safe.
             readNextInputUnsafe();
         } else {
-            throw new IllegalStateException("Neuron Group " + getLabel()
-                    + " is not in input mode.");
+            throw new IllegalStateException("Neuron Group " + getLabel() + " is not in input mode.");
         }
     }
-    
+
     /**
      * If this neuron group has an input table reads in the next entry on the
-     *  table. If all inputs have been read this method resets the counter and
-     *  starts again from the beginning of the table. 
-     *  
-     *  For spiking neuron update rules, values read in are treated as current
-     *  being injected into the cell, for non-spiking neurons activations are
-     *  set immediately to the value at that index in the table.
-     *  
-     *  This method is unsafe because it does not check if the group is in
-     *  input mode or if the input table is non-null. 
+     * table. If all inputs have been read this method resets the counter and
+     * starts again from the beginning of the table.
+     * <p>
+     * For spiking neuron update rules, values read in are treated as current
+     * being injected into the cell, for non-spiking neurons activations are
+     * set immediately to the value at that index in the table.
+     * <p>
+     * This method is unsafe because it does not check if the group is in
+     * input mode or if the input table is non-null.
      */
     private void readNextInputUnsafe() {
         if (inputIndex >= testData.length) {
@@ -372,7 +368,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * activations differently if the neuron group contains only spiking
      * neurons.
      *
-     * @param outputFile the file to write the activations to 
+     * @param outputFile the file to write the activations to
      */
     public void startRecording(final File outputFile) {
         boolean spikeRecord = true;
@@ -451,7 +447,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                 for (int i = 0, n = size() - 1; i < n; i++) {
                     valueWriter.print(neuronList.get(i).getActivation() + ", ");
                 }
-                valueWriter.print(neuronList.get(size()-1).getActivation());
+                valueWriter.print(neuronList.get(size() - 1).getActivation());
                 valueWriter.println();
                 writeCounter++;
             }
@@ -462,8 +458,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     /**
      * @return the name of the neuron update rule used by all the neurons in
-     *         this group (or mixed if more than one update rule governs the
-     *         neurons).
+     * this group (or mixed if more than one update rule governs the
+     * neurons).
      */
     public String getNeuronType() {
         String nType = "Mixed";
@@ -474,8 +470,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         NeuronUpdateRule nur = nIter.next().getUpdateRule();
         boolean conflict = false;
         while (nIter.hasNext() && !conflict) {
-            conflict = !(nur.getClass().equals(nIter.next().getUpdateRule()
-                    .getClass()));
+            conflict = !(nur.getClass().equals(nIter.next().getUpdateRule().getClass()));
         }
         if (conflict) {
             return nType;
@@ -483,9 +478,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             return nur.getName();
         }
     }
-    
+
     public Neuron getNeuron(int neuNo) {
-    	return neuronList.get(neuNo);
+        return neuronList.get(neuNo);
     }
 
     /**
@@ -496,10 +491,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * 
      * Returns a modifiable list of neuron list. Modifications made to this list
      * change the group because this is the underlying list of the group.
-     * 
+     *
      * @return the neurons in this group.
      */
     public List<Neuron> getNeuronListUnsafe() {
@@ -509,8 +503,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the update rule for the neurons in this group.
      *
-     * @param base
-     *            the neuron update rule to set.
+     * @param base the neuron update rule to set.
      */
     public void setNeuronType(NeuronUpdateRule base) {
         isSpikingNeuronGroup = base.isSpikingNeuron();
@@ -522,18 +515,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the string update rule for the neurons in this group.
      *
-     * @param rule
-     *            the neuron update rule to set.
+     * @param rule the neuron update rule to set.
      */
     public void setNeuronType(String rule) {
         try {
-            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName(
-                    "org.simbrain.network.neuron_update_rules." + rule)
-                    .newInstance();
+            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
             isSpikingNeuronGroup = newRule.isSpikingNeuron();
-        } catch (InstantiationException | IllegalAccessException
-                | ClassNotFoundException e)
-        {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         for (Neuron neuron : neuronList) {
@@ -555,8 +543,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Returns true if the provided synapse is in the fan-in weight vector of
      * some node in this neuron group.
      *
-     * @param synapse
-     *            the synapse to check
+     * @param synapse the synapse to check
      * @return true if it's attached to a neuron in this group
      */
     public boolean inFanInOfSomeNode(final Synapse synapse) {
@@ -627,10 +614,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Randomize bias for all neurons in group.
      *
-     * @param lower
-     *            lower bound for randomization.
-     * @param upper
-     *            upper bound for randomization.
+     * @param lower lower bound for randomization.
+     * @param upper upper bound for randomization.
      */
     public void randomizeBiases(double lower, double upper) {
         for (Neuron neuron : this.getNeuronList()) {
@@ -641,10 +626,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Add a neuron to group.
      *
-     * @param neuron
-     *            neuron to add
-     * @param fireEvent
-     *            whether to fire a neuron added event
+     * @param neuron    neuron to add
+     * @param fireEvent whether to fire a neuron added event
      */
     public void addNeuron(Neuron neuron, boolean fireEvent) {
         neuronList.add(neuron);
@@ -656,15 +639,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             }
         }
         if (fireEvent) {
-            resetSubsamplingIndices();            
+            resetSubsamplingIndices();
         }
     }
 
     /**
      * Add neuron to group.
      *
-     * @param neuron
-     *            neuron to add
+     * @param neuron neuron to add
      */
     public void addNeuron(Neuron neuron) {
         addNeuron(neuron, true);
@@ -673,8 +655,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Delete the provided neuron.
      *
-     * @param toDelete
-     *            the neuron to delete
+     * @param toDelete the neuron to delete
      */
     public void removeNeuron(Neuron toDelete) {
         neuronList.remove(toDelete);
@@ -700,10 +681,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Neuron Group [" + getLabel() + "]. Neuron group with "
-                + this.getNeuronList().size() + " neuron(s)" + ". Located at ("
-                + Utils.round(this.getPosition().x, 2) + ","
-                + Utils.round(this.getPosition().y, 2) + ").\n");
+        ret += ("Neuron Group [" + getLabel() + "]. Neuron group with " + this.getNeuronList().size() + " neuron(s)" + ". Located at (" + Utils.round(this.getPosition().x, 2) + "," + Utils.round(this.getPosition().y, 2) + ").\n");
         ret += layout.toString();
         return ret;
     }
@@ -716,14 +694,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set input values of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
-     *
+     * <p>
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      *
-     * @param inputs
-     *            the input vector as a double array.
+     * @param inputs the input vector as a double array.
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setInputValues(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
@@ -732,18 +709,17 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             neuronList.get(i).setInputValue(inputs[i]);
         }
     }
-    
+
     /**
      * Set activations of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
-     *
+     * <p>
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      *
-     * @param inputs
-     *            the input vector as a double array.
+     * @param inputs the input vector as a double array.
      */
-    @Consumable(idMethod="getId")
+    @Consumable(idMethod = "getId")
     public void setActivations(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
@@ -757,12 +733,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Force set activations of neurons using an array of doubles. Assumes the
      * order of the items in the array should match the order of items in the
      * neuronlist.
-     *
+     * <p>
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      *
-     * @param inputs
-     *            the input vector as a double array.
+     * @param inputs the input vector as a double array.
      */
     public void forceSetActivations(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
@@ -778,7 +753,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the activation array
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getActivations() {
         double[] retArray = new double[neuronList.size()];
         int i = 0;
@@ -787,15 +762,15 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         return retArray;
     }
-    
+
     /**
      * Returns an array of spike indices used in couplings, (e.g. to a raster
      * plot). For example, if a neuron group has 9 neurons, and neurons 1 and 4
      * just spiked, the producer will send the list (1,0,0,4,0,0,0,0,0).
-     * 
+     *
      * @return the spike index array
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getSpikeIndexes() {
         List<Double> inds = new ArrayList<Double>(size());
         int i = 0;
@@ -805,7 +780,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             }
             i++;
         }
-        double [] vals = new double[inds.size()];
+        double[] vals = new double[inds.size()];
         int j = 0;
         for (Double d : inds) {
             vals[j++] = d.doubleValue();
@@ -839,8 +814,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         int i = 0;
         for (Neuron neuron : neuronList) {
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                retArray[i++] = ((BiasedUpdateRule) neuron.getUpdateRule())
-                        .getBias();
+                retArray[i++] = ((BiasedUpdateRule) neuron.getUpdateRule()).getBias();
             }
         }
         return retArray;
@@ -849,8 +823,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * True if the group contains the specified neuron.
      *
-     * @param n
-     *            neuron to check for.
+     * @param n neuron to check for.
      * @return true if the group contains this neuron, false otherwise
      */
     public boolean containsNeuron(final Neuron n) {
@@ -869,27 +842,27 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Returns all the neurons in this group within a certain radius of the
      * given neuron. This method will never return the given neuron as part
      * of the list of neurons within the given radius, nor will it return
-     * neurons with the exact same position as the given neuron as a part 
+     * neurons with the exact same position as the given neuron as a part
      * of the returned list.
-     * 
-     * @param n the neurons
+     *
+     * @param n      the neurons
      * @param radius the radius to search within.
      * @return neurons in the group within a certain radius
      */
     public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>((int)(size()/0.75f));
+        ArrayList<Neuron> ret = new ArrayList<Neuron>((int) (size() / 0.75f));
         for (Neuron potN : neuronList) {
-            double dist = Network.getEuclideanDist(n, potN); 
+            double dist = Network.getEuclideanDist(n, potN);
             if (dist <= radius && dist != 0) {
                 ret.add(potN);
             }
-         }
+        }
         return ret;
     }
-    
+
     // TODO: Below don't take account of the actual width of neurons themselves.
     // Treats them as points.
-    
+
     /**
      * Get the central x coordinate of this group, based on the positions of the
      * neurons that comprise it.
@@ -1047,7 +1020,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     /**
      * @return the spatial positions of the corners of the neuron group
-     *  (X and Y only)
+     * (X and Y only)
      */
     public Point2D[] getFourCorners() {
         double centerX = getCenterX();
@@ -1055,24 +1028,17 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
         Point2D[] corners = new Point2D[4];
 
-        corners[0] = new Point2D.Double(getMaxX() - centerX, getMaxY()
-                - centerY);
-        corners[3] = new Point2D.Double(getMaxX() - centerX, getMinY()
-                - centerY);
-        corners[2] = new Point2D.Double(getMinX() - centerX, getMinY()
-                - centerY);
-        corners[1] = new Point2D.Double(getMinX() - centerX, getMaxY()
-                - centerY);
+        corners[0] = new Point2D.Double(getMaxX() - centerX, getMaxY() - centerY);
+        corners[3] = new Point2D.Double(getMaxX() - centerX, getMinY() - centerY);
+        corners[2] = new Point2D.Double(getMinX() - centerX, getMinY() - centerY);
+        corners[1] = new Point2D.Double(getMinX() - centerX, getMaxY() - centerY);
 
         return corners;
     }
 
     /**
-     *
-     * @param x
-     *            x coordinate for neuron group
-     * @param y
-     *            y coordinate for neuron group
+     * @param x x coordinate for neuron group
+     * @param y y coordinate for neuron group
      */
     public void setLocation(final double x, final double y) {
         offset(-this.getMinX(), -this.getMinY());
@@ -1082,10 +1048,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Translate all neurons (the only objects with position information).
      *
-     * @param offsetX
-     *            x offset for translation.
-     * @param offsetY
-     *            y offset for translation.
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : neuronList) {
@@ -1106,8 +1070,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set clamping on all neurons in this group.
      *
-     * @param clamp
-     *            true to clamp them, false otherwise
+     * @param clamp true to clamp them, false otherwise
      */
     public void setClamped(final boolean clamp) {
         for (Neuron neuron : this.getNeuronList()) {
@@ -1118,8 +1081,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set all activations to a specified value.
      *
-     * @param value
-     *            the value to set the neurons to
+     * @param value the value to set the neurons to
      */
     public void setActivationLevels(final double value) {
         for (Neuron n : getNeuronList()) {
@@ -1130,8 +1092,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Force set all activations to a specified value.
      *
-     * @param value
-     *            the value to set the neurons to
+     * @param value the value to set the neurons to
      */
     public void forceSetActivationLevels(final double value) {
         for (Neuron n : getNeuronList()) {
@@ -1142,15 +1103,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Copy activations from one neuron group to this one.
      *
-     * @param toCopy
-     *            the group to copy activations from.
+     * @param toCopy the group to copy activations from.
      */
     public void copyActivations(NeuronGroup toCopy) {
         int i = 0;
         for (Neuron neuron : toCopy.getNeuronList()) {
             if (i < neuronList.size()) {
-                neuronList.get(i).setActivation(
-                        neuron.getInputValue() + neuron.getActivation());
+                neuronList.get(i).setActivation(neuron.getInputValue() + neuron.getActivation());
                 neuronList.get(i++).setSpike(neuron.isSpike());
 
             }
@@ -1161,8 +1120,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Print activations as a vector.
      */
     public void printActivations() {
-        System.out.println(Utils.doubleArrayToString(Network
-                .getActivationVector(neuronList)));
+        System.out.println(Utils.doubleArrayToString(Network.getActivationVector(neuronList)));
     }
 
     @Override
@@ -1175,8 +1133,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     public void applyInputs() {
         for (Neuron neuron : getNeuronList()) {
-            neuron.setActivation(neuron.getActivation()
-                    + neuron.getInputValue());
+            neuron.setActivation(neuron.getActivation() + neuron.getInputValue());
         }
     }
 
@@ -1190,8 +1147,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the layout. Does not apply it. Call apply layout for that.
      *
-     * @param layout
-     *            the layout to set
+     * @param layout the layout to set
      */
     public void setLayout(Layout layout) {
         this.layout = layout;
@@ -1208,7 +1164,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     public void setXYZCoordinatesFromFile(String filename) {
-        try(Scanner rowSc = new Scanner(new File(filename));) {
+        try (Scanner rowSc = new Scanner(new File(filename));) {
             Scanner colSc = null;
             int i = 0;
             int j;
@@ -1242,7 +1198,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             return;
         }
     }
-    
+
     /**
      * Apply this group's layout to its neurons.
      */
@@ -1255,8 +1211,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Apply this group's layout to its neurons based on a specified initial
      * position.
      *
-     * @param initialPosition
-     *            the position from which to begin the layout.
+     * @param initialPosition the position from which to begin the layout.
      */
     public void applyLayout(Point2D initialPosition) {
         layout.setInitialLocation(initialPosition);
@@ -1328,8 +1283,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the lower bound on all neurons in this group.
      *
-     * @param lb
-     *            the lower bound to set.
+     * @param lb the lower bound to set.
      */
     public void setLowerBound(double lb) {
         for (Neuron neuron : this.getNeuronList()) {
@@ -1340,8 +1294,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the upper bound on all neurons in this group.
      *
-     * @param ub
-     *            the upper bound to set.
+     * @param ub the upper bound to set.
      */
     public void setUpperBound(double ub) {
         for (Neuron neuron : this.getNeuronList()) {
@@ -1352,8 +1305,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Set the increment on all neurons in this group.
      *
-     * @param increment
-     *            the increment to set.
+     * @param increment the increment to set.
      */
     public void setIncrement(double increment) {
         for (Neuron neuron : this.getNeuronList()) {
@@ -1369,21 +1321,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * @param testData
-     *            the testData to set
-     * @exception IllegalArgumentException
+     * @param testData the testData to set
+     * @throws IllegalArgumentException
      */
-    public void setTestData(double[][] testData)
-            throws IllegalArgumentException {
+    public void setTestData(double[][] testData) throws IllegalArgumentException {
         for (int i = 0; i < testData.length; i++) {
             if (testData[i].length != size()) {
                 if (i == 0) {
-                    throw new IllegalArgumentException("Data Inconsistency:"
-                            + " Test data does not have a column number equal"
-                            + " to the number of neurons in the group.");
+                    throw new IllegalArgumentException("Data Inconsistency:" + " Test data does not have a column number equal" + " to the number of neurons in the group.");
                 } else {
-                    throw new IllegalArgumentException("Data Inconsistency:"
-                            + " Test data does not have equal column lengths.");
+                    throw new IllegalArgumentException("Data Inconsistency:" + " Test data does not have equal column lengths.");
                 }
             }
         }
@@ -1418,17 +1365,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * If more than gridThreshold neurons use a grid layout, else a horizontal
      * line layout.
      *
-     * @param initialPosition
-     *            the initial Position for the layout
+     * @param initialPosition the initial Position for the layout
      */
     public void setLayoutBasedOnSize(Point2D initialPosition) {
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0, 0);
         }
-        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
-        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
-                betweenNeuronInterval);
+        LineLayout lineLayout = new LineLayout(betweenNeuronInterval, LineOrientation.HORIZONTAL);
+        GridLayout gridLayout = new GridLayout(betweenNeuronInterval, betweenNeuronInterval);
         if (neuronList.size() < gridThreshold) {
             lineLayout.setInitialLocation(initialPosition);
             setLayout(lineLayout);
@@ -1448,8 +1392,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * @param betweenNeuronInterval
-     *            the betweenNeuronInterval to set
+     * @param betweenNeuronInterval the betweenNeuronInterval to set
      */
     public void setBetweenNeuronInterval(int betweenNeuronInterval) {
         this.betweenNeuronInterval = betweenNeuronInterval;
@@ -1463,8 +1406,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * @param gridThreshold
-     *            the gridThreshold to set
+     * @param gridThreshold the gridThreshold to set
      */
     public void setGridThreshold(int gridThreshold) {
         this.gridThreshold = gridThreshold;
@@ -1481,15 +1423,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Utility to method (used in couplings) to get a string showing the labels
      * of all "active" neurons (neurons with activation above a threshold).
      *
-     * @param threshold
-     *            threshold above which to consider a neuron "active"
+     * @param threshold threshold above which to consider a neuron "active"
      * @return the "active labels"
      */
     public String getLabelsOfActiveNeurons(double threshold) {
         StringBuilder strBuilder = new StringBuilder("");
         for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > threshold)
-                    && (!neuron.getLabel().isEmpty())) {
+            if ((neuron.getActivation() > threshold) && (!neuron.getLabel().isEmpty())) {
                 strBuilder.append(neuron.getLabel() + " ");
             }
         }
@@ -1505,8 +1445,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         double min = Double.MIN_VALUE;
         String result = "";
         for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > min)
-                    && (!neuron.getLabel().isEmpty())) {
+            if ((neuron.getActivation() > min) && (!neuron.getLabel().isEmpty())) {
                 result = neuron.getLabel();
                 min = neuron.getActivation();
             }
@@ -1533,28 +1472,25 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * Sets whether or not this neuron group is in input mode. When in input
      * mode the neuron group will draw activations from its {@link #testData}
-     *  field instead of from any impinging synapses or its own neuron update
-     *  functions. This function removes the neurons from the neuron set in
-     *  ConcurrentBufferedUpdate, preventing it from updating the neurons in
-     *  this group, and re-adds those neurons when input mode is turned off.
-     *  Thus the update action associated with this neuron group MUST be added
-     *  to the network update sequence even if ParallelBufferedUpdate is
-     *  selected in order for input values to update the group properly.
+     * field instead of from any impinging synapses or its own neuron update
+     * functions. This function removes the neurons from the neuron set in
+     * ConcurrentBufferedUpdate, preventing it from updating the neurons in
+     * this group, and re-adds those neurons when input mode is turned off.
+     * Thus the update action associated with this neuron group MUST be added
+     * to the network update sequence even if ParallelBufferedUpdate is
+     * selected in order for input values to update the group properly.
+     *
      * @param inputMode whether or not this group will run in input mode during
-     * network and workspace updates.
+     *                  network and workspace updates.
      * @throws IllegalArgumentException if input mode is set to true, but the
-     * {@link #testData} field is set to null.
+     *                                  {@link #testData} field is set to null.
      */
-    public void setInputMode(boolean inputMode)
-            throws IllegalArgumentException {
+    public void setInputMode(boolean inputMode) throws IllegalArgumentException {
         if (testData == null && inputMode) {
-            throw new IllegalArgumentException("Cannot set input mode to true"
-                    + " if there is no input data stored in NeuronGroup field:"
-                    + " testData");
+            throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
         }
         this.inputMode = inputMode;
-        this.getParentNetwork().fireGroupChanged(this,
-                getLabel() + " input mode " + inputMode);
+        this.getParentNetwork().fireGroupChanged(this, getLabel() + " input mode " + inputMode);
     }
 
     public boolean isSpikingNeuronGroup() {
@@ -1587,7 +1523,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the vector of external activations.
      */
-    @Producible(idMethod="getId")
+    @Producible(idMethod = "getId")
     public double[] getExternalActivations() {
         if (!useSubSampling) {
             return getActivations();
@@ -1599,7 +1535,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             for (int i = 0; i < numSubSamples; i++) {
                 retArray[i] = neuronList.get(i).getActivation();
             }
-            return retArray;            
+            return retArray;
         }
     }
 
@@ -1630,12 +1566,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public static void setNumSubSamples(int numSubSamples) {
         NeuronGroup.numSubSamples = numSubSamples;
     }
-    
+
     /**
      * Get the neuron with the specified label, or null if none found.
      *
-     * @param label
-     *            label to search for
+     * @param label label to search for
      * @return the associated neuron
      */
     public Neuron getNeuronByLabel(String label) {
@@ -1647,22 +1582,22 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         return null;
     }
-    
-    
+
+
     /**
      * A hack to guess that the neuron group is spiking and thus that spike
-     * indices menu should be shown.   The isSpikingNeuronGroup field is 
+     * indices menu should be shown.   The isSpikingNeuronGroup field is
      * not currently being maintained, though we may bring it back.
      *
      * @return true if the first node in the group is spiking, false otherwise.
      */
     public boolean isSpiking2() {
         if (neuronList.size() > 0) {
-            if(neuronList.get(0).getUpdateRule().isSpikingNeuron()) {
+            if (neuronList.get(0).getUpdateRule().isSpikingNeuron()) {
                 return true;
             }
         }
         return false;
     }
-    
+
 }

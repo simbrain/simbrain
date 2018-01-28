@@ -1,11 +1,10 @@
 package org.simbrain.world.imageworld.filters;
 
-import java.text.NumberFormat;
-
-import javax.swing.JFormattedTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.imageworld.ImageSource;
+
+import javax.swing.*;
+import java.text.NumberFormat;
 
 public class ThresholdFilterFactory extends ImageFilterFactory {
     private static class ThresholdFilterSource extends FilteredImageSource {

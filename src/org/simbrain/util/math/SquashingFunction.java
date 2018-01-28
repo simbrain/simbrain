@@ -32,7 +32,9 @@ public enum SquashingFunction {
 
     // TODO:Rename to SquashingFunctionEnum?
 
-    /** Arctangent. */
+    /**
+     * Arctangent.
+     */
     ARCTAN {
 
         /** The max value as x -> inf of f(x) = arctan(x) . */
@@ -71,31 +73,32 @@ public enum SquashingFunction {
             return DEFAULT_ARCTAN_FLOOR;
         }
 
-		@Override
-		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.atan(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.atan(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.invAtan(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.invAtan(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.derivAtan(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.derivAtan(in, out, ceil, floor, slope);
+        }
 
-		@Override
-        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
-                                  double slope) {
+        @Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
             valueOf(in, out, ceil, floor, slope);
             derivVal(in, out, ceil, floor, slope);
         }
 
     },
 
-    /** Logistic Function. */
+    /**
+     * Logistic Function.
+     */
     LOGISTIC {
 
         /** The max value as x -> inf of f(x) = 1 / (1 + e^x). */
@@ -110,8 +113,7 @@ public enum SquashingFunction {
         }
 
         @Override
-        public double valueOf(double val, double ceil, double floor,
-                double slope) {
+        public double valueOf(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.logistic(val, ceil, floor, slope);
         }
 
@@ -135,30 +137,31 @@ public enum SquashingFunction {
             return DEFAULT_LOGISTIC_FLOOR;
         }
 
-		@Override
-		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-		    SquashingFunctions.logistic(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.logistic(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.invLogistic(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.invLogistic(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-		    SquashingFunctions.derivLogistic(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.derivLogistic(in, out, ceil, floor, slope);
+        }
 
-		@Override
-        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
-                                  double slope) {
+        @Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
             SquashingFunctions.logisticWithDerivative(in, out, deriv, ceil, floor, slope);
         }
 
     },
 
-    /** Hyperbolic Tangent. */
+    /**
+     * Hyperbolic Tangent.
+     */
     TANH {
 
         /** The max value as x -> inf of f(x) = tanh(x). */
@@ -173,20 +176,17 @@ public enum SquashingFunction {
         }
 
         @Override
-        public double valueOf(double val, double ceil, double floor,
-                double slope) {
+        public double valueOf(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.tanh(val, ceil, floor, slope);
         }
 
         @Override
-        public double inverseVal(double val, double ceil, double floor,
-                double slope) {
+        public double inverseVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.invTanh(val, ceil, floor, slope);
         }
 
         @Override
-        public double derivVal(double val, double ceil, double floor,
-                double slope) {
+        public double derivVal(double val, double ceil, double floor, double slope) {
             return SquashingFunctions.derivTanh(val, ceil, floor, slope);
         }
 
@@ -200,24 +200,23 @@ public enum SquashingFunction {
             return DEFAULT_TANH_FLOOR;
         }
 
-		@Override
-		public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void valueOf(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.invTanh(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void inverseVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.invTanh(in, out, ceil, floor, slope);
+        }
 
-		@Override
-		public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-			SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
-		}
+        @Override
+        public void derivVal(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+            SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
+        }
 
-		@Override
-        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
-                                  double slope) {
+        @Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
             SquashingFunctions.tanh(in, out, ceil, floor, slope);
             SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
         }
@@ -230,7 +229,6 @@ public enum SquashingFunction {
      * last item for consistency with the names function below.
      */
     NULL_STRING {
-
         @Override
         public String toString() {
             return "...";
@@ -261,18 +259,21 @@ public enum SquashingFunction {
             return 0;
         }
 
-		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
+        @Override
+        public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+        }
 
-		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
+        @Override
+        public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+        }
 
-		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {}
+        @Override
+        public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+        }
 
-		@Override
-        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor,
-                                  double slope) {}
+        @Override
+        public void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
+        }
     };
 
     /*
@@ -285,33 +286,29 @@ public enum SquashingFunction {
      * Gives the value of the given squashing function for some input value, a
      * ceiling, floor, and slope.
      *
-     * @param val the base value to pass the function
-     * @param ceil the upper limit of the curve
+     * @param val   the base value to pass the function
+     * @param ceil  the upper limit of the curve
      * @param floor the lower limit of the curve
      * @param slope the slope of the curve at zero
      * @return the output of the given squashing function
      */
-    public abstract double valueOf(double val, double ceil, double floor,
-            double slope);
+    public abstract double valueOf(double val, double ceil, double floor, double slope);
 
-    public abstract void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
-            double slope);
-    
+    public abstract void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
+
     /**
      * Gives the value of the inverse of the given squashing function for some
      * input value, a ceiling, floor, and slope.
      *
-     * @param val the base value to pass the inverse function
-     * @param ceil the upper limit of the squashing function being inverted
+     * @param val   the base value to pass the inverse function
+     * @param ceil  the upper limit of the squashing function being inverted
      * @param floor the lower limit of the squashing function being inverted
      * @param slope the slope of the squashing function being inverted at zero
      * @return the output of the given squashing function's inverse
      */
-    public abstract double inverseVal(double val, double ceil, double floor,
-            double slope);
-    
-    public abstract void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
-            double slope);
+    public abstract double inverseVal(double val, double ceil, double floor, double slope);
+
+    public abstract void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
 
     /**
      * Gives the value of the derivative of the given squashing function for
@@ -319,29 +316,27 @@ public enum SquashingFunction {
      * the squashing function and the return value represents the derivative of
      * THAT function.
      *
-     * @param val the base value to pass the function
-     * @param ceil the upper limit of the curve
+     * @param val   the base value to pass the function
+     * @param ceil  the upper limit of the curve
      * @param floor the lower limit of the curve
      * @param slope the slope of the curve at zero
      * @return the output of the given squashing function's derivative
      */
-    public abstract double derivVal(double val, double ceil, double floor,
-            double slope);
-    
+    public abstract double derivVal(double val, double ceil, double floor, double slope);
+
     public abstract void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
 
-    public abstract void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil,
-                                       double floor, double slope);
+    public abstract void valueAndDeriv(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope);
 
     /**
      * @return the default upper boundary (ceiling) of this particular squashing
-     *         function.
+     * function.
      */
     public abstract double getDefaultUpperBound();
 
     /**
      * @return the default lower boundary (floor) of this particular squashing
-     *         function.
+     * function.
      */
     public abstract double getDefaultLowerBound();
 
@@ -365,14 +360,14 @@ public enum SquashingFunction {
     /**
      * Helper function to make it easy to go from integer index to Squashing
      * function (so that choiceboxes can interact with this).
-     * 
+     *
      * @param index integer index
      * @return the associated squashing function
      */
     public static SquashingFunction getFunctionFromIndex(int index) {
         return SquashingFunction.values()[index];
     }
-    
+
     /**
      * Another helper function for, in this case, going from functions
      * to indices.

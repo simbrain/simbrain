@@ -18,41 +18,41 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>SinusoidalGeneratorPanel</b> edits a sinusoidal actiity generator.
  */
 public class SinusoidalGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** Tabbed panel. */
+    /**
+     * Tabbed panel.
+     */
     private JTabbedPane tabbedPanel = new JTabbedPane();
 
-    /** A reference to the neuron rule being edited. */
+    /**
+     * A reference to the neuron rule being edited.
+     */
     private SinusoidalRule prototypeRule = new SinusoidalRule();
 
     /**
      * Creates an instance of this panel.
-     *
      */
     public SinusoidalGeneratorPanel() {
         super();
         this.add(tabbedPanel);
-        JTextField tfPhase = createTextField(
-                (r) -> ((SinusoidalRule) r).getPhase(),
-                (r, val) -> ((SinusoidalRule) r).setPhase((double) val));
-        JTextField tfFrequency = createTextField(
-                (r) -> ((SinusoidalRule) r).getFrequency(),
-                (r, val) -> ((SinusoidalRule) r).setFrequency((double) val));
+        JTextField tfPhase = createTextField((r) -> ((SinusoidalRule) r).getPhase(), (r, val) -> ((SinusoidalRule) r).setPhase((double) val));
+        JTextField tfFrequency = createTextField((r) -> ((SinusoidalRule) r).getFrequency(), (r, val) -> ((SinusoidalRule) r).setFrequency((double) val));
         mainPanel.addItem("Phase", tfPhase);
         mainPanel.addItem("Frequency", tfFrequency);
         mainPanel.addItem("Add noise", getAddNoise());

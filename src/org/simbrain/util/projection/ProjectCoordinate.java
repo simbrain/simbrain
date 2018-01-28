@@ -27,17 +27,24 @@ package org.simbrain.util.projection;
  */
 public class ProjectCoordinate extends ProjectionMethod {
 
-    /** Coordinate Projection Settings. */
+    /**
+     * Coordinate Projection Settings.
+     */
     private int hiD1;
 
-    /** Coordinate Projection Settings. */
+    /**
+     * Coordinate Projection Settings.
+     */
     private int hiD2;
 
-    /** Automatically use most variant dimensions. */
+    /**
+     * Automatically use most variant dimensions.
+     */
     private boolean autoFind = true;
 
     /**
      * Default projector coordinate constructor.
+     *
      * @param projector
      */
     public ProjectCoordinate(Projector projector) {
@@ -65,9 +72,7 @@ public class ProjectCoordinate extends ProjectionMethod {
         checkCoordinates();
 
         for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
-            double[] newLowDPoint = {
-                    projector.getUpstairs().getComponent(i, hiD1),
-                    projector.getUpstairs().getComponent(i, hiD2) };
+            double[] newLowDPoint = {projector.getUpstairs().getComponent(i, hiD1), projector.getUpstairs().getComponent(i, hiD2)};
             projector.getDownstairs().getPoint(i).setData(newLowDPoint);
         }
 

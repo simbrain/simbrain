@@ -18,14 +18,11 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JToggleButton;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Clamps weights action. NOTE: No longer used as of 3.0. Leaving it here for
@@ -33,7 +30,9 @@ import org.simbrain.resource.ResourceManager;
  */
 public final class ClampWeightsAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -55,8 +54,9 @@ public final class ClampWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Clamp Weights");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

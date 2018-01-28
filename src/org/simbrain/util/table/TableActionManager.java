@@ -18,26 +18,19 @@
  */
 package org.simbrain.util.table;
 
-import java.awt.Toolkit;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 
 /**
  * Contains actions for use in SimbrainJTables.
@@ -46,21 +39,20 @@ import org.simbrain.util.Utils;
  */
 public class TableActionManager {
 
-    /** Default directory where tables are stored. */
-    private static String CSV_DIRECTORY = "."
-            + System.getProperty("file.separator") + "simulations"
-            + System.getProperty("file.separator") + "tables";
+    /**
+     * Default directory where tables are stored.
+     */
+    private static String CSV_DIRECTORY = "." + System.getProperty("file.separator") + "simulations" + System.getProperty("file.separator") + "tables";
 
     /**
      * Action for opening from comma separate value file.
      *
-     * @param table table to load data in to
-     * @param allowRowChanges whether to allow number of rows to change
+     * @param table              table to load data in to
+     * @param allowRowChanges    whether to allow number of rows to change
      * @param allowColumnChanges whether to allow number of columns to change
      * @return the action
      */
-    public static Action getOpenCSVAction(final NumericTable table,
-            final boolean allowRowChanges, final boolean allowColumnChanges) {
+    public static Action getOpenCSVAction(final NumericTable table, final boolean allowRowChanges, final boolean allowColumnChanges) {
         return new AbstractAction() {
 
             // Initialize
@@ -74,17 +66,13 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     try {
-                        table.readData(theFile, allowRowChanges,
-                                allowColumnChanges);
+                        table.readData(theFile, allowRowChanges, allowColumnChanges);
                     } catch (TableDataException e) {
-                        JOptionPane.showOptionDialog(null, e.getMessage(),
-                                "Warning", JOptionPane.DEFAULT_OPTION,
-                                JOptionPane.WARNING_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
                 }
             }
@@ -95,13 +83,12 @@ public class TableActionManager {
     /**
      * Action for opening text table from comma separated value file.
      *
-     * @param table table to load data in to
-     * @param allowRowChanges whether to allow number of rows to change
+     * @param table              table to load data in to
+     * @param allowRowChanges    whether to allow number of rows to change
      * @param allowColumnChanges whether to allow number of columns to change
      * @return the action
      */
-    public static Action getOpenCSVAction(final TextTable table,
-            final boolean allowRowChanges, final boolean allowColumnChanges) {
+    public static Action getOpenCSVAction(final TextTable table, final boolean allowRowChanges, final boolean allowColumnChanges) {
         return new AbstractAction() {
 
             // Initialize
@@ -115,17 +102,13 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     try {
-                        table.readData(theFile, allowRowChanges,
-                                allowColumnChanges);
+                        table.readData(theFile, allowRowChanges, allowColumnChanges);
                     } catch (TableDataException e) {
-                        JOptionPane.showOptionDialog(null, e.getMessage(),
-                                "Warning", JOptionPane.DEFAULT_OPTION,
-                                JOptionPane.WARNING_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
                 }
             }
@@ -153,8 +136,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
                     Utils.writeMatrix(table.asStringArray(), theFile);
@@ -178,8 +160,7 @@ public class TableActionManager {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Randomize");
                 putValue(SHORT_DESCRIPTION, "Randomize");
-                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
@@ -207,8 +188,7 @@ public class TableActionManager {
                 // putValue(SMALL_ICON, ResourceManager.getImageIcon(""));
                 putValue(NAME, "Normalize Column(s)");
                 putValue(SHORT_DESCRIPTION, "Normalize Selected Columns");
-                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
@@ -274,8 +254,7 @@ public class TableActionManager {
      * @param table table to change structure of
      * @return the action
      */
-    public static Action getChangeTableStructureAction(
-            final SimbrainJTable table) {
+    public static Action getChangeTableStructureAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
@@ -284,8 +263,7 @@ public class TableActionManager {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Prefs.gif"));
                 putValue(NAME, "Reset table");
-                putValue(SHORT_DESCRIPTION,
-                        "Set number of rows and columns (cells are zeroed out)");
+                putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
             }
 
             /**
@@ -310,9 +288,7 @@ public class TableActionManager {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    ((MutableTable) table.getData()).reset(
-                            Integer.parseInt(rows.getText()),
-                            Integer.parseInt(columns.getText()));
+                    ((MutableTable) table.getData()).reset(Integer.parseInt(rows.getText()), Integer.parseInt(columns.getText()));
                 }
             }
 
@@ -333,8 +309,7 @@ public class TableActionManager {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Prefs.gif"));
                 putValue(NAME, "Set rows / columns");
-                putValue(SHORT_DESCRIPTION,
-                        "Set number of rows and columns (cells are zeroed out)");
+                putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
             }
 
             /**
@@ -347,8 +322,7 @@ public class TableActionManager {
                 JTextField columns = new JTextField();
                 rows.setText(Integer.toString(table.getData().getRowCount()));
                 rows.setColumns(3);
-                columns.setText(Integer.toString(table.getData()
-                        .getLogicalColumnCount()));
+                columns.setText(Integer.toString(table.getData().getLogicalColumnCount()));
                 columns.setColumns(3);
                 pane.add(new JLabel("Rows"));
                 pane.add(rows);
@@ -360,9 +334,7 @@ public class TableActionManager {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    ((MutableTable) table.getData()).modifyRowsColumns(
-                            Integer.parseInt(rows.getText()),
-                            Integer.parseInt(columns.getText()), 0);
+                    ((MutableTable) table.getData()).modifyRowsColumns(Integer.parseInt(rows.getText()), Integer.parseInt(columns.getText()), 0);
                 }
             }
 
@@ -381,8 +353,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("AddTableRow.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("AddTableRow.png"));
                 putValue(NAME, "Insert row");
                 putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
@@ -393,8 +364,7 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 if (table.getSelectedRow() != -1) {
                     if (table.getData() instanceof MutableTable) {
-                        ((MutableTable<?>) table.getData()).insertRow(table
-                                .getSelectedRow());
+                        ((MutableTable<?>) table.getData()).insertRow(table.getSelectedRow());
                     }
                 }
             }
@@ -415,8 +385,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("AddTableColumn.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("AddTableColumn.png"));
                 putValue(NAME, "Insert column");
                 putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
@@ -426,8 +395,7 @@ public class TableActionManager {
              */
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
-                    ((MutableTable) jtable.getData()).insertColumn(jtable
-                            .getSelectedColumn());
+                    ((MutableTable) jtable.getData()).insertColumn(jtable.getSelectedColumn());
                 }
             }
 
@@ -446,8 +414,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("DeleteRowTable.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteRowTable.png"));
                 putValue(NAME, "Delete row");
                 putValue(SHORT_DESCRIPTION, "Delete row");
             }
@@ -472,8 +439,7 @@ public class TableActionManager {
                 if (selection.size() > 0) {
                     int newSelection = selection.get(selection.size() - 1) - 1;
                     if (newSelection >= 0) {
-                        jtable.setRowSelectionInterval(newSelection,
-                                newSelection);
+                        jtable.setRowSelectionInterval(newSelection, newSelection);
                     }
                 }
             }
@@ -492,8 +458,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("DeleteColumnTable.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteColumnTable.png"));
                 putValue(NAME, "Delete column");
                 putValue(SHORT_DESCRIPTION, "Delete column");
             }
@@ -503,8 +468,7 @@ public class TableActionManager {
              */
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
-                    ((MutableTable) jtable.getData()).removeColumn(jtable
-                            .getSelectedColumn() - 1);
+                    ((MutableTable) jtable.getData()).removeColumn(jtable.getSelectedColumn() - 1);
                 }
             }
 
@@ -532,8 +496,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numRows = JOptionPane.showInputDialog(null,
-                        "Number of rows to add:", "5");
+                String numRows = JOptionPane.showInputDialog(null, "Number of rows to add:", "5");
                 table.addRows(Integer.parseInt(numRows));
             }
 
@@ -561,8 +524,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numCols = JOptionPane.showInputDialog(null,
-                        "Number of columns to add:", "5");
+                String numCols = JOptionPane.showInputDialog(null, "Number of columns to add:", "5");
                 table.addColumns(Integer.parseInt(numCols));
             }
 
@@ -584,8 +546,7 @@ public class TableActionManager {
                 // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Zero fill cells");
                 putValue(SHORT_DESCRIPTION, "Zero fill selected cells");
-                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
@@ -613,8 +574,7 @@ public class TableActionManager {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Fill table cells...");
-                putValue(SHORT_DESCRIPTION,
-                        "Fill table selected cells with specified value");
+                putValue(SHORT_DESCRIPTION, "Fill table selected cells with specified value");
             }
 
             /**
@@ -639,11 +599,9 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("Shuffle.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Shuffle.png"));
                 putValue(NAME, "Shuffle rows");
-                putValue(SHORT_DESCRIPTION,
-                        "Randomize the positions of the rows");
+                putValue(SHORT_DESCRIPTION, "Randomize the positions of the rows");
             }
 
             /**

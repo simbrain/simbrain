@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.util.Utils;
+import org.simbrain.util.math.NumericMatrix;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.simbrain.util.Utils;
-import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Represents input data, target data, a way of iterating through it, a
@@ -32,7 +32,6 @@ import org.simbrain.util.math.NumericMatrix;
  * that uses this.
  *
  * @author Jeff Yoshimi
- *
  */
 public class TrainingSet {
 
@@ -46,7 +45,9 @@ public class TrainingSet {
      */
     private double[][] targetData;
 
-    /** Percentage of data to use for validation. */
+    /**
+     * Percentage of data to use for validation.
+     */
     private double percentValidation = .25;
 
     /**
@@ -58,7 +59,7 @@ public class TrainingSet {
     /**
      * Construct training set from given data.
      *
-     * @param inputData input data
+     * @param inputData  input data
      * @param targetData target data
      */
     public TrainingSet(double[][] inputData, double[][] targetData) {
@@ -67,10 +68,14 @@ public class TrainingSet {
         this.targetData = targetData;
     }
 
-    /** Indices for validation subset of training data. */
+    /**
+     * Indices for validation subset of training data.
+     */
     private List<Integer> validationIndices;
 
-    /** Indices for validation subset of training data. */
+    /**
+     * Indices for validation subset of training data.
+     */
     private List<Integer> mainIndices;
 
     /**
@@ -193,8 +198,7 @@ public class TrainingSet {
             inputData = new double[1][newRow.length];
             inputData = matActivations;
         } else {
-            double newInputData[][] = Utils.concatenate(inputData,
-                    matActivations);
+            double newInputData[][] = Utils.concatenate(inputData, matActivations);
             inputData = newInputData;
         }
     }

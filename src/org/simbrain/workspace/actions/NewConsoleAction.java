@@ -18,13 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add console to workspace.
@@ -35,6 +34,7 @@ public final class NewConsoleAction extends WorkspaceAction {
 
     /**
      * Create a new console action with the specified workspace.
+     *
      * @param workspace
      */
     public NewConsoleAction(Workspace workspace) {
@@ -43,8 +43,9 @@ public final class NewConsoleAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New console");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         ConsoleComponent console = new ConsoleComponent("");

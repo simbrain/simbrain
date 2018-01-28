@@ -26,7 +26,7 @@ import org.simbrain.util.math.SimbrainMath;
 
 /**
  * Trainer for a Hopfield network.
- *
+ * <p>
  * TODO: Add better Hopfield training! See
  * https://www.doc.ic.ac.uk/project/2012/163/g1216318/web/Refinements.html
  *
@@ -34,7 +34,9 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class HopfieldTrainer extends Trainer {
 
-    /** Reference to network being trained. */
+    /**
+     * Reference to network being trained.
+     */
     private final Hopfield hopfield;
 
     /**
@@ -62,15 +64,12 @@ public class HopfieldTrainer extends Trainer {
         double[] vals = new double[numInputs * numInputs - numInputs];
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
-            Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons()
-                .toArray(new Neuron[pattern.length]);
+            Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons().toArray(new Neuron[pattern.length]);
             for (int i = 0; i < pattern.length; i++) {
                 for (int j = 0; j < pattern.length; j++) {
                     if (i != j) {
                         Synapse s = neurons[i].getFanOut().get(neurons[j]);
-                        s.setStrength(s.getStrength()
-                                + Hopfield.bipolar(pattern[i])
-                                * Hopfield.bipolar(pattern[j]));
+                        s.setStrength(s.getStrength() + Hopfield.bipolar(pattern[i]) * Hopfield.bipolar(pattern[j]));
                     }
                 }
             }

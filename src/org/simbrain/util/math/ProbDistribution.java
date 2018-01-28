@@ -18,15 +18,7 @@
  */
 package org.simbrain.util.math;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.ExponentialDist;
-import umontreal.iro.lecuyer.probdist.GammaDist;
-import umontreal.iro.lecuyer.probdist.LognormalDist;
-import umontreal.iro.lecuyer.probdist.NormalDist;
-import umontreal.iro.lecuyer.probdist.ParetoDist;
-import umontreal.iro.lecuyer.probdist.UniformDist;
+import umontreal.iro.lecuyer.probdist.*;
 import umontreal.iro.lecuyer.randvar.ExponentialGen;
 import umontreal.iro.lecuyer.randvar.GammaGen;
 import umontreal.iro.lecuyer.randvar.LognormalGen;
@@ -34,13 +26,14 @@ import umontreal.iro.lecuyer.randvar.ParetoGen;
 import umontreal.iro.lecuyer.rng.LFSR113;
 import umontreal.iro.lecuyer.rng.RandomStream;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public enum ProbDistribution {
-    
+
     // Zoë has ideas about a refactor. Could use an interface or abstract
     // classes or array backings,
 
     EXPONENTIAL {
-
         @Override
         public double nextRand(double lambda, double nullVar) {
             return ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda);
@@ -96,9 +89,7 @@ public enum ProbDistribution {
             return 0;
         }
 
-    },
-    GAMMA {
-
+    }, GAMMA {
         @Override
         public double nextRand(double shape, double scale) {
             return GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale);
@@ -154,13 +145,10 @@ public enum ProbDistribution {
             return 0;
         }
 
-    },
-    LOGNORMAL {
-
+    }, LOGNORMAL {
         @Override
         public double nextRand(double location, double scale) {
-            return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM, location,
-                    scale);
+            return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM, location, scale);
         }
 
         @Override
@@ -213,9 +201,7 @@ public enum ProbDistribution {
             return 0;
         }
 
-    },
-    NORMAL {
-
+    }, NORMAL {
         /**
          * @param mean the mean for this normal distribution
          * @param std the standard deviation for this normal distribution
@@ -279,9 +265,7 @@ public enum ProbDistribution {
             return Double.NEGATIVE_INFINITY;
         }
 
-    },
-    PARETO {
-
+    }, PARETO {
         @Override
         public double nextRand(double slope, double min) {
             return ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min);
@@ -337,9 +321,7 @@ public enum ProbDistribution {
             return getDefaultParam2();
         }
 
-    },
-    UNIFORM {
-
+    }, UNIFORM {
         /**
          * @param floor the lowest value of the interval
          * @param ceil the highest value of the interval
@@ -403,9 +385,7 @@ public enum ProbDistribution {
             return 0;
         }
 
-    },
-    NULL {
-
+    }, NULL {
         @Override
         public String toString() {
             return "...";
@@ -459,7 +439,9 @@ public enum ProbDistribution {
         @Override
         public double getDefaultLowBound() {
             return 0;
-        };
+        }
+
+        ;
 
     };
 
@@ -509,8 +491,7 @@ public enum ProbDistribution {
 
     public abstract Distribution getBestFit(double[] observations, int numObs);
 
-    public abstract double[] getBestFitParams(double[] observations,
-            int numObs);
+    public abstract double[] getBestFitParams(double[] observations, int numObs);
 
     @Override
     public abstract String toString();
@@ -541,27 +522,23 @@ public enum ProbDistribution {
      * information lost when the given distribution is used to approximate the
      * given observations.
      *
-     * @param d a probability distribution
+     * @param d            a probability distribution
      * @param observations a 2D array such that the first row represents x
-     *            values and the second represents y values (must sum to 1, so
-     *            all observations must be scaled to fit this constraint prior
-     *            to being passed to this function)
+     *                     values and the second represents y values (must sum to 1, so
+     *                     all observations must be scaled to fit this constraint prior
+     *                     to being passed to this function)
      * @return the amount of information lost in bits when the distribution d is
-     *         used to approximate the distribution implicit in the
-     *         observations.
+     * used to approximate the distribution implicit in the
+     * observations.
      */
-    public static double KL_Divergence(Distribution d,
-            double[][] observations) {
+    public static double KL_Divergence(Distribution d, double[][] observations) {
         double tot = 0;
         double interval;
         double distProb;
         for (int i = 0, n = observations[0].length - 1; i < n; i++) {
             interval = observations[0][i + 1] - observations[0][i];
-            distProb = d.cdf(observations[0][i + 1])
-                    - d.cdf(observations[0][i]);
-            tot += ((Math.log(interval * observations[1][i]) / Math.log(2))
-                    / (Math.log(distProb) / Math.log(2)))
-                    * (interval * observations[1][i]);
+            distProb = d.cdf(observations[0][i + 1]) - d.cdf(observations[0][i]);
+            tot += ((Math.log(interval * observations[1][i]) / Math.log(2)) / (Math.log(distProb) / Math.log(2))) * (interval * observations[1][i]);
         }
         return tot;
     }

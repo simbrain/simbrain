@@ -13,50 +13,62 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * EffectorDialog is a dialog box for adding effectors to Odor World.
  *
  * @author Lam Nguyen
- *
  */
 
 public class AddEffectorDialog extends StandardDialog implements ActionListener {
 
-    /** String of effector types. */
-    private String[] effectors = { "StraightMovement", "Turning", "Speech" };
+    /**
+     * String of effector types.
+     */
+    private String[] effectors = {"StraightMovement", "Turning", "Speech"};
 
-    /** Entity to which effector is being added. */
+    /**
+     * Entity to which effector is being added.
+     */
     private OdorWorldEntity entity;
 
-    /** Instantiated entity to which effector is being added. */
+    /**
+     * Instantiated entity to which effector is being added.
+     */
     private RotatingEntity rotatingEntity;
 
-    /** Select effector type. */
+    /**
+     * Select effector type.
+     */
     private JComboBox effectorType = new JComboBox(effectors);
 
-    /** Panel that changes to a specific effector panel. */
+    /**
+     * Panel that changes to a specific effector panel.
+     */
     private AbstractEffectorPanel currentEffectorPanel;
 
-    /** Main dialog box. */
+    /**
+     * Main dialog box.
+     */
     private Box mainPanel = Box.createVerticalBox();
 
-    /** Panel for setting effector type. */
+    /**
+     * Panel for setting effector type.
+     */
     private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-    /** Effector Dialog add effector constructor. 
+    /**
+     * Effector Dialog add effector constructor.
+     *
      * @param entity
      */
     public AddEffectorDialog(OdorWorldEntity entity) {
@@ -73,8 +85,7 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
         effectorType.addActionListener(this);
         typePanel.addItem("Effector Type", effectorType);
         effectorType.setSelectedItem("SmellEffector");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld/effectors.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/effectors.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
@@ -123,7 +134,6 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
     }
 
     /**
-     *
      * @param e Action event.
      */
     public void actionPerformed(final ActionEvent e) {

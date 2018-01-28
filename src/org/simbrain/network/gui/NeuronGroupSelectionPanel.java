@@ -1,15 +1,9 @@
 package org.simbrain.network.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class NeuronGroupSelectionPanel extends JPanel implements ActionListener {
 
@@ -31,10 +25,8 @@ public class NeuronGroupSelectionPanel extends JPanel implements ActionListener 
         neuronGroups.setModel(model);
 
         scrollPane = new JScrollPane(neuronGroups);
-        scrollPane
-                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane
-                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         this.setPreferredSize(new Dimension(150, 300));
         this.setLayout(new BorderLayout());

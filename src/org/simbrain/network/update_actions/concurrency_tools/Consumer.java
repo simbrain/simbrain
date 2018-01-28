@@ -18,16 +18,15 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
-import java.util.concurrent.BrokenBarrierException;
-
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate.CyclicTaskQueue;
+
+import java.util.concurrent.BrokenBarrierException;
 
 /**
  * The underlying runnable consumer assigned to a thread, which consumes network
  * update tasks i.e. executes them.
  *
  * @author Zoë Tosi
- *
  */
 public class Consumer implements Runnable {
 
@@ -50,22 +49,18 @@ public class Consumer implements Runnable {
     private volatile boolean live = true;
 
     /**
-     *
-     * @param barrier
-     *            the cyclic barrier this consumer will wait at
-     * @param taskQueue
-     *            the blocking queue this consumer will take tasks from
-     * @param no
-     *            an optional ID number parameter for the consumer, used mainly
-     *            for debugging, but can be used to call out an individual
-     *            consumer elsewhere.
+     * @param barrier   the cyclic barrier this consumer will wait at
+     * @param taskQueue the blocking queue this consumer will take tasks from
+     * @param no        an optional ID number parameter for the consumer, used mainly
+     *                  for debugging, but can be used to call out an individual
+     *                  consumer elsewhere.
      */
     public Consumer(CyclicTaskQueue taskQueue, int no) {
         this.taskQueue = taskQueue;
         this.idNo = no;
     }
 
-	/**
+    /**
      * Executes tasks or waits on a cyclic barrier until a poison task is
      * consumed which kills this consumer (sets {@link #live} to false).
      */
@@ -83,7 +78,7 @@ public class Consumer implements Runnable {
     public int getId_no() {
         return idNo;
     }
-    
+
     public void shutdown() {
         live = false;
     }

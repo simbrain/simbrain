@@ -18,44 +18,49 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the
  * time series workspace component.
- *
+ * <p>
  * TODO: Make a version that extends this, like network panel case. Then
  * document in UML
  */
 public class TimeSeriesPlotPanel extends JPanel {
 
-    /** Chart un-initialized instance. */
+    /**
+     * Chart un-initialized instance.
+     */
     private JFreeChart chart;
 
-    /** Initial size. */
+    /**
+     * Initial size.
+     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /** Panel for chart. */
+    /**
+     * Panel for chart.
+     */
     private ChartPanel chartPanel = new ChartPanel(null);
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private TimeSeriesModel model;
 
-    /** Button panel. */
+    /**
+     * Button panel.
+     */
     private JPanel buttonPanel = new JPanel();
 
     /**
@@ -88,8 +93,7 @@ public class TimeSeriesPlotPanel extends JPanel {
         boolean showLegend = true;
         boolean useTooltips = true;
         boolean generateUrls = false;
-        chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, model.getDataset(),
-                PlotOrientation.VERTICAL, true, true, false);
+        chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, model.getDataset(), PlotOrientation.VERTICAL, true, true, false);
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
@@ -98,8 +102,7 @@ public class TimeSeriesPlotPanel extends JPanel {
             public void chartSettingsUpdated(ChartModel theModel) {
                 chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
                 if (!model.isAutoRange()) {
-                    chart.getXYPlot().getRangeAxis().setRange(
-                            model.getRangeLowerBound(), model.getRangeUpperBound());
+                    chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
                 }
                 chart.getXYPlot().getDomainAxis().setAutoRange(true);
                 //chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
@@ -120,7 +123,7 @@ public class TimeSeriesPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
-     * 
+     *
      * @return
      */
     public JPanel getButtonPanel() {

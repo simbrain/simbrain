@@ -18,25 +18,26 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
-import java.util.List;
-
-import javax.swing.JTextField;
-
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>StochasticNeuronPanel</b> edits a stochastic activity generator.
  */
 public class StochasticGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final StochasticRule prototypeRule = new StochasticRule();
 
     /**
@@ -45,10 +46,7 @@ public class StochasticGeneratorPanel extends AbstractNeuronRulePanel {
     public StochasticGeneratorPanel() {
         super();
         add(mainPanel);
-        JTextField firingProbability = createTextField(
-                (r) -> ((StochasticRule) r).getFiringProbability(),
-                (r, val) -> ((StochasticRule) r)
-                        .setFiringProbability((double) val));
+        JTextField firingProbability = createTextField((r) -> ((StochasticRule) r).getFiringProbability(), (r, val) -> ((StochasticRule) r).setFiringProbability((double) val));
         mainPanel.addItem("Firing Probability", firingProbability);
     }
 

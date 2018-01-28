@@ -18,11 +18,6 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -30,16 +25,23 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.SimbrainScriptEditor;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
 /**
  * Open a script editor.
  */
 public final class ScriptEditorAction extends AbstractAction {
 
-    /** Reference to Simbrain desktop. */
+    /**
+     * Reference to Simbrain desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
      * Open a script editor.
+     *
      * @param desktop
      */
     public ScriptEditorAction(final SimbrainDesktop desktop) {
@@ -49,19 +51,17 @@ public final class ScriptEditorAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Edit / Run Script...");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         String scriptDirectory = SimbrainPreferences.getString("workspaceScriptDirectory");
-        SFileChooser fileChooser = new SFileChooser(scriptDirectory,
-                "Run Script", "bsh");
+        SFileChooser fileChooser = new SFileChooser(scriptDirectory, "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();
         if (scriptFile != null) {
-            SimbrainPreferences.putString("workspaceScriptDirectory",
-                    fileChooser.getCurrentLocation());
-            GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(
-                    desktop, scriptFile);
+            SimbrainPreferences.putString("workspaceScriptDirectory", fileChooser.getCurrentLocation());
+            GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(desktop, scriptFile);
             desktop.addInternalFrame(frame);
             frame.setResizable(true);
             frame.setClosable(true);

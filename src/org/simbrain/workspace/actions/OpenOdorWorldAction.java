@@ -18,17 +18,16 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Open an odor world in current workspace. //TODO: Use generic!
@@ -39,6 +38,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
 
     /**
      * Create an open odor world action with the specified workspace.
+     *
      * @param workspace
      */
     public OpenOdorWorldAction(Workspace workspace) {
@@ -46,17 +46,16 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SwissIcon.png"));
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = SimbrainPreferences.getString("workspaceOdorWorldDirectory");
-        SFileChooser chooser = new SFileChooser(defaultDirectory,
-                "xml file", "xml");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            OdorWorldComponent worldComponent = (OdorWorldComponent) WorkspaceSerializer
-                    .open(OdorWorldComponent.class, theFile);
+            OdorWorldComponent worldComponent = (OdorWorldComponent) WorkspaceSerializer.open(OdorWorldComponent.class, theFile);
             workspace.addWorkspaceComponent(worldComponent);
         }
     }

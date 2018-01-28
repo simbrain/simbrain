@@ -48,8 +48,7 @@ public class PlotBuilder {
     /**
      * @param projectionPlotComponent the projectionPlotComponent to set
      */
-    public void setProjectionPlotComponent(
-            ProjectionComponent projectionPlotComponent) {
+    public void setProjectionPlotComponent(ProjectionComponent projectionPlotComponent) {
         this.projectionPlotComponent = projectionPlotComponent;
     }
 

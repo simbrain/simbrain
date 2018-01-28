@@ -18,22 +18,22 @@
  */
 package org.simbrain.workspace.component_actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Save component action.
  */
 public final class SaveAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final GuiComponent guiComponent;
 
     /**
@@ -51,16 +51,15 @@ public final class SaveAction extends AbstractAction {
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                KeyEvent.VK_S, Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMask()));
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Save this component");
 
         this.guiComponent = guiComponent;
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         guiComponent.save();

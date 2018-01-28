@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import java.util.Random;
-
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+
+import java.util.Random;
 
 /**
  * <b>BinaryNeuron</b> takes one of two values.
@@ -33,14 +33,18 @@ public class BinaryRule extends NeuronUpdateRule {
 
     private static final double DEFAULT_FLOOR = -1.0;
 
-    /** Threshold for binary neurons. */
+    /**
+     * Threshold for binary neurons.
+     */
     private double threshold = .5;
 
     private double ceiling = DEFAULT_CEILING;
 
     private double floor = DEFAULT_FLOOR;
 
-    /** Bias for binary neurons. */
+    /**
+     * Bias for binary neurons.
+     */
     private double bias = 0;
 
     /**
@@ -49,14 +53,14 @@ public class BinaryRule extends NeuronUpdateRule {
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
-    
+
     public BinaryRule() {
     }
-    
+
     public BinaryRule(double floor, double ceil, double threshold) {
-    	this.ceiling = ceil;
-    	this.floor = floor; 
-    	this.threshold = threshold;
+        this.ceiling = ceil;
+        this.floor = floor;
+        this.threshold = threshold;
     }
 
     /**
@@ -125,14 +129,14 @@ public class BinaryRule extends NeuronUpdateRule {
     public String getName() {
         return "Binary";
     }
-    
+
     // TODO: Get rid of redundant wording.   Have not cleaned it up yet
     // for fear of xstream problems.
 
     public double getUpperBound() {
         return ceiling;
     }
-    
+
     public void setUpperBound(double ub) {
         this.ceiling = ub;
     }
@@ -144,7 +148,7 @@ public class BinaryRule extends NeuronUpdateRule {
     public double getLowerBound() {
         return floor;
     }
-    
+
     public void setLowerBound(double lb) {
         this.floor = lb;
     }

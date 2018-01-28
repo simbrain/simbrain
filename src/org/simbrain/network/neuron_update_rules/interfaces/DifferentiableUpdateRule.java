@@ -26,7 +26,7 @@ public interface DifferentiableUpdateRule {
      *
      * @param val the value being sent through the neuron's derivative
      * @return the derivative of the neuron's activation function with respect
-     *         to val.
+     * to val.
      */
     double getDerivative(double val);
 

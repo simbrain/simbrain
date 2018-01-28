@@ -18,30 +18,30 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 /**
  * Edit properties of randomizer object for network.
- *
+ * <p>
  * TODO: Not currently used but being left in case it is reinstated.
  */
 public final class EditRandomizerPropertiesAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * Construct the action.
      *
-     * @param networkPanel
-     *            networkPanel, must not be null
+     * @param networkPanel networkPanel, must not be null
      */
     public EditRandomizerPropertiesAction(final NetworkPanel networkPanel) {
 
@@ -54,8 +54,9 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
         this.networkPanel = networkPanel;
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         // randomPanel.fillFieldValues(networkPanel.getNetwork()

@@ -26,13 +26,12 @@ import org.simbrain.util.UserParameter;
  * Implementation of the model described by Pfister, J-P, Gerstner, W: Triplets
  * of Spikes in a Model of Spike Timing-Dependent Plasticity. J. Neurosci. 26,
  * 9673–9682 (2006).
- * 
+ * <p>
  * Only works if source and target neurons are spiking neurons.
- * 
+ *
  * @author Oliver J. Coleman
  */
-public class PfisterGerstner2006Rule extends SynapseUpdateRule
-        implements Cloneable {
+public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Cloneable {
 
     @UserParameter(label = "Tau+", description = "Decay rate for r1 trace", minimumValue = 1, maximumValue = 100, defaultValue = "16.8", order = 0)
     protected double tauPlus = 16.8;

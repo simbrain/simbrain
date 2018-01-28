@@ -18,36 +18,49 @@
  */
 package org.simbrain.plot.rasterchart;
 
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Data model for a raster plot.
  */
 public class RasterModel extends ChartModel {
 
-    /** Raster Data. */
+    /**
+     * Raster Data.
+     */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
-    /** Default number of data sources for plot initialization. */
+    /**
+     * Default number of data sources for plot initialization.
+     */
     private static final int INITIAL_DATA_SOURCES = 1;
 
-    /** Should the range automatically change to reflect the data. */
+    /**
+     * Should the range automatically change to reflect the data.
+     */
     private boolean autoRange = true;
 
-    /** Size of window. */
+    /**
+     * Size of window.
+     */
     private int windowSize = 100;
 
-    /** Upper bound of the chart range. */
+    /**
+     * Upper bound of the chart range.
+     */
     private double rangeUpperBound = 1;
 
-    /** Lower bound of the chart range. */
+    /**
+     * Lower bound of the chart range.
+     */
     private double rangeLowerBound = 0;
 
-    /** Whether this chart if fixed width or not. */
+    /**
+     * Whether this chart if fixed width or not.
+     */
     private boolean fixedWidth = true;
 
     /**
@@ -223,11 +236,10 @@ public class RasterModel extends ChartModel {
      * Add data to this model.
      *
      * @param dataSourceIndex index of data source to use
-     * @param time data for x axis
-     * @param value data for y axis
+     * @param time            data for x axis
+     * @param value           data for y axis
      */
-    public void addData(final int dataSourceIndex, final double time,
-            final double value) {
+    public void addData(final int dataSourceIndex, final double time, final double value) {
         getDataset().getSeries(dataSourceIndex).add(time, value);
     }
 

@@ -18,16 +18,14 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Copy action.
@@ -43,18 +41,17 @@ public final class CopyAction extends ConditionallyEnabledAction {
         super(networkPanel, "Copy", EnablingCondition.ALLITEMS);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
-        putValue(SHORT_DESCRIPTION,
-                "Copy selected neurons, (connected) synapses, and neuron groups");
+        putValue(SHORT_DESCRIPTION, "Copy selected neurons, (connected) synapses, and neuron groups");
 
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.copy();

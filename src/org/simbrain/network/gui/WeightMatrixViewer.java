@@ -18,26 +18,22 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.listeners.NetworkAdapter;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Widget to display the synaptic connections between two layers of neurons as a
  * matrix, in a jtable.
- *
+ * <p>
  * TODO: Better display of non-existent connections (perhaps by disabling those
  * cells for now). What would be super cool is gray for no synapse. and then as
  * added or deleted ungray it.
@@ -46,7 +42,9 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  */
 public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
-    /** JTable contained in scroller. */
+    /**
+     * JTable contained in scroller.
+     */
     private SimbrainJTable table;
 
     /**
@@ -71,10 +69,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      *
      * @param sourceList the source neurons
      * @param targetList the target neurons
-     * @param panel the parent network panel
+     * @param panel      the parent network panel
      */
-    public WeightMatrixViewer(List<Neuron> sourceList, List<Neuron> targetList,
-            NetworkPanel panel) {
+    public WeightMatrixViewer(List<Neuron> sourceList, List<Neuron> targetList, NetworkPanel panel) {
         init(sourceList, targetList, panel);
     }
 
@@ -97,10 +94,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      *
      * @param sourceList the source neurons
      * @param targetList the target neurons
-     * @param panel the network panel
+     * @param panel      the network panel
      */
-    private void init(List<Neuron> sourceList, List<Neuron> targetList,
-            NetworkPanel panel) {
+    private void init(List<Neuron> sourceList, List<Neuron> targetList, NetworkPanel panel) {
         // By default the lists are sorted horizontally.
         // TODO: Allow for vertical sorting, or for some appropriate sorting
         // when displaying an adjacency matrix
@@ -112,8 +108,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Collections.sort(targetList, OrientationComparator.X_ORDER);
 
         // Populate data in simbrain table
-        Synapse[][] weights = SimnetUtils.getWeightMatrix(sourceList,
-                targetList);
+        Synapse[][] weights = SimnetUtils.getWeightMatrix(sourceList, targetList);
         //displayWarningIfEmptyCells(weights);
         WeightMatrix weightMatrix = new WeightMatrix(weights);
         table = SimbrainJTable.createTable(weightMatrix);
@@ -145,15 +140,11 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      * @param weights weight matrix to check
      */
     private void displayWarningIfEmptyCells(Synapse[][] weights) {
-        String warningMessage = "Only fully connected source-target pairs \n"
-                + "are supported.  Some zeros in the matrix \n"
-                + "correspond to non-existent weights and \n"
-                + "cannot be modified in the viewer.";
+        String warningMessage = "Only fully connected source-target pairs \n" + "are supported.  Some zeros in the matrix \n" + "correspond to non-existent weights and \n" + "cannot be modified in the viewer.";
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[0].length; j++) {
                 if (weights[i][j] == null) {
-                    JOptionPane.showMessageDialog(null, warningMessage,
-                            "Weight Matrix Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, warningMessage, "Weight Matrix Error", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
@@ -162,16 +153,17 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
     /**
      * Matrix of synapses to be viewed in a SimbrainJTable.
-     *
+     * <p>
      * A matrix representation of synapses is passed in, and as the table data
      * are changed the synapses are directly updated.
-     *
+     * <p>
      * Note that the "mutable" features of numerictable are all passed over.
-     *
      */
     private class WeightMatrix extends NumericTable {
 
-        /** Underlying data. */
+        /**
+         * Underlying data.
+         */
         private Synapse[][] weights;
 
         /**
@@ -184,13 +176,12 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
         // TOOD: Explain below. Possibly move to  a special immutable numeric class
         @Override
-        public void setValue(final int row, final int col, final Double value,
-                final boolean fireEvent) {
+        public void setValue(final int row, final int col, final Double value, final boolean fireEvent) {
             if (col == 0) {
                 return;
             }
-            if (weights[row][col-1] != null) {
-                weights[row][col-1].forceSetStrength(value);
+            if (weights[row][col - 1] != null) {
+                weights[row][col - 1].forceSetStrength(value);
             }
             if (fireEvent) {
                 fireTableDataChanged();
@@ -217,17 +208,15 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
 
         @Override
-        public void setLogicalValue(int row, int column, Double value,
-                boolean fireEvent) {
-            setValue(row, column+1, value, fireEvent);
+        public void setLogicalValue(int row, int column, Double value, boolean fireEvent) {
+            setValue(row, column + 1, value, fireEvent);
         }
 
 
         @Override
         public Double getLogicalValueAt(int row, int col) {
-            return getValueAt(row, col+1);
+            return getValueAt(row, col + 1);
         }
-
 
 
     }

@@ -24,15 +24,15 @@ import java.util.List;
 /**
  * Superclass for tables which can be modified.
  *
+ * @param <T>
  * @author jyoshimi
- *@param <T>
  */
 public abstract class MutableTable<T> extends SimbrainDataTable<T> {
 
     /**
      * Add a new row.
      *
-     * @param value value for cells of new row
+     * @param value     value for cells of new row
      * @param fireEvent whether to fire an update event or not
      */
     private void addRow(T value, boolean fireEvent) {
@@ -55,7 +55,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Add a specified number of rows to the bottom of the table.
      *
      * @param rowsToAdd number of rows to add
-     * @param value value for cells of new rows
+     * @param value     value for cells of new rows
      */
     public void addRows(int rowsToAdd, T value) {
         modifyRowsColumns(rowsToAdd, 0, value);
@@ -73,7 +73,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     /**
      * Insert a new row at the specified position.
      *
-     * @param at row index for where to put the new row
+     * @param at    row index for where to put the new row
      * @param value value for new row cells
      */
     public void insertRow(int at, T value) {
@@ -108,9 +108,9 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Create a new row for the table, with a specified value.
      *
      * @param value value for columns of new row
-     * @param cols number of "logical" columns in a row for this table (i.e.
-     *            actual number of columns in the data itself, without
-     *            accounting for fist header row).
+     * @param cols  number of "logical" columns in a row for this table (i.e.
+     *              actual number of columns in the data itself, without
+     *              accounting for fist header row).
      * @return the new row
      */
     protected List<T> createNewRow(final T value, final int cols) {
@@ -126,7 +126,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Remove row with choice whether to fire an event or not.
      *
      * @param rowToRemoveIndex index of row to remove
-     * @param fireEvent whether to fire an event or not
+     * @param fireEvent        whether to fire an event or not
      */
     public void removeRow(final int rowToRemoveIndex, boolean fireEvent) {
         // Don't allow getRowCount() to go to 0
@@ -151,7 +151,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     /**
      * Add a new column.
      *
-     * @param value value for cells of new column
+     * @param value     value for cells of new column
      * @param fireEvent whether to fire an update event or not
      */
     private void addColumn(T value, boolean fireEvent) {
@@ -176,7 +176,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Adds a specified number of columns to the right of the table.
      *
      * @param colsToAdd number of columns to add.
-     * @param value  value for cells of new columns
+     * @param value     value for cells of new columns
      */
     public void addColumns(int colsToAdd, T value) {
         modifyRowsColumns(0, colsToAdd, value);
@@ -194,7 +194,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     /**
      * Insert a new column at the specified position.
      *
-     * @param at column index where column should be added
+     * @param at    column index where column should be added
      * @param value value for cells of new column
      */
     public void insertColumn(int at, T value) {
@@ -217,7 +217,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Remove column with choice whether to fire an event or not.
      *
      * @param columnToRemoveIndex index of row to remove
-     * @param fireEvent whether to fire an event or not
+     * @param fireEvent           whether to fire an event or not
      */
     public void removeColumn(final int columnToRemoveIndex, boolean fireEvent) {
         // Don't allow no columns
@@ -247,7 +247,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      *
      * @param newNumRows logical number of rows in table.
      * @param newNumCols logical number of columns in table.
-     * @param value to be used for any new columns or rows added to the table.
+     * @param value      to be used for any new columns or rows added to the table.
      */
     public void modifyRowsColumns(int newNumRows, int newNumCols, T value) {
 
@@ -298,7 +298,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      *
      * @param rows number of rows to add.
      * @param cols number of columns to add.
-     * @param val value to be added to the table.
+     * @param val  value to be added to the table.
      */
     public void reset(final int rows, final int cols, final T val) {
         reset(rows, cols);
@@ -309,23 +309,16 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     /**
      * Check the integrity of the data.
      *
-     * @param allowRowChanges whether rows should be editable
+     * @param allowRowChanges    whether rows should be editable
      * @param allowColumnChanges whether columns should be editable
-     * @param values the value to check
+     * @param values             the value to check
      * @throws TableDataException exception if data are invalid
      */
-    protected void checkData(boolean allowRowChanges,
-            boolean allowColumnChanges, Object[][] values)
-            throws TableDataException {
+    protected void checkData(boolean allowRowChanges, boolean allowColumnChanges, Object[][] values) throws TableDataException {
         if (!allowRowChanges && values.length != getRowCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values.length + " rows into a table with "
-                    + getRowCount() + " rows.");
-        } else if (!allowColumnChanges
-                && values[0].length != getLogicalColumnCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values[0].length + " columns into a table with "
-                    + getLogicalColumnCount() + " columns.");
+            throw new TableDataException("Trying to import data with " + values.length + " rows into a table with " + getRowCount() + " rows.");
+        } else if (!allowColumnChanges && values[0].length != getLogicalColumnCount()) {
+            throw new TableDataException("Trying to import data with " + values[0].length + " columns into a table with " + getLogicalColumnCount() + " columns.");
         }
     }
 

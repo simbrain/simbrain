@@ -30,19 +30,29 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  */
 public class TileSensor extends Sensor {
 
-    /** Default Activation Amount. */
+    /**
+     * Default Activation Amount.
+     */
     public static final double DEFAULT_ACTIVATION = 1;
 
-    /** Default X coordinate of the upper left corner. */
+    /**
+     * Default X coordinate of the upper left corner.
+     */
     public static final int DEFAULT_X = 0;
 
-    /** Default Y coordinate of the upper left corner. */
+    /**
+     * Default Y coordinate of the upper left corner.
+     */
     public static final int DEFAULT_Y = 0;
 
-    /** Default width. */
+    /**
+     * Default width.
+     */
     public static final int DEFAULT_WIDTH = 20;
 
-    /** Default height. */
+    /**
+     * Default height.
+     */
     public static final int DEFAULT_HEIGHT = 20;
 
     /**
@@ -50,32 +60,41 @@ public class TileSensor extends Sensor {
      */
     private double value = 0;
 
-    /** Value to return when the tile sensor is activated. */
+    /**
+     * Value to return when the tile sensor is activated.
+     */
     private double activationAmount = DEFAULT_ACTIVATION;
 
-    /** Upper left corner. */
+    /**
+     * Upper left corner.
+     */
     private int x;
 
-    /** Upper left corner. */
+    /**
+     * Upper left corner.
+     */
     private int y;
 
-    /** Width of the sensor. */
+    /**
+     * Width of the sensor.
+     */
     private int width;
 
-    /** Height of the sensor. */
+    /**
+     * Height of the sensor.
+     */
     private int height;
 
     /**
      * Construct a tile sensor.
      *
      * @param parent parent entity
-     * @param x upper left
-     * @param y upper right
-     * @param width width in pixels
+     * @param x      upper left
+     * @param y      upper right
+     * @param width  width in pixels
      * @param height height
      */
-    public TileSensor(OdorWorldEntity parent, int x, int y, int width,
-            int height) {
+    public TileSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
         super(parent, "Tile (" + x + "," + y + "):" + width + "x" + height);
         this.x = x;
         this.y = y;
@@ -103,7 +122,7 @@ public class TileSensor extends Sensor {
     /**
      * @return value associated with this sensor, 0 if occupied,
      */
-    @Producible(idMethod="getMixedId")
+    @Producible(idMethod = "getMixedId")
     public double getValue() {
         return value;
     }
@@ -111,7 +130,7 @@ public class TileSensor extends Sensor {
     /**
      * @param value the value to set
      */
-    @Consumable(idMethod="getMixedId")
+    @Consumable(idMethod = "getMixedId")
     public void setValue(double value) {
         this.value = value;
     }

@@ -18,14 +18,12 @@
  */
 package org.simbrain.network.gui.nodes.neuronGroupNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of Competitive network.
@@ -38,19 +36,16 @@ public class CompetitiveGroupNode extends NeuronGroupNode {
      * Create a Competitive Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the competitive network
+     * @param group        the competitive network
      */
-    public CompetitiveGroupNode(final NetworkPanel networkPanel,
-            final CompetitiveGroup group) {
+    public CompetitiveGroupNode(final NetworkPanel networkPanel, final CompetitiveGroup group) {
         super(networkPanel, group);
 
-        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-                "Randomize Weights") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction("Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveGroup group = ((CompetitiveGroup) getNeuronGroup());
                 group.randomize();
-                group.getParentNetwork()
-                        .fireSynapsesUpdated(group.getIncomingWeights());
+                group.getParentNetwork().fireSynapsesUpdated(group.getIncomingWeights());
             }
         }));
 

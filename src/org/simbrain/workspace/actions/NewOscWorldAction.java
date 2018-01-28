@@ -1,9 +1,9 @@
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.oscworld.OscWorldComponent;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Add OSC world to workspace.
@@ -19,7 +19,9 @@ public final class NewOscWorldAction extends WorkspaceAction {
         super("OSC World", workspace);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         OscWorldComponent world = new OscWorldComponent("");
         workspace.addWorkspaceComponent(world);

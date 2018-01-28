@@ -18,14 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.text.NumberFormat;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.BoltzmannMachine;
@@ -33,15 +25,22 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.text.NumberFormat;
+
 /**
  * <b>BoltzmannMachineDialog</b> is used as an assistant to create Boltzmann networks.
  */
 public class BoltzmannMachineDialog extends StandardDialog {
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     LabelledItemPanel propPanel = new LabelledItemPanel(); //TODOs
@@ -95,9 +94,7 @@ public class BoltzmannMachineDialog extends StandardDialog {
 
     @Override
     protected void closeDialogOk() {
-        BoltzmannMachine boltzmannMachine = new BoltzmannMachine(
-                networkPanel.getNetwork(), visibleNeurons, hiddenNeurons,
-                networkPanel.getLastClickedPosition());
+        BoltzmannMachine boltzmannMachine = new BoltzmannMachine(networkPanel.getNetwork(), visibleNeurons, hiddenNeurons, networkPanel.getLastClickedPosition());
         layoutPanel.commitChanges();
 
         networkPanel.getNetwork().addGroup(boltzmannMachine);

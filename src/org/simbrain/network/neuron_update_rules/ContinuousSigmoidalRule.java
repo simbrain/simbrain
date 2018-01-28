@@ -31,14 +31,17 @@ import org.simbrain.util.randomizer.Randomizer;
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
- *
  */
 public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
-    /** Default time constant (ms). */
+    /**
+     * Default time constant (ms).
+     */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;
 
-    /** Default leak constant {@link #leak}. */
+    /**
+     * Default leak constant {@link #leak}.
+     */
     public static final double DEFAULT_LEAK_CONSTANT = 1.0;
 
     /**
@@ -77,8 +80,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction
-     *            the implementation to use.
+     * @param sFunction the implementation to use.
      */
     public ContinuousSigmoidalRule(final SquashingFunction sFunction) {
         super();
@@ -96,76 +98,71 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>
      * Where x_i(t) is the net activation of neuron i at time t, r(t) is the
      * output activation after being put through a sigmoid squashing function at
      * time t, a is the leak constant, and c is the time constant:
-     * 
-     *<b>c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)</b> 
-     *
-     *  Discretizing using euler integration:
-     *  
-     *<b>x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))</b>
-     *
+     * <p>
+     * <b>c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)</b>
+     * <p>
+     * Discretizing using euler integration:
+     * <p>
+     * <b>x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))</b>
+     * <p>
      * Factorting out x_i(t):
-     * 
-     *<b>x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))</b>
-     * 
+     * <p>
+     * <b>x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))</b>
      */
     public void update(Neuron neuron) {
 
         double dt = neuron.getNetwork().getTimeStep();
 
         if (addNoise) {
-            inputTerm = (dt / tau) * (inputType.getInput(neuron) + bias
-                + noiseGenerator.getRandom());
+            inputTerm = (dt / tau) * (inputType.getInput(neuron) + bias + noiseGenerator.getRandom());
         } else {
             inputTerm = (dt / tau) * (inputType.getInput(neuron) + bias);
         }
 
         netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;
 
-        double output = sFunction.valueOf(netActivation, getUpperBound(),
-            getLowerBound(), getSlope());
+        double output = sFunction.valueOf(netActivation, getUpperBound(), getLowerBound(), getSlope());
 
         neuron.setBuffer(output);
 
     }
 
     public int getNoBytes() { // bump to interface...
-    	// [ buff | netInp | netAct | leak | tau | UB | LB | slope ]
-    	return 56 + 8; // Do some reflection here... 8 is for buffer
+        // [ buff | netInp | netAct | leak | tau | UB | LB | slope ]
+        return 56 + 8; // Do some reflection here... 8 is for buffer
     }
-    
+
     private int offset;
-    
+
     public void update(int offset, final double[] arr) {
-    	arr[offset] = arr[offset+2]*(1-arr[offset+3]*arr[offset+4]) +
-    			arr[offset+4]*arr[offset+1];
-    	arr[offset] = sFunction.valueOf(arr[offset],
-    			arr[offset+5], arr[offset+6], arr[offset+7]);
+        arr[offset] = arr[offset + 2] * (1 - arr[offset + 3] * arr[offset + 4]) + arr[offset + 4] * arr[offset + 1];
+        arr[offset] = sFunction.valueOf(arr[offset], arr[offset + 5], arr[offset + 6], arr[offset + 7]);
     }
-    
-    public int writeToArr(Network net, final double [] arr, int _offset) {
-    	offset=_offset;
-    	arr[_offset+1]=inputTerm;
-    	arr[_offset+2]=netActivation;
-    	arr[_offset+3]=leak;
-    	arr[_offset+4]=net.getTimeStep()/tau;
-    	arr[_offset+5]=getUpperBound();
-    	arr[_offset+6]=getLowerBound();
-    	arr[_offset+7]=getSlope();
-    	return _offset+8; // padding
+
+    public int writeToArr(Network net, final double[] arr, int _offset) {
+        offset = _offset;
+        arr[_offset + 1] = inputTerm;
+        arr[_offset + 2] = netActivation;
+        arr[_offset + 3] = leak;
+        arr[_offset + 4] = net.getTimeStep() / tau;
+        arr[_offset + 5] = getUpperBound();
+        arr[_offset + 6] = getLowerBound();
+        arr[_offset + 7] = getSlope();
+        return _offset + 8; // padding
     }
-    
-    public void writeFromArr(Neuron neu, final double [] arr) {
-    	neu.setBuffer(arr[offset]);
-    	netActivation = arr[offset+2];
-    	leak = arr[offset+3];
-    	tau = 1/arr[offset+4] * neu.getNetwork().getTimeStep();
-    	inputTerm = arr[offset+1];
+
+    public void writeFromArr(Neuron neu, final double[] arr) {
+        neu.setBuffer(arr[offset]);
+        netActivation = arr[offset + 2];
+        leak = arr[offset + 3];
+        tau = 1 / arr[offset + 4] * neu.getNetwork().getTimeStep();
+        inputTerm = arr[offset + 1];
     }
-    
+
     @Override
     public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();
@@ -220,8 +217,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     /**
-     * @param inflectionPointSlope
-     *            The inflectionPointSlope to set.
+     * @param inflectionPointSlope The inflectionPointSlope to set.
      */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
@@ -235,8 +231,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     /**
-     * @param noise
-     *            The noise to set.
+     * @param noise The noise to set.
      */
     public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
@@ -250,8 +245,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     /**
-     * @param addNoise
-     *            The addNoise to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -275,7 +269,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     /**
      * {@link #leak}
-     * 
+     *
      * @return the leak constant for the neuron.
      */
     public double getLeakConstant() {
@@ -284,9 +278,8 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     /**
      * {@link #leak}
-     * 
-     * @param leakConstant
-     *            the leak constant for the neuron.
+     *
+     * @param leakConstant the leak constant for the neuron.
      */
     public void setLeakConstant(double leakConstant) {
         this.leak = leakConstant;

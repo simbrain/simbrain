@@ -24,34 +24,51 @@ import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 
-public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
-    NoisyUpdateRule {
+public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
-    /** W. - recovery variable */
+    /**
+     * W. - recovery variable
+     */
     private double w;
 
-    /** V. - membrane potential */
+    /**
+     * V. - membrane potential
+     */
     private double v;
 
-    /** Constant background current. KEEP */
+    /**
+     * Constant background current. KEEP
+     */
     private double iBg = 1;
 
-    /** Threshold value to signal a spike. KEEP */
+    /**
+     * Threshold value to signal a spike. KEEP
+     */
     private double threshold = 1.9;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise;
-    
-    /** Recovery rate */
+
+    /**
+     * Recovery rate
+     */
     private double a = 0.08;
-    
-    /** Recovery dependence on voltage. */
+
+    /**
+     * Recovery dependence on voltage.
+     */
     private double b = 1;
-    
-    /** Recovery self-dependence. */
+
+    /**
+     * Recovery self-dependence.
+     */
     private double c = 0.8;
 
     @Override
@@ -73,9 +90,9 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     @Override
     public void update(final Neuron neuron) {
         double timeStep = neuron.getNetwork().getTimeStep();
-//        final boolean refractory = getLastSpikeTime() + refractoryPeriod
-//                >= neuron.getNetwork().getTime();
-       // final double activation = neuron.getActivation();
+        //        final boolean refractory = getLastSpikeTime() + refractoryPeriod
+        //                >= neuron.getNetwork().getTime();
+        // final double activation = neuron.getActivation();
         double inputs = 0;
         inputs = inputType.getInput(neuron);
         if (addNoise) {
@@ -83,11 +100,11 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
         }
         inputs += iBg;
         v = neuron.getActivation();
-        w += (timeStep * (a*(b*v+0.7-(c*w))));
+        w += (timeStep * (a * (b * v + 0.7 - (c * w))));
 
-        v += timeStep * (v - (v*v*v)/3 - w + inputs);
-        
-       // v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
+        v += timeStep * (v - (v * v * v) / 3 - w + inputs);
+
+        // v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
         // You want this
         if (v >= threshold) {
             neuron.setSpkBuffer(true);
@@ -139,14 +156,14 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     }
 
     public double getiBg() {
-		return iBg;
-	}
+        return iBg;
+    }
 
-	public void setiBg(double iBg) {
-		this.iBg = iBg;
-	}
+    public void setiBg(double iBg) {
+        this.iBg = iBg;
+    }
 
-	/**
+    /**
      * @return Returns the addNoise.
      */
     public boolean getAddNoise() {
@@ -190,23 +207,23 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     public double getA() {
         return a;
     }
-    
+
     public double getB() {
         return b;
     }
-    
-    public double getC(){
+
+    public double getC() {
         return c;
     }
-    
+
     public void setA(double a) {
         this.a = a;
     }
-    
+
     public void setB(double b) {
         this.b = b;
     }
-    
+
     public void setC(double c) {
         this.c = c;
     }

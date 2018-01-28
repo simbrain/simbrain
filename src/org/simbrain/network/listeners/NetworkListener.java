@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.listeners;
 
-import java.util.Collection;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+
+import java.util.Collection;
 
 /**
  * Listener interface for receiving general network events. Classes interested
@@ -58,6 +58,7 @@ public interface NetworkListener {
      * A way to tell listeners that their update is incomplete signaling that
      * they should update. Ideally this goes at the beginning of a network
      * update call.
+     *
      * @param b
      */
     void setUpdateComplete(boolean b);

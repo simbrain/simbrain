@@ -1,27 +1,26 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
-import org.simbrain.world.threedworld.ThreeDWorld;
-import org.simbrain.world.threedworld.entities.Agent;
-import org.simbrain.world.threedworld.entities.ModelEntity;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.math.Vector3f;
+import org.simbrain.world.threedworld.ThreeDWorld;
+import org.simbrain.world.threedworld.entities.Agent;
+import org.simbrain.world.threedworld.entities.ModelEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class AddAgentAction extends AbstractAction {
     private static final long serialVersionUID = 5219992141265803787L;
-    
+
     private ThreeDWorld world;
-    
+
     public AddAgentAction(ThreeDWorld world) {
         super("Add Agent");
         this.world = world;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         world.getEngine().enqueue(() -> {

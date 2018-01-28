@@ -23,16 +23,20 @@ import org.simbrain.util.math.ProbDistribution;
 /**
  * <b>Randomizer</b> produces numbers drawn from a probability distribution
  * according to a set of user-specified parameters.
- * 
+ *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class Randomizer {
 
-    /** The default prob. distribution for this randomizer. */
+    /**
+     * The default prob. distribution for this randomizer.
+     */
     public static final ProbDistribution DEFAULT_DISTRIBUTION = ProbDistribution.UNIFORM;
 
-    /** The probability distribution associated with this randomizer. */
+    /**
+     * The probability distribution associated with this randomizer.
+     */
     protected ProbDistribution pdf = DEFAULT_DISTRIBUTION;
 
     /**
@@ -196,34 +200,30 @@ public class Randomizer {
     /**
      * Set the randomizer by specifying parameter names and parameters.
      */
-    public void setParamsByName(String p1Name, double param1, String p2Name,
-            double param2) {
+    public void setParamsByName(String p1Name, double param1, String p2Name, double param2) {
         // Not currently used and will probably be changed in a refactor.
-        if (!p1Name.equals(pdf.getParam1Name())
-                || !p2Name.equals(pdf.getParam2Name())) {
-            throw new IllegalArgumentException(
-                    "Parameter name/Distribution" + " mismatch.");
+        if (!p1Name.equals(pdf.getParam1Name()) || !p2Name.equals(pdf.getParam2Name())) {
+            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
         }
         setParams(param1, param2);
     }
 
     /**
      * Set the parameter using its string name.
-     * 
+     *
      * @param p1Name string name, must match exactly.
      * @param param1 the parameter value.
      */
     public void setParam1ByName(String p1Name, double param1) {
         if (!p1Name.equals(pdf.getParam1Name())) {
-            throw new IllegalArgumentException(
-                    "Parameter name/Distribution" + " mismatch.");
+            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
         }
         this.param1 = param1;
     }
 
     /**
      * Set the parameter using its string name.
-     * 
+     *
      * @param p2Name string name, must match exactly.
      * @param param2 the parameter value.
      */
@@ -231,8 +231,7 @@ public class Randomizer {
         if (p2Name == null)
             return; // TODO think about this, it's a hack
         if (!p2Name.equals(pdf.getParam2Name())) {
-            throw new IllegalArgumentException(
-                    "Parameter name/Distribution" + " mismatch.");
+            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
         }
         this.param2 = param2;
     }

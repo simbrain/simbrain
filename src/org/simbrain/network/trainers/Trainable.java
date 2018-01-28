@@ -13,10 +13,10 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
+
+import java.util.List;
 
 /**
  * Interface that must be implemented by any object that can be trained by a
@@ -24,7 +24,6 @@ import org.simbrain.network.groups.Group;
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
- *
  */
 public interface Trainable {
 

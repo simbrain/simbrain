@@ -1,10 +1,9 @@
 package org.simbrain.world.threedworld;
 
-import java.awt.Point;
-
-import javax.swing.JPopupMenu;
-
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * ContextMenu populates a popup menu with ThreeDWorld actions and displays
@@ -15,6 +14,7 @@ public class ContextMenu {
 
     /**
      * Construct a new ContextMenu.
+     *
      * @param world The world from which to get the context actions.
      */
     public ContextMenu(ThreeDWorld world) {
@@ -35,6 +35,7 @@ public class ContextMenu {
 
     /**
      * Show the ContextMenu at the current cursor position.
+     *
      * @param engine The ThreeDEngine from which to get the cursor position.
      */
     public void show(ThreeDEngine engine) {

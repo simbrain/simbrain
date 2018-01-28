@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import javax.swing.JPanel;
-
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
@@ -29,19 +27,24 @@ import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.world.textworld.DisplayWorld;
 import org.simbrain.world.textworld.DisplayWorld.StringDataPoint;
 
+import javax.swing.*;
+
 /**
  * Dialog for editing vector to token dictionary (which associates vectors with
  * matching tokens). Used in display world.
  *
  * @author Jeff Yoshimi
  */
-public class VectorToTokenPanel extends VectorDictionaryPanel implements
-        EditablePanel {
+public class VectorToTokenPanel extends VectorDictionaryPanel implements EditablePanel {
 
-    /** The world to edit. */
+    /**
+     * The world to edit.
+     */
     private final DisplayWorld world;
 
-    /** The table representing the dictionary data. */
+    /**
+     * The table representing the dictionary data.
+     */
     private SimbrainJTable table;
 
     /**
@@ -50,13 +53,9 @@ public class VectorToTokenPanel extends VectorDictionaryPanel implements
      * @param world the world whose dictionary is being edited.
      */
     public VectorToTokenPanel(final DisplayWorld world) {
-        super("<html><p>These entries consume vector inputs. "
-                        + "When a vector is received (e.g. from a neuron group) "
-                        + "the text associated with the closest vector on the left is found and displayed "
-                        + "in the display world.");
+        super("<html><p>These entries consume vector inputs. " + "When a vector is received (e.g. from a neuron group) " + "the text associated with the closest vector on the left is found and displayed " + "in the display world.");
         this.world = world;
-        table = SimbrainJTable.createTable(new VectorDictionaryTable(world
-                .getVectorToTokenDict()));
+        table = SimbrainJTable.createTable(new VectorDictionaryTable(world.getVectorToTokenDict()));
         initPanel(table);
     }
 

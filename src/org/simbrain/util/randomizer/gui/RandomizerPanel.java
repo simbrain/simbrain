@@ -18,21 +18,6 @@
  */
 package org.simbrain.util.randomizer.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Window;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
@@ -41,6 +26,15 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
 import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
@@ -51,25 +45,27 @@ import org.simbrain.util.widgets.YesNoNull;
  */
 public class RandomizerPanel extends JPanel {
 
-    /** Parent window reference to use in repacking and recentering. */
+    /**
+     * Parent window reference to use in repacking and recentering.
+     */
     private Window parent;
 
-    /** Distribution combo box. */
-    private JComboBox<ProbDistribution> cbDistribution =
-        new JComboBox<ProbDistribution>(ProbDistribution.values());
+    /**
+     * Distribution combo box.
+     */
+    private JComboBox<ProbDistribution> cbDistribution = new JComboBox<ProbDistribution>(ProbDistribution.values());
 
     // Initialize distribution.
     {
         cbDistribution.setSelectedItem(Randomizer.DEFAULT_DISTRIBUTION);
         // Remove null distribution.  Kind of hacky...
-        cbDistribution.removeItemAt(cbDistribution.getItemCount()-1);
+        cbDistribution.removeItemAt(cbDistribution.getItemCount() - 1);
     }
 
     /**
      * A map between probability distributions and specific distribution panels.
      */
-    private HashMap<ProbDistribution, ProbDistPanel> cardMap =
-        new HashMap<ProbDistribution, ProbDistPanel>();
+    private HashMap<ProbDistribution, ProbDistPanel> cardMap = new HashMap<ProbDistribution, ProbDistPanel>();
 
     /**
      * The main panel where all the different probability distribution panels
@@ -96,7 +92,7 @@ public class RandomizerPanel extends JPanel {
                 }
             }
         }
-    };    
+    };
 
     /**
      * This method is the default constructor. The parent window is set to null
@@ -129,12 +125,10 @@ public class RandomizerPanel extends JPanel {
     private void layoutPanel() {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
-        add(new LabelledItem("Distribution: ", cbDistribution),
-            BorderLayout.NORTH);
+        add(new LabelledItem("Distribution: ", cbDistribution), BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);
 
-        cbItemListener.itemStateChanged(new ItemEvent(cbDistribution,
-            ItemEvent.SELECTED, cardPanel, ItemEvent.ITEM_STATE_CHANGED));
+        cbItemListener.itemStateChanged(new ItemEvent(cbDistribution, ItemEvent.SELECTED, cardPanel, ItemEvent.ITEM_STATE_CHANGED));
         repaint();
         revalidate();
     }
@@ -162,17 +156,15 @@ public class RandomizerPanel extends JPanel {
     /**
      * Populates the fields with current values.
      *
-     * @param randomizers
-     *            List of randomizers
+     * @param randomizers List of randomizers
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
 
-        ParameterGetter<Randomizer, ProbDistribution> pdfGetter = (
-                r) -> ((Randomizer) r).getPdf();
+        ParameterGetter<Randomizer, ProbDistribution> pdfGetter = (r) -> ((Randomizer) r).getPdf();
         if (!NetworkUtils.isConsistent(randomizers, pdfGetter)) {
             if (!(cbDistribution.getItemCount() == ProbDistribution.values().length)) {
                 cbDistribution.addItem(ProbDistribution.NULL);
-                cbDistribution.setSelectedIndex(cbDistribution.getItemCount()-1);                
+                cbDistribution.setSelectedIndex(cbDistribution.getItemCount() - 1);
             }
             cardPanel.removeAll();
             cardPanel.add(new JPanel());
@@ -188,7 +180,7 @@ public class RandomizerPanel extends JPanel {
             Randomizer rand = (Randomizer) randomizers.get(0);
             ProbDistPanel rp = cardMap.get(rand.getPdf());
             cbDistribution.setSelectedItem(rand.getPdf());
-            rp.fillFieldValues(randomizers); 
+            rp.fillFieldValues(randomizers);
             cardPanel.removeAll();
             cardPanel.add(rp.getPanel());
             cardPanel.repaint();
@@ -237,14 +229,11 @@ public class RandomizerPanel extends JPanel {
     /**
      * Called externally when dialog is being closed.
      *
-     * @param rand
-     *            Random source
+     * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
-        if (!cbDistribution.getSelectedItem()
-            .equals(SimbrainConstants.NULL_STRING)) {
-            ProbDistribution pdf =
-                (ProbDistribution) cbDistribution.getSelectedItem();
+        if (!cbDistribution.getSelectedItem().equals(SimbrainConstants.NULL_STRING)) {
+            ProbDistribution pdf = (ProbDistribution) cbDistribution.getSelectedItem();
             cardMap.get(pdf).commitRandom(rand);
         }
     }
@@ -263,10 +252,8 @@ public class RandomizerPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled) {
         cbDistribution.setEnabled(enabled);
-        if (!cbDistribution.getSelectedItem().toString()
-            .equals(SimbrainConstants.NULL_STRING)) {
-            cardMap.get((ProbDistribution) cbDistribution.getSelectedItem())
-                .setEnabled(enabled);
+        if (!cbDistribution.getSelectedItem().toString().equals(SimbrainConstants.NULL_STRING)) {
+            cardMap.get((ProbDistribution) cbDistribution.getSelectedItem()).setEnabled(enabled);
         }
     }
 
@@ -281,36 +268,30 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the isUseBoundsBox.
      */
     public YesNoNull getTsClipping() {
-        if (cbDistribution.getSelectedItem().toString()
-            .equals(SimbrainConstants.NULL_STRING)) {
+        if (cbDistribution.getSelectedItem().toString().equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
-        return cardMap.get((ProbDistribution) cbDistribution
-            .getSelectedItem()).getTsClipping();
+        return cardMap.get((ProbDistribution) cbDistribution.getSelectedItem()).getTsClipping();
     }
 
     /**
      * @return Returns the tfLowBound.
      */
     public JTextField getTfLowBound() {
-        if (cbDistribution.getSelectedItem().toString()
-            .equals(SimbrainConstants.NULL_STRING)) {
+        if (cbDistribution.getSelectedItem().toString().equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
-        return cardMap.get((ProbDistribution) cbDistribution
-            .getSelectedItem()).getTfLowBound();
+        return cardMap.get((ProbDistribution) cbDistribution.getSelectedItem()).getTfLowBound();
     }
 
     /**
      * @return Returns the tfUpBound.
      */
     public JTextField getTfUpBound() {
-        if (cbDistribution.getSelectedItem().toString()
-            .equals(SimbrainConstants.NULL_STRING)) {
+        if (cbDistribution.getSelectedItem().toString().equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
-        return cardMap.get((ProbDistribution) cbDistribution
-            .getSelectedItem()).getTfUpBound();
+        return cardMap.get((ProbDistribution) cbDistribution.getSelectedItem()).getTfUpBound();
     }
 
     /**
@@ -319,8 +300,7 @@ public class RandomizerPanel extends JPanel {
      * @return the summary
      */
     public String getSummary() {
-        ProbDistribution pdf =
-            (ProbDistribution) cbDistribution.getSelectedItem();
+        ProbDistribution pdf = (ProbDistribution) cbDistribution.getSelectedItem();
         ProbDistPanel pdp = cardMap.get(pdf);
         double param1 = pdp.getParam1FieldVal();
         double param2 = pdp.getParam2FieldVal();
@@ -357,22 +337,18 @@ public class RandomizerPanel extends JPanel {
     }
 
     /**
-     *
      * @param pc
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
         cbDistribution.addPropertyChangeListener(pc);
-        if (!cbDistribution.getSelectedItem()
-            .equals(SimbrainConstants.NULL_STRING)) {
-            cardMap.get(cbDistribution.getSelectedItem())
-                .addPropertyChangeListenerToFields(pc);
+        if (!cbDistribution.getSelectedItem().equals(SimbrainConstants.NULL_STRING)) {
+            cardMap.get(cbDistribution.getSelectedItem()).addPropertyChangeListenerToFields(pc);
         }
     }
 
     /**
-    *
-    * @param fl
-    */
+     * @param fl
+     */
     public void addFocusListenerToFields(FocusListener fl) {
         for (ProbDistPanel pdp : cardMap.values()) {
             pdp.addFocusListenerToFields(fl);
@@ -385,7 +361,7 @@ public class RandomizerPanel extends JPanel {
     public void setParent(Window parent) {
         this.parent = parent;
     }
-    
+
     /**
      * Test main.
      */

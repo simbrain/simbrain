@@ -18,26 +18,30 @@
  */
 package org.simbrain.plot.actions;
 
+import org.simbrain.workspace.gui.GuiComponent;
+
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.Action;
-
-import org.simbrain.workspace.gui.GuiComponent;
-
 /**
  * Manages the actions for the plot components.
- *
  */
 public class PlotActionManager {
 
-    /** Open component action. */
+    /**
+     * Open component action.
+     */
     private final Action openPlotAction;
 
-    /** Save component action. */
+    /**
+     * Save component action.
+     */
     private final Action savePlotAction;
 
-    /** Save component as action. */
+    /**
+     * Save component as action.
+     */
     private final Action savePlotAsAction;
 
     /**
@@ -57,8 +61,7 @@ public class PlotActionManager {
      * @return the open/save plot actions.
      */
     public List<Action> getOpenSavePlotActions() {
-        return Arrays.asList(new Action[] { openPlotAction, savePlotAction,
-                savePlotAsAction });
+        return Arrays.asList(new Action[]{openPlotAction, savePlotAction, savePlotAsAction});
     }
 
     /**

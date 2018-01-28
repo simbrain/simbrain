@@ -18,22 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.EditMode;
@@ -45,71 +29,110 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>NetworkPropertiesPanel</b> is a panel for setting the properties of the
  * neural network, mainly the GUI. If the user presses ok, values become default
  * values. Restore defaults restores to original values. When canceling out the
  * values prior to making any changes are restored.
- *
  */
 public class NetworkPropertiesPanel extends JPanel {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     protected NetworkPanel networkPanel;
 
-    /** Background. */
+    /**
+     * Background.
+     */
     private static final String BACKGROUND = "Background";
 
-    /** Line. */
+    /**
+     * Line.
+     */
     private static final String LINE = "Line";
 
-    /** Hot node. */
+    /**
+     * Hot node.
+     */
     private static final String HOTNODE = "Hot node";
 
-    /** Cool node. */
+    /**
+     * Cool node.
+     */
     private static final String COOLNODE = "Cool node";
 
-    /** Excitatory weight. */
+    /**
+     * Excitatory weight.
+     */
     private static final String EXCITATORY = "Excitatory weight";
 
-    /** Inhibitory weight. */
+    /**
+     * Inhibitory weight.
+     */
     private static final String INHIBITORY = "Inhibitory weight";
 
-    /** Lasso. */
+    /**
+     * Lasso.
+     */
     private static final String LASSO = "Lasso";
 
-    /** Selection. */
+    /**
+     * Selection.
+     */
     private static final String SELECTION = "Selection";
 
-    /** Spike. */
+    /**
+     * Spike.
+     */
     private static final String SPIKE = "Spike";
 
-    /** Zero weight. */
+    /**
+     * Zero weight.
+     */
     private static final String ZERO = "Zero weight";
 
-    /** List of items for combo box. */
-    private String[] objectColorList = { BACKGROUND, HOTNODE, COOLNODE,
-            EXCITATORY, INHIBITORY, SPIKE, ZERO };
+    /**
+     * List of items for combo box.
+     */
+    private String[] objectColorList = {BACKGROUND, HOTNODE, COOLNODE, EXCITATORY, INHIBITORY, SPIKE, ZERO};
 
-    /** Color panel displays current color of item selected in combo box. */
+    /**
+     * Color panel displays current color of item selected in combo box.
+     */
     private JPanel colorPanel = new JPanel();
 
-    /** Change color combo box. */
+    /**
+     * Change color combo box.
+     */
     private JComboBox cbChangeColor = new JComboBox(objectColorList);
 
-    /** Change color of the item selected in combo box. */
+    /**
+     * Change color of the item selected in combo box.
+     */
     private JButton changeColorButton = new JButton("Set");
 
-    /** Color indicator. */
+    /**
+     * Color indicator.
+     */
     private JPanel colorIndicator = new JPanel();
 
-    /** Maximum size of weight slider. */
-    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5,
-            50, 10);
+    /**
+     * Maximum size of weight slider.
+     */
+    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
 
-    /** Minimum size of weight slider. */
-    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5,
-            50, 10);
+    /**
+     * Minimum size of weight slider.
+     */
+    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
 
     /**
      * Threshold above which subnetworks or groups with that many synapses stop
@@ -117,25 +140,39 @@ public class NetworkPropertiesPanel extends JPanel {
      */
     private JTextField tfSynapseVisibilityThreshold = new JTextField();
 
-    /** Nudge amount text field. */
+    /**
+     * Nudge amount text field.
+     */
     private JTextField nudgeAmountField = new JTextField();
 
-    /** Network time step text field. */
+    /**
+     * Network time step text field.
+     */
     private JTextField timeStepField = new JTextField();
-    
-    /** A field for updating how often the GUI redraws the network... */
+
+    /**
+     * A field for updating how often the GUI redraws the network...
+     */
     private JTextField iterUpdateField = new JTextField();
 
-    /** Wand radius. */
+    /**
+     * Wand radius.
+     */
     private JTextField wandRadiusField = new JTextField();
 
-    /** Show time check box. */
+    /**
+     * Show time check box.
+     */
     private JCheckBox showTimeBox = new JCheckBox();
 
-    /** Check box for whether to use subsampling. */
+    /**
+     * Check box for whether to use subsampling.
+     */
     private JCheckBox cbUseSubSampling = new JCheckBox();
 
-    /** Text field for number of subsamples to use. */
+    /**
+     * Text field for number of subsamples to use.
+     */
     private JTextField tfNumSubSamples = new JTextField();
 
     /**
@@ -189,18 +226,15 @@ public class NetworkPropertiesPanel extends JPanel {
         LabelledItemPanel miscPanel = new LabelledItemPanel();
         miscPanel.addItem("Network time step", timeStepField);
         miscPanel.addItem("GUI update frequency", iterUpdateField);
-        miscPanel.addItem("Synapse visibility threshold",
-                tfSynapseVisibilityThreshold);
+        miscPanel.addItem("Synapse visibility threshold", tfSynapseVisibilityThreshold);
         nudgeAmountField.setColumns(3);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
         miscPanel.addItem("Wand radius", wandRadiusField);
 
         // Subsampling Stuff
         miscPanel.add(new JSeparator(JSeparator.HORIZONTAL));
-        miscPanel.addItem("Use Subsampling for large neuron groups",
-                cbUseSubSampling);
-        miscPanel.addItem("Number of Subsamples / Subsampling Threshold",
-                tfNumSubSamples);
+        miscPanel.addItem("Use Subsampling for large neuron groups", cbUseSubSampling);
+        miscPanel.addItem("Number of Subsamples / Subsampling Threshold", tfNumSubSamples);
         updateSubSamplingStuff();
 
         // TODO: tooltips for all this
@@ -258,7 +292,7 @@ public class NetworkPropertiesPanel extends JPanel {
      */
     protected void updateSubSamplingStuff() {
         tfNumSubSamples.setEnabled(cbUseSubSampling.isSelected());
-   }
+    }
 
     /**
      * Update relevant colors based on combo box. As noted in
@@ -283,13 +317,11 @@ public class NetworkPropertiesPanel extends JPanel {
             if (theColor != null) {
                 NeuronNode.setCoolColor(Utils.colorToFloat(theColor));
             }
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(EXCITATORY)) {
+        } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
             if (theColor != null) {
                 SynapseNode.setExcitatoryColor(theColor);
             }
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(INHIBITORY)) {
+        } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
             if (theColor != null) {
                 SynapseNode.setInhibitoryColor(theColor);
             }
@@ -314,14 +346,10 @@ public class NetworkPropertiesPanel extends JPanel {
         weightSizeMinSlider.setValue(SynapseNode.getMinDiameter());
         showTimeBox.setSelected(networkPanel.getShowTime());
         wandRadiusField.setText(Integer.toString(EditMode.getWandRadius()));
-        timeStepField.setText(Double.toString(networkPanel.getNetwork()
-                .getTimeStep()));
-        iterUpdateField.setText(Integer.toString(networkPanel.getNetwork()
-        		.getUpdateFreq()));
-        nudgeAmountField
-                .setText(Double.toString(NetworkPanel.getNudgeAmount()));
-        tfSynapseVisibilityThreshold.setText(Integer.toString(Network
-                .getSynapseVisibilityThreshold()));
+        timeStepField.setText(Double.toString(networkPanel.getNetwork().getTimeStep()));
+        iterUpdateField.setText(Integer.toString(networkPanel.getNetwork().getUpdateFreq()));
+        nudgeAmountField.setText(Double.toString(NetworkPanel.getNudgeAmount()));
+        tfSynapseVisibilityThreshold.setText(Integer.toString(Network.getSynapseVisibilityThreshold()));
         cbUseSubSampling.setSelected(NeuronGroup.isUseSubSampling());
         tfNumSubSamples.setText(Integer.toString(NeuronGroup.getNumSubSamples()));
     }
@@ -331,15 +359,12 @@ public class NetworkPropertiesPanel extends JPanel {
      * these unchanged.
      */
     public void commitChanges() {
-        networkPanel.getNetwork().setTimeStep(
-                Double.parseDouble(timeStepField.getText()));
-		int upF = Integer.parseInt(iterUpdateField.getText());
-		upF = upF < 1 ? 1 : upF;
+        networkPanel.getNetwork().setTimeStep(Double.parseDouble(timeStepField.getText()));
+        int upF = Integer.parseInt(iterUpdateField.getText());
+        upF = upF < 1 ? 1 : upF;
         networkPanel.getNetwork().setUpdateFreq(upF);
-        NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
-                .getText()));
-        Network.setSynapseVisibilityThreshold(Integer
-                .parseInt(tfSynapseVisibilityThreshold.getText()));
+        NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
+        Network.setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {
             networkPanel.getEditMode().resetWandCursor();
@@ -349,8 +374,7 @@ public class NetworkPropertiesPanel extends JPanel {
         networkPanel.repaint();
 
         NeuronGroup.setUseSubSampling(cbUseSubSampling.isSelected());
-        NeuronGroup.setNumSubSamples(Integer.parseInt(tfNumSubSamples
-                .getText()));
+        NeuronGroup.setNumSubSamples(Integer.parseInt(tfNumSubSamples.getText()));
     }
 
     /**
@@ -360,8 +384,7 @@ public class NetworkPropertiesPanel extends JPanel {
      */
     public Color showColorChooser() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color",
-                colorIndicator.getBackground());
+        Color theColor = JColorChooser.showDialog(this, "Choose Color", colorIndicator.getBackground());
         colorChooser.setLocation(200, 200); // Set location of color chooser
         return theColor;
     }
@@ -375,16 +398,12 @@ public class NetworkPropertiesPanel extends JPanel {
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
             colorIndicator.setBackground(SynapseNode.getLineColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
-            colorIndicator.setBackground(Utils.floatToHue(NeuronNode
-                    .getHotColor()));
+            colorIndicator.setBackground(Utils.floatToHue(NeuronNode.getHotColor()));
         } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
-            colorIndicator.setBackground(Utils.floatToHue(NeuronNode
-                    .getCoolColor()));
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(EXCITATORY)) {
+            colorIndicator.setBackground(Utils.floatToHue(NeuronNode.getCoolColor()));
+        } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
             colorIndicator.setBackground(SynapseNode.getExcitatoryColor());
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(INHIBITORY)) {
+        } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
             colorIndicator.setBackground(SynapseNode.getInhibitoryColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
             colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());

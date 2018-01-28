@@ -18,11 +18,11 @@
  */
 package org.simbrain.world.textworld;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.textworld.TextWorld.TextItem;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * <b>DisplayComponent</b> is a component which wraps a display world with
@@ -30,10 +30,14 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
  */
 public class DisplayComponent extends WorkspaceComponent {
 
-    /** Instance of world of type DisplayWorld. */
+    /**
+     * Instance of world of type DisplayWorld.
+     */
     private DisplayWorld world;
 
-    /** Default number of string reader attributes to add. */
+    /**
+     * Default number of string reader attributes to add.
+     */
     private int DEFAULT_NUM_STRING_READERS = 10;
 
     /**
@@ -50,7 +54,7 @@ public class DisplayComponent extends WorkspaceComponent {
     /**
      * Construct a component from an existing world; used in deserializing.
      *
-     * @param name name of component
+     * @param name     name of component
      * @param newWorld provided world
      */
     public DisplayComponent(String name, DisplayWorld newWorld) {
@@ -64,19 +68,19 @@ public class DisplayComponent extends WorkspaceComponent {
      */
     private void init() {
         this.world = world;
-//        addConsumerType(new AttributeType(this, "DisplayClosestWord",
-//                double[].class, true));
-//        addConsumerType(new AttributeType(this, "DisplayString", String.class,
-//                false));
-//        addConsumerType(new AttributeType(this, "DisplayWord", double.class,
-//                true));
+        //        addConsumerType(new AttributeType(this, "DisplayClosestWord",
+        //                double[].class, true));
+        //        addConsumerType(new AttributeType(this, "DisplayString", String.class,
+        //                false));
+        //        addConsumerType(new AttributeType(this, "DisplayWord", double.class,
+        //                true));
         world.addListener(new TextListener() {
 
             public void textChanged() {
             }
 
             public void dictionaryChanged() {
-//                DisplayComponent.this.firePotentialAttributesChanged();
+                //                DisplayComponent.this.firePotentialAttributesChanged();
             }
 
             public void positionChanged() {
@@ -91,54 +95,52 @@ public class DisplayComponent extends WorkspaceComponent {
         });
     }
 
-//    @Override
-//    public List<PotentialConsumer> getPotentialConsumers() {
-//        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-//        for (AttributeType type : getVisibleConsumerTypes()) {
-//            if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
-//                for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
-//                    String description = "String reader " + (i + 1);
-//                    PotentialConsumer consumer = getStringConsumer();
-//                    consumer.setCustomDescription(description);
-//                    returnList.add(consumer);
-//                }
-//            }
-//            if (type.getTypeName().equalsIgnoreCase("DisplayWord")) {
-//                for (String word : world.getTokenDictionary()) {
-//                    PotentialConsumer consumer = getAttributeManager()
-//                            .createPotentialConsumer(
-//                                    world,
-//                                    "addTextIfAboveThreshold",
-//                                    new Class<?>[] { double.class, String.class },
-//                                    new Object[] { word });
-//                    consumer.setCustomDescription(word);
-//                    returnList.add(consumer);
-//                }
-//            }
-//            if (type.getTypeName().equalsIgnoreCase("DisplayClosestWord")) {
-//                PotentialConsumer consumer = getAttributeManager()
-//                        .createPotentialConsumer(world, "displayClosestWord",
-//                                double[].class);
-//                consumer.setCustomDescription("Vector reader");
-//                returnList.add(consumer);
-//
-//            }
-//        }
-//        return returnList;
-//    }
+    //    @Override
+    //    public List<PotentialConsumer> getPotentialConsumers() {
+    //        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    //        for (AttributeType type : getVisibleConsumerTypes()) {
+    //            if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
+    //                for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
+    //                    String description = "String reader " + (i + 1);
+    //                    PotentialConsumer consumer = getStringConsumer();
+    //                    consumer.setCustomDescription(description);
+    //                    returnList.add(consumer);
+    //                }
+    //            }
+    //            if (type.getTypeName().equalsIgnoreCase("DisplayWord")) {
+    //                for (String word : world.getTokenDictionary()) {
+    //                    PotentialConsumer consumer = getAttributeManager()
+    //                            .createPotentialConsumer(
+    //                                    world,
+    //                                    "addTextIfAboveThreshold",
+    //                                    new Class<?>[] { double.class, String.class },
+    //                                    new Object[] { word });
+    //                    consumer.setCustomDescription(word);
+    //                    returnList.add(consumer);
+    //                }
+    //            }
+    //            if (type.getTypeName().equalsIgnoreCase("DisplayClosestWord")) {
+    //                PotentialConsumer consumer = getAttributeManager()
+    //                        .createPotentialConsumer(world, "displayClosestWord",
+    //                                double[].class);
+    //                consumer.setCustomDescription("Vector reader");
+    //                returnList.add(consumer);
+    //
+    //            }
+    //        }
+    //        return returnList;
+    //    }
 
     /**
      * {@inheritDoc}
+     *
      * @param input
      * @param name
      * @param format
      * @return
-     * 
      */
-    public static DisplayComponent open(InputStream input, String name,
-            String format) {
-        DisplayWorld newWorld = (DisplayWorld) DisplayWorld.getXStream()
-                .fromXML(input);
+    public static DisplayComponent open(InputStream input, String name, String format) {
+        DisplayWorld newWorld = (DisplayWorld) DisplayWorld.getXStream().fromXML(input);
         return new DisplayComponent(name, newWorld);
     }
 
@@ -180,9 +182,9 @@ public class DisplayComponent extends WorkspaceComponent {
      *
      * @return the string consumer.
      */
-//    public PotentialConsumer getStringConsumer() {
-//        return this.getAttributeManager().createPotentialConsumer(world,
-//                "addText", String.class);
-//    }
+    //    public PotentialConsumer getStringConsumer() {
+    //        return this.getAttributeManager().createPotentialConsumer(world,
+    //                "addText", String.class);
+    //    }
 
 }

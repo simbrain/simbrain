@@ -18,19 +18,19 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show GUI weights action.
  */
 public final class ShowWeightsAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -51,8 +51,9 @@ public final class ShowWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show weights in GUI (Use 5 to toggle)");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

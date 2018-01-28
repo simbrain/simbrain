@@ -19,56 +19,70 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * An abstract superclass for discrete and continuous time sigmodial squashing
  * function based update rules containing methods and variables common to both.
- * 
+ *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
-    BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-    BoundedUpdateRule, NoisyUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
 
-    /** The default squashing function, informs the default upper and lower bounds. */
+    /**
+     * The default squashing function, informs the default upper and lower bounds.
+     */
     public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION = SquashingFunction.LOGISTIC;
 
-    /** The Default upper bound. */
+    /**
+     * The Default upper bound.
+     */
     public static final double DEFAULT_UPPER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
 
-    /** The Default lower bound. */
+    /**
+     * The Default lower bound.
+     */
     public static final double DEFAULT_LOWER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
 
-    /** Current implementation. */
+    /**
+     * Current implementation.
+     */
     protected SquashingFunction sFunction;
 
-    /** Bias. */
+    /**
+     * Bias.
+     */
     protected double bias;
 
-    /** Slope. */
+    /**
+     * Slope.
+     */
     protected double slope = 1;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     protected Randomizer noiseGenerator = new Randomizer();
 
-    /** Adds noise to neuron. */
+    /**
+     * Adds noise to neuron.
+     */
     protected boolean addNoise;
 
-    /** The upper bound of the activity if clipping is used. */
+    /**
+     * The upper bound of the activity if clipping is used.
+     */
     protected double upperBound = DEFAULT_UPPER_BOUND;
 
-    /** The lower bound of the activity if clipping is used. */
+    /**
+     * The lower bound of the activity if clipping is used.
+     */
     protected double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
-     * 
+     *
      */
     public AbstractSigmoidalRule() {
         super();
@@ -76,7 +90,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * 
      * @param sFunction
      */
     public AbstractSigmoidalRule(SquashingFunction sFunction) {
@@ -97,22 +110,21 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public final void setSquashFunctionType(SquashingFunction type) {
         this.sFunction = type;
         setUpperBound(type.getDefaultUpperBound());
         setLowerBound(type.getDefaultLowerBound());
     }
-    
+
     /**
      * Integer getter for use in property editors.
      *
      * @return the index for the squashing function
      */
     public final int getSquashFunctionInt() {
-        return  sFunction.ordinal();
+        return sFunction.ordinal();
     }
 
     /**
@@ -132,8 +144,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionPointSlope
-     *            The inflectionPointSlope to set.
+     * @param inflectionPointSlope The inflectionPointSlope to set.
      */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
@@ -147,8 +158,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param noise
-     *            The noise to set.
+     * @param noise The noise to set.
      */
     public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
@@ -162,8 +172,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param addNoise
-     *            The addNoise to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -171,7 +180,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
 
     /**
      * Copy the overlapping bits of the rule for subclasses.
-     * 
+     *
      * @param sr the sigmoid rule to copy
      * @return the copy.
      */
@@ -184,7 +193,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
         return sr;
     }
 
-    
+
     @Override
     public final double getUpperBound() {
         return upperBound;
@@ -219,8 +228,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionY
-     *            The inflectionY to set.
+     * @param inflectionY The inflectionY to set.
      */
     @Override
     public final void setBias(final double inflectionY) {

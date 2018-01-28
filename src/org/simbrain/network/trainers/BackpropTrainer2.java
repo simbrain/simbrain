@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -31,6 +26,11 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.randomizer.Randomizer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Array-backed backprop, currently using JBlas.
@@ -42,63 +42,101 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class BackpropTrainer2 extends IterableTrainer {
 
-    /** Specifies the method for batching data when calculating network outputs and errors. */
+    /**
+     * Specifies the method for batching data when calculating network outputs and errors.
+     */
     public enum UpdateMethod {
-        /** Calculate outputs and errors for every row of the training data. */
-        EPOCH,
-        /** Not Implemented. */
-        BATCH,
-        /** Calculate outputs and errors for a randomly selected row of training data. */
-        STOCHASTIC,
-        /** Not Implemented */
-        MINI_BATCH,
-        /** Calculate outputs and errors for a single row of the training data determined by the current iteration. */
+        /**
+         * Calculate outputs and errors for every row of the training data.
+         */
+        EPOCH, /**
+         * Not Implemented.
+         */
+        BATCH, /**
+         * Calculate outputs and errors for a randomly selected row of training data.
+         */
+        STOCHASTIC, /**
+         * Not Implemented
+         */
+        MINI_BATCH, /**
+         * Calculate outputs and errors for a single row of the training data determined by the current iteration.
+         */
         SINGLE;
     }
 
-    /** Default learning rate. */
+    /**
+     * Default learning rate.
+     */
     public static final double DEFAULT_LEARNING_RATE = 0.1;
 
-    /** Default momentum. */
+    /**
+     * Default momentum.
+     */
     public static final double DEFAULT_MOMENTUM = 0.0;
 
-    /** The backprop network to be trained. */
+    /**
+     * The backprop network to be trained.
+     */
     private BackpropNetwork net;
 
-    /** Weight matrices ordered input to output. */
+    /**
+     * Weight matrices ordered input to output.
+     */
     public List<DoubleMatrix> weightMatrices = new ArrayList<DoubleMatrix>();
 
-    /** Reference to synapse groups. */
+    /**
+     * Reference to synapse groups.
+     */
     private List<SynapseGroup> synapseGroups = new ArrayList<SynapseGroup>();
 
-    /** Memory of last weight updates for momentum. */
+    /**
+     * Memory of last weight updates for momentum.
+     */
     private List<DoubleMatrix> lastWeightUpdates = new ArrayList<DoubleMatrix>();
 
-    /** Memory of last bias updates for momentum. */
+    /**
+     * Memory of last bias updates for momentum.
+     */
     private List<DoubleMatrix> lastBiasUpdates = new ArrayList<DoubleMatrix>();
 
-    /** Activation vectors. */
+    /**
+     * Activation vectors.
+     */
     private List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
 
-    /** Reference to neuron groups. */
+    /**
+     * Reference to neuron groups.
+     */
     private List<NeuronGroup> neuronGroups = new ArrayList<NeuronGroup>();
 
-    /** Net inputs. */
+    /**
+     * Net inputs.
+     */
     private List<DoubleMatrix> netInputs = new ArrayList<DoubleMatrix>();
 
-    /** Biases. */
+    /**
+     * Biases.
+     */
     private List<DoubleMatrix> biases = new ArrayList<DoubleMatrix>();
 
-    /** Errors for a single input row. */
+    /**
+     * Errors for a single input row.
+     */
     private DoubleMatrix errors;
 
-    /** Aggregate errors for a batch of input rows. */
+    /**
+     * Aggregate errors for a batch of input rows.
+     */
     private DoubleMatrix batchErrors;
 
-    /** Deltas on on the neurons of the network (error times derivative). */
+    /**
+     * Deltas on on the neurons of the network (error times derivative).
+     */
     private List<DoubleMatrix> deltas = new ArrayList<DoubleMatrix>();
 
-    /** Holder for derivatives. */
+    /**
+     * Holder for derivatives.
+     */
     private List<DoubleMatrix> derivs = new ArrayList<DoubleMatrix>();
 
     /**
@@ -107,35 +145,54 @@ public class BackpropTrainer2 extends IterableTrainer {
      */
     private DoubleMatrix inputLayer;
 
-    /** Current target vector. */
+    /**
+     * Current target vector.
+     */
     private DoubleMatrix targetVector;
 
-    /** Inputs. */
+    /**
+     * Inputs.
+     */
     private DoubleMatrix inputData;
 
-    /** Targets. */
+    /**
+     * Targets.
+     */
     private DoubleMatrix targetData;
 
-    /** Parameter randomizer. */
+    /**
+     * Parameter randomizer.
+     */
     private final Randomizer rand = new Randomizer();
 
-    /** List of activation functions for easy reference. */
+    /**
+     * List of activation functions for easy reference.
+     */
     private List<TransferFunction> updateRules = new ArrayList<TransferFunction>();
 
-    /** Current update method. */
+    /**
+     * Current update method.
+     */
     private UpdateMethod updateMethod = UpdateMethod.STOCHASTIC;
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /** Momentum. Must be between 0 and 1. */
+    /**
+     * Momentum. Must be between 0 and 1.
+     */
     private double momentum = DEFAULT_MOMENTUM;
 
-    /** Mean squared error of the most recent training step. */
+    /**
+     * Mean squared error of the most recent training step.
+     */
     private double mse;
 
     /**
      * Construct the trainer.
+     *
      * @param network the network to train
      */
     public BackpropTrainer2(BackpropNetwork network) {
@@ -193,6 +250,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /**
      * Backpropagate error on a single row of the dataset.
+     *
      * @param row Which row of the dataset to use for this update.
      * @return mean squared error of the row
      */
@@ -214,6 +272,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /**
      * Backpropagate errors for all rows in the dataset.
+     *
      * @return mean squared error
      */
     private double trainRows(int firstRow, int lastRow) {
@@ -307,10 +366,7 @@ public class BackpropTrainer2 extends IterableTrainer {
             int kk = 0;
             for (int ii = 0; ii < prevLayer.length; ii++) {
                 for (int jj = 0; jj < currentLayer.length; jj++) {
-                    double deltaVal = learningRate
-                            * deltas.get(layerIndex).data[jj]
-                            * prevLayer.data[ii]
-                            + (momentum * lastDeltas.data[kk]);
+                    double deltaVal = learningRate * deltas.get(layerIndex).data[jj] * prevLayer.data[ii] + (momentum * lastDeltas.data[kk]);
                     wm.data[kk] += deltaVal;
                     lastDeltas.data[kk] = deltaVal;
                     kk++;
@@ -318,8 +374,7 @@ public class BackpropTrainer2 extends IterableTrainer {
             }
             // Update biases
             for (int ii = 0; ii < biasVector.length; ii++) {
-                double deltaVal = learningRate * deltas.get(layerIndex).data[ii]
-                        + (momentum * lastBiasDeltas.data[ii]);
+                double deltaVal = learningRate * deltas.get(layerIndex).data[ii] + (momentum * lastBiasDeltas.data[ii]);
                 biasVector.data[ii] += deltaVal;
                 lastBiasDeltas.data[ii] = deltaVal;
             }
@@ -422,10 +477,10 @@ public class BackpropTrainer2 extends IterableTrainer {
      * which can be considered a "forward" propagation in a column-major
      * paradigm.
      *
-     * @param inputs the right-hand vector MUST be a vector
+     * @param inputs  the right-hand vector MUST be a vector
      * @param weights the matrix
      * @param outputs the result of a matrix-vector multiply MUST be a vector of the
-     *           same number of elements as inputs, can be equal to inputs.
+     *                same number of elements as inputs, can be equal to inputs.
      */
     public static void forwardPropagate(DoubleMatrix inputs, DoubleMatrix weights, DoubleMatrix outputs) {
         boolean wasRowX = false;
@@ -472,8 +527,7 @@ public class BackpropTrainer2 extends IterableTrainer {
      * @param _y the result of a matrix-vector multiply MUST be a vector of the
      *           same number of elements as _x, can be equal to _x.
      */
-    public static void backwardPropagate(DoubleMatrix _x, DoubleMatrix _A,
-                                         DoubleMatrix _y) {
+    public static void backwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
         boolean wasColX = false;
         boolean wasColY = false;
         if (_x.isColumnVector()) {

@@ -13,25 +13,31 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Box;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.LayeredNetworkCreationPanel.LayerCreationPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
 
 /**
  * <b>LMSDialog</b> is a dialog box for creating an LMS network.
  */
 public class LMSCreationDialog extends StandardDialog {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** Input layer creation panel. */
+    /**
+     * Input layer creation panel.
+     */
     private LayerCreationPanel inputLayer;
 
-    /** Target layer creation panel. */
+    /**
+     * Target layer creation panel.
+     */
     private LayerCreationPanel outputLayer;
 
     /**
@@ -52,7 +58,7 @@ public class LMSCreationDialog extends StandardDialog {
 
         // TODO: These defaults should come from the model via something like
         // fill field values
-        Box panel  = Box.createVerticalBox();
+        Box panel = Box.createVerticalBox();
         inputLayer = new LayerCreationPanel("Input layer", 5);
         inputLayer.setComboBox("Linear");
         outputLayer = new LayerCreationPanel("Output layer", 5);
@@ -69,9 +75,7 @@ public class LMSCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
 
         // Create the layered network
-        LMSNetwork lms =   new LMSNetwork(networkPanel.getNetwork(), inputLayer
-                .getNumNeurons(), outputLayer.getNumNeurons(),
-                networkPanel.getWhereToAdd());
+        LMSNetwork lms = new LMSNetwork(networkPanel.getNetwork(), inputLayer.getNumNeurons(), outputLayer.getNumNeurons(), networkPanel.getWhereToAdd());
         lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
         lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
         networkPanel.getNetwork().addGroup(lms);

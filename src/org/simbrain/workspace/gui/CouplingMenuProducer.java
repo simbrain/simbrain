@@ -18,12 +18,12 @@
  */
 package org.simbrain.workspace.gui;
 
-import javax.swing.JMenu;
-
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import javax.swing.*;
 
 /**
  * Menu for making a single coupling. This menu is initialized with a potential
@@ -33,18 +33,22 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class CouplingMenuProducer extends JMenu {
 
-    /** Reference to workspace. */
+    /**
+     * Reference to workspace.
+     */
     Workspace workspace;
 
-    /** The base attribute for this menu. */
+    /**
+     * The base attribute for this menu.
+     */
     Producer<?> producer;
 
     /**
      * Construct the menu.
      *
-     * @param menuName the name of the menu
+     * @param menuName  the name of the menu
      * @param workspace the workspace
-     * @param producer the target consuming attribute.
+     * @param producer  the target consuming attribute.
      */
     public CouplingMenuProducer(String menuName, Workspace workspace, Producer<?> producer) {
         super(menuName);
@@ -63,8 +67,7 @@ public class CouplingMenuProducer extends JMenu {
             JMenu componentMenu = new JMenu(component.getName());
             for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getAllConsumers(component)) {
                 if (consumer.getType() == producer.getType()) {
-                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace, consumer.toString(),
-                            producer, consumer);
+                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace, consumer.toString(), producer, consumer);
                     componentMenu.add(menuItem);
                 }
             }

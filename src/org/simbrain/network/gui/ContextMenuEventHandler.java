@@ -18,19 +18,20 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.geom.Point2D;
-
-import javax.swing.JPopupMenu;
-
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
+
+import javax.swing.*;
+import java.awt.geom.Point2D;
 
 /**
  * Context menu event handler.
  */
 final class ContextMenuEventHandler extends PBasicInputEventHandler {
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -52,14 +53,14 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         event.setHandled(true); // seems to confuse zoom event handler??
         JPopupMenu contextMenu = networkPanel.getContextMenu();
         Point2D canvasPosition = event.getCanvasPosition();
-        contextMenu.show(networkPanel, (int) canvasPosition.getX(),
-                (int) canvasPosition.getY());
+        contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
         networkPanel.getCanvas().getCamera().localToView(canvasPosition);
         networkPanel.setLastClickedPosition(canvasPosition);
     }
 
-    /** @see PBasicInputEventHandler 
+    /**
      * @param event
+     * @see PBasicInputEventHandler
      */
     public void mousePressed(final PInputEvent event) {
         if (event.isPopupTrigger()) {
@@ -68,8 +69,9 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         }
     }
 
-    /** @see PBasicInputEventHandler 
+    /**
      * @param event
+     * @see PBasicInputEventHandler
      */
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {

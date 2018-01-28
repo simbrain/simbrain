@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
+import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.NetworkPanel;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
-
-import org.piccolo2d.PNode;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * PNode representation of a group of synapses. Superclass of  more specific
@@ -36,33 +36,39 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends PNode implements GroupNode,
-    PropertyChangeListener {
+public class SynapseGroupNode extends PNode implements GroupNode, PropertyChangeListener {
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     protected final NetworkPanel networkPanel;
 
-    /** Reference to represented group node. */
+    /**
+     * Reference to represented group node.
+     */
     protected final SynapseGroup synapseGroup;
 
-    /** The outlined objects (synapses) for this node. */
+    /**
+     * The outlined objects (synapses) for this node.
+     */
     protected final OutlinedObjects outlinedObjects;
 
-    /** The interaction box for this neuron group. */
+    /**
+     * The interaction box for this neuron group.
+     */
     protected SynapseGroupInteractionBox interactionBox;
 
     /**
      * Constant for use in group changed events, indicating that the visibility
      * of synpases in a synapse group has changed.
      */
-    public static final String SYNAPSE_VISIBILITY_CHANGED =
-        "synapseVisibilityChanged";
+    public static final String SYNAPSE_VISIBILITY_CHANGED = "synapseVisibilityChanged";
 
     /**
      * Create a Synapse Group PNode.
      *
      * @param networkPanel parent panel
-     * @param group the synapse group
+     * @param group        the synapse group
      */
     protected SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         this.networkPanel = networkPanel;
@@ -84,7 +90,9 @@ public class SynapseGroupNode extends PNode implements GroupNode,
         // This is needed for synapse groups within subnetworks
         // to be updated properly when neuron groups are moved.
         layoutChildren();
-    };
+    }
+
+    ;
 
 
     /**

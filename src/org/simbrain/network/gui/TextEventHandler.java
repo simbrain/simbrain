@@ -18,12 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-
-import javax.swing.text.BadLocationException;
-
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEvent;
@@ -33,14 +27,20 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.nodes.TextNode;
 
+import javax.swing.text.BadLocationException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+
 /**
  * Event handler for text nodes, so that they can be edited directly on the
  * screen.
  */
-public class TextEventHandler extends PStyledTextEventHandler implements
-        ActionListener {
+public class TextEventHandler extends PStyledTextEventHandler implements ActionListener {
 
-    /** Reference to parent network. */
+    /**
+     * Reference to parent network.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -64,17 +64,12 @@ public class TextEventHandler extends PStyledTextEventHandler implements
         if (pickedNode instanceof PStyledText) {
             this.reshapeEditorLater();
             startEditing(inputEvent, (PStyledText) pickedNode);
-        }
-
-        else if (pickedNode instanceof PCamera) {
+        } else if (pickedNode instanceof PCamera) {
 
             // Make a new text object and then edit it
-            NetworkTextObject text = new NetworkTextObject(
-                    networkPanel.getNetwork(), inputEvent.getPosition().getX(),
-                    inputEvent.getPosition().getY());
+            NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(), inputEvent.getPosition().getY());
             networkPanel.getNetwork().addText(text);
-            TextNode node = (TextNode) networkPanel.getObjectNodeMap()
-                    .get(text);
+            TextNode node = (TextNode) networkPanel.getObjectNodeMap().get(text);
             if (node != null) {
                 startEditing(inputEvent, node.getPStyledText());
             }
@@ -94,9 +89,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements
                 editedText.removeFromParent();
             } else {
                 try {
-                    node.getTextObject().setText(
-                            editedText.getDocument().getText(0,
-                                    editedText.getDocument().getLength()));
+                    node.getTextObject().setText(editedText.getDocument().getText(0, editedText.getDocument().getLength()));
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -122,10 +115,11 @@ public class TextEventHandler extends PStyledTextEventHandler implements
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /** @see PInputEventFilter 
+        /**
          * @param event
          * @param type
          * @return
+         * @see PInputEventFilter
          */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
             EditMode editMode = networkPanel.getEditMode();

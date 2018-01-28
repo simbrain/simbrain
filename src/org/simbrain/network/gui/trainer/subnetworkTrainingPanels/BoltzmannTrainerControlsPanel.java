@@ -18,59 +18,60 @@
  */
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
-import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.BoltzmannMachine;
-import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.trainers.BoltzmannTrainer;
-import org.simbrain.network.trainers.SOMTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.concurrent.Executors;
 
 /**
  * Training panel for SOM Network.
  */
 public class BoltzmannTrainerControlsPanel extends JPanel {
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     private NetworkPanel panel;
 
-    /** The network being trained and edited. */
+    /**
+     * The network being trained and edited.
+     */
     private BoltzmannMachine network;
 
-    /** Reference to trainer. */
+    /**
+     * Reference to trainer.
+     */
     private BoltzmannTrainer trainer;
 
-    /** Current number of iterations. */
+    /**
+     * Current number of iterations.
+     */
     private JLabel iterationsLabel = new JLabel("--- ");
 
-    /** Current Learning Rate. */
+    /**
+     * Current Learning Rate.
+     */
     private JLabel lLearningRate = new JLabel();
 
-    /** Current Neighborhood Size. */
+    /**
+     * Current Neighborhood Size.
+     */
     private JLabel lNeighborhoodSize = new JLabel();
 
     /**
      * Construct the SOM Training Controls Panel.
+     *
      * @param panel
      * @param trainer reference to the SOM trainer
      * @param network
      */
-    public BoltzmannTrainerControlsPanel(final NetworkPanel panel,
-            final BoltzmannTrainer trainer, final BoltzmannMachine network) {
+    public BoltzmannTrainerControlsPanel(final NetworkPanel panel, final BoltzmannTrainer trainer, final BoltzmannMachine network) {
         this.panel = panel;
         this.trainer = trainer;
         this.network = network;
@@ -136,15 +137,14 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
      * Update internal labels on panel.
      */
     private void updatePanel() {
-//        lLearningRate.setText("" + network.getSom().getAlpha());
-//        lNeighborhoodSize.setText("" + network.getSom().getNeighborhoodSize());
+        //        lLearningRate.setText("" + network.getSom().getAlpha());
+        //        lNeighborhoodSize.setText("" + network.getSom().getNeighborhoodSize());
         iterationsLabel.setText("" + trainer.getIteration());
     }
 
     /**
      * A "play" action, that can be used to repeatedly iterate iterable training
      * algorithms.
-     *
      */
     private Action runAction = new AbstractAction() {
 
@@ -152,8 +152,7 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             // putValue(NAME, "Open (.csv)");
-            putValue(SHORT_DESCRIPTION,
-                    "Iterate training until stopping condition met");
+            putValue(SHORT_DESCRIPTION, "Iterate training until stopping condition met");
         }
 
         /**
@@ -188,10 +187,7 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
                                 // }
                             }
                         } catch (DataNotInitializedException e) {
-                            JOptionPane.showOptionDialog(null, e.getMessage(),
-                                    "Warning", JOptionPane.DEFAULT_OPTION,
-                                    JOptionPane.WARNING_MESSAGE, null, null,
-                                    null);
+                            JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
                         }
                     }
                 });
@@ -230,9 +226,7 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
                 updatePanel();
                 panel.getNetwork().fireGroupUpdated(network);
             } catch (DataNotInitializedException e) {
-                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
         }
 
@@ -254,7 +248,7 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-//            network.getSom().reset();
+            //            network.getSom().reset();
             trainer.setIteration(0);
             panel.getNetwork().fireGroupUpdated(network);
             updatePanel();
@@ -276,10 +270,9 @@ public class BoltzmannTrainerControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-//            network.getSom().randomizeIncomingWeights();
+            //            network.getSom().randomizeIncomingWeights();
             updatePanel();
-            panel.getNetwork().fireGroupUpdated(
-                    network.getSynapseGroup());
+            panel.getNetwork().fireGroupUpdated(network.getSynapseGroup());
         }
     };
 

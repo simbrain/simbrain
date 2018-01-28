@@ -17,22 +17,6 @@
  */
 package org.simbrain.util.scripteditor;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.SearchContext;
@@ -40,40 +24,66 @@ import org.fife.ui.rtextarea.SearchEngine;
 import org.fife.ui.rtextarea.SearchResult;
 import org.simbrain.util.LabelledItemPanel;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * A find / replace dialog for RSyntaxTextArea (by Robert Futrell).
- *
+ * <p>
  * See http://fifesoft.com/rsyntaxtextarea/
  *
  * @author Jeff Yoshimi
  */
 public class FindReplaceDialog extends JPanel {
 
-    /** Search field. */
+    /**
+     * Search field.
+     */
     private JTextField searchField;
 
-    /** Replace field. */
+    /**
+     * Replace field.
+     */
     private JTextField replaceField;
 
-    /** Whether to use regular expressions. */
+    /**
+     * Whether to use regular expressions.
+     */
     private JCheckBox regexCB = new JCheckBox("Regular expressions");
 
-    /** Match case. */
+    /**
+     * Match case.
+     */
     private JCheckBox matchCaseCB = new JCheckBox("Match Case");
 
-    /** Whole world. */
+    /**
+     * Whole world.
+     */
     private JCheckBox wholeWordCB = new JCheckBox("Whole word");
 
-    /** Wrap search. */
+    /**
+     * Wrap search.
+     */
     private JCheckBox wrapSearchCB = new JCheckBox("Wrap Search");
 
-    /** Search backward. */
+    /**
+     * Search backward.
+     */
     private JRadioButton backwardSearch = new JRadioButton("Backward");
 
-    /** Search forward. */
+    /**
+     * Search forward.
+     */
     private JRadioButton forwardSearch = new JRadioButton("Forward");
 
-    /** Reference to RSyntaxTextArea. */
+    /**
+     * Reference to RSyntaxTextArea.
+     */
     private RSyntaxTextArea textArea;
 
     // TODO
@@ -82,7 +92,7 @@ public class FindReplaceDialog extends JPanel {
 
     /**
      * Construct the panel.
-     * 
+     *
      * @param frame
      * @param editor
      */
@@ -97,8 +107,7 @@ public class FindReplaceDialog extends JPanel {
         JPanel optionsPanel = new JPanel(new GridLayout(2, 2));
         Border paddingBorderOptions = new EmptyBorder(10, 10, 10, 10);
         Border titleBorderOptions = BorderFactory.createTitledBorder("Options");
-        optionsPanel.setBorder(new CompoundBorder(paddingBorderOptions,
-                titleBorderOptions));
+        optionsPanel.setBorder(new CompoundBorder(paddingBorderOptions, titleBorderOptions));
         optionsPanel.add(regexCB);
         optionsPanel.add(matchCaseCB);
         optionsPanel.add(wholeWordCB);
@@ -108,10 +117,8 @@ public class FindReplaceDialog extends JPanel {
         // Direction Panel
         JPanel directionPanel = new JPanel(new GridLayout(1, 2));
         Border paddingBorderDirection = new EmptyBorder(10, 10, 10, 10);
-        Border titleBorderDirection = BorderFactory
-                .createTitledBorder("Direction");
-        directionPanel.setBorder(new CompoundBorder(paddingBorderDirection,
-                titleBorderDirection));
+        Border titleBorderDirection = BorderFactory.createTitledBorder("Direction");
+        directionPanel.setBorder(new CompoundBorder(paddingBorderDirection, titleBorderDirection));
         ButtonGroup group = new ButtonGroup();
         group.add(forwardSearch);
         group.add(backwardSearch);
@@ -184,8 +191,7 @@ public class FindReplaceDialog extends JPanel {
                 editor.setLastReplaceString(replaceField.getText());
                 SearchContext context = setUpContext();
                 if (context != null) {
-                    SearchResult replacements = SearchEngine.replaceAll(textArea,
-                            context);
+                    SearchResult replacements = SearchEngine.replaceAll(textArea, context);
                     // TODO: Display number of replacements made in dialog
                     // using replacements.getCount()
                 }

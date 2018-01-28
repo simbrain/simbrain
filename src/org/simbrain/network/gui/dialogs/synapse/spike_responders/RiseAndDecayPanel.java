@@ -18,12 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
@@ -32,15 +26,24 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * <b>RiseAndDecayPanel</b>.
  */
 public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
 
-    /** Maximum response field. */
+    /**
+     * Maximum response field.
+     */
     private JTextField tfMaximumResponse = new JTextField();
 
-    /** Decay rate field. */
+    /**
+     * Decay rate field.
+     */
     private JTextField tfTimeConstant = new JTextField();
 
     /**
@@ -58,15 +61,15 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         this.addItem("Maximum response", tfMaximumResponse);
         this.addItem("Time Constant", tfTimeConstant);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public RiseAndDecayPanel deepCopy() {
-    	RiseAndDecayPanel cpy = new RiseAndDecayPanel();
-    	cpy.tfMaximumResponse.setText(this.tfMaximumResponse.getText());
-    	cpy.tfTimeConstant.setText(this.tfTimeConstant.getText());
-    	return cpy;
+        RiseAndDecayPanel cpy = new RiseAndDecayPanel();
+        cpy.tfMaximumResponse.setText(this.tfMaximumResponse.getText());
+        cpy.tfTimeConstant.setText(this.tfTimeConstant.getText());
+        return cpy;
     }
 
     /**
@@ -74,10 +77,8 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      */
     @Override
     public void fillDefaultValues() {
-        tfMaximumResponse.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getMaximumResponse()));
-        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getTimeConstant()));
+        tfMaximumResponse.setText(Double.toString(PROTOTYPE_RESPONDER.getMaximumResponse()));
+        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER.getTimeConstant()));
     }
 
     /**
@@ -91,21 +92,17 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle consistency of multiply selections
 
         // Handle Maximum Response
-        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
-                "getMaximumResponse")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class, "getMaximumResponse")) {
             tfMaximumResponse.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfMaximumResponse.setText(Double.toString(spikeResponder
-                    .getMaximumResponse()));
+            tfMaximumResponse.setText(Double.toString(spikeResponder.getMaximumResponse()));
         }
 
         // Handle Decay Rate
-        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
-                "getTimeConstant")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class, "getTimeConstant")) {
             tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfTimeConstant.setText(Double.toString(spikeResponder
-                    .getTimeConstant()));
+            tfTimeConstant.setText(Double.toString(spikeResponder.getTimeConstant()));
 
         }
 
@@ -151,8 +148,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         double maxResponse = Utils.doubleParsable(tfMaximumResponse);
         if (!Double.isNaN(maxResponse)) {
             for (Synapse s : synapses) {
-                ((RiseAndDecay) s.getSpikeResponder())
-                        .setMaximumResponse(maxResponse);
+                ((RiseAndDecay) s.getSpikeResponder()).setMaximumResponse(maxResponse);
             }
         }
 
@@ -160,8 +156,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         double timeConstant = Utils.doubleParsable(tfTimeConstant);
         if (!Double.isNaN(timeConstant)) {
             for (Synapse s : synapses) {
-                ((RiseAndDecay) s.getSpikeResponder())
-                        .setTimeConstant(timeConstant);
+                ((RiseAndDecay) s.getSpikeResponder()).setTimeConstant(timeConstant);
             }
         }
 
@@ -181,8 +176,8 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      */
     @Override
     public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	tfMaximumResponse.setEnabled(enabled);
-    	tfTimeConstant.setEnabled(enabled);
+        super.setEnabled(enabled);
+        tfMaximumResponse.setEnabled(enabled);
+        tfTimeConstant.setEnabled(enabled);
     }
 }

@@ -36,8 +36,7 @@ public class GroupAdapter implements GroupListener {
     }
 
     @Override
-    public void groupChanged(NetworkEvent<Group> networkEvent,
-            String changeDescription) {
+    public void groupChanged(NetworkEvent<Group> networkEvent, String changeDescription) {
     }
 
     @Override

@@ -18,21 +18,17 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import javafx.scene.chart.Chart;
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.plot.barchart.BarChartModel.Bar;
 import org.simbrain.workspace.Consumable;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Data model for a time series plot.
@@ -315,7 +311,7 @@ public class TimeSeriesModel extends ChartModel {
      * @param value value to add.
      */
     public void addData(double value) {
-        addData(0,timeSupplier.get(), value);
+        addData(0, timeSupplier.get(), value);
     }
 
     /**

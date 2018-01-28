@@ -18,6 +18,10 @@
  */
 package org.simbrain.util.projection;
 
+import com.Ostermiller.util.CSVParser;
+import org.apache.log4j.Logger;
+import org.simbrain.util.SimbrainPreferences;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,11 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.simbrain.util.SimbrainPreferences;
-
-import com.Ostermiller.util.CSVParser;
 
 /**
  * <b>Projector</b> is a the main class of this package, which provides an
@@ -40,10 +39,14 @@ import com.Ostermiller.util.CSVParser;
  */
 public class Projector {
 
-    /** Log4j logger. */
+    /**
+     * Log4j logger.
+     */
     private static Logger logger = Logger.getLogger(Projector.class);
 
-    /** Listener list. */
+    /**
+     * Listener list.
+     */
     private List<ProjectorListener> listeners = new ArrayList<ProjectorListener>();
 
     /**
@@ -69,7 +72,9 @@ public class Projector {
      */
     private final static int DEFAULT_NUMBER_OF_DIMENSIONS = 25;
 
-    /** Default projection method. */
+    /**
+     * Default projection method.
+     */
     private final static String DEFAULT_PROJECTION_METHOD = "PCA";
 
     /**
@@ -78,10 +83,14 @@ public class Projector {
      */
     protected double tolerance;
 
-    /** References to projection objects. */
+    /**
+     * References to projection objects.
+     */
     private ProjectionMethod projectionMethod;
 
-    /** List of Neuron update rules; used in Gui Combo boxes. */
+    /**
+     * List of Neuron update rules; used in Gui Combo boxes.
+     */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
 
     // Initialization
@@ -98,7 +107,9 @@ public class Projector {
         tolerance = SimbrainPreferences.getDouble("projectorTolerance");
     }
 
-    /** Manages coloring the datapoints. */
+    /**
+     * Manages coloring the datapoints.
+     */
     private final DataColoringManager colorManager;
 
     /**
@@ -161,8 +172,7 @@ public class Projector {
     public void addDatapoint(final DataPointColored point) {
 
         logger.debug("addDatapoint called");
-        if (point.getDimension() != this.getDimensions()
-                || (projectionMethod == null) || (getUpstairs() == null)) {
+        if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
             return;
         }
 
@@ -184,10 +194,9 @@ public class Projector {
             DataPoint newPoint;
             if (point.getDimension() == 1) {
                 // For 1-d datasets plot points on a horizontal line
-                newPoint = new DataPoint(new double[] { point.get(0), 0 });
+                newPoint = new DataPoint(new double[]{point.get(0), 0});
             } else {
-                newPoint = new DataPoint(new double[] { point.get(0),
-                        point.get(1) });
+                newPoint = new DataPoint(new double[]{point.get(0), point.get(1)});
             }
             downstairs.addPoint(newPoint);
             projectionMethod.project();
@@ -220,9 +229,7 @@ public class Projector {
             if (projName.equalsIgnoreCase(projectionMethods.get(method))) {
                 try {
                     ProjectionMethod projMethod;
-                    projMethod = (ProjectionMethod) method.getConstructor(
-                            new Class[] { Projector.class }).newInstance(
-                            new Object[] { this });
+                    projMethod = (ProjectionMethod) method.getConstructor(new Class[]{Projector.class}).newInstance(new Object[]{this});
                     setProjectionMethod(projMethod);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -235,12 +242,11 @@ public class Projector {
      * Add new high-d datapoints and reinitialize the datasets.
      *
      * @param theFile file containing the high-d data, forwarded to a dataset
-     *            method
+     *                method
      */
     public void importData(final File theFile) {
         try {
-            CSVParser theParser = new CSVParser(new FileInputStream(theFile),
-                    "", "", "#");
+            CSVParser theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
 
             // # is a comment delimeter in net files
             String[][] values = theParser.getAllValues();
@@ -394,11 +400,7 @@ public class Projector {
 
     @Override
     public String toString() {
-        return "Number of Points: " + this.getNumPoints()
-                + "\n-----------------------\n High Dimensional Data \n"
-                + upstairs.toString()
-                + "-----------------------\nProjected Data \n"
-                + downstairs.toString();
+        return "Number of Points: " + this.getNumPoints() + "\n-----------------------\n High Dimensional Data \n" + upstairs.toString() + "-----------------------\nProjected Data \n" + downstairs.toString();
     }
 
     /**
@@ -440,34 +442,26 @@ public class Projector {
      * number of points.
      *
      * @return true if low dimensions are lower than hi dimensions and low
-     *         dimension is less than one
+     * dimension is less than one
      */
     public boolean compareDatasets() {
         if (downstairs.getDimensions() < 1) {
-            System.out
-                    .println("WARNING: The dimension of the low dimensional data set");
+            System.out.println("WARNING: The dimension of the low dimensional data set");
             System.out.println("cannot be less than 1");
 
             return false;
         }
 
         if (downstairs.getDimensions() > upstairs.getDimensions()) {
-            System.out
-                    .println("WARNING: The dimension of the low dimensional data set");
-            System.out
-                    .println("cannot be greater than the dimension of the hi");
+            System.out.println("WARNING: The dimension of the low dimensional data set");
+            System.out.println("cannot be greater than the dimension of the hi");
             System.out.println("dimensional data set.\n");
-            System.out.println("hiDimension = " + upstairs.getDimensions()
-                    + "\n");
+            System.out.println("hiDimension = " + upstairs.getDimensions() + "\n");
             System.out.println("lowD = " + downstairs.getDimensions());
             return false;
         }
         if (downstairs.getNumPoints() != upstairs.getNumPoints()) {
-            System.out
-                    .println("WARNING: The number of points in the hi-d set ("
-                            + upstairs.getNumPoints() + ""
-                            + ") does not match that in the low-d set ("
-                            + downstairs.getNumPoints() + ")\n");
+            System.out.println("WARNING: The number of points in the hi-d set (" + upstairs.getNumPoints() + "" + ") does not match that in the low-d set (" + downstairs.getNumPoints() + ")\n");
 
             return false;
         }

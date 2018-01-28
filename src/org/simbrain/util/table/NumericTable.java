@@ -18,12 +18,12 @@
  */
 package org.simbrain.util.table;
 
+import org.simbrain.util.Utils;
+import org.simbrain.util.table.SimbrainJTable.CellIndex;
+
 import java.io.File;
 import java.util.List;
 import java.util.Random;
-
-import org.simbrain.util.Utils;
-import org.simbrain.util.table.SimbrainJTable.CellIndex;
 
 /**
  * Default implementation of a table of numerical data. The table is mutable,
@@ -31,31 +31,42 @@ import org.simbrain.util.table.SimbrainJTable.CellIndex;
  *
  * @author jyoshimi
  */
-public class NumericTable extends MutableTable<Double> implements
-        IterableRowsTable {
+public class NumericTable extends MutableTable<Double> implements IterableRowsTable {
 
-    /** Default initial number of rows. */
+    /**
+     * Default initial number of rows.
+     */
     private static final int DEFAULT_ROW_COUNT = 30;
 
-    /** Default initial number of columns. */
+    /**
+     * Default initial number of columns.
+     */
     private static final int DEFAULT_COLUMN_COUNT = 5;
 
-    /** Iteration mode. */
+    /**
+     * Iteration mode.
+     */
     private boolean iterationMode = false;
 
-    /** Current row. */
+    /**
+     * Current row.
+     */
     private int currentRow = 0;
 
-    /** Randomization upper bound. */
+    /**
+     * Randomization upper bound.
+     */
     private int upperBound = 1;
 
-    /** Randomization lower bound. */
+    /**
+     * Randomization lower bound.
+     */
     private int lowerBound = -1;
 
     /**
      * Construct a table with a specified number of rows and columns.
      *
-     * @param numRows number of rows.
+     * @param numRows    number of rows.
      * @param numColumns number of columns.
      */
     public NumericTable(final int numRows, final int numColumns) {
@@ -150,7 +161,7 @@ public class NumericTable extends MutableTable<Double> implements
      * Set the values of the specified column in the current row.
      *
      * @param column column index
-     * @param value value to set
+     * @param value  value to set
      */
     public void setValueCurrentRow(final int column, final double value) {
         setLogicalValue(currentRow, column, value, true);
@@ -251,15 +262,14 @@ public class NumericTable extends MutableTable<Double> implements
     /**
      * Load a .csv file.
      *
-     * @param file the CSV file
-     * @param allowRowChanges whether to allow data with a different number of
-     *            rows
+     * @param file               the CSV file
+     * @param allowRowChanges    whether to allow data with a different number of
+     *                           rows
      * @param allowColumnChanges whether to allow data with a different number
-     *            of columns
-     * @exception TableDataException
+     *                           of columns
+     * @throws TableDataException
      */
-    public void readData(final File file, final boolean allowRowChanges,
-            final boolean allowColumnChanges) throws TableDataException {
+    public void readData(final File file, final boolean allowRowChanges, final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
         try {
             checkData(allowRowChanges, allowColumnChanges, values);
@@ -303,7 +313,7 @@ public class NumericTable extends MutableTable<Double> implements
      * Fill the table at selected indices with the indicated value.
      *
      * @param cellIndices list of cell indices.
-     * @param val the value to fill
+     * @param val         the value to fill
      */
     public void fill(List<CellIndex> cellIndices, double val) {
         for (CellIndex cellIndex : cellIndices) {
@@ -358,12 +368,10 @@ public class NumericTable extends MutableTable<Double> implements
             }
         }
         for (int i = 0; i < this.getRowCount(); i++) {
-            setLogicalValue(i, columnIndex, (getLogicalValueAt(i, columnIndex) - min)
-                    / (max - min), false);
+            setLogicalValue(i, columnIndex, (getLogicalValueAt(i, columnIndex) - min) / (max - min), false);
         }
         this.fireTableDataChanged();
     }
-
 
 
 }

@@ -18,15 +18,13 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Save current workspace.
@@ -37,6 +35,7 @@ public final class SaveWorkspaceAction extends DesktopAction {
 
     /**
      * Create a save workspace action with the specified workspace.
+     *
      * @param desktop
      */
     public SaveWorkspaceAction(SimbrainDesktop desktop) {
@@ -44,13 +43,13 @@ public final class SaveWorkspaceAction extends DesktopAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
         putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         desktop.save();

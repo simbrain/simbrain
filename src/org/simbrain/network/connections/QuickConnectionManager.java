@@ -18,18 +18,18 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
+import java.util.List;
+
 /**
  * Manage quick connection preferences, where a connection is applied using key
  * commands. Basically a repository of connection objects whose settings can be
  * changed.
- *
+ * <p>
  * Not thread-safe. This class is used by gui methods, and is not intended to be
  * used in settings where concurrent threads are simultaneously building network
  * objects.
@@ -38,37 +38,55 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  */
 public class QuickConnectionManager {
 
-    /** Default percent of excitatory neurons. */
+    /**
+     * Default percent of excitatory neurons.
+     */
     private static final double DEFAULT_PERCENT_EXCITATORY = 1.0;
 
-    /** The all to all connector. */
+    /**
+     * The all to all connector.
+     */
     private final AllToAll allToAll = new AllToAll();
 
-    /** The one to one connector. */
+    /**
+     * The one to one connector.
+     */
     private final OneToOne oneToOne = new OneToOne();
 
-    /** The sparse connector. */
+    /**
+     * The sparse connector.
+     */
     private final Sparse sparse = new Sparse();
 
-    /** The current connection object. */
+    /**
+     * The current connection object.
+     */
     private ConnectNeurons currentConnector;
 
-    /** Whether excitatory connection should be randomized. */
+    /**
+     * Whether excitatory connection should be randomized.
+     */
     private boolean useExcitatoryRandomization = false;
 
-    /** Whether excitatory connection should be randomized. */
+    /**
+     * Whether excitatory connection should be randomized.
+     */
     private boolean useInhibitoryRandomization = false;
 
-    /** The current ratio of excitatory to inhibitory neurons. */
+    /**
+     * The current ratio of excitatory to inhibitory neurons.
+     */
     private double excitatoryRatio = DEFAULT_PERCENT_EXCITATORY;
 
-    /** The randomizer for excitatory synapses. */
-    private PolarizedRandomizer exRandomizer = new PolarizedRandomizer(
-            Polarity.EXCITATORY);
+    /**
+     * The randomizer for excitatory synapses.
+     */
+    private PolarizedRandomizer exRandomizer = new PolarizedRandomizer(Polarity.EXCITATORY);
 
-    /** The randomizer for inhibitory synapses. */
-    private PolarizedRandomizer inRandomizer = new PolarizedRandomizer(
-            Polarity.INHIBITORY);
+    /**
+     * The randomizer for inhibitory synapses.
+     */
+    private PolarizedRandomizer inRandomizer = new PolarizedRandomizer(Polarity.INHIBITORY);
 
     /**
      * Construct the quick connection manager.
@@ -81,7 +99,7 @@ public class QuickConnectionManager {
      * @return the connection objects
      */
     public ConnectNeurons[] getConnectors() {
-        return new ConnectNeurons[] { allToAll, oneToOne, sparse };
+        return new ConnectNeurons[]{allToAll, oneToOne, sparse};
     }
 
     /**
@@ -94,23 +112,19 @@ public class QuickConnectionManager {
     public void applyCurrentConnection(List<Neuron> source, List<Neuron> target) {
         List<Synapse> retList = null;
         if (currentConnector == allToAll) {
-            retList = ((AllToAll) currentConnector).connectAllToAll(source,
-                    target);
+            retList = ((AllToAll) currentConnector).connectAllToAll(source, target);
         } else if (currentConnector == oneToOne) {
-            retList = ((OneToOne) currentConnector).connectOneToOne(source,
-                    target);
+            retList = ((OneToOne) currentConnector).connectOneToOne(source, target);
         } else if (currentConnector == sparse) {
             retList = ((Sparse) currentConnector).connectSparse(source, target);
         }
         if (retList != null) {
             ConnectionUtilities.polarizeSynapses(retList, excitatoryRatio);
             if (this.isUseExcitatoryRandomization()) {
-                ConnectionUtilities.randomizeExcitatorySynapses(retList,
-                        exRandomizer);
+                ConnectionUtilities.randomizeExcitatorySynapses(retList, exRandomizer);
             }
             if (this.isUseInhibitoryRandomization()) {
-                ConnectionUtilities.randomizeInhibitorySynapses(retList,
-                        exRandomizer);
+                ConnectionUtilities.randomizeInhibitorySynapses(retList, exRandomizer);
             }
         }
 

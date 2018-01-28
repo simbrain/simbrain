@@ -18,24 +18,29 @@
  */
 package org.simbrain.plot.piechart;
 
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.workspace.Consumable;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Model data for pie charts.
  */
 public class PieChartModel extends ChartModel {
 
-    /** Initial Number of data sources. */
+    /**
+     * Initial Number of data sources.
+     */
     private static final int INITIAL_DATA_SOURCES = 6;
 
-    /** JFreeChart dataset for pie charts. */
+    /**
+     * JFreeChart dataset for pie charts.
+     */
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
-    /** Current total value of all data items in pie chart dataset. */
+    /**
+     * Current total value of all data items in pie chart dataset.
+     */
     private double total = 0;
 
     /**

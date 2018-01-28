@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import java.util.Random;
-
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+
+import java.util.Random;
 
 /**
  * <b>ThreeValuedNeuron</b> is a natural extension of a binary neuron, which
@@ -31,22 +31,34 @@ import org.simbrain.network.core.NeuronUpdateRule;
  */
 public class ThreeValueRule extends NeuronUpdateRule {
 
-    /** Bias field. */
+    /**
+     * Bias field.
+     */
     private double bias = 0;
 
-    /** Lower threshold field. */
+    /**
+     * Lower threshold field.
+     */
     private double lowerThreshold = 0;
 
-    /** Upper threshold field. */
+    /**
+     * Upper threshold field.
+     */
     private double upperThreshold = 1;
 
-    /** Lower value field. */
+    /**
+     * Lower value field.
+     */
     private double lowerValue = -1;
 
-    /** Middle value field. */
+    /**
+     * Middle value field.
+     */
     private double middleValue = 0;
 
-    /** Upper value field. */
+    /**
+     * Upper value field.
+     */
     private double upperValue = 1;
 
     /**

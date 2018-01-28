@@ -18,21 +18,14 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import org.simbrain.world.textworld.TextWorld.TextItem;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import org.simbrain.world.textworld.TextWorld.TextItem;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Display text data from another source.
@@ -41,10 +34,14 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
  */
 public class DisplayPanel extends JPanel {
 
-    /** Underlying model text world. */
+    /**
+     * Underlying model text world.
+     */
     private final DisplayWorld world;
 
-    /** Text area for inputting text into networks. */
+    /**
+     * Text area for inputting text into networks.
+     */
     private JTextArea textArea = new JTextArea();
 
     /**
@@ -57,7 +54,7 @@ public class DisplayPanel extends JPanel {
      * Construct a reader panel to represent data in a text world.
      *
      * @param theWorld the world
-     * @param toolbar pass in open / close toolbar
+     * @param toolbar  pass in open / close toolbar
      */
     public DisplayPanel(DisplayWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
@@ -73,8 +70,7 @@ public class DisplayPanel extends JPanel {
             topToolbarPanel.add(openCloseToolBar);
         }
         JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar
-                .add(TextWorldActions.showDictionaryEditor(world));
+        dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
         add(topToolbarPanel, BorderLayout.NORTH);
 
@@ -119,9 +115,7 @@ public class DisplayPanel extends JPanel {
 
         });
 
-        final JScrollPane inputScrollPane = new JScrollPane(textArea,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        final JScrollPane inputScrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(inputScrollPane, BorderLayout.CENTER);
 
         world.addListener(new TextListener() {

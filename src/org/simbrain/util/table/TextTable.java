@@ -18,10 +18,10 @@
  */
 package org.simbrain.util.table;
 
+import org.simbrain.util.Utils;
+
 import java.io.File;
 import java.util.Set;
-
-import org.simbrain.util.Utils;
 
 /**
  * A  mutable text table.
@@ -32,6 +32,7 @@ public class TextTable extends MutableTable<String> {
 
     /**
      * Construct a text table.
+     *
      * @param rows
      * @param cols
      */
@@ -44,6 +45,7 @@ public class TextTable extends MutableTable<String> {
 
     /**
      * Construct table from a set of strings.
+     *
      * @param dictionary
      */
     public TextTable(final Set<String> dictionary) {
@@ -98,15 +100,14 @@ public class TextTable extends MutableTable<String> {
     /**
      * Load a .csv file.
      *
-     * @param file the CSV file
-     * @param allowRowChanges whether to allow data with a different number of
-     *            rows
+     * @param file               the CSV file
+     * @param allowRowChanges    whether to allow data with a different number of
+     *                           rows
      * @param allowColumnChanges whether to allow data with a different number
-     *            of columns
-     * @exception TableDataException
+     *                           of columns
+     * @throws TableDataException
      */
-    public void readData(final File file, final boolean allowRowChanges,
-            final boolean allowColumnChanges) throws TableDataException {
+    public void readData(final File file, final boolean allowRowChanges, final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
         try {
             checkData(allowRowChanges, allowColumnChanges, values);

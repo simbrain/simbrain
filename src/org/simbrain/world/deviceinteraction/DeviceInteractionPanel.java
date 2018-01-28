@@ -15,7 +15,9 @@ import java.awt.event.MouseEvent;
 public class DeviceInteractionPanel extends JPanel {
     private final KeyboardWorld world;
 
-    /** Text area for inputting text into networks. */
+    /**
+     * Text area for inputting text into networks.
+     */
     private JTextArea textArea = new JTextArea();
 
     /**
@@ -28,7 +30,7 @@ public class DeviceInteractionPanel extends JPanel {
      * Construct a reader panel to represent data in a text world.
      *
      * @param theWorld the world
-     * @param toolbar pass in open / close toolbar
+     * @param toolbar  pass in open / close toolbar
      */
     public DeviceInteractionPanel(KeyboardWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
@@ -44,13 +46,12 @@ public class DeviceInteractionPanel extends JPanel {
             topToolbarPanel.add(openCloseToolBar);
         }
         JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar
-                .add(new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        //TODO
-                    }
-                });
+        dictionaryToolBar.add(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
         topToolbarPanel.add(dictionaryToolBar);
         add(topToolbarPanel, BorderLayout.NORTH);
 
@@ -89,9 +90,7 @@ public class DeviceInteractionPanel extends JPanel {
 
         });
 
-        final JScrollPane inputScrollPane = new JScrollPane(textArea,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        final JScrollPane inputScrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(inputScrollPane, BorderLayout.CENTER);
 
         world.addKeyboardListener(new KeyboardWorld.KeyboardListener() {

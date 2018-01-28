@@ -1,12 +1,5 @@
 package org.simbrain.custom_sims.simulations.actor_critic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
@@ -21,7 +14,6 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
@@ -31,16 +23,25 @@ import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+
 /**
  * Create the actor-critic simulation.
  */
 // CHECKSTYLE:OFF
 public class ActorCritic extends RegisteredSimulation {
 
-    /** Number of trials per run. */
+    /**
+     * Number of trials per run.
+     */
     int numTrials = 5;
 
-    /** Learning Rate. */
+    /**
+     * Learning Rate.
+     */
     double alpha = .25;
 
     /**
@@ -49,7 +50,9 @@ public class ActorCritic extends RegisteredSimulation {
      */
     double lambda = 0;
 
-    /** Prob. of taking a random action. "Exploitation" vs. "exploration". */
+    /**
+     * Prob. of taking a random action. "Exploitation" vs. "exploration".
+     */
     double epsilon = .25;
 
     /**
@@ -59,11 +62,15 @@ public class ActorCritic extends RegisteredSimulation {
      */
     double gamma = 1;
 
-    /** GUI Variables. */
+    /**
+     * GUI Variables.
+     */
     ControlPanel controlPanel;
     JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Other variables and references. */
+    /**
+     * Other variables and references.
+     */
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
@@ -71,7 +78,9 @@ public class ActorCritic extends RegisteredSimulation {
     NetBuilder net;
     PlotBuilder plot;
 
-    /** Tile World. */
+    /**
+     * Tile World.
+     */
     int tileSets = 1; // Number of tilesets
     int numTiles = 5; // Number of rows / cols in each tileset
     int worldWidth = 320;
@@ -85,15 +94,21 @@ public class ActorCritic extends RegisteredSimulation {
     double hitRadius = rewardDispersionFactor * (tileSize / 2);
     int mouseHomeLocation = (tileSize * numTiles) - tileSize / 2;
 
-    /** Entities that a simulation can refer to. */
+    /**
+     * Entities that a simulation can refer to.
+     */
     RotatingEntity mouse;
     BasicEntity cheese; // TODO: Change to goal or generify like RL_Sim?
 
-    /** Couplings. */
+    /**
+     * Couplings.
+     */
     List<Coupling<?>> effectorCouplings = new ArrayList<>();
     List<Coupling<?>> sensorCouplings = new ArrayList<>();
 
-    /** Neural net variables. */
+    /**
+     * Neural net variables.
+     */
     Network network;
     List<Neuron> tileNeurons;
     Neuron reward;
@@ -156,8 +171,7 @@ public class ActorCritic extends RegisteredSimulation {
         network.addUpdateAction(updateMethod);
 
         // Add docviewer
-        sim.addDocViewer(0, 301, 253, 313, "Information",
-                "src/org/simbrain/custom_sims/simulations/actor_critic/ActorCritic.html");
+        sim.addDocViewer(0, 301, 253, 313, "Information", "src/org/simbrain/custom_sims/simulations/actor_critic/ActorCritic.html");
 
         // Add method for custom update
         addCustomWorkspaceUpdate();
@@ -221,9 +235,7 @@ public class ActorCritic extends RegisteredSimulation {
         cheese = new BasicEntity("Swiss.gif", world);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
-        cheese.setSmellSource(new SmellSource(new double[] { 1, 0 },
-                SmellSource.DecayFunction.STEP, dispersion,
-                cheese.getCenterLocation()));
+        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion, cheese.getCenterLocation()));
         world.addEntity(cheese);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();
@@ -240,8 +252,7 @@ public class ActorCritic extends RegisteredSimulation {
                     double y = (k * tileSize) - i * tileIncrement;
 
                     // Create tile sensor
-                    TileSensor sensor = new TileSensor(mouse, (int) x, (int) y,
-                            tileSize, tileSize);
+                    TileSensor sensor = new TileSensor(mouse, (int) x, (int) y, tileSize, tileSize);
                     mouse.addSensor(sensor);
 
                     // Create corresponding neuron
@@ -328,12 +339,9 @@ public class ActorCritic extends RegisteredSimulation {
     private void setUpPlot(NetBuilder net) {
         // Create a time series plot
         plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
-        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(), reward,
-                plot.getTimeSeriesComponent(), 0);
-        Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError,
-                plot.getTimeSeriesComponent(), 1);
-        Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value,
-                plot.getTimeSeriesComponent(), 2);
+        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
+        Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
+        Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value, plot.getTimeSeriesComponent(), 2);
         plot.getTimeSeriesModel().setAutoRange(false);
         plot.getTimeSeriesModel().setRangeUpperBound(2);
         plot.getTimeSeriesModel().setRangeLowerBound(-1);
@@ -353,8 +361,7 @@ public class ActorCritic extends RegisteredSimulation {
         outputs.setRandomProb(epsilon);
         outputs.setWinValue(tileSize * movementFactor);
         // Add a little extra spacing between neurons to accommodate labels
-        outputs.setLayout(
-                new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
+        outputs.setLayout(new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
         outputs.applyLayout();
         outputs.setLabel("Outputs");
     }
@@ -410,9 +417,7 @@ public class ActorCritic extends RegisteredSimulation {
                     // Keep iterating until the mouse achieves its goal
                     // Goal is currently to get near the cheese
                     while (!goalAchieved) {
-                        int distance = (int) SimbrainMath.distance(
-                                mouse.getCenterLocation(),
-                                cheese.getCenterLocation());
+                        int distance = (int) SimbrainMath.distance(mouse.getCenterLocation(), cheese.getCenterLocation());
                         if (distance < hitRadius) {
                             goalAchieved = true;
                         }
@@ -444,8 +449,7 @@ public class ActorCritic extends RegisteredSimulation {
 
         // Set up text fields
         trialField = controlPanel.addTextField("Trials", "" + numTrials);
-        discountField = controlPanel.addTextField("Discount (gamma)",
-                "" + gamma);
+        discountField = controlPanel.addTextField("Discount (gamma)", "" + gamma);
         // lambdaField = controlPanel.addTextField("Lambda", "" + lambda);
         epsilonField = controlPanel.addTextField("Epsilon", "" + epsilon);
         alphaField = controlPanel.addTextField("Learning rt.", "" + alpha);

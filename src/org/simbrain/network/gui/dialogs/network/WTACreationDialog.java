@@ -18,16 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
 
 /**
  * <b>WTADialog</b> is a dialog box for setting the properties of the Network
@@ -35,22 +32,34 @@ import org.simbrain.util.widgets.ShowHelpAction;
  */
 public class WTACreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
+    /**
+     * Logic panel.
+     */
     private WTAPropertiesPanel wtaPanel;
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -96,8 +105,7 @@ public class WTACreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         wta.setLayout(layoutPanel.getCurrentLayout());
         wta.applyLayout();
-        wta.offset(networkPanel.getWhereToAdd().getX(), networkPanel
-                .getWhereToAdd().getY());
+        wta.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(wta);
         networkPanel.repaint();
         super.closeDialogOk();

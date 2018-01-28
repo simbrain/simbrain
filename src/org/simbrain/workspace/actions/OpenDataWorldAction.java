@@ -18,17 +18,16 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Open data world in current workspace.
@@ -47,16 +46,16 @@ public final class OpenDataWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = SimbrainPreferences.getString("workspaceTableDirectory");
         SFileChooser chooser = new SFileChooser(defaultDirectory, "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            DataWorldComponent tableComponent = (DataWorldComponent) WorkspaceSerializer.open(
-                    DataWorldComponent.class, theFile);
+            DataWorldComponent tableComponent = (DataWorldComponent) WorkspaceSerializer.open(DataWorldComponent.class, theFile);
             workspace.addWorkspaceComponent(tableComponent);
         }
     }

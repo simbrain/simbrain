@@ -29,17 +29,22 @@ import org.simbrain.util.randomizer.Randomizer;
  * the jump-height of a convolved jump and decay spike responder.
  *
  * @author Zoë Tosi
- *
  */
 public class UDF extends JumpAndDecay {
 
-    /** Use constant. */
+    /**
+     * Use constant.
+     */
     private double U;
 
-    /** Depression constant. */
+    /**
+     * Depression constant.
+     */
     private double D;
 
-    /** Facilitation constant. */
+    /**
+     * Facilitation constant.
+     */
     private double F;
 
     /**
@@ -48,15 +53,20 @@ public class UDF extends JumpAndDecay {
      */
     private double lastSpikeTime;
 
-    /** Use/Facilitation variable */
+    /**
+     * Use/Facilitation variable
+     */
     private double u = 0.0;
 
-    /** Depression variable. */
+    /**
+     * Depression variable.
+     */
     private double R = 1.0;
 
-    /** The actual spike responder for the post synaptic response for UDF. */
-    private final ConvolvedJumpAndDecay spikeDecay =
-            new ConvolvedJumpAndDecay();
+    /**
+     * The actual spike responder for the post synaptic response for UDF.
+     */
+    private final ConvolvedJumpAndDecay spikeDecay = new ConvolvedJumpAndDecay();
 
     /**
      * Whether or not this is the first time this is being updated. If so it
@@ -88,7 +98,7 @@ public class UDF extends JumpAndDecay {
         }
         final double A;
         if (s.getSource().isSpike()) {
-        	final double ISI = lastSpikeTime - s.getNetwork().getTime();
+            final double ISI = lastSpikeTime - s.getNetwork().getTime();
             u = U + (u * (1 - U) * Math.exp(ISI / F));
             R = 1 + ((R - (u * R) - 1) * Math.exp(ISI / D));
             A = R * s.getStrength() * u;
@@ -99,14 +109,15 @@ public class UDF extends JumpAndDecay {
         }
     }
 
-//    @Override
-//    public String getDescription() {
-//        return "Use, Depression, Facilitation (UDF) Short-term Plasticity";
-//    }
+    //    @Override
+    //    public String getDescription() {
+    //        return "Use, Depression, Facilitation (UDF) Short-term Plasticity";
+    //    }
 
     /**
      * Sets the time constant for the decay of the PSR which is always
      * governed by a ConvolvedJumpAndDecay spike responder.
+     *
      * @param timeConstant the time constant for PSR decay
      */
     public void setPSRDecayTimeConstant(double timeConstant) {
@@ -124,8 +135,9 @@ public class UDF extends JumpAndDecay {
      * Initializes this UDF object based on the synapse it governs. UDF draws
      * its values from different distributions based on the polarity of the
      * source and target neurons.
+     *
      * @param s the synapse which is used to determine what polarities of
-     * neurons the synapse connects and draw values based on that.
+     *          neurons the synapse connects and draw values based on that.
      */
     public void init(Synapse s) {
         Randomizer rand = new Randomizer();
@@ -133,9 +145,7 @@ public class UDF extends JumpAndDecay {
         rand.setClipping(true);
         rand.setUpperBound(Double.MAX_VALUE);
         rand.setLowerBound(0.0000001);
-        if (s.getSource().getPolarity() == Polarity.EXCITATORY
-                && s.getTarget().getPolarity() == Polarity.EXCITATORY)
-        {
+        if (s.getSource().getPolarity() == Polarity.EXCITATORY && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
             rand.setParam1(0.5);
             rand.setParam2(0.25);
             U = rand.getRandom();
@@ -146,9 +156,7 @@ public class UDF extends JumpAndDecay {
             rand.setParam2(25);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
-        } else if (s.getSource().getPolarity() == Polarity.EXCITATORY
-                && s.getTarget().getPolarity() == Polarity.INHIBITORY)
-        {
+        } else if (s.getSource().getPolarity() == Polarity.EXCITATORY && s.getTarget().getPolarity() == Polarity.INHIBITORY) {
             rand.setParam1(0.05);
             rand.setParam2(0.025);
             U = rand.getRandom();
@@ -159,9 +167,7 @@ public class UDF extends JumpAndDecay {
             rand.setParam2(60);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
-        } else if (s.getSource().getPolarity() == Polarity.INHIBITORY
-                && s.getTarget().getPolarity() == Polarity.EXCITATORY)
-        {
+        } else if (s.getSource().getPolarity() == Polarity.INHIBITORY && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
             rand.setParam1(0.25);
             rand.setParam2(0.125);
             U = rand.getRandom();
@@ -172,9 +178,7 @@ public class UDF extends JumpAndDecay {
             rand.setParam2(10);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(6);
-        } else if (s.getSource().getPolarity() == Polarity.INHIBITORY
-                && s.getTarget().getPolarity() == Polarity.INHIBITORY)
-        {
+        } else if (s.getSource().getPolarity() == Polarity.INHIBITORY && s.getTarget().getPolarity() == Polarity.INHIBITORY) {
             rand.setParam1(0.32);
             rand.setParam2(0.16);
             U = rand.getRandom();

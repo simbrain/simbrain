@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.actions;
 
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+
+import javax.swing.*;
 
 /**
  * Subclass this class if an action should be enabled or not depending on
@@ -32,7 +32,9 @@ import org.simbrain.network.gui.NetworkSelectionListener;
  */
 public abstract class ConditionallyEnabledAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     protected final NetworkPanel networkPanel;
 
     /**
@@ -48,24 +50,26 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
      * <li>SOURCE_AND_TARGET_NEURON_GROUPS: if at least one neuron group is
      * designated as source and one neuron group is designated as target.</li>
      * </ul>
-     *
      */
     public static enum EnablingCondition {
         NEURONS, SYNAPSES, ALLITEMS, SOURCE_NEURONS, SOURCE_AND_TARGET_NEURONS, SOURCE_AND_TARGET_NEURON_GROUPS
-    };
+    }
 
-    /** Under what condition should this action be enabled. */
+    ;
+
+    /**
+     * Under what condition should this action be enabled.
+     */
     private final EnablingCondition enableCondition;
 
     /**
      * Construct the update action.
      *
      * @param networkPanel parent network panel, must not be null
-     * @param title the name for this action, passed up to superclass
-     * @param updateType in what conditions to enable the action
+     * @param title        the name for this action, passed up to superclass
+     * @param updateType   in what conditions to enable the action
      */
-    public ConditionallyEnabledAction(final NetworkPanel networkPanel,
-            final String title, final EnablingCondition updateType) {
+    public ConditionallyEnabledAction(final NetworkPanel networkPanel, final String title, final EnablingCondition updateType) {
         super(title);
         this.enableCondition = updateType;
 
@@ -118,12 +122,10 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
      * @param networkPanel the network panel to check.
      * @return true if the condition is met, false otherwise.
      */
-    public static boolean sourceAndTargetNeuronGroupsSelected(
-            NetworkPanel networkPanel) {
+    public static boolean sourceAndTargetNeuronGroupsSelected(NetworkPanel networkPanel) {
         // Available as a method here since it is reused elsewhere.  Can
         // do something similar for other conditions as needed.
-        if ((networkPanel.getSourceModelGroups().size() > 0)
-                && (networkPanel.getSelectedModelNeuronGroups().size() > 0)) {
+        if ((networkPanel.getSourceModelGroups().size() > 0) && (networkPanel.getSelectedModelNeuronGroups().size() > 0)) {
             return true;
         }
         return false;
@@ -135,10 +137,8 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
      * @param networkPanel the network panel to check.
      * @return true if the condition is met, false otherwise.
      */
-    public static boolean sourceAndTargetNeuronSelected(
-            NetworkPanel networkPanel) {
-        if ((networkPanel.getSourceModelNeurons().size() > 0)
-                && (networkPanel.getSelectedModelNeurons().size() > 0)) {
+    public static boolean sourceAndTargetNeuronSelected(NetworkPanel networkPanel) {
+        if ((networkPanel.getSourceModelNeurons().size() > 0) && (networkPanel.getSelectedModelNeurons().size() > 0)) {
             return true;
         }
         return false;

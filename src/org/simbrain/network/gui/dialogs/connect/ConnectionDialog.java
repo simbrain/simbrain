@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Neuron;
@@ -39,6 +28,12 @@ import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+
 /**
  * Dialog wrapper for all connection panels.
  *
@@ -48,37 +43,46 @@ import org.simbrain.util.widgets.ShowHelpAction;
 @SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** The connection panel wrapped in this dialog. */
+    /**
+     * The connection panel wrapped in this dialog.
+     */
     private AbstractConnectionPanel connectionPanel;
 
-    /** The main panel. */
+    /**
+     * The main panel.
+     */
     private JPanel mainPanel;
 
-    /** The connection properties panel. */
+    /**
+     * The connection properties panel.
+     */
     private ConnectionSynapsePropertiesPanel propertiesPanel;
 
-    /** The excitatory ratio and randomizer panel. */
+    /**
+     * The excitatory ratio and randomizer panel.
+     */
     private SynapsePolarityAndRandomizerPanel eirPanel;
 
-    /** Drop down triangle for synapse properties. */
+    /**
+     * Drop down triangle for synapse properties.
+     */
     private DropDownTriangle detailTriangle;
 
     /**
      * Create an instance of a connection dialog.
      *
      * @param optionsPanel the connection panel
-     * @param connection the connection object
+     * @param connection   the connection object
      * @param networkPanel the parent panel
      * @return the constructed dialog
      */
-    public static ConnectionDialog createConnectionDialog(
-            final AbstractConnectionPanel optionsPanel,
-            final ConnectNeurons connection, final NetworkPanel networkPanel) {
-        ConnectionDialog cd = new ConnectionDialog(optionsPanel, connection,
-                networkPanel);
+    public static ConnectionDialog createConnectionDialog(final AbstractConnectionPanel optionsPanel, final ConnectNeurons connection, final NetworkPanel networkPanel) {
+        ConnectionDialog cd = new ConnectionDialog(optionsPanel, connection, networkPanel);
         cd.init();
         return cd;
     }
@@ -88,10 +92,9 @@ public class ConnectionDialog extends StandardDialog {
      *
      * @param networkPanel parent panel
      * @param optionsPanel the option panel for this connection type
-     * @param connection the underlyign connection object
+     * @param connection   the underlyign connection object
      */
-    private ConnectionDialog(final AbstractConnectionPanel optionsPanel,
-            final ConnectNeurons connection, final NetworkPanel networkPanel) {
+    private ConnectionDialog(final AbstractConnectionPanel optionsPanel, final ConnectNeurons connection, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         this.connectionPanel = optionsPanel;
     }
@@ -103,16 +106,13 @@ public class ConnectionDialog extends StandardDialog {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(connectionPanel);
-        detailTriangle = new DropDownTriangle(UpDirection.RIGHT, false,
-                "Synapse Properties", "Synapse Properties", this);
+        detailTriangle = new DropDownTriangle(UpDirection.RIGHT, false, "Synapse Properties", "Synapse Properties", this);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainPanel.add(leftJustify(detailTriangle));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        propertiesPanel = ConnectionSynapsePropertiesPanel
-                .createSynapsePropertiesPanel(this);
+        propertiesPanel = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(this);
         mainPanel.add(propertiesPanel);
-        eirPanel = SynapsePolarityAndRandomizerPanel
-                .createPolarityRatioPanel(this);
+        eirPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(this);
         mainPanel.add(eirPanel);
         detailTriangle.addMouseListener(new MouseAdapter() {
             @Override
@@ -150,8 +150,7 @@ public class ConnectionDialog extends StandardDialog {
      * Fills the standard dialog with the connection panel and a help button.
      */
     public void fillFrame() {
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Network/connections.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));
         setContentPane(mainPanel);
     }
@@ -162,22 +161,16 @@ public class ConnectionDialog extends StandardDialog {
         connectionPanel.commitChanges();
         List<Neuron> source = networkPanel.getSourceModelNeurons();
         List<Neuron> target = networkPanel.getSelectedModelNeurons();
-        List<Synapse> synapses = connectionPanel.applyConnection(source,
-                target);
-        ConnectionUtilities.polarizeSynapses(synapses,
-                eirPanel.getPercentExcitatory());
+        List<Synapse> synapses = connectionPanel.applyConnection(source, target);
+        ConnectionUtilities.polarizeSynapses(synapses, eirPanel.getPercentExcitatory());
         propertiesPanel.commitChanges();
-        ConnectionUtilities.conformToTemplates(synapses,
-                propertiesPanel.getTemplateExcitatorySynapse(),
-                propertiesPanel.getTemplateInhibitorySynapse());
+        ConnectionUtilities.conformToTemplates(synapses, propertiesPanel.getTemplateExcitatorySynapse(), propertiesPanel.getTemplateInhibitorySynapse());
         eirPanel.commitChanges();
         if (eirPanel.exRandomizerEnabled()) {
-            ConnectionUtilities.randomizeExcitatorySynapses(synapses,
-                    eirPanel.getExRandomizer());
+            ConnectionUtilities.randomizeExcitatorySynapses(synapses, eirPanel.getExRandomizer());
         }
         if (eirPanel.inRandomizerEnabled()) {
-            ConnectionUtilities.randomizeInhibitorySynapses(synapses,
-                    eirPanel.getInRandomizer());
+            ConnectionUtilities.randomizeInhibitorySynapses(synapses, eirPanel.getInRandomizer());
         }
         networkPanel.getNetwork().fireSynapsesUpdated(synapses);
     }

@@ -26,7 +26,9 @@ import org.simbrain.network.core.Synapse;
  */
 public class ProbabilisticResponder extends SpikeResponder {
 
-    /** Probability of producing an output; must be between 0 and 1. */
+    /**
+     * Probability of producing an output; must be between 0 and 1.
+     */
     private double activationProbability = .5;
 
     /**

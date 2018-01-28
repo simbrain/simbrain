@@ -1,10 +1,10 @@
 package org.simbrain.world.threedworld.actions;
 
+import org.simbrain.world.threedworld.ThreeDWorld;
+
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.AbstractAction;
-import org.simbrain.world.threedworld.ThreeDWorld;
 
 public class ActionManager {
     public static Map<String, AbstractAction> createActions(ThreeDWorld world) {
@@ -28,8 +28,8 @@ public class ActionManager {
         putAction(actions, new PasteSelectionAction(world));
         return actions;
     }
-    
+
     private static void putAction(Map<String, AbstractAction> actions, AbstractAction action) {
-        actions.put((String)action.getValue(AbstractAction.NAME), action);
+        actions.put((String) action.getValue(AbstractAction.NAME), action);
     }
 }

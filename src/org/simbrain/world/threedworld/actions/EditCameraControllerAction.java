@@ -18,37 +18,39 @@
  */
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Action for showing world preferences.
  */
 public final class EditCameraControllerAction extends AbstractAction {
     private static final long serialVersionUID = 3353903249936368827L;
-    
+
     private ThreeDWorld world;
-    
+
     public EditCameraControllerAction(ThreeDWorld world) {
         super("Edit Camera Controller");
         this.world = world;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Edit Camera Controller");
     }
-    
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         ThreeDEngine.State previousState = world.getEngine().getState();
         world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
         ReflectivePropertyEditor editor = new ReflectivePropertyEditor(world.getCameraController());
-        editor.setExcludeList(new String[] {"mouseLookActive"});
+        editor.setExcludeList(new String[]{"mouseLookActive"});
         JDialog dialog = editor.getDialog();
         dialog.addWindowListener(new WindowAdapter() {
             @Override

@@ -18,23 +18,20 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Polygon;
-import java.awt.geom.Arc2D;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+
+import java.awt.*;
+import java.awt.geom.Arc2D;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Creates a simple synapse group node that represents a recurrent synapse
  * group.
  *
  * @author Zoë
- *
  */
 @SuppressWarnings("serial")
 public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
@@ -48,19 +45,15 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
     private AtomicBoolean halt = new AtomicBoolean(false);
 
     /**
-     *
      * @param networkPanel
      * @param group
      * @return
      */
-    public static SynapseGroupNodeRecurrent createRecurrentSynapseGN(
-        final NetworkPanel networkPanel, SynapseGroup group) {
-        SynapseGroupNodeRecurrent synGNR = new SynapseGroupNodeRecurrent(
-            networkPanel, group);
+    public static SynapseGroupNodeRecurrent createRecurrentSynapseGN(final NetworkPanel networkPanel, SynapseGroup group) {
+        SynapseGroupNodeRecurrent synGNR = new SynapseGroupNodeRecurrent(networkPanel, group);
         synGNR.addChild(synGNR.arcCurve);
         synGNR.addChild(synGNR.arrowHead);
-        ((NeuronGroupNode) networkPanel.getObjectNodeMap().get(
-            group.getTargetNeuronGroup())).addChild(synGNR);
+        ((NeuronGroupNode) networkPanel.getObjectNodeMap().get(group.getTargetNeuronGroup())).addChild(synGNR);
         synGNR.lowerToBottom();
         // ((NeuronGroupNode)
         // networkPanel.getObjectNodeMap().get(group.getTargetNeuronGroup())).addPropertyChangeListener(synGNR);
@@ -68,12 +61,10 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         return synGNR;
     }
 
-    private SynapseGroupNodeRecurrent(NetworkPanel networkPanel,
-        SynapseGroup group) {
+    private SynapseGroupNodeRecurrent(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
         if (!group.isRecurrent()) {
-            throw new IllegalArgumentException("Using a recurrent synapse node"
-                + " for a non-recurrent synapse group.");
+            throw new IllegalArgumentException("Using a recurrent synapse node" + " for a non-recurrent synapse group.");
         }
         arrowHead = new PPath.Float();
         arcCurve = new PPath.Float();
@@ -82,31 +73,25 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         //arrowHead.setTransparency(0.5f); 
         arrowHead.setPaint(Color.green);
         strokeWidth = (float) (group.getSourceNeuronGroup().getMaxDim() / 6);
-        arcCurve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE,
-            BasicStroke.JOIN_MITER));
+        arcCurve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
         arcCurve.setStrokePaint(Color.green);
         arcCurve.setTransparency(0.5f);
         arcCurve.setPaint(null);
-        arrowHead.lowerBelow(networkPanel.getObjectNodeMap()
-        		.get(group.getTargetNeuronGroup().getNeuronList().get(0)));
-        arcCurve.lowerToBottom(networkPanel.getObjectNodeMap()
-        		.get(group.getTargetNeuronGroup()));
+        arrowHead.lowerBelow(networkPanel.getObjectNodeMap().get(group.getTargetNeuronGroup().getNeuronList().get(0)));
+        arcCurve.lowerToBottom(networkPanel.getObjectNodeMap().get(group.getTargetNeuronGroup()));
     }
 
     @Override
     public synchronized void layoutChildren() {
-    	if (networkPanel.isRunning()) {
-    		return;
-    	}
+        if (networkPanel.isRunning()) {
+            return;
+        }
         if (halt.get())
             return;
         NeuronGroup ng = getSynapseGroup().getSourceNeuronGroup();
-        float quarterSizeX =
-            (float) Math.abs((ng.getMaxX() - ng.getMinX())) / 4;
-        float quarterSizeY =
-            (float) Math.abs((ng.getMaxY() - ng.getMinY())) / 4;
-        float quarterSize = quarterSizeX < quarterSizeY ? quarterSizeX
-            : quarterSizeY;
+        float quarterSizeX = (float) Math.abs((ng.getMaxX() - ng.getMinX())) / 4;
+        float quarterSizeY = (float) Math.abs((ng.getMaxY() - ng.getMinY())) / 4;
+        float quarterSize = quarterSizeX < quarterSizeY ? quarterSizeX : quarterSizeY;
         float qRatio;
         if (quarterSize == 0) { // LineLayout
             quarterSize = (float) ng.getMaxDim() / 15.0f;
@@ -118,26 +103,16 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         if (Float.isNaN(qRatio)) {
             qRatio = 1;
         }
-        Arc2D.Float recArc =
-            new Arc2D.Float((float) ng.getCenterX() - 3 * quarterSize / 2,
-                (float) ng.getCenterY() - 3 * quarterSize / 2,
-                quarterSize * 3,
-                quarterSize * 3, 30, 300, Arc2D.OPEN);
+        Arc2D.Float recArc = new Arc2D.Float((float) ng.getCenterX() - 3 * quarterSize / 2, (float) ng.getCenterY() - 3 * quarterSize / 2, quarterSize * 3, quarterSize * 3, 30, 300, Arc2D.OPEN);
 
-        strokeWidth =
-            (float) ((qRatio * (ng.getWidth() + ng.getHeight())) / 6);
-        arcCurve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE,
-            BasicStroke.JOIN_MITER));
+        strokeWidth = (float) ((qRatio * (ng.getWidth() + ng.getHeight())) / 6);
+        arcCurve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
         arcCurve.reset();
         arcCurve.append(recArc, false);
         arrowHead.reset();
         double endAng = -(11.0 * Math.PI / 6.0);
-        arrowHead.append(
-            traceArrowHead(endAng - 3.1 * Math.PI / 6.0, recArc
-                .getEndPoint().getX() + 0.9 * strokeWidth, recArc
-                .getEndPoint().getY() - 0.9 * 2 * strokeWidth), false);
-        interactionBox.centerFullBoundsOnPoint(recArc.getCenterX(),
-                recArc.getCenterY());
+        arrowHead.append(traceArrowHead(endAng - 3.1 * Math.PI / 6.0, recArc.getEndPoint().getX() + 0.9 * strokeWidth, recArc.getEndPoint().getY() - 0.9 * 2 * strokeWidth), false);
+        interactionBox.centerFullBoundsOnPoint(recArc.getCenterX(), recArc.getCenterY());
         interactionBox.raiseToTop();
         arrowHead.lowerToBottom();
         arcCurve.lowerToBottom();

@@ -1,30 +1,28 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
+import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.math.Vector3f;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.entities.Agent;
 import org.simbrain.world.threedworld.entities.ModelEntity;
 import org.simbrain.world.threedworld.entities.VisionSensor;
 import org.simbrain.world.threedworld.entities.WalkingEffector;
 
-import com.jme3.bullet.collision.shapes.CollisionShape;
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.util.CollisionShapeFactory;
-import com.jme3.math.Vector3f;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class AddMouseAction extends AbstractAction {
     private static final long serialVersionUID = 5219992141265803787L;
-    
+
     private ThreeDWorld world;
-    
+
     public AddMouseAction(ThreeDWorld world) {
         super("Add Mouse");
         this.world = world;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         world.getEngine().enqueue(() -> {

@@ -18,34 +18,16 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.filechooser.FileFilter;
-
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.serialization.WorkspaceSerializer;
 
 /**
  * <b>WorkspaceChangedDialog</b> tells the user what components have changed
@@ -53,10 +35,14 @@ import org.simbrain.workspace.serialization.WorkspaceSerializer;
  */
 public class WorkspaceChangedDialog extends JDialog {
 
-    /** The default serial version Id. */
+    /**
+     * The default serial version Id.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** The parent desktop. */
+    /**
+     * The parent desktop.
+     */
     private final SimbrainDesktop desktop;
 
     /**
@@ -72,7 +58,9 @@ public class WorkspaceChangedDialog extends JDialog {
     /** Main Panel. */
     // private JPanel panel;
 
-    /** Whether the user has canceled out of this dialog. */
+    /**
+     * Whether the user has canceled out of this dialog.
+     */
     private boolean userCancelled = false;
 
     /**
@@ -107,20 +95,13 @@ public class WorkspaceChangedDialog extends JDialog {
         // getContentPane().add(BorderLayout.SOUTH, buttonPanel);
         getContentPane().add(buttonPanel);
 
-        layout.putConstraint(SpringLayout.NORTH, container, -5,
-                SpringLayout.NORTH, textPanel);
-        layout.putConstraint(SpringLayout.SOUTH, container, 5,
-                SpringLayout.SOUTH, buttonPanel);
-        layout.putConstraint(SpringLayout.WEST, container, -5,
-                SpringLayout.WEST, browsePanel);
-        layout.putConstraint(SpringLayout.EAST, container, 5,
-                SpringLayout.EAST, browsePanel);
-        layout.putConstraint(SpringLayout.WEST, textPanel, 5,
-                SpringLayout.WEST, container);
-        layout.putConstraint(SpringLayout.NORTH, browsePanel, 5,
-                SpringLayout.SOUTH, textPanel);
-        layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5,
-                SpringLayout.SOUTH, browsePanel);
+        layout.putConstraint(SpringLayout.NORTH, container, -5, SpringLayout.NORTH, textPanel);
+        layout.putConstraint(SpringLayout.SOUTH, container, 5, SpringLayout.SOUTH, buttonPanel);
+        layout.putConstraint(SpringLayout.WEST, container, -5, SpringLayout.WEST, browsePanel);
+        layout.putConstraint(SpringLayout.EAST, container, 5, SpringLayout.EAST, browsePanel);
+        layout.putConstraint(SpringLayout.WEST, textPanel, 5, SpringLayout.WEST, container);
+        layout.putConstraint(SpringLayout.NORTH, browsePanel, 5, SpringLayout.SOUTH, textPanel);
+        layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, browsePanel);
 
         setTitle("Save Resources");
 
@@ -167,33 +148,24 @@ public class WorkspaceChangedDialog extends JDialog {
         panel.add(browse);
         panel.add(location);
 
-        layout.putConstraint(SpringLayout.NORTH, location, 5,
-                SpringLayout.NORTH, panel);
-        layout.putConstraint(SpringLayout.NORTH, browse, 5, SpringLayout.NORTH,
-                panel);
-        layout.putConstraint(SpringLayout.WEST, panel, -5, SpringLayout.WEST,
-                location);
-        layout.putConstraint(SpringLayout.WEST, location, 5, SpringLayout.WEST,
-                panel);
-        layout.putConstraint(SpringLayout.EAST, panel, 0, SpringLayout.EAST,
-                browse);
-        layout.putConstraint(SpringLayout.WEST, browse, 5, SpringLayout.EAST,
-                location);
-        layout.putConstraint(SpringLayout.SOUTH, panel, 0, SpringLayout.SOUTH,
-                browse);
+        layout.putConstraint(SpringLayout.NORTH, location, 5, SpringLayout.NORTH, panel);
+        layout.putConstraint(SpringLayout.NORTH, browse, 5, SpringLayout.NORTH, panel);
+        layout.putConstraint(SpringLayout.WEST, panel, -5, SpringLayout.WEST, location);
+        layout.putConstraint(SpringLayout.WEST, location, 5, SpringLayout.WEST, panel);
+        layout.putConstraint(SpringLayout.EAST, panel, 0, SpringLayout.EAST, browse);
+        layout.putConstraint(SpringLayout.WEST, browse, 5, SpringLayout.EAST, location);
+        layout.putConstraint(SpringLayout.SOUTH, panel, 0, SpringLayout.SOUTH, browse);
 
         browse.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 JFileChooser chooser = new JFileChooser(location.getText());
 
-                chooser.addChoosableFileFilter(new Filter("zip",
-                        "Simbrain Archives"));
+                chooser.addChoosableFileFilter(new Filter("zip", "Simbrain Archives"));
 
                 switch (chooser.showOpenDialog(WorkspaceChangedDialog.this)) {
 
-                case JFileChooser.APPROVE_OPTION:
-                    location.setText(chooser.getSelectedFile()
-                            .getAbsolutePath());
+                    case JFileChooser.APPROVE_OPTION:
+                        location.setText(chooser.getSelectedFile().getAbsolutePath());
                 }
             }
         });

@@ -18,19 +18,19 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Action for adding tile sensors.
  */
 public final class AddTileSensorsAction extends AbstractAction {
 
-    /** Entity to add tile sensors to. */
+    /**
+     * Entity to add tile sensors to.
+     */
     private final OdorWorldEntity entity;
 
     /**
@@ -45,11 +45,12 @@ public final class AddTileSensorsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Add tile sensors...");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
         // TODO: Quick and dirty here. Make a proper dialog!
-        String resultString = JOptionPane.showInputDialog(null,
-                "Rows, Columns, Offset.", "10,10,0");
+        String resultString = JOptionPane.showInputDialog(null, "Rows, Columns, Offset.", "10,10,0");
         if (resultString != null) {
             String[] parsedString = resultString.split(",");
             int rows = Integer.parseInt(parsedString[0]);

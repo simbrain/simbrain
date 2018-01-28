@@ -27,7 +27,6 @@ import java.lang.annotation.Target;
  * An annotation that can be used to control the order in which fields are
  * displayed in a reflective property editor.
  *
- *
  * @author jeffyoshimi
  */
 @Target(ElementType.METHOD)

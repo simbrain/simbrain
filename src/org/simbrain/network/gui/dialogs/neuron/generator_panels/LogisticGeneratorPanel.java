@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>LogisticNeuronPanel</b> TODO: Work into new Input Generator Framework,
@@ -32,26 +31,25 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class LogisticGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** A reference to the neuron rule being edited. */
-    private LogisticRule prototypRule  = new LogisticRule();
+    /**
+     * A reference to the neuron rule being edited.
+     */
+    private LogisticRule prototypRule = new LogisticRule();
 
     /**
      * Creates an instance of this panel.
      */
     public LogisticGeneratorPanel() {
         super();
-        JTextField tfGrowthRate = createTextField(
-                (r) -> ((LogisticRule) r).getGrowthRate(),
-                (r, val) -> ((LogisticRule) r).setGrowthRate((double) val));
+        JTextField tfGrowthRate = createTextField((r) -> ((LogisticRule) r).getGrowthRate(), (r, val) -> ((LogisticRule) r).setGrowthRate((double) val));
         mainPanel.addItem("Growth Rate", tfGrowthRate);
         add(mainPanel);
-        this.addBottomText(
-                "<html>Note 1: This is not a sigmoidal logistic function. <p>"
-                        + "For that, create a neuron and set its update rule to sigmoidal.<p> "
-                        + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
+        this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>" + "For that, create a neuron and set its update rule to sigmoidal.<p> " + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
     }
 
     @Override

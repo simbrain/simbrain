@@ -18,10 +18,6 @@
  */
 package org.simbrain.custom_sims;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
@@ -36,18 +32,19 @@ import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
-import com.sun.org.apache.regexp.internal.RE;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Super class for all custom simulations. Also has code to manage custom
  * simulations.
- * 
+ * <p>
  * All registered simulations must be added to REGISTERED_SIMS to
  * show up in Simbrain's menu.
  *
  * @author ztosi
  * @author jyoshimi
- *
  */
 public abstract class RegisteredSimulation {
 
@@ -59,7 +56,9 @@ public abstract class RegisteredSimulation {
      */
     public static final List<RegisteredSimulation> REGISTERED_SIMS = new ArrayList<>();
 
-    /** The main simulation object. */
+    /**
+     * The main simulation object.
+     */
     protected final Simulation sim;
 
     static {
@@ -76,8 +75,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new SimpleNeuroevolution());
 
         // Alphabetize
-        REGISTERED_SIMS
-                .sort(Comparator.comparing(RegisteredSimulation::getName));
+        REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getName));
     }
 
     /**
@@ -114,10 +112,10 @@ public abstract class RegisteredSimulation {
      * Instantiates a registered simulation class the same as the caller.
      *
      * @param desktop the simbrain desktop object where the instantiated sim
-     *            will exist
+     *                will exist
      * @return An instance of this registered simulation (ideally of the same
-     *         type) that has its Simbrain desktop parameter initialized to a
-     *         non null
+     * type) that has its Simbrain desktop parameter initialized to a
+     * non null
      */
     public abstract RegisteredSimulation instantiate(SimbrainDesktop desktop);
 
@@ -126,7 +124,7 @@ public abstract class RegisteredSimulation {
      * simulations.
      *
      * @param rs the registered simulation to add to the directory of registered
-     *            sims
+     *           sims
      */
     public static void register(final RegisteredSimulation rs) {
         if (!REGISTERED_SIMS.contains(rs)) {

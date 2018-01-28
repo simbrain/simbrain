@@ -1,15 +1,15 @@
 package org.simbrain.world.imageworld.filters;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.ImageSourceAdapter;
 import org.simbrain.world.imageworld.ImageSourceListener;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+
 /**
  * FilteredImageSource decorates an ImageSource with a color and size transform.
- *
+ * <p>
  * Based on a similar pattern in awt.
  *
  * @author Tim Shea
@@ -26,11 +26,12 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
 
     /**
      * Construct a new FilteredImageSource.
-     * @param source the ImageSource to be filtered
-     * @param type the type of this filter
+     *
+     * @param source  the ImageSource to be filtered
+     * @param type    the type of this filter
      * @param colorOp the color filter to apply
-     * @param width the width of the output image
-     * @param height the height of the output image
+     * @param width   the width of the output image
+     * @param height  the height of the output image
      */
     public FilteredImageSource(ImageSource source, String type, BufferedImageOp colorOp, int width, int height) {
         wrappedSource = source;
@@ -62,17 +63,23 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         return colorOp;
     }
 
-    /** @return the current unfiltered image */
+    /**
+     * @return the current unfiltered image
+     */
     public BufferedImage getUnfilteredImage() {
         return wrappedSource.getCurrentImage();
     }
 
-    /** @param value The BufferedImageOp to assign to the color op. */
+    /**
+     * @param value The BufferedImageOp to assign to the color op.
+     */
     protected void setColorOp(BufferedImageOp value) {
         colorOp = value;
     }
 
-    /** @param value the BufferedImageOp to assign to the scale op. */
+    /**
+     * @param value the BufferedImageOp to assign to the scale op.
+     */
     protected void setScaleOp(BufferedImageOp value) {
         scaleOp = value;
     }

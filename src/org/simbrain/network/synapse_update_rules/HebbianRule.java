@@ -27,9 +27,10 @@ import org.simbrain.util.UserParameter;
  */
 public class HebbianRule extends SynapseUpdateRule {
 
-    /** Learning rate. */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", 
-            minimumValue = -10, maximumValue = 10, defaultValue = ".01", order = 1)
+    /**
+     * Learning rate.
+     */
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", minimumValue = -10, maximumValue = 10, defaultValue = ".01", order = 1)
     private double learningRate;
 
     @Override
@@ -52,8 +53,7 @@ public class HebbianRule extends SynapseUpdateRule {
     public void update(Synapse synapse) {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
-        double strength = synapse.clip(synapse.getStrength()
-                + (learningRate * input * output));
+        double strength = synapse.clip(synapse.getStrength() + (learningRate * input * output));
         synapse.setStrength(strength);
     }
 

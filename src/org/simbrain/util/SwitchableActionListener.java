@@ -31,9 +31,7 @@ import java.awt.event.ActionListener;
  * starting an infinite loop. In practice it allows for easy differentiating on
  * the part of the code between user induced actions and model-induced actions.
  *
- *
  * @author ztosi
- *
  */
 public abstract class SwitchableActionListener implements ActionListener {
 

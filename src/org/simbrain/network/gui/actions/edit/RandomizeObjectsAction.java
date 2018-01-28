@@ -18,17 +18,14 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Randomize screen elements action.
@@ -47,13 +44,13 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
         putValue(SHORT_DESCRIPTION, "Randomize Selected Weights and Nodes (r)");
 
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('r'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('r'), this);
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         // TODO: Consider just updating the nodes while we have them
@@ -64,9 +61,7 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().randomize();
         }
-        networkPanel.getNetwork().fireNeuronsUpdated(
-                networkPanel.getSelectedModelNeurons());
-        networkPanel.getNetwork().fireSynapsesUpdated(
-                networkPanel.getSelectedModelSynapses());
+        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModelNeurons());
+        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModelSynapses());
     }
 }

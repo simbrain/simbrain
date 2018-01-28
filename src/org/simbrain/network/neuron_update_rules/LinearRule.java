@@ -21,48 +21,62 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
-    DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule,
-    NoisyUpdateRule {
+public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
-    /** The Default upper bound. */
+    /**
+     * The Default upper bound.
+     */
     private static final double DEFAULT_UPPER_BOUND = 1.0;
 
-    /** The Default lower bound. */
+    /**
+     * The Default lower bound.
+     */
     private static final double DEFAULT_LOWER_BOUND = -1.0;
 
-    /** Default clipping setting. */
+    /**
+     * Default clipping setting.
+     */
     private static final boolean DEFAULT_CLIPPING = true;
 
-    /** Slope. */
+    /**
+     * Slope.
+     */
     public double slope = 1;
 
-    /** Bias. */
+    /**
+     * Bias.
+     */
     public double bias = 0;
 
-    /** Noise generator. */
+    /**
+     * Noise generator.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise = false;
 
-    /** Clipping. */
+    /**
+     * Clipping.
+     */
     private boolean clipping = DEFAULT_CLIPPING;
 
-    /** The upper bound of the activity if clipping is used. */
+    /**
+     * The upper bound of the activity if clipping is used.
+     */
     private double upperBound = DEFAULT_UPPER_BOUND;
 
-    /** The lower bound of the activity if clipping is used. */
+    /**
+     * The lower bound of the activity if clipping is used.
+     */
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @Override
@@ -91,7 +105,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
             return val;
         }
     }
-    
+
     @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -224,7 +238,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     public void setClipped(boolean clipping) {
         this.clipping = clipping;
     }
-    
+
     /**
      * @return Returns the slope.
      */

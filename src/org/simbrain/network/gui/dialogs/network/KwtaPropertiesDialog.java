@@ -18,35 +18,44 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JButton;
-import javax.swing.JTextField;
-
 import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+
 /**
  * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * k-winner take all network.
- *
+ * <p>
  * TODO: When this is re-implemented, use new property panel format.
  */
 public class KwtaPropertiesDialog extends StandardDialog {
 
-    /** Main Panel. */
+    /**
+     * Main Panel.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** Winner value field. */
+    /**
+     * Winner value field.
+     */
     private JTextField kValue = new JTextField();
 
-    /** The model subnetwork. */
+    /**
+     * The model subnetwork.
+     */
     private KWTA wta;
 
-    /** Help Button. */
+    /**
+     * Help Button.
+     */
     private JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. */
+    /**
+     * Show Help Action.
+     */
     private ShowHelpAction helpAction;
 
     /**

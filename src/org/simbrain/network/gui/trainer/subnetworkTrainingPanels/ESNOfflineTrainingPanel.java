@@ -18,44 +18,43 @@
  */
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.LMSOffline;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * Panel for training ESN's.
- *
+ * <p>
  * ESN classes like this have to do some tricky things because of how ESN's
  * work. The "visible training set" for the ESN is inputs and targets. But the
  * "real training set" that the learning rule is applied to is actually
  * harvested data from the reservoir network as inputs and the visible target
  * data as targets.
- *
+ * <p>
  * This is similar to LMSOfflineTrainingPanel, but customized in light of the
  * above.
  */
 @SuppressWarnings("serial")
 public class ESNOfflineTrainingPanel extends JPanel {
 
-    /** Reference to the controls panel. */
+    /**
+     * Reference to the controls panel.
+     */
     private final LMSOfflineControlPanel controlPanel;
 
     /**
      * Construct an ESN Training Panel.
      *
      * @param panel the parent network panel
-     * @param esn the underlying network
+     * @param esn   the underlying network
      * @param frame
      */
-    public ESNOfflineTrainingPanel(final NetworkPanel panel,
-        final EchoStateNetwork esn, final Window frame) {
+    public ESNOfflineTrainingPanel(final NetworkPanel panel, final EchoStateNetwork esn, final Window frame) {
         // Initialize control panel with no trainer. It has to be set
         // After the apply button is pressed
         controlPanel = new LMSOfflineControlPanel(frame);

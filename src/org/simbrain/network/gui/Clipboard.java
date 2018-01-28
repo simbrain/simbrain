@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
@@ -30,6 +25,11 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -40,13 +40,19 @@ public class Clipboard {
     // util.CopyPaste, Network.addObjects, and
     // NetworkPanel.getSelectedModelElements()
 
-    /** Static list of cut or copied objects. */
+    /**
+     * Static list of cut or copied objects.
+     */
     private static ArrayList copiedObjects = new ArrayList();
 
-    /** List of components which listen for changes to this clipboard. */
+    /**
+     * List of components which listen for changes to this clipboard.
+     */
     private static HashSet listenerList = new HashSet();
 
-    /** Distance between pasted elemeents. */
+    /**
+     * Distance between pasted elemeents.
+     */
     private static final double PASTE_INCREMENT = 15;
 
     /**
@@ -73,7 +79,7 @@ public class Clipboard {
      *
      * @param net the network to paste into
      */
-    public static void paste(final NetworkPanel net) {        
+    public static void paste(final NetworkPanel net) {
         if (isEmpty()) {
             return;
         }
@@ -84,8 +90,7 @@ public class Clipboard {
         // Gather data for translating the object then add the objects to the
         // network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(copiedObjects);
-        translate(copy, getPasteOffset(net, upperLeft, "X"),
-                getPasteOffset(net, upperLeft, "Y"));
+        translate(copy, getPasteOffset(net, upperLeft, "X"), getPasteOffset(net, upperLeft, "Y"));
         net.getNetwork().addObjects(copy);
 
         // Select pasted items
@@ -96,12 +101,11 @@ public class Clipboard {
     /**
      * Returns those objects that should be selected after a paste.
      *
-     * @param net reference to network panel.
+     * @param net  reference to network panel.
      * @param list list of objects.
      * @return list of objects to be selected after pasting.
      */
-    private static ArrayList getPostPasteSelectionObjects(
-            final NetworkPanel net, final ArrayList list) {
+    private static ArrayList getPostPasteSelectionObjects(final NetworkPanel net, final ArrayList list) {
         ArrayList<Object> ret = new ArrayList<Object>();
         for (Object object : list) {
             if (object instanceof Neuron) {
@@ -126,41 +130,37 @@ public class Clipboard {
 
     /**
      * Returns the paste offset. Handles complexities of paste-trails.
-     *
+     * <p>
      * Begin where the last object was pasted (default to a standard position if
      * none has). Add the size of the object. Add the number of recent clicks
      * times the paste increment.
      *
-     * @param net reference to network panel.
+     * @param net       reference to network panel.
      * @param upperLeft the upper left of the group of objects to be pasted
-     * @param xOrY whether to return x or y offset.
+     * @param xOrY      whether to return x or y offset.
      * @return the offset for the pasted items.
      */
-    private static double getPasteOffset(final NetworkPanel net,
-            final Point2D upperLeft, final String xOrY) {
-        
+    private static double getPasteOffset(final NetworkPanel net, final Point2D upperLeft, final String xOrY) {
+
         if (xOrY.equals("X")) {
-            return (net.getBeginPosition().getX() - upperLeft.getX() - ((net
-                    .getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
+            return (net.getBeginPosition().getX() - upperLeft.getX() - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
         } else {
-            return (net.getBeginPosition().getY() - upperLeft.getY() - ((net
-                    .getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
+            return (net.getBeginPosition().getY() - upperLeft.getY() - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
         }
     }
 
     /**
      * Private method for handling complexities of paste-trails.
-     *
+     * <p>
      * When first pasting, paste at the default location relative to the
      * original paste. Otherwise use the paste increment computed by the
      * network.
      *
-     * @param net Reference to network
+     * @param net  Reference to network
      * @param xOrY Whether to look at x or y values
      * @return the proper paste increment
      */
-    private static double getPasteIncrement(final NetworkPanel net,
-            final String xOrY) {
+    private static double getPasteIncrement(final NetworkPanel net, final String xOrY) {
 
         if (xOrY.equals("X")) {
             if (net.getPasteX() != 0) {
@@ -193,7 +193,7 @@ public class Clipboard {
      * Fire a clipboard changed event to all registered model listeners.
      */
     public static void fireClipboardChanged() {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
             ClipboardListener listener = (ClipboardListener) i.next();
             listener.clipboardChanged();
         }
@@ -206,8 +206,7 @@ public class Clipboard {
      * @param offsetX x offset for translation.
      * @param offsetY y offset for translation.
      */
-    public static void translate(final ArrayList objects, final double offsetX,
-            final double offsetY) {
+    public static void translate(final ArrayList objects, final double offsetX, final double offsetY) {
         for (Object object : objects) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;

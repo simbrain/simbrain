@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.gui.actions.connection;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Set source neurons.
@@ -36,9 +36,7 @@ public final class SetSourceNeurons extends ConditionallyEnabledAction {
     public SetSourceNeurons(final NetworkPanel networkPanel) {
         super(networkPanel, "Set Source Neurons", EnablingCondition.NEURONS);
         putValue(NAME, "Set Source Neurons");
-        putValue(
-                SHORT_DESCRIPTION,
-                "Set selected neurons as source neurons.  They can then be connected to target neurons using the connect commands.");
+        putValue(SHORT_DESCRIPTION, "Set selected neurons as source neurons.  They can then be connected to target neurons using the connect commands.");
     }
 
     @Override

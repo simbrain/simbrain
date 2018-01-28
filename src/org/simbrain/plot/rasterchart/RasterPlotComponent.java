@@ -18,22 +18,24 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents raster data.
  */
 public class RasterPlotComponent extends WorkspaceComponent {
 
-    /** The data model. */
+    /**
+     * The data model.
+     */
     private final RasterModel model;
 
     /**
@@ -52,11 +54,10 @@ public class RasterPlotComponent extends WorkspaceComponent {
      * Creates a new raster plot component from a specified model. Used in
      * deserializing.
      *
-     * @param name chart name
+     * @param name  chart name
      * @param model chart model
      */
-    public RasterPlotComponent(final String name,
-            final RasterModel model) {
+    public RasterPlotComponent(final String name, final RasterModel model) {
         super(name);
         this.model = model;
         addListener();
@@ -65,7 +66,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     /**
      * Initializes a JFreeChart with specific number of data sources.
      *
-     * @param name name of component
+     * @param name           name of component
      * @param numDataSources number of data sources to initialize plot with
      */
     public RasterPlotComponent(final String name, final int numDataSources) {
@@ -116,15 +117,13 @@ public class RasterPlotComponent extends WorkspaceComponent {
     /**
      * Opens a saved raster plot.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return bar chart component to be opened
      */
-    public static RasterPlotComponent open(final InputStream input,
-            final String name, final String format) {
-        RasterModel dataModel = (RasterModel) RasterModel
-                .getXStream().fromXML(input);
+    public static RasterPlotComponent open(final InputStream input, final String name, final String format) {
+        RasterModel dataModel = (RasterModel) RasterModel.getXStream().fromXML(input);
         return new RasterPlotComponent(name, dataModel);
     }
 
@@ -159,21 +158,20 @@ public class RasterPlotComponent extends WorkspaceComponent {
      */
     @Consumable
     public void setValues(final double[] values) {
-        setValues(values,0);
+        setValues(values, 0);
     }
-    
+
     /**
-     * Set the value of a specified data source (one curve in the raster 
+     * Set the value of a specified data source (one curve in the raster
      * plot). This is the main method for updating the data in a raster plot
      *
      * @param values the current "y-axis" value for the raster series
-     * @param index which raster series to set.
+     * @param index  which raster series to set.
      */
     public void setValues(final double[] values, final Integer index) {
         // TODO: Throw exception if index out of current bounds
         for (int i = 0, n = values.length; i < n; i++) {
-            model.addData(index, RasterPlotComponent.this.getWorkspace()
-                .getTime(), values[i]);
+            model.addData(index, RasterPlotComponent.this.getWorkspace().getTime(), values[i]);
         }
     }
 

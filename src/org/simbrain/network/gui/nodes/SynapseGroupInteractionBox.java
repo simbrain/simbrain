@@ -18,20 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
@@ -44,23 +30,28 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Interaction box for synapse groups.
  */
 public class SynapseGroupInteractionBox extends InteractionBox {
 
-    /** Reference to underlying synapse group. */
+    /**
+     * Reference to underlying synapse group.
+     */
     private final SynapseGroup synapseGroup;
 
     /**
      * Construct the custom interaction box.
      *
-     * @param net
-     *            parent network panel
+     * @param net          parent network panel
      * @param synapseGroup
      */
-    public SynapseGroupInteractionBox(NetworkPanel net,
-        SynapseGroup synapseGroup) {
+    public SynapseGroupInteractionBox(NetworkPanel net, SynapseGroup synapseGroup) {
         super(net);
         this.synapseGroup = synapseGroup;
 
@@ -70,7 +61,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * @return the synapse group associated with this interaction box.
      */
     public SynapseGroup getSynapseGroup() {
-    	return synapseGroup;
+        return synapseGroup;
     }
 
     @Override
@@ -104,9 +95,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         // Edit
         Action editGroup = new AbstractAction("Edit Synapse Group...") {
             public void actionPerformed(final ActionEvent event) {
-                StandardDialog dialog = SynapseGroupDialog
-                    .createSynapseGroupDialog(getNetworkPanel(),
-                        synapseGroup);
+                StandardDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(getNetworkPanel(), synapseGroup);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -123,13 +112,11 @@ public class SynapseGroupInteractionBox extends InteractionBox {
             }
         };
         menu.add(selectSynapses);
-        Action selectIncomingNodes = new AbstractAction(
-            "Select Incoming Neurons") {
+        Action selectIncomingNodes = new AbstractAction("Select Incoming Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> incomingNodes = new ArrayList<NeuronNode>();
                 for (Neuron neuron : synapseGroup.getSourceNeurons()) {
-                    incomingNodes.add((NeuronNode) getNetworkPanel()
-                        .getObjectNodeMap().get(neuron));
+                    incomingNodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
 
                 }
                 getNetworkPanel().clearSelection();
@@ -137,13 +124,11 @@ public class SynapseGroupInteractionBox extends InteractionBox {
             }
         };
         menu.add(selectIncomingNodes);
-        Action selectOutgoingNodes = new AbstractAction(
-            "Select Outgoing Neurons") {
+        Action selectOutgoingNodes = new AbstractAction("Select Outgoing Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> outgoingNodes = new ArrayList<NeuronNode>();
                 for (Neuron neuron : synapseGroup.getTargetNeurons()) {
-                    outgoingNodes.add((NeuronNode) getNetworkPanel()
-                        .getObjectNodeMap().get(neuron));
+                    outgoingNodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
 
                 }
                 getNetworkPanel().clearSelection();
@@ -157,24 +142,24 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         //Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
         //    public void actionPerformed(final ActionEvent event) {
         //        selectSynapses();
-                // TODO: Check after synapse group code stabilizes for more
-                // efficient way.
-                // final SynapseAdjustmentPanel synapsePanel =
-                // SynapseAdjustmentPanel
-                // .createSynapseAdjustmentPanel(getNetworkPanel(),
-                // synapseGroup.getAllSynapses());
-                // JDialog dialog = new JDialog();
-                // dialog.setTitle("Adjust selected synapses");
-                // dialog.setContentPane(synapsePanel);
-                // dialog.pack();
-                // dialog.setLocationRelativeTo(null);
-                // dialog.setVisible(true);
-                // dialog.addWindowListener(new WindowAdapter() {
-                // public void windowClosing(WindowEvent e) {
-                // synapsePanel.removeListeners();
-                // }
-                // });
-            //}
+        // TODO: Check after synapse group code stabilizes for more
+        // efficient way.
+        // final SynapseAdjustmentPanel synapsePanel =
+        // SynapseAdjustmentPanel
+        // .createSynapseAdjustmentPanel(getNetworkPanel(),
+        // synapseGroup.getAllSynapses());
+        // JDialog dialog = new JDialog();
+        // dialog.setTitle("Adjust selected synapses");
+        // dialog.setContentPane(synapsePanel);
+        // dialog.pack();
+        // dialog.setLocationRelativeTo(null);
+        // dialog.setVisible(true);
+        // dialog.addWindowListener(new WindowAdapter() {
+        // public void windowClosing(WindowEvent e) {
+        // synapsePanel.removeListeners();
+        // }
+        // });
+        //}
         //};
         //menu.add(adjustSynapses);
         menu.add(new JMenuItem(showWeightMatrixAction));
@@ -194,19 +179,14 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         // Synapse Visibility
         menu.addSeparator();
         final JCheckBoxMenuItem tsvCheckBox = new JCheckBoxMenuItem();
-        Action toggleSynapseVisibility = new AbstractAction(
-            "Toggle Synapse Visibility") {
+        Action toggleSynapseVisibility = new AbstractAction("Toggle Synapse Visibility") {
             public void actionPerformed(final ActionEvent event) {
                 if (synapseGroup.isDisplaySynapses()) {
                     synapseGroup.setDisplaySynapses(false);
                 } else {
                     synapseGroup.setDisplaySynapses(true);
                 }
-                synapseGroup.getParentNetwork().fireGroupChanged(
-                    new NetworkEvent<Group>(
-                        synapseGroup.getParentNetwork(), synapseGroup,
-                        synapseGroup),
-                    SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+                synapseGroup.getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(synapseGroup.getParentNetwork(), synapseGroup, synapseGroup), SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
                 tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
             }
         };
@@ -215,10 +195,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(tsvCheckBox);
 
         // Coupling menu
-        JMenu consumerMenu = this.getNetworkPanel()
-                .getSynapseGroupConsumerMenu(synapseGroup);
-        JMenu producerMenu = getNetworkPanel()
-                .getSynapseGroupProducerMenu(synapseGroup);
+        JMenu consumerMenu = this.getNetworkPanel().getSynapseGroupConsumerMenu(synapseGroup);
+        JMenu producerMenu = getNetworkPanel().getSynapseGroupProducerMenu(synapseGroup);
         if ((consumerMenu != null) || (producerMenu != null)) {
             menu.addSeparator();
         }
@@ -237,13 +215,11 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     private void selectSynapses() {
         List<SynapseNode> nodes = new ArrayList<SynapseNode>();
         for (Synapse synapse : synapseGroup.getExcitatorySynapses()) {
-            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(
-                synapse));
+            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
 
         }
         for (Synapse synapse : synapseGroup.getInhibitorySynapses()) {
-            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(
-                synapse));
+            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
 
         }
         getNetworkPanel().clearSelection();
@@ -266,18 +242,17 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         public void actionPerformed(ActionEvent event) {
             List<Neuron> sourceNeurons = synapseGroup.getSourceNeurons();
             List<Neuron> targetNeurons = synapseGroup.getTargetNeurons();
-            JPanel panel = WeightMatrixViewer
-                .getWeightMatrixPanel(new WeightMatrixViewer(sourceNeurons,
-                    targetNeurons, getNetworkPanel()));
+            JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(sourceNeurons, targetNeurons, getNetworkPanel()));
             getNetworkPanel().displayPanel(panel, "Edit weights");
         }
     };
 
-    /** Action for editing the group name. */
+    /**
+     * Action for editing the group name.
+     */
     protected Action renameAction = new AbstractAction("Rename Group...") {
         public void actionPerformed(final ActionEvent event) {
-            String newName = JOptionPane.showInputDialog("Name:",
-                synapseGroup.getLabel());
+            String newName = JOptionPane.showInputDialog("Name:", synapseGroup.getLabel());
             synapseGroup.setLabel(newName);
         }
     };
@@ -302,19 +277,19 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     /**
      * Sets whether the freezing actions are enabled based on whether the
      * synapses are all frozen or not.
-     *
+     * <p>
      * If all synapses are frozen already, then "freeze synapses" is disabled.
-     *
+     * <p>
      * If all synapses are unfrozen already, then "unfreeze synapses" is
      * disabled.
      */
     private void setFreezeActionsEnabled() {
-    	try {
-        freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
-        unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
-    	} catch (NullPointerException e) {
-    		e.printStackTrace();
-    	}
+        try {
+            freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
+            unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -325,8 +300,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Freeze Synapses");
-            putValue(SHORT_DESCRIPTION,
-                "Freeze all synapses in this group (prevent learning)");
+            putValue(SHORT_DESCRIPTION, "Freeze all synapses in this group (prevent learning)");
         }
 
         @Override
@@ -343,8 +317,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Unfreeze Synapses");
-            putValue(SHORT_DESCRIPTION,
-                "Unfreeze all synapses in this group (allow learning)");
+            putValue(SHORT_DESCRIPTION, "Unfreeze all synapses in this group (allow learning)");
         }
 
         @Override
@@ -359,10 +332,10 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * two things here, (1) a property of synapses whereby the let current pass
      * or not and (2) a property of swing actions where being disabled means
      * being grayed out and unusable.
-     *
+     * <p>
      * If all synapses are enabled already, then the "enable synapses" action is
      * disabled.
-     *
+     * <p>
      * If all synapses are disabled already, then the "disable synapses" actions
      * is disabled.
      */
@@ -379,9 +352,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Enable Synapses");
-            putValue(SHORT_DESCRIPTION,
-                "Enable all synapses in this group (allow activation "
-                    + "to pass through synapses)");
+            putValue(SHORT_DESCRIPTION, "Enable all synapses in this group (allow activation " + "to pass through synapses)");
         }
 
         @Override
@@ -398,9 +369,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Disable Synapses");
-            putValue(SHORT_DESCRIPTION,
-                "Disable all synapses in this group (don't allow "
-                    + "activation to pass through synapses)");
+            putValue(SHORT_DESCRIPTION, "Disable all synapses in this group (don't allow " + "activation to pass through synapses)");
         }
 
         @Override
@@ -411,15 +380,12 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     @Override
     protected String getToolTipText() {
-        return "Synapses: " + synapseGroup.size() + " Density: "
-                + (double) synapseGroup.size()
-                        / (synapseGroup.getSourceNeuronGroup().size()
-                                * synapseGroup.getTargetNeuronGroup().size());
+        return "Synapses: " + synapseGroup.size() + " Density: " + (double) synapseGroup.size() / (synapseGroup.getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
     }
 
     @Override
     protected boolean hasToolTipText() {
-       return true;
+        return true;
     }
 
 }

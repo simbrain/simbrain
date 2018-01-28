@@ -18,18 +18,14 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.OdorWorldPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * <b>DialogOdorWorld</b> is used to set the enivronment's parameters, in
@@ -40,22 +36,34 @@ public class OdorWorldDialog extends StandardDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
-    /** The inital value for world width field's number of columns. */
+    /**
+     * The inital value for world width field's number of columns.
+     */
     private final int initialWorldWidth = 5;
 
-    /** The indent for the color chooser. */
+    /**
+     * The indent for the color chooser.
+     */
     private final int colorChooserIndent = 200;
 
-    /** The world for which properties are to be set. */
+    /**
+     * The world for which properties are to be set.
+     */
     private OdorWorldPanel worldPanel;
 
-    /** The pane that holds the choices to set. */
+    /**
+     * The pane that holds the choices to set.
+     */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** The text field containing the width of the world. */
+    /**
+     * The text field containing the width of the world.
+     */
     private JTextField worldWidth = new JTextField();
 
-    /** The text field containing the height of the world. */
+    /**
+     * The text field containing the height of the world.
+     */
     private JTextField worldHeight = new JTextField();
 
     /**
@@ -88,7 +96,9 @@ public class OdorWorldDialog extends StandardDialog implements ActionListener {
      */
     private JButton colorChoice = new JButton("Set");
 
-    /** The color returned from the color chooser. */
+    /**
+     * The color returned from the color chooser.
+     */
     private Color theColor;
 
     /**
@@ -114,11 +124,9 @@ public class OdorWorldDialog extends StandardDialog implements ActionListener {
 
         mainPanel.addItem("World Width", worldWidth);
         mainPanel.addItem("World Height", worldHeight);
-        mainPanel.addItem("Moving objects initiates creature movement",
-                initiateMovement);
+        mainPanel.addItem("Moving objects initiates creature movement", initiateMovement);
         mainPanel.addItem("Objects block movement", inhibitMovement);
-        mainPanel.addItem("Enable boundaries (if not, agents wrap around)",
-                useLocalBounds);
+        mainPanel.addItem("Enable boundaries (if not, agents wrap around)", useLocalBounds);
         mainPanel.addItem("Update network while dragging objects", updateDrag);
         mainPanel.addItem("Set Background Color", colorChoice);
 
@@ -188,13 +196,12 @@ public class OdorWorldDialog extends StandardDialog implements ActionListener {
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color",
-                Color.BLACK);
+        Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
         colorChooser.setLocation(colorChooserIndent, colorChooserIndent); // Set
-                                                                          // location
-                                                                          // of
-                                                                          // color
-                                                                          // chooser
+        // location
+        // of
+        // color
+        // chooser
 
         return theColor;
     }

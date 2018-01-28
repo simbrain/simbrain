@@ -18,15 +18,14 @@
  */
 package org.simbrain.workspace.updater;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import org.simbrain.workspace.Workspace;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
-import org.simbrain.workspace.Workspace;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 
 /**
  * Update using a custom action saved as a beanshell script.
@@ -35,10 +34,14 @@ import bsh.Interpreter;
  */
 public class UpdateActionCustom implements UpdateAction {
 
-    /** Provides access to workspace updater. */
+    /**
+     * Provides access to workspace updater.
+     */
     private final transient WorkspaceUpdater updater;
 
-    /** The custom update script in persistable string form. */
+    /**
+     * The custom update script in persistable string form.
+     */
     private String scriptString;
 
     /**
@@ -47,7 +50,9 @@ public class UpdateActionCustom implements UpdateAction {
      */
     private transient Interpreter interpreter = new Interpreter();
 
-    /** Custom update action. */
+    /**
+     * Custom update action.
+     */
     private transient UpdateAction theAction;
 
     /**
@@ -55,10 +60,9 @@ public class UpdateActionCustom implements UpdateAction {
      * script.
      *
      * @param updater reference to workspace updater
-     * @param script the custom script as a string
+     * @param script  the custom script as a string
      */
-    public UpdateActionCustom(final WorkspaceUpdater updater,
-            final String script) {
+    public UpdateActionCustom(final WorkspaceUpdater updater, final String script) {
         this.updater = updater;
         this.scriptString = script;
         init();
@@ -69,10 +73,9 @@ public class UpdateActionCustom implements UpdateAction {
      * script.
      *
      * @param workspace reference to parent workspace
-     * @param file file containing custom code
+     * @param file      file containing custom code
      */
-    public UpdateActionCustom(final Workspace workspace,
-            final File file) {
+    public UpdateActionCustom(final Workspace workspace, final File file) {
         this.updater = workspace.getUpdater();
         StringBuilder scriptText = new StringBuilder();
         String newLine = System.getProperty("line.separator");
@@ -90,7 +93,6 @@ public class UpdateActionCustom implements UpdateAction {
         this.scriptString = scriptText.toString();
         init();
     }
-
 
 
     /**

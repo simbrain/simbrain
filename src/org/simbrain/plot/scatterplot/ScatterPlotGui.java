@@ -18,18 +18,6 @@
  */
 package org.simbrain.plot.scatterplot;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -43,38 +31,53 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * Display a Scatter Plot.
  */
-public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
-        implements ActionListener {
+public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implements ActionListener {
 
-    /** Chart un-initialized instance. */
+    /**
+     * Chart un-initialized instance.
+     */
     private JFreeChart chart;
 
-    /** Chart panel. */
+    /**
+     * Chart panel.
+     */
     private ChartPanel chartPanel = new ChartPanel(null);
 
-    /** Scatter plot component. */
+    /**
+     * Scatter plot component.
+     */
     private ScatterPlotComponent component;
 
-    /** XY chart renderer. */
+    /**
+     * XY chart renderer.
+     */
     private XYDotRenderer renderer;
 
-    /** Plot action manager. */
+    /**
+     * Plot action manager.
+     */
     private PlotActionManager actionManager;
 
-    /** Preferred frame size. */
+    /**
+     * Preferred frame size.
+     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
     /**
      * Construct the ScatterPlot.
      *
-     * @param frame Generic frame for gui use
+     * @param frame     Generic frame for gui use
      * @param component Scatter plot component
      */
-    public ScatterPlotGui(final GenericFrame frame,
-            final ScatterPlotComponent component) {
+    public ScatterPlotGui(final GenericFrame frame, final ScatterPlotComponent component) {
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(PREFERRED_SIZE));
@@ -105,30 +108,13 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
     public void postAddInit() {
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("", "X", "Y", this
-                .getWorkspaceComponent().getModel().getDataset(),
-                PlotOrientation.VERTICAL, true, false, false);
+        chart = ChartFactory.createScatterPlot("", "X", "Y", this.getWorkspaceComponent().getModel().getDataset(), PlotOrientation.VERTICAL, true, false, false);
 
         // Use below to make this stuff settable
-        chart.getXYPlot()
-                .getDomainAxis()
-                .setRange(
-                        getWorkspaceComponent().getModel()
-                                .getLowerDomainBoundary(),
-                        getWorkspaceComponent().getModel()
-                                .getUpperDomainBoundary());
-        chart.getXYPlot()
-                .getRangeAxis()
-                .setRange(
-                        getWorkspaceComponent().getModel()
-                                .getLowerRangeBoundary(),
-                        getWorkspaceComponent().getModel()
-                                .getUpperRangeBoundary());
-        chart.getXYPlot()
-                .getDomainAxis()
-                .setAutoRange(getWorkspaceComponent().getModel().isAutoDomain());
-        chart.getXYPlot().getRangeAxis()
-                .setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
+        chart.getXYPlot().getDomainAxis().setRange(getWorkspaceComponent().getModel().getLowerDomainBoundary(), getWorkspaceComponent().getModel().getUpperDomainBoundary());
+        chart.getXYPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerRangeBoundary(), getWorkspaceComponent().getModel().getUpperRangeBoundary());
+        chart.getXYPlot().getDomainAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoDomain());
+        chart.getXYPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
         // for (int i = 0; i <
         // getWorkspaceComponent().getModel().getColor().size(); ++i) {
         // renderer.setSeriesPaint(i,
@@ -139,48 +125,23 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
         renderer = new XYDotRenderer();
         chart.getXYPlot().setRenderer(renderer);
 
-        getWorkspaceComponent().getModel().addChartSettingsListener(
-                new ChartSettingsListener() {
-                    public void chartSettingsUpdated(ChartModel model) {
-                        chart.getXYPlot()
-                                .getDomainAxis()
-                                .setAutoRange(
-                                        getWorkspaceComponent().getModel()
-                                                .isAutoDomain());
-                        if (!getWorkspaceComponent().getModel().isAutoDomain()) {
-                            chart.getXYPlot()
-                                    .getDomainAxis()
-                                    .setRange(
-                                            getWorkspaceComponent().getModel()
-                                                    .getLowerDomainBoundary(),
-                                            getWorkspaceComponent().getModel()
-                                                    .getUpperDomainBoundary());
-                        }
-                        chart.getXYPlot()
-                                .getRangeAxis()
-                                .setAutoRange(
-                                        getWorkspaceComponent().getModel()
-                                                .isAutoRange());
-                        if (!getWorkspaceComponent().getModel().isAutoRange()) {
-                            chart.getXYPlot()
-                                    .getRangeAxis()
-                                    .setRange(
-                                            getWorkspaceComponent().getModel()
-                                                    .getLowerRangeBoundary(),
-                                            getWorkspaceComponent().getModel()
-                                                    .getUpperRangeBoundary());
-                        }
-                        renderer.setDotHeight(getWorkspaceComponent()
-                                .getModel().getDotSize());
-                        renderer.setDotWidth(getWorkspaceComponent().getModel()
-                                .getDotSize());
-                        for (int i = 0; i < getWorkspaceComponent().getModel()
-                                .getChartSeriesPaint().size(); ++i) {
-                            renderer.setSeriesPaint(i, getWorkspaceComponent()
-                                    .getModel().getChartSeriesPaint().get(i));
-                        }
-                    }
-                });
+        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
+            public void chartSettingsUpdated(ChartModel model) {
+                chart.getXYPlot().getDomainAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoDomain());
+                if (!getWorkspaceComponent().getModel().isAutoDomain()) {
+                    chart.getXYPlot().getDomainAxis().setRange(getWorkspaceComponent().getModel().getLowerDomainBoundary(), getWorkspaceComponent().getModel().getUpperDomainBoundary());
+                }
+                chart.getXYPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
+                if (!getWorkspaceComponent().getModel().isAutoRange()) {
+                    chart.getXYPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerRangeBoundary(), getWorkspaceComponent().getModel().getUpperRangeBoundary());
+                }
+                renderer.setDotHeight(getWorkspaceComponent().getModel().getDotSize());
+                renderer.setDotWidth(getWorkspaceComponent().getModel().getDotSize());
+                for (int i = 0; i < getWorkspaceComponent().getModel().getChartSeriesPaint().size(); ++i) {
+                    renderer.setSeriesPaint(i, getWorkspaceComponent().getModel().getChartSeriesPaint().get(i));
+                }
+            }
+        });
 
         // Activate settings above!
         component.getModel().fireSettingsChanged();
@@ -206,8 +167,7 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
         editMenu.add(preferences);
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/scatter_plot.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/scatter_plot.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 
@@ -226,19 +186,16 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
     public void update() {
     }
 
-    /** @see ActionListener
+    /**
      * @param arg0
+     * @see ActionListener
      */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            for (int i = getWorkspaceComponent().getModel()
-                    .getChartSeriesPaint().size(); i < chart.getXYPlot()
-                    .getSeriesCount(); ++i) {
-                getWorkspaceComponent().getModel().getChartSeriesPaint()
-                        .add(renderer.getSeriesPaint(i));
+            for (int i = getWorkspaceComponent().getModel().getChartSeriesPaint().size(); i < chart.getXYPlot().getSeriesCount(); ++i) {
+                getWorkspaceComponent().getModel().getChartSeriesPaint().add(renderer.getSeriesPaint(i));
             }
-            ScatterPlotDialog dialog = new ScatterPlotDialog(chart,
-                    getWorkspaceComponent().getModel());
+            ScatterPlotDialog dialog = new ScatterPlotDialog(chart, getWorkspaceComponent().getModel());
             // JDialog dialog = new JDialog();
             // dialog.setContentPane(new
             // ReflectivePropertyEditor(getWorkspaceComponent()

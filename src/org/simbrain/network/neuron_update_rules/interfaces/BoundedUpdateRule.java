@@ -14,13 +14,11 @@
 package org.simbrain.network.neuron_update_rules.interfaces;
 
 /**
- *
  * An interface for updates rules that make use of an upper and lower bound,
  * either for clipping or for setting intrinsic bounds.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
- *
  */
 public interface BoundedUpdateRule {
 

@@ -26,13 +26,19 @@ import org.simbrain.network.core.Network;
  */
 public abstract class Group {
 
-    /** Reference to the network this group is a part of. */
+    /**
+     * Reference to the network this group is a part of.
+     */
     private final Network parentNetwork;
 
-    /** Name of this group. */
+    /**
+     * Name of this group.
+     */
     private String id;
 
-    /** Name of this group. Null strings lead to default labeling conventions. */
+    /**
+     * Name of this group. Null strings lead to default labeling conventions.
+     */
     private String label;
 
     /**
@@ -45,7 +51,9 @@ public abstract class Group {
      * Whether this group should be deleted when all its components are deleted.
      */
 
-    /** Flag which prevents infinite loops when deleting composite groups. */
+    /**
+     * Flag which prevents infinite loops when deleting composite groups.
+     */
     private boolean markedForDeletion = false;
 
     /**
@@ -72,7 +80,7 @@ public abstract class Group {
 
     /**
      * @return the number of synapses/neurons in this group as applicable to the
-     *         group type
+     * group type
      */
     public abstract int size();
 

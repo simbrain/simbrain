@@ -3,7 +3,6 @@ package org.simbrain.workspace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.function.Function;
 
 public class Consumer<V> extends Attribute {
 

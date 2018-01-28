@@ -18,23 +18,24 @@
  */
 package org.simbrain.network.gui.actions.selection;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SynapseNode;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Select incoming weights action weights action.
  */
 public final class SelectIncomingWeightsAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -60,16 +61,16 @@ public final class SelectIncomingWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Select All Incoming Weights");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> list = networkPanel.getSelectedModelNeurons();
         List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();
         for (Neuron neuron : list) {
             for (Synapse synapse : neuron.getFanIn()) {
-                sourceWeights.add((SynapseNode) networkPanel.getObjectNodeMap()
-                        .get(synapse));
+                sourceWeights.add((SynapseNode) networkPanel.getObjectNodeMap().get(synapse));
             }
         }
         networkPanel.clearSelection();

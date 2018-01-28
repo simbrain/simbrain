@@ -18,10 +18,10 @@
  */
 package org.simbrain.util.projection;
 
-import java.util.Arrays;
-
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
+
+import java.util.Arrays;
 
 /**
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two
@@ -33,6 +33,7 @@ public class ProjectPCA extends ProjectionMethod {
 
     /**
      * Default PCA project.
+     *
      * @param projector
      */
     public ProjectPCA(Projector projector) {
@@ -81,8 +82,7 @@ public class ProjectPCA extends ProjectionMethod {
                         break; // needed for cases of repeated e-vals?
                     }
 
-                    matrixProjector.setMatrix(k, k, 0, updim - 1,
-                            combined.getMatrix(j, j, 1, updim));
+                    matrixProjector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));
                     k++;
                 }
             }

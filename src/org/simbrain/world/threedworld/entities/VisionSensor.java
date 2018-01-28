@@ -1,50 +1,60 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.awt.image.ImageFilter;
-
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
 import org.simbrain.util.UserParameter;
 import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 import org.simbrain.world.threedworld.engine.ThreeDRenderSource;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
+
+import java.awt.image.ImageFilter;
 
 /**
  * VisionSensor provides an interface for a camera to render the ThreeDWorld from
- * the perspective of an agent. 
+ * the perspective of an agent.
  *
  * @author Tim Shea
  */
 public class VisionSensor extends SensorMatrix implements Sensor {
-    
-    /** Color filter type for the sensor. */
+
+    /**
+     * Color filter type for the sensor.
+     */
     public enum FilterType {
-        /** Color filter preserves full color renders. */
-        COLOR,
-        /** Gray filter sets all pixel channels to the brightness of the rendered pixel. */
-        GRAY,
         /**
+         * Color filter preserves full color renders.
+         */
+        COLOR, /**
+         * Gray filter sets all pixel channels to the brightness of the rendered pixel.
+         */
+        GRAY, /**
          * Threshold filter sets all pixel channels to one if the brightness of the
          * rendered pixel was greater than the threshold value or zero otherwise.
          */
         THRESHOLD
     }
 
-    /** FOV defines the angular width in degrees of the sensor. */
+    /**
+     * FOV defines the angular width in degrees of the sensor.
+     */
     public static final float FOV = 45;
-    /** NEAR_CLIP defines the distance (in arbitrary units) to the near clipping plane. */
+    /**
+     * NEAR_CLIP defines the distance (in arbitrary units) to the near clipping plane.
+     */
     public static final float NEAR_CLIP = 0.1f;
-    /** FAR_CLIP defines the distance (in arbitrary units) to the far clipping plane. */
+    /**
+     * FAR_CLIP defines the distance (in arbitrary units) to the far clipping plane.
+     */
     public static final float FAR_CLIP = 100;
 
     private Agent agent;
     private Vector3f headOffset = Vector3f.UNIT_Z.clone();
-    @UserParameter(label="Width", defaultValue="10", minimumValue=1, maximumValue=2048)
+    @UserParameter(label = "Width", defaultValue = "10", minimumValue = 1, maximumValue = 2048)
     private int width = 10;
-    @UserParameter(label="Height", defaultValue="10", minimumValue=1, maximumValue=2048)
+    @UserParameter(label = "Height", defaultValue = "10", minimumValue = 1, maximumValue = 2048)
     private int height = 10;
     private FilterType filterType = FilterType.COLOR;
     private double threshold = 0.5;
@@ -54,6 +64,7 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     /**
      * Construct a new VisionSensor.
+     *
      * @param agent The agent to attach the sensor to.
      */
     public VisionSensor(Agent agent) {
@@ -149,15 +160,15 @@ public class VisionSensor extends SensorMatrix implements Sensor {
     private void applyFilter() {
         ImageFilter filter;
         switch (filterType) {
-        case COLOR:
-            setSource(ImageFilterFactory.createColorFilter(renderSource, width, height));
-            break;
-        case GRAY:
-            setSource(ImageFilterFactory.createGrayFilter(renderSource, width, height));
-            break;
-        case THRESHOLD:
-            setSource(ThresholdFilterFactory.createThresholdFilter(renderSource, threshold, width, height));
-            break;
+            case COLOR:
+                setSource(ImageFilterFactory.createColorFilter(renderSource, width, height));
+                break;
+            case GRAY:
+                setSource(ImageFilterFactory.createGrayFilter(renderSource, width, height));
+                break;
+            case THRESHOLD:
+                setSource(ThresholdFilterFactory.createThresholdFilter(renderSource, threshold, width, height));
+                break;
         }
     }
 
@@ -191,7 +202,8 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     /**
      * Resize the sensor by providing a new width and height in pixels.
-     * @param width The new width.
+     *
+     * @param width  The new width.
      * @param height The new height.
      */
     public void resize(int width, int height) {
@@ -207,7 +219,7 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     /**
      * Update the sensor by recalculating the position from the agent.
-     * 
+     *
      * @param tpf The time since the previous update in seconds.
      */
     public void update(float tpf) {

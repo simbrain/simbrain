@@ -29,16 +29,18 @@ import org.simbrain.network.gui.NetworkPanel;
  * Usage: <code>
  * final PNode node = ...;
  * node.addInputEventListener(new ToolTipTextUpdater() {
- *     protected String getToolTipText() {
- *       return node.toString();
- *     }
- *   });
+ * protected String getToolTipText() {
+ * return node.toString();
+ * }
+ * });
  * </code>
  * </p>
  */
 abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -58,8 +60,9 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
      */
     protected abstract String getToolTipText();
 
-    /** @see PBasicInputEventHandler 
+    /**
      * @param event
+     * @see PBasicInputEventHandler
      */
     public final void mouseEntered(final PInputEvent event) {
 
@@ -69,8 +72,9 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
         // }
     }
 
-    /** @see PBasicInputEventHandler
+    /**
      * @param event
+     * @see PBasicInputEventHandler
      */
     public final void mouseExited(final PInputEvent event) {
 

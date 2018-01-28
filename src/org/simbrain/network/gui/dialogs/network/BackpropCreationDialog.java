@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JOptionPane;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for creating a Backprop network.
@@ -43,9 +43,7 @@ public class BackpropCreationDialog extends FeedForwardCreationDialog {
             networkCreationPanel.commit(networkPanel, "Backprop");
             dispose();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null,
-                    "Inappropriate Field Values (Numbers only in all all field)", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Inappropriate Field Values (Numbers only in all all field)", "Error", JOptionPane.ERROR_MESSAGE);
             nfe.printStackTrace();
         }
     }

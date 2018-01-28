@@ -19,21 +19,16 @@
 package org.simbrain.network.gui.filters;
 
 import org.piccolo2d.PNode;
-import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.ScreenElement;
-import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.gui.nodes.SynapseGroupNode;
-import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.gui.nodes.TextNode;
-import org.simbrain.network.gui.nodes.ViewGroupNode;
+import org.simbrain.network.gui.nodes.*;
 
 /**
  * Filters.
  */
 public final class Filters {
 
-    /** Neuron node filter. */
+    /**
+     * Neuron node filter.
+     */
     private static final AbstractFilter NEURON_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -41,7 +36,9 @@ public final class Filters {
         }
     };
 
-    /** Neuron group node filter. */
+    /**
+     * Neuron group node filter.
+     */
     private static final AbstractFilter NEURON_GROUP_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -49,7 +46,9 @@ public final class Filters {
         }
     };
 
-    /** Synapse node filter. */
+    /**
+     * Synapse node filter.
+     */
     private static final AbstractFilter SYNAPSE_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -57,16 +56,19 @@ public final class Filters {
         }
     };
 
-    /** Neuron node filter. */
+    /**
+     * Neuron node filter.
+     */
     private static final AbstractFilter MODEL_GROUP_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return ((node instanceof NeuronGroupNode)
-                    || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
+            return ((node instanceof NeuronGroupNode) || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
         }
     };
 
-    /** Neuron or synapse node filter. Don't worry about grouping for this. */
+    /**
+     * Neuron or synapse node filter. Don't worry about grouping for this.
+     */
     private static final AbstractFilter NEURON_OR_SYNAPSE_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -74,7 +76,9 @@ public final class Filters {
         }
     };
 
-    /** Text object filter. */
+    /**
+     * Text object filter.
+     */
     private static final AbstractFilter TEXT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -95,22 +99,23 @@ public final class Filters {
         return false;
     }
 
-    /** Selectable filter. */
+    /**
+     * Selectable filter.
+     */
     private static final AbstractFilter SELECTABLE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return (((node instanceof NeuronNode) && (!isGrouped(node)))
-                    || ((node instanceof SynapseNode) && (!isGrouped(node)))
-                    || ((node instanceof TextNode) && (!isGrouped(node))) || (node instanceof ViewGroupNode));
+            return (((node instanceof NeuronNode) && (!isGrouped(node))) || ((node instanceof SynapseNode) && (!isGrouped(node))) || ((node instanceof TextNode) && (!isGrouped(node))) || (node instanceof ViewGroupNode));
         }
     };
 
-    /** Subnetwork node filter. */
+    /**
+     * Subnetwork node filter.
+     */
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return ((node instanceof NeuronGroupNode)
-                    || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
+            return ((node instanceof NeuronGroupNode) || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
         }
     };
 

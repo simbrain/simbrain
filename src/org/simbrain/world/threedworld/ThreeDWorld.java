@@ -1,13 +1,9 @@
 package org.simbrain.world.threedworld;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.swing.AbstractAction;
-
+import com.jme3.app.Application;
+import com.jme3.app.state.AppState;
+import com.jme3.app.state.AppStateManager;
+import com.jme3.renderer.RenderManager;
 import org.simbrain.world.threedworld.actions.ActionManager;
 import org.simbrain.world.threedworld.controllers.AgentController;
 import org.simbrain.world.threedworld.controllers.CameraController;
@@ -15,23 +11,36 @@ import org.simbrain.world.threedworld.controllers.ClipboardController;
 import org.simbrain.world.threedworld.controllers.SelectionController;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.Entity;
-import com.jme3.app.Application;
-import com.jme3.app.state.AppState;
-import com.jme3.app.state.AppStateManager;
-import com.jme3.renderer.RenderManager;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * ThreeDWorld is a container for the engine, entities, and controllers needed
  * for the simbrain 3d environment.
  */
 public class ThreeDWorld implements AppState {
-    /** Listener receives notifications when a ThreeDWorld is initialized or updated. */
+    /**
+     * Listener receives notifications when a ThreeDWorld is initialized or updated.
+     */
     public interface Listener {
-        /** @param world The world which has been initialized. */
+        /**
+         * @param world The world which has been initialized.
+         */
         void onWorldInitialize(ThreeDWorld world);
-        /** @param world The world which has been updated. */
+
+        /**
+         * @param world The world which has been updated.
+         */
         void onWorldUpdate(ThreeDWorld world);
-        /** @param world The world which is closing. */
+
+        /**
+         * @param world The world which is closing.
+         */
         void onWorldClosing(ThreeDWorld world);
     }
 
@@ -128,6 +137,7 @@ public class ThreeDWorld implements AppState {
 
     /**
      * Add a listener to this ThreeDWorld to receive initialize and update notifications.
+     *
      * @param listener The listener to notify.
      */
     public void addListener(Listener listener) {
@@ -136,6 +146,7 @@ public class ThreeDWorld implements AppState {
 
     /**
      * Remove a listener from this ThreeDWorld.
+     *
      * @param listener The listener to remove.
      */
     public void removeListener(Listener listener) {
@@ -202,7 +213,8 @@ public class ThreeDWorld implements AppState {
     }
 
     @Override
-    public void setEnabled(boolean value) { }
+    public void setEnabled(boolean value) {
+    }
 
     @Override
     public boolean isEnabled() {
@@ -210,10 +222,12 @@ public class ThreeDWorld implements AppState {
     }
 
     @Override
-    public void stateAttached(AppStateManager stateManager) { }
+    public void stateAttached(AppStateManager stateManager) {
+    }
 
     @Override
-    public void stateDetached(AppStateManager stateManager) { }
+    public void stateDetached(AppStateManager stateManager) {
+    }
 
     @Override
     public void update(float tpf) {
@@ -226,10 +240,12 @@ public class ThreeDWorld implements AppState {
     }
 
     @Override
-    public void render(RenderManager rm) { }
+    public void render(RenderManager rm) {
+    }
 
     @Override
-    public void postRender() { }
+    public void postRender() {
+    }
 
     @Override
     public void cleanup() {

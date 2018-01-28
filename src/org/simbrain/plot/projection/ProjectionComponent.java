@@ -18,11 +18,6 @@
  */
 package org.simbrain.plot.projection;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
@@ -30,16 +25,24 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Component for a projection plot.
  */
 public class ProjectionComponent extends WorkspaceComponent {
 
-    /** Data model. */
+    /**
+     * Data model.
+     */
     private ProjectionModel projectionModel;
 
     /**
      * Create new Projection Component.
+     *
      * @param name
      */
     public ProjectionComponent(final String name) {
@@ -50,7 +53,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     /**
      * Initializes a JFreeChart with specific number of data sources.
      *
-     * @param name name of component
+     * @param name           name of component
      * @param numDataSources number of data sources to initialize plot with
      */
     public ProjectionComponent(final String name, final int numDataSources) {
@@ -63,7 +66,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      * deserializing.
      *
      * @param model projection model
-     * @param name name of component
+     * @param name  name of component
      */
     public ProjectionComponent(final ProjectionModel model, final String name) {
         super(name);
@@ -72,8 +75,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         // Add the data to the chart.
         int numPoints = projectionModel.getProjector().getNumPoints();
         for (int i = 0; i < numPoints; i++) {
-            DataPoint point = projectionModel.getProjector().getDownstairs()
-                    .getPoint(i);
+            DataPoint point = projectionModel.getProjector().getDownstairs().getPoint(i);
             if (point != null) {
                 projectionModel.addPoint(point.get(0), point.get(1));
             }
@@ -89,15 +91,13 @@ public class ProjectionComponent extends WorkspaceComponent {
     /**
      * Opens a saved projection component.
      *
-     * @param input stream
-     * @param name name of file
+     * @param input  stream
+     * @param name   name of file
      * @param format format
      * @return component to be opened
      */
-    public static ProjectionComponent open(InputStream input,
-            final String name, final String format) {
-        ProjectionModel model = (ProjectionModel) ProjectionModel.getXStream()
-                .fromXML(input);
+    public static ProjectionComponent open(InputStream input, final String name, final String format) {
+        ProjectionModel model = (ProjectionModel) ProjectionModel.getXStream().fromXML(input);
         return new ProjectionComponent(model, name);
     }
 
@@ -177,13 +177,11 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     @Consumable
     public void addPoint(double[] newPoint) {
-        if (newPoint.length != projectionModel
-                .getProjector().getDimensions()) {
+        if (newPoint.length != projectionModel.getProjector().getDimensions()) {
             projectionModel.getProjector().init(newPoint.length);
             System.out.println(newPoint.length);
         }
-        projectionModel.getProjector()
-                .addDatapoint(new DataPointColored(newPoint));
+        projectionModel.getProjector().addDatapoint(new DataPointColored(newPoint));
     }
 
     @Override

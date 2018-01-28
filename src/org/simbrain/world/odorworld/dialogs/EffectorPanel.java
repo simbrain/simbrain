@@ -18,27 +18,6 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.WorldListenerAdapter;
@@ -48,22 +27,40 @@ import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Panel showing an agent's effectors.
  *
  * @author Jeff Yoshimi
  * @author Lam Nguyen
- *
  */
 public class EffectorPanel extends JPanel {
 
-    /** Table representing Effector. */
+    /**
+     * Table representing Effector.
+     */
     private JTable table;
 
-    /** Table model. */
+    /**
+     * Table model.
+     */
     private EffectorModel model;
 
-    /** The parent entity. */
+    /**
+     * The parent entity.
+     */
     private OdorWorldEntity entity;
 
     /**
@@ -82,8 +79,7 @@ public class EffectorPanel extends JPanel {
         // Set up table
         model = new EffectorModel();
         table = new JTable(model);
-        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-                .setHorizontalAlignment(SwingConstants.CENTER);
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
@@ -110,8 +106,7 @@ public class EffectorPanel extends JPanel {
         });
         table.addMouseListener(new MouseAdapter() {
             public void mouseReleased(final MouseEvent e) {
-                if (e.getClickCount() == 2
-                        && table.columnAtPoint(e.getPoint()) != 1) {
+                if (e.getClickCount() == 2 && table.columnAtPoint(e.getPoint()) != 1) {
                     final int row = table.rowAtPoint(e.getPoint());
                     table.setRowSelectionInterval(row, row);
                     final Effector effector = model.getEffector(row);
@@ -119,30 +114,25 @@ public class EffectorPanel extends JPanel {
                 }
             }
         });
-        table.getSelectionModel().addListSelectionListener(
-                new ListSelectionListener() {
-                    public void valueChanged(ListSelectionEvent e) {
-                        if (table.getSelectedRow() > 0) {
-                            selectedEffector = model.getEffector(table
-                                    .getSelectedRow());
-                        }
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (table.getSelectedRow() > 0) {
+                    selectedEffector = model.getEffector(table.getSelectedRow());
+                }
 
-                    }
-                });
+            }
+        });
         for (Effector effector : entity.getEffectors()) {
             model.addRow(effector);
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel buttonBar = new JPanel();
-        JButton addEffector = new JButton("Add",
-                ResourceManager.getImageIcon("plus.png"));
+        JButton addEffector = new JButton("Add", ResourceManager.getImageIcon("plus.png"));
         addEffector.setToolTipText("Add effector...");
-        JButton deleteEffector = new JButton("Delete",
-                ResourceManager.getImageIcon("minus.png"));
+        JButton deleteEffector = new JButton("Delete", ResourceManager.getImageIcon("minus.png"));
         deleteEffector.setToolTipText("Delete effector...");
-        JButton editEffector = new JButton("Edit",
-                ResourceManager.getImageIcon("Properties.png"));
+        JButton editEffector = new JButton("Edit", ResourceManager.getImageIcon("Properties.png"));
         editEffector.setToolTipText("Edit effector...");
         buttonBar.add(addEffector);
         buttonBar.add(deleteEffector);
@@ -195,7 +185,7 @@ public class EffectorPanel extends JPanel {
      * Edit an effector.
      */
     private void editEffector(Effector effector) {
-        
+
         // Cheap null fix.  Panel is null when no item is selected on opening.
         // Should disable the edit button in this case.
         if (effector == null) {
@@ -208,8 +198,7 @@ public class EffectorPanel extends JPanel {
         if (effector instanceof Turning) {
             effectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
         } else if (effector instanceof StraightMovement) {
-            effectorPanel = new StraightEffectorPanel(entity,
-                    (StraightMovement) effector);
+            effectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
         } else if (effector instanceof Speech) {
             effectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
         }
@@ -227,10 +216,14 @@ public class EffectorPanel extends JPanel {
      */
     class EffectorModel extends AbstractTableModel {
 
-        /** Column names. */
-        String[] columnNames = { "Id", "Label", "Type" };
+        /**
+         * Column names.
+         */
+        String[] columnNames = {"Id", "Label", "Type"};
 
-        /** Internal list of components. */
+        /**
+         * Internal list of components.
+         */
         private List<Effector> data = new ArrayList<Effector>();
 
         /**
@@ -301,14 +294,14 @@ public class EffectorPanel extends JPanel {
          */
         public Object getValueAt(int row, int col) {
             switch (col) {
-            case 0:
-                return data.get(row).getId();
-            case 1:
-                return data.get(row).getLabel();
-            case 2:
-                return data.get(row).getTypeDescription();
-            default:
-                return null;
+                case 0:
+                    return data.get(row).getId();
+                case 1:
+                    return data.get(row).getLabel();
+                case 2:
+                    return data.get(row).getTypeDescription();
+                default:
+                    return null;
             }
         }
 
@@ -317,13 +310,13 @@ public class EffectorPanel extends JPanel {
          */
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
-            case 0:
-                return;
-            case 1:
-                data.get(row).setLabel((String) value);
-                return;
-            case 2:
-                return;
+                case 0:
+                    return;
+                case 1:
+                    data.get(row).setLabel((String) value);
+                    return;
+                case 2:
+                    return;
             }
             this.fireTableDataChanged();
         }
@@ -333,14 +326,14 @@ public class EffectorPanel extends JPanel {
          */
         public boolean isCellEditable(int row, int col) {
             switch (col) {
-            case 0:
-                return false;
-            case 1:
-                return true;
-            case 2:
-                return false;
-            default:
-                return false;
+                case 0:
+                    return false;
+                case 1:
+                    return true;
+                case 2:
+                    return false;
+                default:
+                    return false;
             }
         }
 
@@ -349,14 +342,14 @@ public class EffectorPanel extends JPanel {
          */
         public Class getColumnClass(int col) {
             switch (col) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return null;
+                case 0:
+                    return String.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                default:
+                    return null;
             }
         }
     }

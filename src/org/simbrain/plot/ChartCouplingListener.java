@@ -1,7 +1,5 @@
 package org.simbrain.plot;
 
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartModel;
 import org.simbrain.workspace.*;
 
 import java.util.List;
@@ -18,8 +16,9 @@ public class ChartCouplingListener implements CouplingListener {
 
     /**
      * Create a new ChartCouplingListener to allow for dynamic creation of data sources.
-     * @param workspace The workspace to listen for couplings.
-     * @param model The chart model to replace couplings on.
+     *
+     * @param workspace         The workspace to listen for couplings.
+     * @param model             The chart model to replace couplings on.
      * @param descriptionPrefix A prefix to append to the description of newly created data sources.
      */
     public ChartCouplingListener(Workspace workspace, ChartModel model, String descriptionPrefix) {

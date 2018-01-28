@@ -17,47 +17,68 @@ import java.awt.event.ComponentEvent;
 /**
  * @author Amanda Pandey <amanda.pandey@gmail.com>
  */
-public class DeviceInteractionDesktopComponent extends
-        GuiComponent<DeviceInteractionComponent> {
+public class DeviceInteractionDesktopComponent extends GuiComponent<DeviceInteractionComponent> {
 
-    /** Default height. */
+    /**
+     * Default height.
+     */
     private static final int DEFAULT_HEIGHT = 250;
 
-    /** Default width. */
+    /**
+     * Default width.
+     */
     private static final int DEFAULT_WIDTH = 400;
 
-    /** Menu Bar. */
+    /**
+     * Menu Bar.
+     */
     private JMenuBar menuBar = new JMenuBar();
 
-    /** File menu for saving and opening world files. */
+    /**
+     * File menu for saving and opening world files.
+     */
     private JMenu file = new JMenu("File");
 
-    /** Edit menu Item. */
+    /**
+     * Edit menu Item.
+     */
     private JMenu edit = new JMenu("Edit");
 
-    /** Opens user preferences dialog. */
+    /**
+     * Opens user preferences dialog.
+     */
     private JMenuItem preferences = new JMenuItem("Preferences");
 
-    /** Show dictionary. */
+    /**
+     * Show dictionary.
+     */
     private JMenuItem showDictionary = new JMenuItem("Show dictionary");
 
-    /** Opens the help dialog for TextWorld. */
+    /**
+     * Opens the help dialog for TextWorld.
+     */
     private JMenu help = new JMenu("Help");
 
-    /** Help menu item. */
+    /**
+     * Help menu item.
+     */
     private JMenuItem helpItem = new JMenuItem("Display Help");
 
-    /** The pane representing the text world. */
+    /**
+     * The pane representing the text world.
+     */
     private DeviceInteractionPanel panel;
 
-    /** The text world. */
+    /**
+     * The text world.
+     */
     private KeyboardWorld world;
 
 
     /**
      * Construct a workspace component.
      *
-     * @param frame              the parent frame.
+     * @param frame     the parent frame.
      * @param component the component to wrap.
      */
     public DeviceInteractionDesktopComponent(GenericFrame frame, DeviceInteractionComponent component) {
@@ -77,8 +98,7 @@ public class DeviceInteractionDesktopComponent extends
             @Override
             public void componentResized(ComponentEvent e) {
                 Component component = e.getComponent();
-                panel.setPreferredSize(new Dimension(component.getWidth(),
-                        component.getHeight()));
+                panel.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
                 panel.revalidate();
             }
         });
@@ -114,8 +134,7 @@ public class DeviceInteractionDesktopComponent extends
         menuBar.add(help);
 
         //TODO: create equivalent html for Device interaction
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/TextWorld/TextWorld.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html");
         helpItem.setAction(helpAction);
         help.add(helpItem);
 

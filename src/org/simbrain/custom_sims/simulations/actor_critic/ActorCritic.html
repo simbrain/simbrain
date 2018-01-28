@@ -7,34 +7,59 @@
 </head>
 
 <body>
-    <!--  TODO: Add exercizes where cheeses are added, rewards moved around, etc. -->
-    <!--  TODO: Once value representations are added to the grid cells describe these -->
-    <!--  TODO: Add background information.  When an action leads to reward reinforce the last-state > value link since that led to the reward, and reinforce the last-state > action reward since that action led to reward -->
-    <!--  TODO: Need anatomy model to supplement, with GPe, etc. (Cerebellum kind of has this)   In this model, sensory neurons are like sensory or hippocampus > cortical state > striatum, actions are kind of like GPi>thalamus>cortex, and td error is like substantia nigra pars compacta, reward is like VTA, but it's all very abstracted.  -->
-    <!--  TODO: Discuss ways the simulation can be modified directly  -->
-    <h1>Actor Critic model</h1>
-    <p>Based on Richard Sutton (1996), Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey.</p>
-    <h2>Getting started</h2>
-    <p>A model which learns the location of rewarding stimuli. Do a few runs through 5 trials using the "run" button on the control panel. Using default values, the rat should figure out how to get the cheese.</p>
-    <h2>Parameters and what they mean</h2>
-    <p><b>Epsilon</b>: Probability of taking a random action. 0 for no random actions; 1 for all random actions. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/">Doya, 2007</a> suggests this may be related to noradernaline (or Norepinephrine) which regulates overall arousal (it decreases when asleep, rises when awake, etc.) </p>
-    <!-- When you are in a new situation that demands different responses you need the alertness to be able to respond appropriately and to act in new ways.   -->
-    <!--  TODO: Discuss exploitation / exploration  -->
-    <p><b>Learning rate</b>:How much weights are updated at each time step. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/">Doya, 2007</a> suggests this may be related to acetlycholine in the brain, which regulates some forms of plasticity.</p>
-    <p><b>Discount Factor (gamma)</b>: Determines how "future oriented" the agent is. Range is 0-1. For values closer to 0 the agent is more focused on immediate rewards, it is "short-sighted" or impulsive. For values closer to 1 the agent is more focused on distant rewards. The agent will not learn when gamma is 0 because it only cares about immediate reward and never learns to attach values to states <i>leading to</i> reward.</p>
-    <p>Higher values of gamma produce better results in this model. The agent thinks ahead, and takes actions that will lead in the long run to cheese; the agent attaches value to states associated with other states that are associated via a chain of actions to the cheese.</p>
-    <p>Tanaka et. al. have related the discount factor to serotonin in the brain:
-        <blockquote>
-            to elucidate the role of serotonin in the evaluation of delayed rewards, we performed a functional brain imaging experiment in which subjects chose small-immediate or large-delayed liquid rewards under dietary regulation of tryptophan, a precursor of serotonin. A model-based analysis revealed that <i>the activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels</i>. By contrast, <i>the activity of the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels.</i> (<a href="https://www.ncbi.nlm.nih.gov/pubmed/18091999">Tanaka et. al, 2007</a>, our emphasis).</blockquote>
-    </p>
-    <h2>Reward, Value, TD Error</h2>
-    <p>The activation of the <b>reward</b> neuron is shown in the <b>red time series</b>. In this simulation, it only goes up when the agent is on top of the cheese.</p>
-    <p>The activation of the <b>value</b> neuron is shown in the <b>green time series</b>. When it goes up the agent is either experiencing reward or is in a state that it believes will lead to reward.</p>
-    <p>The activation of the <b>td-error</b> neuron is shown in the <b>blue time series</b>. When an unexpected amount of value occurs, td-error is positive and the network learns to associate the current state and action with more value. The last action is also reinforced. Conversely, if less than the expected value occurs td-error is negative and the network learns to associate the current state and action with less value. The last action is diminished.</p>
-    
-    <h2>Changes in values with learning</h2>
+<!--  TODO: Add exercizes where cheeses are added, rewards moved around, etc. -->
+<!--  TODO: Once value representations are added to the grid cells describe these -->
+<!--  TODO: Add background information.  When an action leads to reward reinforce the last-state > value link since that led to the reward, and reinforce the last-state > action reward since that action led to reward -->
+<!--  TODO: Need anatomy model to supplement, with GPe, etc. (Cerebellum kind of has this)   In this model, sensory neurons are like sensory or hippocampus > cortical state > striatum, actions are kind of like GPi>thalamus>cortex, and td error is like substantia nigra pars compacta, reward is like VTA, but it's all very abstracted.  -->
+<!--  TODO: Discuss ways the simulation can be modified directly  -->
+<h1>Actor Critic model</h1>
+<p>Based on Richard Sutton (1996), Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse
+    Coding. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey.</p>
+<h2>Getting started</h2>
+<p>A model which learns the location of rewarding stimuli. Do a few runs through 5 trials using the "run" button on the
+    control panel. Using default values, the rat should figure out how to get the cheese.</p>
+<h2>Parameters and what they mean</h2>
+<p><b>Epsilon</b>: Probability of taking a random action. 0 for no random actions; 1 for all random actions. <a
+        href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/">Doya, 2007</a> suggests this may be related to
+    noradernaline (or Norepinephrine) which regulates overall arousal (it decreases when asleep, rises when awake, etc.)
+</p>
+<!-- When you are in a new situation that demands different responses you need the alertness to be able to respond appropriately and to act in new ways.   -->
+<!--  TODO: Discuss exploitation / exploration  -->
+<p><b>Learning rate</b>:How much weights are updated at each time step. <a
+        href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/">Doya, 2007</a> suggests this may be related to
+    acetlycholine in the brain, which regulates some forms of plasticity.</p>
+<p><b>Discount Factor (gamma)</b>: Determines how "future oriented" the agent is. Range is 0-1. For values closer to 0
+    the agent is more focused on immediate rewards, it is "short-sighted" or impulsive. For values closer to 1 the agent
+    is more focused on distant rewards. The agent will not learn when gamma is 0 because it only cares about immediate
+    reward and never learns to attach values to states <i>leading to</i> reward.</p>
+<p>Higher values of gamma produce better results in this model. The agent thinks ahead, and takes actions that will lead
+    in the long run to cheese; the agent attaches value to states associated with other states that are associated via a
+    chain of actions to the cheese.</p>
+<p>Tanaka et. al. have related the discount factor to serotonin in the brain:
+<blockquote>
+    to elucidate the role of serotonin in the evaluation of delayed rewards, we performed a functional brain imaging
+    experiment in which subjects chose small-immediate or large-delayed liquid rewards under dietary regulation of
+    tryptophan, a precursor of serotonin. A model-based analysis revealed that <i>the activity of the ventral part of
+    the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger
+    at low serotonin levels</i>. By contrast, <i>the activity of the dorsal part of the striatum was correlated with
+    reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels.</i> (<a
+        href="https://www.ncbi.nlm.nih.gov/pubmed/18091999">Tanaka et. al, 2007</a>, our emphasis).
+</blockquote>
+</p>
+<h2>Reward, Value, TD Error</h2>
+<p>The activation of the <b>reward</b> neuron is shown in the <b>red time series</b>. In this simulation, it only goes
+    up when the agent is on top of the cheese.</p>
+<p>The activation of the <b>value</b> neuron is shown in the <b>green time series</b>. When it goes up the agent is
+    either experiencing reward or is in a state that it believes will lead to reward.</p>
+<p>The activation of the <b>td-error</b> neuron is shown in the <b>blue time series</b>. When an unexpected amount of
+    value occurs, td-error is positive and the network learns to associate the current state and action with more value.
+    The last action is also reinforced. Conversely, if less than the expected value occurs td-error is negative and the
+    network learns to associate the current state and action with less value. The last action is diminished.</p>
 
-    <p>Running many trials will tend to increase value (green), bring reward (red) more frequently, and error (blue) less frequently.  Of course these factors change as the parameters are changed.</p>
+<h2>Changes in values with learning</h2>
+
+<p>Running many trials will tend to increase value (green), bring reward (red) more frequently, and error (blue) less
+    frequently. Of course these factors change as the parameters are changed.</p>
 </body>
 
 </html>

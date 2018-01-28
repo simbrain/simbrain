@@ -18,10 +18,10 @@
  */
 package org.simbrain.workspace.gui;
 
-import javax.swing.JButton;
-
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
+
+import javax.swing.*;
 
 /**
  * A JButton which is automatically disabled when the workspace is running.
@@ -32,7 +32,7 @@ public final class SimbrainButton extends JButton {
      * Construct a button with a reference the workspace which, when running,
      * will disable the button.
      *
-     * @param text jbutton text forwarded to jbutton constructor
+     * @param text      jbutton text forwarded to jbutton constructor
      * @param workspace workspace reference
      */
     public SimbrainButton(String text, Workspace workspace) {
@@ -41,30 +41,29 @@ public final class SimbrainButton extends JButton {
 
         // Listen to workspace updater so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getUpdater().addUpdaterListener(
-                new WorkspaceUpdaterListener() {
+        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
 
-                    public void changeNumThreads() {
-                    }
+            public void changeNumThreads() {
+            }
 
-                    public void changedUpdateController() {
-                    }
+            public void changedUpdateController() {
+            }
 
-                    public void updatingStarted() {
-                        setEnabled(false);
-                    }
+            public void updatingStarted() {
+                setEnabled(false);
+            }
 
-                    public void updatingFinished() {
-                        setEnabled(true);
-                    }
+            public void updatingFinished() {
+                setEnabled(true);
+            }
 
-                    public void updatedCouplings(int update) {
-                    }
+            public void updatedCouplings(int update) {
+            }
 
-                    public void workspaceUpdated() {
-                    }
+            public void workspaceUpdated() {
+            }
 
-                });
+        });
 
     }
 

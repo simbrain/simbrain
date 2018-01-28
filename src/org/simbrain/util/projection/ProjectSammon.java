@@ -18,22 +18,26 @@
  */
 package org.simbrain.util.projection;
 
-import java.util.ArrayList;
-
 import org.simbrain.util.SimbrainPreferences;
+
+import java.util.ArrayList;
 
 /**
  * <B>ProjectSammon.java</B> implements gradient descent to compute image of
  * Sammon projection.
- *
+ * <p>
  * TODO: Possibly convert all arrays to datapoints.
  */
 public class ProjectSammon extends IterableProjectionMethod {
 
-    /** Array of datasets. */
+    /**
+     * Array of datasets.
+     */
     private ArrayList<DataPoint> yArray;
 
-    /** Amount by which to perturb overlapping points. */
+    /**
+     * Amount by which to perturb overlapping points.
+     */
     protected double perturbationAmount;
 
     /**
@@ -41,47 +45,74 @@ public class ProjectSammon extends IterableProjectionMethod {
      */
     private double epsilon;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] xI;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] xJ;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] yI;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] yJ;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] yM;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] yN;
 
-    /** Temporary variables. */
+    /**
+     * Temporary variables.
+     */
     private double[] yNew;
 
-    /** Matrix of "upstairs" interpoint distances. */
+    /**
+     * Matrix of "upstairs" interpoint distances.
+     */
     private double[][] dstar;
 
-    /** Matrix of "downstairs" interpoint distances. */
+    /**
+     * Matrix of "downstairs" interpoint distances.
+     */
     private double[][] d;
 
-    /** Sum distances. */
+    /**
+     * Sum distances.
+     */
     private double dstarSum;
 
-    /** Parital sum. */
+    /**
+     * Parital sum.
+     */
     private double partialSum;
 
-    /** Current closeness of datapoints. */
+    /**
+     * Current closeness of datapoints.
+     */
     private double currentCloseness;
 
-    /** Temporary variable. */
+    /**
+     * Temporary variable.
+     */
     private double e;
 
     /**
      * Default sammon projector constructor.
+     *
      * @param projector
      */
     public ProjectSammon(Projector projector) {
@@ -131,8 +162,7 @@ public class ProjectSammon extends IterableProjectionMethod {
                     }
 
                     yI = yArray.get(i).getVector();
-                    partialSum += (((dstar[i][m] - d[i][m]) * (yI[n] - yM[n]))
-                            / dstar[i][m] / d[i][m]);
+                    partialSum += (((dstar[i][m] - d[i][m]) * (yI[n] - yM[n])) / dstar[i][m] / d[i][m]);
                 }
 
                 yNew[n] = yM[n] - ((epsilon * 2 * partialSum) / dstarSum);
@@ -145,8 +175,7 @@ public class ProjectSammon extends IterableProjectionMethod {
         e = 0;
         for (int i = 0; i < projector.getNumPoints(); i++) {
             for (int j = i + 1; j < projector.getNumPoints(); j++) {
-                e += ((dstar[i][j] - d[i][j]) * (dstar[i][j] - d[i][j]))
-                        / dstar[i][j];
+                e += ((dstar[i][j] - d[i][j]) * (dstar[i][j] - d[i][j])) / dstar[i][j];
             }
         }
 

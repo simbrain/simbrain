@@ -1,21 +1,19 @@
 package org.simbrain.world.imageworld.filters;
 
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.world.imageworld.ImageSource;
+
+import javax.swing.*;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
-import java.nio.Buffer;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import javax.swing.JFormattedTextField;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.world.imageworld.ImageSource;
 
 /**
  * Maintains gui information (name, editor panel) relating to filters. Add
@@ -51,37 +49,41 @@ public abstract class ImageFilterFactory extends XmlAdapter<String, FilteredImag
         return new FilteredImageSource(source, "Gray Filter", createGrayOp(), width, height);
     }
 
-    /** Create an identity image op (no transform). Useful for null object pattern. */
+    /**
+     * Create an identity image op (no transform). Useful for null object pattern.
+     */
     protected static BufferedImageOp createIdentityOp() {
-        return new AffineTransformOp(new AffineTransform(),
-                AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        return new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     }
 
-    /** Create a BufferedImageOp which converts the input image to a grayscale colorspace */
+    /**
+     * Create a BufferedImageOp which converts the input image to a grayscale colorspace
+     */
     protected static BufferedImageOp createGrayOp() {
         return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
     }
 
     /**
      * Create a scaling image op.
-     * @param sX the horizontal scaling factor
-     * @param sY the vertical scaling factor
+     *
+     * @param sX     the horizontal scaling factor
+     * @param sY     the vertical scaling factor
      * @param smooth whether the output image should receive bilinear smoothing
      * @return a BufferedImageOp which applies a scaling transform to input images
      */
     protected static BufferedImageOp createScaleOp(float sX, float sY, boolean smooth) {
         AffineTransform transform = AffineTransform.getScaleInstance(sX, sY);
-        int interpolation = smooth ? AffineTransformOp.TYPE_BILINEAR
-                : AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
+        int interpolation = smooth ? AffineTransformOp.TYPE_BILINEAR : AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
         return new AffineTransformOp(transform, interpolation);
     }
 
     /**
      * Create a translation and scaling transform op.
-     * @param tX The amount to translate in the x direction.
-     * @param tY The amount to translate in the y direction.
-     * @param sX The amount to scale in the x direction.
-     * @param sY The amount to scale in the y direction.
+     *
+     * @param tX     The amount to translate in the x direction.
+     * @param tY     The amount to translate in the y direction.
+     * @param sX     The amount to scale in the x direction.
+     * @param sY     The amount to scale in the y direction.
      * @param smooth Whether to use bilinear smoothing (slower) or nearest neighbor.
      * @return a BufferedImageOp which applies a scaling and translation to input images.
      */

@@ -17,31 +17,34 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them according to
  * some probability.
- *
+ * <p>
  * Currently this is not accessible in the GUI, and is only used by some
  * scripts.
  *
  * @author Jeff Yoshimi
- *
  */
 public class RadialSimple implements ConnectNeurons {
 
-    /** Whether to allow self-connections. */
+    /**
+     * Whether to allow self-connections.
+     */
     private boolean allowSelfConnections = false;
 
-    /** Template synapse for excitatory synapses. */
+    /**
+     * Template synapse for excitatory synapses.
+     */
     private Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
 
     /**
@@ -50,13 +53,19 @@ public class RadialSimple implements ConnectNeurons {
      */
     private double excitatoryProbability = .8;
 
-    /** Radius within which to connect excitatory neurons. */
+    /**
+     * Radius within which to connect excitatory neurons.
+     */
     private double excitatoryRadius = 100;
 
-    /** Template synapse for inhibitory synapses. */
+    /**
+     * Template synapse for inhibitory synapses.
+     */
     private Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
-    /** Radius within which to connect inhibitory neurons. */
+    /**
+     * Radius within which to connect inhibitory neurons.
+     */
     private double inhibitoryRadius = 80;
 
     /**
@@ -78,7 +87,7 @@ public class RadialSimple implements ConnectNeurons {
     private List<Neuron> sourceNeurons;
 
     /**
-     * @param network the network
+     * @param network       the network
      * @param sourceNeurons the source neurons
      */
     public RadialSimple(Network network, List<Neuron> sourceNeurons) {
@@ -109,10 +118,8 @@ public class RadialSimple implements ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeInhibitory(final Neuron source, List<Synapse> syns,
-            boolean looseSynapses) {
-        for (Neuron target : getNeuronsInRadius(source,
-                inhibitoryRadius)) {
+    private void makeInhibitory(final Neuron source, List<Synapse> syns, boolean looseSynapses) {
+        for (Neuron target : getNeuronsInRadius(source, inhibitoryRadius)) {
             if (!sourceNeurons.contains(target)) {
                 continue;
             }
@@ -159,10 +166,8 @@ public class RadialSimple implements ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeExcitatory(final Neuron source, List<Synapse> syns,
-            boolean looseSynapses) {
-        for (Neuron target : getNeuronsInRadius(source,
-                excitatoryRadius)) {
+    private void makeExcitatory(final Neuron source, List<Synapse> syns, boolean looseSynapses) {
+        for (Neuron target : getNeuronsInRadius(source, excitatoryRadius)) {
             if (!sourceNeurons.contains(target)) {
                 continue;
             }
@@ -195,8 +200,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param allowSelfConnections
-     *            the allowSelfConnections to set
+     * @param allowSelfConnections the allowSelfConnections to set
      */
     public void setAllowSelfConnections(final boolean allowSelfConnections) {
         this.allowSelfConnections = allowSelfConnections;
@@ -210,8 +214,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param excitatoryProbability
-     *            the excitatoryProbability to set
+     * @param excitatoryProbability the excitatoryProbability to set
      */
     public void setExcitatoryProbability(final double excitatoryProbability) {
         this.excitatoryProbability = excitatoryProbability;
@@ -225,8 +228,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param excitatoryRadius
-     *            the excitatoryRadius to set
+     * @param excitatoryRadius the excitatoryRadius to set
      */
     public void setExcitatoryRadius(final double excitatoryRadius) {
         this.excitatoryRadius = excitatoryRadius;
@@ -240,8 +242,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param inhibitoryRadius
-     *            the inhibitoryRadius to set
+     * @param inhibitoryRadius the inhibitoryRadius to set
      */
     public void setInhibitoryRadius(final double inhibitoryRadius) {
         this.inhibitoryRadius = inhibitoryRadius;
@@ -255,8 +256,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param inhibitoryProbability
-     *            the inhibitoryProbability to set
+     * @param inhibitoryProbability the inhibitoryProbability to set
      */
     public void setInhibitoryProbability(final double inhibitoryProbability) {
         this.inhibitoryProbability = inhibitoryProbability;
@@ -270,8 +270,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param baseExcitatorySynapse
-     *            the baseExcitatorySynapse to set
+     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
      */
     public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
         this.baseExcitatorySynapse = baseExcitatorySynapse;
@@ -285,8 +284,7 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     /**
-     * @param baseInhibitorySynapse
-     *            the baseInhibitorySynapse to set
+     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
      */
     public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
         this.baseInhibitorySynapse = baseInhibitorySynapse;

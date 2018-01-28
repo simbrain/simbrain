@@ -18,23 +18,9 @@
  */
 package org.simbrain.plot.piechart;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -42,32 +28,43 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * Display a PieChart.
  */
-public class PieChartGui extends GuiComponent<PieChartComponent> implements
-        ActionListener {
+public class PieChartGui extends GuiComponent<PieChartComponent> implements ActionListener {
 
-    /** Plot action manager. */
+    /**
+     * Plot action manager.
+     */
     private PlotActionManager actionManager;
 
-    /** Chart Panel. */
+    /**
+     * Chart Panel.
+     */
     private ChartPanel chartPanel = new ChartPanel(null);
 
-    /** Preferred frame size. */
+    /**
+     * Preferred frame size.
+     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /** Chart gui. */
+    /**
+     * Chart gui.
+     */
     private JFreeChart chart;
 
     /**
      * Construct the GUI Pie Chart.
      *
-     * @param frame Generic Frame
+     * @param frame     Generic Frame
      * @param component Pie chart component
      */
-    public PieChartGui(final GenericFrame frame,
-            final PieChartComponent component) {
+    public PieChartGui(final GenericFrame frame, final PieChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
@@ -119,8 +116,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements
         editMenu.add(preferences);
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/pie_chart.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/pie_chart.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 
@@ -144,8 +140,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
             this.getWorkspaceComponent().getModel().addDataSource();
         } else if (e.getActionCommand().equalsIgnoreCase("dialog")) {
-            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
-                    getWorkspaceComponent().getModel()));
+            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(getWorkspaceComponent().getModel()));
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();

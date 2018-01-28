@@ -27,10 +27,14 @@ import org.simbrain.network.core.Synapse;
  */
 public class ProductRule extends LinearRule {
 
-    /** Whether to use weights by default. */
+    /**
+     * Whether to use weights by default.
+     */
     private static final boolean DEFAULT_USE_WEIGHTS = false;
-    
-    /** Whether to use weights or not. */
+
+    /**
+     * Whether to use weights or not.
+     */
     private boolean useWeights = DEFAULT_USE_WEIGHTS;
 
     @Override
@@ -52,11 +56,11 @@ public class ProductRule extends LinearRule {
         if (useWeights) {
             for (Synapse s : neuron.getFanIn()) {
                 val *= s.getPsr();
-            }            
+            }
         } else {
             for (Synapse s : neuron.getFanIn()) {
                 val *= s.getSource().getActivation();
-            }            
+            }
         }
         // Special case of isolated neuron
         if (neuron.getFanIn().size() == 0) {

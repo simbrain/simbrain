@@ -1,32 +1,39 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import org.junit.Assert;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+
+import java.awt.image.BufferedImage;
 
 /**
  * A rectangular matrix of filtered sensors on an ImageSource which
  * can be coupled to.
+ *
  * @author Jeff Yoshimi, Tim Shea
  */
 public class SensorMatrix implements ImageSourceListener {
-    /** Name of this matrix. */
+    /**
+     * Name of this matrix.
+     */
     private String name;
 
-    /** An ImageSource from which to extract sensor values. */
+    /**
+     * An ImageSource from which to extract sensor values.
+     */
     private ImageSource source;
 
-    /** The vales this matrix produces for floating point channel couplings. */
+    /**
+     * The vales this matrix produces for floating point channel couplings.
+     */
     private transient double[][] channels;
 
-    /** The values this matrix produces for integer color coupling. */
+    /**
+     * The values this matrix produces for integer color coupling.
+     */
     private transient int[] colors;
 
     /**
      * Construct a sensor matrix without attaching it to a source.
+     *
      * @param name The name of the sensor matrix.
      */
     protected SensorMatrix(String name) {
@@ -35,7 +42,8 @@ public class SensorMatrix implements ImageSourceListener {
 
     /**
      * Construct a sensor matrix attached to an ImageSource.
-     * @param name The name of the sensor matrix.
+     *
+     * @param name   The name of the sensor matrix.
      * @param source The source to attach.
      */
     public SensorMatrix(String name, ImageSource source) {
@@ -50,12 +58,16 @@ public class SensorMatrix implements ImageSourceListener {
         return this;
     }
 
-    /** @return the name */
+    /**
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
-    /** @return the image source this sensor matrix reads */
+    /**
+     * @return the image source this sensor matrix reads
+     */
     public ImageSource getSource() {
         return source;
     }
@@ -71,42 +83,56 @@ public class SensorMatrix implements ImageSourceListener {
         this.source.addListener(this);
     }
 
-    /** @return the width */
+    /**
+     * @return the width
+     */
     public int getWidth() {
         return source.getWidth();
     }
 
-    /** @return the height */
+    /**
+     * @return the height
+     */
     public int getHeight() {
         return source.getHeight();
     }
 
-    /** Returns an array of doubles which corresponds to the brightness of the pixels. */
-    @Producible(idMethod="getName")
+    /**
+     * Returns an array of doubles which corresponds to the brightness of the pixels.
+     */
+    @Producible(idMethod = "getName")
     public double[] getBrightness() {
         return channels[0];
     }
 
-    /** @return Returns an array of doubles for the each pixel */
-    @Producible(idMethod="getName", defaultVisibility=false)
+    /**
+     * @return Returns an array of doubles for the each pixel
+     */
+    @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getRed() {
         return channels[1];
     }
 
-    /** @return Returns an array of doubles for the each pixel */
-    @Producible(idMethod="getName", defaultVisibility=false)
+    /**
+     * @return Returns an array of doubles for the each pixel
+     */
+    @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getGreen() {
         return channels[2];
     }
 
-    /** @return Returns an array of doubles for the each pixel */
-    @Producible(idMethod="getName", defaultVisibility=false)
+    /**
+     * @return Returns an array of doubles for the each pixel
+     */
+    @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getBlue() {
         return channels[3];
     }
 
-    /** Returns an array of RGB colors encoded in integers. */
-    @Producible(idMethod="getName", defaultVisibility=true)
+    /**
+     * Returns an array of RGB colors encoded in integers.
+     */
+    @Producible(idMethod = "getName", defaultVisibility = true)
     public int[] getRGBColor() {
         return colors;
     }
@@ -123,6 +149,7 @@ public class SensorMatrix implements ImageSourceListener {
 
     /**
      * Update the sensor matrix values.
+     *
      * @param image the image to copy to the sensor values
      */
     private void updateSensorValues(BufferedImage image) {

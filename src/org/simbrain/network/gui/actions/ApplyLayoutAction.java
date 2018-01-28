@@ -18,38 +18,38 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Apply specified layout to selected neurons.
  */
 public final class ApplyLayoutAction extends ConditionallyEnabledAction {
 
-    /** The connection to apply. */
+    /**
+     * The connection to apply.
+     */
     private Layout layout;
 
     /**
      * Construct the action.
      *
      * @param networkPanel networkPanel, must not be null
-     * @param layout the layout to apply
-     * @param name the name of this action
+     * @param layout       the layout to apply
+     * @param name         the name of this action
      */
-    public ApplyLayoutAction(final NetworkPanel networkPanel, Layout layout,
-            String name) {
+    public ApplyLayoutAction(final NetworkPanel networkPanel, Layout layout, String name) {
         super(networkPanel, name, EnablingCondition.NEURONS);
         this.layout = layout;
-        putValue(SHORT_DESCRIPTION, "Apply the " + name
-                + " layout to selected neurons");
+        putValue(SHORT_DESCRIPTION, "Apply the " + name + " layout to selected neurons");
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         layout.layoutNeurons(networkPanel.getSelectedModelNeurons());

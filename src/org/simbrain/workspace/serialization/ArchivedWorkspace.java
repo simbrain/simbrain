@@ -18,22 +18,17 @@
  */
 package org.simbrain.workspace.serialization;
 
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.updater.*;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.util.*;
 
 /**
  * Instances of this class are used for building and reading the TOC of an
@@ -47,28 +42,40 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 @XStreamAlias("ArchivedWorkspace")
 class ArchivedWorkspace {
 
-    /** A map of all the components to their uris. */
+    /**
+     * A map of all the components to their uris.
+     */
     private transient Map<WorkspaceComponent, String> componentUris = new HashMap<WorkspaceComponent, String>();
 
-    /** The serializer for this archive. */
+    /**
+     * The serializer for this archive.
+     */
     private final transient WorkspaceComponentSerializer serializer;
 
-    /** All of the components in the archive. */
+    /**
+     * All of the components in the archive.
+     */
     private List<ArchivedWorkspaceComponent> archivedComponents = new ArrayList<ArchivedWorkspaceComponent>();
 
-    /** All of the couplings in the archive. */
+    /**
+     * All of the couplings in the archive.
+     */
     private List<ArchivedCoupling> archivedCouplings = new ArrayList<ArchivedCoupling>();
 
-    /** All of the updateactions in the archive. */
+    /**
+     * All of the updateactions in the archive.
+     */
     private List<ArchivedUpdateAction> archivedActions = new ArrayList<ArchivedUpdateAction>();
 
-    /** Reference to workspace used to serialize parameters in workspace. */
+    /**
+     * Reference to workspace used to serialize parameters in workspace.
+     */
     private final Workspace workspaceParameters;
 
     /**
      * The component serializer for this archive.
      *
-     * @param workspace references to parent workspace
+     * @param workspace  references to parent workspace
      * @param serializer The component serializer for this archive.
      */
     ArchivedWorkspace(Workspace workspace, WorkspaceComponentSerializer serializer) {
@@ -167,14 +174,13 @@ class ArchivedWorkspace {
     /**
      * Create a "real" update action from an archived update action.
      *
-     * @param workspace parent workspace in which to place the new action
+     * @param workspace             parent workspace in which to place the new action
      * @param componentDeserializer used to get the workspace component
-     *            corresponding to a workspace component id
-     * @param archivedAction the archived action to convert into a real action
+     *                              corresponding to a workspace component id
+     * @param archivedAction        the archived action to convert into a real action
      * @return the "real" update action
      */
-    UpdateAction createUpdateAction(Workspace workspace, WorkspaceComponentDeserializer componentDeserializer,
-                                    ArchivedUpdateAction archivedAction) {
+    UpdateAction createUpdateAction(Workspace workspace, WorkspaceComponentDeserializer componentDeserializer, ArchivedUpdateAction archivedAction) {
         // Use reflection to create the update action, based on what type of action was archived.
         // For actions whose constructors require components or couplings, the archived ids are
         // used to find the component or coupling.
@@ -184,8 +190,7 @@ class ArchivedWorkspace {
             try {
                 WorkspaceComponent component = componentDeserializer.getComponent(archivedAction.getComponentId());
                 Class<? extends UpdateAction> type = serializedAction.getClass();
-                Constructor<? extends UpdateAction> constructor = type.getConstructor(
-                        WorkspaceUpdater.class, WorkspaceComponent.class);
+                Constructor<? extends UpdateAction> constructor = type.getConstructor(WorkspaceUpdater.class, WorkspaceComponent.class);
                 action = constructor.newInstance(workspace.getUpdater(), component);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -201,8 +206,7 @@ class ArchivedWorkspace {
             try {
                 String script = ((UpdateActionCustom) archivedAction.getUpdateAction()).getScriptString();
                 Class<? extends UpdateAction> type = serializedAction.getClass();
-                action = type.getConstructor(WorkspaceUpdater.class, String.class).newInstance(
-                        workspace.getUpdater(), script);
+                action = type.getConstructor(WorkspaceUpdater.class, String.class).newInstance(workspace.getUpdater(), script);
             } catch (Exception e) {
                 e.printStackTrace();
             }

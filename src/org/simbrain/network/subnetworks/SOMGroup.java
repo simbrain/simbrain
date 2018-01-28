@@ -18,9 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -29,34 +26,50 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
  *
  * @author William B. St. Clair
  * @author Jeff Yoshimi
- *
  */
 public class SOMGroup extends NeuronGroup {
 
-    /** Default alpha. */
+    /**
+     * Default alpha.
+     */
     public static final double DEFAULT_ALPHA = 0.06;
 
-    /** Default initial neighborhood size. */
+    /**
+     * Default initial neighborhood size.
+     */
     public static final double DEFAULT_INIT_NSIZE = 100;
 
-    /** Default batchSize. */
+    /**
+     * Default batchSize.
+     */
     public static final int DEFAULT_BATCH_SIZE = 100;
 
-    /** The default alphaDecayRate. */
+    /**
+     * The default alphaDecayRate.
+     */
     public static final double DEFAULT_DECAY_RATE = 0.002;
 
-    /** The default neighborhoodDecayAmount. */
+    /**
+     * The default neighborhoodDecayAmount.
+     */
     public static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = .05;
 
-    /** Initial Learning Rate. */
+    /**
+     * Initial Learning Rate.
+     */
     private double initAlpha = DEFAULT_ALPHA;
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double alpha = DEFAULT_ALPHA;
 
     /**
@@ -77,33 +90,42 @@ public class SOMGroup extends NeuronGroup {
      */
     private double winDistance, distance, val;
 
-    /** Number of neurons. */
+    /**
+     * Number of neurons.
+     */
     private int numNeurons = 16;
 
-    /** Reference to winning neuron. */
+    /**
+     * Reference to winning neuron.
+     */
     Neuron winner;
 
-    /** The number of epochs run in a given batch. */
+    /**
+     * The number of epochs run in a given batch.
+     */
     private int batchSize = DEFAULT_BATCH_SIZE;
 
-    /** The rate at which the learning rate decays. */
+    /**
+     * The rate at which the learning rate decays.
+     */
     private double alphaDecayRate = DEFAULT_DECAY_RATE;
 
-    /** The amount that the neighborhood decrements. */
+    /**
+     * The amount that the neighborhood decrements.
+     */
     private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /**
      * Default layout for neuron groups. Used to set layout defaults in SOM
      * Creation dialog. Overrides superclass DEFAULT_LAYOUT.
      */
-    public static final Layout DEFAULT_LAYOUT = new HexagonalGridLayout(50, 50,
-            5);
+    public static final Layout DEFAULT_LAYOUT = new HexagonalGridLayout(50, 50, 5);
 
     /**
      * Constructs an SOM network with specified number of neurons.
      *
      * @param numNeurons size of this network in neurons
-     * @param root reference to Network.
+     * @param root       reference to Network.
      */
     public SOMGroup(final Network root, final int numNeurons) {
         super(root);
@@ -133,11 +155,11 @@ public class SOMGroup extends NeuronGroup {
         this.neighborhoodDecayAmount = oldNet.getNeighborhoodDecayAmount();
         setLabel("SOM Group (copy)");
     }
-    
+
     public SOMGroup deepCopy() {
-    	return new SOMGroup(this.getParentNetwork(), this);
+        return new SOMGroup(this.getParentNetwork(), this);
     }
-    
+
     @Override
     public String getTypeDescription() {
         return "Self Organizing Map";
@@ -228,10 +250,7 @@ public class SOMGroup extends NeuronGroup {
             // The center of the neuron is within the update region.
             if (physicalDistance <= neighborhoodSize) {
                 for (Synapse incoming : neuron.getFanIn()) {
-                    val = incoming.getStrength()
-                            + alpha
-                            * (incoming.getSource().getActivation() - incoming
-                                    .getStrength());
+                    val = incoming.getStrength() + alpha * (incoming.getSource().getActivation() - incoming.getStrength());
                     incoming.setStrength(val);
                 }
             }
@@ -274,8 +293,7 @@ public class SOMGroup extends NeuronGroup {
     private double findDistance(final Neuron n) {
         double ret = 0;
         for (Synapse incoming : n.getFanIn()) {
-            ret += Math.pow(incoming.getStrength()
-                    - incoming.getSource().getActivation(), 2);
+            ret += Math.pow(incoming.getStrength() - incoming.getSource().getActivation(), 2);
         }
         return ret;
     }
@@ -287,10 +305,8 @@ public class SOMGroup extends NeuronGroup {
      * @param neuron2 Second neuron.
      * @return physical distance between two neurons in Simbrain.
      */
-    private double findPhysicalDistance(final Neuron neuron1,
-            final Neuron neuron2) {
-        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
-                + Math.pow(neuron2.getY() - neuron1.getY(), 2));
+    private double findPhysicalDistance(final Neuron neuron1, final Neuron neuron2) {
+        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2) + Math.pow(neuron2.getY() - neuron1.getY(), 2));
         return ret;
     }
 
@@ -441,5 +457,5 @@ public class SOMGroup extends NeuronGroup {
     public Neuron getWinner() {
         return winner;
     }
-    
+
 }

@@ -18,59 +18,54 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Polygon;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Point2D;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.gui.nodes.NeuronGroupNode.Port;
 
+import java.awt.*;
+import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Point2D;
+
 /**
- *
  * @author Zoë Tosi
- *
  */
 @SuppressWarnings("serial")
 public class DirectedCubicArrow extends PNode {
 
     public enum BezierTemplate {
         DIRECTED {
-
             @Override
             public Point2D.Float getBez1(Point2D src, Point2D tar, Port port) {
                 float bez_y = 0;
                 float bez_x = 0;
                 switch (port) {
-                    case NORTH:	bez_y = (float) (src.getY()
-                            + Math.abs(src.getY() - tar.getY())/2);
-                    bez_x = (float) src.getX();
-                    break;
-                    case SOUTH:	bez_y = (float) (src.getY()
-                            - Math.abs(src.getY() - tar.getY())/2);
-                    bez_x = (float) src.getX();
-                    break;
-                    case EAST:	bez_x = (float) (src.getX()
-                            + Math.abs(src.getX() - tar.getX())/2);
-                    bez_y = (float) src.getY();
-                    break;
-                    case WEST:	bez_x = (float) (src.getX()
-                            - Math.abs(src.getX() - tar.getX())/2);
-                    bez_y = (float) src.getY();
-                    break;
+                    case NORTH:
+                        bez_y = (float) (src.getY() + Math.abs(src.getY() - tar.getY()) / 2);
+                        bez_x = (float) src.getX();
+                        break;
+                    case SOUTH:
+                        bez_y = (float) (src.getY() - Math.abs(src.getY() - tar.getY()) / 2);
+                        bez_x = (float) src.getX();
+                        break;
+                    case EAST:
+                        bez_x = (float) (src.getX() + Math.abs(src.getX() - tar.getX()) / 2);
+                        bez_y = (float) src.getY();
+                        break;
+                    case WEST:
+                        bez_x = (float) (src.getX() - Math.abs(src.getX() - tar.getX()) / 2);
+                        bez_y = (float) src.getY();
+                        break;
                 }
                 return new Point2D.Float(bez_x, bez_y);
             }
 
             @Override
             public Point2D.Float getBez2(Point2D src, Point2D tar, Port port) {
-                double theta =  getTheta(port);
-                float distanceToMidpoint = BezierTemplate
-                        .distanceToMidpoints(src, tar);
-                float dist = distanceToMidpoint/2;
-                if (dist < 120)  dist = 120;
+                double theta = getTheta(port);
+                float distanceToMidpoint = BezierTemplate.distanceToMidpoints(src, tar);
+                float dist = distanceToMidpoint / 2;
+                if (dist < 120)
+                    dist = 120;
                 float b2X = (float) (tar.getX() - (dist * Math.cos(theta)));
                 float b2Y = (float) (tar.getY() - (dist * Math.sin(theta)));
                 return new Point2D.Float(b2X, b2Y);
@@ -82,7 +77,7 @@ public class DirectedCubicArrow extends PNode {
             public Point2D.Float getBez1(Point2D src, Point2D tar, Port port) {
                 double theta = getTheta(port);
                 float distanceToMidpoint = BezierTemplate.distanceToMidpoints(src, tar);
-                float dist = distanceToMidpoint/1.25f;
+                float dist = distanceToMidpoint / 1.25f;
                 float b1X = (float) (src.getX() - (dist * Math.cos(theta)));
                 float b1Y = (float) (src.getY() - (dist * Math.sin(theta)));
                 return new Point2D.Float(b1X, b1Y);
@@ -90,9 +85,9 @@ public class DirectedCubicArrow extends PNode {
 
             @Override
             public Point2D.Float getBez2(Point2D src, Point2D tar, Port port) {
-                double theta =  getTheta(port);
+                double theta = getTheta(port);
                 float distanceToMidpoint = BezierTemplate.distanceToMidpoints(src, tar);
-                float dist = distanceToMidpoint/1.25f;
+                float dist = distanceToMidpoint / 1.25f;
                 float b2X = (float) (tar.getX() - (dist * Math.cos(theta)));
                 float b2Y = (float) (tar.getY() - (dist * Math.sin(theta)));
                 return new Point2D.Float(b2X, b2Y);
@@ -144,12 +139,11 @@ public class DirectedCubicArrow extends PNode {
         this(DEFAULT_TEMPLATE);
     }
 
-    public DirectedCubicArrow(BezierTemplate template){
+    public DirectedCubicArrow(BezierTemplate template) {
         this(template, DEFAULT_COLOR, DEFAULT_TRANSPARENCY, DEFAULT_WIDTH);
     }
 
-    public DirectedCubicArrow(BezierTemplate template, Color color,
-            float transparency, float strokeWidth){
+    public DirectedCubicArrow(BezierTemplate template, Color color, float transparency, float strokeWidth) {
         this.setTemplate(template);
         this.color = color;
         this.transparency = transparency;
@@ -158,9 +152,7 @@ public class DirectedCubicArrow extends PNode {
         arrow = new PPath.Float();
         this.addChild(curve);
         this.addChild(arrow);
-        curve.setStroke(new BasicStroke(strokeWidth,
-                BasicStroke.CAP_SQUARE,
-                BasicStroke.JOIN_MITER));
+        curve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
         curve.setTransparency(0.5f);
         curve.setPaint(null);
         curve.setStrokePaint(color);
@@ -172,30 +164,22 @@ public class DirectedCubicArrow extends PNode {
 
     }
 
-    public void layoutChildren(Point2D src, Port srcPort,
-            Point2D tar, Port tarPort) {
+    public void layoutChildren(Point2D src, Port srcPort, Point2D tar, Port tarPort) {
         this.bezier_1 = template.getBez1(src, tar, srcPort);
         this.bezier_2 = template.getBez2(src, tar, tarPort);
 
-        int endX = (int) (tar.getX() - (strokeWidth * Math.sqrt(3)
-                * Math.cos(getTheta(tarPort))));
-        int endY = (int) (tar.getY() - (strokeWidth * Math.sqrt(3)
-                * Math.sin(getTheta(tarPort))));
+        int endX = (int) (tar.getX() - (strokeWidth * Math.sqrt(3) * Math.cos(getTheta(tarPort))));
+        int endY = (int) (tar.getY() - (strokeWidth * Math.sqrt(3) * Math.sin(getTheta(tarPort))));
 
-        int startX = (int) (src.getX() - (strokeWidth * Math.sqrt(3)
-                * Math.cos(getTheta(srcPort))));
-        int startY = (int) (src.getY() - (strokeWidth * Math.sqrt(3)
-                * Math.sin(getTheta(srcPort))));
+        int startX = (int) (src.getX() - (strokeWidth * Math.sqrt(3) * Math.cos(getTheta(srcPort))));
+        int startY = (int) (src.getY() - (strokeWidth * Math.sqrt(3) * Math.sin(getTheta(srcPort))));
 
-        CubicCurve2D.Double theCurve = new CubicCurve2D.Double(startX, startY,
-                bezier_1.getX(), bezier_1.getY(), bezier_2.getX(),
-                bezier_2.getY(), endX, endY);
+        CubicCurve2D.Double theCurve = new CubicCurve2D.Double(startX, startY, bezier_1.getX(), bezier_1.getY(), bezier_2.getX(), bezier_2.getY(), endX, endY);
         curve.reset();
         curve.append(theCurve, false);
 
         arrow.reset();
-        arrow.append(traceArrowHead(getTheta(tarPort), tar.getX(), tar.getY()),
-                false);
+        arrow.append(traceArrowHead(getTheta(tarPort), tar.getX(), tar.getY()), false);
 
     }
 
@@ -205,8 +189,8 @@ public class DirectedCubicArrow extends PNode {
         int[] triPty = new int[numSides];
         double phi = Math.PI / 6;
 
-        triPtx[0] = (int) (tarX - (strokeWidth/2 * Math.cos(theta)));
-        triPty[0] = (int) (tarY - (strokeWidth/2 * Math.sin(theta)));
+        triPtx[0] = (int) (tarX - (strokeWidth / 2 * Math.cos(theta)));
+        triPty[0] = (int) (tarY - (strokeWidth / 2 * Math.sin(theta)));
 
         triPtx[1] = (int) (tarX - (2 * strokeWidth * Math.cos(theta + phi)));
         triPty[1] = (int) (tarY - (2 * strokeWidth * Math.sin(theta + phi)));
@@ -219,11 +203,19 @@ public class DirectedCubicArrow extends PNode {
 
     public static float getTheta(Port port) {
         double theta = 0;
-        switch(port) {
-            case NORTH: theta = -Math.PI/2;	break;
-            case SOUTH: theta = Math.PI/2;	break;
-            case EAST:	theta = Math.PI; 	break;
-            case WEST: 	theta = 0;			break;
+        switch (port) {
+            case NORTH:
+                theta = -Math.PI / 2;
+                break;
+            case SOUTH:
+                theta = Math.PI / 2;
+                break;
+            case EAST:
+                theta = Math.PI;
+                break;
+            case WEST:
+                theta = 0;
+                break;
         }
         return (float) theta;
     }

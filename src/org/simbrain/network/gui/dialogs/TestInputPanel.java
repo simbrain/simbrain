@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JToolBar;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -38,6 +27,12 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.List;
 
 /**
  * Panel for sending inputs from a table to a network. The action that calls
@@ -49,13 +44,19 @@ import org.simbrain.util.table.SimbrainJTable;
  */
 public class TestInputPanel extends DataPanel {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** True when iteration mode is on. */
+    /**
+     * True when iteration mode is on.
+     */
     private boolean iterationMode = true;
 
-    /** Button used to advance row. Disabled when iteration mode is on. */
+    /**
+     * Button used to advance row. Disabled when iteration mode is on.
+     */
     private JButton advance;
 
     /**
@@ -69,17 +70,15 @@ public class TestInputPanel extends DataPanel {
      * simply creates temporary data.
      */
     private double[][] tempDataMatrix = new double[5][inputNeurons.size()];
-    
+
     private NeuronGroup neuronGroup;
 
-    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,
-            NeuronGroup neuronGroup) {
-        TestInputPanel tip = TestInputPanel.createTestInputPanel(networkPanel,
-                neuronGroup.getNeuronList());
+    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel, NeuronGroup neuronGroup) {
+        TestInputPanel tip = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList());
         tip.neuronGroup = neuronGroup;
         return tip;
     }
-    
+
     /**
      * Create panel using a network panel and a list of selected neurons for
      * case where no data holder is provided (currently, applying test inputs to
@@ -89,8 +88,7 @@ public class TestInputPanel extends DataPanel {
      * @param inputNeurons input neurons of the network to be tested
      * @return the constructed panel
      */
-    public static TestInputPanel createTestInputPanel(
-            NetworkPanel networkPanel, final List<Neuron> inputNeurons) {
+    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel, final List<Neuron> inputNeurons) {
 
         NumericMatrix dataHolder = new NumericMatrix() {
             double[][] dataMatrix = new double[5][inputNeurons.size()];
@@ -106,13 +104,12 @@ public class TestInputPanel extends DataPanel {
             }
 
         };
-        final TestInputPanel panel = new TestInputPanel(networkPanel,
-        		inputNeurons, dataHolder);
+        final TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons, dataHolder);
         panel.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				panel.commitChanges(); //TODO: More efficient way?
-			}
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                panel.commitChanges(); //TODO: More efficient way?
+            }
         });
         return panel;
     }
@@ -122,20 +119,18 @@ public class TestInputPanel extends DataPanel {
      *
      * @param networkPanel networkPanel, must not be null.
      * @param inputNeurons input neurons of the network to be tested.
-     * @param dataHolder the class whose data should be edited.
+     * @param dataHolder   the class whose data should be edited.
      * @return the constructed panel.
      */
-    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,
-    		List<Neuron> inputNeurons, NumericMatrix dataHolder) {
-    	final TestInputPanel panel = new TestInputPanel(networkPanel,
-    			inputNeurons, dataHolder);
-    	panel.addPropertyChangeListener(new PropertyChangeListener() {
-    		@Override
-    		public void propertyChange(PropertyChangeEvent evt) {
-    			panel.commitChanges(); //TODO: More efficient way?
-    		}
-    	});
-    	return panel;
+    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons, NumericMatrix dataHolder) {
+        final TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons, dataHolder);
+        panel.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                panel.commitChanges(); //TODO: More efficient way?
+            }
+        });
+        return panel;
     }
 
     /**
@@ -144,10 +139,9 @@ public class TestInputPanel extends DataPanel {
      *
      * @param networkPanel networkPanel, must not be null
      * @param inputNeurons input neurons of the network to be tested
-     * @param dataHolder the class whose data should be edited.
+     * @param dataHolder   the class whose data should be edited.
      */
-    private TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
-            NumericMatrix dataHolder) {
+    private TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons, NumericMatrix dataHolder) {
         super(inputNeurons, dataHolder, 5, "Test Inputs");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -256,9 +250,7 @@ public class TestInputPanel extends DataPanel {
     private void advanceRow() {
         ((NumericTable) table.getData()).updateCurrentRow();
         table.updateRowSelection();
-        table.scrollRectToVisible(table.getCellRect(
-                ((NumericTable) table.getData()).getCurrentRow(),
-                table.getColumnCount(), true));
+        table.scrollRectToVisible(table.getCellRect(((NumericTable) table.getData()).getCurrentRow(), table.getColumnCount(), true));
     }
 
     /**
@@ -271,9 +263,7 @@ public class TestInputPanel extends DataPanel {
         }
         table.updateRowSelection();
         for (int j = 0; j < inputNeurons.size(); j++) {
-            inputNeurons.get(j).forceSetActivation(
-                    ((NumericTable) table.getData()).getLogicalValueAt(testRow,
-                            j));
+            inputNeurons.get(j).forceSetActivation(((NumericTable) table.getData()).getLogicalValueAt(testRow, j));
         }
         if (network != null) {
             network.update();
@@ -293,9 +283,7 @@ public class TestInputPanel extends DataPanel {
     private void testTable() {
         for (int j = 0; j < ((NumericTable) table.getData()).getRowCount(); j++) {
             ((NumericTable) table.getData()).setCurrentRow(j);
-            table.scrollRectToVisible(table.getCellRect(
-                    ((NumericTable) table.getData()).getCurrentRow(),
-                    table.getColumnCount(), true));
+            table.scrollRectToVisible(table.getCellRect(((NumericTable) table.getData()).getCurrentRow(), table.getColumnCount(), true));
             testRow();
         }
     }

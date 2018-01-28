@@ -18,10 +18,8 @@
  */
 package org.simbrain.util.table;
 
-import java.awt.Dimension;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A scroll panel for a jtable, which sizes itself to fit whatever data it
@@ -34,25 +32,39 @@ import javax.swing.JTable;
  */
 public class SimbrainJTableScrollPanel extends JScrollPane {
 
-    /** The underlying jtable . */
+    /**
+     * The underlying jtable .
+     */
     private SimbrainJTable jtable;
 
-    /** Default column width. */
+    /**
+     * Default column width.
+     */
     private static final int DEFAULT_COLUMN_WIDTH = 100;
 
-    /** Default column width. */
+    /**
+     * Default column width.
+     */
     private static final int DEFAULT_MAX_COLS = 6;
 
-    /** Default column width. */
+    /**
+     * Default column width.
+     */
     private static final int DEFAULT_MAX_ROWS = 25;
 
-    /** How wide to make columns. */
+    /**
+     * How wide to make columns.
+     */
     private int columnWidth = DEFAULT_COLUMN_WIDTH;
 
-    /** Maximum number of columns to display at one time in the scrollpane. */
+    /**
+     * Maximum number of columns to display at one time in the scrollpane.
+     */
     private int maxVisibleColumns = DEFAULT_MAX_COLS;
 
-    /** Maximum number of rows to display at one time in the scrollpane. */
+    /**
+     * Maximum number of rows to display at one time in the scrollpane.
+     */
     private int maxVisibleRows = DEFAULT_MAX_ROWS;
 
     /**
@@ -74,8 +86,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     /**
      * Sets the jtable.
      *
-     * @param jtable
-     *            the jtable.
+     * @param jtable the jtable.
      */
     public void setTable(SimbrainJTable jtable) {
         this.jtable = jtable;
@@ -130,8 +141,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     }
 
     /**
-     * @param maxVisibleColumns
-     *            the maxVisibleColumns to set
+     * @param maxVisibleColumns the maxVisibleColumns to set
      */
     public void setMaxVisibleColumns(int maxVisibleColumns) {
         this.maxVisibleColumns = maxVisibleColumns;
@@ -146,8 +156,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     }
 
     /**
-     * @param maxVisibleRows
-     *            the maxVisibleRows to set
+     * @param maxVisibleRows the maxVisibleRows to set
      */
     public void setMaxVisibleRows(int maxVisibleRows) {
         this.maxVisibleRows = maxVisibleRows;

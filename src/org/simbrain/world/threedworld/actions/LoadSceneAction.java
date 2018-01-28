@@ -1,13 +1,12 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * LoadSceneAction displays a JFileChooser for selecting a j3o
@@ -22,6 +21,7 @@ public class LoadSceneAction extends AbstractAction {
 
     /**
      * Construct a new LoadSceneAction.
+     *
      * @param world The world in which to load a new scene.
      */
     public LoadSceneAction(ThreeDWorld world) {

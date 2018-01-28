@@ -18,10 +18,10 @@
  */
 package org.simbrain.workspace.gui;
 
+import org.simbrain.resource.ResourceManager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.simbrain.resource.ResourceManager;
 
 /*
  * @(#)Splasher.java  2.0  January 31, 2004
@@ -42,8 +42,7 @@ public class Splasher {
      * Shows the splash screen, launches the application and then disposes the
      * splash screen.
      *
-     * @param args
-     *            the command line arguments
+     * @param args the command line arguments
      */
     public static void main(final String[] args) {
         // try {
@@ -58,8 +57,7 @@ public class Splasher {
         Logger.getLogger("com.jmex").setLevel(Level.OFF);
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
-        SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
-            args);
+        SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);
         SplashWindow.disposeSplash();
     }
 }

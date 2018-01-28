@@ -9,16 +9,20 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class GameAttributes {
 
-    /** The parent component. */
+    /**
+     * The parent component.
+     */
     private final WorkspaceComponent parent;
-    /** The game model. */
+    /**
+     * The game model.
+     */
     private final GameModel model;
 
     /**
      * Creates a new instance with the given parent and model.
      *
      * @param parent the parent component.
-     * @param model the game model.
+     * @param model  the game model.
      */
     public GameAttributes(final WorkspaceComponent parent, final GameModel model) {
         this.parent = parent;
@@ -27,6 +31,7 @@ public class GameAttributes {
 
     /**
      * {@inheritDoc}
+     *
      * @return
      */
     public String getDescription() {
@@ -35,6 +40,7 @@ public class GameAttributes {
 
     /**
      * {@inheritDoc}
+     *
      * @return
      */
     public WorkspaceComponent getParentComponent() {

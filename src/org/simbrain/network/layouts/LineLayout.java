@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.layouts;
 
+import org.simbrain.network.core.Neuron;
+
 import java.awt.geom.Point2D;
 import java.util.List;
-
-import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a line.
@@ -30,42 +30,57 @@ import org.simbrain.network.core.Neuron;
  */
 public class LineLayout implements Layout {
 
-    /** Orientation of the line. */
+    /**
+     * Orientation of the line.
+     */
     public enum LineOrientation {
         VERTICAL {
             public String toString() {
                 return "Vertical";
             }
-        },
-        HORIZONTAL {
+        }, HORIZONTAL {
             public String toString() {
                 return "Horizontal";
             }
         }
-    };
+    }
 
-    /** The default orientation of the line. */
+    ;
+
+    /**
+     * The default orientation of the line.
+     */
     public static final LineOrientation DEFAULT_LINE_ORIENTATION = LineOrientation.HORIZONTAL;
 
-    /** The default spacing between neurons when laid out. */
+    /**
+     * The default spacing between neurons when laid out.
+     */
     public static final double DEFAULT_SPACING = 40;
 
-    /** Current line orientation. */
+    /**
+     * Current line orientation.
+     */
     private LineOrientation orientation = DEFAULT_LINE_ORIENTATION;
 
-    /** Spacing between neurons. */
+    /**
+     * Spacing between neurons.
+     */
     private double spacing = DEFAULT_SPACING;
 
-    /** Initial x position of line of neurons. */
+    /**
+     * Initial x position of line of neurons.
+     */
     private double initialX;
 
-    /** Initial y position of line of neurons. */
+    /**
+     * Initial y position of line of neurons.
+     */
     private double initialY;
 
     /**
      * Create a layout.
      *
-     * @param spacing spacing between neurons
+     * @param spacing     spacing between neurons
      * @param orientation of the neurons
      */
     public LineLayout(final double spacing, final LineOrientation orientation) {
@@ -76,13 +91,12 @@ public class LineLayout implements Layout {
     /**
      * Create a line layout with all values specified.
      *
-     * @param x initial x position
-     * @param y initial y position
-     * @param spacing spacing between neurons
+     * @param x           initial x position
+     * @param y           initial y position
+     * @param spacing     spacing between neurons
      * @param orientation vertical or horizontal
      */
-    public LineLayout(final double x, final double y, final double spacing,
-            final LineOrientation orientation) {
+    public LineLayout(final double x, final double y, final double spacing, final LineOrientation orientation) {
         initialX = x;
         initialY = y;
         this.spacing = spacing;

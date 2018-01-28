@@ -18,33 +18,53 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 /**
  * <b>OdorWorldMenu</b>.
  */
 public class OdorWorldMenu {
 
-    /** Parent world. */
+    /**
+     * Parent world.
+     */
     private OdorWorldPanel parentWorld;
 
-    /** Delete menu item. */
+    /**
+     * Delete menu item.
+     */
     private JMenuItem deleteItem = new JMenuItem("Delete object");
-    /** Add agent menu item. */
+    /**
+     * Add agent menu item.
+     */
     private JMenuItem addAgentItem = new JMenuItem("Add new agent");
-    /** Objects properties menu item. */
+    /**
+     * Objects properties menu item.
+     */
     private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
-    /** World properties menu item. */
+    /**
+     * World properties menu item.
+     */
     private JMenuItem propsItem = new JMenuItem("Set world properties");
-    /** Wall menu item. */
+    /**
+     * Wall menu item.
+     */
     private JMenuItem wallItem = new JMenuItem("Draw a wall");
-    /** Wall properties menu item. */
+    /**
+     * Wall properties menu item.
+     */
     private JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
-    /** Copy object menu item. */
+    /**
+     * Copy object menu item.
+     */
     private JMenuItem copyItem = new JMenuItem("Copy");
-    /** Cut object menu item. */
+    /**
+     * Cut object menu item.
+     */
     private JMenuItem cutItem = new JMenuItem("Cut");
-    /** Paste object menu item. */
+    /**
+     * Paste object menu item.
+     */
     private JMenuItem pasteItem = new JMenuItem("Paste");
 
     /**

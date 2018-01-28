@@ -1,16 +1,11 @@
 package org.simbrain.util;
 
 //JMultiLineToolTip.java
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
 
-import javax.swing.CellRendererPane;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.JToolTip;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
+import java.awt.*;
 
 /**
  * @author Zafir Anjum
@@ -35,24 +30,32 @@ public class JMultiLineToolTip extends JToolTip {
         setUI(MultiLineToolTipUI.createUI(this));
     }
 
-    /** @param columns number of columns */
+    /**
+     * @param columns number of columns
+     */
     public void setColumns(final int columns) {
         this.columns = columns;
         this.fixedwidth = 0;
     }
 
-    /** @return columns */
+    /**
+     * @return columns
+     */
     public int getColumns() {
         return columns;
     }
 
-    /** @param width width */
+    /**
+     * @param width width
+     */
     public void setFixedWidth(final int width) {
         this.fixedwidth = width;
         this.columns = 0;
     }
 
-    /** @return ret */
+    /**
+     * @return ret
+     */
     public int getFixedWidth() {
         return fixedwidth;
     }
@@ -89,7 +92,9 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         super();
     }
 
-    /** @param c */
+    /**
+     * @param c
+     */
     public void installUI(JComponent c) {
         super.installUI(c);
         tip = (JToolTip) c;
@@ -97,7 +102,9 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         c.add(rendererPane);
     }
 
-    /** @param c component */
+    /**
+     * @param c component
+     */
     public void uninstallUI(final JComponent c) {
         super.uninstallUI(c);
 
@@ -108,12 +115,11 @@ class MultiLineToolTipUI extends BasicToolTipUI {
     /**
      * @param g graphics
      * @param c component
-     * */
+     */
     public void paint(final Graphics g, final JComponent c) {
         Dimension size = c.getSize();
         textArea.setBackground(c.getBackground());
-        rendererPane.paintComponent(g, textArea, c, 1, 1, size.width - 1,
-                size.height - 1, true);
+        rendererPane.paintComponent(g, textArea, c, 1, 1, size.width - 1, size.height - 1, true);
     }
 
     /**

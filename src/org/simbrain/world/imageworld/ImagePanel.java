@@ -1,9 +1,8 @@
 package org.simbrain.world.imageworld;
 
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
 
 /**
  * Display images from an ImageSource.

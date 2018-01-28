@@ -18,15 +18,13 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JPanel;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Show weight matrix connecting selected source and target neurons.
@@ -40,20 +38,17 @@ public final class ShowWeightMatrixAction extends ConditionallyEnabledAction {
      */
     public ShowWeightMatrixAction(final NetworkPanel networkPanel) {
 
-        super(networkPanel, "Display / Edit Weight Matrix...",
-                EnablingCondition.SOURCE_AND_TARGET_NEURONS);
+        super(networkPanel, "Display / Edit Weight Matrix...", EnablingCondition.SOURCE_AND_TARGET_NEURONS);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
-        putValue(
-                SHORT_DESCRIPTION,
-                "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)");
+        putValue(SHORT_DESCRIPTION, "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        JPanel panel = WeightMatrixViewer
-                .getWeightMatrixPanel(new WeightMatrixViewer(networkPanel));
+        JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(networkPanel));
         networkPanel.displayPanel(panel, "Weight matrix viewer");
     }
 }

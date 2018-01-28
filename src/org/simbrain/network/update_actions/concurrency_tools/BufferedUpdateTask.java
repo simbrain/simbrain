@@ -21,48 +21,48 @@ package org.simbrain.network.update_actions.concurrency_tools;
 import org.simbrain.network.core.Neuron;
 
 /**
- * 
  * @author Zoë Tosi
- * 
+ * <p>
  * A task that updates neurons according to their update rules, then updates
  * all afferent synapses to that neuron. Neuron's activations are not set
  * from their buffers here.
- *
  */
 public class BufferedUpdateTask implements Task {
 
-	/** The host neurons, whose update will constitute this task. */
-	private final Neuron[] hosts;
+    /**
+     * The host neurons, whose update will constitute this task.
+     */
+    private final Neuron[] hosts;
 
-	private final int hostSize;
-	
-	/**
-	 * @param hosts
-	 */
-	public BufferedUpdateTask(final Neuron[] hosts) {
-		this.hosts = hosts;
-		this.hostSize = hosts.length;
-	}
+    private final int hostSize;
 
-	/**
-	 * {@inheritDoc}
-	 * Updates the neurons (does not send their buffered value to their
-	 * activation) then updates all afferent synapses to the neurons in
-	 * question.
-	 */
-	@Override
-	public void perform() {
-		for (int i = 0; i < hostSize; i++) {
-			if (hosts[i] == null) {
-				break;
-			}
-			hosts[i].update();
-			hosts[i].updateFanIn();
-		}
-	}
+    /**
+     * @param hosts
+     */
+    public BufferedUpdateTask(final Neuron[] hosts) {
+        this.hosts = hosts;
+        this.hostSize = hosts.length;
+    }
 
-	public Neuron[] getHosts() {
-		return hosts;
-	}
+    /**
+     * {@inheritDoc}
+     * Updates the neurons (does not send their buffered value to their
+     * activation) then updates all afferent synapses to the neurons in
+     * question.
+     */
+    @Override
+    public void perform() {
+        for (int i = 0; i < hostSize; i++) {
+            if (hosts[i] == null) {
+                break;
+            }
+            hosts[i].update();
+            hosts[i].updateFanIn();
+        }
+    }
+
+    public Neuron[] getHosts() {
+        return hosts;
+    }
 
 }

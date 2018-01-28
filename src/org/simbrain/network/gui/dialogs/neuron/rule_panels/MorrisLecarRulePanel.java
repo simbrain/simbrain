@@ -18,16 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
-import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.MorrisLecarRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>MorrisLecarRulePanel</b> edits MorrisLecar neurons.
@@ -36,10 +32,14 @@ import org.simbrain.util.widgets.YesNoNull;
  */
 public class MorrisLecarRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final MorrisLecarRule prototypeRule = new MorrisLecarRule();
 
     /**
@@ -49,21 +49,11 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel {
         super();
         this.add(tabbedPane);
 
-        JTextField tfCMembrane = createTextField(
-                (r) -> ((MorrisLecarRule) r).getcMembrane(),
-                (r, val) -> ((MorrisLecarRule) r).setcMembrane((double) val));
-        JTextField tfV_M1 = createTextField(
-                (r) -> ((MorrisLecarRule) r).getV_m1(),
-                (r, val) -> ((MorrisLecarRule) r).setV_m1((double) val));
-        JTextField tfV_M2 = createTextField(
-                (r) -> ((MorrisLecarRule) r).getV_m2(),
-                (r, val) -> ((MorrisLecarRule) r).setV_m2((double) val));
-        JTextField tfThreshold = createTextField(
-                (r) -> ((MorrisLecarRule) r).getThreshold(),
-                (r, val) -> ((MorrisLecarRule) r).setThreshold((double) val));
-        JTextField tfI_Bg = createTextField(
-                (r) -> ((MorrisLecarRule) r).getI_bg(),
-                (r, val) -> ((MorrisLecarRule) r).setI_bg((double) val));
+        JTextField tfCMembrane = createTextField((r) -> ((MorrisLecarRule) r).getcMembrane(), (r, val) -> ((MorrisLecarRule) r).setcMembrane((double) val));
+        JTextField tfV_M1 = createTextField((r) -> ((MorrisLecarRule) r).getV_m1(), (r, val) -> ((MorrisLecarRule) r).setV_m1((double) val));
+        JTextField tfV_M2 = createTextField((r) -> ((MorrisLecarRule) r).getV_m2(), (r, val) -> ((MorrisLecarRule) r).setV_m2((double) val));
+        JTextField tfThreshold = createTextField((r) -> ((MorrisLecarRule) r).getThreshold(), (r, val) -> ((MorrisLecarRule) r).setThreshold((double) val));
+        JTextField tfI_Bg = createTextField((r) -> ((MorrisLecarRule) r).getI_bg(), (r, val) -> ((MorrisLecarRule) r).setI_bg((double) val));
 
         LabelledItemPanel cellPanel = new LabelledItemPanel();
         cellPanel.addItem("Capacitance (\u03BCF/cm\u00B2)", tfCMembrane);
@@ -73,49 +63,30 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel {
         cellPanel.addItem("Background current (nA)", tfI_Bg);
         cellPanel.addItem("Add noise: ", getAddNoise());
 
-        JTextField tfG_Ca = createTextField(
-                (r) -> ((MorrisLecarRule) r).getG_Ca(),
-                (r, val) -> ((MorrisLecarRule) r).setG_Ca((double) val));
-        JTextField tfG_K = createTextField(
-                (r) -> ((MorrisLecarRule) r).getG_K(),
-                (r, val) -> ((MorrisLecarRule) r).setG_K((double) val));
-        JTextField tfG_L = createTextField(
-                (r) -> ((MorrisLecarRule) r).getG_L(),
-                (r, val) -> ((MorrisLecarRule) r).setG_L((double) val));
-        JTextField tfVRest_Ca = createTextField(
-                (r) -> ((MorrisLecarRule) r).getvRest_Ca(),
-                (r, val) -> ((MorrisLecarRule) r).setvRest_Ca((double) val));
-        JTextField tfvRest_k = createTextField(
-                (r) -> ((MorrisLecarRule) r).getvRest_k(),
-                (r, val) -> ((MorrisLecarRule) r).setvRest_k((double) val));
-        JTextField tfVRest_L = createTextField(
-                (r) -> ((MorrisLecarRule) r).getvRest_Ca(),
-                (r, val) -> ((MorrisLecarRule) r).setvRest_Ca((double) val));
+        JTextField tfG_Ca = createTextField((r) -> ((MorrisLecarRule) r).getG_Ca(), (r, val) -> ((MorrisLecarRule) r).setG_Ca((double) val));
+        JTextField tfG_K = createTextField((r) -> ((MorrisLecarRule) r).getG_K(), (r, val) -> ((MorrisLecarRule) r).setG_K((double) val));
+        JTextField tfG_L = createTextField((r) -> ((MorrisLecarRule) r).getG_L(), (r, val) -> ((MorrisLecarRule) r).setG_L((double) val));
+        JTextField tfVRest_Ca = createTextField((r) -> ((MorrisLecarRule) r).getvRest_Ca(), (r, val) -> ((MorrisLecarRule) r).setvRest_Ca((double) val));
+        JTextField tfvRest_k = createTextField((r) -> ((MorrisLecarRule) r).getvRest_k(), (r, val) -> ((MorrisLecarRule) r).setvRest_k((double) val));
+        JTextField tfVRest_L = createTextField((r) -> ((MorrisLecarRule) r).getvRest_Ca(), (r, val) -> ((MorrisLecarRule) r).setvRest_Ca((double) val));
         LabelledItemPanel ionPanel = new LabelledItemPanel();
-        ionPanel.addItem("Ca\u00B2\u207A conductance (\u03BCS/cm\u00B2)",
-                tfG_Ca);
+        ionPanel.addItem("Ca\u00B2\u207A conductance (\u03BCS/cm\u00B2)", tfG_Ca);
         ionPanel.addItem("K\u207A conductance (\u03BCS/cm\u00B2)", tfG_K);
         ionPanel.addItem("Leak conductance (\u03BCS/cm\u00B2)", tfG_L);
         ionPanel.addItem("Ca\u00B2\u207A equilibrium (mV)", tfVRest_Ca);
         ionPanel.addItem("K\u207A equilibrium (mV)", tfvRest_k);
         ionPanel.addItem("Leak equilibrium (mV)", tfVRest_L);
 
-        JTextField tfV_W1 = createTextField(
-                (r) -> ((MorrisLecarRule) r).getV_w1(),
-                (r, val) -> ((MorrisLecarRule) r).setV_w1((double) val));
-        JTextField tfV_W2 = createTextField(
-                (r) -> ((MorrisLecarRule) r).getV_w2(),
-                (r, val) -> ((MorrisLecarRule) r).setV_w2((double) val));
-//        JTextField tfW_K = createTextField(
-//                (r) -> ((MorrisLecarRule) r).getK(),
-//                (r, val) -> ((MorrisLecarRule) r).setW_K((double) val));
-        JTextField tfPhi = createTextField(
-                (r) -> ((MorrisLecarRule) r).getPhi(),
-                (r, val) -> ((MorrisLecarRule) r).setPhi((double) val));
+        JTextField tfV_W1 = createTextField((r) -> ((MorrisLecarRule) r).getV_w1(), (r, val) -> ((MorrisLecarRule) r).setV_w1((double) val));
+        JTextField tfV_W2 = createTextField((r) -> ((MorrisLecarRule) r).getV_w2(), (r, val) -> ((MorrisLecarRule) r).setV_w2((double) val));
+        //        JTextField tfW_K = createTextField(
+        //                (r) -> ((MorrisLecarRule) r).getK(),
+        //                (r, val) -> ((MorrisLecarRule) r).setW_K((double) val));
+        JTextField tfPhi = createTextField((r) -> ((MorrisLecarRule) r).getPhi(), (r, val) -> ((MorrisLecarRule) r).setPhi((double) val));
         LabelledItemPanel potas = new LabelledItemPanel();
         potas.addItem("K\u207A const. 1", tfV_W1);
         potas.addItem("K\u207A const. 2", tfV_W2);
-//        potas.addItem("Open K\u207A channels", tfW_K);
+        //        potas.addItem("Open K\u207A channels", tfW_K);
         potas.addItem("K\u207A \u03C6", tfPhi);
 
         tabbedPane.add(cellPanel, "Membrane Properties");

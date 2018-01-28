@@ -18,13 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add a document viewer to the workspace.
@@ -33,6 +32,7 @@ public final class NewDocViewerAction extends WorkspaceAction {
 
     /**
      * Create a new console action with the specified workspace.
+     *
      * @param workspace
      */
     public NewDocViewerAction(Workspace workspace) {
@@ -41,8 +41,9 @@ public final class NewDocViewerAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New doc viewer");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         DocViewerComponent component = new DocViewerComponent();

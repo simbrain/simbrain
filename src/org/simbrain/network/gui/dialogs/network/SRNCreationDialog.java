@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.GridBagConstraints;
-import java.util.HashMap;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -38,6 +27,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Creates a GUI dialog to set the parameters for and then build a simple
@@ -49,19 +42,29 @@ import org.simbrain.util.widgets.ShowHelpAction;
 @SuppressWarnings("serial")
 public class SRNCreationDialog extends StandardDialog {
 
-    /** Underlying Network Panel */
+    /**
+     * Underlying Network Panel
+     */
     private final NetworkPanel panel;
 
-    /** Underlying labeled item panel for dialog */
+    /**
+     * Underlying labeled item panel for dialog
+     */
     private LabelledItemPanel srnPanel = new LabelledItemPanel();
 
-    /** Text field for number of input nodes */
+    /**
+     * Text field for number of input nodes
+     */
     private JTextField tfNumInputs = new JTextField();
 
-    /** Text field for number of hidden layer nodes */
+    /**
+     * Text field for number of hidden layer nodes
+     */
     private JTextField tfNumHidden = new JTextField();
 
-    /** Text field for number of output nodes */
+    /**
+     * Text field for number of output nodes
+     */
     private JTextField tfNumOutputs = new JTextField();
 
     /**
@@ -73,8 +76,7 @@ public class SRNCreationDialog extends StandardDialog {
     /**
      * Mapping of Strings to NeuronUpdateRules, currently only Logisitc, Tanh,
      * and Linear neurons are allowed.
-     */
-    {
+     */ {
         boxMap.put("Linear", new LinearRule());
         SigmoidalRule sig0 = new SigmoidalRule();
         sig0.setSquashFunctionType(SquashingFunction.LOGISTIC);
@@ -84,13 +86,19 @@ public class SRNCreationDialog extends StandardDialog {
         boxMap.put("Tanh", sig1);
     }
 
-    /** String values for combo-boxes (same as key values for boxMap) */
-    private String[] options = { "Linear", "Tanh", "Logistic" };
+    /**
+     * String values for combo-boxes (same as key values for boxMap)
+     */
+    private String[] options = {"Linear", "Tanh", "Logistic"};
 
-    /** Combo box for selecting update rule for the hidden layer */
+    /**
+     * Combo box for selecting update rule for the hidden layer
+     */
     private JComboBox hiddenNeuronTypes = new JComboBox(options);
 
-    /** Combo box for selecting the update rule for the output layer */
+    /**
+     * Combo box for selecting the update rule for the output layer
+     */
     private JComboBox outputNeuronTypes = new JComboBox(options);
 
     /**
@@ -129,8 +137,7 @@ public class SRNCreationDialog extends StandardDialog {
         fillFieldValues();
 
         // Help button
-        Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/srn.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/srn.html");
         addButton(new JButton(helpAction));
 
         setContentPane(srnPanel);
@@ -140,8 +147,8 @@ public class SRNCreationDialog extends StandardDialog {
      * Creates a new dialog section given a title and using a JSeparator.
      *
      * @param label name of the section
-     * @param gbc current GridBagConstraints, to align label and separators
-     * @param cRow current row relative to LabeledItemPanel
+     * @param gbc   current GridBagConstraints, to align label and separators
+     * @param cRow  current row relative to LabeledItemPanel
      */
     public void sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
         // Section label
@@ -182,24 +189,15 @@ public class SRNCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-            NeuronUpdateRule hidType = boxMap.get(hiddenNeuronTypes
-                    .getSelectedItem());
-            NeuronUpdateRule outType = boxMap.get(outputNeuronTypes
-                    .getSelectedItem());
-            SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(
-                    panel.getNetwork(),
-                    Integer.parseInt(tfNumInputs.getText()),
-                    Integer.parseInt(tfNumHidden.getText()),
-                    Integer.parseInt(tfNumOutputs.getText()), hidType, outType,
-                    panel.getWhereToAdd());
+            NeuronUpdateRule hidType = boxMap.get(hiddenNeuronTypes.getSelectedItem());
+            NeuronUpdateRule outType = boxMap.get(outputNeuronTypes.getSelectedItem());
+            SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputs.getText()), Integer.parseInt(tfNumHidden.getText()), Integer.parseInt(tfNumOutputs.getText()), hidType, outType, panel.getWhereToAdd());
 
             srn.getParentNetwork().addGroup(srn);
             srn.getParentNetwork().fireGroupUpdated(srn);
             dispose();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"
-                    + "\nNetwork construction failed.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Inappropriate Field Values:" + "\nNetwork construction failed.", "Error", JOptionPane.ERROR_MESSAGE);
         }
         panel.repaint();
     }

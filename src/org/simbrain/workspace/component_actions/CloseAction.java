@@ -18,21 +18,21 @@
  */
 package org.simbrain.workspace.component_actions;
 
-import java.awt.Toolkit;
+import org.simbrain.workspace.WorkspaceComponent;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Close component action. For use in individual component menus.
  */
 public final class CloseAction extends AbstractAction {
 
-    /** Parent component. */
+    /**
+     * Parent component.
+     */
     private final WorkspaceComponent workspaceComponent;
 
     /**
@@ -45,20 +45,18 @@ public final class CloseAction extends AbstractAction {
         super("Close");
 
         if (workspaceComponent == null) {
-            throw new IllegalArgumentException(
-                    "networkDesktopComponent must not be null");
+            throw new IllegalArgumentException("networkDesktopComponent must not be null");
         }
 
         this.workspaceComponent = workspaceComponent;
 
-        putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                KeyEvent.VK_W, Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMask()));
+        putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Close this component");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         workspaceComponent.tryClosing();

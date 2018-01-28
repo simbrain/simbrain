@@ -18,13 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.Component;
-import java.awt.Window;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -32,25 +25,31 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel.RandBehavior;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * A panel that combines a DensityBasedConnectionPanel (Sparse) with a
  * SynapsePolarityAndRandomizerPanel with the ability to create a synapse group
  * with the given properties given a source and target neuron group. Meant for
  * cases where a limited number of properties can be set for a given synapse
  * group.
- *
+ * <p>
  * For the very common case where a variable density, variable polarity,
  * random synapse group is desired.
  *
  * @author Zoë Tosi
- *
  */
 public class CondensedConnectionPanel {
 
-    /** The connection panel for changing the density. */
+    /**
+     * The connection panel for changing the density.
+     */
     private final SparseConnectionPanel connectorPanel;
 
-    /** The panel responsible for chaning polarity ratio and randomizers. */
+    /**
+     * The panel responsible for chaning polarity ratio and randomizers.
+     */
     private final SynapsePolarityAndRandomizerPanel polarityPanel;
 
     /** */
@@ -58,21 +57,18 @@ public class CondensedConnectionPanel {
 
     /**
      * Creates a CondensedConnectionPanel.
+     *
      * @param networkPanel the place where the synapse group will go
-     * @param parent for resizing
-     * @param numTargs so the DensityBasedConnectionPanel can estimate
-     * the number of efferents should the user chose to equalize them.
+     * @param parent       for resizing
+     * @param numTargs     so the DensityBasedConnectionPanel can estimate
+     *                     the number of efferents should the user chose to equalize them.
      */
-    public CondensedConnectionPanel(final NetworkPanel networkPanel,
-        final Window parent, final int numTargs) {
-        connectorPanel = SparseConnectionPanel
-            .createSparsityAdjustmentPanel(new Sparse(), networkPanel);
-        connectorPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createEmptyBorder(5, 5, 10, 5)));
+    public CondensedConnectionPanel(final NetworkPanel networkPanel, final Window parent, final int numTargs) {
+        connectorPanel = SparseConnectionPanel.createSparsityAdjustmentPanel(new Sparse(), networkPanel);
+        connectorPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5)));
         connectorPanel.setNumTargs(numTargs);
         connectorPanel.setDensity(0.25);
-        polarityPanel = SynapsePolarityAndRandomizerPanel
-            .createPolarityRatioPanel(parent, RandBehavior.FORCE_ON);
+        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parent, RandBehavior.FORCE_ON);
         polarityPanel.setPercentExcitatory(0.5);
         mainPanel.add(connectorPanel);
         mainPanel.add(polarityPanel);
@@ -86,12 +82,10 @@ public class CondensedConnectionPanel {
      * @param target the target neuron group
      * @return the synapse group connecting them
      */
-    public SynapseGroup createSynapseGroup(NeuronGroup source,
-        NeuronGroup target) {
+    public SynapseGroup createSynapseGroup(NeuronGroup source, NeuronGroup target) {
 
         connectorPanel.commitChanges();
-        Sparse dbc = (Sparse) connectorPanel
-            .getConnection();
+        Sparse dbc = (Sparse) connectorPanel.getConnection();
 
         SynapseGroup synGrp = new SynapseGroup(source, target, dbc);
 
@@ -106,7 +100,8 @@ public class CondensedConnectionPanel {
     /**
      * Returns the density based connection panel so that other classes can
      * set certain properties of the panel independent of this class.
-     * @return the density 
+     *
+     * @return the density
      */
     public SparseConnectionPanel getConnectorPanel() {
         return connectorPanel;
@@ -116,6 +111,7 @@ public class CondensedConnectionPanel {
      * Returns the main panel where all the components are actually laid out.
      * Doing this so that this class doesn't have to extend a Swing class and
      * thus clutter the JavaDocs.
+     *
      * @return
      */
     public Component getMainPanel() {

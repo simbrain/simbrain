@@ -18,17 +18,16 @@
  */
 package org.simbrain.plot.barchart;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Consumable;
 
-import com.thoughtworks.xstream.XStream;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Data for a JFreeChart pie chart.
@@ -39,50 +38,72 @@ public class BarChartModel extends ChartModel {
      * Bar encapsulates a single data column in the BarChartModel.
      */
     public class Bar implements ChartDataSource {
-        
-        /** Coupling Description. */
+
+        /**
+         * Coupling Description.
+         */
         private String description;
 
-        /** Construct the Bar. */
+        /**
+         * Construct the Bar.
+         */
         Bar(String description) {
             this.description = description;
-            dataset.addValue((Number)0, 1, description);
+            dataset.addValue((Number) 0, 1, description);
         }
 
-        /** Get the description. */
+        /**
+         * Get the description.
+         */
         public String getDescription() {
             return description;
         }
 
-        @Consumable(idMethod="getDescription")
+        @Consumable(idMethod = "getDescription")
         public void setValue(double value) {
-            dataset.setValue((Number)value, 1, description);
+            dataset.setValue((Number) value, 1, description);
         }
     }
 
-    /** JFreeChart dataset for bar charts. */
+    /**
+     * JFreeChart dataset for bar charts.
+     */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    /** List of bar objects which can be coupled to. */
+    /**
+     * List of bar objects which can be coupled to.
+     */
     private List<Bar> bars = new ArrayList<Bar>();
 
-    /** Color of bars in barchart. */
+    /**
+     * Color of bars in barchart.
+     */
     private Color barColor = Color.red;
 
-    /** Auto range bar chart. */
+    /**
+     * Auto range bar chart.
+     */
     private boolean autoRange = true;
 
-    /** Maximum range. */
+    /**
+     * Maximum range.
+     */
     private double upperBound = 10;
 
-    /** Minimum range. */
+    /**
+     * Minimum range.
+     */
     private double lowerBound = 0;
 
-    /** Bar chart model constructor. */
-    public BarChartModel() {}
+    /**
+     * Bar chart model constructor.
+     */
+    public BarChartModel() {
+    }
 
     /**
      * Return JFreeChart category dataset.
+     *
      * @return dataset
      */
     public DefaultCategoryDataset getDataset() {
@@ -91,6 +112,7 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Returns a properly initialized xstream object.
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -179,7 +201,9 @@ public class BarChartModel extends ChartModel {
         fireSettingsChanged();
     }
 
-    /** Return a list of all bars used by this BarChartModel. */
+    /**
+     * Return a list of all bars used by this BarChartModel.
+     */
     public List<Bar> getBars() {
         return bars;
     }
@@ -189,16 +213,20 @@ public class BarChartModel extends ChartModel {
      * Couplings to this method will be replaced by couplings to new data sources by the
      * ChartCouplingListener.
      */
-    @Consumable(idMethod="getId")
-    public void addBar(double value) {}
+    @Consumable(idMethod = "getId")
+    public void addBar(double value) {
+    }
 
-    /** Identify this model. */
+    /**
+     * Identify this model.
+     */
     public String getId() {
         return "BarChart";
     }
 
     /**
      * Create specified number of bars.
+     *
      * @param numBars number of bars to add.
      */
     public void addBars(int numBars) {
@@ -207,7 +235,9 @@ public class BarChartModel extends ChartModel {
         }
     }
 
-    /** Add a new bar to the dataset. */
+    /**
+     * Add a new bar to the dataset.
+     */
     public Bar addBar() {
         return addBar("Bar" + (bars.size() + 1));
     }
@@ -235,7 +265,9 @@ public class BarChartModel extends ChartModel {
         }
     }
 
-    /** Remove a bar with the specified description from the model. */
+    /**
+     * Remove a bar with the specified description from the model.
+     */
     public void removeBar(String description) {
         Optional<Bar> bar = getBar(description);
         if (bar.isPresent()) {
@@ -253,13 +285,13 @@ public class BarChartModel extends ChartModel {
     @Override
     public void removeDataSource(ChartDataSource source) {
         if (source instanceof Bar) {
-            removeBar((Bar)source);
+            removeBar((Bar) source);
         }
     }
 
     /**
      * Find matching bar object. Used to deserialize.
-     * 
+     *
      * @param description key
      * @return matching bar
      */

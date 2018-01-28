@@ -18,38 +18,40 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.ProductRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>ProductNeuronPanel</b> edits a product rule.
  */
 public class ProductRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final ProductRule prototypeRule = new ProductRule();
 
     /**
      * Creates an instance of this panel.
-     *
      */
     public ProductRulePanel() {
         this.add(tabbedPane);
-        YesNoNull useWeights = createYesNoChoiceBox(
-                (r) -> ((ProductRule) r).getUseWeights(),
-                (r, val) -> ((ProductRule) r).setUseWeights((boolean) val));
+        YesNoNull useWeights = createYesNoChoiceBox((r) -> ((ProductRule) r).getUseWeights(), (r, val) -> ((ProductRule) r).setUseWeights((boolean) val));
         mainTab.addItem("Use weight values", useWeights);
         mainTab.addItem("Add noise", getAddNoise());
         tabbedPane.add(mainTab, "Main");

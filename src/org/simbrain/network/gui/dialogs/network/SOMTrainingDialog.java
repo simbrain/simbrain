@@ -18,15 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
@@ -37,37 +28,54 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 /**
  * Dialog for training a SOM network.
  *
  * @author Jeff Yoshimi
- *
  */
 public class SOMTrainingDialog extends StandardDialog {
 
-    /** Main tabbed pane. */
+    /**
+     * Main tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Panel for setting properties of the SOM network. */
+    /**
+     * Panel for setting properties of the SOM network.
+     */
     private SOMPropertiesPanel somPropsPanel;
 
-    /** Reference to network panel. */
+    /**
+     * Reference to network panel.
+     */
     private NetworkPanel panel;
 
-    /** Reference to the SOM Network. */
+    /**
+     * Reference to the SOM Network.
+     */
     private SOMNetwork network;
 
-    /** Reference to input data panel. */
+    /**
+     * Reference to input data panel.
+     */
     private DataPanel inputPanel;
 
-    /** Reference to validate inputs panel */
+    /**
+     * Reference to validate inputs panel
+     */
     private TestInputPanel validateInputsPanel;
 
 
     /**
      * Construct the dialog.
      *
-     * @param np parent network panel
+     * @param np      parent network panel
      * @param network the SOM network
      */
     public SOMTrainingDialog(NetworkPanel np, SOMNetwork network) {
@@ -83,28 +91,23 @@ public class SOMTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Network Properties", somPropsPanel);
 
         // Set up training tab
-        final SOMTrainerControlsPanel controlPanel = new SOMTrainerControlsPanel(panel,
-                new SOMTrainer(network), network);
+        final SOMTrainerControlsPanel controlPanel = new SOMTrainerControlsPanel(panel, new SOMTrainer(network), network);
         tabbedPane.addTab("Train Network", controlPanel);
 
         // Input data tab
-        inputPanel = new DataPanel(network.getInputNeurons(),
-                network.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        inputPanel = new DataPanel(network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
-                network.getInputNeurons(), network.getTrainingSet()
-                        .getInputDataMatrix());
+        validateInputsPanel = TestInputPanel.createTestInputPanel(np, network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix());
         tabbedPane.addTab("Validate", validateInputsPanel);
 
         // Listen for tab changed events. Load inputs to test tab
         // If inputs have been loaded
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 // Just clicked out of Properties tab
                 if (index == 1) {
@@ -113,8 +116,7 @@ public class SOMTrainingDialog extends StandardDialog {
                     somPropsPanel.commitChanges();
                 } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel
-                                .getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
                     }
                 }
             }
@@ -122,8 +124,7 @@ public class SOMTrainingDialog extends StandardDialog {
         tabbedPane.addChangeListener(changeListener);
 
         // Set up help
-        Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/som.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/som.html");
         addButton(new JButton(helpAction));
 
         // Finish configuration

@@ -18,10 +18,10 @@
  */
 package org.simbrain.util.projection;
 
+import org.simbrain.network.trainers.ErrorListener;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.network.trainers.ErrorListener;
 
 /**
  * <b>IterableProjectionMethod</b> extends projection method and provides tools
@@ -29,10 +29,14 @@ import org.simbrain.network.trainers.ErrorListener;
  */
 public abstract class IterableProjectionMethod extends ProjectionMethod {
 
-    /** Listener list. */
+    /**
+     * Listener list.
+     */
     private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
 
-    /** The current error. */
+    /**
+     * The current error.
+     */
     private double error;
 
     /**

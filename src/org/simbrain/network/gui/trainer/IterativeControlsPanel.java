@@ -18,21 +18,6 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
@@ -44,11 +29,15 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.concurrent.Executors;
+
 /**
  * The main controller panel for iterative learning, with buttons etc. to run
  * the trainer. Wraps a trainer object. Used in conjunction with a training set
  * panel in the iterative training panel.
- *
+ * <p>
  * Iterative abstracts over different iterative algorithms, via IterableTrainer.
  *
  * @author Jeff Yoshimi
@@ -71,53 +60,72 @@ public class IterativeControlsPanel extends JPanel {
         };
     }
 
-    /** Reference to trainer object. */
+    /**
+     * Reference to trainer object.
+     */
     private IterableTrainer trainer;
 
-    /** Current number of iterations. */
+    /**
+     * Current number of iterations.
+     */
     private JLabel iterationsLabel = new JLabel("--- ");
 
-    /** Reference to network panel. */
+    /**
+     * Reference to network panel.
+     */
     private final NetworkPanel panel;
 
     /** Flag for showing updates in GUI. */
     //private final JCheckBox showUpdates = new JCheckBox("Show updates");
 
-    /** Error progress bar. */
+    /**
+     * Error progress bar.
+     */
     private JProgressBar errorBar;
 
     /** Validation progress bar. */
     // private JProgressBar validationBar;
 
-    /** Number of "ticks" in progress bars. */
+    /**
+     * Number of "ticks" in progress bars.
+     */
     private int numTicks = 1000;
 
-    /** The error listener. */
+    /**
+     * The error listener.
+     */
     private ErrorListener errorListener;
 
-    /** A play action that repeatedly iterates training algorithms. */
-    private Action runAction = createAction("Run", "Iterate training until stop button is pressed.", "Play.png",
-            this::run);
+    /**
+     * A play action that repeatedly iterates training algorithms.
+     */
+    private Action runAction = createAction("Run", "Iterate training until stop button is pressed.", "Play.png", this::run);
 
-    /** A step action that iterates learning algorithms one time. */
+    /**
+     * A step action that iterates learning algorithms one time.
+     */
     private Action stepAction = createAction("Iterate", "Iterate training once.", "Step.png", this::iterate);
 
-    /** Action for randomizing the underlying network. */
-    private Action randomizeAction = createAction("Randomize", "Randomize network.", "Rand.png",
-            this::randomizeNetwork);
+    /**
+     * Action for randomizing the underlying network.
+     */
+    private Action randomizeAction = createAction("Randomize", "Randomize network.", "Rand.png", this::randomizeNetwork);
 
-    /** Action for setting properties of the trainer. */
-    private Action setPropertiesAction = createAction("Properties", "Edit trainer properties.", "Prefs.png",
-            this::editTrainerProperties);
+    /**
+     * Action for setting properties of the trainer.
+     */
+    private Action setPropertiesAction = createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
 
-    /** Action for setting randomizer properties. */
-    private Action randPropertiesAction = createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png",
-            this::editRandomizerProperties);
+    /**
+     * Action for setting randomizer properties.
+     */
+    private Action randPropertiesAction = createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png", this::editRandomizerProperties);
 
     /**
      * Construct the panel.
+     *
      * @param networkPanel the parent network panel
-     * @param trainer the trainer this panel represents
+     * @param trainer      the trainer this panel represents
      */
     public IterativeControlsPanel(NetworkPanel networkPanel, IterableTrainer trainer) {
         this.trainer = trainer;
@@ -186,7 +194,9 @@ public class IterativeControlsPanel extends JPanel {
         addErrorListener();
     }
 
-    /** Add an error listener to the trainer to update error views. */
+    /**
+     * Add an error listener to the trainer to update error views.
+     */
     private void addErrorListener() {
         if (errorListener != null) {
             trainer.removeErrorListener(errorListener);
@@ -252,8 +262,7 @@ public class IterativeControlsPanel extends JPanel {
                     trainer.iterate();
                 }
             } catch (DataNotInitializedException e) {
-                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
+                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
         });
     }
@@ -270,8 +279,7 @@ public class IterativeControlsPanel extends JPanel {
             trainer.iterate();
             trainer.revalidateSynapseGroups();
         } catch (DataNotInitializedException e) {
-            JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, null, null);
+            JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
         }
     }
 
@@ -285,8 +293,7 @@ public class IterativeControlsPanel extends JPanel {
         initTrainer(false);
         ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
         // TODO: un-exclude once those features are implemented!
-        editor.setExcludeList(new String[] { "iteration", "updateCompleted", "stoppingCond",
-                "stoppingCondition", "iterationsBeforeStopping", "errorThreshold" });
+        editor.setExcludeList(new String[]{"iteration", "updateCompleted", "stoppingCond", "stoppingCondition", "iterationsBeforeStopping", "errorThreshold"});
         editor.setObjectToEdit(trainer);
         JDialog dialog = editor.getDialog();
         dialog.setModal(true);

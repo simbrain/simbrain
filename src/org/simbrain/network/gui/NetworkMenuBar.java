@@ -18,17 +18,14 @@
  */
 package org.simbrain.network.gui;
 
-import java.util.ArrayList;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
+import java.util.ArrayList;
 
 /**
  * Menu bar that appears inside of JPanel; for use in Applets.
- *
+ * <p>
  * TODO: Add file menu; fix help menu. TODO: Reduce duplicated code between this
  * and NetworkPanelDesktop. TODO: Rename so that the fact that this is only used
  * in applets is clear.

@@ -4,9 +4,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 
 /**
- * 
  * @author Sharai
- *
  */
 public class CreaturesSynapseRule extends StaticSynapseRule {
 
@@ -15,12 +13,14 @@ public class CreaturesSynapseRule extends StaticSynapseRule {
      * These two different types do not differ from one another in any way
      * beyond what settings they're given when they're defined in a lobe's gene
      * code.
-     * 
+     *
      * @author Sharai
      */
     public static enum DendriteType {
         TYPE1, TYPE2
-    };
+    }
+
+    ;
 
     /**
      * Short Term Weight.

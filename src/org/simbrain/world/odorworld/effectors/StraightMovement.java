@@ -28,23 +28,31 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class StraightMovement extends Effector {
 
-    /** Amount by which to move ahead. Set externally. */
+    /**
+     * Amount by which to move ahead. Set externally.
+     */
     private double amount = 0;
 
-    /** Default scaling factor. */
+    /**
+     * Default scaling factor.
+     */
     public static final double DEFAULT_SCALING_FACTOR = 1;
 
-    /** Effector moves agent ahead by scaling factor times amount. */
+    /**
+     * Effector moves agent ahead by scaling factor times amount.
+     */
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
-    /** Default label. */
+    /**
+     * Default label.
+     */
     public static final String DEFAULT_LABEL = "Go-Straight";
 
     /**
      * Construct the straight movement effector.
      *
      * @param parent parent entity.
-     * @param label descriptive label
+     * @param label  descriptive label
      */
     public StraightMovement(RotatingEntity parent, String label) {
         super(parent, label);
@@ -66,7 +74,7 @@ public class StraightMovement extends Effector {
     /**
      * @param amount the amount to set
      */
-    @Consumable(idMethod="getMixedId")
+    @Consumable(idMethod = "getMixedId")
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -77,7 +85,7 @@ public class StraightMovement extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod="getMixedId")
+    @Consumable(idMethod = "getMixedId")
     public void addAmount(double amount) {
         this.amount += amount;
     }

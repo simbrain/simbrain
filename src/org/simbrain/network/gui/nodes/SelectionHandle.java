@@ -18,29 +18,28 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
+import org.piccolo2d.PNode;
+import org.piccolo2d.extras.handles.PHandle;
+import org.piccolo2d.extras.util.PNodeLocator;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.piccolo2d.PNode;
-import org.piccolo2d.extras.handles.PHandle;
-import org.piccolo2d.extras.util.PNodeLocator;
-
 /**
  * The graphical handle drawn around selected PNodes.
- *
+ * <p>
  * Usage:
- *
+ * <p>
  * <pre>
  * PNode node = ...;
  * SelectionHandle.addSelectionHandleTo(node)
  * </pre>
- *
+ * <p>
  * and
- *
+ * <p>
  * <pre>
  * PNode node = ...;
  * SelectionHandle.removeSelectionHandleFrom(node)
@@ -57,7 +56,9 @@ public final class SelectionHandle extends PHandle {
      */
     private static final float DEFAULT_EXTEND_FACTOR = 0.075f;
 
-    /** Color of selection boxes. */
+    /**
+     * Color of selection boxes.
+     */
     private static Color selectionColor = Color.green;
 
     /**
@@ -73,7 +74,7 @@ public final class SelectionHandle extends PHandle {
      * Create a selection handle with a specified extend factor (distance between selected
      * PNode and the selection handle).
      *
-     * @param locator the locator
+     * @param locator      the locator
      * @param extendFactor extension factor (see above).
      */
     private SelectionHandle(final PNodeLocator locator, final float extendFactor) {
@@ -93,7 +94,9 @@ public final class SelectionHandle extends PHandle {
         relocateHandle();
     }
 
-    /** @see PHandle */
+    /**
+     * @see PHandle
+     */
     public void parentBoundsChanged() {
         updateBounds(DEFAULT_EXTEND_FACTOR);
         super.parentBoundsChanged();
@@ -108,14 +111,11 @@ public final class SelectionHandle extends PHandle {
 
         double x = 0.0f - (parentNode.getBounds().getWidth() * extendFactor);
         double y = 0.0f - (parentNode.getBounds().getHeight() * extendFactor);
-        double width = parentNode.getBounds().getWidth() + 2
-                * (parentNode.getBounds().getWidth() * extendFactor);
-        double height = parentNode.getBounds().getHeight() + 2
-                * (parentNode.getBounds().getHeight() * extendFactor);
+        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * extendFactor);
+        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * extendFactor);
 
         this.reset(); // TODO: Check with Heuer
-        append(new Rectangle2D.Float((float) x, (float) y, (float) width,
-                (float) height), false);
+        append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class SelectionHandle extends PHandle {
      * @return true if the specified node has a selection handle as a child
      */
     private static boolean hasSelectionHandle(final PNode node) {
-        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
             PNode n = (PNode) i.next();
             if (n instanceof SelectionHandle) {
                 return true;
@@ -154,10 +154,8 @@ public final class SelectionHandle extends PHandle {
 
         // Special treatment for interaction boxes
         if (node instanceof InteractionBox) {
-            SelectionHandle selectionHandle = new SelectionHandle(nodeLocator,
-                    0);
-            selectionHandle.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND));
+            SelectionHandle selectionHandle = new SelectionHandle(nodeLocator, 0);
+            selectionHandle.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         } else {
             SelectionHandle selectionHandle = new SelectionHandle(nodeLocator);
         }
@@ -177,7 +175,7 @@ public final class SelectionHandle extends PHandle {
 
         Collection handlesToRemove = new ArrayList();
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SelectionHandle) {

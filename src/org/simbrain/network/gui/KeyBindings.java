@@ -18,23 +18,19 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
- *
+ * <p>
  * TODO: - Migrate some of the local actions here to "official" actions in the
  * action package
  */
@@ -48,8 +44,7 @@ public class KeyBindings {
     public static void addBindings(final NetworkPanel panel) {
 
         // TODO: Change below if not all of this status (when in focused window)
-        InputMap inputMap = panel
-                .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        InputMap inputMap = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // Adjust activations
         inputMap.put(KeyStroke.getKeyStroke("UP"), "increment");
@@ -68,15 +63,10 @@ public class KeyBindings {
         });
 
         // Nudge objects
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.SHIFT_MASK),
-                "up");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
-                ActionEvent.SHIFT_MASK), "right");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-                ActionEvent.SHIFT_MASK), "down");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
-                ActionEvent.SHIFT_MASK), "left");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.SHIFT_MASK), "up");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.SHIFT_MASK), "right");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.SHIFT_MASK), "down");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.SHIFT_MASK), "left");
         panel.getActionMap().put("up", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.nudge(0, -1);
@@ -99,18 +89,10 @@ public class KeyBindings {
         });
 
         // Contextual increment / decrement
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.ALT_MASK),
-                "contextualIncrement");
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.ALT_MASK),
-                "contextualIncrement");
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.ALT_MASK),
-                "contextualDecrement");
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK),
-                "contextualDecrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.ALT_MASK), "contextualIncrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.ALT_MASK), "contextualIncrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.ALT_MASK), "contextualDecrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK), "contextualDecrement");
         panel.getActionMap().put("contextualIncrement", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.contextualIncrementSelectedObjects();
@@ -124,19 +106,15 @@ public class KeyBindings {
 
         // Clamp/unclamp nodes and freeze/unfreeize synapses using Shift-F /
         // Shift-U
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.SHIFT_MASK),
-                "toggleClamping");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.SHIFT_MASK), "toggleClamping");
         panel.getActionMap().put("toggleClamping", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.toggleClamping();
             }
         });
-        
+
         // Duplicate selected objects
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.META_MASK),
-                "duplicate");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.META_MASK), "duplicate");
         panel.getActionMap().put("duplicate", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.duplicate();
@@ -165,9 +143,7 @@ public class KeyBindings {
         // });
 
         // Print debug info
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
-                "debug");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK), "debug");
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(panel.getNetwork());
@@ -176,13 +152,10 @@ public class KeyBindings {
         });
 
         // Show piccolo scene-graph browser (for debugging piccolo issues)
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK),
-                "scenegraph");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK), "scenegraph");
         panel.getActionMap().put("scenegraph", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                SceneGraphBrowser sgb = new SceneGraphBrowser(
-                        panel.getCanvas().getRoot());
+                SceneGraphBrowser sgb = new SceneGraphBrowser(panel.getCanvas().getRoot());
                 StandardDialog dialog = new StandardDialog();
                 dialog.setContentPane(sgb);
                 dialog.setTitle("Piccolo Scenegraph Browser");
@@ -195,18 +168,15 @@ public class KeyBindings {
 
         // Selection Mode
         inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");
-        panel.getActionMap().put("selectionMode",
-                panel.getActionManager().getSelectionEditModeAction());
+        panel.getActionMap().put("selectionMode", panel.getActionManager().getSelectionEditModeAction());
 
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
-        panel.getActionMap().put("textMode",
-                panel.getActionManager().getTextEditModeAction());
+        panel.getActionMap().put("textMode", panel.getActionManager().getTextEditModeAction());
 
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
-        panel.getActionMap().put("wandMode",
-                panel.getActionManager().getWandEditModeAction());
+        panel.getActionMap().put("wandMode", panel.getActionManager().getWandEditModeAction());
 
         // Number keys
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");
@@ -221,25 +191,20 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (ConditionallyEnabledAction
-                        .sourceAndTargetNeuronGroupsSelected(panel)) {
+                if (ConditionallyEnabledAction.sourceAndTargetNeuronGroupsSelected(panel)) {
                     AddSynapseGroupAction.displaySynapseGroupDialog(panel);
                 } else {
-                    panel.getQuickConnector().applyCurrentConnection(
-                            panel.getSourceModelNeurons(),
-                            panel.getSelectedModelNeurons());
+                    panel.getQuickConnector().applyCurrentConnection(panel.getSourceModelNeurons(), panel.getSelectedModelNeurons());
                     panel.getNetwork().fireSynapsesUpdated();
                 }
             }
         });
 
         inputMap.put(KeyStroke.getKeyStroke("3"), "selectIncoming");
-        panel.getActionMap().put("selectIncoming",
-                panel.getActionManager().getSelectIncomingWeightsAction());
+        panel.getActionMap().put("selectIncoming", panel.getActionManager().getSelectIncomingWeightsAction());
 
         inputMap.put(KeyStroke.getKeyStroke("4"), "selectOutgoing");
-        panel.getActionMap().put("selectOutgoing",
-                panel.getActionManager().getSelectOutgoingWeightsAction());
+        panel.getActionMap().put("selectOutgoing", panel.getActionManager().getSelectOutgoingWeightsAction());
 
         inputMap.put(KeyStroke.getKeyStroke("5"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {

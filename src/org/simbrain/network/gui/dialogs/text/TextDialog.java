@@ -1,120 +1,159 @@
 package org.simbrain.network.gui.dialogs.text;
 
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import org.simbrain.network.gui.nodes.TextNode;
+import org.simbrain.util.StandardDialog;
 
-import javax.swing.JColorChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import org.simbrain.network.gui.nodes.TextNode;
-import org.simbrain.util.StandardDialog;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Font dialog. Adapted from a post on website from a long time ago...
  *
  * @author jyoshimi
  */
-public class TextDialog extends StandardDialog implements ActionListener,
-        ListSelectionListener {
+public class TextDialog extends StandardDialog implements ActionListener, ListSelectionListener {
 
-    /** Selection list. */
+    /**
+     * Selection list.
+     */
     private ArrayList<TextNode> selectionList = new ArrayList<TextNode>();
 
-    /** Tabbed pane for font and color effects. */
+    /**
+     * Tabbed pane for font and color effects.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Color Chooser. */
+    /**
+     * Color Chooser.
+     */
     private JColorChooser colorTab = new JColorChooser();
 
-    /** Gets available fonts. */
-    private static String[] fonts = GraphicsEnvironment
-            .getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    /**
+     * Gets available fonts.
+     */
+    private static String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
-    /** Font style list. */
-    private static String[] style = { "Regular", "Bold", "Italic",
-            "Bold Italic" };
+    /**
+     * Font style list.
+     */
+    private static String[] style = {"Regular", "Bold", "Italic", "Bold Italic"};
 
-    /** Font size list. */
-    private static String[] size = { "8", "9", "10", "11", "12", "14", "16",
-            "18", "20", "22", "24", "26", "28", "36", "48", "72" };
+    /**
+     * Font size list.
+     */
+    private static String[] size = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
 
-    /** Font text type. */
+    /**
+     * Font text type.
+     */
     private String textType;
 
-    /** Font text Style. */
+    /**
+     * Font text Style.
+     */
     private int textStyle;
 
-    /** Font text size. */
+    /**
+     * Font text size.
+     */
     private int textSize;
 
-    /** Is font italic. */
+    /**
+     * Is font italic.
+     */
     private boolean italic;
 
-    /** Is font bold. */
+    /**
+     * Is font bold.
+     */
     private boolean bold;
 
-    /** Font list. */
+    /**
+     * Font list.
+     */
     private JList fList = new JList(fonts);
 
-    /** Style list. */
+    /**
+     * Style list.
+     */
     private JList stList = new JList(style);
 
-    /** Size list. */
+    /**
+     * Size list.
+     */
     private JList sizeList = new JList(size);
 
-    /** Font list text field. */
+    /**
+     * Font list text field.
+     */
     private JTextField jtfFonts = new JTextField();
 
-    /** Font style text field. */
+    /**
+     * Font style text field.
+     */
     private JTextField jtfStyle = new JTextField();
 
-    /** Font size text field. */
+    /**
+     * Font size text field.
+     */
     private JTextField jtfSize = new JTextField();
 
-    /** Font label. */
+    /**
+     * Font label.
+     */
     private JLabel jlbFonts = new JLabel("Font:");
 
-    /** Style label. */
+    /**
+     * Style label.
+     */
     private JLabel jlbStyle = new JLabel("Style:");
 
-    /** Size label. */
+    /**
+     * Size label.
+     */
     private JLabel jlbSize = new JLabel("Size:");
 
-    /** Font scroll pane. */
+    /**
+     * Font scroll pane.
+     */
     private JScrollPane jspFont = new JScrollPane(fList);
 
-    /** Style scroll pane. */
+    /**
+     * Style scroll pane.
+     */
     private JScrollPane jspStyle = new JScrollPane(stList);
 
-    /** Size scroll pane. */
+    /**
+     * Size scroll pane.
+     */
     private JScrollPane jspSize = new JScrollPane(sizeList);
 
-    /** Text field for selected font. */
+    /**
+     * Text field for selected font.
+     */
     private JTextField jtfTest = new JTextField("AaBbYyZz");
 
-    /** Main container. */
+    /**
+     * Main container.
+     */
     Container container = getContentPane();
 
-    /** Main panel. */
+    /**
+     * Main panel.
+     */
     JPanel panel = new JPanel();
 
     /**
      * Construct text dialog.
      *
      * @param selectedTextNodes currently selected text nodes in the network
-     *            panel.
+     *                          panel.
      */
     public TextDialog(final ArrayList<TextNode> selectedTextNodes) {
         selectionList = selectedTextNodes;
@@ -227,8 +266,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
 
         for (int i = 0; i < sizeList.getModel().getSize(); i++) {
             sizeList.setSelectedIndex(i);
-            if (theTextSize == Integer.parseInt((String) sizeList
-                    .getSelectedValue())) {
+            if (theTextSize == Integer.parseInt((String) sizeList.getSelectedValue())) {
                 found = true;
                 setScrollPos(jspSize, sizeList, i);
 
@@ -254,8 +292,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
             textType = jtfFonts.getText();
 
             for (int i = 0; i < fList.getModel().getSize(); i++) {
-                if (((String) fList.getModel().getElementAt(i))
-                        .startsWith(jtfFonts.getText().trim())) {
+                if (((String) fList.getModel().getElementAt(i)).startsWith(jtfFonts.getText().trim())) {
                     fList.setSelectedIndex(i);
                     setScrollPos(jspFont, fList, i);
                     found = true;
@@ -276,8 +313,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
             jtfTest.setFont(new Font(textType, textStyle, textSize));
 
             for (int i = 0; i < sizeList.getModel().getSize(); i++) {
-                if (jtfSize.getText().trim()
-                        .equals(sizeList.getModel().getElementAt(i))) {
+                if (jtfSize.getText().trim().equals(sizeList.getModel().getElementAt(i))) {
                     sizeList.setSelectedIndex(i);
                     setScrollPos(jspSize, sizeList, i);
                     found = true;
@@ -354,14 +390,12 @@ public class TextDialog extends StandardDialog implements ActionListener,
      * scrollPane's scrollbar so that the selected item in the JList is in about
      * the middle of the scrollPane.
      *
-     * @param sp scroll pane
-     * @param list list of items
+     * @param sp    scroll pane
+     * @param list  list of items
      * @param index of item
      */
-    private void setScrollPos(final JScrollPane sp, final JList list,
-            final int index) {
-        int unitSize = sp.getVerticalScrollBar().getMaximum()
-                / list.getModel().getSize();
+    private void setScrollPos(final JScrollPane sp, final JList list, final int index) {
+        int unitSize = sp.getVerticalScrollBar().getMaximum() / list.getModel().getSize();
 
         sp.getVerticalScrollBar().setValue((index - 2) * unitSize);
     }

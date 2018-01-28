@@ -1,24 +1,23 @@
 package org.simbrain.world.threedworld.actions;
 
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-
+import com.jme3.math.Vector3f;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.entities.BoxEntity;
 import org.simbrain.world.threedworld.entities.Entity;
 
-import com.jme3.math.Vector3f;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class AddBlockAction extends AbstractAction {
     private static final long serialVersionUID = 2605000029274172245L;
-    
+
     private ThreeDWorld world;
-    
+
     public AddBlockAction(ThreeDWorld world) {
         super("Add Block");
         this.world = world;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         world.getEngine().enqueue(() -> {

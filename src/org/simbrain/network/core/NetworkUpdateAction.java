@@ -23,7 +23,6 @@ package org.simbrain.network.core;
  * together comprise a network update.
  *
  * @author jyoshimi
- *
  */
 public interface NetworkUpdateAction {
 

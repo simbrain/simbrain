@@ -18,53 +18,73 @@
  */
 package org.simbrain.plot.scatterplot;
 
-import java.awt.Color;
-import java.awt.Paint;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 
-import com.thoughtworks.xstream.XStream;
+import java.awt.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Model for a JFreeChart Scatter plot.
  */
 public class ScatterPlotModel extends ChartModel {
 
-    /** Scatter Plot Data. */
+    /**
+     * Scatter Plot Data.
+     */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
-    /** Default number of sources. */
+    /**
+     * Default number of sources.
+     */
     private static final int DEFAULT_DATA_SOURCES = 5;
 
-    /** Show plot history. */
+    /**
+     * Show plot history.
+     */
     private boolean showHistory = false;
 
-    /** Auto domain. */
+    /**
+     * Auto domain.
+     */
     private boolean autoDomain = true;
 
-    /** Auto range. */
+    /**
+     * Auto range.
+     */
     private boolean autoRange = true;
 
-    /** Upper range boundary. */
+    /**
+     * Upper range boundary.
+     */
     private double upperRangeBoundary = 10;
 
-    /** Lower range boundary. */
+    /**
+     * Lower range boundary.
+     */
     private double lowerRangeBoundary = 0;
 
-    /** Upper domain boundary. */
+    /**
+     * Upper domain boundary.
+     */
     private double upperDomainBoundary = 10;
 
-    /** Lower domain boundary. */
+    /**
+     * Lower domain boundary.
+     */
     private double lowerDomainBoundary = 0;
 
-    /** Size of chart dot. */
+    /**
+     * Size of chart dot.
+     */
     private int dotSize = 5;
 
-    /** Color for series. */
+    /**
+     * Color for series.
+     */
     private List<Paint> chartSeriesPaint = new LinkedList<Paint>();
 
     /**

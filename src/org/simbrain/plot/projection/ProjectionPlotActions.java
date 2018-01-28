@@ -13,14 +13,12 @@
  */
 package org.simbrain.plot.projection;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Actions for projection plot.
@@ -29,10 +27,10 @@ import org.simbrain.util.SFileChooser;
  */
 public class ProjectionPlotActions {
 
-    /** Default directory where csv files are stored. */
-    private static String CSV_DIRECTORY = "."
-            + System.getProperty("file.separator") + "simulations"
-            + System.getProperty("file.separator") + "tables";
+    /**
+     * Default directory where csv files are stored.
+     */
+    private static String CSV_DIRECTORY = "." + System.getProperty("file.separator") + "simulations" + System.getProperty("file.separator") + "tables";
 
     /**
      * Export high dimensional data to .csv.
@@ -54,8 +52,7 @@ public class ProjectionPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
                     model.getProjector().getUpstairs().exportToCSV(theFile);
@@ -85,8 +82,7 @@ public class ProjectionPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
                     model.getProjector().getDownstairs().exportToCSV(theFile);
@@ -116,8 +112,7 @@ public class ProjectionPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
-                        "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     model.getProjector().importData(theFile);

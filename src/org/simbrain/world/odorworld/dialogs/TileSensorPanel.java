@@ -13,35 +13,46 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
+
+import javax.swing.*;
 
 /**
  * Panel to add a single tile sensor to an entity or to modify an existing one.
  *
  * @author Lam Nguyen
- *
  */
 public class TileSensorPanel extends AbstractSensorPanel {
 
-    /** Text field to edit value. */
+    /**
+     * Text field to edit value.
+     */
     private JTextField activation = new JTextField();
 
-    /** Text field to edit x. */
+    /**
+     * Text field to edit x.
+     */
     private JTextField x = new JTextField();
 
-    /** Text field to edit y. */
+    /**
+     * Text field to edit y.
+     */
     private JTextField y = new JTextField();
 
-    /** Text field to edit width. */
+    /**
+     * Text field to edit width.
+     */
     private JTextField width = new JTextField();
 
-    /** Text field to edit height. */
+    /**
+     * Text field to edit height.
+     */
     private JTextField height = new JTextField();
 
-    /** Entity to which a tile sensor is being added. */
+    /**
+     * Entity to which a tile sensor is being added.
+     */
     private OdorWorldEntity entity;
 
     /**
@@ -50,7 +61,9 @@ public class TileSensorPanel extends AbstractSensorPanel {
      */
     private TileSensor tileSensor;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -90,25 +103,22 @@ public class TileSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            TileSensor sensor = new TileSensor(entity, Integer.parseInt(x
-                    .getText()), Integer.parseInt(y.getText()),
-                    Integer.parseInt(width.getText()), Integer.parseInt(height
-                            .getText()));
+            TileSensor sensor = new TileSensor(entity, Integer.parseInt(x.getText()), Integer.parseInt(y.getText()), Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
             sensor.setActivationAmount(Double.parseDouble(activation.getText()));
             entity.addSensor(sensor);
         } else {
-            tileSensor.setActivationAmount(Double.parseDouble(activation
-                    .getText()));
+            tileSensor.setActivationAmount(Double.parseDouble(activation.getText()));
             tileSensor.setX(Integer.parseInt(x.getText()));
             tileSensor.setY(Integer.parseInt(y.getText()));
             tileSensor.setWidth(Integer.parseInt(width.getText()));
             tileSensor.setHeight(Integer.parseInt(height.getText()));
-            tileSensor.getParent().getParentWorld()
-                    .fireEntityChanged(tileSensor.getParent());
+            tileSensor.getParent().getParentWorld().fireEntityChanged(tileSensor.getParent());
         }
     }
 
-    /** Fill in appropriate text fields when tile sensor is being modified. */
+    /**
+     * Fill in appropriate text fields when tile sensor is being modified.
+     */
     private void fillFieldValues() {
         if (isCreationPanel) {
             activation.setText("" + TileSensor.DEFAULT_ACTIVATION);
@@ -117,8 +127,7 @@ public class TileSensorPanel extends AbstractSensorPanel {
             width.setText("" + TileSensor.DEFAULT_WIDTH);
             height.setText("" + TileSensor.DEFAULT_HEIGHT);
         } else {
-            activation.setText(""
-                    + Double.toString(tileSensor.getActivationAmount()));
+            activation.setText("" + Double.toString(tileSensor.getActivationAmount()));
             x.setText("" + Integer.toString(tileSensor.getX()));
             y.setText("" + Integer.toString(tileSensor.getY()));
             width.setText("" + Integer.toString(tileSensor.getWidth()));

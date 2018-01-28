@@ -18,55 +18,41 @@
  */
 package org.simbrain.world.oscworld;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
-
 /**
  * OSC world desktop component.
  */
-public final class OscWorldDesktopComponent extends
-        GuiComponent<OscWorldComponent> {
+public final class OscWorldDesktopComponent extends GuiComponent<OscWorldComponent> {
 
-    /** List of OSC out message consumers. */
+    /**
+     * List of OSC out message consumers.
+     */
     private final JList consumers;
 
-    /** List of OSC in message producers. */
+    /**
+     * List of OSC in message producers.
+     */
     private final JList producers;
 
     /**
      * Create a new OSC world desktop component with the specified OSC world
      * component.
      *
-     * @param frame parent frame
+     * @param frame             parent frame
      * @param oscWorldComponent OSC world component
      */
-    public OscWorldDesktopComponent(final GenericFrame frame,
-            final OscWorldComponent oscWorldComponent) {
+    public OscWorldDesktopComponent(final GenericFrame frame, final OscWorldComponent oscWorldComponent) {
         super(frame, oscWorldComponent);
 
         Action closeAction = new CloseAction();
@@ -172,18 +158,14 @@ public final class OscWorldDesktopComponent extends
         getParentFrame().setJMenuBar(menuBar);
 
         LabelledItemPanel inPanel = new LabelledItemPanel();
-        inPanel.addItem("OSC in host:",
-                new JLabel(oscWorldComponent.getOscInHost()));
-        inPanel.addItem("OSC in port:",
-                new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
+        inPanel.addItem("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));
+        inPanel.addItem("OSC in port:", new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
         // inPanel.addSpacing(11);
         inPanel.addItem("OSC in messages:", new JScrollPane(producers));
 
         LabelledItemPanel outPanel = new LabelledItemPanel();
-        outPanel.addItem("OSC out host:",
-                new JLabel(oscWorldComponent.getOscOutHost()));
-        outPanel.addItem("OSC out port:",
-                new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
+        outPanel.addItem("OSC out host:", new JLabel(oscWorldComponent.getOscOutHost()));
+        outPanel.addItem("OSC out port:", new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
         // outPanel.addSpacing(11);
         outPanel.addItem("OSC out messages:", new JScrollPane(consumers));
 
@@ -198,7 +180,9 @@ public final class OscWorldDesktopComponent extends
         add("Center", mainPanel);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void closing() {
         // empty
     }
@@ -216,14 +200,15 @@ public final class OscWorldDesktopComponent extends
             // "OscWorldDesktop 1"
             super("Close");
             putValue(Action.LONG_DESCRIPTION, "Close");
-            KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
-                    .getDefaultToolkit().getMenuShortcutKeyMask());
+            KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
             putValue(Action.ACCELERATOR_KEY, keyStroke);
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         public void actionPerformed(final ActionEvent event) {
-//            close();
+            //            close();
         }
     }
 
@@ -240,17 +225,14 @@ public final class OscWorldDesktopComponent extends
             putValue(Action.LONG_DESCRIPTION, "Create a new OSC in message");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         public void actionPerformed(final ActionEvent event) {
             SwingUtilities.invokeLater(new Runnable() {
                 /** {@inheritDoc} */
                 public void run() {
-                    String address = JOptionPane
-                            .showInputDialog(
-                                    null,
-                                    "Create a new OSC in message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC in message address:",
-                                    "Create a new OSC in message",
-                                    JOptionPane.QUESTION_MESSAGE);
+                    String address = JOptionPane.showInputDialog(null, "Create a new OSC in message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC in message address:", "Create a new OSC in message", JOptionPane.QUESTION_MESSAGE);
                     getWorkspaceComponent().addInMessage(address);
                 }
             });
@@ -270,17 +252,14 @@ public final class OscWorldDesktopComponent extends
             putValue(Action.LONG_DESCRIPTION, "Create a new OSC out message");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         public void actionPerformed(final ActionEvent event) {
             SwingUtilities.invokeLater(new Runnable() {
                 /** {@inheritDoc} */
                 public void run() {
-                    String address = JOptionPane
-                            .showInputDialog(
-                                    null,
-                                    "Create a new OSC out message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC out message address:",
-                                    "Create a new OSC out message",
-                                    JOptionPane.QUESTION_MESSAGE);
+                    String address = JOptionPane.showInputDialog(null, "Create a new OSC out message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC out message address:", "Create a new OSC out message", JOptionPane.QUESTION_MESSAGE);
                     getWorkspaceComponent().addOutMessage(address);
                 }
             });

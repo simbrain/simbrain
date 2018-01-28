@@ -18,6 +18,12 @@
  */
 package org.simbrain.network.desktop;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,25 +31,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
-
-import org.simbrain.network.core.Network;
-import org.simbrain.network.gui.NetworkPanel;
-
-import bsh.EvalError;
-import bsh.Interpreter;
-
 /**
  * Creates a network script menu, which shows a menu item for each script in the
  * relevant directory.
  */
 public class NetworkScriptMenu {
 
-    /** Location of script menu directory. */
-    private static final String SCRIPT_MENU_DIRECTORY = "scripts"
-            + System.getProperty("file.separator") + "network";
+    /**
+     * Location of script menu directory.
+     */
+    private static final String SCRIPT_MENU_DIRECTORY = "scripts" + System.getProperty("file.separator") + "network";
 
     /**
      * Create script menu.
@@ -86,19 +83,25 @@ public class NetworkScriptMenu {
      */
     public static class ScriptAction extends AbstractAction {
 
-        /** Name of script for use in actions (e.g. menu items). */
+        /**
+         * Name of script for use in actions (e.g. menu items).
+         */
         private String scriptName;
 
-        /** Reference to Root Network */
+        /**
+         * Reference to Root Network
+         */
         private Network network;
 
-        /** Reference to Network panel */
+        /**
+         * Reference to Network panel
+         */
         private NetworkPanel networkPanel;
 
         /**
          * Construct a network script action.
          *
-         * @param name name of the action.
+         * @param name  name of the action.
          * @param panel reference to parent network panel
          */
         public ScriptAction(String name, NetworkPanel panel) {
@@ -109,8 +112,9 @@ public class NetworkScriptMenu {
             this.network = panel.getNetwork();
         }
 
-        /** @see AbstractAction 
+        /**
          * @param event
+         * @see AbstractAction
          */
         public void actionPerformed(final ActionEvent event) {
 
@@ -119,8 +123,7 @@ public class NetworkScriptMenu {
             try {
                 interpreter.set("network", network);
                 interpreter.set("networkPanel", networkPanel);
-                interpreter.source(SCRIPT_MENU_DIRECTORY
-                        + System.getProperty("file.separator") + scriptName);
+                interpreter.source(SCRIPT_MENU_DIRECTORY + System.getProperty("file.separator") + scriptName);
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");
                 e.printStackTrace();

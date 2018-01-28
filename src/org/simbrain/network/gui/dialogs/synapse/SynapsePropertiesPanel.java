@@ -18,26 +18,18 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-import java.awt.Component;
-import java.awt.Window;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.EditablePanel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
 /**
  * This panel combines synapse editing sub-panels and handles changes to one
  * being applied to the others.
- *
+ * <p>
  * TODO: See NeuronPropertiesPanel docs
  *
  * @author Jeff Yoshimi
@@ -45,53 +37,61 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
-    /** Vertical gap between panel elements. */
+    /**
+     * Vertical gap between panel elements.
+     */
     private static final int DEFAULT_VGAP = 10;
 
-    /** The synapses being modified. */
+    /**
+     * The synapses being modified.
+     */
     private final List<Synapse> synapseList;
 
-    /** Panel to edit general synapse properties */
+    /**
+     * Panel to edit general synapse properties
+     */
     private AnnotatedPropertyEditor generalSynapseProperties;
 
-    /** Panel to edit specific synapse type */
+    /**
+     * Panel to edit specific synapse type
+     */
     private SynapseRulePanel synapseRulePanel;
 
-    /** Panel to edit spike responders. */
+    /**
+     * Panel to edit spike responders.
+     */
     private SpikeResponderSettingsPanel editSpikeResponders;
 
     /**
      * Creates a synapse property panel with a default display state.
      *
      * @param synapseList the list of synapse synapses either being edited
-     *            (editing) or being used to fill the panel with default values
-     *            (creation).
-     * @param parent the parent window, made available for easy resizing.
+     *                    (editing) or being used to fill the panel with default values
+     *                    (creation).
+     * @param parent      the parent window, made available for easy resizing.
      * @return
      */
-    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
-            final List<Synapse> synapseList, final Window parent) {
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(final List<Synapse> synapseList, final Window parent) {
         return new SynapsePropertiesPanel(synapseList, parent);
     }
-    
+
     /**
      * {@link #createSynapsePropertiesPanel(List, Window, boolean)}
      *
-     * @param synapseList the list of synapses either being edited (editing) or
-     *            being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
+     * @param synapseList            the list of synapses either being edited (editing) or
+     *                               being used to fill the panel with default values (creation).
+     * @param parent                 the parent window, made available for easy resizing.
      * @param showSpecificRuleParams whether or not to display the synapse
-     *            update rule's details initially.
+     *                               update rule's details initially.
      */
-    private SynapsePropertiesPanel(final List<Synapse> synapseList,
-            final Window parent) {
+    private SynapsePropertiesPanel(final List<Synapse> synapseList, final Window parent) {
 
         this.synapseList = synapseList;
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
+
         // Show id if editing one synapse
-        if(synapseList.size() ==1) {
+        if (synapseList.size() == 1) {
             JLabel idlabel = new JLabel(synapseList.get(0).getId());
             idlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             this.add(idlabel);
@@ -121,8 +121,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
         // Spike Responders
         if (SynapseDialog.targsUseSynapticInputs(synapseList)) {
-            editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
-                    parent);
+            editSpikeResponders = new SpikeResponderSettingsPanel(synapseList, parent);
         }
         if (editSpikeResponders != null) {
             this.add(Box.createVerticalStrut(DEFAULT_VGAP));

@@ -26,12 +26,14 @@ public interface ChartListener {
 
     /**
      * A data source was added to the model.
+     *
      * @param source The data source.
      */
     void dataSourceAdded(ChartDataSource source);
 
     /**
      * A data source was removed from the model.
+     *
      * @param source The data source.
      */
     void dataSourceRemoved(ChartDataSource source);

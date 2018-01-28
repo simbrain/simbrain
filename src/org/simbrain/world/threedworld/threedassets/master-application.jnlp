@@ -5,18 +5,18 @@
         <homepage href="${APPLICATION.HOMEPAGE}"/>
         <description>${APPLICATION.DESC}</description>
         <description kind="short">${APPLICATION.DESC.SHORT}</description>
-<!--${JNLP.ICONS}-->
-<!--${JNLP.OFFLINE.ALLOWED}-->
+        <!--${JNLP.ICONS}-->
+        <!--${JNLP.OFFLINE.ALLOWED}-->
     </information>
-<!--${JNLP.SECURITY}-->
+    <!--${JNLP.SECURITY}-->
     <resources>
-<!--${JNLP.RESOURCES.RUNTIME}-->
-<!--${JNLP.RESOURCES.MAIN.JAR}-->
-<!--${JNLP.RESOURCES.JARS}-->
-<jar href='lib/assets.jar'/>
-<!--${JNLP.RESOURCES.EXTENSIONS}-->
+        <!--${JNLP.RESOURCES.RUNTIME}-->
+        <!--${JNLP.RESOURCES.MAIN.JAR}-->
+        <!--${JNLP.RESOURCES.JARS}-->
+        <jar href='lib/assets.jar'/>
+        <!--${JNLP.RESOURCES.EXTENSIONS}-->
     </resources>
     <application-desc main-class="${jnlp.main.class}">
-<!--${JNLP.APPLICATION.ARGS}-->
+        <!--${JNLP.APPLICATION.ARGS}-->
     </application-desc>
 </jnlp>

@@ -18,29 +18,35 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import java.util.List;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import java.util.List;
 
 /**
  * Interface for 2d world sensors.
  */
 public abstract class Sensor {
 
-    /** Reference to parent entity. */
+    /**
+     * Reference to parent entity.
+     */
     protected OdorWorldEntity parent;
 
-    /** The id of this smell sensor.. */
+    /**
+     * The id of this smell sensor..
+     */
     private String id;
 
-    /** Public label of this sensor. */
+    /**
+     * Public label of this sensor.
+     */
     private String label;
 
     /**
      * Construct the sensor.
      *
      * @param parent the parent entity
-     * @param label a label for this sensor
+     * @param label  a label for this sensor
      */
     public Sensor(OdorWorldEntity parent, String label) {
         super();

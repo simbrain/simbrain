@@ -18,29 +18,28 @@
  */
 package org.simbrain.util.table;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
  * reasonable, readable way with XStream.
- *
+ * <p>
  * All data are backed to a list of lists. This data structure can then be
  * converted to other data structures (e.g. a 2d array of doubles) as needed.
  * This is not as fast as alternatives but it's pretty fast and so suitable for
  * most purposes.
- *
+ * <p>
  * This class can also be subclassed and relevant methods overridden for an
  * immutable, view type setup. For an example see WeightMatrixViewer.
- *
+ * <p>
  * Note that the first column of all tables is a special header column that
  * displays row number or other information. For convenience and ease of use,
  * special "logical" methods are provided that use the indices of the data
@@ -85,7 +84,9 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      */
     private List<String> columnHeadings;
 
-    /** Whether to display column headings. */
+    /**
+     * Whether to display column headings.
+     */
     private boolean displayColumnHeadings = true;
 
     @Override
@@ -96,8 +97,8 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
     /**
      * Set the value at specific position in the table.
      *
-     * @param row row index
-     * @param col column index
+     * @param row   row index
+     * @param col   column index
      * @param value value to add
      */
     public void setValue(int row, int col, T value) {
@@ -110,13 +111,12 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      * changed at once and it would waste time to update the GUI for every such
      * change).
      *
-     * @param row row index
-     * @param column column index
-     * @param value value to add
+     * @param row       row index
+     * @param column    column index
+     * @param value     value to add
      * @param fireEvent true if an event should be fired, false otherwise.
      */
-    public void setValue(final int row, final int column, final T value,
-            final boolean fireEvent) {
+    public void setValue(final int row, final int column, final T value, final boolean fireEvent) {
 
         if (column == 0) {
             return; // Can't adjust first "header" column.
@@ -141,13 +141,12 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      * values need to be changed at once and it would waste time to update the
      * GUI for every such change).
      *
-     * @param row row index in the "logical" data
-     * @param column column index in the "logical" data
-     * @param value value to add
+     * @param row       row index in the "logical" data
+     * @param column    column index in the "logical" data
+     * @param value     value to add
      * @param fireEvent true if an event should be fired, false otherwise.
      */
-    public void setLogicalValue(final int row, final int column, final T value,
-            final boolean fireEvent) {
+    public void setLogicalValue(final int row, final int column, final T value, final boolean fireEvent) {
         rowData.get(row).set(column, value);
         if (fireEvent) {
             this.fireTableCellUpdated(row, column);

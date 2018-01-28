@@ -25,17 +25,22 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * activated and and outputValue is sent out.
  *
  * @author Jeff Yoshimi
- *
  */
 public class Hearing extends Sensor {
 
-    /** Default phrase. */
+    /**
+     * Default phrase.
+     */
     public static final String DEFAULT_PHRASE = "Hi!";
 
-    /** Default output amount. */
+    /**
+     * Default output amount.
+     */
     public static final double DEFAULT_OUTPUT_AMOUNT = 1;
 
-    /** The thing this hearing sensor listens for. */
+    /**
+     * The thing this hearing sensor listens for.
+     */
     private String phrase = "";
 
     /**
@@ -51,8 +56,8 @@ public class Hearing extends Sensor {
     /**
      * Construct the hearing sensor.
      *
-     * @param parent parent entity
-     * @param phrase the phrase associated with this sensor
+     * @param parent       parent entity
+     * @param phrase       the phrase associated with this sensor
      * @param outputAmount the amount to output when this sensor is activated
      */
     public Hearing(OdorWorldEntity parent, String phrase, double outputAmount) {
@@ -64,7 +69,7 @@ public class Hearing extends Sensor {
     //TODO: Clean up / Make this settable
     private int time = 0;
     private int lingerTime = 10;
-    
+
     @Override
     public void update() {
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {

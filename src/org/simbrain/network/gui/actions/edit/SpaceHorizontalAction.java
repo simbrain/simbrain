@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Space horizontal.
@@ -38,13 +37,13 @@ public final class SpaceHorizontalAction extends ConditionallyEnabledAction {
      */
     public SpaceHorizontalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Space Horizontal", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON,
-                ResourceManager.getImageIcon("SpaceHorizontal.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SpaceHorizontal.png"));
         putValue(SHORT_DESCRIPTION, "Space selected neurons horizontally");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.spaceHorizontal();

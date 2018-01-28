@@ -18,13 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.textworld.DisplayComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add display text world to workspace.
@@ -35,6 +34,7 @@ public final class NewDisplayWorldAction extends WorkspaceAction {
 
     /**
      * Create a new text world action with the specified workspace.
+     *
      * @param workspace
      */
     public NewDisplayWorldAction(Workspace workspace) {
@@ -43,8 +43,9 @@ public final class NewDisplayWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         DisplayComponent world = new DisplayComponent("");

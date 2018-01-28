@@ -18,25 +18,29 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.text.NumberFormat;
-
-import javax.swing.*;
-
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.updater.*;
+import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionManager;
+import org.simbrain.workspace.updater.UpdateEventListener;
+import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.NumberFormat;
 
 /**
- * Display updater and thread information.
+ * Display update action performance and thread monitor.
  *
- * @author jyoshimi
- *
+ * @author jyoshimi, Tim Shea
  */
 public class PerformanceMonitorPanel extends JPanel {
 
+    /**
+     * UpdateActionTimer just stores timing information provided by the workspace updater for each update action,
+     * and then displays that information with some summary statistics in a string.
+     */
     private static class UpdateActionTimer {
 
         private static NumberFormat format = NumberFormat.getNumberInstance();
@@ -73,8 +77,7 @@ public class PerformanceMonitorPanel extends JPanel {
 
         @Override
         public String toString() {
-            return String.format("%s:      %10sms      Max: %10sms      Ave: %10sms", action.getDescription(),
-                    format.format(durationMs), format.format(maximumMs), format.format(averageMs));
+            return String.format("%.25s:      %10sms      Max: %10sms      Ave: %10sms", action.getDescription(), format.format(durationMs), format.format(maximumMs), format.format(averageMs));
         }
     }
 
@@ -84,10 +87,14 @@ public class PerformanceMonitorPanel extends JPanel {
 
     private DefaultListModel<String> threadsModel = new DefaultListModel<>();
 
-    /** Reference to parent workspace. */
+    /**
+     * Reference to parent workspace.
+     */
     private Workspace workspace;
 
-    /** Number of update threads. */
+    /**
+     * Number of update threads.
+     */
     private JTextField updaterNumThreads = new JTextField();
 
     /**
@@ -130,8 +137,7 @@ public class PerformanceMonitorPanel extends JPanel {
         updaterNumThreads.setMaximumSize(new Dimension(100, 100));
         toolBar.add(updaterNumThreads);
         JButton setThreadsButton = new JButton("Set");
-        setThreadsButton.addActionListener(evt ->
-                workspace.getUpdater().setNumThreads(Integer.parseInt(updaterNumThreads.getText())));
+        setThreadsButton.addActionListener(evt -> workspace.getUpdater().setNumThreads(Integer.parseInt(updaterNumThreads.getText())));
         toolBar.add(setThreadsButton);
         toolBar.addSeparator();
         toolBar.add(new JLabel("Number of Processors: " + Runtime.getRuntime().availableProcessors()));
@@ -142,69 +148,67 @@ public class PerformanceMonitorPanel extends JPanel {
         this.add("Center", contentPanel);
 
         // Add updater component listener
-        workspace.getUpdater().addComponentListener(
-            new UpdateEventListener() {
-                @Override
-                public void beforeUpdateAction(UpdateAction action, long nanoTime) {
-                    for (int i = 0; i < timersModel.getSize(); ++i) {
-                        if (timersModel.get(i).isTimingAction(action)) {
-                            timersModel.get(i).setStart(nanoTime);
-                        }
+        workspace.getUpdater().addComponentListener(new UpdateEventListener() {
+            @Override
+            public void beforeUpdateAction(UpdateAction action, long nanoTime) {
+                for (int i = 0; i < timersModel.getSize(); ++i) {
+                    if (timersModel.get(i).isTimingAction(action)) {
+                        timersModel.get(i).setStart(nanoTime);
                     }
                 }
+            }
 
-                @Override
-                public void afterUpdateAction(UpdateAction action, long nanoTime) {
-                    for (int i = 0; i < timersModel.getSize(); ++i) {
-                        if (timersModel.get(i).isTimingAction(action)) {
-                            timersModel.get(i).setEnd(nanoTime);
-                        }
+            @Override
+            public void afterUpdateAction(UpdateAction action, long nanoTime) {
+                for (int i = 0; i < timersModel.getSize(); ++i) {
+                    if (timersModel.get(i).isTimingAction(action)) {
+                        timersModel.get(i).setEnd(nanoTime);
                     }
                 }
+            }
 
-                @Override
-                public void beforeComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime) {
-                    String text = String.format("Thread %s: Started updating %s", thread, component.getName());
-                    threadsModel.setElementAt(text, thread - 1);
-                    contentPanel.repaint();
-                }
+            @Override
+            public void beforeComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime) {
+                String text = String.format("Thread %s: Started updating %s", thread, component.getName());
+                threadsModel.setElementAt(text, thread - 1);
+                contentPanel.repaint();
+            }
 
-                @Override
-                public void afterComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime) {
-                    String text = String.format("Thread %s: Finished updating %s", thread, component.getName());
-                    threadsModel.setElementAt(text, thread - 1);
-                    contentPanel.repaint();
-                }
-            });
+            @Override
+            public void afterComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime) {
+                String text = String.format("Thread %s: Finished updating %s", thread, component.getName());
+                threadsModel.setElementAt(text, thread - 1);
+                contentPanel.repaint();
+            }
+        });
 
         // Add updater listener
-        workspace.getUpdater().addUpdaterListener(
-            new WorkspaceUpdaterListener() {
-                public void updatedCouplings(int update) {
-                    String text = String.format("Thread %s: Updated couplings", update);
-                    threadsModel.setElementAt(text, update - 1);
-                    contentPanel.repaint();
-                }
+        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
+            public void updatedCouplings(int update) {
+                String text = String.format("Thread %s: Updated couplings", update);
+                threadsModel.setElementAt(text, update - 1);
+                contentPanel.repaint();
+            }
 
-                public void changedUpdateController() {
-                    updateStats();
-                }
+            public void changedUpdateController() {
+                updateStats();
+            }
 
-                public void changeNumThreads() {
-                    updateList();
-                }
+            public void changeNumThreads() {
+                updateList();
+            }
 
-                // TODO: Should be some useful graphic thing to do when update begins and ends...
-                public void updatingStarted() {
-                }
+            // TODO: Should be some useful graphic thing to do when update begins and ends...
+            public void updatingStarted() {
+            }
 
-                public void updatingFinished() {
-                }
+            public void updatingFinished() {
+            }
 
-                public void workspaceUpdated() {
-                    contentPanel.repaint();
-                }
-            });
+            public void workspaceUpdated() {
+                contentPanel.repaint();
+            }
+        });
 
         workspace.getUpdater().getUpdateManager().addListener(new UpdateActionManager.UpdateManagerListener() {
             @Override

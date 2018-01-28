@@ -17,20 +17,18 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.util.math.ProbDistribution;
 
 /**
- *
  * An implementation of Log-STDP as introduced in:
- *
+ * <p>
  * Gilson M, Fukai T (2011) Stability versus Neuronal Specialization for STDP:
  * Long-Tail Weight Distributions Solve the Dilemma. PLoS ONE 6(10): e25339
  * doi:10.1371/journal.pone.0025339
- *
+ * <p>
  * Log-STDP pushes weight values toward a log normal distribution. This can
  * help with weight divergence, which is common to Add and Mlt STDP. It also
  * allows for specialization of synapses, and fits very well with experimental
  * data concerning synaptic efficacy.
  *
  * @author Zoë Tosi
- *
  */
 public class LogSTDPRule extends STDPRule {
 
@@ -41,22 +39,26 @@ public class LogSTDPRule extends STDPRule {
      * this value. LTD for weights below this value linearly approach 0 as the
      * weight approaches 0. LTD for weights above this value are related
      * logarithmically to the synapse strength.
-     *
+     * <p>
      * J_0 in the cited paper.
      */
     private double smallWtThreshold = 1;
 
-    /** A constant for LTP. c_+ in the cited paper. */
+    /**
+     * A constant for LTP. c_+ in the cited paper.
+     */
     private double w_plus = 2;
 
-    /** A constant for LTD. c_- in the cited paper. */
+    /**
+     * A constant for LTD. c_- in the cited paper.
+     */
     private double w_minus = 1;
 
     /**
      * The degree to which the distribution is pushed logarithmically. Has an
      * effect on how strongly LTD pushes larger weights toward the small weight
      * threshold.
-     *
+     * <p>
      * alpha in the cited paper.
      */
     private double logSaturation = 5;
@@ -64,7 +66,7 @@ public class LogSTDPRule extends STDPRule {
     /**
      * A moderating constant for LTP, causing LTP to behave noticeably
      * differently for weights greater than ltpMod * smallWtThreshold.
-     *
+     * <p>
      * beta in the cited paper.
      */
     private double ltpMod = 10;
@@ -79,54 +81,47 @@ public class LogSTDPRule extends STDPRule {
      */
     @Override
     public void update(Synapse synapse) {
-        boolean sourceSpiking = synapse.getSource().getUpdateRule()
-                .isSpikingNeuron();
-        boolean targetSpiking = synapse.getTarget().getUpdateRule()
-                .isSpikingNeuron();
+        boolean sourceSpiking = synapse.getSource().getUpdateRule().isSpikingNeuron();
+        boolean targetSpiking = synapse.getTarget().getUpdateRule().isSpikingNeuron();
         if (!sourceSpiking || !targetSpiking) {
             return; // STDP is non-sensical if one of the units doesn't spike...
         }
-        SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse
-                .getSource().getUpdateRule();
-        SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
-                .getTarget().getUpdateRule();
+        SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule();
+        SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule();
         double delta_t, delta_w;
         final double timeStep = synapse.getNetwork().getTimeStep();
-//        final double delay = synapse.getDelay() * timeStep;
-//        if (synapse.getStrength() >= 0) {
-        delta_t = (src.getLastSpikeTime())
-        		- tar.getLastSpikeTime();
-//        } else {
-//        	delta_t = tar.getLastSpikeTime()
-//        			- (src.getLastSpikeTime());
-//        }
+        //        final double delay = synapse.getDelay() * timeStep;
+        //        if (synapse.getStrength() >= 0) {
+        delta_t = (src.getLastSpikeTime()) - tar.getLastSpikeTime();
+        //        } else {
+        //        	delta_t = tar.getLastSpikeTime()
+        //        			- (src.getLastSpikeTime());
+        //        }
         if (synapse.getStrength() >= 0) {
-	        double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
-	        if (delta_t < 0) {
-	            calcW_plusTerm(synapse);
-	            delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
-	                    / tau_plus)) * (1 + noise);
-	        } else if (delta_t > 0) {
-	            calcW_minusTerm(synapse);
-	            delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t
-	                    / tau_minus)) * (1 + noise);
-	        } else {
-	            delta_w = 0;
-	        }
-	        if (synapse.getTarget().isSpike()) {
-        		synapse.setStrength(synapse.clip(synapse.getStrength() - (learningRate * 0.05)));
-        	}
+            double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
+            if (delta_t < 0) {
+                calcW_plusTerm(synapse);
+                delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t / tau_plus)) * (1 + noise);
+            } else if (delta_t > 0) {
+                calcW_minusTerm(synapse);
+                delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t / tau_minus)) * (1 + noise);
+            } else {
+                delta_w = 0;
+            }
+            if (synapse.getTarget().isSpike()) {
+                synapse.setStrength(synapse.clip(synapse.getStrength() - (learningRate * 0.05)));
+            }
         } else {
-        	if (delta_t > 0) {
-        		delta_w  = timeStep * learningRate * -1.0 * Math.exp(-delta_t / tau_plus);
-        	} else if (delta_t < 0) {
-        		delta_w  = timeStep * learningRate * 1.5 * Math.exp(delta_t / tau_plus);
-        	} else {
-        		delta_w = 0;
-        	}
-        	if (synapse.getSource().isSpike()) {
-        		synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * 0.05)));
-        	}
+            if (delta_t > 0) {
+                delta_w = timeStep * learningRate * -1.0 * Math.exp(-delta_t / tau_plus);
+            } else if (delta_t < 0) {
+                delta_w = timeStep * learningRate * 1.5 * Math.exp(delta_t / tau_plus);
+            } else {
+                delta_w = 0;
+            }
+            if (synapse.getSource().isSpike()) {
+                synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * 0.05)));
+            }
         }
         if (synapse.getStrength() <= 0) {
             if (delta_t > 0) {
@@ -138,8 +133,7 @@ public class LogSTDPRule extends STDPRule {
             }
             synapse.setStrength(synapse.clip(synapse.getStrength() - delta_w));
             if (synapse.getSource().isSpike()) {
-                synapse.setStrength(synapse.clip(synapse.getStrength()
-                        + learningRate * 0.2));
+                synapse.setStrength(synapse.clip(synapse.getStrength() + learningRate * 0.2));
             }
         }
     }
@@ -149,9 +143,7 @@ public class LogSTDPRule extends STDPRule {
      * @return
      */
     private double calcW_plusTerm(Synapse s) {
-        W_plus = w_plus
-                * Math.exp(-Math.abs(s.getStrength()) / (smallWtThreshold
-                        * ltpMod));
+        W_plus = w_plus * Math.exp(-Math.abs(s.getStrength()) / (smallWtThreshold * ltpMod));
         // if (s.getStrength() > 0) {
         // if (s.getStrength() >= s.getUpperBound()) {
         // W_plus = 0;
@@ -171,7 +163,6 @@ public class LogSTDPRule extends STDPRule {
     }
 
     /**
-     * 
      * @param s
      * @return
      */
@@ -181,8 +172,7 @@ public class LogSTDPRule extends STDPRule {
             W_minus = w_minus * wt / smallWtThreshold;
         } else {
 
-            double numerator = Math.log(1 + (logSaturation
-                    * ((wt / smallWtThreshold) - 1)));
+            double numerator = Math.log(1 + (logSaturation * ((wt / smallWtThreshold) - 1)));
             W_minus = w_minus * (1 + (numerator / logSaturation));
         }
         // if (s.getStrength() < 0) {

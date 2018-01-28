@@ -18,12 +18,10 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Reposition and resize all desktop windows in the upper left corner. Useful
@@ -33,24 +31,25 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Reference to Simbrain Desktop. */
+    /**
+     * Reference to Simbrain Desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
      * Construct the action.
-     * 
+     *
      * @param desktop
      */
     public RepositionAllWindowsAction(final SimbrainDesktop desktop) {
         super("Reposition All Windows", desktop.getWorkspace());
-        putValue(SHORT_DESCRIPTION,
-                "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.");
+        putValue(SHORT_DESCRIPTION, "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.");
         this.desktop = desktop;
     }
 
     /**
-     * @see AbstractAction
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         // TODO: How did this get in here?

@@ -27,10 +27,11 @@ import org.simbrain.util.UserParameter;
  */
 public class SubtractiveNormalizationRule extends SynapseUpdateRule {
 
-	//TODO: check description
-    /** Momentum. */
-    @UserParameter(label = "Learning rate", description = "Momentum", 
-            defaultValue = "1", order = 1)
+    //TODO: check description
+    /**
+     * Momentum.
+     */
+    @UserParameter(label = "Learning rate", description = "Momentum", defaultValue = "1", order = 1)
     private double learningRate;
 
     @Override
@@ -54,8 +55,7 @@ public class SubtractiveNormalizationRule extends SynapseUpdateRule {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
         double averageInput = synapse.getTarget().getAverageInput();
-        double strength = synapse.getStrength()
-                + ((learningRate * output * input) - (learningRate * output * averageInput));
+        double strength = synapse.getStrength() + ((learningRate * output * input) - (learningRate * output * averageInput));
         synapse.setStrength(synapse.clip(strength));
 
     }

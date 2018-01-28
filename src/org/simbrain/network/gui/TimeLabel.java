@@ -1,9 +1,8 @@
 package org.simbrain.network.gui;
 
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JLabel;
 
 /**
  * The visible label showing the time step as defined by the model network
@@ -11,7 +10,9 @@ import javax.swing.JLabel;
  */
 public class TimeLabel extends JLabel {
 
-    /** Reference to parent NetworkPanel. */
+    /**
+     * Reference to parent NetworkPanel.
+     */
     private NetworkPanel networkPanel;
 
     /**

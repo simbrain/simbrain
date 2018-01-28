@@ -1,19 +1,12 @@
 package org.simbrain.world.threedworld.entities;
 
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
-import net.miginfocom.swing.MigLayout;
-
-import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
-
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import net.miginfocom.swing.MigLayout;
+import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
+
+import javax.swing.*;
 
 public class EntityEditor implements Editor {
     private Entity entity;
@@ -26,7 +19,7 @@ public class EntityEditor implements Editor {
     private JFormattedTextField yawRotationField = new JFormattedTextField(EditorDialog.floatFormat);
     private JFormattedTextField pitchRotationField = new JFormattedTextField(EditorDialog.floatFormat);
     private JFormattedTextField rollRotationField = new JFormattedTextField(EditorDialog.floatFormat);
-    
+
     public EntityEditor(Entity entity) {
         this.entity = entity;
         xPositionField.setColumns(6);
@@ -36,44 +29,44 @@ public class EntityEditor implements Editor {
         pitchRotationField.setColumns(6);
         rollRotationField.setColumns(6);
     }
-    
+
     public Entity getEntity() {
         return entity;
     }
-    
+
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
     }
-    
+
     public JPanel getMainTab() {
         return mainTab;
     }
-    
+
     @Override
     public JComponent layoutFields() {
         tabbedPane = new JTabbedPane();
-        
+
         mainTab = new JPanel();
         MigLayout layout = new MigLayout();
         mainTab.setLayout(layout);
         tabbedPane.addTab("Entity", mainTab);
-        
+
         mainTab.add(new JLabel("Name"));
         mainTab.add(nameField, "growx, wrap");
-        
+
         mainTab.add(new JLabel("Position"));
         mainTab.add(xPositionField, "split 3");
         mainTab.add(yPositionField);
         mainTab.add(zPositionField, "wrap");
-        
+
         mainTab.add(new JLabel("Rotation"));
         mainTab.add(yawRotationField, "split 3");
         mainTab.add(pitchRotationField);
         mainTab.add(rollRotationField, "wrap");
-        
+
         return tabbedPane;
     }
-    
+
     @Override
     public void readValues() {
         nameField.setText(entity.getName());
@@ -85,22 +78,17 @@ public class EntityEditor implements Editor {
         pitchRotationField.setValue(FastMath.RAD_TO_DEG * angles[0]);
         rollRotationField.setValue(FastMath.RAD_TO_DEG * angles[2]);
     }
-    
+
     @Override
     public void writeValues() {
         entity.setName(nameField.getText());
-        entity.queuePosition(new Vector3f(
-                ((Number)xPositionField.getValue()).floatValue(),
-                ((Number)yPositionField.getValue()).floatValue(),
-                ((Number)zPositionField.getValue()).floatValue()));
+        entity.queuePosition(new Vector3f(((Number) xPositionField.getValue()).floatValue(), ((Number) yPositionField.getValue()).floatValue(), ((Number) zPositionField.getValue()).floatValue()));
         Quaternion rotation = new Quaternion();
-        rotation.fromAngles(
-                FastMath.DEG_TO_RAD * ((Number)pitchRotationField.getValue()).floatValue(),
-                FastMath.DEG_TO_RAD * ((Number)yawRotationField.getValue()).floatValue(),
-                FastMath.DEG_TO_RAD * ((Number)rollRotationField.getValue()).floatValue());
+        rotation.fromAngles(FastMath.DEG_TO_RAD * ((Number) pitchRotationField.getValue()).floatValue(), FastMath.DEG_TO_RAD * ((Number) yawRotationField.getValue()).floatValue(), FastMath.DEG_TO_RAD * ((Number) rollRotationField.getValue()).floatValue());
         entity.queueRotation(rotation);
     }
-    
+
     @Override
-    public void close() {}
+    public void close() {
+    }
 }

@@ -18,14 +18,13 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.dataworld.DataWorldComponent;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add data world to workspace.
@@ -36,6 +35,7 @@ public final class NewDataWorldAction extends WorkspaceAction {
 
     /**
      * Create a new data world action with the specified workspace.
+     *
      * @param workspace
      */
     public NewDataWorldAction(Workspace workspace) {
@@ -43,12 +43,12 @@ public final class NewDataWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        DataWorldComponent world = DataWorldComponent.createDataWorld(
-                new NumericTable(), "");
+        DataWorldComponent world = DataWorldComponent.createDataWorld(new NumericTable(), "");
         workspace.addWorkspaceComponent(world);
     }
 }

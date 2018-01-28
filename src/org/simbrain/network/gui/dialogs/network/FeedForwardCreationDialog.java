@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JOptionPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
 
 /**
  * <b>FeedForwardCreationDialog</b> is a dialog box for creating a generic
@@ -29,10 +29,14 @@ import org.simbrain.util.StandardDialog;
  */
 public class FeedForwardCreationDialog extends StandardDialog {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     protected NetworkPanel networkPanel;
 
-    /** Main network creation panel. */
+    /**
+     * Main network creation panel.
+     */
     protected LayeredNetworkCreationPanel networkCreationPanel;
 
     /**
@@ -62,11 +66,7 @@ public class FeedForwardCreationDialog extends StandardDialog {
             networkCreationPanel.commit(networkPanel, "FeedForward");
             super.closeDialogOk();
         } catch (NumberFormatException nfe) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "Inappropriate Field Values (Numbers only in all all field)",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Inappropriate Field Values (Numbers only in all all field)", "Error", JOptionPane.ERROR_MESSAGE);
             nfe.printStackTrace();
         }
     }

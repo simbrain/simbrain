@@ -18,12 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
@@ -32,15 +26,24 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * <b>StepSpikerPanel</b>.
  */
 public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 
-    /** Response height field. */
+    /**
+     * Response height field.
+     */
     private JTextField tfResponseHeight = new JTextField();
 
-    /** Response time field. */
+    /**
+     * Response time field.
+     */
     private JTextField tfResponseDuration = new JTextField();
 
     /**
@@ -52,7 +55,6 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 
     /**
      * This method is the default constructor.
-     *
      */
     public StepSpikerPanel() {
         tfResponseHeight.setColumns(6);
@@ -64,21 +66,19 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
      * {@inheritDoc}
      */
     public StepSpikerPanel deepCopy() {
-    	StepSpikerPanel cpy = new StepSpikerPanel();
-    	cpy.tfResponseDuration.setText(this.tfResponseDuration.getText());
-    	cpy.tfResponseHeight.setText(this.tfResponseHeight.getText());
-    	return cpy;
+        StepSpikerPanel cpy = new StepSpikerPanel();
+        cpy.tfResponseDuration.setText(this.tfResponseDuration.getText());
+        cpy.tfResponseHeight.setText(this.tfResponseHeight.getText());
+        return cpy;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void fillDefaultValues() {
-        tfResponseHeight.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getResponseHeight()));
-        tfResponseDuration.setText(Double.toString(PROTOTYPE_RESPONDER
-                .getResponseDuration()));
+        tfResponseHeight.setText(Double.toString(PROTOTYPE_RESPONDER.getResponseHeight()));
+        tfResponseDuration.setText(Double.toString(PROTOTYPE_RESPONDER.getResponseDuration()));
     }
 
     /**
@@ -92,21 +92,17 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
         // Handle consistency of multiply selections
 
         // Handle Response Height
-        if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
-                "getResponseHeight")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, Step.class, "getResponseHeight")) {
             tfResponseHeight.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfResponseHeight.setText(Double.toString(spikeResponder
-                    .getResponseHeight()));
+            tfResponseHeight.setText(Double.toString(spikeResponder.getResponseHeight()));
         }
 
         // Handle Response Duration
-        if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
-                "getResponseDuration")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, Step.class, "getResponseDuration")) {
             tfResponseDuration.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfResponseDuration.setText(Double.toString(spikeResponder
-                    .getResponseDuration()));
+            tfResponseDuration.setText(Double.toString(spikeResponder.getResponseDuration()));
         }
 
     }
@@ -148,8 +144,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
         double responseHeight = Utils.doubleParsable(tfResponseHeight);
         if (!Double.isNaN(responseHeight)) {
             for (Synapse s : synapses) {
-                ((Step) s.getSpikeResponder())
-                        .setResponseHeight(responseHeight);
+                ((Step) s.getSpikeResponder()).setResponseHeight(responseHeight);
             }
         }
 
@@ -157,8 +152,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
         double responseDuration = Utils.doubleParsable(tfResponseDuration);
         if (!Double.isNaN(responseDuration)) {
             for (Synapse s : synapses) {
-                ((Step) s.getSpikeResponder())
-                        .setResponseDuration(responseDuration);
+                ((Step) s.getSpikeResponder()).setResponseDuration(responseDuration);
             }
         }
     }
@@ -177,8 +171,8 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
      */
     @Override
     public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	tfResponseHeight.setEnabled(enabled);
-    	tfResponseDuration.setEnabled(enabled);
+        super.setEnabled(enabled);
+        tfResponseHeight.setEnabled(enabled);
+        tfResponseDuration.setEnabled(enabled);
     }
 }

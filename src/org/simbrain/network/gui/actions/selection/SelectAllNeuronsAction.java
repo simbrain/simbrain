@@ -18,20 +18,19 @@
  */
 package org.simbrain.network.gui.actions.selection;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Select all neurons.
  */
 public final class SelectAllNeuronsAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -48,15 +47,14 @@ public final class SelectAllNeuronsAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('n'), this);
-        putValue(SHORT_DESCRIPTION,
-                "Select all neurons (n)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('n'), this);
+        putValue(SHORT_DESCRIPTION, "Select all neurons (n)");
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.clearSelection();

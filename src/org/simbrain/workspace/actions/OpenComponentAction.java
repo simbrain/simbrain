@@ -37,6 +37,7 @@ public class OpenComponentAction<T extends WorkspaceComponent> extends Workspace
 
     /**
      * Create an open odor world action with the specified workspace.
+     *
      * @param workspace The workspace which will own the opened component.
      */
     public OpenComponentAction(Class<T> type, String name, String iconFile, Workspace workspace) {

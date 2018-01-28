@@ -17,33 +17,6 @@
  */
 package org.simbrain.util.scripteditor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -53,9 +26,14 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
 /**
  * An editor for beanshell scripts with syntax highlighting.
- *
+ * <p>
  * Uses RSyntaxTextArea by Robert Futrell. See
  * http://fifesoft.com/rsyntaxtextarea/
  *
@@ -63,30 +41,44 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
  */
 public class ScriptEditor extends JPanel {
 
-    /** Default script directory. */
-    private static final String DEFAULT_SCRIPT_DIRECTORY = "."
-            + System.getProperty("file.separator") + "scripts"
-            + System.getProperty("file.separator") + "scriptmenu";
+    /**
+     * Default script directory.
+     */
+    private static final String DEFAULT_SCRIPT_DIRECTORY = "." + System.getProperty("file.separator") + "scripts" + System.getProperty("file.separator") + "scriptmenu";
 
-    /** Script directory. */
+    /**
+     * Script directory.
+     */
     private String scriptDirectory = DEFAULT_SCRIPT_DIRECTORY;
 
-    /** Reference to file (for saving). */
+    /**
+     * Reference to file (for saving).
+     */
     private File scriptFile;
 
-    /** Main text area. */
+    /**
+     * Main text area.
+     */
     private final RSyntaxTextArea textArea;
 
-    /** Default width. */
+    /**
+     * Default width.
+     */
     private final int DEFAULT_WIDTH = 70;
 
-    /** Default height. */
+    /**
+     * Default height.
+     */
     private final int DEFAULT_HEIGHT = 25;
 
-    /** Memory for last search string used in find and replace. */
+    /**
+     * Memory for last search string used in find and replace.
+     */
     private String lastSearch = "";
 
-    /** Memory for last replace string used in find and replace. */
+    /**
+     * Memory for last replace string used in find and replace.
+     */
     private String lastReplace = "";
 
     /**
@@ -112,7 +104,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Initialize with initial text and a default directory.
      *
-     * @param initialText initial text
+     * @param initialText   initial text
      * @param fileDirectory initial file directory
      */
     public ScriptEditor(String initialText, String fileDirectory) {
@@ -136,8 +128,7 @@ public class ScriptEditor extends JPanel {
             @Override
             public void componentResized(ComponentEvent e) {
                 Component component = e.getComponent();
-                sp.setPreferredSize(new Dimension(component.getWidth(),
-                        component.getHeight()));
+                sp.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
                 sp.revalidate();
             }
         });
@@ -211,7 +202,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Initialize the frame with the provided panel.
      *
-     * @param frame frame to initialize
+     * @param frame  frame to initialize
      * @param editor the panel to display in the frame
      */
     private void initFrame(final GenericFrame frame, final ScriptEditor editor) {
@@ -228,8 +219,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Creates the menu bar.
      */
-    protected void createAttachMenuBar(final GenericFrame frame,
-            final ScriptEditor editor) {
+    protected void createAttachMenuBar(final GenericFrame frame, final ScriptEditor editor) {
         JMenuBar bar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
@@ -267,8 +257,7 @@ public class ScriptEditor extends JPanel {
      *
      * @return the toolbar
      */
-    protected JToolBar getToolbarOpenClose(final GenericFrame frame,
-            final ScriptEditor editor) {
+    protected JToolBar getToolbarOpenClose(final GenericFrame frame, final ScriptEditor editor) {
         JToolBar toolbar = new JToolBar();
         toolbar.add(getOpenScriptAction(frame, editor));
         toolbar.add(getSaveScriptAction(frame, editor));
@@ -278,8 +267,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for opening script files.
      */
-    private Action getOpenScriptAction(final GenericFrame frame,
-            final ScriptEditor editor) {
+    private Action getOpenScriptAction(final GenericFrame frame, final ScriptEditor editor) {
         return new AbstractAction() {
 
             // Initialize
@@ -287,16 +275,13 @@ public class ScriptEditor extends JPanel {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
                 putValue(NAME, "Open Script (.bsh)...");
                 putValue(SHORT_DESCRIPTION, "Open");
-                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                        KeyEvent.VK_O, Toolkit.getDefaultToolkit()
-                                .getMenuShortcutKeyMask()));
+                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                SFileChooser fileChooser = new SFileChooser(scriptDirectory,
-                        "Edit Script", "bsh");
+                SFileChooser fileChooser = new SFileChooser(scriptDirectory, "Edit Script", "bsh");
                 final File scriptFile = fileChooser.showOpenDialog();
                 if (scriptFile == null) {
                     return;
@@ -304,8 +289,7 @@ public class ScriptEditor extends JPanel {
 
                 frame.setTitle(scriptFile.getName());
                 try {
-                    BufferedReader r = new BufferedReader(new FileReader(
-                            scriptFile));
+                    BufferedReader r = new BufferedReader(new FileReader(scriptFile));
                     editor.setScriptFile(scriptFile);
                     editor.getTextArea().read(r, null);
                     r.close();
@@ -322,8 +306,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for saving script files.
      */
-    private Action getSaveScriptAction(final GenericFrame frame,
-            final ScriptEditor editor) {
+    private Action getSaveScriptAction(final GenericFrame frame, final ScriptEditor editor) {
         return new AbstractAction() {
 
             // Initialize
@@ -331,17 +314,14 @@ public class ScriptEditor extends JPanel {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
                 putValue(SHORT_DESCRIPTION, "save");
                 putValue(Action.NAME, "Save");
-                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                        KeyEvent.VK_S, Toolkit.getDefaultToolkit()
-                                .getMenuShortcutKeyMask()));
+                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 File scriptFile = editor.getScriptFile();
                 if (scriptFile == null) {
-                    SFileChooser fileChooser = new SFileChooser(
-                            scriptDirectory, "Edit Script", "bsh");
+                    SFileChooser fileChooser = new SFileChooser(scriptDirectory, "Edit Script", "bsh");
                     scriptFile = fileChooser.showSaveDialog();
                     if (scriptFile == null) {
                         return;
@@ -351,8 +331,7 @@ public class ScriptEditor extends JPanel {
                 }
 
                 try {
-                    BufferedWriter r = new BufferedWriter(new FileWriter(
-                            scriptFile));
+                    BufferedWriter r = new BufferedWriter(new FileWriter(scriptFile));
                     editor.getTextArea().write(r);
                     r.close();
                 } catch (IOException ioe) {
@@ -367,8 +346,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for saving script files.
      */
-    private Action getSaveScriptAsAction(final GenericFrame frame,
-            final ScriptEditor editor) {
+    private Action getSaveScriptAsAction(final GenericFrame frame, final ScriptEditor editor) {
         return new AbstractAction() {
 
             // Initialize
@@ -380,16 +358,14 @@ public class ScriptEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                SFileChooser fileChooser = new SFileChooser(scriptDirectory,
-                        "Edit Script", "bsh");
+                SFileChooser fileChooser = new SFileChooser(scriptDirectory, "Edit Script", "bsh");
                 File scriptFile = fileChooser.showSaveDialog();
                 if (scriptFile == null) {
                     return;
                 }
                 editor.setScriptFile(scriptFile);
                 try {
-                    BufferedWriter r = new BufferedWriter(new FileWriter(
-                            scriptFile));
+                    BufferedWriter r = new BufferedWriter(new FileWriter(scriptFile));
                     editor.getTextArea().write(r);
                     frame.setTitle(editor.getScriptFile().getName());
                     r.close();
@@ -406,17 +382,14 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for finding and replacing text
      */
-    private Action getFindReplaceAction(final GenericFrame frame,
-            final ScriptEditor editor) {
+    private Action getFindReplaceAction(final GenericFrame frame, final ScriptEditor editor) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SHORT_DESCRIPTION, "Find/Replace");
                 putValue(Action.NAME, "Find/Replace...");
-                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                        KeyEvent.VK_F, Toolkit.getDefaultToolkit()
-                                .getMenuShortcutKeyMask()));
+                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             }
 
             @Override

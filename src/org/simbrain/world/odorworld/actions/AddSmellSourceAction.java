@@ -18,24 +18,26 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add a new smell source to this entity.
  */
 public final class AddSmellSourceAction extends AbstractAction {
 
-    /** Plot GUI component. */
+    /**
+     * Plot GUI component.
+     */
     private final OdorWorldPanel component;
 
-    /** Entity to edit. */
+    /**
+     * Entity to edit.
+     */
     private final OdorWorldEntity entity;
 
     /**
@@ -44,13 +46,11 @@ public final class AddSmellSourceAction extends AbstractAction {
      * @param component GUI component, must not be null.
      * @param entity
      */
-    public AddSmellSourceAction(final OdorWorldPanel component,
-            OdorWorldEntity entity) {
+    public AddSmellSourceAction(final OdorWorldPanel component, OdorWorldEntity entity) {
         super("Add smell source...");
         this.entity = entity;
         if (component == null) {
-            throw new IllegalArgumentException(
-                    "Desktop component must not be null");
+            throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
         // this.putValue(this.ACCELERATOR_KEY,
@@ -60,10 +60,11 @@ public final class AddSmellSourceAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Add a smell source to this object...");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(final ActionEvent event) {
-        String dimension = JOptionPane
-                .showInputDialog("How many dimensions will the smell vector have?");
+        String dimension = JOptionPane.showInputDialog("How many dimensions will the smell vector have?");
         if (dimension != null) {
             int dims = Integer.parseInt(dimension);
             entity.setSmellSource(new SmellSource(new double[dims]));

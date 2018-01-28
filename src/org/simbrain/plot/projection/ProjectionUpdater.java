@@ -18,14 +18,16 @@
  */
 package org.simbrain.plot.projection;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  * Update iterable projection algorithms.
  */
 public class ProjectionUpdater implements Runnable {
 
-    /** Reference to projection component. */
+    /**
+     * Reference to projection component.
+     */
     private ProjectionComponent component;
 
     /**

@@ -18,22 +18,21 @@
  */
 package org.simbrain.util.widgets;
 
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 
 /**
- * A SpinnerNumberModel that allows a null state. 
+ * A SpinnerNumberModel that allows a null state.
  * When the edited objects return different states the field is shown as empty.
  *
- * @see JNumberSpinnerWithNull
- *
  * @author O. J. Coleman
+ * @see JNumberSpinnerWithNull
  */
 public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
-	private Number stepSize, value;
+    private Number stepSize, value;
     private Comparable minimum, maximum;
 
-	
+
     /**
      * Constructs a <code>SpinnerModel</code> that represents
      * a closed sequence of
@@ -55,14 +54,13 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * Similarly if <code>(minimum &lt;= value &lt;= maximum</code>) is false,
      * an <code>IllegalArgumentException</code> is thrown.
      *
-     * @param value the current (non <code>null</code>) value of the model
-     * @param minimum the first number in the sequence or <code>null</code>
-     * @param maximum the last number in the sequence or <code>null</code>
+     * @param value    the current (non <code>null</code>) value of the model
+     * @param minimum  the first number in the sequence or <code>null</code>
+     * @param maximum  the last number in the sequence or <code>null</code>
      * @param stepSize the difference between elements of the sequence
-     *
      * @throws IllegalArgumentException if stepSize or value is
-     *     <code>null</code> or if the following expression is false:
-     *     <code>minimum &lt;= value &lt;= maximum</code>
+     *                                  <code>null</code> or if the following expression is false:
+     *                                  <code>minimum &lt;= value &lt;= maximum</code>
      */
     public SpinnerNumberModelWithNull(Number value, Comparable minimum, Comparable maximum, Number stepSize) {
         if (stepSize == null) {
@@ -73,8 +71,8 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         this.maximum = maximum;
         this.stepSize = stepSize;
     }
-    
-    
+
+
     /**
      * Changes the lower bound for numbers in this sequence.
      * If <code>minimum</code> is <code>null</code>,
@@ -105,8 +103,8 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * if the <code>minimum</code> has changed.
      *
      * @param minimum a <code>Comparable</code> that has a
-     *     <code>compareTo</code> method for <code>Number</code>s with
-     *     the same type as <code>value</code>
+     *                <code>compareTo</code> method for <code>Number</code>s with
+     *                the same type as <code>value</code>
      * @see #getMinimum
      * @see #setMaximum
      * @see SpinnerModel#addChangeListener
@@ -152,8 +150,8 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * <code>maximum</code> has changed.
      *
      * @param maximum a <code>Comparable</code> that has a
-     *     <code>compareTo</code> method for <code>Number</code>s with
-     *     the same type as <code>value</code>
+     *                <code>compareTo</code> method for <code>Number</code>s with
+     *                the same type as <code>value</code>
      * @see #getMaximum
      * @see #setMinimum
      * @see SpinnerModel#addChangeListener
@@ -187,7 +185,7 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * <code>stepSize</code> has changed.
      *
      * @param stepSize the size of the value change computed by the
-     *     <code>getNextValue</code> and <code>getPreviousValue</code> methods
+     *                 <code>getNextValue</code> and <code>getPreviousValue</code> methods
      * @see #getNextValue
      * @see #getPreviousValue
      * @see #getStepSize
@@ -217,36 +215,30 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
     }
 
 
-    private Number incrValue(int dir)
-    {
-    	if (value == null) {
-    		return null;
-    	}
-    	
+    private Number incrValue(int dir) {
+        if (value == null) {
+            return null;
+        }
+
         Number newValue;
         if ((stepSize instanceof Float) || (stepSize instanceof Double)) {
-            double v = value.doubleValue() + (stepSize.doubleValue() * (double)dir);
+            double v = value.doubleValue() + (stepSize.doubleValue() * (double) dir);
             if (value instanceof Double) {
                 newValue = new Double(v);
-            }
-            else {
+            } else {
                 newValue = new Float(v);
             }
-        }
-        else {
-            long v = value.longValue() + (stepSize.longValue() * (long)dir);
+        } else {
+            long v = value.longValue() + (stepSize.longValue() * (long) dir);
 
             if (value instanceof Long) {
                 newValue = Long.valueOf(v);
-            }
-            else if (value instanceof Integer) {
-                newValue = Integer.valueOf((int)v);
-            }
-            else if (value instanceof Short) {
-                newValue = Short.valueOf((short)v);
-            }
-            else {
-                newValue = Byte.valueOf((byte)v);
+            } else if (value instanceof Integer) {
+                newValue = Integer.valueOf((int) v);
+            } else if (value instanceof Short) {
+                newValue = Short.valueOf((short) v);
+            } else {
+                newValue = Byte.valueOf((byte) v);
             }
         }
 
@@ -255,8 +247,7 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         }
         if ((minimum != null) && (minimum.compareTo(newValue) > 0)) {
             return null;
-        }
-        else {
+        } else {
             return newValue;
         }
     }
@@ -266,8 +257,7 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * Returns the next number in the sequence.
      *
      * @return <code>value + stepSize</code> or <code>null</code> if the sum
-     *     exceeds <code>maximum</code>.
-     *
+     * exceeds <code>maximum</code>.
      * @see SpinnerModel#getNextValue
      * @see #getPreviousValue
      * @see #setStepSize
@@ -281,9 +271,8 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * Returns the previous number in the sequence.
      *
      * @return <code>value - stepSize</code>, or
-     *     <code>null</code> if the sum is less
-     *     than <code>minimum</code>.
-     *
+     * <code>null</code> if the sum is less
+     * than <code>minimum</code>.
      * @see SpinnerModel#getPreviousValue
      * @see #getNextValue
      * @see #setStepSize
@@ -324,37 +313,35 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
      * This method fires a <code>ChangeEvent</code> if the value has changed.
      *
      * @param value the current <code>Number</code>
-     *         for this sequence, or null for no value.
+     *              for this sequence, or null for no value.
      * @throws IllegalArgumentException if <code>value</code> is
-     * not null and is not a <code>Number</code>
+     *                                  not null and is not a <code>Number</code>
      * @see #getNumber
      * @see #getValue
      * @see SpinnerModel#addChangeListener
      */
     public void setValue(Object value) {
-    	if (value == null) {
-    		if (this.value != null) {
+        if (value == null) {
+            if (this.value != null) {
                 this.value = null;
                 fireStateChanged();
             }
-    	}
-    	else {
-	        if (!(value instanceof Number)) {
-	            throw new IllegalArgumentException("illegal value");
-	        }
-	        if (!value.equals(this.value)) {
-	        	Number newValue = (Number)value;
-	            
-	            if ((maximum != null) && (maximum.compareTo(newValue) < 0)) {
-	            	newValue = (Number) maximum;
-	            }
-	            else if ((minimum != null) && (minimum.compareTo(newValue) > 0)) {
-	            	newValue = (Number) minimum;
-	            }
-	            
-	            this.value = newValue;
-	            fireStateChanged();
-	        }
-    	}
+        } else {
+            if (!(value instanceof Number)) {
+                throw new IllegalArgumentException("illegal value");
+            }
+            if (!value.equals(this.value)) {
+                Number newValue = (Number) value;
+
+                if ((maximum != null) && (maximum.compareTo(newValue) < 0)) {
+                    newValue = (Number) maximum;
+                } else if ((minimum != null) && (minimum.compareTo(newValue) > 0)) {
+                    newValue = (Number) minimum;
+                }
+
+                this.value = newValue;
+                fireStateChanged();
+            }
+        }
     }
 }

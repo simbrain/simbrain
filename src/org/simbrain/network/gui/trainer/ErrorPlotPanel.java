@@ -13,16 +13,14 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
 import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Component for representing error in a trainer.
@@ -31,16 +29,24 @@ import org.simbrain.util.Utils;
  */
 public class ErrorPlotPanel extends JPanel {
 
-    /** Reference to trainer object. */
+    /**
+     * Reference to trainer object.
+     */
     private IterableTrainer trainer;
 
-    /** Data for the error graph. */
+    /**
+     * Data for the error graph.
+     */
     private final TimeSeriesModel model;
 
-    /** Error label. */
+    /**
+     * Error label.
+     */
     private JLabel rmsError = new JLabel("Error: ----- ");
 
-    /** Indicates that (an iterative) training algorithm is running. */
+    /**
+     * Indicates that (an iterative) training algorithm is running.
+     */
     private JLabel runningLabel = new JLabel();
 
     /**
@@ -60,13 +66,10 @@ public class ErrorPlotPanel extends JPanel {
         model.setMaximumDataPoints(Integer.MAX_VALUE);
         TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
         graphPanel.getChartPanel().getChart().setTitle("");
-        graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis()
-                .setLabel("Iterations");
-        graphPanel.getChartPanel().getChart().getXYPlot().getRangeAxis()
-                .setLabel("Error");
+        graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis().setLabel("Iterations");
+        graphPanel.getChartPanel().getChart().getXYPlot().getRangeAxis().setLabel("Error");
         graphPanel.getChartPanel().getChart().removeLegend();
-        graphPanel.setPreferredSize(new Dimension(
-                graphPanel.getPreferredSize().width, 250));
+        graphPanel.setPreferredSize(new Dimension(graphPanel.getPreferredSize().width, 250));
 
         // Customize button panel; first remove all buttons
         graphPanel.removeAllButtonsFromToolBar();

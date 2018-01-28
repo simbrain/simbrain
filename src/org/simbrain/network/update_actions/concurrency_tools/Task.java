@@ -24,12 +24,11 @@ import java.util.concurrent.BrokenBarrierException;
  * An interface used to perform a task and which is tagged with information
  * for flagging the tasks with whether or not it is used to make consumers
  * wait or poison (kill) consumer threads.
- * 
- * @author Zoë Tosi
  *
+ * @author Zoë Tosi
  */
 public interface Task {
 
-	void perform() throws InterruptedException, BrokenBarrierException;
+    void perform() throws InterruptedException, BrokenBarrierException;
 
 }

@@ -12,14 +12,19 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 class ArchivedCoupling {
 
-    /** The source attribute for the coupling. */
+    /**
+     * The source attribute for the coupling.
+     */
     private ArchivedAttribute producer;
 
-    /** The target attribute for the coupling. */
+    /**
+     * The target attribute for the coupling.
+     */
     private ArchivedAttribute consumer;
 
     /**
      * Creates a new instance.
+     *
      * @param producer The producer attribute.
      * @param consumer The consumer attribute.
      */
@@ -52,8 +57,7 @@ class ArchivedCoupling {
         WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
         Object object = component.getObjectFromKey(attribute.getId());
         if (object == null) {
-            throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.",
-                    attribute.getId(), attribute.getComponentId()));
+            throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.", attribute.getId(), attribute.getComponentId()));
         }
         return object;
     }

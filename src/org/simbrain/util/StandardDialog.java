@@ -18,27 +18,18 @@
  */
 package org.simbrain.util;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
-
-import org.simbrain.util.genericframe.GenericJDialog;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
  * "Cancel" buttons. Special functionality associated with Simbrain has also
  * been added. Subclasses can override the isDataValid(), okButtonPressed(), and
  * cancelButtonPressed() methods to perform implementation specific processing.
- * <P>
+ * <p>
  * By default, the dialog is modal, and has a JPanel with a BorderLayout for its
  * content pane.
  *
@@ -61,29 +52,43 @@ public class StandardDialog extends GenericJDialog {
      */
     private static final boolean USE_RUN_WARNINGS = true;
 
-    /** Custom button panel. */
+    /**
+     * Custom button panel.
+     */
     private JPanel customButtonPanel = new JPanel();
 
-    /** Action listener. */
+    /**
+     * Action listener.
+     */
     ActionListener actionListener = new ActionListener() {
         public void actionPerformed(final ActionEvent actionEvent) {
             setVisible(false);
         }
     };
 
-    /** A global okay button for accessibility. */
+    /**
+     * A global okay button for accessibility.
+     */
     private JButton okButton;
 
-    /** A global cancel button for accessibility. */
+    /**
+     * A global cancel button for accessibility.
+     */
     private JButton cancelButton;
 
-    /** The spacing between components in pixels. */
+    /**
+     * The spacing between components in pixels.
+     */
     private static final int COMPONENT_SPACING = 10;
 
-    /** Flag indicating if the "Cancel" button was pressed to close dialog. */
+    /**
+     * Flag indicating if the "Cancel" button was pressed to close dialog.
+     */
     private boolean myIsDialogCancelled = true;
 
-    /** The content pane for holding user components. */
+    /**
+     * The content pane for holding user components.
+     */
     private Container myUserContentPane;
 
     /**
@@ -99,14 +104,16 @@ public class StandardDialog extends GenericJDialog {
      * title.
      *
      * @param parent The parent frame for the dialog.
-     * @param title The title to display in the dialog.
+     * @param title  The title to display in the dialog.
      */
     public StandardDialog(Frame parent, String title) {
         super(parent, title);
         init();
     }
 
-    /** Create a modeless StandardDialog as a child of the specified JFrame. */
+    /**
+     * Create a modeless StandardDialog as a child of the specified JFrame.
+     */
     public StandardDialog(JFrame parent, String title) {
         super(parent, title);
         init();
@@ -120,13 +127,7 @@ public class StandardDialog extends GenericJDialog {
     private void init() {
 
         if (isRunning && USE_RUN_WARNINGS) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "WARNING: You are modifying system parameters while a simulation is running. \n "
-                                    + "It is reccomended that you first stop the simulation using the stop button.\n"
-                                    + " Some functions may not behave as they are supposed to.",
-                            "Warning!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
 
         setModal(true);
@@ -136,12 +137,9 @@ public class StandardDialog extends GenericJDialog {
         // and the standard button panel
         JPanel internalContentPane = new JPanel();
 
-        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING,
-                COMPONENT_SPACING));
+        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
 
-        internalContentPane.setBorder(BorderFactory.createEmptyBorder(
-                COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING,
-                COMPONENT_SPACING));
+        internalContentPane.setBorder(BorderFactory.createEmptyBorder(COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING));
 
         // Create the standard "Ok" Button
         Action okAction = new AbstractAction("OK") {
@@ -169,7 +167,7 @@ public class StandardDialog extends GenericJDialog {
         okButton = new JButton(okAction);
         buttonPanel.add(customButtonPanel);
         buttonPanel.add(okButton);
-        cancelButton  = new JButton(cancelAction);
+        cancelButton = new JButton(cancelAction);
         buttonPanel.add(cancelButton);
 
         getRootPane().setDefaultButton(okButton);
@@ -192,10 +190,7 @@ public class StandardDialog extends GenericJDialog {
 
         addWindowListener(windowAdapter);
 
-        this.getRootPane().registerKeyboardAction(
-                actionListener,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
-                        .getDefaultToolkit().getMenuShortcutKeyMask()), 0);
+        this.getRootPane().registerKeyboardAction(actionListener, KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 0);
 
         // this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();
@@ -245,6 +240,7 @@ public class StandardDialog extends GenericJDialog {
      * "Escape" key is pressed. In other words, if the User has caused the
      * dialog to close by any method other than by pressing the "Ok" button,
      * this method will return <code>true</code>.
+     *
      * @return
      */
     public boolean hasUserCancelled() {
@@ -257,8 +253,8 @@ public class StandardDialog extends GenericJDialog {
      * implemented by each dialog that extends this class.
      *
      * @return a boolean indicating if the data is valid. <code>true</code>
-     *         indicates that all of the fields were validated correctly and
-     *         <code>false</code> indicates the validation failed
+     * indicates that all of the fields were validated correctly and
+     * <code>false</code> indicates the validation failed
      */
     protected boolean isValidData() {
         return true;

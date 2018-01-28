@@ -5,9 +5,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 
 /**
- * 
  * @author Sharai
- *
  */
 
 // TODO: Maybe change this into a spiking neuron rule once we figure out how to
@@ -18,7 +16,9 @@ import org.simbrain.network.neuron_update_rules.DecayRule;
 public class CreaturesNeuronRule extends DecayRule {
 
     // TODO: Wire this up
-    /** Reference to parent lobe. */
+    /**
+     * Reference to parent lobe.
+     */
     private NeuronGroup parentLobe;
 
     /**
@@ -65,54 +65,54 @@ public class CreaturesNeuronRule extends DecayRule {
         // it back later or adapt everything to a smaller value like this
         setUpperBound(10);
         setLowerBound(0);
-//        this.setAddNoise(true);
+        //        this.setAddNoise(true);
     }
 
     @Override
     public void update(Neuron neuron) {
-//        // System.out.println("Updating neuron: " + neuron.getLabel());
-//
-//        // Get input and modulate it with inputGain.
-//        double input = inputType.getInput(neuron);
-//        // TODO: Find an algorithm that can modulate input with inputGain. (In
-//        // the default genome in Creatures, input gain is always set at max
-//        // (255),
-//        // except for the decisions lobe (#6), which is set at 128)
-//
-//        // SVRule stuff goes here.
-//
-//        // Placeholder until SVRule stuff is implemented
-//        stateValue += input;
-//
-//        // Clip values
-//        if (isClipped()) {
-//            stateValue = super.clip(stateValue);
-//        }
-//
-//        // Update the neuron if override is not enabled
-//        if (!override) {
-//            if (stateValue > nominalThreshold) {
-//                neuron.setBuffer(stateValue);
-//                // System.out.print("State value was " + stateValue + ", ");
-//                stateValue -= nominalThreshold;
-//                // System.out.println("now it's " + stateValue + "!");
-//            } else {
-//                neuron.setBuffer(0);
-//                // TODO: Find an algorithm that better replicates how leakage
-//                // rate in Creatures
-//                // works, such that 0 = Instant, 255 = 52 years.
-//                // System.out.print("State value was " + stateValue + ", ");
-//                stateValue = restState
-//                        + (stateValue * (leakageRate / getUpperBound()));
-//                // System.out.println("now it's " + stateValue + "!");
-//            }
-//
-//        }
+        //        // System.out.println("Updating neuron: " + neuron.getLabel());
+        //
+        //        // Get input and modulate it with inputGain.
+        //        double input = inputType.getInput(neuron);
+        //        // TODO: Find an algorithm that can modulate input with inputGain. (In
+        //        // the default genome in Creatures, input gain is always set at max
+        //        // (255),
+        //        // except for the decisions lobe (#6), which is set at 128)
+        //
+        //        // SVRule stuff goes here.
+        //
+        //        // Placeholder until SVRule stuff is implemented
+        //        stateValue += input;
+        //
+        //        // Clip values
+        //        if (isClipped()) {
+        //            stateValue = super.clip(stateValue);
+        //        }
+        //
+        //        // Update the neuron if override is not enabled
+        //        if (!override) {
+        //            if (stateValue > nominalThreshold) {
+        //                neuron.setBuffer(stateValue);
+        //                // System.out.print("State value was " + stateValue + ", ");
+        //                stateValue -= nominalThreshold;
+        //                // System.out.println("now it's " + stateValue + "!");
+        //            } else {
+        //                neuron.setBuffer(0);
+        //                // TODO: Find an algorithm that better replicates how leakage
+        //                // rate in Creatures
+        //                // works, such that 0 = Instant, 255 = 52 years.
+        //                // System.out.print("State value was " + stateValue + ", ");
+        //                stateValue = restState
+        //                        + (stateValue * (leakageRate / getUpperBound()));
+        //                // System.out.println("now it's " + stateValue + "!");
+        //            }
+        //
+        //        }
 
-        
-         super.update(neuron);
-         
-         
+
+        super.update(neuron);
+
+
     }
 
     @Override
@@ -165,9 +165,9 @@ public class CreaturesNeuronRule extends DecayRule {
     public void setStateValue(double num) {
         this.stateValue = num;
     }
-    
+
     public void incrementStateValue(double num) {
-    	this.stateValue += num;
+        this.stateValue += num;
     }
 
     public double getStateValue() {

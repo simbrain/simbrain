@@ -50,51 +50,50 @@ public abstract class NeuronUpdateRule {
                 return n.getWeightedInputs();
             }
 
-			@Override
-			public double[] getSeparatedInput(Neuron n) {
-				double [] ei = new double[2];
-				for (Synapse s : n.getFanIn()) {
-					double wt = s.calcWeightedSum();
-					if (wt > 0) {
-						ei[0] += wt;
-					} else {
-						ei[1] += wt;
-					}
-				}
-				return ei;
-			}
-			
-			@Override
-			public double[] getNormalizedSeparatedInput(Neuron n) {
-				double [] ei = new double[2];
-				double e = 0;
-				double i = 0;
-				for (Synapse s : n.getFanIn()) {
-					double wt = s.calcWeightedSum();
-					if (wt > 0) {
-						ei[0] += wt;
-						e++;
-					} else {
-						ei[1] += wt;
-						i++;
-					}
-				}
-				if (e > 1) {
-					ei[0] /= e;
-				}
-				if (i > 1) {
-					ei[1] /= i;
-				}
-				return ei;
-			}
-			
+            @Override
+            public double[] getSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                for (Synapse s : n.getFanIn()) {
+                    double wt = s.calcWeightedSum();
+                    if (wt > 0) {
+                        ei[0] += wt;
+                    } else {
+                        ei[1] += wt;
+                    }
+                }
+                return ei;
+            }
+
+            @Override
+            public double[] getNormalizedSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                double e = 0;
+                double i = 0;
+                for (Synapse s : n.getFanIn()) {
+                    double wt = s.calcWeightedSum();
+                    if (wt > 0) {
+                        ei[0] += wt;
+                        e++;
+                    } else {
+                        ei[1] += wt;
+                        i++;
+                    }
+                }
+                if (e > 1) {
+                    ei[0] /= e;
+                }
+                if (i > 1) {
+                    ei[1] /= i;
+                }
+                return ei;
+            }
+
             @Override
             public String toString() {
                 return "Weighted";
             }
 
-        },
-        SYNAPTIC {
+        }, SYNAPTIC {
             /**
              * Gets the synaptic sum of the pre-synaptic neurons' firing state
              * weighted by synapses and processed through a spike responder.
@@ -103,46 +102,46 @@ public abstract class NeuronUpdateRule {
             public double getInput(Neuron n) {
                 return n.getSynapticInput();
             }
-            
-			@Override
-			public double[] getSeparatedInput(Neuron n) {
-				double [] ei = new double[2];
-				for (Synapse s : n.getFanIn()) {
-					double psr = s.calcPSR();
-					if (psr > 0) {
-						ei[0] += psr;
-					} else {
-						ei[1] += psr;
-					}
-				}
-				return ei;
-			}
+
+            @Override
+            public double[] getSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                for (Synapse s : n.getFanIn()) {
+                    double psr = s.calcPSR();
+                    if (psr > 0) {
+                        ei[0] += psr;
+                    } else {
+                        ei[1] += psr;
+                    }
+                }
+                return ei;
+            }
 
 
-			@Override
-			public double[] getNormalizedSeparatedInput(Neuron n) {
-				double [] ei = new double[2];
-				double e = 0;
-				double i = 0;
-				for (Synapse s : n.getFanIn()) {
-					double psr = s.calcPSR();
-					if (psr > 0) {
-						ei[0] += psr;
-						e++;
-					} else {
-						ei[1] += psr;
-						i++;
-					}
-				}
-				if (e > 1) {
-					ei[0] /= e;
-				}
-				if (i > 1) {
-					ei[1] /= i;
-				}
-				return ei;
-			}
-			
+            @Override
+            public double[] getNormalizedSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                double e = 0;
+                double i = 0;
+                for (Synapse s : n.getFanIn()) {
+                    double psr = s.calcPSR();
+                    if (psr > 0) {
+                        ei[0] += psr;
+                        e++;
+                    } else {
+                        ei[1] += psr;
+                        i++;
+                    }
+                }
+                if (e > 1) {
+                    ei[0] /= e;
+                }
+                if (i > 1) {
+                    ei[1] /= i;
+                }
+                return ei;
+            }
+
             @Override
             public String toString() {
                 return "Synaptic";
@@ -150,38 +149,46 @@ public abstract class NeuronUpdateRule {
 
 
         };
-        
+
         /**
          * Returns the total input to a neuron using either a post-synaptic
          * response value calculated from each synapse and derived from the
          * spike-train of the pre-synaptic neuron or a simple weighted sum of
          * the product of the synapse values and their respective source
          * neurons.
+         *
          * @param n
          * @return
          */
         public abstract double getInput(Neuron n);
-        
+
         /**
          * Returns the total excitatory and inhibitory inputs to a neuron
          * separated. Otherwise the same as {@link #getInput(Neuron)}.
+         *
          * @param n
          * @return
          */
-        public abstract double [] getSeparatedInput(Neuron n);
-        
-        public abstract double [] getNormalizedSeparatedInput(Neuron n);
+        public abstract double[] getSeparatedInput(Neuron n);
+
+        public abstract double[] getNormalizedSeparatedInput(Neuron n);
     }
 
-    /** The maximum number of digits to display in the tool tip. */
+    /**
+     * The maximum number of digits to display in the tool tip.
+     */
     private static final int MAX_DIGITS = 9;
 
-    /** The default increment of a neuron using this rule. */
+    /**
+     * The default increment of a neuron using this rule.
+     */
     public static final double DEFAULT_INCREMENT = 0.1;
 
     protected InputType inputType = InputType.WEIGHTED;
 
-    /** Amount by which to increment or decrement neuron. */
+    /**
+     * Amount by which to increment or decrement neuron.
+     */
     protected double increment = DEFAULT_INCREMENT;
 
     /**
@@ -208,6 +215,7 @@ public abstract class NeuronUpdateRule {
 
     /**
      * Increment a neuron by increment.
+     *
      * @param n neuron
      */
     public final void incrementActivation(Neuron n) {
@@ -217,6 +225,7 @@ public abstract class NeuronUpdateRule {
 
     /**
      * Decrement a neuron by increment.
+     *
      * @param n neuron
      */
     public final void decrementActivation(Neuron n) {
@@ -227,7 +236,8 @@ public abstract class NeuronUpdateRule {
     /**
      * Increment a neuron by increment, respecting neuron specific constraints.
      * Intended to be overriden.
-     * @param n neuron to be incremented 
+     *
+     * @param n neuron to be incremented
      */
     public void contextualIncrement(Neuron n) {
         incrementActivation(n);
@@ -236,6 +246,7 @@ public abstract class NeuronUpdateRule {
     /**
      * Decrement a neuron by increment, respecting neuron specific constraints.
      * Intended to be overriden.
+     *
      * @param n neuron
      */
     public void contextualDecrement(Neuron n) {
@@ -251,10 +262,7 @@ public abstract class NeuronUpdateRule {
      */
     public double getRandomValue() {
         if (this instanceof BoundedUpdateRule) {
-            return (((BoundedUpdateRule) this).getUpperBound() - ((BoundedUpdateRule) this)
-                    .getLowerBound())
-                    * Math.random()
-                    + ((BoundedUpdateRule) this).getLowerBound();
+            return (((BoundedUpdateRule) this).getUpperBound() - ((BoundedUpdateRule) this).getLowerBound()) * Math.random() + ((BoundedUpdateRule) this).getLowerBound();
         } else {
             return 2 * Math.random() - 1;
         }
@@ -317,9 +325,7 @@ public abstract class NeuronUpdateRule {
      * @return tool tip text
      */
     public String getToolTipText(final Neuron neuron) {
-        return  neuron.getId() + ".  Location: (" + (int) neuron.getX()
-                + "," + (int) neuron.getY() + "). Activation: "
-                + Utils.round(neuron.getActivation(), MAX_DIGITS);
+        return neuron.getId() + ".  Location: (" + (int) neuron.getX() + "," + (int) neuron.getY() + "). Activation: " + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
     /**
@@ -352,11 +358,11 @@ public abstract class NeuronUpdateRule {
     }
 
     public boolean isSpikingNeuron() {
-    	return false;
+        return false;
     }
 
     public boolean isSkipsSynapticUpdates() {
-    	return false;
+        return false;
     }
-    
+
 }

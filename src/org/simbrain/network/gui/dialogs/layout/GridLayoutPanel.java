@@ -18,33 +18,40 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import org.simbrain.network.layouts.GridLayout;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-
-import org.simbrain.network.layouts.GridLayout;
 
 /**
  * <b>GridLayoutPanel</b> allows the user to define the layout of a network.
  */
 public class GridLayoutPanel extends AbstractLayoutPanel {
 
-    /** Spacing field. */
+    /**
+     * Spacing field.
+     */
     private JTextField tfNumColumns = new JTextField();
 
-    /** Spacing field. */
+    /**
+     * Spacing field.
+     */
     private JTextField tfHSpacing = new JTextField();
 
-    /** Vertical spacing field. */
+    /**
+     * Vertical spacing field.
+     */
     private JTextField tfVSpacing = new JTextField();
 
-    /** Manual spacing field. */
+    /**
+     * Manual spacing field.
+     */
     private JCheckBox manuallySetNumColumns = new JCheckBox();
 
     /**
      * Default constructor.
+     *
      * @param layout
      */
     public GridLayoutPanel(GridLayout layout) {
@@ -78,14 +85,10 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
      */
     @Override
     public void commitChanges() {
-        ((GridLayout) layout).setNumColumns(Integer.parseInt(tfNumColumns
-                .getText()));
-        ((GridLayout) layout).setHSpacing(Double.parseDouble(tfHSpacing
-                .getText()));
-        ((GridLayout) layout).setVSpacing(Double.parseDouble(tfVSpacing
-                .getText()));
-        ((GridLayout) layout).setManualColumns(manuallySetNumColumns
-                .isSelected());
+        ((GridLayout) layout).setNumColumns(Integer.parseInt(tfNumColumns.getText()));
+        ((GridLayout) layout).setHSpacing(Double.parseDouble(tfHSpacing.getText()));
+        ((GridLayout) layout).setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        ((GridLayout) layout).setManualColumns(manuallySetNumColumns.isSelected());
     }
 
     /**
@@ -93,14 +96,10 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
      */
     @Override
     public void fillFieldValues() {
-        tfNumColumns.setText(Integer.toString(((GridLayout) layout)
-                .getNumColumns()));
-        tfHSpacing
-                .setText(Double.toString(((GridLayout) layout).getHSpacing()));
-        tfVSpacing
-                .setText(Double.toString(((GridLayout) layout).getVSpacing()));
-        manuallySetNumColumns.setSelected(((GridLayout) layout)
-                .isManualColumns());
+        tfNumColumns.setText(Integer.toString(((GridLayout) layout).getNumColumns()));
+        tfHSpacing.setText(Double.toString(((GridLayout) layout).getHSpacing()));
+        tfVSpacing.setText(Double.toString(((GridLayout) layout).getVSpacing()));
+        manuallySetNumColumns.setSelected(((GridLayout) layout).isManualColumns());
         enableDisableSpacingFields();
     }
 

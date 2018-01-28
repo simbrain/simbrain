@@ -3,19 +3,23 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 import org.simbrain.network.core.Synapse;
 
 /**
- * 
  * @author Zoë Tosi
- *
  */
 public class ConvolvedJumpAndDecay extends SpikeResponder {
 
-    /** Jump height value. */
+    /**
+     * Jump height value.
+     */
     private double jumpHeight = 1;
 
-    /** Base line value. */
+    /**
+     * Base line value.
+     */
     private double baseLine = 0.0;
 
-    /** Rate at which synapse will decay (ms). */
+    /**
+     * Rate at which synapse will decay (ms).
+     */
     private double timeConstant = 3;
 
     /**
@@ -100,7 +104,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
 
     /**
      * @return the time constant of the exponential decay of the post synaptic
-     *         response
+     * response
      */
     public double getTimeConstant() {
         return timeConstant;
@@ -108,7 +112,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
 
     /**
      * @param decayTimeConstant the new time constant of the exponential decay
-     *            of the post synaptic response
+     *                          of the post synaptic response
      */
     public void setTimeConstant(double decayTimeConstant) {
         this.timeConstant = decayTimeConstant;

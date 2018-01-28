@@ -8,6 +8,7 @@ import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
+import org.simbrain.world.imageworld.ImageSourceAdapter;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -16,11 +17,10 @@ import java.awt.image.BufferedImageOp;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import org.simbrain.world.imageworld.ImageSourceAdapter;
-
 /**
  * ThreeDRenderer joins a JME3 rendering buffer to an ImageSource interface. It allows
  * Simbrain classes to easily use and filter the output of a rendered ThreeDWorld.
+ *
  * @author Tim Shea
  */
 public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProcessor {
@@ -37,7 +37,8 @@ public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProce
     /**
      * Create a new ThreeDRenderSource by specifying the viewport to render and whether the
      * source should use the main accelerated frame buffer.
-     * @param viewPort The viewport to render to this image source.
+     *
+     * @param viewPort     The viewport to render to this image source.
      * @param attachAsMain Whether to use the main frame buffer. Set false for agent views.
      */
     public ThreeDRenderSource(ViewPort viewPort, boolean attachAsMain) {
@@ -92,10 +93,12 @@ public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProce
     }
 
     @Override
-    public void preFrame(float tpf) { }
+    public void preFrame(float tpf) {
+    }
 
     @Override
-    public void postQueue(RenderQueue renderQueue) { }
+    public void postQueue(RenderQueue renderQueue) {
+    }
 
     @Override
     public void postFrame(FrameBuffer out) {
@@ -112,7 +115,8 @@ public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProce
     }
 
     @Override
-    public void reshape(ViewPort viewPort, int width, int height) {}
+    public void reshape(ViewPort viewPort, int width, int height) {
+    }
 
     @Override
     public void cleanup() {

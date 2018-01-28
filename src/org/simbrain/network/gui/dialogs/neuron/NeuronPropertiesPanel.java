@@ -18,27 +18,19 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.Window;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Panel for editing the properties of neuron, including general properties
  * (e.g. activation and label) and selecting and editing a specific update rule.
- *
+ * <p>
  * Called both from neuron dialog and from other dialogs that use it, e.g. the
  * add neurons (plural) dialog, and neuron group dialogs.
  *
@@ -48,10 +40,14 @@ import org.simbrain.util.widgets.EditablePanel;
 @SuppressWarnings("serial")
 public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
 
-    /** Panel to edit general neuron properties. */
+    /**
+     * Panel to edit general neuron properties.
+     */
     private GeneralNeuronPropertiesPanel generalNeuronPropertiesPanel;
 
-    /** Panel to edit properties of specific neuron type. */
+    /**
+     * Panel to edit properties of specific neuron type.
+     */
     private UpdateRulePanel updateRulePanel;
 
     /**
@@ -60,52 +56,43 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      */
     private static final int DEFAULT_VGAP = 10;
 
-    /** Whether to initially display the update rule panel. */
+    /**
+     * Whether to initially display the update rule panel.
+     */
     private static boolean DEFAULT_DISPLAY_UPDATE_RULE_PANEL = true;
 
     /** Static initializer */
     static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("useNativeFileChooser")) {
-            DEFAULT_DISPLAY_UPDATE_RULE_PANEL = Boolean.parseBoolean(properties
-                    .getProperty("initializeNeuronDialogToExpandedState"));
+            DEFAULT_DISPLAY_UPDATE_RULE_PANEL = Boolean.parseBoolean(properties.getProperty("initializeNeuronDialogToExpandedState"));
         }
     }
 
     /**
      * Creates a neuron property panel with a default display state.
      *
-     * @param neuronList
-     *            the list of neurons either being edited (editing) or being
-     *            used to fill the panel with default values (creation).
-     * @param parent
-     *            the parent window, made available for easy resizing.
+     * @param neuronList the list of neurons either being edited (editing) or being
+     *                   used to fill the panel with default values (creation).
+     * @param parent     the parent window, made available for easy resizing.
      * @return the property panel
      */
-    public static NeuronPropertiesPanel createNeuronPropertiesPanel(
-        final List<Neuron> neuronList, final Window parent) {
-        return createNeuronPropertiesPanel(neuronList, parent,
-                DEFAULT_DISPLAY_UPDATE_RULE_PANEL);
+    public static NeuronPropertiesPanel createNeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent) {
+        return createNeuronPropertiesPanel(neuronList, parent, DEFAULT_DISPLAY_UPDATE_RULE_PANEL);
     }
 
     /**
      * Create the panel without specifying whether to display id (that is done
      * automatically).
      *
-     * @param neuronList
-     *            the list of neurons either being edited (editing) or being
-     *            used to fill the panel with default values (creation).
-     * @param parent
-     *            the parent window, made available for easy resizing.
-     * @param displayUpdateRuleProperties
-     *            whether or not to display the neuron update rule properties
+     * @param neuronList                  the list of neurons either being edited (editing) or being
+     *                                    used to fill the panel with default values (creation).
+     * @param parent                      the parent window, made available for easy resizing.
+     * @param displayUpdateRuleProperties whether or not to display the neuron update rule properties
      * @return the property panel
      */
-    public static NeuronPropertiesPanel createNeuronPropertiesPanel(
-            final List<Neuron> neuronList, final Window parent,
-            final boolean displayUpdateRuleProperties) {
-        NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList,
-                parent, displayUpdateRuleProperties);
+    public static NeuronPropertiesPanel createNeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent, final boolean displayUpdateRuleProperties) {
+        NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList, parent, displayUpdateRuleProperties);
         cnip.initializeLayout();
         return cnip;
     }
@@ -113,25 +100,18 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     /**
      * {@link #createNeuronPropertiesPanel(List, Window, boolean, boolean)}
      */
-    private NeuronPropertiesPanel(final List<Neuron> neuronList,
-        final Window parent, final boolean displayUpdateRuleProperties,
-        final boolean displayID) {
-        generalNeuronPropertiesPanel = GeneralNeuronPropertiesPanel.createPanel(
-            neuronList, parent, displayID);
-        updateRulePanel = new UpdateRulePanel(neuronList, parent,
-                displayUpdateRuleProperties);
+    private NeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent, final boolean displayUpdateRuleProperties, final boolean displayID) {
+        generalNeuronPropertiesPanel = GeneralNeuronPropertiesPanel.createPanel(neuronList, parent, displayID);
+        updateRulePanel = new UpdateRulePanel(neuronList, parent, displayUpdateRuleProperties);
     }
 
     /**
      * Construct the panel without specifying whether to display id (that is
      * done automatically).
      */
-    private NeuronPropertiesPanel(final List<Neuron> neuronList,
-        final Window parent, final boolean displayUpdateRuleProperties) {
-        generalNeuronPropertiesPanel = GeneralNeuronPropertiesPanel.createPanel(
-            neuronList, parent);
-        updateRulePanel = new UpdateRulePanel(neuronList, parent,
-                displayUpdateRuleProperties);
+    private NeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent, final boolean displayUpdateRuleProperties) {
+        generalNeuronPropertiesPanel = GeneralNeuronPropertiesPanel.createPanel(neuronList, parent);
+        updateRulePanel = new UpdateRulePanel(neuronList, parent, displayUpdateRuleProperties);
     }
 
     /**
@@ -140,12 +120,10 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     private void initializeLayout() {
 
         // Respond to update panel combo box changes here, so that general panel can be updated too
-        updateRulePanel.getCbNeuronType().addActionListener(
-                e -> SwingUtilities.invokeLater(() -> {
-                    generalNeuronPropertiesPanel
-                            .updateFieldVisibility(updateRulePanel.getNeuronRulePanel().getPrototypeRule());
-                        repaint();
-                }));
+        updateRulePanel.getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> {
+            generalNeuronPropertiesPanel.updateFieldVisibility(updateRulePanel.getNeuronRulePanel().getPrototypeRule());
+            repaint();
+        }));
 
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);
@@ -193,38 +171,38 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
 
-//    /**
-//     * Testing main.
-//     */
-//    public static void main(String[] args) {
-//
-//        // Set up a large inconsistent set of rules.
-//        List<Neuron> neuronList = new ArrayList<Neuron>();
-//        Network network = new Network();
-//        for (int i = 0; i < 10000; i++) {
-//            Neuron neuron = new Neuron(network);
-//            LinearRule rule = new LinearRule();
-//            neuron.setUpdateRule(rule);
-//            neuronList.add(neuron);
-//        }
-////        ((LinearRule) neuronList.get(1).getUpdateRule()).setSlope(-1); // Add an inconsistency in                                                     // slope
-//        ((LinearRule) neuronList.get(1).getUpdateRule()).setAddNoise(true); // Add a boolean inconsistency
-//
-//        // Test the test panel!
-//        NeuronDialog dialog = NeuronDialog.createNeuronDialog(neuronList);
-//
-//        // Show the test dialog
-//        dialog.setLocationRelativeTo(null);
-//        dialog.pack();
-//        dialog.setVisible(true);
-//
-//        System.out.println("Slope "
-//                + ((LinearRule) neuronList.get(1).getUpdateRule()).getSlope());
-//        System.out.println("Bias "
-//                + ((LinearRule) neuronList.get(1).getUpdateRule()).getBias());
-//        System.out.println(
-//                "Add noise " + ((LinearRule) neuronList.get(1).getUpdateRule())
-//                        .getAddNoise());
-//    }
+    //    /**
+    //     * Testing main.
+    //     */
+    //    public static void main(String[] args) {
+    //
+    //        // Set up a large inconsistent set of rules.
+    //        List<Neuron> neuronList = new ArrayList<Neuron>();
+    //        Network network = new Network();
+    //        for (int i = 0; i < 10000; i++) {
+    //            Neuron neuron = new Neuron(network);
+    //            LinearRule rule = new LinearRule();
+    //            neuron.setUpdateRule(rule);
+    //            neuronList.add(neuron);
+    //        }
+    ////        ((LinearRule) neuronList.get(1).getUpdateRule()).setSlope(-1); // Add an inconsistency in                                                     // slope
+    //        ((LinearRule) neuronList.get(1).getUpdateRule()).setAddNoise(true); // Add a boolean inconsistency
+    //
+    //        // Test the test panel!
+    //        NeuronDialog dialog = NeuronDialog.createNeuronDialog(neuronList);
+    //
+    //        // Show the test dialog
+    //        dialog.setLocationRelativeTo(null);
+    //        dialog.pack();
+    //        dialog.setVisible(true);
+    //
+    //        System.out.println("Slope "
+    //                + ((LinearRule) neuronList.get(1).getUpdateRule()).getSlope());
+    //        System.out.println("Bias "
+    //                + ((LinearRule) neuronList.get(1).getUpdateRule()).getBias());
+    //        System.out.println(
+    //                "Add noise " + ((LinearRule) neuronList.get(1).getUpdateRule())
+    //                        .getAddNoise());
+    //    }
 
 }

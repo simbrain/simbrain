@@ -28,7 +28,9 @@ import org.simbrain.util.propertyeditor2.EditableObject;
  */
 public abstract class SynapseUpdateRule implements EditableObject {
 
-    /** The maximum number of digits to display in the tool tip. */
+    /**
+     * The maximum number of digits to display in the tool tip.
+     */
     private static final int MAX_DIGITS = 9;
 
     /**
@@ -79,8 +81,7 @@ public abstract class SynapseUpdateRule implements EditableObject {
      * @return tool tip text
      */
     public String getToolTipText(final Synapse synapse) {
-        return "(" + synapse.getId() + ") Strength: "
-                + Utils.round(synapse.getStrength(), MAX_DIGITS);
+        return "(" + synapse.getId() + ") Strength: " + Utils.round(synapse.getStrength(), MAX_DIGITS);
     }
-    
+
 }

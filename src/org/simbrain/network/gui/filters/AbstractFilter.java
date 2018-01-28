@@ -28,9 +28,10 @@ import org.simbrain.util.Predicate;
  */
 public abstract class AbstractFilter implements PNodeFilter, Predicate {
 
-    /** @see Predicate
+    /**
      * @param object
      * @return
+     * @see Predicate
      */
     public boolean evaluate(final Object object) {
         // recast in terms of PNodeFilter
@@ -42,15 +43,17 @@ public abstract class AbstractFilter implements PNodeFilter, Predicate {
         }
     }
 
-    /** @see PNodeFilter
+    /**
      * @param node
      * @return
+     * @see PNodeFilter
      */
     public abstract boolean accept(final PNode node);
 
-    /** @see PNodeFilter
+    /**
      * @param node
      * @return
+     * @see PNodeFilter
      */
     public boolean acceptChildrenOf(final PNode node) {
         // always returns true, override for performance reasons

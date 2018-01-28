@@ -18,15 +18,14 @@
  */
 package org.simbrain.network.gui.actions.modelgroups;
 
-import java.awt.event.ActionEvent;
-import java.util.List;
-
-import javax.swing.*;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
 /**
  * Convert selected neurons to a neuron group.
@@ -43,16 +42,15 @@ public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
         super(networkPanel, "Convert to Neuron Group", EnablingCondition.NEURONS);
 
         putValue(NAME, "Convert Neurons to Neuron Group");
-        putValue(SHORT_DESCRIPTION,
-                "Convert selected neurons to a neuron group (G)");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(KeyStroke.getKeyStroke('G'), this);
+        putValue(SHORT_DESCRIPTION, "Convert selected neurons to a neuron group (G)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('G'), this);
         networkPanel.getActionMap().put(this, this);
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> neuronList = networkPanel.getSelectedModelNeurons();

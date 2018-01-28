@@ -23,19 +23,18 @@ package org.simbrain.util;
  * Functional interface for lambdas used to set values.
  *
  * @param <O> the type parameter of the object from which a parameter will
- * be retrieved
+ *            be retrieved
  * @param <V> the type of the set parameter
- *
  */
-public interface ParameterSetter <O, V> {
-	
+public interface ParameterSetter<O, V> {
+
     /**
      * Set an arbitrary parameter on an arbitrary type of object.
      *
      * @param source the object from which it is intended that one of
-     * its parameters will be returned
-     * @param value the value on the source object 
+     *               its parameters will be returned
+     * @param value  the value on the source object
      */
-	void setParameter(O source, V value);
+    void setParameter(O source, V value);
 
 }

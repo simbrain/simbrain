@@ -28,13 +28,19 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class Turning extends Effector {
 
-    /** Default direction. */
+    /**
+     * Default direction.
+     */
     public static final double DEFAULT_DIRECTION = 0;
 
-    /** Direction value to turn left. */
+    /**
+     * Direction value to turn left.
+     */
     public static final double LEFT = 1;
 
-    /** Direction value to turn right. */
+    /**
+     * Direction value to turn right.
+     */
     public static final double RIGHT = -1;
 
     /**
@@ -43,20 +49,26 @@ public class Turning extends Effector {
      */
     private double direction;
 
-    /** Default amount. */
+    /**
+     * Default amount.
+     */
     public static final double DEFAULT_AMOUNT = 0;
 
-    /** Amount to turn in radians. */
+    /**
+     * Amount to turn in radians.
+     */
     private double amount = 0;
 
-    /** Default label. */
+    /**
+     * Default label.
+     */
     public static final String DEFAULT_LABEL = "Turn";
 
     /**
      * Construct a turning effector.
      *
-     * @param parent parent entity.
-     * @param label descriptive label
+     * @param parent    parent entity.
+     * @param label     descriptive label
      * @param direction amount turn in radians.
      */
     public Turning(RotatingEntity parent, String label, double direction) {
@@ -82,7 +94,7 @@ public class Turning extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod="getMixedId")
+    @Consumable(idMethod = "getMixedId")
     public void addAmount(double amount) {
         this.amount += amount;
     }
@@ -91,7 +103,7 @@ public class Turning extends Effector {
     /**
      * @param amount the amount to set
      */
-    @Consumable(idMethod="getMixedId")
+    @Consumable(idMethod = "getMixedId")
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -115,5 +127,5 @@ public class Turning extends Effector {
         return "Turning Movement";
     }
 
-    
+
 }

@@ -25,13 +25,19 @@ import org.simbrain.network.core.Synapse;
  */
 public class JumpAndDecay extends SpikeResponder {
 
-    /** Jump height value. */
+    /**
+     * Jump height value.
+     */
     private double jumpHeight = 1;
 
-    /** Base line value. */
+    /**
+     * Base line value.
+     */
     private double baseLine;
 
-    /** Rate at which synapse will decay (ms). */
+    /**
+     * Rate at which synapse will decay (ms).
+     */
     private double timeConstant = 3;
 
     /**
@@ -105,7 +111,7 @@ public class JumpAndDecay extends SpikeResponder {
 
     /**
      * @return the time constant of the exponential decay of the post synaptic
-     *         response
+     * response
      */
     public double getTimeConstant() {
         return timeConstant;
@@ -113,7 +119,7 @@ public class JumpAndDecay extends SpikeResponder {
 
     /**
      * @param decayTimeConstant the new time constant of the exponential decay
-     *            of the post synaptic response
+     *                          of the post synaptic response
      */
     public void setTimeConstant(double decayTimeConstant) {
         this.timeConstant = decayTimeConstant;

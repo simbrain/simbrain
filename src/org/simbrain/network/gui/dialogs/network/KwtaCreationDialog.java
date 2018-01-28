@@ -18,10 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.Layout;
@@ -29,33 +25,49 @@ import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
+import javax.swing.*;
+
 /**
  * <b>KwtaDialog</b> is used as an assistant to create Kwta networks.
- *
+ * <p>
  * TODO: When this is re-implemented, use new property panel format.
  */
 public class KwtaCreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
+    /**
+     * Logic panel.
+     */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
     // TODO: Separate this from number of neurons! Add a second field.
-    /** K field. */
+    /**
+     * K field.
+     */
     private JTextField tfK = new JTextField("5");
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -73,8 +85,7 @@ public class KwtaCreationDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK
-                .getText()));
+        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()));
         layoutPanel.commitChanges();
         Layout layout = layoutPanel.getCurrentLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());

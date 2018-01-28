@@ -18,8 +18,7 @@
  */
 package org.simbrain.util;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  * Displays a simple JFrame, centers it, packs it, and makes it visible.
@@ -41,7 +40,7 @@ public class SimpleFrame {
      * Show the panel in a jframe with the provided title.
      *
      * @param component the component to show
-     * @param string the title
+     * @param string    the title
      */
     public static void displayPanel(JComponent component, String string) {
         JFrame frame = new JFrame();

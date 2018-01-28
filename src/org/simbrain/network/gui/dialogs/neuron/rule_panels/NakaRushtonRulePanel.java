@@ -18,49 +18,64 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.YesNoNull;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * <b>NakaRushtonNeuronPanel</b> edits a Naka Rushton neuron.
  */
-public class NakaRushtonRulePanel extends AbstractNeuronRulePanel
-        implements ActionListener {
+public class NakaRushtonRulePanel extends AbstractNeuronRulePanel implements ActionListener {
 
-    /** Steepness field. */
+    /**
+     * Steepness field.
+     */
     private JTextField tfSteepness;
 
-    /** Semi saturation field. */
+    /**
+     * Semi saturation field.
+     */
     private JTextField tfSemiSaturation;
 
-    /** Time constant field. */
+    /**
+     * Time constant field.
+     */
     private JTextField tfTimeConstant;
 
-    /** Use adaptation combo box. */
+    /**
+     * Use adaptation combo box.
+     */
     private YesNoNull tsUseAdaptation;
 
-    /** Adaptation time constant. */
+    /**
+     * Adaptation time constant.
+     */
     private JTextField tfAdaptationTime;
 
-    /** Adaptation parameter. */
+    /**
+     * Adaptation parameter.
+     */
     private JTextField tfAdaptationParam;
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final NakaRushtonRule prototypeRule = new NakaRushtonRule();
 
     /**
@@ -69,28 +84,12 @@ public class NakaRushtonRulePanel extends AbstractNeuronRulePanel
     public NakaRushtonRulePanel() {
         super();
 
-        tfSteepness = createTextField(
-                (r) -> ((NakaRushtonRule) r).getSteepness(),
-                (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
-        tfSemiSaturation = createTextField(
-                (r) -> ((NakaRushtonRule) r).getSteepness(),
-                (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
-        tfTimeConstant = createTextField(
-                (r) -> ((NakaRushtonRule) r).getTimeConstant(),
-                (r, val) -> ((NakaRushtonRule) r)
-                        .setTimeConstant((double) val));
-        tsUseAdaptation = createYesNoChoiceBox(
-                (r) -> ((NakaRushtonRule) r).getUseAdaptation(),
-                (r, val) -> ((NakaRushtonRule) r)
-                        .setUseAdaptation((Boolean) val));
-        tfAdaptationParam = createTextField(
-                (r) -> ((NakaRushtonRule) r).getAdaptationParameter(),
-                (r, val) -> ((NakaRushtonRule) r)
-                        .setAdaptationParameter((double) val));
-        tfAdaptationTime = createTextField(
-                (r) -> ((NakaRushtonRule) r).getAdaptationTimeConstant(),
-                (r, val) -> ((NakaRushtonRule) r)
-                        .setAdaptationTimeConstant((double) val));
+        tfSteepness = createTextField((r) -> ((NakaRushtonRule) r).getSteepness(), (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
+        tfSemiSaturation = createTextField((r) -> ((NakaRushtonRule) r).getSteepness(), (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
+        tfTimeConstant = createTextField((r) -> ((NakaRushtonRule) r).getTimeConstant(), (r, val) -> ((NakaRushtonRule) r).setTimeConstant((double) val));
+        tsUseAdaptation = createYesNoChoiceBox((r) -> ((NakaRushtonRule) r).getUseAdaptation(), (r, val) -> ((NakaRushtonRule) r).setUseAdaptation((Boolean) val));
+        tfAdaptationParam = createTextField((r) -> ((NakaRushtonRule) r).getAdaptationParameter(), (r, val) -> ((NakaRushtonRule) r).setAdaptationParameter((double) val));
+        tfAdaptationTime = createTextField((r) -> ((NakaRushtonRule) r).getAdaptationTimeConstant(), (r, val) -> ((NakaRushtonRule) r).setAdaptationTimeConstant((double) val));
 
         tsUseAdaptation.addActionListener(this);
 

@@ -18,62 +18,62 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.AbstractSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.widgets.ChoicesWithNull;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * A rule panel containing all the variables and methods which would be shared
  * between rules panels for discrete and continuous time sigmoidal rule panels.
- * 
+ *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public abstract class AbstractSigmoidalRulePanel
-        extends AbstractNeuronRulePanel {
+public abstract class AbstractSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
     //TODO: Clean up top
-    
-    /** Implementation combo box. */
+
+    /**
+     * Implementation combo box.
+     */
     protected ChoicesWithNull cbImplementation;
 
-    /** Bias field. */
+    /**
+     * Bias field.
+     */
     protected JTextField tfBias;
 
-    /** Slope field. */
+    /**
+     * Slope field.
+     */
     protected JTextField tfSlope;
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     protected JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     protected LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /**
      * Construct the abstract panel.
      */
     protected AbstractSigmoidalRulePanel() {
-        cbImplementation = createDropDown(
-                (r) -> ((AbstractSigmoidalRule) r).getSquashFunctionInt(),
-                (r, val) -> ((AbstractSigmoidalRule) r)
-                        .setSquashFunctionInt((int) val));
+        cbImplementation = createDropDown((r) -> ((AbstractSigmoidalRule) r).getSquashFunctionInt(), (r, val) -> ((AbstractSigmoidalRule) r).setSquashFunctionInt((int) val));
         cbImplementation.setItems(SquashingFunction.names());
-        tfSlope = createTextField(
-                (r) -> ((AbstractSigmoidalRule) r).getSlope(),
-                (r, val) -> ((AbstractSigmoidalRule) r).setSlope((double) val));
-        tfBias = createTextField((r) -> ((AbstractSigmoidalRule) r).getBias(),
-                (r, val) -> ((AbstractSigmoidalRule) r).setBias((double) val));
+        tfSlope = createTextField((r) -> ((AbstractSigmoidalRule) r).getSlope(), (r, val) -> ((AbstractSigmoidalRule) r).setSlope((double) val));
+        tfBias = createTextField((r) -> ((AbstractSigmoidalRule) r).getBias(), (r, val) -> ((AbstractSigmoidalRule) r).setBias((double) val));
     }
 
     /**
-     * Return the combo box. 
+     * Return the combo box.
      *
      * @return the cbImplementation
      */

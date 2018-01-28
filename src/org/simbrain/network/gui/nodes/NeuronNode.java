@@ -18,23 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
-//import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
@@ -43,84 +29,129 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+//import org.piccolo2d.nodes.PText;
+
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
  * network model.
  */
 @SuppressWarnings("serial")
-public class NeuronNode extends ScreenElement
-        implements PropertyChangeListener {
+public class NeuronNode extends ScreenElement implements PropertyChangeListener {
 
-    /** The logical neuron this screen element represents. */
+    /**
+     * The logical neuron this screen element represents.
+     */
     protected Neuron neuron;
 
-    /** Default text visibility threshold. */
+    /**
+     * Default text visibility threshold.
+     */
     private static final double TEXT_VISIBILITY_THRESHOLD = 0.5;
 
-    /** Diameter of neuron. */
+    /**
+     * Diameter of neuron.
+     */
     private static final int DIAMETER = 24;
 
-    /** Font for input and output labels. */
+    /**
+     * Font for input and output labels.
+     */
     public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
 
-    /** Main shape. */
+    /**
+     * Main shape.
+     */
     private PPath mainShape;
 
-    /** Circle shape for representing neurons. */
-    private PPath circle = PPath.createEllipse(0 - DIAMETER / 2,
-            0 - DIAMETER / 2, DIAMETER, DIAMETER);
+    /**
+     * Circle shape for representing neurons.
+     */
+    private PPath circle = PPath.createEllipse(0 - DIAMETER / 2, 0 - DIAMETER / 2, DIAMETER, DIAMETER);
 
-    /** Square shape for representing activity generators. */
-    private PPath square = PPath.createRectangle(0 - DIAMETER / 2,
-            0 - DIAMETER / 2, DIAMETER, DIAMETER);
+    /**
+     * Square shape for representing activity generators.
+     */
+    private PPath square = PPath.createRectangle(0 - DIAMETER / 2, 0 - DIAMETER / 2, DIAMETER, DIAMETER);
 
     /**
      * A list of SynapseNodes connected to this NeuronNode; used for updating.
      */
     private HashSet<SynapseNode> connectedSynapses = new HashSet<SynapseNode>();
 
-    /** Number text inside neuron. */
+    /**
+     * Number text inside neuron.
+     */
     private PText activationText = new PText();
 
-    /** Text corresponding to neuron's (optional) label. */
+    /**
+     * Text corresponding to neuron's (optional) label.
+     */
     private PText labelText = new PText();
 
-    /** Text corresponding to neuron's update priority. */
+    /**
+     * Text corresponding to neuron's update priority.
+     */
     private PText priorityText = new PText();
 
-    /** Background for label text, so that background objects don't show up. */
+    /**
+     * Background for label text, so that background objects don't show up.
+     */
     private PNode labelBackground = new PNode();
 
-    /** Heavy stroke for clamped nodes. */
+    /**
+     * Heavy stroke for clamped nodes.
+     */
     private static final BasicStroke CLAMPED_STROKE = new BasicStroke(2f);
 
-    /** Neuron Font. */
+    /**
+     * Neuron Font.
+     */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
-    /** Priority Font. */
+    /**
+     * Priority Font.
+     */
     public static final Font PRIORITY_FONT = new Font("Courier", Font.PLAIN, 9);
 
     // TODO: These should be replaced with actual scaling of the text object.
 
-    /** Neuron font bold. */
-    public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD,
-            11);
+    /**
+     * Neuron font bold.
+     */
+    public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
 
-    /** Neuron font small. */
-    public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN,
-            9);
+    /**
+     * Neuron font small.
+     */
+    public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
 
-    /** Neuron font very small. */
-    public static final Font NEURON_FONT_VERYSMALL = new Font("Arial",
-            Font.PLAIN, 7);
+    /**
+     * Neuron font very small.
+     */
+    public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
 
-    /** Color of "active" neurons, with positive values. */
+    /**
+     * Color of "active" neurons, with positive values.
+     */
     private static float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
 
-    /** Color of "inhibited" neurons, with negative values. */
+    /**
+     * Color of "inhibited" neurons, with negative values.
+     */
     private static float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
 
-    /** Color of "spiking" synapse. */
+    /**
+     * Color of "spiking" synapse.
+     */
     private static Color spikingColor = Color.yellow;
 
     /**
@@ -128,13 +159,15 @@ public class NeuronNode extends ScreenElement
      */
     private boolean currentTextVisibility;
 
-    /** If true then a custom color is being used for stroke. */
+    /**
+     * If true then a custom color is being used for stroke.
+     */
     private boolean customStrokeColor = false;
 
     /**
      * Create a new neuron node.
      *
-     * @param net Reference to NetworkPanel
+     * @param net    Reference to NetworkPanel
      * @param neuron reference to model neuron
      */
     public NeuronNode(final NetworkPanel net, final Neuron neuron) {
@@ -179,7 +212,7 @@ public class NeuronNode extends ScreenElement
 
     /**
      * Update the neuron view based on the model neuron.
-     *
+     * <p>
      * This should not be called on every update but only when the neuron is
      * changed.
      */
@@ -227,7 +260,7 @@ public class NeuronNode extends ScreenElement
             activationText.scale(.7);
             activationText.translate(-4, 3);
         } else if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and
-                                                                // 1
+            // 1
             activationText.setFont(NEURON_FONT_BOLD);
             String text = Utils.round(act, 1);
             if (text.startsWith("0.")) {
@@ -241,8 +274,7 @@ public class NeuronNode extends ScreenElement
             activationText.setText(text);
         } else if ((act > -1) && (act < 0)) { // Between -1 and 0
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText(Utils.round(act, 1).replaceAll("^-0*", "-")
-                    .replaceAll(".0$", ""));
+            activationText.setText(Utils.round(act, 1).replaceAll("^-0*", "-").replaceAll(".0$", ""));
         } else {
             // greater than 1 or less than -1
             activationText.setFont(NEURON_FONT_BOLD);
@@ -264,8 +296,7 @@ public class NeuronNode extends ScreenElement
      * "zoomed in" show all text; when zoomed out, don't.
      */
     public void updateTextVisibility() {
-        double scale = this.getNetworkPanel().getCanvas().getCamera()
-                .getViewScale();
+        double scale = this.getNetworkPanel().getCanvas().getCamera().getViewScale();
         if (scale > TEXT_VISIBILITY_THRESHOLD) {
             if (!currentTextVisibility) {
                 setDisplayText(true);
@@ -311,12 +342,10 @@ public class NeuronNode extends ScreenElement
         if ((activation > -.1) && (activation < .1)) {
             mainShape.setPaint(Color.white);
         } else if (activation > 0) {
-            float saturation = checkSaturationValid((float) Math.abs(activation
-                    / neuron.getUpdateRule().getGraphicalUpperBound()));
+            float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalUpperBound()));
             mainShape.setPaint(Color.getHSBColor(hotColor, saturation, 1));
         } else if (activation < 0) {
-            float saturation = checkSaturationValid((float) Math.abs(activation
-                    / neuron.getUpdateRule().getGraphicalLowerBound()));
+            float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalLowerBound()));
             mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
@@ -338,13 +367,10 @@ public class NeuronNode extends ScreenElement
             return;
         }
         // Set label text
-        if ((!neuron.getLabel().equalsIgnoreCase("")) || (!neuron.getLabel()
-                .equalsIgnoreCase(SimbrainConstants.NULL_STRING))) {
+        if ((!neuron.getLabel().equalsIgnoreCase("")) || (!neuron.getLabel().equalsIgnoreCase(SimbrainConstants.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(
-                    mainShape.getX() - labelText.getWidth() / 2 + DIAMETER / 2,
-                    mainShape.getY() - DIAMETER / 2 - 1);
+            labelText.setOffset(mainShape.getX() - labelText.getWidth() / 2 + DIAMETER / 2, mainShape.getY() - DIAMETER / 2 - 1);
             labelBackground.setBounds(labelText.getFullBounds());
 
             // update bounds to include text
@@ -381,8 +407,7 @@ public class NeuronNode extends ScreenElement
      */
     private void setActivationTextPosition() {
         if (activationText != null) {
-            activationText.setOffset(mainShape.getX() + DIAMETER / 4 + 2,
-                    mainShape.getY() + DIAMETER / 4 + 1);
+            activationText.setOffset(mainShape.getX() + DIAMETER / 4 + 2, mainShape.getY() + DIAMETER / 4 + 1);
         }
     }
 
@@ -390,7 +415,7 @@ public class NeuronNode extends ScreenElement
      * Toggles the visibility of the priority view text label.
      *
      * @param makePriorityTextVisible whether the priority text label should be
-     *            visible or not
+     *                                visible or not
      */
     public void setPriorityView(boolean makePriorityTextVisible) {
         if (makePriorityTextVisible) {
@@ -410,47 +435,52 @@ public class NeuronNode extends ScreenElement
         if (priorityText == null || !currentTextVisibility) {
             return;
         }
-        priorityText.setOffset(mainShape.getBounds().getCenterX(),
-                mainShape.getBounds().getCenterY() + DIAMETER - 10);
+        priorityText.setOffset(mainShape.getBounds().getCenterX(), mainShape.getBounds().getCenterY() + DIAMETER - 10);
     }
 
     /**
-     * @see ScreenElement
      * @return screen element selectable
+     * @see ScreenElement
      */
     public boolean isSelectable() {
         return true;
     }
 
     /**
-     * @see ScreenElement
      * @return screen element show a selection handle
+     * @see ScreenElement
      */
     public boolean showSelectionHandle() {
         return true;
     }
 
     /**
-     * @see ScreenElement
      * @return able to drag screen element
+     * @see ScreenElement
      */
     public boolean isDraggable() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected boolean hasToolTipText() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected String getToolTipText() {
         String ret = new String();
         ret += neuron.getToolTipText();
         return ret;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected boolean hasContextMenu() {
         return true;
     }
@@ -464,25 +494,29 @@ public class NeuronNode extends ScreenElement
         return mainShape.getGlobalBounds().getCenter2D();
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected JPopupMenu getContextMenu() {
         return getNetworkPanel().getNeuronContextMenu(neuron);
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected boolean hasPropertyDialog() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected JDialog getPropertyDialog() {
-        Collection<NeuronNode> neurons = this.getNetworkPanel()
-                .getSelectedNeurons();
+        Collection<NeuronNode> neurons = this.getNetworkPanel().getSelectedNeurons();
         if (neurons == null || neurons.isEmpty()) {
             return null;
         }
-        NeuronDialog dialog = (NeuronDialog) getNetworkPanel()
-                .getNeuronDialog(neurons);
+        NeuronDialog dialog = (NeuronDialog) getNetworkPanel().getNeuronDialog(neurons);
         return dialog;
     }
 
@@ -493,8 +527,7 @@ public class NeuronNode extends ScreenElement
      */
     public String toString() {
         String ret = new String();
-        ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")("
-                + getGlobalFullBounds().y + ")\n";
+        ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
         return ret;
     }
 
@@ -521,7 +554,9 @@ public class NeuronNode extends ScreenElement
         firePropertyChange(-1, "neuron", oldNeuron, neuron);
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected JPopupMenu createContextMenu() {
         return getContextMenu();
     }
@@ -614,7 +649,7 @@ public class NeuronNode extends ScreenElement
     @Override
     public void resetColors() {
         if (!customStrokeColor) {
-            mainShape.setStrokePaint(SynapseNode.getLineColor());            
+            mainShape.setStrokePaint(SynapseNode.getLineColor());
         }
         // TODO: Check if change only?
         labelBackground.setPaint(NetworkPanel.getBackgroundColor());
@@ -672,8 +707,8 @@ public class NeuronNode extends ScreenElement
     }
 
     /**
-     * Set a custom color for the circle stroke (not the fill). 
-     * 
+     * Set a custom color for the circle stroke (not the fill).
+     *
      * @param color Color to use
      */
     public void setCustomStrokeColor(Color color) {

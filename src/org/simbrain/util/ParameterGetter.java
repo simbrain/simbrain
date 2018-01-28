@@ -21,25 +21,24 @@ package org.simbrain.util;
 import org.simbrain.network.gui.NetworkUtils;
 
 /**
- * Functional interface for lambdas used primarily in checking consistency 
+ * Functional interface for lambdas used primarily in checking consistency
  * of an objects parameter via {@linkplain NetworkUtils}.
  *
  * @param <O> the type parameter of the object from which a parameter will
- * be retrieved
+ *            be retrieved
  * @param <V> the type of the retrieved parameter
- *  
  * @author Zoë Tosi
  */
-public interface ParameterGetter <O, V> {
-	
-	/**
-	 * A generic method set up with the intention of allowing programmers
-	 * to create a simple function which retrieves an arbitrary parameter
-	 * of an arbitrary type of object.
-	 *
-	 * @param source the object returning a value
-	 * @return the value on the source object 
-	 */
-	V getParameter(O source);
-	
+public interface ParameterGetter<O, V> {
+
+    /**
+     * A generic method set up with the intention of allowing programmers
+     * to create a simple function which retrieves an arbitrary parameter
+     * of an arbitrary type of object.
+     *
+     * @param source the object returning a value
+     * @return the value on the source object
+     */
+    V getParameter(O source);
+
 }

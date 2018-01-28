@@ -17,10 +17,10 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.List;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+
+import java.util.List;
 
 /**
  * Extend neuron group with layer information used in a layered network.
@@ -29,20 +29,24 @@ import org.simbrain.network.core.Neuron;
  */
 public class NeuronLayer extends NeuronGroup {
 
-    /** Enumeration of layer types. */
+    /**
+     * Enumeration of layer types.
+     */
     public enum LayerType {
         Input, Hidden, Output, Context, Reservoir
     }
 
-    /** The type of this layer: input, hidden, or outout. */
+    /**
+     * The type of this layer: input, hidden, or outout.
+     */
     private LayerType type;
 
     /**
      * Construct a neuron layer.
      *
-     * @param net parent network
+     * @param net     parent network
      * @param neurons set of neurons
-     * @param type the type of this layer
+     * @param type    the type of this layer
      */
     public NeuronLayer(Network net, List<Neuron> neurons, LayerType type) {
         super(net, neurons);

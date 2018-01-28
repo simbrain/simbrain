@@ -1,39 +1,38 @@
 package org.simbrain.util.widgets;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-
-import org.simbrain.resource.ResourceManager;
-
 /**
- *
  * This class consists of a graphical lock that when clicked changes to an open
  * lock and back to a locked lock when clicked again.
  *
- *
  * @author Zoë
- *
  */
 public class LinkIcon extends JPanel implements MouseListener {
 
-    /** The locked lock icon. */
-    private ImageIcon linkedImIc = ResourceManager
-            .getImageIcon("chainIcon.png");
+    /**
+     * The locked lock icon.
+     */
+    private ImageIcon linkedImIc = ResourceManager.getImageIcon("chainIcon.png");
 
-    /** The unlocked lock icon. */
-    private ImageIcon unlinkedImIc = ResourceManager
-            .getImageIcon("brokenChainIcon.png");
+    /**
+     * The unlocked lock icon.
+     */
+    private ImageIcon unlinkedImIc = ResourceManager.getImageIcon("brokenChainIcon.png");
 
-    /** The image assigned either the locked or unlocked ImageIcon. */
+    /**
+     * The image assigned either the locked or unlocked ImageIcon.
+     */
     private Image link;
 
-    /** Whether or not the icon is in the locked or unlocked state. */
+    /**
+     * Whether or not the icon is in the locked or unlocked state.
+     */
     private boolean linked;
 
     /**
@@ -47,8 +46,7 @@ public class LinkIcon extends JPanel implements MouseListener {
         link = linked ? linkedImIc.getImage() : unlinkedImIc.getImage();
         addMouseListener(this);
 
-        Dimension dim = new Dimension((int) link.getWidth(null),
-                link.getHeight(null));
+        Dimension dim = new Dimension((int) link.getWidth(null), link.getHeight(null));
         setPreferredSize(dim);
         setMinimumSize(dim);
         setMaximumSize(dim);

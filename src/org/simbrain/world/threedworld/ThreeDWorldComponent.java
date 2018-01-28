@@ -1,18 +1,20 @@
 package org.simbrain.world.threedworld;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.threedworld.engine.ThreeDEngine;
+import org.simbrain.world.threedworld.engine.ThreeDEngineConverter;
+import org.simbrain.world.threedworld.entities.Agent;
+import org.simbrain.world.threedworld.entities.BoxEntityXmlConverter;
+import org.simbrain.world.threedworld.entities.Entity;
+import org.simbrain.world.threedworld.entities.ModelEntityXmlConverter;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.threedworld.engine.ThreeDEngine;
-import org.simbrain.world.threedworld.engine.ThreeDEngineConverter;
-import org.simbrain.world.threedworld.entities.*;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * ThreeDWorldComponent is a workspace component to extract some serialization and attribute
@@ -32,8 +34,9 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
 
     /**
      * Open a saved ThreeDWorldComponent from an XML input stream.
-     * @param input The input stream to read.
-     * @param name The name of the new world component.
+     *
+     * @param input  The input stream to read.
+     * @param name   The name of the new world component.
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ThreeDWorldComponent with a valid ThreeDWorld.
      */
@@ -47,6 +50,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
 
     /**
      * Construct a new ThreeDWorldComponent.
+     *
      * @param name The name of the new component.
      */
     public ThreeDWorldComponent(String name) {
@@ -54,10 +58,12 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
         world = new ThreeDWorld();
         world.addListener(new ThreeDWorld.Listener() {
             @Override
-            public void onWorldInitialize(ThreeDWorld world) {}
+            public void onWorldInitialize(ThreeDWorld world) {
+            }
 
             @Override
-            public void onWorldUpdate(ThreeDWorld world) {}
+            public void onWorldUpdate(ThreeDWorld world) {
+            }
 
             @Override
             public void onWorldClosing(ThreeDWorld world) {
@@ -68,7 +74,8 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
 
     /**
      * Construct a ThreeDWorldComponent with an existing ThreeDWorld.
-     * @param name The name of the new component.
+     *
+     * @param name  The name of the new component.
      * @param world The world.
      */
     private ThreeDWorldComponent(String name, ThreeDWorld world) {

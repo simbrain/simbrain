@@ -13,13 +13,11 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import org.simbrain.network.layouts.HexagonalGridLayout;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-
-import org.simbrain.network.layouts.HexagonalGridLayout;
 
 /**
  * <b>HexagonalGridLayoutPanel</b> allows the user to define the layout of a
@@ -27,16 +25,24 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
  */
 public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 
-    /** Spacing field. */
+    /**
+     * Spacing field.
+     */
     private JTextField tfNumColumns = new JTextField();
 
-    /** Spacing field. */
+    /**
+     * Spacing field.
+     */
     private JTextField tfHSpacing = new JTextField();
 
-    /** Vertical spacing field. */
+    /**
+     * Vertical spacing field.
+     */
     private JTextField tfVSpacing = new JTextField();
 
-    /** Manual spacing field. */
+    /**
+     * Manual spacing field.
+     */
     private JCheckBox manuallySetNumColumns = new JCheckBox();
 
     /**
@@ -73,14 +79,10 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
      */
     @Override
     public void commitChanges() {
-        ((HexagonalGridLayout) layout).setNumColumns(Integer
-                .parseInt(tfNumColumns.getText()));
-        ((HexagonalGridLayout) layout).setHSpacing(Double
-                .parseDouble(tfHSpacing.getText()));
-        ((HexagonalGridLayout) layout).setVSpacing(Double
-                .parseDouble(tfVSpacing.getText()));
-        ((HexagonalGridLayout) layout).setManualColumns(manuallySetNumColumns
-                .isSelected());
+        ((HexagonalGridLayout) layout).setNumColumns(Integer.parseInt(tfNumColumns.getText()));
+        ((HexagonalGridLayout) layout).setHSpacing(Double.parseDouble(tfHSpacing.getText()));
+        ((HexagonalGridLayout) layout).setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        ((HexagonalGridLayout) layout).setManualColumns(manuallySetNumColumns.isSelected());
     }
 
     /**
@@ -88,14 +90,10 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
      */
     @Override
     public void fillFieldValues() {
-        tfNumColumns.setText(Integer.toString(((HexagonalGridLayout) layout)
-                .getNumColumns()));
-        tfHSpacing.setText(Double.toString(((HexagonalGridLayout) layout)
-                .getHSpacing()));
-        tfVSpacing.setText(Double.toString(((HexagonalGridLayout) layout)
-                .getVSpacing()));
-        manuallySetNumColumns.setSelected(((HexagonalGridLayout) layout)
-                .isManualColumns());
+        tfNumColumns.setText(Integer.toString(((HexagonalGridLayout) layout).getNumColumns()));
+        tfHSpacing.setText(Double.toString(((HexagonalGridLayout) layout).getHSpacing()));
+        tfVSpacing.setText(Double.toString(((HexagonalGridLayout) layout).getVSpacing()));
+        manuallySetNumColumns.setSelected(((HexagonalGridLayout) layout).isManualColumns());
         enableDisableSpacingFields();
     }
 

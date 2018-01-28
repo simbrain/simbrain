@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
 
 /**
@@ -29,12 +28,13 @@ import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuron
  */
 public class RandomGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final RandomNeuronRule prototypeRule = new RandomNeuronRule();
 
     /**
      * Creates an instance of this panel.
-     *
      */
     public RandomGeneratorPanel() {
         super();

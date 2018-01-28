@@ -13,7 +13,7 @@
  */
 package org.simbrain.util;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.prefs.Preferences;
 
@@ -37,17 +37,22 @@ import java.util.prefs.Preferences;
  * This is 0 for numbers and an empty string for string.
  *
  * @author Jeff Yoshimi
- *
  */
 public class SimbrainPreferences {
 
-    /** The main preference object. */
+    /**
+     * The main preference object.
+     */
     private static final Preferences SIMBRAIN_PREFERENCES = Preferences.userRoot().node("/org/simbrain");
 
-    /** Mapping from property names to default values. */
+    /**
+     * Mapping from property names to default values.
+     */
     private static final HashMap<String, Object> DEFAULT_MAP = new HashMap<String, Object>();
 
-    /** System specific file separator. */
+    /**
+     * System specific file separator.
+     */
     private static final String FS = System.getProperty("file.separator");
 
     /** Initialize default map */
@@ -110,7 +115,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a String.
      *
      * @param property the property name
-     * @param val the string value
+     * @param val      the string value
      */
     public static void putString(String property, String val) {
         SIMBRAIN_PREFERENCES.put(property, val);
@@ -129,7 +134,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a double.
      *
      * @param property the property name
-     * @param val the double value
+     * @param val      the double value
      */
     public static void putDouble(String property, double val) {
         SIMBRAIN_PREFERENCES.putDouble(property, val);
@@ -143,12 +148,12 @@ public class SimbrainPreferences {
         Double defaultValue = DEFAULT_MAP.containsKey(property) ? (Double) DEFAULT_MAP.get(property) : 0.0;
         return SIMBRAIN_PREFERENCES.getDouble(property, defaultValue);
     }
-    
+
     /**
      * Set a property whose value is a boolean.
      *
      * @param property the property name
-     * @param val the boolean value
+     * @param val      the boolean value
      */
     public static void putBoolean(String property, boolean val) {
         SIMBRAIN_PREFERENCES.putBoolean(property, val);
@@ -167,7 +172,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a integer.
      *
      * @param property the property name
-     * @param val the int value
+     * @param val      the int value
      */
     public static void putInt(String property, int val) {
         SIMBRAIN_PREFERENCES.putInt(property, val);
@@ -186,7 +191,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a float.
      *
      * @param property the property name
-     * @param val the float value
+     * @param val      the float value
      */
     public static void putFloat(String property, float val) {
         SIMBRAIN_PREFERENCES.putFloat(property, val);

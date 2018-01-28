@@ -18,69 +18,72 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.reflect.Type;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.MismatchedAttributesException;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * GUI dialog for creating couplings.
  */
 public class DesktopCouplingManager extends JPanel implements ActionListener {
 
-    /** Flag to ensure that only one dialog is opened at a time. */
+    /**
+     * Flag to ensure that only one dialog is opened at a time.
+     */
     public static boolean isVisible;
 
-    /** List of producers. */
+    /**
+     * List of producers.
+     */
     private AttributePanel producerPanel;
 
-    /** List of consumers. */
+    /**
+     * List of consumers.
+     */
     private AttributePanel consumerPanel;
 
-    /** Methods for making couplings. */
-    private String[] tempStrings = { "One to One", "One to Many" };
+    /**
+     * Methods for making couplings.
+     */
+    private String[] tempStrings = {"One to One", "One to Many"};
 
-    /** Methods for making couplings. */
+    /**
+     * Methods for making couplings.
+     */
     private JComboBox<String> couplingMethodComboBox = new JComboBox<String>(tempStrings);
 
-    /** Reference to desktop. */
+    /**
+     * Reference to desktop.
+     */
     private SimbrainDesktop desktop;
 
-    /** Reference of parent frame. */
+    /**
+     * Reference of parent frame.
+     */
     private GenericFrame frame;
 
     /**
      * Creates and displays the coupling manager.
      *
      * @param desktop reference to parent desktop
-     * @param frame reference to parent frame
+     * @param frame   reference to parent frame
      */
-    public DesktopCouplingManager(final SimbrainDesktop desktop,
-            final GenericJInternalFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericJInternalFrame frame) {
         super(new BorderLayout());
         this.desktop = desktop;
         this.frame = frame;
@@ -133,15 +136,14 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     }
 
     /**
-     * @see ActionListener
      * @param event to listen.
+     * @see ActionListener
      */
     public void actionPerformed(final ActionEvent event) {
 
         // Refresh component lists
         if (event.getSource() instanceof JComboBox) {
-            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event
-                    .getSource()).getSelectedItem();
+            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
         }
 
         // Handle Button Presses
@@ -165,10 +167,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         List<Consumer<?>> consumers = (List<Consumer<?>>) consumerPanel.getSelectedAttributes();
 
         if ((producers.size() == 0) || (consumers.size() == 0)) {
-            JOptionPane.showMessageDialog(null,
-                    "You must select at least one consuming and producing attribute\nto create couplings.",
-                    "No Attributes Selected Warning",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "You must select at least one consuming and producing attribute\nto create couplings.", "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -180,8 +179,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
                 desktop.getWorkspace().getCouplingFactory().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(),
-                    "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
         }
     }
 

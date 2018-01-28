@@ -1,15 +1,14 @@
 package org.simbrain.util.propertyeditor2;
 
-import java.awt.Color;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Arrays;
-
-import javax.swing.JDialog;
-
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 /**
  * For testing ReflectivePropertyEditor.
@@ -36,18 +35,16 @@ public class TestObject implements EditableObject {
     Short theShortObject = 20;
 
     // Primitive number tests
-    @UserParameter(label = "The int", description = "The int", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
+    @UserParameter(label = "The int", description = "The int", minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
     int theInt = 1;
     double theDouble = .9092342;
     float theFloat = 0;
-    @UserParameter(label = "The long", description = "The long", 
-            minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
+    @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
     long theLong = 20L;
     short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
-    double[] doubleArray = new double[] { .1, .2, .3, 4 };
+    double[] doubleArray = new double[]{.1, .2, .3, 4};
 
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
@@ -65,24 +62,15 @@ public class TestObject implements EditableObject {
         public String toString() {
             return name;
         }
-    };
+    }
+
+    ;
 
     public String toString() {
 
         return "(Test Object) \n" +
 
-        "The Enum: " + theEnum + "\n" + "The Color: " + theColor + "\n"
-                + "The Boolean Object: " + theBooleanObject + "\n"
-                + "The Boolean: " + theBool + "\n" + "The String: " + theString
-                + "\n" + "The Integer Object: " + theIntObject + "\n"
-                + "The Double Array: " + Arrays.toString(doubleArray) + "\n"
-                + "The Double Object: " + theDoubleObject + "\n"
-                + "The Float Object: " + theFloatObject + "\n"
-                + "The Long Object: " + theLongObject + "\n"
-                + "The Short Object: " + theShortObject + "\n" + "The int: "
-                + theInt + "\n" + "The double: " + theDouble + "\n"
-                + "The float: " + theFloat + "\n" + "The long: " + theLong
-                + "\n" + "The short: " + theShort + "\n";
+                "The Enum: " + theEnum + "\n" + "The Color: " + theColor + "\n" + "The Boolean Object: " + theBooleanObject + "\n" + "The Boolean: " + theBool + "\n" + "The String: " + theString + "\n" + "The Integer Object: " + theIntObject + "\n" + "The Double Array: " + Arrays.toString(doubleArray) + "\n" + "The Double Object: " + theDoubleObject + "\n" + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + theLongObject + "\n" + "The Short Object: " + theShortObject + "\n" + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n" + "The float: " + theFloat + "\n" + "The long: " + theLong + "\n" + "The short: " + theShort + "\n";
     }
 
     /*
@@ -134,7 +122,7 @@ public class TestObject implements EditableObject {
             }
         });
         dialog.setVisible(true);
-   
+
     }
 
     /**

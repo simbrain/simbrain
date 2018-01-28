@@ -18,17 +18,14 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitiveTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * PNode representation of competitive network.
@@ -41,18 +38,16 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
      * Create a competitive Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the competitive network
+     * @param group        the competitive network
      */
-    public CompetitiveNetworkNode(NetworkPanel networkPanel,
-            CompetitiveNetwork group) {
+    public CompetitiveNetworkNode(NetworkPanel networkPanel, CompetitiveNetwork group) {
         super(networkPanel, group);
         setContextMenu();
     }
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new CompetitiveTrainingDialog(getNetworkPanel(),
-                (CompetitiveNetwork) getSubnetwork());
+        return new CompetitiveTrainingDialog(getNetworkPanel(), (CompetitiveNetwork) getSubnetwork());
 
     }
 
@@ -76,13 +71,11 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         };
         menu.add(trainNet);
         menu.addSeparator();
-        Action randomizeNet = new AbstractAction(
-                "Randomize synapses") {
+        Action randomizeNet = new AbstractAction("Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
                 net.getCompetitive().randomize();
-                net.getParentNetwork().fireGroupUpdated(
-                        net.getSynapseGroup());
+                net.getParentNetwork().fireGroupUpdated(net.getSynapseGroup());
             }
         };
         menu.add(randomizeNet);

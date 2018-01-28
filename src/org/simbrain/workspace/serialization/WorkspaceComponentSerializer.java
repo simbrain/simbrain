@@ -1,10 +1,10 @@
 package org.simbrain.workspace.serialization;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.OutputStream;
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Class used to assist with serializing components.
@@ -13,10 +13,14 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class WorkspaceComponentSerializer {
 
-    /** The last component id. */
+    /**
+     * The last component id.
+     */
     private int lastComponent = 0;
 
-    /** Map of components to their ids. */
+    /**
+     * Map of components to their ids.
+     */
     private final Map<WorkspaceComponent, Integer> componentIds = new IdentityHashMap<WorkspaceComponent, Integer>();
 
     /**
@@ -39,7 +43,7 @@ public class WorkspaceComponentSerializer {
      * component.
      *
      * @param component The component to serialize.
-     * @param stream The stream to write to
+     * @param stream    The stream to write to
      * @return The id for the component that was serialized.
      */
     int serializeComponent(WorkspaceComponent component, OutputStream stream) {

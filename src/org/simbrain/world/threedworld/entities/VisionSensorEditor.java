@@ -1,16 +1,13 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.awt.Dimension;
-
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-
 import org.simbrain.world.threedworld.ThreeDImagePanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * VisionSensorEditor provides a GUI panel for editing the properties of a VisionSensor.
+ *
  * @author Tim Shea
  */
 public class VisionSensorEditor extends SensorEditor {
@@ -37,6 +34,7 @@ public class VisionSensorEditor extends SensorEditor {
 
     /**
      * Construct a new VisionSensorEditor.
+     *
      * @param sensor The sensor to edit.
      */
     public VisionSensorEditor(VisionSensor sensor) {

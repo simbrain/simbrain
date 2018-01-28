@@ -26,7 +26,7 @@ import org.simbrain.util.math.SquashingFunction;
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
  * neuron.
- *
+ * <p>
  * TODO: Possibly rename to "DiscreteSigmoidalRule" (after xstream is improved
  * to allow better backwards compat)
  *
@@ -45,8 +45,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction
-     *            the squashing function implementation to use.
+     * @param sFunction the squashing function implementation to use.
      */
     public SigmoidalRule(SquashingFunction sFunction) {
         super(sFunction);
@@ -66,9 +65,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
             val += noiseGenerator.getRandom();
         }
 
-        val =
-            sFunction
-                .valueOf(val, getUpperBound(), getLowerBound(), getSlope());
+        val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
         neuron.setBuffer(val);
     }
@@ -79,7 +76,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
         sr = (SigmoidalRule) super.baseDeepCopy(sr);
         return sr;
     }
-    
+
     @Override
     public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();
@@ -119,10 +116,10 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
         return "Sigmoidal (Discrete)";
     }
 
-	@Override
-	public void applyFunctionInPlace(DoubleMatrix input) {
-		applyFunction(input, input);		
-	}
+    @Override
+    public void applyFunctionInPlace(DoubleMatrix input) {
+        applyFunction(input, input);
+    }
 
     @Override
     public void applyFunction(DoubleMatrix input, DoubleMatrix output) {

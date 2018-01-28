@@ -18,20 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.LMSOfflineControlPanel;
@@ -39,24 +25,33 @@ import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 /**
  * <b>LMSEditorDialog</b> is a dialog box for editing a LMS network.
  */
 public class LMSEditorDialog extends SupervisedTrainingDialog {
 
-    /** Reference to the lms network being edited. */
+    /**
+     * Reference to the lms network being edited.
+     */
     private LMSNetwork lms;
 
-    /** Reference to iterative trainer. */
+    /**
+     * Reference to iterative trainer.
+     */
     private LMSIterative trainer;
 
     /**
      * Default constructor.
      *
-     * @param np
-     *            parent panel
-     * @param lms
-     *            edited network
+     * @param np  parent panel
+     * @param lms edited network
      */
     public LMSEditorDialog(final NetworkPanel np, final LMSNetwork lms) {
         super(np, lms);
@@ -72,7 +67,7 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit LMS Network");
 
         // Set up combo box
-        String[] lmsTypes = { "Iterative", "Offline" };
+        String[] lmsTypes = {"Iterative", "Offline"};
         final JComboBox<String> selectType = new JComboBox<String>(lmsTypes);
         Box cbHolder = Box.createHorizontalBox();
         cbHolder.add(Box.createHorizontalGlue());
@@ -110,37 +105,27 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
     /**
      * Update trainer panel based on the combo box.
      *
-     * @param selectType
-     *            the combo box
-     * @param trainerContainer
-     *            the container
+     * @param selectType       the combo box
+     * @param trainerContainer the container
      */
-    private void updateComboBox(JComboBox<String> selectType,
-        final JPanel trainerContainer) {
+    private void updateComboBox(JComboBox<String> selectType, final JPanel trainerContainer) {
         trainerContainer.removeAll();
         if (selectType.getSelectedIndex() == 0) {
             trainer = new LMSIterative(lms);
-            IterativeControlsPanel iterativeControls =
-                new IterativeControlsPanel(
-                    networkPanel, trainer);
+            IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
             trainerContainer.add(iterativeControls, BorderLayout.CENTER);
-            trainerContainer.setPreferredSize(iterativeControls
-                .getPreferredSize());
+            trainerContainer.setPreferredSize(iterativeControls.getPreferredSize());
         } else {
             LMSOffline trainer = new LMSOffline(lms);
-            final LMSOfflineControlPanel offlineControls =
-                new LMSOfflineControlPanel(trainer, this);
+            final LMSOfflineControlPanel offlineControls = new LMSOfflineControlPanel(trainer, this);
             offlineControls.addMouseListenerToTriangle(new MouseAdapter() {
                 public void mouseClicked(MouseEvent me) {
-                    trainerContainer.setPreferredSize(offlineControls
-                        .getPreferredSize());
+                    trainerContainer.setPreferredSize(offlineControls.getPreferredSize());
                 }
             });
-            offlineControls.setBorder(BorderFactory.createEmptyBorder(5, 5, 10,
-                5));
+            offlineControls.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
             trainerContainer.add(offlineControls, BorderLayout.CENTER);
-            trainerContainer.setPreferredSize(offlineControls
-                .getPreferredSize());
+            trainerContainer.setPreferredSize(offlineControls.getPreferredSize());
 
         }
         trainerContainer.revalidate();
@@ -151,7 +136,7 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
     }
 
     @Override
-    protected void  stopTrainer() {
+    protected void stopTrainer() {
         if (trainer != null) {
             trainer.setUpdateCompleted(true);
         }

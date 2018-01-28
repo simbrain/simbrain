@@ -1,10 +1,5 @@
 package org.simbrain.world.imageworld.dialogs;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -12,6 +7,8 @@ import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
+
+import javax.swing.*;
 
 /**
  * A dialog to create a new SensorMatrix.
@@ -30,6 +27,7 @@ public class SensorMatrixDialog extends StandardDialog {
     /**
      * Construct a new SensorMatrixDialog for selecting parameters of a new
      * SensorMatrix.
+     *
      * @param world The ImageWorld which will hold the new SensorMatrix.
      */
     public SensorMatrixDialog(ImageWorld world) {
@@ -67,7 +65,9 @@ public class SensorMatrixDialog extends StandardDialog {
         commitChanges();
     }
 
-    /** Called externally when the dialog is closed, to commit any changes made. */
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         String name = nameField.getText();
         FilteredImageSource filter = filterFactory.create(world.getCompositeImageSource());

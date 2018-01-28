@@ -1,8 +1,7 @@
 package org.simbrain.workspace.serialization;
 
-import org.simbrain.workspace.WorkspaceComponent;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Represents the data used to store components in the archive.
@@ -12,16 +11,24 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("ArchivedWorkspaceComponent")
 final class ArchivedWorkspaceComponent {
 
-    /** The name of the class for the component. */
+    /**
+     * The name of the class for the component.
+     */
     private final String className;
 
-    /** The name of the Component. */
+    /**
+     * The name of the Component.
+     */
     private final String name;
 
-    /** The uri for the serialized component. */
+    /**
+     * The uri for the serialized component.
+     */
     final String uri;
 
-    /** A unique id for the component in the archive. */
+    /**
+     * A unique id for the component in the archive.
+     */
     private final int id;
 
     /**
@@ -40,17 +47,14 @@ final class ArchivedWorkspaceComponent {
      * Creates a new Component entry.
      *
      * @param serializer The component serializer for the archive.
-     * @param component The workspace component this entry represents.
+     * @param component  The workspace component this entry represents.
      */
-    ArchivedWorkspaceComponent(
-            final WorkspaceComponentSerializer serializer,
-            final WorkspaceComponent component) {
+    ArchivedWorkspaceComponent(final WorkspaceComponentSerializer serializer, final WorkspaceComponent component) {
         this.className = component.getClass().getCanonicalName();
         this.id = serializer.getId(component);
         this.name = component.getName();
         this.format = component.getDefaultFormat();
-        this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_")
-                + '.' + format;
+        this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_") + '.' + format;
     }
 
     /**
@@ -59,8 +63,7 @@ final class ArchivedWorkspaceComponent {
      * @param dc The desktop component to add an entry for.
      * @return The entry for the desktop component.
      */
-    ArchivedWorkspaceComponent.ArchivedDesktopComponent addDesktopComponent(
-            final org.simbrain.workspace.gui.GuiComponent<?> dc) {
+    ArchivedWorkspaceComponent.ArchivedDesktopComponent addDesktopComponent(final org.simbrain.workspace.gui.GuiComponent<?> dc) {
         return desktopComponent = new ArchivedDesktopComponent(this, dc);
     }
 
@@ -72,27 +75,31 @@ final class ArchivedWorkspaceComponent {
     @XStreamAlias("DesktopComponent")
     static final class ArchivedDesktopComponent {
 
-        /** The class for the desktop component. */
+        /**
+         * The class for the desktop component.
+         */
         private final String className;
 
-        /** The uri for the serialized data. */
+        /**
+         * The uri for the serialized data.
+         */
         private final String uri;
 
-        /** The format for the serialized data. */
+        /**
+         * The format for the serialized data.
+         */
         private final String format;
 
         /**
          * Creates a new instance.
          *
          * @param parent The parent component entry.
-         * @param dc The desktop component this instance represents.
+         * @param dc     The desktop component this instance represents.
          */
-        private ArchivedDesktopComponent(final ArchivedWorkspaceComponent parent,
-                final org.simbrain.workspace.gui.GuiComponent<?> dc) {
+        private ArchivedDesktopComponent(final ArchivedWorkspaceComponent parent, final org.simbrain.workspace.gui.GuiComponent<?> dc) {
             this.className = dc.getClass().getCanonicalName();
             this.format = dc.getWorkspaceComponent().getDefaultFormat();
-            this.uri = "guis/" + parent.id + '_'
-                    + parent.name.replaceAll("\\s", "_") + '.' + format;
+            this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_") + '.' + format;
         }
 
         /**

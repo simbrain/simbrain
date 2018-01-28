@@ -18,19 +18,20 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Stop network action.
  */
 public final class StopNetworkAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -49,8 +50,9 @@ public final class StopNetworkAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Stop iterating the network");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.setRunning(false);

@@ -18,11 +18,6 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -30,6 +25,10 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Open a network within current workspace.
@@ -48,8 +47,9 @@ public final class OpenNetworkAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = SimbrainPreferences.getString("workspaceNetworkDirectory");

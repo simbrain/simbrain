@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.util.LabelledItemPanel;
+
+import javax.swing.*;
 
 /**
  * <b>RunningAverageNeuronPanel</b> Unimplemented: Scheduled for deletion
@@ -30,10 +30,14 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class RunningAverageRulePanel extends AbstractNeuronRulePanel {
 
-    /** Rate constant field. */
+    /**
+     * Rate constant field.
+     */
     private JTextField tfRateConstant = new JTextField();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /**

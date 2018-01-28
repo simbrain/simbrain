@@ -18,16 +18,14 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Contains actions for use in Time Series Component.
- *
+ * <p>
  * TODO: Possibly abstract these actions and move to top level of plot package.
  *
  * @author jyoshimi
@@ -102,8 +100,7 @@ public class TimeSeriesPlotActions {
      * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getRemoveSourceAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getRemoveSourceAction(final TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize

@@ -13,13 +13,13 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.geom.Point2D;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
+
+import java.awt.geom.Point2D;
 
 /**
  * A Least Mean Squares network.
@@ -36,15 +36,13 @@ public class LMSNetwork extends FeedForward implements Trainable {
     /**
      * Construct a new LMS Network.
      *
-     * @param network the parent network
-     * @param numInputNeurons number of input neurons
+     * @param network          the parent network
+     * @param numInputNeurons  number of input neurons
      * @param numOutputNeurons number of output neurons
-     * @param initialPosition initial location of the network
+     * @param initialPosition  initial location of the network
      */
-    public LMSNetwork(final Network network, int numInputNeurons,
-            int numOutputNeurons, Point2D initialPosition) {
-        super(network, new int[] { numInputNeurons, numOutputNeurons },
-                initialPosition);
+    public LMSNetwork(final Network network, int numInputNeurons, int numOutputNeurons, Point2D initialPosition) {
+        super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
         getOutputLayer().setNeuronType(new LinearRule());
         setLabel("LMS Network");
     }

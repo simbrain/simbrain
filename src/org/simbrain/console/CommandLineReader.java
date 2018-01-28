@@ -42,14 +42,14 @@ import java.io.Reader;
  * This is a quick hack to turn empty lines entered interactively on the command
  * line into ';\n' empty lines for the interpreter. It's just more pleasant to
  * be able to hit return on an empty line and see the prompt reappear.
- *
+ * <p>
  * This is *not* used when text is sourced from a file non-interactively.
  */
 class CommandLineReader extends FilterReader {
 
-    static final int normal = 0, lastCharNL = 1, sentSemi = 2;
+    private static final int NORMAL = 0, LAST_CHAR_NL = 1, SENT_SEMI = 2;
 
-    int state = lastCharNL;
+    private int state = LAST_CHAR_NL;
 
     public CommandLineReader(Reader in) {
         super(in);
@@ -58,8 +58,8 @@ class CommandLineReader extends FilterReader {
     public int read() throws IOException {
         int b;
 
-        if (state == sentSemi) {
-            state = lastCharNL;
+        if (state == SENT_SEMI) {
+            state = LAST_CHAR_NL;
             return '\n';
         }
 
@@ -68,13 +68,13 @@ class CommandLineReader extends FilterReader {
             ;
 
         if (b == '\n')
-            if (state == lastCharNL) {
+            if (state == LAST_CHAR_NL) {
                 b = ';';
-                state = sentSemi;
+                state = SENT_SEMI;
             } else
-                state = lastCharNL;
+                state = LAST_CHAR_NL;
         else
-            state = normal;
+            state = NORMAL;
 
         return b;
     }
@@ -83,12 +83,12 @@ class CommandLineReader extends FilterReader {
      * This is a degenerate implementation. I don't know how to keep this from
      * blocking if we try to read more than one char... There is no available()
      * for Readers ??
-     * 
+     *
      * @param buff
      * @param off
      * @param len
-     * @exception IOException
-     * @return 
+     * @return
+     * @throws IOException
      */
     public int read(char buff[], int off, int len) throws IOException {
         int b = read();

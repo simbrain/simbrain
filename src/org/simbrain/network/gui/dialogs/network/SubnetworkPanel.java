@@ -18,15 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
+
+import javax.swing.*;
 
 /**
  * Default subnetwork panel that displays basic info. Most subnetworks should
@@ -37,22 +34,25 @@ import org.simbrain.util.widgets.ShowHelpAction;
 public class SubnetworkPanel extends JPanel {
 
 
-    /** Parent network panel. */
+    /**
+     * Parent network panel.
+     */
     private NetworkPanel networkPanel;
 
-    /** Subnetwork. */
+    /**
+     * Subnetwork.
+     */
     private Subnetwork subnetwork;
 
     /**
      * Constructor for case where an existing subnetwork is being
      * edited.
      *
-     * @param np Parent network panel
-     * @param sn subnetwork being edited
+     * @param np           Parent network panel
+     * @param sn           subnetwork being edited
      * @param parentDialog parent dialog containing this panel.
      */
-    public SubnetworkPanel(final NetworkPanel np, final Subnetwork sn,
-            final StandardDialog parentDialog) {
+    public SubnetworkPanel(final NetworkPanel np, final Subnetwork sn, final StandardDialog parentDialog) {
         this.networkPanel = np;
         this.subnetwork = sn;
         initPanel(parentDialog);

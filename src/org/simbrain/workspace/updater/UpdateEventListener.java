@@ -30,7 +30,7 @@ public interface UpdateEventListener {
     /**
      * Called before an update action is invoked.
      *
-     * @param action The action to be invoked.
+     * @param action   The action to be invoked.
      * @param nanoTime The time in nanaseconds at which the event was triggered.
      */
     void beforeUpdateAction(UpdateAction action, long nanoTime);
@@ -38,7 +38,7 @@ public interface UpdateEventListener {
     /**
      * Called after an update action is invoked.
      *
-     * @param action The action which was invoked.
+     * @param action   The action which was invoked.
      * @param nanoTime The time in nanaseconds at which the event was triggered.
      */
     void afterUpdateAction(UpdateAction action, long nanoTime);
@@ -47,9 +47,9 @@ public interface UpdateEventListener {
      * Called when a component update begins.
      *
      * @param component The component being updated.
-     * @param update The number of the update.
-     * @param thread The thread doing the update.
-     * @param nanoTime The time in nanaseconds at which the event was triggered.
+     * @param update    The number of the update.
+     * @param thread    The thread doing the update.
+     * @param nanoTime  The time in nanaseconds at which the event was triggered.
      */
     void beforeComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime);
 
@@ -57,9 +57,9 @@ public interface UpdateEventListener {
      * Called when a component update ends.
      *
      * @param component The component that was updated.
-     * @param update The number of the update.
-     * @param thread The thread doing the update.
-     * @param nanoTime The time in nanaseconds at which the event was triggered.
+     * @param update    The number of the update.
+     * @param thread    The thread doing the update.
+     * @param nanoTime  The time in nanaseconds at which the event was triggered.
      */
     void afterComponentUpdate(WorkspaceComponent component, int update, int thread, long nanoTime);
 

@@ -18,16 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.HodgkinHuxleyRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.YesNoNull;
+
+import javax.swing.*;
 
 /**
  * <b>Hodgkin-Huxley Rule Panel</b> edits an H-H neurons.
@@ -43,13 +39,19 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronRulePanel {
 
     private JTextField getEk;
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final HodgkinHuxleyRule prototypeRule = new HodgkinHuxleyRule();
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab for neuron preferences. */
+    /**
+     * Main tab for neuron preferences.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /**
@@ -58,20 +60,10 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronRulePanel {
     public HodgkinHuxleyRulePanel() {
         super();
         this.add(tabbedPane);
-        perNaChannels = createTextField(Float.class,
-                (r) -> ((HodgkinHuxleyRule) r).getPerNaChannels(),
-                (r, val) -> ((HodgkinHuxleyRule) r)
-                        .setPerNaChannels((float) val));
-        perKChannels = createTextField(Float.class,
-                (r) -> ((HodgkinHuxleyRule) r).getPerKChannels(),
-                (r, val) -> ((HodgkinHuxleyRule) r)
-                        .setPerKChannels((float) val));
-        getEna = createTextField(Float.class,
-                (r) -> ((HodgkinHuxleyRule) r).getEna(),
-                (r, val) -> ((HodgkinHuxleyRule) r).setEna((float) val));
-        getEk = createTextField(Float.class,
-                (r) -> ((HodgkinHuxleyRule) r).getEk(),
-                (r, val) -> ((HodgkinHuxleyRule) r).setEk((float) val));
+        perNaChannels = createTextField(Float.class, (r) -> ((HodgkinHuxleyRule) r).getPerNaChannels(), (r, val) -> ((HodgkinHuxleyRule) r).setPerNaChannels((float) val));
+        perKChannels = createTextField(Float.class, (r) -> ((HodgkinHuxleyRule) r).getPerKChannels(), (r, val) -> ((HodgkinHuxleyRule) r).setPerKChannels((float) val));
+        getEna = createTextField(Float.class, (r) -> ((HodgkinHuxleyRule) r).getEna(), (r, val) -> ((HodgkinHuxleyRule) r).setEna((float) val));
+        getEk = createTextField(Float.class, (r) -> ((HodgkinHuxleyRule) r).getEk(), (r, val) -> ((HodgkinHuxleyRule) r).setEk((float) val));
 
         mainTab.addItem("Sodium Channels", perNaChannels);
         mainTab.addItem("Potassium Channels", perKChannels);

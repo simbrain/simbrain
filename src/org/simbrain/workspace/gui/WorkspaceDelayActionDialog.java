@@ -18,23 +18,22 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.*;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
  * <b>WorkspaceDelayActionDialog</b> is a dialog box for setting the workspace update delay.
  */
-public class WorkspaceDelayActionDialog extends StandardDialog  {
+public class WorkspaceDelayActionDialog extends StandardDialog {
 
-    /** Reference to workspace. **/
+    /**
+     * Reference to workspace.
+     **/
     private Workspace workspace;
 
     /**
@@ -64,8 +63,7 @@ public class WorkspaceDelayActionDialog extends StandardDialog  {
         JSlider delaySlider = new JSlider(JSlider.HORIZONTAL, 0, 500, workspace.getUpdateDelay());
         JLabel delayValueLabel = new JLabel("" + workspace.getUpdateDelay());
         delayValueLabel.setPreferredSize(new Dimension(50, 10));
-        delaySlider.setToolTipText("Use this to delay simulation speed. "
-                + "This will make it easier to see very fast updates.");
+        delaySlider.setToolTipText("Use this to delay simulation speed. " + "This will make it easier to see very fast updates.");
         delaySlider.setMajorTickSpacing(100);
         delaySlider.setPaintTicks(true);
         delaySlider.addChangeListener(new ChangeListener() {

@@ -23,7 +23,6 @@ package org.simbrain.workspace.updater;
  * together comprise a workspace update.
  *
  * @author jyoshimi
- *
  */
 public interface UpdateAction {
 

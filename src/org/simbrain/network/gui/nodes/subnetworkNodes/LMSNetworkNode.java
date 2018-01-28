@@ -18,16 +18,6 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.LMSEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
@@ -40,6 +30,10 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 /**
  * PNode representation of a group of a LMS network.
  *
@@ -51,7 +45,7 @@ public class LMSNetworkNode extends SubnetworkNode {
      * Create a layered network.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group        the layered network
      */
     public LMSNetworkNode(NetworkPanel networkPanel, LMSNetwork group) {
         super(networkPanel, group);
@@ -70,15 +64,10 @@ public class LMSNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
         final LMSNetwork network = (LMSNetwork) getSubnetwork();
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
-            getNetworkPanel(), network));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getInputNeurons(), network.getTrainingSet()
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-            network.getOutputNeurons(), network.getTrainingSet()
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(), network.getTrainingSet().getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
 
         setContextMenu(menu);
@@ -86,8 +75,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new LMSEditorDialog(this.getNetworkPanel(),
-            (LMSNetwork) getSubnetwork());
+        return new LMSEditorDialog(this.getNetworkPanel(), (LMSNetwork) getSubnetwork());
     }
 
     /**
@@ -105,11 +93,8 @@ public class LMSNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             LMSNetwork network = (LMSNetwork) getSubnetwork();
-            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
-                getNetworkPanel(), new LMSIterative(network));
-            Window frame =
-                getNetworkPanel().displayPanelInWindow(trainingPanel,
-                    "Trainer");
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(getNetworkPanel(), new LMSIterative(network));
+            Window frame = getNetworkPanel().displayPanelInWindow(trainingPanel, "Trainer");
             trainingPanel.setFrame(frame);
         }
     };
@@ -129,11 +114,8 @@ public class LMSNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             LMSNetwork network = (LMSNetwork) getSubnetwork();
-            JDialog frame = getNetworkPanel()
-                .displayPanelInWindow(new JPanel(), "Trainer"); // hack
-            LMSOfflineTrainingPanel trainingPanel =
-                new LMSOfflineTrainingPanel(
-                    getNetworkPanel(), new LMSOffline(network), (Window) frame);
+            JDialog frame = getNetworkPanel().displayPanelInWindow(new JPanel(), "Trainer"); // hack
+            LMSOfflineTrainingPanel trainingPanel = new LMSOfflineTrainingPanel(getNetworkPanel(), new LMSOffline(network), (Window) frame);
             frame.setContentPane(trainingPanel);
             frame.pack();
         }

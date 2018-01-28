@@ -18,20 +18,20 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.SwingUtilities;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * An action that opens a help file in an external web browser.
  */
 public final class ShowHelpAction extends AbstractAction {
 
-    /** Documentation URL. */
+    /**
+     * Documentation URL.
+     */
     private final String theURL;
 
     // TODO: Construct with URL; throw exceptions for bad pages
@@ -41,7 +41,7 @@ public final class ShowHelpAction extends AbstractAction {
      * Simbrain/docs).
      *
      * @param actionName the name associated with this action
-     * @param url the url to open.
+     * @param url        the url to open.
      */
     public ShowHelpAction(final String actionName, final String url) {
         super(actionName);
@@ -63,8 +63,9 @@ public final class ShowHelpAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show help via local web page");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

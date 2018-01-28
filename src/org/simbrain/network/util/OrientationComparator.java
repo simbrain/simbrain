@@ -17,10 +17,10 @@
  */
 package org.simbrain.network.util;
 
+import org.simbrain.network.core.Neuron;
+
 import java.util.Comparator;
 import java.util.List;
-
-import org.simbrain.network.core.Neuron;
 
 /**
  * Comparators for using in sorting various kinds of org.simbrain.network lists.
@@ -31,7 +31,6 @@ import org.simbrain.network.core.Neuron;
 public enum OrientationComparator implements Comparator<Neuron> {
 
     X_ORDER {
-
         @Override
         public String toString() {
             return "Horizontal (L to R)";
@@ -42,9 +41,7 @@ public enum OrientationComparator implements Comparator<Neuron> {
             return Double.compare(neuron1.getX(), neuron2.getX());
         }
 
-    },
-    Y_ORDER {
-
+    }, Y_ORDER {
         @Override
         public String toString() {
             return "Vertical (U to D)";
@@ -55,9 +52,7 @@ public enum OrientationComparator implements Comparator<Neuron> {
             return Double.compare(neuron1.getY(), neuron2.getY());
         }
 
-    },
-    X_REVERSE {
-
+    }, X_REVERSE {
         @Override
         public String toString() {
             return "Horizontal (R to L)";
@@ -68,9 +63,7 @@ public enum OrientationComparator implements Comparator<Neuron> {
             return -Double.compare(neuron1.getX(), neuron2.getX());
         }
 
-    },
-    Y_REVERSE {
-
+    }, Y_REVERSE {
         @Override
         public String toString() {
             return "Vertical (D to U)";
@@ -84,7 +77,6 @@ public enum OrientationComparator implements Comparator<Neuron> {
     };
 
     /**
-     *
      * @param neuron1
      * @param neuron2
      * @return
@@ -92,7 +84,6 @@ public enum OrientationComparator implements Comparator<Neuron> {
     public abstract int compare(final Neuron neuron1, final Neuron neuron2);
 
     /**
-     *
      * @param neurons
      * @return
      */

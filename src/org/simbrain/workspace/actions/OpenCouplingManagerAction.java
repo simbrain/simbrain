@@ -18,16 +18,15 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
+
+import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import java.awt.event.ActionEvent;
 
 /**
  * Open data world in current workspace.
@@ -36,12 +35,14 @@ public final class OpenCouplingManagerAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Reference to Simbrain desktop. */
+    /**
+     * Reference to Simbrain desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
      * Create an open data world with the specified workspace.
-     * 
+     *
      * @param desktop
      */
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
@@ -52,15 +53,14 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     }
 
     /**
-     * @see AbstractAction
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         desktop.addInternalFrame(frame);
         if (!DesktopCouplingManager.isVisible) {
-            DesktopCouplingManager cm = new DesktopCouplingManager(desktop,
-                    frame);
+            DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
             frame.setTitle("Coupling Manager");
             frame.setContentPane(cm);
             // frame.setSize(850, 420);

@@ -18,19 +18,19 @@
  */
 package org.simbrain.network.gui.actions.toolbar;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Clamps neurons action.
  */
 public final class ShowEditToolBarAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -50,8 +50,9 @@ public final class ShowEditToolBarAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
 

@@ -18,14 +18,17 @@
  */
 package org.simbrain.workspace.updater;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
-
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 /**
  * This class manages workspace updates. "Running" and "Stepping" the simulation
@@ -47,40 +50,64 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class WorkspaceUpdater {
 
-    /** The static logger for the class. */
+    /**
+     * The static logger for the class.
+     */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdater.class);
 
-    /** The parent workspace. */
+    /**
+     * The parent workspace.
+     */
     private final Workspace workspace;
 
-    /** The executor service for managing workspace updates. */
+    /**
+     * The executor service for managing workspace updates.
+     */
     private final ExecutorService workspaceUpdateExecutor;
 
-    /** The executor service for notifying listeners. */
+    /**
+     * The executor service for notifying listeners.
+     */
     private final ExecutorService notificationEvents;
 
-    /** Component listeners. */
+    /**
+     * Component listeners.
+     */
     private final List<UpdateEventListener> componentListeners = new CopyOnWriteArrayList<UpdateEventListener>();
 
-    /** Updater listeners. */
+    /**
+     * Updater listeners.
+     */
     private final List<WorkspaceUpdaterListener> updaterListeners = new CopyOnWriteArrayList<WorkspaceUpdaterListener>();
 
-    /** Creates a default synch-manager that does nothing. */
+    /**
+     * Creates a default synch-manager that does nothing.
+     */
     private volatile TaskSynchronizationManager syncManager = NO_ACTION_SYNC_MANAGER;
 
-    /** Executes queued InvocationEvents (i.e. AWT-driven events). */
+    /**
+     * Executes queued InvocationEvents (i.e. AWT-driven events).
+     */
     private SynchronizedTaskUpdateAction syncUpdateAction = new SynchronizedTaskUpdateAction(syncManager);
 
-    /** Whether updates should continue to run. */
+    /**
+     * Whether updates should continue to run.
+     */
     private volatile boolean run = false;
 
-    /** The number of times the update has run. */
+    /**
+     * The number of times the update has run.
+     */
     private volatile int time;
 
-    /** Number of threads used in the update service. */
+    /**
+     * Number of threads used in the update service.
+     */
     private int numThreads;
 
-    /** The update Manager. */
+    /**
+     * The update Manager.
+     */
     private UpdateActionManager updateActionManager;
 
     /**
@@ -88,7 +115,7 @@ public class WorkspaceUpdater {
      * threads.
      *
      * @param workspace The parent workspace.
-     * @param threads The number of threads for component updates.
+     * @param threads   The number of threads for component updates.
      */
     public WorkspaceUpdater(Workspace workspace, int threads) {
         this.workspace = workspace;
@@ -178,8 +205,8 @@ public class WorkspaceUpdater {
      */
     public void run() {
         run = true;
-        for(WorkspaceComponent wc : workspace.getComponentList()) {
-        	wc.setRunning(true);
+        for (WorkspaceComponent wc : workspace.getComponentList()) {
+            wc.setRunning(true);
         }
         workspaceUpdateExecutor.submit(() -> {
             notifyWorkspaceUpdateStarted();
@@ -193,7 +220,7 @@ public class WorkspaceUpdater {
             }
             run = false;
             for (WorkspaceComponent component : workspace.getComponentList()) {
-            	component.setRunning(false);
+                component.setRunning(false);
             }
             syncManager.releaseTasks();
             syncManager.runTasks();
@@ -221,7 +248,7 @@ public class WorkspaceUpdater {
 
     /**
      * Iterate a set number of iterations.
-     *
+     * <p>
      * See {@link Workspace#iterate(int)}
      *
      * @param numIterations the number of iterations to update
@@ -327,7 +354,7 @@ public class WorkspaceUpdater {
      * Called when a new component is starting to update.
      *
      * @param component The component to update.
-     * @param thread The number of the thread doing the update.
+     * @param thread    The number of the thread doing the update.
      */
     void notifyComponentUpdateStarted(WorkspaceComponent component, int thread) {
         final int simTime = this.time;
@@ -341,7 +368,7 @@ public class WorkspaceUpdater {
      * Called when a new component is finished updating.
      *
      * @param component The component to update.
-     * @param thread The number of the thread doing the update.
+     * @param thread    The number of the thread doing the update.
      */
     void notifyComponentUpdateFinished(WorkspaceComponent component, int thread) {
         final int simTime = this.time;
@@ -364,24 +391,21 @@ public class WorkspaceUpdater {
      * Called when the workspace update begins.
      */
     private void notifyWorkspaceUpdateStarted() {
-        notificationEvents.submit(() ->
-                updaterListeners.forEach(WorkspaceUpdaterListener::updatingStarted));
+        notificationEvents.submit(() -> updaterListeners.forEach(WorkspaceUpdaterListener::updatingStarted));
     }
 
     /**
      * Called when workspace update finishes.
      */
     private void notifyWorkspaceUpdateCompleted() {
-        notificationEvents.submit(() ->
-                updaterListeners.forEach(WorkspaceUpdaterListener::updatingFinished));
+        notificationEvents.submit(() -> updaterListeners.forEach(WorkspaceUpdaterListener::updatingFinished));
     }
 
     /**
      * Called after every workspace update .
      */
     private void notifyWorkspaceUpdated() {
-        notificationEvents.submit(() ->
-                updaterListeners.forEach(WorkspaceUpdaterListener::workspaceUpdated));
+        notificationEvents.submit(() -> updaterListeners.forEach(WorkspaceUpdaterListener::workspaceUpdated));
     }
 
     /**
@@ -409,7 +433,9 @@ public class WorkspaceUpdater {
 
     }
 
-    /** A synch-manager where the methods do nothing. */
+    /**
+     * A synch-manager where the methods do nothing.
+     */
     private static final TaskSynchronizationManager NO_ACTION_SYNC_MANAGER = new TaskSynchronizationManager() {
         public void queueTasks() {
             /* no implementation */

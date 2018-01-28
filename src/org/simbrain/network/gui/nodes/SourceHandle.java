@@ -18,40 +18,43 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
+import org.piccolo2d.PNode;
+import org.piccolo2d.extras.handles.PHandle;
+import org.piccolo2d.extras.util.PNodeLocator;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.piccolo2d.PNode;
-import org.piccolo2d.extras.handles.PHandle;
-import org.piccolo2d.extras.util.PNodeLocator;
-
 /**
  * Selection handle.
- *
+ * <p>
  * Usage:
- *
+ * <p>
  * <pre>
  * PNode node = ...;
  * SelectionHandle.addSelectionHandleTo(node)
  * </pre>
- *
+ * <p>
  * and
- *
+ * <p>
  * <pre>
  * PNode node = ...;
  * SelectionHandle.removeSelectionHandleFrom(node)
  * </pre>
- *
  */
 public final class SourceHandle extends PHandle {
 
-    /** Extend factor. */
+    /**
+     * Extend factor.
+     */
     private static final double EXTEND_FACTOR = 0.2d;
 
-    /** Color of selection boxes. */
+    /**
+     * Color of selection boxes.
+     */
     private static Color sourceColor = Color.RED;
 
     /**
@@ -77,7 +80,9 @@ public final class SourceHandle extends PHandle {
         relocateHandle();
     }
 
-    /** @see PHandle */
+    /**
+     * @see PHandle
+     */
     public void parentBoundsChanged() {
         updateBounds();
         super.parentBoundsChanged();
@@ -92,12 +97,9 @@ public final class SourceHandle extends PHandle {
 
         double x = 0.0d - (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
         double y = 0.0d - (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
-        double width = parentNode.getBounds().getWidth() + 2
-                * (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
-        double height = parentNode.getBounds().getHeight() + 2
-                * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
-        append(new Rectangle2D.Float((float) x, (float) y, (float) width,
-                (float) height), false);
+        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
+        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
+        append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);
     }
 
     /**
@@ -108,7 +110,7 @@ public final class SourceHandle extends PHandle {
      */
     private static boolean hasSelectionHandle(final PNode node) {
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SourceHandle) {
@@ -151,7 +153,7 @@ public final class SourceHandle extends PHandle {
 
         Collection handlesToRemove = new ArrayList();
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SourceHandle) {

@@ -17,31 +17,25 @@
  */
 package org.simbrain.network;
 
+import org.simbrain.network.core.*;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.NeuronListener;
+import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.workspace.WorkspaceComponent;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.network.listeners.NeuronListener;
-import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Network component.
  */
 public final class NetworkComponent extends WorkspaceComponent {
 
-    /** Reference to root network, the main model network. */
+    /**
+     * Reference to root network, the main model network.
+     */
     private Network network = new Network();
 
     /**
@@ -57,7 +51,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     /**
      * Create a new network component.
      *
-     * @param name name of network
+     * @param name    name of network
      * @param network the network being created
      */
     public NetworkComponent(final String name, final Network network) {
@@ -66,7 +60,9 @@ public final class NetworkComponent extends WorkspaceComponent {
         init();
     }
 
-    /** Initialize attribute types and listeners. */
+    /**
+     * Initialize attribute types and listeners.
+     */
     private void init() {
         network.addNeuronListener(new NeuronListener() {
             public void neuronAdded(NetworkEvent<Neuron> e) {
@@ -144,8 +140,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         return retList;
     }
 
-    public static NetworkComponent open(final InputStream input,
-            final String name, final String format) {
+    public static NetworkComponent open(final InputStream input, final String name, final String format) {
         Network newNetwork = (Network) Network.getXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
@@ -168,16 +163,17 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     /**
-     * Sets whether or not this component is marked as currently running... 
+     * Sets whether or not this component is marked as currently running...
      * meant to be false if only doing a one-off update
+     *
      * @param running
      */
     @Override
     public void setRunning(boolean running) {
-    	super.setRunning(running);
-    	network.setOneOffRun(!running);
+        super.setRunning(running);
+        network.setOneOffRun(!running);
     }
-    
+
     /**
      * Returns the root network.
      *
@@ -193,7 +189,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {}
+    public void closing() {
+    }
 
     @Override
     public String getXML() {

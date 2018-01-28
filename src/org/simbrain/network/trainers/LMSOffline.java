@@ -24,9 +24,7 @@ package org.simbrain.network.trainers;
 //import java.util.ArrayList;
 //import java.util.Collections;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
+import Jama.Matrix;
 import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
@@ -40,7 +38,7 @@ import org.simbrain.util.math.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.randomizer.Randomizer;
 
-import Jama.Matrix;
+import javax.swing.*;
 
 /**
  * Offline/Batch Learning with least mean squares.
@@ -50,19 +48,27 @@ import Jama.Matrix;
  */
 public class LMSOffline extends Trainer {
 
-    /** Current solution type. */
+    /**
+     * Current solution type.
+     */
     private SolutionType solutionType = SolutionType.WIENER_HOPF;
 
-    /** Whether or not ridge regression is to be performed. */
+    /**
+     * Whether or not ridge regression is to be performed.
+     */
     private boolean ridgeRegression;
 
-    /** The magnitude of the ridge regression. */
+    /**
+     * The magnitude of the ridge regression.
+     */
     private double alpha;
 
-    /** Whether or not to add noise to the input state matrix. */
+    /**
+     * Whether or not to add noise to the input state matrix.
+     */
     private boolean noiseAdded;
 
-    /** 
+    /**
      * The noise generator from which random values are taken if randomizing
      * the input state matrix.
      */
@@ -78,8 +84,7 @@ public class LMSOffline extends Trainer {
      * Construct the LMSOOffline object, with a trainable network the Synapse
      * group where the new synapses will be placed.
      *
-     * @param network
-     *            the network to train
+     * @param network the network to train
      */
     public LMSOffline(Trainable network) {
         super(network);
@@ -109,18 +114,18 @@ public class LMSOffline extends Trainer {
             }
         }
 
-    };
+    }
+
+    ;
 
     @Override
     public void apply() throws DataNotInitializedException {
 
         if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
-            throw new DataNotInitializedException(
-                "Input data not initalized");
+            throw new DataNotInitializedException("Input data not initalized");
         }
         if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
-            throw new DataNotInitializedException(
-                "Target data not initalized");
+            throw new DataNotInitializedException("Target data not initalized");
         }
 
         fireTrainingBegin();
@@ -133,12 +138,8 @@ public class LMSOffline extends Trainer {
             // the sigmoidal. Warning: problems can occur here if the bounds of
             // the sigmoidal are not set properly.
             if (n.getUpdateRule() instanceof SigmoidalRule) {
-                for (int i = 0; i < network.getTrainingSet()
-                    .getTargetData().length; i++) {
-                    network.getTrainingSet().getTargetData()[i][index] =
-                        ((SigmoidalRule) n.getUpdateRule())
-                            .getInverse(network.getTrainingSet()
-                                .getTargetData()[i][index]);
+                for (int i = 0; i < network.getTrainingSet().getTargetData().length; i++) {
+                    network.getTrainingSet().getTargetData()[i][index] = ((SigmoidalRule) n.getUpdateRule()).getInverse(network.getTrainingSet().getTargetData()[i][index]);
                 }
             }
             index++;
@@ -149,8 +150,7 @@ public class LMSOffline extends Trainer {
             double[][] stateMat = network.getTrainingSet().getInputData();
             for (int i = 0, n = stateMat.length; i < n; i++) {
                 for (int j = 0, m = stateMat[i].length; j < m; j++) {
-                    network.getTrainingSet().getInputData()[i][j] =
-                        stateMat[i][j] + noiseGen.getRandom();
+                    network.getTrainingSet().getInputData()[i][j] = stateMat[i][j] + noiseGen.getRandom();
                 }
             }
         }
@@ -160,21 +160,18 @@ public class LMSOffline extends Trainer {
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
             moorePenroseSolution(network);
         } else {
-            throw new IllegalArgumentException("Solution type must be "
-                + "'MoorePenrose' or 'WeinerHopf'.");
+            throw new IllegalArgumentException("Solution type must be " + "'MoorePenrose' or 'WeinerHopf'.");
         }
 
         // Make sure excitatory/inhibitory are in proper lists
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
-            SynapseGroup group = ((Subnetwork) getTrainableNetwork()
-                    .getNetwork()).getSynapseGroup();
+            SynapseGroup group = ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroup();
             if (group != null) {
                 group.revalidateSynapseSets();
             }
         } else if (getTrainableNetwork().getNetwork() instanceof SynapseGroup) {
             if (getTrainableNetwork().getNetwork() != null) {
-                ((SynapseGroup) getTrainableNetwork().getNetwork())
-                        .revalidateSynapseSets();
+                ((SynapseGroup) getTrainableNetwork().getNetwork()).revalidateSynapseSets();
             }
         }
 
@@ -186,19 +183,18 @@ public class LMSOffline extends Trainer {
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
      * TODO: Fix progress updates to reflect actual training times &#38; %s
+     *
      * @param network the trainable network being trained
      */
     public void weinerHopfSolution(Trainable network) {
         long start = System.nanoTime();
         double[][] inputMatrix = network.getTrainingSet().getInputData();
-        double[][] trainingMatrix = network.getTrainingSet()
-            .getTargetData();
+        double[][] trainingMatrix = network.getTrainingSet().getTargetData();
         try {
 
             Factory<?> mf = PrimitiveMatrix.FACTORY;
 
-            Builder<?> tmpBuilder = mf.getBuilder(inputMatrix.length,
-                inputMatrix[0].length);
+            Builder<?> tmpBuilder = mf.getBuilder(inputMatrix.length, inputMatrix[0].length);
             for (int i = 0; i < tmpBuilder.countRows(); i++) {
                 for (int j = 0; j < tmpBuilder.countColumns(); j++) {
                     tmpBuilder.set(i, j, inputMatrix[i][j]);
@@ -207,15 +203,12 @@ public class LMSOffline extends Trainer {
 
             BasicMatrix stateMat = (BasicMatrix) tmpBuilder.build();
 
-            tmpBuilder = mf.getBuilder(trainingMatrix.length,
-                trainingMatrix[0].length);
+            tmpBuilder = mf.getBuilder(trainingMatrix.length, trainingMatrix[0].length);
             for (int i = 0; i < tmpBuilder.countRows(); i++) {
                 for (int j = 0; j < tmpBuilder.countColumns(); j++) {
                     tmpBuilder.set(i, j, trainingMatrix[i][j]);
-                    if (Double.isInfinite(trainingMatrix[i][j])
-                        || Double.isNaN(trainingMatrix[i][j])) {
-                        throw new NumberFormatException("Invalid target"
-                            + " values.");
+                    if (Double.isInfinite(trainingMatrix[i][j]) || Double.isNaN(trainingMatrix[i][j])) {
+                        throw new NumberFormatException("Invalid target" + " values.");
                     }
                 }
             }
@@ -225,16 +218,13 @@ public class LMSOffline extends Trainer {
             fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
             teachMat = stateMat.transpose().multiplyRight(teachMat);
 
-            fireProgressUpdate(
-                "Cross-Correlating States with Teacher data (P = S'D)...",
-                15);
+            fireProgressUpdate("Cross-Correlating States with Teacher data (P = S'D)...", 15);
             stateMat = stateMat.transpose().multiplyRight(stateMat);
 
             fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
 
             if (ridgeRegression) {
-                tmpBuilder = mf.getBuilder((int) stateMat.countRows(),
-                    (int) stateMat.countColumns());
+                tmpBuilder = mf.getBuilder((int) stateMat.countRows(), (int) stateMat.countColumns());
                 for (int i = 0, n = (int) stateMat.countColumns(); i < n; i++) {
                     tmpBuilder.set(i, i, alpha * alpha);
                 }
@@ -245,29 +235,22 @@ public class LMSOffline extends Trainer {
             stateMat = stateMat.invert();
 
             fireProgressUpdate("Computing Weights...", 80);
-            tmpBuilder =
-                stateMat.multiplyRight(teachMat).copyToBuilder();
+            tmpBuilder = stateMat.multiplyRight(teachMat).copyToBuilder();
             BasicMatrix finalMat = (BasicMatrix) tmpBuilder.build();
             double[][] wOut = new double[(int) tmpBuilder.countRows()]
-                [(int) tmpBuilder.countColumns()];
+                    [(int) tmpBuilder.countColumns()];
             for (int i = 0, n = (int) tmpBuilder.countRows(); i < n; i++) {
-                for (int j = 0, m = (int) tmpBuilder.countColumns(); j < m; j++)
-                {
+                for (int j = 0, m = (int) tmpBuilder.countColumns(); j < m; j++) {
                     wOut[i][j] = finalMat.doubleValue(i, j);
                 }
             }
             fireProgressUpdate("Setting Weights...", 95);
-            SimnetUtils.setWeights(network.getInputNeurons(),
-                network.getOutputNeurons(), wOut);
+            SimnetUtils.setWeights(network.getInputNeurons(), network.getOutputNeurons(), wOut);
             fireProgressUpdate("Done!", 100);
 
             // TODO: What error does JAMA actually throw for singular Matrices?
         } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(new JFrame(), ""
-                + "State Correlation Matrix is Singular."
-                + "\nCheck that target values are in range of output units."
-                + "\nOtherwise, input matrix is rank-deficient.",
-                "Training Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), "" + "State Correlation Matrix is Singular." + "\nCheck that target values are in range of output units." + "\nOtherwise, input matrix is rank-deficient.", "Training Failed", JOptionPane.ERROR_MESSAGE);
             fireProgressUpdate("Training Failed", 0);
         }
 
@@ -280,13 +263,12 @@ public class LMSOffline extends Trainer {
 
     /**
      * Moore penrose.
+     *
      * @param network the trainable network being trained
      */
     public void moorePenroseSolution(Trainable network) {
-        Matrix inputMatrix =
-            new Matrix(network.getTrainingSet().getInputData());
-        Matrix trainingMatrix =
-            new Matrix(network.getTrainingSet().getTargetData());
+        Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
+        Matrix trainingMatrix = new Matrix(network.getTrainingSet().getTargetData());
 
         fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
@@ -296,8 +278,7 @@ public class LMSOffline extends Trainer {
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
 
         fireProgressUpdate("Setting Weights...", 75);
-        SimnetUtils.setWeights(network.getInputNeurons(),
-            network.getOutputNeurons(), wOut);
+        SimnetUtils.setWeights(network.getInputNeurons(), network.getOutputNeurons(), wOut);
         fireProgressUpdate("Done!", 100);
 
         inputMatrix = null;
@@ -307,8 +288,7 @@ public class LMSOffline extends Trainer {
     /**
      * Set solution type.
      *
-     * @param solutionType
-     *            the solutionType to set
+     * @param solutionType the solutionType to set
      */
     public void setSolutionType(SolutionType solutionType) {
         this.solutionType = solutionType;
@@ -335,8 +315,7 @@ public class LMSOffline extends Trainer {
     /**
      * Set the current parse style. Used by preference dialog.
      *
-     * @param solutionType
-     *            the current solution.
+     * @param solutionType the current solution.
      */
     public void setSolutionType(ComboBoxWrapper solutionType) {
         setSolutionType((SolutionType) solutionType.getCurrentObject());

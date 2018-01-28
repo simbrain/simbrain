@@ -18,21 +18,22 @@
  */
 package org.simbrain.util.widgets;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-
 import org.simbrain.util.SimbrainConstants;
+
+import javax.swing.*;
 
 /**
  * <b>ChoicesWithNull</b> is a combo box with a null state. Used
- * used to edit properties that return that can be one of a 
+ * used to edit properties that return that can be one of a
  * a discrete set of states.  When the edited  objects
  * return different states, the null "..." is shown.
  */
 @SuppressWarnings("serial")
 public class ChoicesWithNull extends JComboBox<String> {
 
-    /** Whether the combo box has the null string in it. */
+    /**
+     * Whether the combo box has the null string in it.
+     */
     private boolean hasNull = false;
 
     /**
@@ -45,7 +46,7 @@ public class ChoicesWithNull extends JComboBox<String> {
     /**
      * Set the items in the combo box, e.g. {"Relative", "Absolute"} or
      * {"Happy","Neutral","Sad"}.
-     * 
+     *
      * @param items the list of items to use as items in the combo box.
      */
     public void setItems(String[] items) {
@@ -101,8 +102,7 @@ public class ChoicesWithNull extends JComboBox<String> {
      * @return true or false if value is null
      */
     public boolean isNull() {
-        if (this.getSelectedItem().toString()
-                .equalsIgnoreCase(SimbrainConstants.NULL_STRING)) {
+        if (this.getSelectedItem().toString().equalsIgnoreCase(SimbrainConstants.NULL_STRING)) {
             return true;
         }
         return false;

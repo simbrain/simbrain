@@ -3,10 +3,10 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import java.awt.Image;
-import java.util.ArrayList;
-
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * The Animation class manages a series of images (frames) and the amount of
@@ -18,13 +18,19 @@ import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
  */
 public class Animation {
 
-    /** The frames that comprise this image. */
+    /**
+     * The frames that comprise this image.
+     */
     private ArrayList<AnimFrame> frames = new ArrayList<AnimFrame>();
 
-    /** Names of images; used for persistence. */
+    /**
+     * Names of images; used for persistence.
+     */
     private String[] imageNames;
 
-    /** Current frame index. */
+    /**
+     * Current frame index.
+     */
     private int currFrameIndex;
 
     /**
@@ -34,7 +40,9 @@ public class Animation {
      */
     private long animTime;
 
-    /** Total duration of an animation. */
+    /**
+     * Total duration of an animation.
+     */
     private long totalDuration;
 
     /**
@@ -49,7 +57,7 @@ public class Animation {
      * file locations.
      *
      * @param imageLocations array of image locations.
-     * @param frameDuration time to display each frame.
+     * @param frameDuration  time to display each frame.
      */
     public Animation(final String[] imageLocations, final long frameDuration) {
         this.imageNames = imageLocations;
@@ -66,17 +74,17 @@ public class Animation {
     public Animation(final String imageLocation) {
         // Frame duration does not matter in this case, so set it to 1
         // arbitrarily.
-        this(new String[] { imageLocation }, 1);
+        this(new String[]{imageLocation}, 1);
     }
 
     /**
      * Adds an image to the animation with the specified duration (time to
      * display the image).
+     *
      * @param image
      * @param frameDuration
      */
-    public synchronized void addFrame(final Image image,
-            final long frameDuration) {
+    public synchronized void addFrame(final Image image, final long frameDuration) {
         totalDuration += frameDuration;
         frames.add(new AnimFrame(image, totalDuration));
     }
@@ -135,7 +143,9 @@ public class Animation {
      */
     private class AnimFrame {
 
-        /** The image for this frame. */
+        /**
+         * The image for this frame.
+         */
         private Image image;
 
         /**
@@ -149,7 +159,7 @@ public class Animation {
         /**
          * Initialize the frame.
          *
-         * @param image image
+         * @param image   image
          * @param endTime end time
          */
         public AnimFrame(final Image image, final long endTime) {
@@ -175,8 +185,7 @@ public class Animation {
         }
         if (imageNames.length > 0) {
             for (int i = 0; i < imageNames.length; i++) {
-                this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]),
-                        frameDuration);
+                this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]), frameDuration);
             }
         }
 

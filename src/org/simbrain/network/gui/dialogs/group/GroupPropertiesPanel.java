@@ -24,7 +24,6 @@ import org.simbrain.util.widgets.EditablePanel;
  * to this interface.
  *
  * @author Jeff Yoshimi
- *
  */
 public interface GroupPropertiesPanel extends EditablePanel {
 

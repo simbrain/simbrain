@@ -18,16 +18,15 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.textworld.TextListener.TextAdapter;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <b>ReaderWorld</b> intuitively models "reading". Text in the main display is
@@ -35,7 +34,7 @@ import com.thoughtworks.xstream.XStream;
  * expression that can be customized), and highlighted. This item is converted
  * in to scalar or vector values and sent to consumers (mainly neurons and
  * neuron groups) via couplings.
- *
+ * <p>
  * When the reader world is updated, the current character or word is
  * highlighted. A dictionary is consulted, and if a match is found, any
  * correspond couplings produce values:
@@ -55,7 +54,9 @@ public final class ReaderWorld extends TextWorld {
      */
     private final LinkedHashMap<String, double[]> tokenToVectorDictionary = new LinkedHashMap<String, double[]>();
 
-    /** The current text item. */
+    /**
+     * The current text item.
+     */
     private TextItem currentTextItem;
 
     /**
@@ -66,34 +67,47 @@ public final class ReaderWorld extends TextWorld {
      */
     private int vectorLength = 5;
 
-    /** List of parsing style. */
+    /**
+     * List of parsing style.
+     */
     public enum ParseStyle {
         CHARACTER, WORD
-    };
+    }
 
-    /** The current parsing style. */
+    ;
+
+    /**
+     * The current parsing style.
+     */
     private ParseStyle parseStyle = ParseStyle.WORD;
 
-    /** Regular expression pattern. By default search for whole words */
+    /**
+     * Regular expression pattern. By default search for whole words
+     */
     private Pattern pattern;
 
     // TODO: Document other good choices in the pref dialog. e.g. (\\w+)
-    /** Regular expression for matcher. */
+    /**
+     * Regular expression for matcher.
+     */
     private String regularExpression = "(\\S+)";
 
-    /** Pattern matcher. */
+    /**
+     * Pattern matcher.
+     */
     private Matcher matcher;
 
     // Initialize tokenToVectorDictionary
     {
-        tokenToVectorDictionary.put("hello", new double[] { .2, 0, 0 });
-        tokenToVectorDictionary.put("how", new double[] { 1, 0, 1 });
-        tokenToVectorDictionary.put("are", new double[] { 0, 1, 0 });
-        tokenToVectorDictionary.put("you", new double[] { 1, .5, 0 });
+        tokenToVectorDictionary.put("hello", new double[]{.2, 0, 0});
+        tokenToVectorDictionary.put("how", new double[]{1, 0, 1});
+        tokenToVectorDictionary.put("are", new double[]{0, 1, 0});
+        tokenToVectorDictionary.put("you", new double[]{1, .5, 0});
     }
 
     /**
      * Factory method for Reader world.
+     *
      * @return the constructed world.
      */
     public static ReaderWorld createReaderWorld() {
@@ -175,6 +189,7 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Returns a standard java string containing the character or characters
      * selected by the reader world.
+     *
      * @return the current string
      */
     @Producible
@@ -203,7 +218,7 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Add an entry to the token-vector dictionary.
      *
-     * @param token the String to add
+     * @param token  the String to add
      * @param vector the vector
      */
     public void addTokenVectorPair(String token, double[] vector) {
@@ -226,8 +241,7 @@ public final class ReaderWorld extends TextWorld {
             wrapText();
             int begin = getPosition();
             int end = getPosition() + 1;
-            setCurrentItem(new TextItem(begin, end, getText().substring(begin,
-                    end)));
+            setCurrentItem(new TextItem(begin, end, getText().substring(begin, end)));
             setPosition(end);
         } else if (parseStyle == ParseStyle.WORD) {
             if (matcher == null) {
@@ -304,7 +318,7 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * @return true if the current position is past the end of the text area,
-     *         false otherwise.
+     * false otherwise.
      */
     private boolean atEnd() {
         return getPosition() >= getText().length();

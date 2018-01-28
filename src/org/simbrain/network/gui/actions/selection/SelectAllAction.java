@@ -18,22 +18,21 @@
  */
 package org.simbrain.network.gui.actions.selection;
 
-import java.awt.Toolkit;
+import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
-import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * Select all action.
  */
 public final class SelectAllAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -51,15 +50,14 @@ public final class SelectAllAction extends AbstractAction {
         this.networkPanel = networkPanel;
 
         putValue(SHORT_DESCRIPTION, "Select all network items");
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('a'), this);
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('a'), this);
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.selectAll();

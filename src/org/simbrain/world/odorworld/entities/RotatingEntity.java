@@ -18,25 +18,26 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.world.odorworld.OdorWorld;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 /**
  * Represents an entity that can rotate.
- *
+ * <p>
  * TODO: Currently rotating entities are "agents" that can accept sensors and
  * effectors. This concepts needs to be separated from that of a rotating
  * entity. In principle non-rotating entities should be able to have sensors,
  * for example.
  */
+
 /**
  * Represents an entity that can rotate.
- *
+ * <p>
  * TODO: Currently rotating entities are "agents" that can accept sensors and
  * effectors. The concept of an "Agent" needs to be separated from that of a
  * rotating entity. In principle non-rotating entities should be able to have
@@ -44,32 +45,50 @@ import org.simbrain.world.odorworld.OdorWorld;
  */
 public class RotatingEntity extends OdorWorldEntity {
 
-    /** Images for various angles. */
+    /**
+     * Images for various angles.
+     */
     private TreeMap<Double, Animation> imageMap;
 
-    /** Current heading / orientation. */
+    /**
+     * Current heading / orientation.
+     */
     private double heading = DEFAULT_HEADING;
 
-    /** Initial heading of agent. */
+    /**
+     * Initial heading of agent.
+     */
     private final static double DEFAULT_HEADING = 0;
 
-    /** Default location for sensors relative to agent. */
+    /**
+     * Default location for sensors relative to agent.
+     */
     private static double WHISKER_ANGLE = Math.PI / 4;
 
-    /** Amount to manually rotate. */
+    /**
+     * Amount to manually rotate.
+     */
     private final double manualMotionTurnIncrement = 4;
 
-    /** Amount to manually rotate. */
+    /**
+     * Amount to manually rotate.
+     */
     private final double manualStraightMovementIncrement = 4;
 
-    /** Default type. */
+    /**
+     * Default type.
+     */
     private static final String DEFAULT_TYPE = "Mouse";
 
     // TODO: Poorly named. Image or image-set name.
-    /** Type; used to load images. */
+    /**
+     * Type; used to load images.
+     */
     private String entityType = DEFAULT_TYPE;
 
-    /** Obvious... */
+    /**
+     * Obvious...
+     */
     private final static double DEGREES_IN_A_CIRCLE = 360;
 
     /**
@@ -93,7 +112,8 @@ public class RotatingEntity extends OdorWorldEntity {
         }
         if (entityType.equalsIgnoreCase("Circle")) {
             imageMap = RotatingEntityManager.getCircle();
-        } if (entityType.equalsIgnoreCase("Mouse")) {
+        }
+        if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
         } else if (entityType.equalsIgnoreCase("Amy")) {
             imageMap = RotatingEntityManager.getRotatingTileset("amy", 20);
@@ -248,8 +268,7 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Amy", "Arnold", "Boy", "Circle", "Cow",  "Girl", "Jake",
-                        "Lion", "Mouse", "Susi", "Steve" };
+                return new Object[]{"Amy", "Arnold", "Boy", "Circle", "Cow", "Girl", "Jake", "Lion", "Mouse", "Susi", "Steve"};
             }
         };
     }

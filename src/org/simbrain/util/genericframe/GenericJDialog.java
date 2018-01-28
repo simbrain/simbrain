@@ -18,10 +18,9 @@
  */
 package org.simbrain.util.genericframe;
 
-import java.awt.Frame;
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyVetoException;
-
-import javax.swing.JDialog;
 
 /**
  * JDialog which implements Generic Frame.

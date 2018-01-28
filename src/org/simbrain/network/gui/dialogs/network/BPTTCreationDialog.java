@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.*;
 
 /**
  * Creates a GUI dialog to set the parameters for and then build a BPTT Network.
@@ -33,16 +32,24 @@ import org.simbrain.util.StandardDialog;
  */
 public class BPTTCreationDialog extends StandardDialog {
 
-    /** Underlying Network Panel */
+    /**
+     * Underlying Network Panel
+     */
     private final NetworkPanel panel;
 
-    /** Underlying labeled item panel for dialog */
+    /**
+     * Underlying labeled item panel for dialog
+     */
     private LabelledItemPanel prefsPanel = new LabelledItemPanel();
 
-    /** Text field for number of input nodes */
+    /**
+     * Text field for number of input nodes
+     */
     private JTextField tfNumInputsOutputs = new JTextField();
 
-    /** Text field for number of hidden layer nodes */
+    /**
+     * Text field for number of hidden layer nodes
+     */
     private JTextField tfNumHidden = new JTextField();
 
     /**
@@ -58,8 +65,7 @@ public class BPTTCreationDialog extends StandardDialog {
 
         // Add fields
         tfNumInputsOutputs.setColumns(5);
-        prefsPanel.addItem("Number of input / outupt nodes:",
-                tfNumInputsOutputs);
+        prefsPanel.addItem("Number of input / outupt nodes:", tfNumInputsOutputs);
         prefsPanel.addItem("Number of hidden nodes:", tfNumHidden);
 
         // Fill fields with default values
@@ -73,19 +79,13 @@ public class BPTTCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-            BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(),
-                    Integer.parseInt(tfNumInputsOutputs.getText()),
-                    Integer.parseInt(tfNumHidden.getText()),
-                    Integer.parseInt(tfNumInputsOutputs.getText()),
-                    panel.getLastClickedPosition());
+            BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputsOutputs.getText()), Integer.parseInt(tfNumHidden.getText()), Integer.parseInt(tfNumInputsOutputs.getText()), panel.getLastClickedPosition());
 
             bptt.getParentNetwork().addGroup(bptt);
             dispose();
 
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"
-                    + "\nNetwork construction failed.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Inappropriate Field Values:" + "\nNetwork construction failed.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

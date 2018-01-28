@@ -18,18 +18,16 @@
  */
 package org.simbrain.util.projection;
 
+import Jama.Matrix;
+import com.Ostermiller.util.CSVPrinter;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import Jama.Matrix;
-
-import com.Ostermiller.util.CSVPrinter;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and
@@ -38,11 +36,12 @@ import com.Ostermiller.util.CSVPrinter;
  * dataset up, adding points, checking their integrity, finding nearest
  * neighbors of a point, calculating their interpoint distances, etc.). It is
  * assumed that all points in a dataset have the same dimensionality.
- *
  */
 public class Dataset {
 
-    /** Logger. */
+    /**
+     * Logger.
+     */
     Logger logger = Logger.getLogger(Dataset.class);
 
     /**
@@ -66,7 +65,9 @@ public class Dataset {
      */
     private List<DataPoint> persistentData = new ArrayList<DataPoint>();
 
-    /** The last point added to this dataset. */
+    /**
+     * The last point added to this dataset.
+     */
     private DataPoint lastAddedPoint;
 
     /**
@@ -83,7 +84,7 @@ public class Dataset {
      * Creates an instance of Dataset.
      *
      * @param dimensions dimension of dataset
-     * @param numPoints number of points
+     * @param numPoints  number of points
      */
     public Dataset(final int dimensions, final int numPoints) {
         this(dimensions);
@@ -102,8 +103,7 @@ public class Dataset {
      */
     public DataPoint getPoint(final int i) {
         if (i >= getNumPoints()) {
-            System.err
-                    .println("Error: requested datapoint outside of dataset range");
+            System.err.println("Error: requested datapoint outside of dataset range");
 
             return null;
         }
@@ -153,10 +153,9 @@ public class Dataset {
     /**
      * Add a new datapoint to the dataset.
      *
-     * @param point A point in the high dimensional space
+     * @param point     A point in the high dimensional space
      * @param tolerance forwarded to isUniquePoint; if -1 then add point
-     *            regardless of whether it is unique or not
-     *
+     *                  regardless of whether it is unique or not
      * @return null if point added, overlapping point otherwise
      */
     public DataPoint addPoint(final DataPoint point, final double tolerance) {
@@ -198,13 +197,12 @@ public class Dataset {
     /**
      * Set a specified point in the dataset.
      *
-     * @param i the point to set
+     * @param i     the point to set
      * @param point the new n-dimensional point
      */
     public void setPoint(final int i, final DataPoint point) {
         if ((i < 0) || (i >= getNumPoints())) {
-            System.err
-                    .println("Error: trying to set a datapoint which does not exist");
+            System.err.println("Error: trying to set a datapoint which does not exist");
 
             return;
         }
@@ -241,13 +239,13 @@ public class Dataset {
      */
     private int getDistanceIndex(int point) {
         switch (point) {
-        case 0:
-            return -1; /* no start for point 0 */
-        case 1:
-            return 0;
-        default:
-            int n = point - 1;
-            return ((n * n) + n) / 2;
+            case 0:
+                return -1; /* no start for point 0 */
+            case 1:
+                return 0;
+            default:
+                int n = point - 1;
+                return ((n * n) + n) / 2;
         }
     }
 
@@ -260,9 +258,7 @@ public class Dataset {
      */
     private double calculateDistance(int pointA, int pointB) {
         if (pointA <= pointB) {
-            throw new IllegalArgumentException(
-                    "pointA must be greater than pointB - A: " + pointA
-                            + " B: " + pointB);
+            throw new IllegalArgumentException("pointA must be greater than pointB - A: " + pointA + " B: " + pointB);
         }
 
         int start = getDistanceIndex(pointA);
@@ -290,8 +286,7 @@ public class Dataset {
 
         for (int i = point + 1; i < numPoints; i++) {
             start = getDistanceIndex(i);
-            distances[start + point] = getDistance(ntree.get(point),
-                    ntree.get(i));
+            distances[start + point] = getDistance(ntree.get(point), ntree.get(i));
         }
     }
 
@@ -419,8 +414,7 @@ public class Dataset {
                 double[] newPoint = new double[dimensions];
 
                 for (int k = 0; k < dimensions; k++) {
-                    newPoint[k] = getComponent(i, k)
-                            + ((Math.random() - 0.5) * factor);
+                    newPoint[k] = getComponent(i, k) + ((Math.random() - 0.5) * factor);
                     getPoint(i).setData(newPoint);
                 }
             } else {
@@ -432,6 +426,7 @@ public class Dataset {
     /**
      * Print out low dimensional points so maple can plot them Just does low
      * dimension = 2.
+     *
      * @param ps
      */
     public void resultsToMaple(PrintStream ps) {
@@ -445,8 +440,7 @@ public class Dataset {
         }
 
         ps.println("]:");
-        ps.println("plotsetup(ps,plotoutput=`plot.ps`,"
-                + "plotoptions=`portrait,noborder,width=6.0in,height=6.0in`):");
+        ps.println("plotsetup(ps,plotoutput=`plot.ps`," + "plotoptions=`portrait,noborder,width=6.0in,height=6.0in`):");
         ps.println("plot(points, style=POINT,symbol=CIRCLE);");
     }
 
@@ -456,14 +450,12 @@ public class Dataset {
      * points.
      *
      * @param datapointNumber index of the point to get
-     * @param dimension dimension of the desired component
-     *
+     * @param dimension       dimension of the desired component
      * @return the value of of n'th component of the specified datapoint
      */
     public double getComponent(final int datapointNumber, final int dimension) {
         if (dimension < 0 || dimension >= dimensions) {
-            throw new IllegalArgumentException(dimension
-                    + " is not a valid dimesion for this dataset.");
+            throw new IllegalArgumentException(dimension + " is not a valid dimesion for this dataset.");
         }
 
         return getPoint(datapointNumber).get(dimension);
@@ -476,9 +468,7 @@ public class Dataset {
      */
     private void checkDimension(DataPoint point) {
         if ((point.getDimension() > 1) && (point.getDimension() != dimensions)) {
-            throw new IllegalArgumentException("Error: Dataset is "
-                    + dimensions + " dimensional, added data is "
-                    + point.getDimension() + " dimensional");
+            throw new IllegalArgumentException("Error: Dataset is " + dimensions + " dimensional, added data is " + point.getDimension() + " dimensional");
         }
     }
 
@@ -486,21 +476,17 @@ public class Dataset {
      * Check that a given point is "new", that is, that it is not already in the
      * dataset.
      *
-     * @param point the point to check
+     * @param point     the point to check
      * @param tolerance distance within which a point is considered old, and
-     *            outside of which it is considered new
-     *
+     *                  outside of which it is considered new
      * @return null if the point is new, reference to overlapping point
-     *         otherwise
+     * otherwise
      */
-    private DataPoint isUniquePoint(final DataPoint toCheck,
-            final double tolerance) {
+    private DataPoint isUniquePoint(final DataPoint toCheck, final double tolerance) {
         logger.debug("checking for uniqueness with tolerance: " + tolerance);
 
         if (toCheck.getDimension() != dimensions) {
-            throw new IllegalArgumentException("point to check has "
-                    + toCheck.getDimension()
-                    + " dimensions.  This dataset requires " + dimensions);
+            throw new IllegalArgumentException("point to check has " + toCheck.getDimension() + " dimensions.  This dataset requires " + dimensions);
         }
         return ntree.isUnique(toCheck, tolerance);
     }
@@ -509,7 +495,6 @@ public class Dataset {
      * Returns the index of the closest point.
      *
      * @param point the point to check
-     *
      * @return the index of the point closest to this one in the dataset
      */
     public int getClosestIndex(final DataPoint point) {
@@ -521,7 +506,7 @@ public class Dataset {
      * returns k neighbors where the 0th item is the closest and the 1st item is
      * the second closest etc.
      *
-     * @param k the number of points to retrieve
+     * @param k     the number of points to retrieve
      * @param point the point to find neighbors for
      * @return the indices of the neighbors
      */
@@ -544,21 +529,18 @@ public class Dataset {
      *
      * @param index1 index of point 1
      * @param index2 index of point 2
-     *
      * @return distance between points 1 and 2
      */
     public double getDistance(int index1, int index2) {
         int numPoints = getNumPoints();
 
         if (index1 < 0 || index1 > numPoints) {
-            System.out.println("Dataset.getDistance() - index1: " + index1
-                    + " out of bounds");
+            System.out.println("Dataset.getDistance() - index1: " + index1 + " out of bounds");
 
             // TODO throw exception
             return 0;
         } else if (index2 < 0 || index2 > numPoints) {
-            System.out.println("Dataset.getDistance() - index2: " + index2
-                    + " out of bounds");
+            System.out.println("Dataset.getDistance() - index2: " + index2 + " out of bounds");
 
             // TODO throw exception
             return 0;
@@ -586,7 +568,6 @@ public class Dataset {
      *
      * @param point1 First point of distance
      * @param point2 Second point of distance
-     *
      * @return the Euclidean distance between points 1 and 2
      */
     public double getDistance(final DataPoint point1, final DataPoint point2) {
@@ -641,7 +622,6 @@ public class Dataset {
      * Returns the mean of the dataset on a given dimension.
      *
      * @param d index of the dimension whose mean to get
-     *
      * @return mean of dataset on dimension d
      */
     public double getMean(final int d) {
@@ -661,7 +641,6 @@ public class Dataset {
      *
      * @param i first dimension
      * @param j second dimension
-     *
      * @return covariance of i with respect to j
      */
     public double getCovariance(final int i, final int j) {
@@ -684,7 +663,7 @@ public class Dataset {
      * Returns a covariance matrix for the dataset.
      *
      * @return covariance matrix which describes how the data covary along each
-     *         dimension
+     * dimension
      */
     public Matrix getCovarianceMatrix() {
         Matrix m = new Matrix(dimensions, dimensions);

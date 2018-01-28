@@ -18,46 +18,49 @@
  */
 package org.simbrain.network.gui.actions.connection;
 
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+
 /**
  * Connect neurons action. Connects a set of source neurons to a set of target
  * neurons.
- *
+ * <p>
  * Not currently used.
  */
 public class ConnectNeuronsSimpleAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
-    /** Source neurons. */
+    /**
+     * Source neurons.
+     */
     private Collection<NeuronNode> sourceNeurons;
 
-    /** Target neuron. */
+    /**
+     * Target neuron.
+     */
     private NeuronNode targetNeuron;
 
     /**
      * Create a new connect neurons action. Connects a set of source neurons to
      * a set of target neurons.
      *
-     * @param networkPanel network panel, must not be null
+     * @param networkPanel  network panel, must not be null
      * @param sourceNeurons NeuronNodes to connect from
-     * @param targetNeuron NeuronNodes to connect to
+     * @param targetNeuron  NeuronNodes to connect to
      */
-    public ConnectNeuronsSimpleAction(final NetworkPanel networkPanel,
-            final Collection<NeuronNode> sourceNeurons,
-            final NeuronNode targetNeuron) {
+    public ConnectNeuronsSimpleAction(final NetworkPanel networkPanel, final Collection<NeuronNode> sourceNeurons, final NeuronNode targetNeuron) {
 
         super("Connect Simple");
 
@@ -71,8 +74,9 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction
+    /**
      * @param arg0
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent arg0) {
 
@@ -81,9 +85,7 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
         }
 
         for (NeuronNode source : sourceNeurons) {
-            networkPanel.getNetwork().addSynapse(
-                    new Synapse(networkPanel.getNetwork(), source.getNeuron(),
-                            targetNeuron.getNeuron(), new StaticSynapseRule()));
+            networkPanel.getNetwork().addSynapse(new Synapse(networkPanel.getNetwork(), source.getNeuron(), targetNeuron.getNeuron(), new StaticSynapseRule()));
         }
 
     }

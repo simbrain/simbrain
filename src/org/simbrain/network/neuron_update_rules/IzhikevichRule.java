@@ -29,36 +29,53 @@ import org.simbrain.util.randomizer.Randomizer;
  * different types. Students could just look it up, but this would be
  * faster/cooler. Just a thought.
  */
-public class IzhikevichRule extends SpikingNeuronUpdateRule implements
-    NoisyUpdateRule {
+public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
-    /** Recovery. */
+    /**
+     * Recovery.
+     */
     private double recovery;
 
-    /** A. */
+    /**
+     * A.
+     */
     private double a = .02;
 
-    /** B. */
+    /**
+     * B.
+     */
     private double b = .2;
 
-    /** C. */
+    /**
+     * C.
+     */
     private double c = -65;
 
-    /** D. */
+    /**
+     * D.
+     */
     private double d = 8;
 
-    /** Constant background current. */
+    /**
+     * Constant background current.
+     */
     private double iBg = 14;
 
-    /** Threshold value to signal a spike. */
+    /**
+     * Threshold value to signal a spike.
+     */
     private double threshold = 30;
 
-    /** Noise dialog. */
+    /**
+     * Noise dialog.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
+    /**
+     * Add noise to the neuron.
+     */
     private boolean addNoise;
-    
+
     // Backwards compatibility... to be removed
     @Deprecated
     private double inputs;
@@ -85,6 +102,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         in.noiseGenerator = new Randomizer(noiseGenerator);
         return in;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -100,10 +118,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         inputs += iBg;
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
-        val = activation
-            + (timeStep * (((.04 * (activation * activation))
-                + (5 * activation) + 140)
-                - recovery + inputs));
+        val = activation + (timeStep * (((.04 * (activation * activation)) + (5 * activation) + 140) - recovery + inputs));
 
         if (val >= threshold) {
             val = c;
@@ -185,14 +200,14 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     }
 
     public double getiBg() {
-		return iBg;
-	}
+        return iBg;
+    }
 
-	public void setiBg(double iBg) {
-		this.iBg = iBg;
-	}
+    public void setiBg(double iBg) {
+        this.iBg = iBg;
+    }
 
-	/**
+    /**
      * @return Returns the addNoise.
      */
     public boolean getAddNoise() {

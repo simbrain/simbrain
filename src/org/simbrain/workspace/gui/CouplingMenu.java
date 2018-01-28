@@ -5,7 +5,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
-import javax.swing.JMenu;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class CouplingMenu extends JMenu {
         setText(source.toString());
         updateItems();
     }
-    
+
     public void setCustomName(String name) {
         this.setText(name);
     }
@@ -48,8 +48,7 @@ public class CouplingMenu extends JMenu {
             List<Consumer<?>> consumers = workspace.getCouplingFactory().getAllConsumers(targetComponent);
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, consumer.getId() + ":" + consumer.getDescription(),
-                            producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace, consumer.getId() + ":" + consumer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {
@@ -72,8 +71,7 @@ public class CouplingMenu extends JMenu {
             List<Producer<?>> producers = workspace.getCouplingFactory().getAllProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, producer.getId() + ":" + producer.getDescription(),
-                            producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace, producer.getId() + ":" + producer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {

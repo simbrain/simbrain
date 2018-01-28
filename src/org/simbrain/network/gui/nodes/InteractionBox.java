@@ -18,34 +18,39 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
 import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Interaction Box: graphical element for interacting with a group.
  */
 public class InteractionBox extends ScreenElement {
 
-    /** Width of interaction box.  */
+    /**
+     * Width of interaction box.
+     */
     private final static float DEFAULT_WIDTH = 20;
 
-    /** Height of interaction box.  */
+    /**
+     * Height of interaction box.
+     */
     private final static float DEFAULT_HEIGHT = 10;
 
-    /** Text label. */
+    /**
+     * Text label.
+     */
     private PText textLabel;
 
-    /** Context menu. */
+    /**
+     * Context menu.
+     */
     private JPopupMenu contextMenu;
 
     /**
@@ -55,17 +60,19 @@ public class InteractionBox extends ScreenElement {
      */
     private final double largestZoomRescaleFactor = 4;
 
-    /** Reference to property change listener so it can be cleaned up later. */
+    /**
+     * Reference to property change listener so it can be cleaned up later.
+     */
     private final PropertyChangeListener zoomListener;
 
     /**
      * Create a new tab node.
+     *
      * @param net
      */
     public InteractionBox(final NetworkPanel net) {
         super(net);
-        this.append(new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT),
-                false);
+        this.append(new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT), false);
         Color color = new Color(248, 252, 184);
         setPaint(color);
         // setTransparency(.2f);
@@ -82,18 +89,14 @@ public class InteractionBox extends ScreenElement {
                 if (viewScale < 1) {
                     // Rescale based on linear equation so that as view scale
                     // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
-                    double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale
-                            + largestZoomRescaleFactor;
+                    double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor;
                     setScale(rescaleAmount);
                 } else {
                     setScale(1);
                 }
             }
         };
-        net.getCanvas()
-                .getCamera()
-                .addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
-                        zoomListener);
+        net.getCanvas().getCamera().addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener);
 
     }
 
@@ -107,8 +110,7 @@ public class InteractionBox extends ScreenElement {
             return;
         }
         if (textLabel.getScale() == 1) {
-            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(),
-                    getBounds().getCenter2D().getY());
+            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(), getBounds().getCenter2D().getY());
         }
         textLabel.setText(text);
         textLabel.resetBounds();
@@ -119,19 +121,18 @@ public class InteractionBox extends ScreenElement {
      * Update the text label bounds.
      */
     public void updateText() {
-    // TODO: Appears to be one source of performance drains.
-    // This is called multiple times at each iteration and it calls repaint
-    // Reduce number of times this is called
-    	SwingUtilities.invokeLater(new Runnable() {
-    		@Override
-    		public void run() {
-    			// Reset box bounds
-    			textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(),
-    					getBounds().getCenter2D().getY());
-    			setBounds(textLabel.getBounds());
-    			getNetworkPanel().repaint();
-    		}
-    	});
+        // TODO: Appears to be one source of performance drains.
+        // This is called multiple times at each iteration and it calls repaint
+        // Reduce number of times this is called
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                // Reset box bounds
+                textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(), getBounds().getCenter2D().getY());
+                setBounds(textLabel.getBounds());
+                getNetworkPanel().repaint();
+            }
+        });
     }
 
     @Override

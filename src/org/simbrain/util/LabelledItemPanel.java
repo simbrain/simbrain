@@ -18,13 +18,8 @@
  */
 package org.simbrain.util;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * <b>LabelledItemPanel</b> provides a panel for laying out labeled elements
@@ -34,11 +29,12 @@ import javax.swing.JPanel;
  * @author Michael Harris
  * @author Jeff Yoshimi
  * @author Zoë Tosi
- *
  */
 public class LabelledItemPanel extends JPanel {
 
-    /** The row to add the next labeled item to. */
+    /**
+     * The row to add the next labeled item to.
+     */
     private int myNextItemRow = 0;
 
     /**
@@ -75,7 +71,7 @@ public class LabelledItemPanel extends JPanel {
      * last item added.
      *
      * @param labelText The label text for the item.
-     * @param item The item to be added.
+     * @param item      The item to be added.
      */
     public void addItem(final String labelText, final JComponent item) {
         // Create the label and its constraints
@@ -111,8 +107,8 @@ public class LabelledItemPanel extends JPanel {
      * item to the panel on the current row, at the specified column.
      *
      * @param label The label text for the item.
-     * @param item The item to be added.
-     * @param col desired grid bag layer column
+     * @param item  The item to be added.
+     * @param col   desired grid bag layer column
      */
     public void addItem(final JLabel label, final JComponent item, int col) {
 
@@ -146,7 +142,7 @@ public class LabelledItemPanel extends JPanel {
      *
      * @param name The label text for the item.
      * @param item The item to be added.
-     * @param col desired grid bag layor column
+     * @param col  desired grid bag layor column
      */
     public void addItem(final String name, final JComponent item, int col) {
 
@@ -181,7 +177,7 @@ public class LabelledItemPanel extends JPanel {
      * argument.
      *
      * @param label Label to be added
-     * @param item SimbrainComponent to be added
+     * @param item  SimbrainComponent to be added
      */
     public void addItemLabel(final JLabel label, final JComponent item) {
         GridBagConstraints labelConstraints = new GridBagConstraints();
@@ -208,7 +204,7 @@ public class LabelledItemPanel extends JPanel {
 
         myNextItemRow++;
     }
-    
+
     /**
      * Add an item which spans the columns.
      *
@@ -237,7 +233,7 @@ public class LabelledItemPanel extends JPanel {
      * LabelledItemPanel class to keep the code clean.
      *
      * @param item the desired item
-     * @param col the column in which it is to be deposited
+     * @param col  the column in which it is to be deposited
      */
     public void addItem(final JComponent item, int col) {
         GridBagConstraints itemConstraints = new GridBagConstraints();
@@ -250,7 +246,7 @@ public class LabelledItemPanel extends JPanel {
         itemConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         add(item, itemConstraints);
- 
+
         myNextItemRow++;
 
     }

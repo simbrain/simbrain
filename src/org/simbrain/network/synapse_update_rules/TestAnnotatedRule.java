@@ -18,49 +18,48 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.UserParameter;
 
 
 /**
- * Test annotated param. 
- * Extends PfisterGerstner2006Rule which defines floating params. 
+ * Test annotated param.
+ * Extends PfisterGerstner2006Rule which defines floating params.
  * This also tests handling params defined in super-classes.
- * 
+ *
  * @author Oliver J. Coleman
  */
 public class TestAnnotatedRule extends PfisterGerstner2006Rule {
-	@UserParameter(label="test string", description="Test string parameter.", order=-1)
+    @UserParameter(label = "test string", description = "Test string parameter.", order = -1)
     protected String ts;
-	
-	@UserParameter(label="test bool", description="Test boolean parameter.", order=-1, defaultValue="true")
+
+    @UserParameter(label = "test bool", description = "Test boolean parameter.", order = -1, defaultValue = "true")
     protected boolean tb;
-	
-	@UserParameter(label="test int def", description="Test int parameter with default.", order=-1, defaultValue="2")
+
+    @UserParameter(label = "test int def", description = "Test int parameter with default.", order = -1, defaultValue = "2")
     protected int ti;
-	
-	@UserParameter(label="test int min", description="Test int parameter with minimum.", order=-1, minimumValue=1)
+
+    @UserParameter(label = "test int min", description = "Test int parameter with minimum.", order = -1, minimumValue = 1)
     protected int timin;
 
-	@UserParameter(label="test int max", description="Test int parameter with maximum.", order=-1, maximumValue=-50)
+    @UserParameter(label = "test int max", description = "Test int parameter with maximum.", order = -1, maximumValue = -50)
     protected int timax;
-	
-	@UserParameter(label="test int min max", description="Test int parameter with min and max.", order=-1, minimumValue=-10, maximumValue=200)
+
+    @UserParameter(label = "test int min max", description = "Test int parameter with min and max.", order = -1, minimumValue = -10, maximumValue = 200)
     protected int timinmax;
-	
-	@Override
-	public String getName() {
-		return "TestAnnotatedRule";
-	}
-	
-	
+
+    @Override
+    public String getName() {
+        return "TestAnnotatedRule";
+    }
+
+
     @Override
     public SynapseUpdateRule deepCopy() {
-    	try {
-			return (PfisterGerstner2006Rule) this.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
+        try {
+            return (PfisterGerstner2006Rule) this.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

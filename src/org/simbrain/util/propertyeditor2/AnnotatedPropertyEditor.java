@@ -18,19 +18,6 @@
  */
 package org.simbrain.util.propertyeditor2;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Parameter;
@@ -38,14 +25,22 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.widgets.ParameterWidget;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * A panel for editing objects based on objects. Draws on annotations. Handles
  * inconsistent cases with null widgets.
- * 
+ * <p>
  * To use simply initialize with a single object or list of objects to edit,
  * which contain the {@link UserParameter} annotation. When ready to write the
  * values of the panel to the underlying objects call commitChanges.
- * 
+ * <p>
  * In the multiple object case, inconsistencies are handled by displaying "null"
  * values, like "..." in a text field, to indicate that the edited objects
  * currently have inconsistent states. Closing the dialog in that case without
@@ -80,7 +75,9 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     private List<? extends EditableObject> editedObjects;
 
-    /** Main item panel. */
+    /**
+     * Main item panel.
+     */
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
 
     /**
@@ -99,7 +96,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
 
-        if(objects.isEmpty()) {
+        if (objects.isEmpty()) {
             return;
         }
         this.editedObjects = objects;
@@ -123,11 +120,9 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
 
         // Check that the objects given are of the same type
-        boolean objectsSameType = editedObjects.stream().allMatch(
-                m -> m.getClass().equals(editedObjects.get(0).getClass()));
+        boolean objectsSameType = editedObjects.stream().allMatch(m -> m.getClass().equals(editedObjects.get(0).getClass()));
         if (!objectsSameType) {
-            throw new IllegalArgumentException(
-                    "Edited objects must be of the same type as each other");
+            throw new IllegalArgumentException("Edited objects must be of the same type as each other");
         }
 
         widgets = new TreeSet<>();
@@ -149,14 +144,14 @@ public class AnnotatedPropertyEditor extends JPanel {
      * These can be externally provided objects of the same type as those
      * maintained by the dialog (and then used in conjunction with
      * commitChanges(list)).
-     * 
+     *
      * @objectsToEdit the objects whose values should be set using this panel.
-     *                All objects must be of the same type as the objects
-     *                maintained by this panel.
+     * All objects must be of the same type as the objects
+     * maintained by this panel.
      */
     public void fillFieldValues(List<? extends EditableObject> objectsToFillFieldValues) {
 
-        if(objectsToFillFieldValues.isEmpty()) {
+        if (objectsToFillFieldValues.isEmpty()) {
             return;
         }
         checkTypes(objectsToFillFieldValues);
@@ -169,8 +164,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             for (int i = 1; i < objectsToFillFieldValues.size(); i++) {
                 Object obj = objectsToFillFieldValues.get(i);
                 Object objValue = pw.parameter.getFieldValue(obj);
-                if ((refValue == null && objValue != null)
-                        || (refValue != null && !refValue.equals(objValue))) {
+                if ((refValue == null && objValue != null) || (refValue != null && !refValue.equals(objValue))) {
                     consistent = false;
                     break;
                 }
@@ -204,10 +198,10 @@ public class AnnotatedPropertyEditor extends JPanel {
 
     /**
      * Apply the values of the editor panel to a list of objects.
-     * 
+     *
      * @objectsToEdit the objects whose values should be set using this panel.
-     *                All objects must be of the same type as the objects
-     *                maintained by this panel.
+     * All objects must be of the same type as the objects
+     * maintained by this panel.
      */
     public void commitChanges(List<? extends EditableObject> objectsToEdit) {
 
@@ -220,8 +214,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             // Ignore unspecified values.
             // If the value isn't null and it's either not a String or not an
             // empty string.
-            if (value != null && (!(value instanceof String)
-                    || !((String) value).equals(""))) {
+            if (value != null && (!(value instanceof String) || !((String) value).equals(""))) {
                 for (Object o : objectsToEdit) {
                     pw.parameter.setFieldValue(o, value);
                 }
@@ -245,14 +238,10 @@ public class AnnotatedPropertyEditor extends JPanel {
         if (objectsToCheck.isEmpty()) {
             return;
         }
-        boolean objectsSameType = objectsToCheck.stream().allMatch(
-                m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
-        boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass()
-                .equals(editedObjects.get(0).getClass());
+        boolean objectsSameType = objectsToCheck.stream().allMatch(m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
+        boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
         if (!objectsSameType || !objectsSameTypeAsInternal) {
-            throw new IllegalArgumentException(
-                    "Committed objects must be of the same type as each other and"
-                            + "as the objects handled by this editor");
+            throw new IllegalArgumentException("Committed objects must be of the same type as each other and" + "as the objects handled by this editor");
         }
     }
 
@@ -262,8 +251,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      * @param object object the object whose properties should be displayed
      * @return the action
      */
-    public static AbstractAction getPropertiesDialogAction(
-            final EditableObject object) {
+    public static AbstractAction getPropertiesDialogAction(final EditableObject object) {
         return new AbstractAction() {
 
             // Initialize
@@ -274,8 +262,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             }
 
             public void actionPerformed(ActionEvent arg0) {
-                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(
-                        object);
+                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(object);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();
@@ -310,7 +297,7 @@ public class AnnotatedPropertyEditor extends JPanel {
 
     /**
      * Returns the list of edited objects.
-     * 
+     *
      * @return the objects being edited
      */
     public List<? extends EditableObject> getEditedObjects() {

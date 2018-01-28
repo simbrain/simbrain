@@ -18,29 +18,8 @@
  */
 package org.simbrain.network.update_actions;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -60,40 +39,43 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.Randomizer;
 
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- *
  * @author Zoë Tosi
- *
- *         A class which performs a parallelized update of an entire network.
- *         Any given thread which is updating a neuron is also responsible for
- *         updating all the afferent synapses of that neuron. Update occurs
- *         synchronously using the same technique as buffered update, despite
- *         being concurrent.
- *
- *         This class keeps its own separate list of neurons in the network
- *         because for networks with groups, it would be expensive to extract
- *         neuron groups from a generic groups list every invocation. Instead it
- *         implements a group and neuron listener and updates its internal set
- *         of neurons when/if neurons or neuron groups are added to or removed
- *         from the network.
- *
- *         Parallelization in this class follows a classical consumer/producer
- *         framework. One thread: the producer has the job of filling a blocking
- *         queue with tasks for the consumers to take. The consumers take tasks
- *         from the queue and execute them until the queue is empty. In this
- *         way, consumers can take on tasks whenever they are available to do so
- *         and there are more tasks to complete, instead of having to wait on
- *         some other condition. In order to keep the sort of synchronization
- *         necessary for a neural network, a cyclic barrier ensures that all
- *         tasks have been completed before more tasks (amounting to the next
- *         network iteration/update) are allowed in the queue. Furthermore this
- *         class implements a synchronous or buffered update. The producer
- *         thread does not set the activation of each neuron to their buffer
- *         values until all tasks have been completed.
- *
+ * <p>
+ * A class which performs a parallelized update of an entire network.
+ * Any given thread which is updating a neuron is also responsible for
+ * updating all the afferent synapses of that neuron. Update occurs
+ * synchronously using the same technique as buffered update, despite
+ * being concurrent.
+ * <p>
+ * This class keeps its own separate list of neurons in the network
+ * because for networks with groups, it would be expensive to extract
+ * neuron groups from a generic groups list every invocation. Instead it
+ * implements a group and neuron listener and updates its internal set
+ * of neurons when/if neurons or neuron groups are added to or removed
+ * from the network.
+ * <p>
+ * Parallelization in this class follows a classical consumer/producer
+ * framework. One thread: the producer has the job of filling a blocking
+ * queue with tasks for the consumers to take. The consumers take tasks
+ * from the queue and execute them until the queue is empty. In this
+ * way, consumers can take on tasks whenever they are available to do so
+ * and there are more tasks to complete, instead of having to wait on
+ * some other condition. In order to keep the sort of synchronization
+ * necessary for a neural network, a cyclic barrier ensures that all
+ * tasks have been completed before more tasks (amounting to the next
+ * network iteration/update) are allowed in the queue. Furthermore this
+ * class implements a synchronous or buffered update. The producer
+ * thread does not set the activation of each neuron to their buffer
+ * values until all tasks have been completed.
  */
-public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
-        NeuronListener, GroupListener {
+public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronListener, GroupListener {
 
     /**
      * The initial capacity of the set containing this class's private neuron
@@ -117,18 +99,23 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     /**
      * This class's private set of neurons in the network, used for updating.
      */
-    private final Set<Neuron> neurons = Collections
-            .synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
+    private final Set<Neuron> neurons = Collections.synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
 
     private CyclicTaskQueue taskSet;
 
-    /** A count of the number of network changes which have taken place. */
+    /**
+     * A count of the number of network changes which have taken place.
+     */
     private AtomicInteger pendingOperations = new AtomicInteger(0);
 
-    /** A copy of the network. */
+    /**
+     * A copy of the network.
+     */
     private final Network network;
 
-    /** A reference to the current thread which is acting as a producer. */
+    /**
+     * A reference to the current thread which is acting as a producer.
+     */
     private volatile Thread producer;
 
     private final List<NeuronGroup> inputGroups = new ArrayList<NeuronGroup>();
@@ -169,7 +156,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     private volatile int ops = 0;
 
     //private final SynchronizationPoint syncPoint;
-    
+
     private ExecutorService executors;
 
     /**
@@ -179,14 +166,13 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * @param network
      * @return
      */
-    public static ConcurrentBufferedUpdate createConcurrentBufferedUpdate(
-            final Network network) {
+    public static ConcurrentBufferedUpdate createConcurrentBufferedUpdate(final Network network) {
         ConcurrentBufferedUpdate cbu = new ConcurrentBufferedUpdate(network);
-//        for (int i = 0; i < cbu.currentAvailableProcessors; i++) {
-//            cbu.consumerThreads.add(new Consumer(cbu.taskSet, i));
-//            new Thread(cbu.consumerThreads.get(i)).start();
-//        }
-        
+        //        for (int i = 0; i < cbu.currentAvailableProcessors; i++) {
+        //            cbu.consumerThreads.add(new Consumer(cbu.taskSet, i));
+        //            new Thread(cbu.consumerThreads.get(i)).start();
+        //        }
+
         network.addGroupListener(cbu);
         network.addNeuronListener(cbu);
         // Checks for inconsistencies between the input and output group
@@ -207,8 +193,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * also not active at the same time at least half the time). Also populates
      * this classes copy of the neurons in the network.
      *
-     * @param network
-     *            the network being updated by this updater.
+     * @param network the network being updated by this updater.
      */
     private ConcurrentBufferedUpdate(final Network network) {
         this.network = network;
@@ -223,6 +208,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
         taskSet = new CyclicTaskQueue(neurons, currentAvailableProcessors);
     }
+
     //int z = 0;
     @Override
     public void invoke() {
@@ -230,37 +216,35 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         // Update input neurons accordingly
         for (int i = 0, n = inputGroups.size(); i < n; i++) {
             inputGroups.get(i).readNextInputs();
-        }      
+        }
         try {
-        	synchronized(taskSet) {
-	        	//System.out.println(z++);
-	        	List<Future<Task>> results = executors.invokeAll(taskSet.getCallableTasks());
-	        	for (int i = 0; i < results.size(); i++) {		
-	        		for (int j = 0; j < ((BufferedUpdateTask)results.get(i)
-	        				.get()).getHosts().length; j++) {
-	        			((BufferedUpdateTask)results.get(i)
-	    				.get()).getHosts()[j].setToBufferVals();
-	        		}
-	        	}
-        	}
+            synchronized (taskSet) {
+                //System.out.println(z++);
+                List<Future<Task>> results = executors.invokeAll(taskSet.getCallableTasks());
+                for (int i = 0; i < results.size(); i++) {
+                    for (int j = 0; j < ((BufferedUpdateTask) results.get(i).get()).getHosts().length; j++) {
+                        ((BufferedUpdateTask) results.get(i).get()).getHosts()[j].setToBufferVals();
+                    }
+                }
+            }
             while (pendingOperations.get() > 0) {
                 synchronized (producer) {
                     producer.wait();
                 }
             }
         } catch (InterruptedException | ExecutionException e1) {
-        	e1.getCause().printStackTrace();
+            e1.getCause().printStackTrace();
             e1.printStackTrace();
         }
-//        synchronized (neurons) {
-//            for (int i = 0, n = taskSet.taskArray.length; i < n; i++) {
-//                for (int j = 0, m = taskSet.taskArray[i].getHosts().length;
-//                        j < m; j++)
-//                {
-//                    taskSet.taskArray[i].getHosts()[j].setToBufferVals();
-//                }
-//            }
-//        }
+        //        synchronized (neurons) {
+        //            for (int i = 0, n = taskSet.taskArray.length; i < n; i++) {
+        //                for (int j = 0, m = taskSet.taskArray[i].getHosts().length;
+        //                        j < m; j++)
+        //                {
+        //                    taskSet.taskArray[i].getHosts()[j].setToBufferVals();
+        //                }
+        //            }
+        //        }
         for (int i = 0, n = outputGroups.size(); i < n; i++) {
             outputGroups.get(i).writeActsToFile();
         }
@@ -288,8 +272,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
             }
             decrementPendingOperations();
         } else if (e.getObject() instanceof Subnetwork) {
-            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-                    .getNeuronGroupList();
+            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject()).getNeuronGroupList();
             for (NeuronGroup ng : neuronGroups) {
                 groupAdded(new NetworkEvent<Group>(network, null, ng));
             }
@@ -311,8 +294,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
             taskSet.repopulateQueue(neurons);
             decrementPendingOperations();
         } else if (e.getObject() instanceof Subnetwork) {
-            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-                    .getNeuronGroupList();
+            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject()).getNeuronGroupList();
             for (NeuronGroup ng : neuronGroups) {
                 groupRemoved(new NetworkEvent<Group>(network, null, ng));
             }
@@ -322,8 +304,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     }
 
     @Override
-    public void groupChanged(NetworkEvent<Group> networkEvent,
-            String changeDescription) {
+    public void groupChanged(NetworkEvent<Group> networkEvent, String changeDescription) {
         if (networkEvent.getObject() instanceof NeuronGroup) {
             NeuronGroup ng = (NeuronGroup) networkEvent.getObject();
             synchronized (outputGroups) {
@@ -410,7 +391,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     public List<NeuronGroup> getInputGroups() {
         return new ArrayList<NeuronGroup>(inputGroups);
     }
-    
+
     private int getAvailableConsumerProcessors() {
         return Runtime.getRuntime().availableProcessors();
     }
@@ -428,9 +409,8 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * A memory saving version of a BlockingQueue specifically set up to prevent
      * memory leaks in the form of LinkedList nodes and with the express purpose
      * of making synchronization points easier to implement.
-     * 
-     * @author Zoë Tosi
      *
+     * @author Zoë Tosi
      */
     public class CyclicTaskQueue {
 
@@ -444,9 +424,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 
         private int taskPartition;
 
-//        public CyclicTaskQueue(Collection<Neuron> tasks) {
-//            this(tasks, DEFAULT_TASK_PARTITION_RATIO);
-//        }
+        //        public CyclicTaskQueue(Collection<Neuron> tasks) {
+        //            this(tasks, DEFAULT_TASK_PARTITION_RATIO);
+        //        }
 
         public CyclicTaskQueue(Collection<Neuron> tasks, int taskPartition) {
             this.taskPartition = taskPartition;
@@ -454,7 +434,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
 
         public synchronized void repopulateQueue(Collection<Neuron> tasks) {
-        	setUpCallableTasks();
+            setUpCallableTasks();
             int chunkSize = (int) Math.floor(tasks.size() / taskPartition);
             int remainingTasks = tasks.size() % taskPartition;
             Iterator<Neuron> taskIter = tasks.iterator();
@@ -488,44 +468,44 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
 
         public Task take() {
-//            synchronized (indexPtr) {
-//                if (indexPtr.get() >= taskArray.length) {
-//                    syncPoint.setWorkAvailable(false);
-//                    return syncPoint;
-//                }
-                return taskArray[indexPtr.getAndIncrement()];
-            
+            //            synchronized (indexPtr) {
+            //                if (indexPtr.get() >= taskArray.length) {
+            //                    syncPoint.setWorkAvailable(false);
+            //                    return syncPoint;
+            //                }
+            return taskArray[indexPtr.getAndIncrement()];
+
         }
-        
+
         List<Callable<Task>> taskList = new ArrayList<Callable<Task>>();
+
         public void setUpCallableTasks() {
-        	taskList.clear();
-        	taskList = new ArrayList<Callable<Task>>();
-        	int chunkSize = neurons.size()/currentAvailableProcessors;
-        	Neuron[] neuronTasks = null;
-        	int i = 0;
-        	int j = 0;
-        	int k = 1;
-        	for (Neuron n : neurons) {
-        		if(j % chunkSize == 0) {
-        			if (neuronTasks != null) {
-        				taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
-        				//System.out.println(neuronTasks.length + " " + k++);
-        			}
-    				i = 0;
-    				neuronTasks = new Neuron[((neurons.size()-j)
-    						> chunkSize) ? chunkSize:(neurons.size()-j)];
-        		}
-        		neuronTasks[i] = n;
-        		i++;
-        		j++;
-        	}
-			taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
-			//System.out.println(neuronTasks.length + " " + k++);
+            taskList.clear();
+            taskList = new ArrayList<Callable<Task>>();
+            int chunkSize = neurons.size() / currentAvailableProcessors;
+            Neuron[] neuronTasks = null;
+            int i = 0;
+            int j = 0;
+            int k = 1;
+            for (Neuron n : neurons) {
+                if (j % chunkSize == 0) {
+                    if (neuronTasks != null) {
+                        taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
+                        //System.out.println(neuronTasks.length + " " + k++);
+                    }
+                    i = 0;
+                    neuronTasks = new Neuron[((neurons.size() - j) > chunkSize) ? chunkSize : (neurons.size() - j)];
+                }
+                neuronTasks[i] = n;
+                i++;
+                j++;
+            }
+            taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
+            //System.out.println(neuronTasks.length + " " + k++);
         }
-        
+
         public List<Callable<Task>> getCallableTasks() {
-        	return taskList;
+            return taskList;
         }
 
         public int size() {
@@ -535,11 +515,11 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
             }
             return size;
         }
-        
+
         public void reset() {
             synchronized (indexPtr) {
                 indexPtr.set(0);
-               // syncPoint.setWorkAvailable(true);
+                // syncPoint.setWorkAvailable(true);
             }
         }
 
@@ -547,24 +527,24 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 
     private static class CallableTask implements Callable<Task> {
 
-    	public final Task t;
-    	
-    	public CallableTask(Task t) {
-    		this.t = t;
-    	}
-    	
-		@Override
-		public Task call() throws Exception {
-			t.perform();
-			return t;
-		}
-    	
+        public final Task t;
+
+        public CallableTask(Task t) {
+            this.t = t;
+        }
+
+        @Override
+        public Task call() throws Exception {
+            t.perform();
+            return t;
+        }
+
     }
-    
+
     /**
      * Test main to demonstrate performance improvements over serial updates
      * without a GUI.
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -587,7 +567,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         ng.setNeuronType(upRule);
         Randomizer rand = new Randomizer(ProbDistribution.NORMAL);
         for (Neuron neuron : ng.getNeuronList()) {
-        	IzhikevichRule iz = new IzhikevichRule();
+            IzhikevichRule iz = new IzhikevichRule();
             if (Math.random() < 0.2) {
                 neuron.setPolarity(Polarity.INHIBITORY);
                 iz.setRefractoryPeriod(1.0);
@@ -615,22 +595,18 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
         GridLayout gl = new GridLayout();
         gl.layoutNeurons(ng.getNeuronList());
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
         exRand.setParam1(.25);
         exRand.setParam2(1);
         inRand.setParam1(2);
         inRand.setParam2(2);
         System.out.println("Begin Network Construction...");
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng,
-                new Sparse(density, false, false),
-                .8, exRand, inRand);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(density, false, false), .8, exRand, inRand);
         for (Synapse s : sg.getAllSynapses()) {
             s.setId(null);
             s.setFrozen(true);
-            s.forceSetStrength(s.getStrength()/5);
+            s.forceSetStrength(s.getStrength() / 5);
         }
         sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
         ConvolvedJumpAndDecay inhibJD = new ConvolvedJumpAndDecay();
@@ -643,8 +619,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         net.addGroup(sg);
         long end = System.nanoTime();
         System.out.println("End Network construction");
-        System.out.println("Time: "
-                + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        System.out.println("Time: " + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
         System.out.println(ng.size() + " neurons.");
         System.out.println(sg.size() + " synapses.");
         System.out.println("Begin Test? (Y/N)");
@@ -654,38 +629,37 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
             return;
         }
         net.getUpdateManager().clear();
-        ConcurrentBufferedUpdate cbu = ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(net);
+        ConcurrentBufferedUpdate cbu = ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net);
         net.getUpdateManager().addAction(cbu);
         int siz = 0;
         for (BufferedUpdateTask but : cbu.taskSet.taskArray) {
             siz += but.getHosts().length;
         }
-//        System.out.println(siz);
+        //        System.out.println(siz);
         System.out.println();
         for (int i = 0; i < 10000; i++) {
             net.update();
-//            int upC = i+1;
-//            int synC = i+1;
-////            for (Neuron n : ng.getNeuronList()) {
-//                if(((IzhikevichRule) n.getUpdateRule()).upCount.intValue() != upC) {
-//                	System.out.println("UP " + upC + " " + ((IzhikevichRule) n.getUpdateRule()).upCount.intValue());
-//                }
-//                if(n.syncCount.intValue() != synC) {
-//                	System.out.println("SYN " + synC + " " + n.syncCount.intValue());
-//                }
-//            }
+            //            int upC = i+1;
+            //            int synC = i+1;
+            ////            for (Neuron n : ng.getNeuronList()) {
+            //                if(((IzhikevichRule) n.getUpdateRule()).upCount.intValue() != upC) {
+            //                	System.out.println("UP " + upC + " " + ((IzhikevichRule) n.getUpdateRule()).upCount.intValue());
+            //                }
+            //                if(n.syncCount.intValue() != synC) {
+            //                	System.out.println("SYN " + synC + " " + n.syncCount.intValue());
+            //                }
+            //            }
         }
-//        
-//        for (Neuron n : ng.getNeuronList()) {
-//            System.out.println(((IzhikevichRule) n.getUpdateRule()).getFiringRate(n));
-//        }
+        //
+        //        for (Neuron n : ng.getNeuronList()) {
+        //            System.out.println(((IzhikevichRule) n.getUpdateRule()).getFiringRate(n));
+        //        }
         // // final int TEST_ITERATIONS = 500;
         //net.getUpdateManager().clear();
         //ConcurrentBufferedUpdate cbu = ConcurrentBufferedUpdate
         //        .createConcurrentBufferedUpdate(net);
         //net.getUpdateManager().addAction(cbu);
-//        System.out.println(cbu.currentAvailableProcessors);
+        //        System.out.println(cbu.currentAvailableProcessors);
         // Quick tune up...
         for (int i = 0; i < 10000; i++) {
             if (i % 100 == 0) {
@@ -693,33 +667,33 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
             }
             net.update();
         }
-//        // System.out.println("End tune-up");
-//        // for (NetworkUpdateAction nua :
-//        // net.getUpdateManager().getActionList()) {
-//        // if (nua instanceof ConcurrentBufferedUpdate) {
-//        // ((ConcurrentBufferedUpdate) nua).shutdown();
-//        // }
-//        // }
-//
-//        // SerialExecution
- //       ng.startRecording();
-//        // start = System.nanoTime();
-//        // net.getUpdateManager().clear();
-//        // net.getUpdateManager().addAction(new UpdateGroup(sg));
-//        // net.getUpdateManager().addAction(new UpdateGroup(ng));
-//        // net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
-//        // for (int i = 0; i < TEST_ITERATIONS; i++) {
-//        // net.update();
-//        // }
-//        // ng.stopRecording();
-//        // end = System.nanoTime();
-//        // System.out.println("Serial: "
-//        // + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
-//
-//        // net.getUpdateManager().clear();
-//        // net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
-//        // net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
-//        // ng.startRecording();
+        //        // System.out.println("End tune-up");
+        //        // for (NetworkUpdateAction nua :
+        //        // net.getUpdateManager().getActionList()) {
+        //        // if (nua instanceof ConcurrentBufferedUpdate) {
+        //        // ((ConcurrentBufferedUpdate) nua).shutdown();
+        //        // }
+        //        // }
+        //
+        //        // SerialExecution
+        //       ng.startRecording();
+        //        // start = System.nanoTime();
+        //        // net.getUpdateManager().clear();
+        //        // net.getUpdateManager().addAction(new UpdateGroup(sg));
+        //        // net.getUpdateManager().addAction(new UpdateGroup(ng));
+        //        // net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
+        //        // for (int i = 0; i < TEST_ITERATIONS; i++) {
+        //        // net.update();
+        //        // }
+        //        // ng.stopRecording();
+        //        // end = System.nanoTime();
+        //        // System.out.println("Serial: "
+        //        // + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        //
+        //        // net.getUpdateManager().clear();
+        //        // net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
+        //        // net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
+        //        // ng.startRecording();
         start = System.nanoTime();
         ng.startRecording(new File("outs.csv"));
         for (int i = 0; i < 100000; i++) {
@@ -727,8 +701,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
         //ng.stopRecording();
         end = System.nanoTime();
-        System.out.println("Parallel: "
-                + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        System.out.println("Parallel: " + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
         System.exit(0);
         return;
     }

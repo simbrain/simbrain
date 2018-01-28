@@ -18,11 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
@@ -31,27 +26,41 @@ import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
  */
 public class SOMNetworkCreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
+    /**
+     * Logic tab panel.
+     */
     private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
+    /**
+     * Layout tab panel.
+     */
     private JPanel tabLayout = new JPanel();
 
-    /** SOM properties panel. */
+    /**
+     * SOM properties panel.
+     */
     private SOMPropertiesPanel somPanel;
 
-    /** Layout panel. */
+    /**
+     * Layout panel.
+     */
     private MainLayoutPanel layoutPanel;
 
-    /** Network Panel. */
+    /**
+     * Network Panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -71,8 +80,7 @@ public class SOMNetworkCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New SOM Network");
-        somPanel = new SOMPropertiesPanel(networkPanel,
-                SOMPropsPanelType.CREATE_NETWORK);
+        somPanel = new SOMPropertiesPanel(networkPanel, SOMPropsPanelType.CREATE_NETWORK);
 
         // Set up tab panels
         tabLogic.add(somPanel);
@@ -95,7 +103,7 @@ public class SOMNetworkCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         somPanel.commitChanges();
-        SOMNetwork somNet =  (SOMNetwork) somPanel.getGroup();
+        SOMNetwork somNet = (SOMNetwork) somPanel.getGroup();
         SOMGroup som = somNet.getSom();
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());

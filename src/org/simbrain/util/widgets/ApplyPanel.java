@@ -13,15 +13,10 @@
  */
 package org.simbrain.util.widgets;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 
 /**
  * A widget that contains an apply button, for cases when it should be possible
@@ -40,13 +35,19 @@ public class ApplyPanel extends JPanel implements EditablePanel {
      */
     private final EditablePanel mainPanel;
 
-    /** The button used to apply changes. */
+    /**
+     * The button used to apply changes.
+     */
     private final JButton applyButton = new JButton("Apply");
 
-    /** Layout manager for the panel. */
+    /**
+     * Layout manager for the panel.
+     */
     private final GridBagLayout layoutManager = new GridBagLayout();
 
-    /** Constraints. */
+    /**
+     * Constraints.
+     */
     private final GridBagConstraints gbc = new GridBagConstraints();
 
     {
@@ -133,6 +134,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     /**
      * Allows outside parties to add other listeners to the apply panel's apply
      * button.
+     *
      * @param l
      */
     public void addActionListener(ActionListener l) {
@@ -149,8 +151,8 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     public void setEnabled(boolean enabled) {
-    	super.setEnabled(enabled);
-    	applyButton.setEnabled(enabled);
+        super.setEnabled(enabled);
+        applyButton.setEnabled(enabled);
     }
-    
+
 }

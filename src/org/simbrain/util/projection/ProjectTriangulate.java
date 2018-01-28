@@ -37,6 +37,7 @@ public class ProjectTriangulate extends ProjectionMethod {
 
     /**
      * Default PCA project.
+     *
      * @param projector
      */
     public ProjectTriangulate(Projector projector) {
@@ -67,49 +68,41 @@ public class ProjectTriangulate extends ProjectionMethod {
         int numPoints = projector.getUpstairs().getNumPoints() - 1;
 
         DataPoint lastAdded2D = projector.getDownstairs().getLastAddedPoint();
-        DataPoint lastAddedUpstairs = projector.getUpstairs()
-                .getLastAddedPoint();
+        DataPoint lastAddedUpstairs = projector.getUpstairs().getLastAddedPoint();
 
         switch (numPoints) { // assumes numPoints is a positive integer
-        case 0:
-            lastAdded2D.setData(new double[] { 0, 0 });
-            return;
-        case 1:
-            System.out.println("Only one point upstairs");
-            point1Index = projector.getUpstairs().getKNearestNeighbors(1,
-                    lastAddedUpstairs)[0];
-            point1Up = projector.getUpstairs().getPoint(point1Index);
-            point1Down = projector.getUpstairs().getPoint(point1Index);
+            case 0:
+                lastAdded2D.setData(new double[]{0, 0});
+                return;
+            case 1:
+                System.out.println("Only one point upstairs");
+                point1Index = projector.getUpstairs().getKNearestNeighbors(1, lastAddedUpstairs)[0];
+                point1Up = projector.getUpstairs().getPoint(point1Index);
+                point1Down = projector.getUpstairs().getPoint(point1Index);
 
-            dist = projector.getUpstairs().getDistance(point1Up,
-                    lastAddedUpstairs);
-            x = point1Down.get(0) + dist;
-            y = point1Down.get(1);
+                dist = projector.getUpstairs().getDistance(point1Up, lastAddedUpstairs);
+                x = point1Down.get(0) + dist;
+                y = point1Down.get(1);
 
-            lastAdded2D.setData(new double[] { x, y });
-            return;
-        case 2:
-            System.out.println("Only two points upstairs");
-            int[] neighbors = projector.getUpstairs().getKNearestNeighbors(2,
-                    lastAddedUpstairs);
-            point1Index = neighbors[0];
-            point2Index = neighbors[1];
-            point1Up = projector.getUpstairs().getPoint(point1Index);
-            point2Up = projector.getUpstairs().getPoint(point2Index);
-            point1Down = projector.getDownstairs().getPoint(point1Index);
-            point2Down = projector.getDownstairs().getPoint(point2Index);
+                lastAdded2D.setData(new double[]{x, y});
+                return;
+            case 2:
+                System.out.println("Only two points upstairs");
+                int[] neighbors = projector.getUpstairs().getKNearestNeighbors(2, lastAddedUpstairs);
+                point1Index = neighbors[0];
+                point2Index = neighbors[1];
+                point1Up = projector.getUpstairs().getPoint(point1Index);
+                point2Up = projector.getUpstairs().getPoint(point2Index);
+                point1Down = projector.getDownstairs().getPoint(point1Index);
+                point2Down = projector.getDownstairs().getPoint(point2Index);
 
-            d1 = projector.getUpstairs().getDistance(point1Up,
-                    lastAddedUpstairs);
-            d2 = projector.getUpstairs().getDistance(point2Up,
-                    lastAddedUpstairs);
+                d1 = projector.getUpstairs().getDistance(point1Up, lastAddedUpstairs);
+                d2 = projector.getUpstairs().getDistance(point2Up, lastAddedUpstairs);
 
-            x = ((d1 * point1Down.get(0)) + (d2 * point2Down.get(0)))
-                    / (d1 + d2);
-            y = ((d1 * point1Down.get(1)) + (d2 * point2Down.get(1)))
-                    / (d1 + d2);
+                x = ((d1 * point1Down.get(0)) + (d2 * point2Down.get(0))) / (d1 + d2);
+                y = ((d1 * point1Down.get(1)) + (d2 * point2Down.get(1))) / (d1 + d2);
 
-            lastAdded2D.setData(new double[] { x, y });
+                lastAdded2D.setData(new double[]{x, y});
         }
     }
 

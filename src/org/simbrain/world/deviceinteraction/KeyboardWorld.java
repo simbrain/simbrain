@@ -28,7 +28,9 @@ public class KeyboardWorld {
         return Collections.unmodifiableList(keys);
     }
 
-    /** Threshold for displaying text. */
+    /**
+     * Threshold for displaying text.
+     */
     private double displayThreshold = .5;
 
 
@@ -39,7 +41,7 @@ public class KeyboardWorld {
     }
 
     public void keyPress(double threshold, Character key) {
-        if(threshold > displayThreshold) {
+        if (threshold > displayThreshold) {
             keyPress(key);
         }
     }

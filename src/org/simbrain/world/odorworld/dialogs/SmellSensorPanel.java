@@ -13,29 +13,36 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import javax.swing.JTextField;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+
+import javax.swing.*;
 
 /**
  * Panel to add a smell sensor to an entity.
  *
  * @author Lam Nguyen
- *
  */
 public class SmellSensorPanel extends AbstractSensorPanel {
 
-    /** Text field to edit label. */
+    /**
+     * Text field to edit label.
+     */
     private JTextField label = new JTextField();
 
-    /** Text field to edit theta. */
+    /**
+     * Text field to edit theta.
+     */
     private JTextField theta = new JTextField();
 
-    /** Text field to edit radius. */
+    /**
+     * Text field to edit radius.
+     */
     private JTextField radius = new JTextField();
 
-    /** Entity to which a smell sensor is being added. */
+    /**
+     * Entity to which a smell sensor is being added.
+     */
     private OdorWorldEntity entity;
 
     /**
@@ -43,7 +50,9 @@ public class SmellSensorPanel extends AbstractSensorPanel {
      */
     private SmellSensor smellSensor;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    /**
+     * If true this is a creation panel. Otherwise it is an edit panel.
+     */
     private boolean isCreationPanel;
 
     /**
@@ -79,15 +88,12 @@ public class SmellSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addSensor(new SmellSensor(entity, label.getText(), Double
-                    .parseDouble(theta.getText()), Double.parseDouble(radius
-                    .getText())));
+            entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText())));
         } else {
             smellSensor.setLabel(label.getText());
             smellSensor.setTheta(Double.parseDouble(theta.getText()));
             smellSensor.setRadius(Double.parseDouble(radius.getText()));
-            smellSensor.getParent().getParentWorld()
-                    .fireEntityChanged(smellSensor.getParent());
+            smellSensor.getParent().getParentWorld().fireEntityChanged(smellSensor.getParent());
         }
     }
 

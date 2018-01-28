@@ -18,23 +18,22 @@
  */
 package org.simbrain.network.trainers;
 
-import java.io.File;
-
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SquashingFunction;
 
+import java.io.File;
+
 import static org.junit.Assert.assertTrue;
 
 /**
  * Test backprop trainer.
- * 
+ * <p>
  * Future test methods. But for now just run them with a main.
  */
 public class BackpropTrainerTest {
@@ -47,13 +46,10 @@ public class BackpropTrainerTest {
     @Test
     public void testXor() {
         // Create a network. Hidden layer of 5 makes training much more reliable.
-        BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 2, 5, 1 });
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{2, 5, 1});
 
-        network.getTrainingSet().setInputData(
-                new double[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } });
-        network.getTrainingSet().setTargetData(
-                new double[][] { { .2 }, { .8 }, { .8 }, { .2 } });
+        network.getTrainingSet().setInputData(new double[][]{{-1, -1}, {-1, 1}, {1, -1}, {1, 1}});
+        network.getTrainingSet().setTargetData(new double[][]{{.2}, {.8}, {.8}, {.2}});
 
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
@@ -81,13 +77,10 @@ public class BackpropTrainerTest {
      */
     @Test
     public void testAssociator() {
-        BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 2, 2, 2 });
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{2, 2, 2});
 
-        network.getTrainingSet().setInputData(
-                new double[][] { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } });
-        network.getTrainingSet().setTargetData(
-                new double[][] { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } });
+        network.getTrainingSet().setInputData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
+        network.getTrainingSet().setTargetData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
@@ -116,13 +109,10 @@ public class BackpropTrainerTest {
      */
     @Test
     public void testAssociator5() {
-        BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 5, 5, 5 });
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{5, 5, 5});
 
-        network.getTrainingSet().setInputData(Utils.getDoubleMatrix(
-                new File("./simulations/tables/5_binary.csv")));
-        network.getTrainingSet().setTargetData(Utils.getDoubleMatrix(
-                new File("./simulations/tables/5_binary.csv")));
+        network.getTrainingSet().setInputData(Utils.getDoubleMatrix(new File("./simulations/tables/5_binary.csv")));
+        network.getTrainingSet().setTargetData(Utils.getDoubleMatrix(new File("./simulations/tables/5_binary.csv")));
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
@@ -149,8 +139,7 @@ public class BackpropTrainerTest {
 
     @Test
     public void testSineWave() {
-        BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 1, 5, 1 });
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{1, 5, 1});
 
         double[][] inpData = new double[100][1];
         double[][] targData = new double[100][1];
@@ -185,13 +174,12 @@ public class BackpropTrainerTest {
     /**
      * Test based on this discussion.
      * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-     * 
+     * <p>
      * TODO: Migrate to unit testing
      */
     @Test
     public void testMazur() {
-        BackpropNetwork network = new BackpropNetwork(new Network(),
-                new int[] { 2, 2, 2 });
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{2, 2, 2});
 
         SigmoidalRule sigmoidal = new SigmoidalRule();
         sigmoidal.setSquashFunctionType(SquashingFunction.LOGISTIC);
@@ -200,25 +188,23 @@ public class BackpropTrainerTest {
         network.getNeuronGroup(1).setNeuronType(sigmoidal);
         network.getNeuronGroup(2).setNeuronType(sigmoidal);
 
-        network.getTrainingSet().setInputData(new double[][] { { .05, .10 } });
-        network.getTrainingSet().setTargetData(new double[][] { { .01, .99 } });
+        network.getTrainingSet().setInputData(new double[][]{{.05, .10}});
+        network.getTrainingSet().setTargetData(new double[][]{{.01, .99}});
 
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
         trainer.setMomentum(0);
         trainer.setLearningRate(.5);
 
-        DoubleMatrix weightLayer1 = new DoubleMatrix(
-                new double[][] { { .15, .25 }, { .2, .3 } });
+        DoubleMatrix weightLayer1 = new DoubleMatrix(new double[][]{{.15, .25}, {.2, .3}});
         trainer.getWeightMatrices().set(0, weightLayer1);
-        DoubleMatrix weightLayer2 = new DoubleMatrix(
-                new double[][] { { .4, .5 }, { .45, .55 } });
+        DoubleMatrix weightLayer2 = new DoubleMatrix(new double[][]{{.4, .5}, {.45, .55}});
         trainer.getWeightMatrices().set(1, weightLayer2);
 
-        DoubleMatrix biases1 = new DoubleMatrix(new double[] { .35, .35 });
+        DoubleMatrix biases1 = new DoubleMatrix(new double[]{.35, .35});
         trainer.getBiases().set(0, biases1);
 
-        DoubleMatrix biases2 = new DoubleMatrix(new double[] { .6, .6 });
+        DoubleMatrix biases2 = new DoubleMatrix(new double[]{.6, .6});
         trainer.getBiases().set(1, biases2);
 
         for (int i = 0; i < 1; i++) {

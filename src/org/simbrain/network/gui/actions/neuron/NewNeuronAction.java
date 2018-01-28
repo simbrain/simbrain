@@ -18,22 +18,21 @@
  */
 package org.simbrain.network.gui.actions.neuron;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.resource.ResourceManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * New neuron action.
  */
 public final class NewNeuronAction extends AbstractAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
@@ -52,14 +51,14 @@ public final class NewNeuronAction extends AbstractAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
         putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
 
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('p'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('p'), this);
         networkPanel.getActionMap().put(this, this);
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.addNeuron(new LinearRule());

@@ -18,30 +18,32 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.util.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import org.simbrain.workspace.*;
-import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Displays a list of attribute types.
  */
 public class AttributeTypePanel extends JPanel {
 
-    /** AttributeType is a string-based representation of unique kinds of Attributes. */
+    /**
+     * AttributeType is a string-based representation of unique kinds of Attributes.
+     */
     static class AttributeType {
         String source;
         String name;
         String type;
         boolean visibility;
 
-        AttributeType() {}
+        AttributeType() {
+        }
 
         AttributeType(String source, String name, String type, boolean visibility) {
             this.source = source;
@@ -88,13 +90,19 @@ public class AttributeTypePanel extends JPanel {
         }
     }
 
-    /** Table model which represents types of attributes. */
+    /**
+     * Table model which represents types of attributes.
+     */
     static class AttributeTypeModel extends AbstractTableModel {
 
-        /** Column names. */
-        String[] columnNames = { "Source", "Name", "Type", "Visible" };
+        /**
+         * Column names.
+         */
+        String[] columnNames = {"Source", "Name", "Type", "Visible"};
 
-        /** Internal list of components. */
+        /**
+         * Internal list of components.
+         */
         private List<AttributeType> data = new ArrayList<AttributeType>();
 
         public void addRow(AttributeType type) {
@@ -115,31 +123,31 @@ public class AttributeTypePanel extends JPanel {
 
         public Object getValueAt(int row, int col) {
             switch (col) {
-            case 0:
-                return data.get(row).getSource();
-            case 1:
-                return data.get(row).getName();
-            case 2:
-                return data.get(row).getType();
-            case 3:
-                return data.get(row).isVisible();
-            default:
-                return null;
+                case 0:
+                    return data.get(row).getSource();
+                case 1:
+                    return data.get(row).getName();
+                case 2:
+                    return data.get(row).getType();
+                case 3:
+                    return data.get(row).isVisible();
+                default:
+                    return null;
             }
         }
 
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                data.get(row).setVisible((boolean) value);
-                fireTableDataChanged();
-                break;
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    data.get(row).setVisible((boolean) value);
+                    fireTableDataChanged();
+                    break;
             }
         }
 
@@ -149,30 +157,36 @@ public class AttributeTypePanel extends JPanel {
 
         public Class getColumnClass(int col) {
             switch (col) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            case 3:
-                return Boolean.class;
-            default:
-                return null;
+                case 0:
+                    return String.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                case 3:
+                    return Boolean.class;
+                default:
+                    return null;
             }
         }
 
     }
 
-    /** uniqueAttributeTypes allows us to remember attribute visibility. */
-    private static Map<String,AttributeType> uniqueAttributeTypes = new HashMap<String,AttributeType>();
+    /**
+     * uniqueAttributeTypes allows us to remember attribute visibility.
+     */
+    private static Map<String, AttributeType> uniqueAttributeTypes = new HashMap<String, AttributeType>();
 
-    /** Returns whether the attribute type is default visible or marked visible. */
+    /**
+     * Returns whether the attribute type is default visible or marked visible.
+     */
     public static boolean isAttributeTypeVisible(Attribute attribute) {
         return getUniqueType(new AttributeType(attribute)).isVisible();
     }
 
-    /** Returns the unique AttributeType which was first added to the attribute type map. */
+    /**
+     * Returns the unique AttributeType which was first added to the attribute type map.
+     */
     private static AttributeType getUniqueType(AttributeType attributeType) {
         String key = attributeType.source + attributeType.name + attributeType.type;
         if (uniqueAttributeTypes.containsKey(key)) {
@@ -183,13 +197,19 @@ public class AttributeTypePanel extends JPanel {
         }
     }
 
-    /** Attribute types. */
+    /**
+     * Attribute types.
+     */
     Set<AttributeType> attributeTypesInModel = new HashSet<AttributeType>();
 
-    /** Table representing attribute types. */
+    /**
+     * Table representing attribute types.
+     */
     private JTable table;
 
-    /** Table model. */
+    /**
+     * Table model.
+     */
     private AttributeTypeModel model;
 
     /**
@@ -229,7 +249,9 @@ public class AttributeTypePanel extends JPanel {
         }
     }
 
-    /** Add an AttributeType to the table model. */
+    /**
+     * Add an AttributeType to the table model.
+     */
     private void addTypeToModel(AttributeType attributeType) {
         AttributeType uniqueType = getUniqueType(attributeType);
         if (!attributeTypesInModel.contains(uniqueType)) {

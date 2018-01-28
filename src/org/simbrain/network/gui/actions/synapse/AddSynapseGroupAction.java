@@ -18,46 +18,44 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Creates a synapse group connecting two neuron groups.
  */
 public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
 
-    /** Network panel. */
+    /**
+     * Network panel.
+     */
     private final NetworkPanel networkPanel;
 
     /**
      * Create a new neuron action with the specified network panel.
      *
-     * @param networkPanel
-     *            network panel, must not be null
+     * @param networkPanel network panel, must not be null
      */
     public AddSynapseGroupAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Connect Neuron Groups with Synapse Group...",
-                EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS);
+        super(networkPanel, "Connect Neuron Groups with Synapse Group...", EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS);
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        putValue(SHORT_DESCRIPTION,
-                "Connect source and target neuron groups with a synpase group");
+        putValue(SHORT_DESCRIPTION, "Connect source and target neuron groups with a synpase group");
 
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         displaySynapseGroupDialog(networkPanel);
@@ -67,15 +65,13 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
      * Display the add synapse group dialog. Assumes the enabling condition (at
      * least one source and target neuron group designated) is in effect.
      *
-     * @param networkPanel
-     *            the network panel in which to add the group.
+     * @param networkPanel the network panel in which to add the group.
      */
     public static void displaySynapseGroupDialog(NetworkPanel networkPanel) {
         // Placed as a separate method since it is reused elsewhere.
         NeuronGroup src = networkPanel.getSourceModelGroups().get(0);
         NeuronGroup tar = networkPanel.getSelectedModelNeuronGroups().get(0);
-        JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(
-                networkPanel, src, tar);
+        JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar);
         dialog.setLocationRelativeTo(null);
         dialog.pack();
         dialog.setVisible(true);

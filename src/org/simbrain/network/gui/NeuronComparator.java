@@ -32,7 +32,9 @@ public class NeuronComparator implements java.util.Comparator<Neuron> {
         COMPARE_X, COMPARE_Y
     }
 
-    /** How to compare the PNodes. */
+    /**
+     * How to compare the PNodes.
+     */
     private Type comparisonType;
 
     /**
@@ -48,26 +50,26 @@ public class NeuronComparator implements java.util.Comparator<Neuron> {
     }
 
     /**
-     * @see NeuronComparator
      * @param p1
      * @param p2
-     * @return 
+     * @return
+     * @see NeuronComparator
      */
     public int compare(final Neuron p1, final Neuron p2) {
         double d1;
         double d2;
 
         switch (comparisonType) {
-        case COMPARE_X:
-            d1 = p1.getX();
-            d2 = p2.getX();
-            break;
-        case COMPARE_Y:
-            d1 = p1.getX();
-            d2 = p2.getX();
-            break;
-        default:
-            throw new IllegalArgumentException("unknown: " + comparisonType);
+            case COMPARE_X:
+                d1 = p1.getX();
+                d2 = p2.getX();
+                break;
+            case COMPARE_Y:
+                d1 = p1.getX();
+                d2 = p2.getX();
+                break;
+            default:
+                throw new IllegalArgumentException("unknown: " + comparisonType);
         }
 
         return Double.valueOf(d1).compareTo(d2);

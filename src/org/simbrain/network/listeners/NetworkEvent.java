@@ -18,31 +18,36 @@
  */
 package org.simbrain.network.listeners;
 
-import java.util.EventObject;
-
 import org.simbrain.network.core.Network;
+
+import java.util.EventObject;
 
 /**
  * Network event which holds an old and new version of some type of object.
- *
  *
  * @param <T> The type of the object involved in the event.
  */
 public final class NetworkEvent<T> extends EventObject {
 
-    /** New version of object */
+    /**
+     * New version of object
+     */
     private T theObject;
 
-    /** Previous version of object. */
+    /**
+     * Previous version of object.
+     */
     private T oldObject;
 
-    /** An auxiliarity object. */
+    /**
+     * An auxiliarity object.
+     */
     private Object auxiliaryObject;
 
     /**
      * Create a network event with a new and old object.
      *
-     * @param net reference to parent network.
+     * @param net      reference to parent network.
      * @param oldThing old version of object.
      * @param theThing reference to relevant object.
      */
@@ -55,7 +60,7 @@ public final class NetworkEvent<T> extends EventObject {
     /**
      * Create a network event with one object only.
      *
-     * @param net reference to parent network.
+     * @param net      reference to parent network.
      * @param theThing reference to relevant object.
      */
     public NetworkEvent(Network net, final T theThing) {

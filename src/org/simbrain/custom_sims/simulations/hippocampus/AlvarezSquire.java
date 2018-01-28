@@ -12,16 +12,20 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class AlvarezSquire extends CompetitiveGroup {
 
-    /** Noise generator. */
+    /**
+     * Noise generator.
+     */
     private Randomizer noiseGenerator = new Randomizer();
 
-    /** Reference to parent simulation. */
+    /**
+     * Reference to parent simulation.
+     */
     private Hippocampus hippo;
 
     /**
      * Construct the group.
      *
-     * @param hippo reference to parent sim
+     * @param hippo      reference to parent sim
      * @param numNeurons number neurons
      */
     public AlvarezSquire(Hippocampus hippo, int numNeurons) {
@@ -61,8 +65,7 @@ public class AlvarezSquire extends CompetitiveGroup {
      */
     private void alvarezSquireUpdate(Neuron neuron) {
         // TODO: Use library for clipping
-        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs()
-                + noiseGenerator.getRandom();
+        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs() + noiseGenerator.getRandom();
         neuron.forceSetActivation((val > 0) ? val : 0);
         neuron.forceSetActivation((val < 1) ? val : 1);
     }
@@ -76,8 +79,7 @@ public class AlvarezSquire extends CompetitiveGroup {
             for (Synapse synapse : n.getFanIn()) {
                 if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
                     rho = .04;
-                } else if (synapse.getTarget()
-                        .getParentGroup() == hippo.hippocampus) {
+                } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
                     rho = .04;
                 } else {
                     rho = .0008;
@@ -99,15 +101,12 @@ public class AlvarezSquire extends CompetitiveGroup {
         for (Synapse synapse : neuron.getFanIn()) {
             if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
                 lambda = .1;
-            } else if (synapse.getTarget()
-                    .getParentGroup() == hippo.hippocampus) {
+            } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
                 lambda = .1;
             } else {
                 lambda = .002;
             }
-            double deltaw = lambda * synapse.getTarget().getActivation()
-                    * (synapse.getSource().getActivation()
-                            - synapse.getTarget().getAverageInput());
+            double deltaw = lambda * synapse.getTarget().getActivation() * (synapse.getSource().getActivation() - synapse.getTarget().getAverageInput());
             synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
 
         }

@@ -18,14 +18,13 @@
  */
 package org.simbrain.workspace.actions.chart;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
 import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Add bar chart component to workspace.
@@ -43,8 +42,9 @@ public final class NewBarChartAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Bar Chart");
     }
 
-    /** @see AbstractAction 
+    /**
      * @param event
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
         BarChartComponent plot = new BarChartComponent("");

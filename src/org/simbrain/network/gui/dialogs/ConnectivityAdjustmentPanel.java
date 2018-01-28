@@ -18,47 +18,40 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.Utils;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.Utils;
-
 /**
  * Panel for adjusting the connectivity between a source and target set of
  * neurons.
- *
+ * <p>
  * TODO: Not yet completed. This is temporary.
- *
  */
 public class ConnectivityAdjustmentPanel extends JPanel {
 
-    /** A slider for setting the sparsity of the connections. */
-    private JSlider sparsitySlider =
-        new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
+    /**
+     * A slider for setting the sparsity of the connections.
+     */
+    private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
 
-    /** A text field for setting the sparsity of the connections. */
-    private JFormattedTextField sparsity = new JFormattedTextField(
-        NumberFormat.getNumberInstance());
+    /**
+     * A text field for setting the sparsity of the connections.
+     */
+    private JFormattedTextField sparsity = new JFormattedTextField(NumberFormat.getNumberInstance());
 
-    /** The number of target neurons. */
+    /**
+     * The number of target neurons.
+     */
     private final int numTargs;
 
     private final JButton applyButton = new JButton("Apply");
@@ -71,8 +64,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
     private Sparse connection;
 
-    public ConnectivityAdjustmentPanel(final Sparse connection,
-        final NetworkPanel networkPanel) {
+    public ConnectivityAdjustmentPanel(final Sparse connection, final NetworkPanel networkPanel) {
         this.connection = connection;
         numTargs = networkPanel.getSelectedModelNeurons().size();
         // fillFieldValues();
@@ -148,8 +140,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         sparsitySlider.setMinorTickSpacing(2);
         sparsitySlider.setPaintTicks(true);
 
-        Hashtable<Integer, JLabel> labelTable2 =
-            new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
         labelTable2.put(new Integer(0), new JLabel("0%"));
         labelTable2.put(new Integer(100), new JLabel("100%"));
         sparsitySlider.setLabelTable(labelTable2);
@@ -180,24 +171,22 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
         });
 
-        sparsity.addPropertyChangeListener("value",
-            new PropertyChangeListener() {
+        sparsity.addPropertyChangeListener("value", new PropertyChangeListener() {
 
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getSource() == sparsity) {
-                        if (userFlag) {
-                            userFlag = false;
-                            if (sparsity.getValue() != null) {
-                                int sVal = (int) (((Number) sparsity
-                                    .getValue()).doubleValue() * 100);
-                                sparsitySlider.setValue(new Integer(sVal));
-                            }
-                        } else {
-                            userFlag = true;
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getSource() == sparsity) {
+                    if (userFlag) {
+                        userFlag = false;
+                        if (sparsity.getValue() != null) {
+                            int sVal = (int) (((Number) sparsity.getValue()).doubleValue() * 100);
+                            sparsitySlider.setValue(new Integer(sVal));
                         }
+                    } else {
+                        userFlag = true;
                     }
                 }
-            });
+            }
+        });
 
     }
 

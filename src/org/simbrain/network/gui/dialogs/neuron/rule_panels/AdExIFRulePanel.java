@@ -1,28 +1,36 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.util.LabelledItemPanel;
 
+import javax.swing.*;
+
 public class AdExIFRulePanel extends AbstractNeuronRulePanel {
 
-    /** Tabbed pane. */
+    /**
+     * Tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Main tab. */
+    /**
+     * Main tab.
+     */
     private LabelledItemPanel currentTab = new LabelledItemPanel();
 
-    /** Inputs tab. */
+    /**
+     * Inputs tab.
+     */
     private LabelledItemPanel adaptationTab = new LabelledItemPanel();
 
-    /** A reference to the neuron update rule being edited. */
+    /**
+     * A reference to the neuron update rule being edited.
+     */
     private static final AdExIFRule prototypeRule = new AdExIFRule();
 
     /**
@@ -31,50 +39,21 @@ public class AdExIFRulePanel extends AbstractNeuronRulePanel {
     public AdExIFRulePanel() {
         super();
         this.add(tabbedPane);
-        JTextField tfPeak = createTextField(
-                (r) -> ((AdExIFRule) r).getV_Peak(),
-                (r, val) -> ((AdExIFRule) r).setV_Peak((double) val));
-        JTextField tfThreshold = createTextField(
-                (r) -> ((AdExIFRule) r).getV_Th(),
-                (r, val) -> ((AdExIFRule) r).setV_Th((double) val));
-        JTextField tfV_Reset = createTextField(
-                (r) -> ((AdExIFRule) r).getV_Reset(),
-                (r, val) -> ((AdExIFRule) r).setV_Reset((double) val));
-        JTextField tfCap = createTextField(
-                (r) -> ((AdExIFRule) r).getMemCapacitance(),
-                (r, val) -> ((AdExIFRule) r).setMemCapacitance((double) val));
-        JTextField tfBgCurrent = createTextField(
-                (r) -> ((AdExIFRule) r).getI_bg(),
-                (r, val) -> ((AdExIFRule) r).setI_bg((double) val));
-        JTextField tfSlopeFactor = createTextField(
-                (r) -> ((AdExIFRule) r).getSlopeFactor(),
-                (r, val) -> ((AdExIFRule) r).setSlopeFactor((double) val));
-        JTextField tfGL = createTextField((r) -> ((AdExIFRule) r).getG_L(),
-                (r, val) -> ((AdExIFRule) r).setG_L((double) val));
-        JTextField tfGeBar = createTextField(
-                (r) -> ((AdExIFRule) r).getG_e_bar(),
-                (r, val) -> ((AdExIFRule) r).setG_e_bar((double) val));
-        JTextField tfGiBar = createTextField(
-                (r) -> ((AdExIFRule) r).getG_i_bar(),
-                (r, val) -> ((AdExIFRule) r).setG_i_bar((double) val));
-        JTextField tfLR = createTextField(
-                (r) -> ((AdExIFRule) r).getLeakReversal(),
-                (r, val) -> ((AdExIFRule) r).setLeakReversal((double) val));
-        JTextField tfER = createTextField(
-                (r) -> ((AdExIFRule) r).getExReversal(),
-                (r, val) -> ((AdExIFRule) r).setExReversal((double) val));
-        JTextField tfIR = createTextField(
-                (r) -> ((AdExIFRule) r).getInReversal(),
-                (r, val) -> ((AdExIFRule) r).setInReversal((double) val));
-        JTextField tfAdaptResetParam = createTextField(
-                (r) -> ((AdExIFRule) r).getB(),
-                (r, val) -> ((AdExIFRule) r).setB((double) val));
-        JTextField tfAdaptCouplingConst = createTextField(
-                (r) -> ((AdExIFRule) r).getA(),
-                (r, val) -> ((AdExIFRule) r).setA((double) val));
-        JTextField tfAdaptTC = createTextField(
-                (r) -> ((AdExIFRule) r).getTauW(),
-                (r, val) -> ((AdExIFRule) r).setTauW((double) val));
+        JTextField tfPeak = createTextField((r) -> ((AdExIFRule) r).getV_Peak(), (r, val) -> ((AdExIFRule) r).setV_Peak((double) val));
+        JTextField tfThreshold = createTextField((r) -> ((AdExIFRule) r).getV_Th(), (r, val) -> ((AdExIFRule) r).setV_Th((double) val));
+        JTextField tfV_Reset = createTextField((r) -> ((AdExIFRule) r).getV_Reset(), (r, val) -> ((AdExIFRule) r).setV_Reset((double) val));
+        JTextField tfCap = createTextField((r) -> ((AdExIFRule) r).getMemCapacitance(), (r, val) -> ((AdExIFRule) r).setMemCapacitance((double) val));
+        JTextField tfBgCurrent = createTextField((r) -> ((AdExIFRule) r).getI_bg(), (r, val) -> ((AdExIFRule) r).setI_bg((double) val));
+        JTextField tfSlopeFactor = createTextField((r) -> ((AdExIFRule) r).getSlopeFactor(), (r, val) -> ((AdExIFRule) r).setSlopeFactor((double) val));
+        JTextField tfGL = createTextField((r) -> ((AdExIFRule) r).getG_L(), (r, val) -> ((AdExIFRule) r).setG_L((double) val));
+        JTextField tfGeBar = createTextField((r) -> ((AdExIFRule) r).getG_e_bar(), (r, val) -> ((AdExIFRule) r).setG_e_bar((double) val));
+        JTextField tfGiBar = createTextField((r) -> ((AdExIFRule) r).getG_i_bar(), (r, val) -> ((AdExIFRule) r).setG_i_bar((double) val));
+        JTextField tfLR = createTextField((r) -> ((AdExIFRule) r).getLeakReversal(), (r, val) -> ((AdExIFRule) r).setLeakReversal((double) val));
+        JTextField tfER = createTextField((r) -> ((AdExIFRule) r).getExReversal(), (r, val) -> ((AdExIFRule) r).setExReversal((double) val));
+        JTextField tfIR = createTextField((r) -> ((AdExIFRule) r).getInReversal(), (r, val) -> ((AdExIFRule) r).setInReversal((double) val));
+        JTextField tfAdaptResetParam = createTextField((r) -> ((AdExIFRule) r).getB(), (r, val) -> ((AdExIFRule) r).setB((double) val));
+        JTextField tfAdaptCouplingConst = createTextField((r) -> ((AdExIFRule) r).getA(), (r, val) -> ((AdExIFRule) r).setA((double) val));
+        JTextField tfAdaptTC = createTextField((r) -> ((AdExIFRule) r).getTauW(), (r, val) -> ((AdExIFRule) r).setTauW((double) val));
         mainTab.addItem("Peak Voltage (mV)", tfPeak);
         mainTab.addItem("Threshold Voltage (mV)", tfThreshold);
         mainTab.addItem("Reset Voltage (mV)", tfV_Reset);

@@ -24,7 +24,6 @@ package org.simbrain.util.table;
  * when updated.
  *
  * @author jyoshimi
- *
  */
 public interface IterableRowsTable {
 

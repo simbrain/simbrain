@@ -1,17 +1,15 @@
 package org.simbrain.world.threedworld.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.simbrain.world.threedworld.ThreeDWorldComponent;
-import org.simbrain.world.threedworld.engine.ThreeDEngine;
-import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
-
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.simbrain.world.threedworld.engine.ThreeDEngine;
+import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Agent is an Entity which contains a Model, Sensors, and Effectors.
@@ -24,6 +22,7 @@ public class Agent implements Entity {
 
     /**
      * Construct a new Agent.
+     *
      * @param model The model to attach to the Agent.
      */
     public Agent(ModelEntity model) {
@@ -38,7 +37,9 @@ public class Agent implements Entity {
         sensors.remove(sensor);
     }
 
-    /** Returns the sensor of the specified class, if one exists. */
+    /**
+     * Returns the sensor of the specified class, if one exists.
+     */
     public <T extends Sensor> Optional<T> getSensor(Class<T> sensorType) {
         for (Sensor sensor : sensors) {
             if (sensorType.isInstance(sensor)) {
@@ -50,6 +51,7 @@ public class Agent implements Entity {
 
     /**
      * Returns the sensor of the specified type, if one exists.
+     *
      * @param type The simple name of a class of sensor.
      */
     public Optional<Sensor> getSensor(String type) {
@@ -73,7 +75,9 @@ public class Agent implements Entity {
         effectors.remove(effector);
     }
 
-    /** Return the effector of the specified type, if one exists. */
+    /**
+     * Return the effector of the specified type, if one exists.
+     */
     public <T extends Effector> Optional<T> getEffector(Class<T> effectorType) {
         for (Effector effector : effectors) {
             if (effectorType.isInstance(effector)) {
@@ -85,6 +89,7 @@ public class Agent implements Entity {
 
     /**
      * Return the effector the specified type, if one exists.
+     *
      * @param type The simple name of a class of effector.
      */
     public Optional<Effector> getEffector(String type) {

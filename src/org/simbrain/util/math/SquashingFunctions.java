@@ -34,12 +34,12 @@ public class SquashingFunctions {
      * The hyperbolic tangent given an upper and lower limit and slope for a
      * particular value.
      *
-     * @param val the input to the tanh function
-     * @param ceil the desired maximum value (upper boundary) of tanh
+     * @param val   the input to the tanh function
+     * @param ceil  the desired maximum value (upper boundary) of tanh
      * @param floor the desired minimum value (lower boundary) of tanh
      * @param slope the desired slope of the tanh function for val == 0
      * @return the value of val after being passed through a tanh function with
-     *         these parameters
+     * these parameters
      */
     public static double tanh(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
@@ -73,12 +73,11 @@ public class SquashingFunctions {
      * The logistic function given an upper and lower limit and slope for a
      * particular value.
      *
-     * @param val the input to the logistic function
-     * @param ceil the desired maximum value (upper boundary) of logistic
+     * @param val   the input to the logistic function
+     * @param ceil  the desired maximum value (upper boundary) of logistic
      * @param floor the desired minimum value (lower boundary) of logistic
      * @param slope the desired slope of the logistic function for val == 0
      * @return the value of val after being passed through a logistic function with these parameters
-     *         
      * @author Scott Hotton
      */
     public static double logistic(double val, double ceil, double floor, double slope) {
@@ -87,9 +86,10 @@ public class SquashingFunctions {
 
     /**
      * Compute the scaled logistic function on a DoubleMatrix of input values.
-     * @param in The input array, will not be modified.
-     * @param out The output array, will be overwritten with the result.
-     * @param ceil The upper limit of the logistic curve.
+     *
+     * @param in    The input array, will not be modified.
+     * @param out   The output array, will be overwritten with the result.
+     * @param ceil  The upper limit of the logistic curve.
      * @param floor The lower limit of the logistic curve.
      * @param slope The slope of the curve at val == 0.
      */
@@ -105,12 +105,12 @@ public class SquashingFunctions {
      * The arctan function given an upper and lower limit and slope for a
      * particular value.
      *
-     * @param val the input to the arctan function
-     * @param ceil the desired maximum value (upper boundary) of arctan
+     * @param val   the input to the arctan function
+     * @param ceil  the desired maximum value (upper boundary) of arctan
      * @param floor the desired minimum value (lower boundary) of arctan
      * @param slope the desired slope of the arctan function for val == 0
      * @return the value of val after being passed through a arctan function
-     *         with these parameters
+     * with these parameters
      */
     public static double atan(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
@@ -140,15 +140,15 @@ public class SquashingFunctions {
      * The inverse hyperbolic tangent given an upper and lower limit and slope
      * for a particular value for the hyperbolic tangent before being inverted.
      *
-     * @param val the input to the inverse tanh function
-     * @param ceil the desired maximum value (upper boundary) of the tanh
-     *            function that this is an inverse of
+     * @param val   the input to the inverse tanh function
+     * @param ceil  the desired maximum value (upper boundary) of the tanh
+     *              function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the tanh
-     *            function that this is an inverse of
+     *              function that this is an inverse of
      * @param slope the desired slope of the tanh function function that this is
-     *            an inverse of for val == 0
+     *              an inverse of for val == 0
      * @return the value of val after being passed through the inverse tanh
-     *         function with these parameters
+     * function with these parameters
      */
     public static double invTanh(double val, double ceil, double floor, double slope) {
         double z = 0.5 * (((val - floor) / (ceil - floor)) - 0.5);
@@ -172,15 +172,15 @@ public class SquashingFunctions {
      * Returns the results of the inverse of the standard sigmoidal (logistic)
      * function.
      *
-     * @param val the input to the inverse logistic function
-     * @param ceil the desired maximum value (upper boundary) of the logistic
-     *            function that this is an inverse of
+     * @param val   the input to the inverse logistic function
+     * @param ceil  the desired maximum value (upper boundary) of the logistic
+     *              function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the logistic
-     *            function that this is an inverse of
+     *              function that this is an inverse of
      * @param slope the desired slope of the logistic function function that
-     *            this is an inverse of for val == 0
+     *              this is an inverse of for val == 0
      * @return the value of val after being passed through the inverse logistic
-     *         function with these parameters.
+     * function with these parameters.
      */
     public static double invLogistic(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
@@ -196,15 +196,15 @@ public class SquashingFunctions {
     /**
      * Returns the result of the inverse arctangent or tangent function.
      *
-     * @param val the input to the inverse arctan (tan) function
-     * @param ceil the desired maximum value (upper boundary) of the arctan
-     *            function that this is an inverse of
+     * @param val   the input to the inverse arctan (tan) function
+     * @param ceil  the desired maximum value (upper boundary) of the arctan
+     *              function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the arctan
-     *            function that this is an inverse of
+     *              function that this is an inverse of
      * @param slope the desired slope of the arctan function function that this
-     *            is an inverse of for val == 0
+     *              is an inverse of for val == 0
      * @return the value of val after being passed through the inverse arctan
-     *         function with these parameters
+     * function with these parameters
      */
     public static double invAtan(double val, double ceil, double floor, double slope) {
         double a = (Math.PI * slope) / (ceil - floor);
@@ -229,15 +229,15 @@ public class SquashingFunctions {
      * The derivative of the hyperbolic tangent given the original function's
      * upper and lower bounds, and slope for a given value.
      *
-     * @param val the input to the derivative of the tanh function
-     * @param ceil the desired maximum value (upper boundary) of the tanh
-     *            function that this is the derivative of
+     * @param val   the input to the derivative of the tanh function
+     * @param ceil  the desired maximum value (upper boundary) of the tanh
+     *              function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the tanh
-     *            function that this is the derivative of
+     *              function that this is the derivative of
      * @param slope the desired slope of the tanh function function that this is
-     *            the derivative of for val == 0
+     *              the derivative of for val == 0
      * @return the value of val after being passed through the derivative of the
-     *         tanh function with these parameters
+     * tanh function with these parameters
      */
     public static double derivTanh(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
@@ -258,16 +258,15 @@ public class SquashingFunctions {
      * The derivative of the logistic function given the original function's
      * upper and lower bounds, and slope for a given value.
      *
-     * @param val the input to the derivative of the logistic function
-     * @param ceil the desired maximum value (upper boundary) of the logistic
-     *            function that this is the derivative of
+     * @param val   the input to the derivative of the logistic function
+     * @param ceil  the desired maximum value (upper boundary) of the logistic
+     *              function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the logistic
-     *            function that this is the derivative of
+     *              function that this is the derivative of
      * @param slope the desired slope of the logistic function function that this is
-     *            the derivative of for val == 0
+     *              the derivative of for val == 0
      * @return the value of val after being passed through the derivative of the
-     *         logistic function with these parameters.
-     * 
+     * logistic function with these parameters.
      * @author Scott Hotton
      */
     public static double derivLogistic(double val, double ceil, double floor, double slope) {
@@ -277,9 +276,10 @@ public class SquashingFunctions {
 
     /**
      * Calculate the derivative of the logistic function at each value in the input array.
-     * @param in The input array, will not be modified.
-     * @param out The output array.
-     * @param ceil The upper bound on the logistic function.
+     *
+     * @param in    The input array, will not be modified.
+     * @param out   The output array.
+     * @param ceil  The upper bound on the logistic function.
      * @param floor The lower bound on the logistic function.
      * @param slope The slope of the logistic function.
      */
@@ -295,15 +295,15 @@ public class SquashingFunctions {
     /**
      * Calculate the logistic function and its derivative on each value of the input array. Makes use of an
      * optimization to avoid recomputing the logistic.
-     * @param in The input array, will not be modified.
-     * @param out The output array.
+     *
+     * @param in    The input array, will not be modified.
+     * @param out   The output array.
      * @param deriv The derivative array.
-     * @param ceil The upper bound of the logistic function.
+     * @param ceil  The upper bound of the logistic function.
      * @param floor The lower bound of the logistic function.
      * @param slope The slope of the logistic function.
      */
-    public static void logisticWithDerivative(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil,
-                                              double floor, double slope) {
+    public static void logisticWithDerivative(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
         logistic(in, out, ceil, floor, slope);
         // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
         out.rsubi(ceil, deriv);
@@ -317,15 +317,15 @@ public class SquashingFunctions {
      * The derivative of the arc tangent given the original function's upper and
      * lower bounds, and slope for a given value.
      *
-     * @param val the input to the derivative of arctan (tan) function
-     * @param ceil the desired maximum value (upper boundary) of the arctan
-     *            function that this is the derivative of
+     * @param val   the input to the derivative of arctan (tan) function
+     * @param ceil  the desired maximum value (upper boundary) of the arctan
+     *              function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the arctan
-     *            function that this is the derivative of
+     *              function that this is the derivative of
      * @param slope the desired slope of the arctan function function that this
-     *            is the derivative of for val == 0
+     *              is the derivative of for val == 0
      * @return the value of val after being passed through the derivative of the
-     *         arctan function with these parameters
+     * arctan function with these parameters
      */
     public static double derivAtan(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;

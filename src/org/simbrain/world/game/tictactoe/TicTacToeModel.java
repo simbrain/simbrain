@@ -1,9 +1,9 @@
 package org.simbrain.world.game.tictactoe;
 
+import org.simbrain.world.game.GameModel;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.simbrain.world.game.GameModel;
 
 /**
  * Holds the state of the game.
@@ -11,12 +11,14 @@ import org.simbrain.world.game.GameModel;
  * @author Matt Watson
  */
 public class TicTacToeModel extends GameModel {
-    /** the size of the board (3). */
+    /**
+     * the size of the board (3).
+     */
     private static final int SIZE = 3;
-    /** The state of the board. */
-    State[][] board = { { State.EMPTY, State.EMPTY, State.EMPTY },
-            { State.EMPTY, State.EMPTY, State.EMPTY },
-            { State.EMPTY, State.EMPTY, State.EMPTY } };
+    /**
+     * The state of the board.
+     */
+    State[][] board = {{State.EMPTY, State.EMPTY, State.EMPTY}, {State.EMPTY, State.EMPTY, State.EMPTY}, {State.EMPTY, State.EMPTY, State.EMPTY}};
 
     /**
      * Creates a new tic-tac-toe game.
@@ -31,11 +33,15 @@ public class TicTacToeModel extends GameModel {
      * @author Matt Watson
      */
     public enum State {
-        /** State for an empty square. */
-        EMPTY,
-        /** 'O' state for a square. */
-        OUH,
-        /** 'X' state for a square. */
+        /**
+         * State for an empty square.
+         */
+        EMPTY, /**
+         * 'O' state for a square.
+         */
+        OUH, /**
+         * 'X' state for a square.
+         */
         ECKS
     }
 
@@ -53,8 +59,8 @@ public class TicTacToeModel extends GameModel {
     /**
      * Sets the state of the given square.
      *
-     * @param x the horizontal position.
-     * @param y the vertical position.
+     * @param x     the horizontal position.
+     * @param y     the vertical position.
      * @param state the state to set the square.
      */
     public void setState(final int x, final int y, final State state) {
@@ -70,15 +76,14 @@ public class TicTacToeModel extends GameModel {
     @Override
     public double get(final int x, final int y) {
         switch (getState(x, y)) {
-        case EMPTY:
-            return 0;
-        case OUH:
-            return -1;
-        case ECKS:
-            return 1;
-        default:
-            throw new IllegalStateException("No vaild value set at " + x + ", "
-                    + y);
+            case EMPTY:
+                return 0;
+            case OUH:
+                return -1;
+            case ECKS:
+                return 1;
+            default:
+                throw new IllegalStateException("No vaild value set at " + x + ", " + y);
         }
     }
 

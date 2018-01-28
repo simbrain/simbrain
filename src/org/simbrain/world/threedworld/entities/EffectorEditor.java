@@ -1,12 +1,10 @@
 package org.simbrain.world.threedworld.entities;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-
 import net.miginfocom.swing.MigLayout;
-
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 public class EffectorEditor implements Editor {
     private Agent agent;

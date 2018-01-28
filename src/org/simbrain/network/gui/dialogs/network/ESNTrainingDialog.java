@@ -18,49 +18,53 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.ESNOfflineTrainingPanel;
-import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.SOMTrainerControlsPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.subnetworks.SOMNetwork;
-import org.simbrain.network.trainers.SOMTrainer;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  * Dialog for training an ESN network.
- *
  */
 public class ESNTrainingDialog extends StandardDialog {
 
-    /** Main tabbed pane. */
+    /**
+     * Main tabbed pane.
+     */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Reference to network panel. */
+    /**
+     * Reference to network panel.
+     */
     private NetworkPanel panel;
 
-    /** Reference to input data panel. */
+    /**
+     * Reference to input data panel.
+     */
     private DataPanel inputPanel;
 
-    /** Reference to training data panel. */
+    /**
+     * Reference to training data panel.
+     */
     private DataPanel trainingPanel;
 
-    /** Reference to validate inputs panel */
+    /**
+     * Reference to validate inputs panel
+     */
     private TestInputPanel validateInputsPanel;
 
     /**
      * Construct the dialog.
      *
-     * @param np parent network panel
+     * @param np      parent network panel
      * @param network the ESN network
      */
     public ESNTrainingDialog(NetworkPanel np, EchoStateNetwork network) {
@@ -71,33 +75,28 @@ public class ESNTrainingDialog extends StandardDialog {
         setModalityType(ModalityType.MODELESS);
 
         // Set up training tab
-        ESNOfflineTrainingPanel controlPanel = new ESNOfflineTrainingPanel(
-                panel, network, this);
+        ESNOfflineTrainingPanel controlPanel = new ESNOfflineTrainingPanel(panel, network, this);
         tabbedPane.addTab("Train Network", controlPanel);
 
         // Input data tab
-        inputPanel = new DataPanel(network.getInputLayer().getNeuronList(),
-                network.getInputDataMatrix(), 5, "Input");
+        inputPanel = new DataPanel(network.getInputLayer().getNeuronList(), network.getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Input data", inputPanel);
 
         // Training data tab
-        trainingPanel = new DataPanel(network.getOutputLayer().getNeuronList(),
-                network.getTargetDataMatrix(), 5, "Targets");
+        trainingPanel = new DataPanel(network.getOutputLayer().getNeuronList(), network.getTargetDataMatrix(), 5, "Targets");
         trainingPanel.setFrame(this);
         tabbedPane.addTab("Target data", trainingPanel);
 
         // Testing tab
-        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
-                network.getInputLayer().getNeuronList(), network.getInputDataMatrix());
+        validateInputsPanel = TestInputPanel.createTestInputPanel(np, network.getInputLayer().getNeuronList(), network.getInputDataMatrix());
         tabbedPane.addTab("Validate Input Data", validateInputsPanel);
 
         // Listen for tab changed events. Load inputs to test tab
         // If inputs have been loaded
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 // Just clicked out of training tab
                 if (index == 1) {
@@ -106,8 +105,7 @@ public class ESNTrainingDialog extends StandardDialog {
                     //somPropsPanel.commitChanges();
                 } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel
-                                .getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
                     }
                 }
             }
@@ -115,8 +113,7 @@ public class ESNTrainingDialog extends StandardDialog {
         tabbedPane.addChangeListener(changeListener);
 
         // Set up help
-        Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/echostatenetwork.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/echostatenetwork.html");
         addButton(new JButton(helpAction));
 
         // Finish configuration

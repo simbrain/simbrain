@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules.interfaces;
 /**
  * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
  * neurons.
- *
+ * <p>
  * TODO: Add upper and lower bound parameters? Add randomize option?
  */
 public interface BiasedUpdateRule {

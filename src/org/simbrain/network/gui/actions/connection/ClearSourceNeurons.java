@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.gui.actions.connection;
 
-import java.awt.event.ActionEvent;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Clear source neurons action.
@@ -36,8 +36,7 @@ public final class ClearSourceNeurons extends ConditionallyEnabledAction {
     public ClearSourceNeurons(final NetworkPanel networkPanel) {
         super(networkPanel, "Clear Source Neurons", EnablingCondition.SOURCE_NEURONS);
         putValue(NAME, "Clear Source Neurons");
-        putValue(SHORT_DESCRIPTION, "Remove all source neurons (neurons with red"
-                + " squares around them)");
+        putValue(SHORT_DESCRIPTION, "Remove all source neurons (neurons with red" + " squares around them)");
     }
 
     @Override

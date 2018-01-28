@@ -30,10 +30,14 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
  */
 public class LMSIterative extends IterableTrainer {
 
-    /** Current error. */
+    /**
+     * Current error.
+     */
     private double rmsError;
 
-    /** Learning rate. */
+    /**
+     * Learning rate.
+     */
     private double learningRate = .01;
 
     /**
@@ -67,10 +71,7 @@ public class LMSIterative extends IterableTrainer {
 
             // Set input layer values
             for (int i = 0; i < numInputs; i++) {
-                network.getInputNeurons()
-                        .get(i)
-                        .forceSetActivation(
-                                network.getTrainingSet().getInputData()[row][i]);
+                network.getInputNeurons().get(i).forceSetActivation(network.getTrainingSet().getInputData()[row][i]);
             }
 
             // Update output node
@@ -87,8 +88,7 @@ public class LMSIterative extends IterableTrainer {
 
                 // Update weights
                 for (Synapse synapse : outputNeuron.getFanIn()) {
-                    double deltaW = (learningRate * error * synapse.getSource()
-                            .getActivation());
+                    double deltaW = (learningRate * error * synapse.getSource().getActivation());
                     // System.out.println(Utils.round(deltaW,2) + "=" + error +
                     // " * " + synapse.getSource()
                     // .getActivation());
@@ -102,8 +102,7 @@ public class LMSIterative extends IterableTrainer {
                 // Utils.round(error,2) + ")");
 
                 // Update bias of target neuron
-                BiasedUpdateRule bias = (BiasedUpdateRule) outputNeuron
-                        .getUpdateRule();
+                BiasedUpdateRule bias = (BiasedUpdateRule) outputNeuron.getUpdateRule();
                 bias.setBias(bias.getBias() + (learningRate * error));
             }
             rmsError = rmsError / (numInputs * numOutputs);
@@ -121,8 +120,7 @@ public class LMSIterative extends IterableTrainer {
             neuron.clear(); // Looks nicer in the GUI
             neuron.randomizeFanIn();
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math
-                        .random());
+                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math.random());
             }
         }
         revalidateSynapseGroups();
@@ -136,8 +134,7 @@ public class LMSIterative extends IterableTrainer {
     }
 
     /**
-     * @param learningRate
-     *            the learningRate to set
+     * @param learningRate the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;

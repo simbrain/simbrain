@@ -18,10 +18,10 @@
  */
 package org.simbrain.util.projection;
 
-import java.awt.Color;
-
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
+
+import java.awt.*;
 
 /**
  * Utility for coloring points of a dataset using a "halo".Outside this radius
@@ -51,7 +51,7 @@ public class Halo {
     /**
      * Make halo with default halo radius.
      *
-     * @param proj the projector whose points should be colored
+     * @param proj   the projector whose points should be colored
      * @param target target value around which the halo is created.
      */
     public static void makeHalo(Projector proj, double[] target) {
@@ -62,10 +62,10 @@ public class Halo {
      * Color the points in the plot according to how close they are to a
      * provided target value. A "halo" of red is created around the target
      * point.
-     *
+     * <p>
      * The current point in the dataset is colored green.
      *
-     * @param proj the projector whose points should be colored
+     * @param proj   the projector whose points should be colored
      * @param target target value around which the halo is created.
      * @param radius radius of the halo
      */
@@ -74,10 +74,8 @@ public class Halo {
 
             // Color the current point green
             double[] point = proj.getUpstairs().getPoint(i).getVector();
-            if (java.util.Arrays.equals(point,
-                    proj.getCurrentPoint().getVector())) {
-                ((DataPointColored) proj.getUpstairs().getPoint(i))
-                        .setColor(Color.green);
+            if (java.util.Arrays.equals(point, proj.getCurrentPoint().getVector())) {
+                ((DataPointColored) proj.getUpstairs().getPoint(i)).setColor(Color.green);
                 continue;
             }
 
@@ -88,12 +86,9 @@ public class Halo {
             if (distance < radius) {
                 float slope = -(maxSaturation - minSaturation) / radius;
                 float saturation = (float) (distance * slope + maxSaturation);
-                ((DataPointColored) proj.getUpstairs().getPoint(i)).setColor(
-                        Color.getHSBColor(Utils.colorToFloat(Color.red),
-                                saturation, 1));
+                ((DataPointColored) proj.getUpstairs().getPoint(i)).setColor(Color.getHSBColor(Utils.colorToFloat(Color.red), saturation, 1));
             } else {
-                ((DataPointColored) proj.getUpstairs().getPoint(i))
-                        .setColor(Color.gray);
+                ((DataPointColored) proj.getUpstairs().getPoint(i)).setColor(Color.gray);
             }
 
         }

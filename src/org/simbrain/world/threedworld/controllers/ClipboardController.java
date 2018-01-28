@@ -1,26 +1,20 @@
 package org.simbrain.world.threedworld.controllers;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.ThreeDWorldComponent;
-import org.simbrain.world.threedworld.engine.ThreeDEngineConverter;
 import org.simbrain.world.threedworld.engine.ThreeDEngine.State;
+import org.simbrain.world.threedworld.engine.ThreeDEngineConverter;
 import org.simbrain.world.threedworld.entities.BoxEntityXmlConverter;
 import org.simbrain.world.threedworld.entities.Entity;
 import org.simbrain.world.threedworld.entities.ModelEntityXmlConverter;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClipboardController implements ClipboardOwner {
     public interface ClipboardListener {

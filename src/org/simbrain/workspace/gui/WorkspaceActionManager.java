@@ -247,7 +247,7 @@ public class WorkspaceActionManager {
         openDataWorldAction = new OpenDataWorldAction(workspace);
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
-        openImageWorldAction = new OpenComponentAction<>(ImageWorldComponent.class, "Image World", "Camera.png", workspace);
+        openImageWorldAction = new OpenComponentAction<>(ImageWorldComponent.class, "Image World", "camera.png", workspace);
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);

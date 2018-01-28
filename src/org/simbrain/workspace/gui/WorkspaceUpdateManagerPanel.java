@@ -41,27 +41,7 @@ import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
 public class WorkspaceUpdateManagerPanel extends JPanel {
 
     /** UpdateListener updates the action sequence whenever changes are made or an update is completed. */
-    private class UpdateListener implements WorkspaceUpdaterListener, UpdateManagerListener {
-
-        @Override
-        public void updatingStarted() {}
-
-        @Override
-        public void updatingFinished() {}
-
-        @Override
-        public void workspaceUpdated() {
-            updateCurrentActionsList();
-        }
-
-        @Override
-        public void updatedCouplings(int update) {}
-
-        @Override
-        public void changeNumThreads() {}
-
-        @Override
-        public void changedUpdateController() {}
+    private class UpdateListener implements UpdateManagerListener {
 
         @Override
         public void actionAdded(UpdateAction action) {
@@ -247,13 +227,11 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                 @Override
                 public void windowClosing(WindowEvent evt) {
                     super.windowClosing(evt);
-                    workspace.getUpdater().removeUpdaterListener(listener);
                     workspace.getUpdater().getUpdateManager().removeListener(listener);
                 }
             });
         }
 
-        workspace.getUpdater().addUpdaterListener(listener);
         workspace.getUpdater().getUpdateManager().addListener(listener);
     }
 

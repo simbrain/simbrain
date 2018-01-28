@@ -190,7 +190,7 @@ class ArchivedWorkspace {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (serializedAction instanceof UpdateAllBuffered) {
+        } else if (serializedAction instanceof UpdateAllAction) {
             try {
                 Class<? extends UpdateAction> type = serializedAction.getClass();
                 action = type.getConstructor(WorkspaceUpdater.class).newInstance(workspace.getUpdater());

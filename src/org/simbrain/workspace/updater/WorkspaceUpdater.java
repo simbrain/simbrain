@@ -60,7 +60,7 @@ public class WorkspaceUpdater {
     private final ExecutorService notificationEvents;
 
     /** Component listeners. */
-    private final List<ComponentUpdateListener> componentListeners = new CopyOnWriteArrayList<ComponentUpdateListener>();
+    private final List<UpdateEventListener> componentListeners = new CopyOnWriteArrayList<UpdateEventListener>();
 
     /** Updater listeners. */
     private final List<WorkspaceUpdaterListener> updaterListeners = new CopyOnWriteArrayList<WorkspaceUpdaterListener>();
@@ -167,8 +167,6 @@ public class WorkspaceUpdater {
 
     /**
      * Returns whether the updater is set to run.
-     *
-     * @return whether the updater is set to run.
      */
     public boolean isRunning() {
         return run;
@@ -257,7 +255,9 @@ public class WorkspaceUpdater {
         time++;
         LOGGER.trace("starting: " + time);
         for (UpdateAction action : updateActionManager.getActionList()) {
+            notifyBeforeUpdateAction(action);
             action.invoke();
+            notifyAfterUpdateAction(action);
         }
         notifyWorkspaceUpdated();
         LOGGER.trace("done: " + time);
@@ -268,7 +268,7 @@ public class WorkspaceUpdater {
      *
      * @param listener The component listener to add.
      */
-    public void addComponentListener(ComponentUpdateListener listener) {
+    public void addComponentListener(UpdateEventListener listener) {
         componentListeners.add(listener);
     }
 
@@ -277,7 +277,7 @@ public class WorkspaceUpdater {
      *
      * @param listener The listener to add.
      */
-    public void removeComponentListener(ComponentUpdateListener listener) {
+    public void removeComponentListener(UpdateEventListener listener) {
         componentListeners.remove(listener);
     }
 
@@ -300,15 +300,40 @@ public class WorkspaceUpdater {
     }
 
     /**
+     * Called when an update action is about to be invoked.
+     *
+     * @param action The action to be invoked.
+     */
+    void notifyBeforeUpdateAction(UpdateAction action) {
+        final long nanoTime = System.nanoTime();
+        notificationEvents.submit(() -> {
+            componentListeners.forEach(l -> l.beforeUpdateAction(action, nanoTime));
+        });
+    }
+
+    /**
+     * Called after an update action has been invoked.
+     *
+     * @param action The action that was invoked.
+     */
+    void notifyAfterUpdateAction(UpdateAction action) {
+        final long nanoTime = System.nanoTime();
+        notificationEvents.submit(() -> {
+            componentListeners.forEach(l -> l.afterUpdateAction(action, nanoTime));
+        });
+    }
+
+    /**
      * Called when a new component is starting to update.
      *
      * @param component The component to update.
      * @param thread The number of the thread doing the update.
      */
     void notifyComponentUpdateStarted(WorkspaceComponent component, int thread) {
-        final int time = this.time;
+        final int simTime = this.time;
+        final long nanoTime = System.nanoTime();
         notificationEvents.submit(() -> {
-            componentListeners.forEach(l -> l.startingComponentUpdate(component, time, thread));
+            componentListeners.forEach(l -> l.beforeComponentUpdate(component, simTime, thread, nanoTime));
         });
     }
 
@@ -319,9 +344,10 @@ public class WorkspaceUpdater {
      * @param thread The number of the thread doing the update.
      */
     void notifyComponentUpdateFinished(WorkspaceComponent component, int thread) {
-        final int time = this.time;
+        final int simTime = this.time;
+        final long nanoTime = System.nanoTime();
         notificationEvents.submit(() -> {
-            componentListeners.forEach(l -> l.finishedComponentUpdate(component, time, thread));
+            componentListeners.forEach(l -> l.afterComponentUpdate(component, simTime, thread, nanoTime));
         });
     }
 

@@ -403,9 +403,9 @@ public class SimbrainDesktop {
         // Create the Tabbed Pane for bottom of the desktop
         bottomDock = new JTabbedPane();
         bottomDock.addTab("Components", null, new ComponentPanel(this), "Show workspace components");
-
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
-        bottomDock.addTab("Updater", null, new ThreadViewerPanel(this.getWorkspace()), "Simbrain thread viewer");
+        bottomDock.addTab("Performance", null, new PerformanceMonitorPanel(this.getWorkspace()),
+                "Performance and thread monitoring");
 
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

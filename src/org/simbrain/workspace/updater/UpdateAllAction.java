@@ -28,28 +28,17 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * This is the default action for all workspace updates.
- *
- * First update couplings using a buffering system whereby the order in which
- * they are updated does not matter (read all producer values, write them to a
- * buffer, then read all buffer values and write them to the consumers). Then
- * update all the components.
- *
- * In workspace updater, the following happens. Each component update call is
- * fed to an executor service which uses as many threads as it's configured to
- * use (it defaults to the number of available processors which can be changed.)
- * Then the executing thread waits on a countdown latch. Each component update
- * decrements the latch so that after the last update is complete, the thread
- * waiting on the latch wakes up and updates all the couplings.
+ * First update couplings then update all the components.
  *
  * @author jyoshimi
  */
-public class UpdateAllBuffered implements UpdateAction {
+public class UpdateAllAction implements UpdateAction {
 
     /** Provides access to workspace updater. */
     private transient WorkspaceUpdater updater;
 
     /** The static logger for the class. */
-    static Logger LOGGER = Logger.getLogger(UpdateAllBuffered.class);
+    static Logger LOGGER = Logger.getLogger(UpdateAllAction.class);
 
     /** The executor service for doing the component updates. */
     private transient ExecutorService componentUpdateExecutor;
@@ -59,7 +48,7 @@ public class UpdateAllBuffered implements UpdateAction {
      *
      * @param updater reference to parent updater
      */
-    public UpdateAllBuffered(WorkspaceUpdater updater) {
+    public UpdateAllAction(WorkspaceUpdater updater) {
         this.updater = updater;
 
         // In some cases components can be updated in parallel. So
@@ -134,7 +123,7 @@ public class UpdateAllBuffered implements UpdateAction {
 
     @Override
     public String getDescription() {
-        return "Buffered update of all components and couplings.";
+        return "Update All Components and Couplings";
     }
 
     @Override

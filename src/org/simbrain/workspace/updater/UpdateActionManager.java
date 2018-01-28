@@ -236,7 +236,7 @@ public class UpdateActionManager {
      */
     public void setDefaultUpdateActions() {
         clear();
-        addAction(new UpdateAllBuffered(workspaceUpdater));
+        addAction(new UpdateAllAction(workspaceUpdater));
         addAction(workspaceUpdater.getSyncUpdateAction());
     }
 
@@ -286,7 +286,7 @@ public class UpdateActionManager {
         List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
 
         // Default updater
-        availableActionList.add(new UpdateAllBuffered(workspaceUpdater));
+        availableActionList.add(new UpdateAllAction(workspaceUpdater));
         availableActionList.add(new WorkspaceDelayAction(workspaceUpdater.getWorkspace()));
 
         // Add update actions for all components available

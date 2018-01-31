@@ -34,6 +34,7 @@ import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.util.*;
@@ -968,9 +969,7 @@ public class Network {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver("UTF-8"));
-        xstream.ignoreUnknownElements();
-
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(Network.class, "groupListeners");
         xstream.omitField(Network.class, "neuronListeners");
         xstream.omitField(Network.class, "networkListeners");

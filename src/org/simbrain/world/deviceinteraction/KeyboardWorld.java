@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,9 +92,7 @@ public class KeyboardWorld {
      * @return the XStream object
      */
     static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        return xstream;
-
+        return Utils.getSimbrainXStream();
     }
 
 

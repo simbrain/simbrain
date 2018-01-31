@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.simbrain.util.Utils;
+
 /**
  * <b>TextWorld</b> is an environment for modeling speech and reading and other
  * linguistic phenomena. It is the superclass for readerworld, where text is
@@ -333,8 +335,7 @@ public abstract class TextWorld {
      * @return the XStream object
      */
     static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(TextWorld.class, "listenerList");
         return xstream;
     }

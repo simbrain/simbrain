@@ -20,6 +20,9 @@ package org.simbrain.util;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.security.*;
 import org.apache.log4j.Logger;
 import org.simbrain.resource.ResourceManager;
 
@@ -747,6 +750,23 @@ public class Utils {
                 runnable.run();
             }
         };
+    }
+
+    /**
+     * Returns an XStream instance with default Simbrain settings, including
+     * backwards compatibility with earlier xml, and turning off security
+     * warning, and formatting xml as utf-8.
+     *
+     * @return the properly initialized XStream object
+     */
+    public static XStream getSimbrainXStream() {
+        XStream xstream = new XStream(new DomDriver("UTF-8"));
+        xstream.ignoreUnknownElements();
+        // Trying to suppress xstream warnings. Not working yet...
+        xstream.allowTypesByWildcard(new String[] {
+            "org.simbrain.**",
+        });
+        return xstream;
     }
 
 }

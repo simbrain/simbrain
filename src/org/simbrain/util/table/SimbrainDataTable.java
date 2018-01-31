@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.util.Utils;
+
 /**
  * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
  * reasonable, readable way with XStream.
@@ -304,8 +306,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(AbstractTableModel.class, "listenerList");
         return xstream;
     }

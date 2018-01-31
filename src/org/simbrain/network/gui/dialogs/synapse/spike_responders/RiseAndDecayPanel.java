@@ -25,6 +25,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.List;
 /**
  * <b>RiseAndDecayPanel</b>.
  */
-public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
+public class RiseAndDecayPanel extends AbstractSpikeResponsePanel implements EditableObject {
 
     /**
      * Maximum response field.

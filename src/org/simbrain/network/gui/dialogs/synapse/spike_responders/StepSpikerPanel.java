@@ -25,6 +25,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.List;
 /**
  * <b>StepSpikerPanel</b>.
  */
-public class StepSpikerPanel extends AbstractSpikeResponsePanel {
+public class StepSpikerPanel extends AbstractSpikeResponsePanel implements EditableObject {
 
     /**
      * Response height field.

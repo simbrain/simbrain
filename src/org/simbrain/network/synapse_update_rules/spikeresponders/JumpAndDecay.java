@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>JumpAndDecay</b>.
@@ -28,16 +29,21 @@ public class JumpAndDecay extends SpikeResponder {
     /**
      * Jump height value.
      */
-    private double jumpHeight = 1;
+	@UserParameter(label = "Jump height", description = "Jump height value", defaultValue = "1", order = 1)
+    private double jumpHeight;
 
+    
+    
     /**
      * Base line value.
      */
+	@UserParameter(label = "Base-line", description = "Base line value", defaultValue = "0", order = 1)
     private double baseLine;
 
     /**
      * Rate at which synapse will decay (ms).
      */
+	@UserParameter(label = "Time constant", description = "Rate at which synapse will decay (ms)", defaultValue = "3", order = 1)
     private double timeConstant = 3;
 
     /**

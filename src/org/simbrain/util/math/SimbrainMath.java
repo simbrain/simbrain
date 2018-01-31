@@ -21,6 +21,7 @@ package org.simbrain.util.math;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -631,35 +632,35 @@ public class SimbrainMath {
         return Math.sqrt(distance);
     }
 
-//    /**
-//     * Returns the mean squared error between a source and target vector.
-//     *
-//     * @param src source vector
-//     * @param tar target vector
-//     * @return the mse
-//     * @throws IllegalArgumentException if src and tar have different lengths
-//     */
-//    public static double getMeanSquaredError(final double[] src,
-//            final double[] tar) throws IllegalArgumentException {
-//
-//        if (src.length != tar.length) {
-//            String srcVec = Arrays.toString(src);
-//            String tarVec = Arrays.toString(tar);
-//            throw new IllegalArgumentException("Source vector " + srcVec
-//                    + " has " + src.length + " components.  Target vector "
-//                    + tarVec + " has " + tar.length + " components.");
-//        }
-//
-//        double retVal = 0;
-//        double n = src.length;
-//        if (n == 0) {
-//            return 0;
-//        }
-//        for (int i = 0; i < n; i++) {
-//            retVal += Math.pow(tar[i] - src[i], 2);
-//        }
-//        return retVal / n;
-//    }
+    /**
+     * Returns the mean squared error between a source and target vector.
+     *
+     * @param src source vector
+     * @param tar target vector
+     * @return the mse
+     * @throws IllegalArgumentException if src and tar have different lengths
+     */
+    public static double getMeanSquaredError(final double[] src,
+            final double[] tar) throws IllegalArgumentException {
+
+        if (src.length != tar.length) {
+            String srcVec = Arrays.toString(src);
+            String tarVec = Arrays.toString(tar);
+            throw new IllegalArgumentException("Source vector " + srcVec
+                    + " has " + src.length + " components.  Target vector "
+                    + tarVec + " has " + tar.length + " components.");
+        }
+
+        double retVal = 0;
+        double n = src.length;
+        if (n == 0) {
+            return 0;
+        }
+        for (int i = 0; i < n; i++) {
+            retVal += Math.pow(tar[i] - src[i], 2);
+        }
+        return retVal / n;
+    }
     
     /**
      * Returns a row compressed representation of a weight matrix represented as

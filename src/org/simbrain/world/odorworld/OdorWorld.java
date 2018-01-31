@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
@@ -270,8 +271,7 @@ public class OdorWorld {
      * @return the XStream object TODO: There is more to remove!
      */
     static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(OdorWorld.class, "listenerList");
         xstream.omitField(Animation.class, "frames");
         xstream.omitField(Animation.class, "currFrameIndex");

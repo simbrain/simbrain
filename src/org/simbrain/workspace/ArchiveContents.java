@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateAllBuffered;
@@ -616,8 +617,7 @@ class ArchiveContents {
      * @return An XStream instance.
      */
     static XStream xstream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
 
         xstream.omitField(ArchiveContents.class, "serializer");
         xstream.omitField(ArchiveContents.class, "archivedAvailableActions");

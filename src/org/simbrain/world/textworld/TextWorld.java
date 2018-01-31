@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.Utils;
 
 /**
  * <b>TextWorld</b> is an environment for modeling speech and reading and other
@@ -320,8 +321,7 @@ public abstract class TextWorld {
      * @return the XStream object
      */
     static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(TextWorld.class, "listenerList");
         return xstream;
     }

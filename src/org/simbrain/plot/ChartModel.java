@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.Utils;
 
 /**
  * Base class for chart model classes. Maintains listeners.
@@ -119,8 +120,7 @@ public class ChartModel {
      * @return
      */
     public static XStream getXStream() {
-        final XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(ChartModel.class, "listenerList");
         xstream.omitField(ChartModel.class, "settingsListenerList");
         return xstream;

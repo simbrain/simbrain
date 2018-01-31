@@ -40,6 +40,9 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.security.*;
 import org.apache.log4j.Logger;
 
 import com.Ostermiller.util.CSVParser;
@@ -759,6 +762,23 @@ public class Utils {
         Set<T> setB = new HashSet<T>(B);
         setA.retainAll(setB);
         return setA.size() > 0;
+    }
+
+    /**
+     * Returns an XStream instance with default Simbrain settings, including
+     * backwards compatibility with earlier xml, and turning off security
+     * warning, and formatting xml as utf-8.
+     *
+     * @return the properly initialized XStream object
+     */
+    public static XStream getSimbrainXStream() {
+        XStream xstream = new XStream(new DomDriver("UTF-8"));
+        xstream.ignoreUnknownElements();
+        // Trying to suppress xstream warnings. Not working yet...
+        xstream.allowTypesByWildcard(new String[] {
+            "org.simbrain.**",
+        });
+        return xstream;
     }
 
 }

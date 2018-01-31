@@ -20,6 +20,7 @@ package org.simbrain.world.visionworld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.Utils;
 
 /**
  * Abstract implementation of VisionWorldModel which provides
@@ -42,8 +43,7 @@ abstract class AbstractVisionWorldModel extends VisionWorldModelListenerSupport
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
+        XStream xstream = Utils.getSimbrainXStream();
         // TODO: Too much is stored in pixel matrix and elsewhere
         // Also the pixels don't actually get stored
         // xstream.omitField(MutableVisionWorldModel.class, "pixelMatrix");

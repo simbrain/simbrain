@@ -240,6 +240,8 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
         boolean objectsSameType = objectsToCheck.stream().allMatch(m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
         boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
+        //TODO: In exception say which condition failed and what the types are
+        // objectsToCheck.get(0).getClass() and  editedObjects.get(0).getClass()
         if (!objectsSameType || !objectsSameTypeAsInternal) {
             throw new IllegalArgumentException("Committed objects must be of the same type as each other and" + "as the objects handled by this editor");
         }

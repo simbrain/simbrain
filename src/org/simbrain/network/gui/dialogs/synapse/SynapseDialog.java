@@ -181,9 +181,13 @@ public final class SynapseDialog extends StandardDialog {
         return synapseList;
     }
 
+
+    //TODO: Rename and rethink. We have two things. Source neuron is spiking
+    //  and target neuron uses spiking nodes. At the very least new javadocs
+
     /**
      * Tests to make sure that at least one source neuron in the provided list
-     * of synapses is a spiking neuron. . This is used to determine if a spike
+     * of synapses is a spiking neuron. This is used to determine if a spike
      * responder panel should or shouldn't be displayed.
      *
      * @param synapses the synapses whose source neurons will be tested.
@@ -201,6 +205,13 @@ public final class SynapseDialog extends StandardDialog {
                 return true;
             }
         }
+
+        boolean noSpikeResponders = synapses.stream().anyMatch(s -> s.getSpikeResponder() == null);
+        if (noSpikeResponders) {
+            return false;
+        }
+
+        // Check for synaptic inputs in target
         for (Synapse s : synapses) {
             if (s.getTarget() != null) {
                 if (s.getTarget().getUpdateRule().getInputType() == InputType.SYNAPTIC) {

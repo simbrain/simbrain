@@ -19,18 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.ConvolvedJumpAndDecayPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.JumpAndDecayPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.ProbabilisticSpikeResponderPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.RiseAndDecayPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.StepSpikerPanel;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
-import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
+import org.simbrain.network.synapse_update_rules.spikeresponders.*;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -46,11 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,20 +86,19 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
      * resizing purposes.
      */
     private final Window parent;
-    
-    
+
     /**
      * A mapping of available spike responders to their respective panels. Used
      * as a reference (especially for combo-boxes) by GUI classes.
      */
     public static final LinkedHashMap<String, AnnotatedPropertyEditor> RESPONDER_MAP = new LinkedHashMap<>();
-    
+
     static {
-        RESPONDER_MAP.put(new JumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new JumpAndDecayPanel()));
-        RESPONDER_MAP.put(new ConvolvedJumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new ConvolvedJumpAndDecayPanel()));
-        RESPONDER_MAP.put(new ProbabilisticResponder().getDescription(), new AnnotatedPropertyEditor(new ProbabilisticSpikeResponderPanel()));
-        RESPONDER_MAP.put(new RiseAndDecay().getDescription(), new AnnotatedPropertyEditor(new RiseAndDecayPanel()));
-        RESPONDER_MAP.put(new Step().getDescription(), new AnnotatedPropertyEditor(new StepSpikerPanel()));
+        RESPONDER_MAP.put(new JumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new JumpAndDecay()));
+        RESPONDER_MAP.put(new ConvolvedJumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new ConvolvedJumpAndDecay()));
+        RESPONDER_MAP.put(new ProbabilisticResponder().getDescription(), new AnnotatedPropertyEditor(new ProbabilisticResponder()));
+        RESPONDER_MAP.put(new RiseAndDecay().getDescription(), new AnnotatedPropertyEditor(new RiseAndDecay()));
+        RESPONDER_MAP.put(new Step().getDescription(), new AnnotatedPropertyEditor(new Step()));
     }
 
     /**
@@ -134,14 +118,15 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
      *
      * @param synapseList   the list of synapses, the spike responders of which will be
      *                      displayed for edit
-     * @param startingState  whether or not the dropdown showing spike responder parameters 
-     * 						should be visible by default.
+     * @param startingState whether or not the dropdown showing spike responder parameters
+     *                      should be visible by default.
      * @param parent        the parent window
      */
     public SpikeResponderSettingsPanel(final Collection<Synapse> synapseList, final boolean startingState, final Window parent) {
         this.synapseList = synapseList;
         this.parent = parent;
         displaySPTriangle = new DropDownTriangle(UpDirection.LEFT, startingState, "Settings", "Settings", parent);
+
         // Find out what panel we're starting with and fill it as necessary
         initSpikeResponderType();
         // After the starting spike responder panel has been initialized we can
@@ -175,53 +160,52 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
         spikeResponderPanel.setBorder(padding);
         spikeResponderPanel.setVisible(displaySPTriangle.isDown());
         this.add(spikeResponderPanel);
-        
+
         // Border
         TitledBorder tb2 = BorderFactory.createTitledBorder("Spike Responder");
         this.setBorder(tb2);
 
     }
 
-    // TODO: private void initSynapseType() not done
     /**
      * Initialize the main synapse panel based on the type of the selected
      * synapses.
      */
     private void initSpikeResponderType() {
-    	Iterator<Synapse> synIter = synapseList.iterator();
-    	Synapse synapseRef = synIter.next();
-    	
+        Iterator<Synapse> synIter = synapseList.iterator();
+        Synapse firstSynapse = synIter.next();
+
         boolean discrepancy = false;
         while (synIter.hasNext()) {
-            if (!synapseRef.getSpikeResponder().getClass().equals(synIter.next().getSpikeResponder().getClass())) {
+            if (!firstSynapse.getSpikeResponder().getClass().equals(synIter.next().getSpikeResponder().getClass())) {
                 discrepancy = true;
                 break;
             }
         }
-    	
-     // If they are different types, display combo box as null
+
+        // If they are different types, display combo box as null
         if (discrepancy) {
-        	cbResponderType.addItem(SimbrainConstants.NULL_STRING);
-        	cbResponderType.setSelectedIndex(cbResponderType.getItemCount() - 1);
-        	// Simply to serve as an empty panel
-        	spikeResponderPanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
+            cbResponderType.addItem(SimbrainConstants.NULL_STRING);
+            cbResponderType.setSelectedIndex(cbResponderType.getItemCount() - 1);
+            // Simply to serve as an empty panel
+            spikeResponderPanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
         } else {
-        	String responderName = synapseRef.getSpikeResponder().getDescription();
-        	spikeResponderPanel = RESPONDER_MAP.get(responderName);
-        	List<EditableObject> responderList = synapseList.stream()
-        			.map(Synapse::getSpikeResponder)
-        			.collect(Collectors.toList());
-        	spikeResponderPanel.fillFieldValues(responderList);
-        	cbResponderType.setSelectedItem(responderName);
+            String responderName = firstSynapse.getSpikeResponder().getDescription();
+            spikeResponderPanel = RESPONDER_MAP.get(responderName);
+            List<EditableObject> responderList = synapseList.stream()
+                .map(Synapse::getSpikeResponder)
+                .collect(Collectors.toList());
+            spikeResponderPanel.fillFieldValues(responderList);
+            cbResponderType.setSelectedItem(responderName);
         }
     }
-    
+
     /**
      * Adds the listeners to this dialog.
      */
     private void addListeners() {
-    	
-    	// Respond to triangle drop down clicks
+
+        // Respond to triangle drop down clicks
         displaySPTriangle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -230,7 +214,7 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
                 parent.pack();
             }
         });
-        
+
         cbResponderType.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -255,7 +239,7 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
     }
 
     /**
-     * Called to repaint the panel based on changes in the to the selected
+     * Called to repaint the panel based on changes in the selected
      * synapse type.
      */
     public void repaintPanel() {
@@ -284,41 +268,40 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
     }
 
 
-
     /**
      * Commit changes to the panel.
      *
      * @return success or not, but does nothing now.
      */
     public boolean commitChanges() {
-    	// referencing SynapseRulePanel
+
         SpikeResponder selectedResponder = (SpikeResponder) spikeResponderPanel.getEditedObject();
-        
-        if(selectedResponder == null) {
-        	return true;
+
+        if (selectedResponder == null) {
+            return true;
         }
-        
-        for(Synapse s : synapseList) {
-        	if(!s.getSpikeResponder().getClass().equals(selectedResponder.getClass())) {
-        		s.setSpikeResponder(selectedResponder.deepCopy());
-        	}
+
+        for (Synapse s : synapseList) {
+            if (!s.getSpikeResponder().getClass().equals(selectedResponder.getClass())) {
+                s.setSpikeResponder(selectedResponder.deepCopy());
+            }
         }
-        
+
         List<EditableObject> responderList = synapseList.stream()
-        		.map(Synapse::getLearningRule)
-        		.collect(Collectors.toList());
+            .map(Synapse::getSpikeResponder)
+            .collect(Collectors.toList());
         spikeResponderPanel.commitChanges(responderList);
-        
+
         return true;
     }
 
-	@Override
-	public void fillFieldValues() {
-	}
+    @Override
+    public void fillFieldValues() {
+    }
 
-	@Override
-	public JPanel getPanel() {
-		return this;
-	}
+    @Override
+    public JPanel getPanel() {
+        return this;
+    }
 
 }

@@ -89,7 +89,7 @@ public class Synapse implements EditableObject {
     /**
      * Only used of source neuron is a spiking neuron.
      */
-    private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
+    private SpikeResponder spikeResponder;
 
     /**
      * Synapse id.
@@ -343,7 +343,7 @@ public class Synapse implements EditableObject {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
                 if (getSpikeResponder() == null) {
-                    setSpikeResponder(new JumpAndDecay());
+                    setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
                 }
             } else {
                 setSpikeResponder(null);

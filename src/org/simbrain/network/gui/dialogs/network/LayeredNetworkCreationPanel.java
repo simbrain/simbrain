@@ -24,7 +24,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.FeedForward;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,10 +79,10 @@ public class LayeredNetworkCreationPanel extends JPanel {
     static {
         DEFAULT_NEURON_TYPES.put("Linear", new LinearRule());
         SigmoidalRule sig0 = new SigmoidalRule();
-        sig0.setSquashFunctionType(SquashingFunction.LOGISTIC);
+        sig0.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
         DEFAULT_NEURON_TYPES.put("Logistic", sig0);
         SigmoidalRule sig1 = new SigmoidalRule();
-        sig1.setSquashFunctionType(SquashingFunction.LOGISTIC);
+        sig1.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
         DEFAULT_NEURON_TYPES.put("Logistic", sig1);
     }
 

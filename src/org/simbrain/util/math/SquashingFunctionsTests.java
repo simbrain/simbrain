@@ -24,7 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * JUnit tests for static methods in squashing functions.
+ * JUnit tests for static methods in {@link SquashingFunctions}
  *
  * @author Jeff Yoshimi
  */
@@ -86,6 +86,7 @@ public class SquashingFunctionsTests {
 
     @Test
     public void testMatrixFunctions() {
+
         // Check that the matrix forms are approximately equal to the singular forms
         double epsilon = 0.001;
         DoubleMatrix inputs = DoubleMatrix.linspace(-10, 10, 1000);

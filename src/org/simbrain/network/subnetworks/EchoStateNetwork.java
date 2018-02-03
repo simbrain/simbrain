@@ -36,7 +36,7 @@ import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.randomizer.Randomizer;
 
 import java.awt.geom.Point2D;
@@ -111,7 +111,7 @@ public class EchoStateNetwork extends Subnetwork {
     private NeuronGroup outputLayer;
 
     /** Default TANH neurons for the reservoir */ {
-        ((SigmoidalRule) reservoirNeuronType).setSquashFunctionType(SquashingFunction.TANH);
+        ((SigmoidalRule) reservoirNeuronType).setSquashFunctionType(SquashingFunctionEnum.TANH);
     }
 
     /**

@@ -25,7 +25,7 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -79,10 +79,10 @@ public class SRNCreationDialog extends StandardDialog {
      */ {
         boxMap.put("Linear", new LinearRule());
         SigmoidalRule sig0 = new SigmoidalRule();
-        sig0.setSquashFunctionType(SquashingFunction.LOGISTIC);
+        sig0.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
         boxMap.put("Logistic", sig0);
         SigmoidalRule sig1 = new SigmoidalRule();
-        sig1.setSquashFunctionType(SquashingFunction.TANH);
+        sig1.setSquashFunctionType(SquashingFunctionEnum.TANH);
         boxMap.put("Tanh", sig1);
     }
 

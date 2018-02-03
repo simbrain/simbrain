@@ -25,7 +25,7 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 
 import java.io.File;
 
@@ -182,7 +182,7 @@ public class BackpropTrainerTest {
         BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{2, 2, 2});
 
         SigmoidalRule sigmoidal = new SigmoidalRule();
-        sigmoidal.setSquashFunctionType(SquashingFunction.LOGISTIC);
+        sigmoidal.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
         sigmoidal.setSlope(0.25);
 
         network.getNeuronGroup(1).setNeuronType(sigmoidal);

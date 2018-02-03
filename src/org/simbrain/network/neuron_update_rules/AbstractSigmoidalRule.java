@@ -20,7 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -34,7 +34,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * The default squashing function, informs the default upper and lower bounds.
      */
-    public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION = SquashingFunction.LOGISTIC;
+    public static final SquashingFunctionEnum DEFAULT_SQUASHING_FUNCTION = SquashingFunctionEnum.LOGISTIC;
 
     /**
      * The Default upper bound.
@@ -49,7 +49,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Current implementation.
      */
-    protected SquashingFunction sFunction;
+    protected SquashingFunctionEnum sFunction;
 
     /**
      * Bias.
@@ -92,7 +92,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * @param sFunction
      */
-    public AbstractSigmoidalRule(SquashingFunction sFunction) {
+    public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
         super();
         this.sFunction = sFunction;
         setUpperBound(sFunction.getDefaultUpperBound());
@@ -102,9 +102,9 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * @return the type
      */
-    public SquashingFunction getSquashFunctionType() {
+    public SquashingFunctionEnum getSquashFunctionType() {
         if (sFunction == null) {
-            sFunction = SquashingFunction.LOGISTIC; // TODO: Explain (backwards compat)
+            sFunction = SquashingFunctionEnum.LOGISTIC; // TODO: Explain (backwards compat)
         }
         return sFunction;
     }
@@ -112,7 +112,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * @param type the type to set
      */
-    public final void setSquashFunctionType(SquashingFunction type) {
+    public final void setSquashFunctionType(SquashingFunctionEnum type) {
         this.sFunction = type;
         setUpperBound(type.getDefaultUpperBound());
         setLowerBound(type.getDefaultLowerBound());
@@ -133,7 +133,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
      * @param typeIndex index of the squashing function
      */
     public void setSquashFunctionInt(Integer typeIndex) {
-        this.sFunction = SquashingFunction.values()[typeIndex];
+        this.sFunction = SquashingFunctionEnum.values()[typeIndex];
     }
 
     /**

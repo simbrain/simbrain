@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -82,7 +82,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      *
      * @param sFunction the implementation to use.
      */
-    public ContinuousSigmoidalRule(final SquashingFunction sFunction) {
+    public ContinuousSigmoidalRule(final SquashingFunctionEnum sFunction) {
         super();
         this.sFunction = sFunction;
     }
@@ -97,8 +97,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Where x_i(t) is the net activation of neuron i at time t, r(t) is the
      * output activation after being put through a sigmoid squashing function at
      * time t, a is the leak constant, and c is the time constant:

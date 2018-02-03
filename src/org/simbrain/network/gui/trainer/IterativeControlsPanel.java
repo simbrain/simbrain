@@ -44,22 +44,6 @@ import java.util.concurrent.Executors;
  */
 public class IterativeControlsPanel extends JPanel {
 
-    // A small helper method to reduce code repetition. This could be moved to util somewhere.
-    private static Action createAction(String name, String description, String iconFile, Runnable runnable) {
-        return new AbstractAction() {
-            {
-                putValue(NAME, name);
-                putValue(SHORT_DESCRIPTION, description);
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconFile));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                runnable.run();
-            }
-        };
-    }
-
     /**
      * Reference to trainer object.
      */
@@ -99,27 +83,27 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * A play action that repeatedly iterates training algorithms.
      */
-    private Action runAction = createAction("Run", "Iterate training until stop button is pressed.", "Play.png", this::run);
+    private Action runAction = Utils.createAction("Run", "Iterate training until stop button is pressed.", "Play.png", this::run);
 
     /**
      * A step action that iterates learning algorithms one time.
      */
-    private Action stepAction = createAction("Iterate", "Iterate training once.", "Step.png", this::iterate);
+    private Action stepAction = Utils.createAction("Iterate", "Iterate training once.", "Step.png", this::iterate);
 
     /**
      * Action for randomizing the underlying network.
      */
-    private Action randomizeAction = createAction("Randomize", "Randomize network.", "Rand.png", this::randomizeNetwork);
+    private Action randomizeAction = Utils.createAction("Randomize", "Randomize network.", "Rand.png", this::randomizeNetwork);
 
     /**
      * Action for setting properties of the trainer.
      */
-    private Action setPropertiesAction = createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
+    private Action setPropertiesAction = Utils.createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
 
     /**
      * Action for setting randomizer properties.
      */
-    private Action randPropertiesAction = createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png", this::editRandomizerProperties);
+    private Action randPropertiesAction = Utils.createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png", this::editRandomizerProperties);
 
     /**
      * Construct the panel.
@@ -130,13 +114,7 @@ public class IterativeControlsPanel extends JPanel {
     public IterativeControlsPanel(NetworkPanel networkPanel, IterableTrainer trainer) {
         this.trainer = trainer;
         this.panel = networkPanel;
-        init();
-    }
 
-    /**
-     * Initialize the panel.
-     */
-    public void init() {
         //setBorder(BorderFactory.createTitledBorder("Controls"));
 
         // Set up properties tab
@@ -293,7 +271,7 @@ public class IterativeControlsPanel extends JPanel {
         initTrainer(false);
         ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
         // TODO: un-exclude once those features are implemented!
-        editor.setExcludeList(new String[]{"iteration", "updateCompleted", "stoppingCond", "stoppingCondition", "iterationsBeforeStopping", "errorThreshold"});
+        editor.setExcludeList(new String[] {"iteration", "updateCompleted", "stoppingCond", "stoppingCondition", "iterationsBeforeStopping", "errorThreshold"});
         editor.setObjectToEdit(trainer);
         JDialog dialog = editor.getDialog();
         dialog.setModal(true);

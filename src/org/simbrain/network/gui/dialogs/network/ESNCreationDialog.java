@@ -32,7 +32,7 @@ import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -58,7 +58,7 @@ public class ESNCreationDialog extends StandardDialog {
 
     public static final TimeType DEFAULT_TIME_TYPE = TimeType.DISCRETE;
 
-    public static final SquashingFunction DEFAULT_INITIAL_FUNCTION = SquashingFunction.TANH;
+    public static final SquashingFunctionEnum DEFAULT_INITIAL_FUNCTION = SquashingFunctionEnum.TANH;
 
     public static final double DEFAULT_SPECTRAL_RADIUS = 0.98;
 
@@ -571,7 +571,7 @@ public class ESNCreationDialog extends StandardDialog {
          * @param initPop
          * @return
          */
-        public static NeuronLayerPanel createNeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunction initialFunc, int initPop) {
+        public static NeuronLayerPanel createNeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunctionEnum initialFunc, int initPop) {
             NeuronLayerPanel nlp = new NeuronLayerPanel(parent, timeType, initialFunc, initPop);
             nlp.setTimeType(timeType);
             nlp.rulePanel.getCbImplementation().setSelectedItem(initialFunc);
@@ -588,7 +588,7 @@ public class ESNCreationDialog extends StandardDialog {
          * @param initialFunc
          * @param initPop
          */
-        private NeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunction initialFunc, int initPop) {
+        private NeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunctionEnum initialFunc, int initPop) {
             this.parent = parent;
             tfPopulation.setText(Integer.toString(initPop));
             editTriangle = new DropDownTriangle(UpDirection.LEFT, false, "Edit", "Edit", parent);
@@ -679,16 +679,16 @@ public class ESNCreationDialog extends StandardDialog {
          */
         public void resetLabelColors() {
             JComboBox impCb = rulePanel.getCbImplementation();
-            SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb.getSelectedIndex());
+            SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
             typeLabel.setText(func.toString());
             // TODO: Cleanup/generalize
-            if (func == SquashingFunction.TANH) {
+            if (func == SquashingFunctionEnum.TANH) {
                 typeLabel.setForeground(TANH_COLOR);
-            } else if (func == SquashingFunction.LOGISTIC) {
+            } else if (func == SquashingFunctionEnum.LOGISTIC) {
                 typeLabel.setForeground(LOG_COLOR);
             } else {
                 // TODO: Better assertion. Check ALL Squashing functions.
-                assert func == SquashingFunction.ARCTAN : "No such squashing function";
+                assert func == SquashingFunctionEnum.ARCTAN : "No such squashing function";
                 typeLabel.setForeground(ARCT_COLOR);
             }
         }
@@ -724,11 +724,11 @@ public class ESNCreationDialog extends StandardDialog {
             }
             // Update the Type Label based on the selection in the combobox
             final JComboBox impCb = rulePanel.getCbImplementation();
-            impCb.setSelectedIndex(SquashingFunction.getIndexFromFunction(DEFAULT_INITIAL_FUNCTION));
+            impCb.setSelectedIndex(SquashingFunctionEnum.getIndexFromFunction(DEFAULT_INITIAL_FUNCTION));
             impCb.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb.getSelectedIndex());
+                    SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
                     typeLabel.setText(func.toString());
                     // TODO: Cleanup/generalize
                     resetLabelColors();

@@ -1536,8 +1536,11 @@ public class SynapseGroup extends Group {
     public void setSpikeResponder(SpikeResponder spr, Polarity polarity) {
         SynapseParameterSetter<SpikeResponder> setSPR = new SynapseParameterSetter<SpikeResponder>() {
             @Override
-            public void setSynapseParameter(Synapse synapse, SpikeResponder val) {
-                synapse.setSpikeResponder(val.deepCopy());
+            public void setSynapseParameter(Synapse synapse, SpikeResponder sr) {
+                if(sr == null) {
+                    return;
+                }
+                synapse.setSpikeResponder(sr.deepCopy());
             }
         };
         setSynapses(setSPR, spr, polarity);

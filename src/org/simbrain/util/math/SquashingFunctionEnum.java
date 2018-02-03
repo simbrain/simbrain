@@ -28,9 +28,7 @@ import org.jblas.DoubleMatrix;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public enum SquashingFunction {
-
-    // TODO:Rename to SquashingFunctionEnum?
+public enum SquashingFunctionEnum {
 
     /**
      * Arctangent.
@@ -348,7 +346,7 @@ public enum SquashingFunction {
      * @return list of squashing function names, as an array.
      */
     public static String[] names() {
-        SquashingFunction[] states = values();
+        SquashingFunctionEnum[] states = values();
         String[] names = new String[states.length - 1];
         // The last item is the ... item which should not be part of the list
         for (int i = 0; i < states.length - 1; i++) {
@@ -364,8 +362,8 @@ public enum SquashingFunction {
      * @param index integer index
      * @return the associated squashing function
      */
-    public static SquashingFunction getFunctionFromIndex(int index) {
-        return SquashingFunction.values()[index];
+    public static SquashingFunctionEnum getFunctionFromIndex(int index) {
+        return SquashingFunctionEnum.values()[index];
     }
 
     /**
@@ -375,7 +373,7 @@ public enum SquashingFunction {
      * @param function the Squashing Function who index is sought
      * @return the index of that function
      */
-    public static int getIndexFromFunction(SquashingFunction function) {
+    public static int getIndexFromFunction(SquashingFunctionEnum function) {
         return function.ordinal();
     }
 

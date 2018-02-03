@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.AbstractSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.widgets.ChoicesWithNull;
 
 import javax.swing.*;
@@ -67,7 +67,7 @@ public abstract class AbstractSigmoidalRulePanel extends AbstractNeuronRulePanel
      */
     protected AbstractSigmoidalRulePanel() {
         cbImplementation = createDropDown((r) -> ((AbstractSigmoidalRule) r).getSquashFunctionInt(), (r, val) -> ((AbstractSigmoidalRule) r).setSquashFunctionInt((int) val));
-        cbImplementation.setItems(SquashingFunction.names());
+        cbImplementation.setItems(SquashingFunctionEnum.names());
         tfSlope = createTextField((r) -> ((AbstractSigmoidalRule) r).getSlope(), (r, val) -> ((AbstractSigmoidalRule) r).setSlope((double) val));
         tfBias = createTextField((r) -> ((AbstractSigmoidalRule) r).getBias(), (r, val) -> ((AbstractSigmoidalRule) r).setBias((double) val));
     }

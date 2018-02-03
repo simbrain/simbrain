@@ -242,7 +242,8 @@ public class SquashingFunctions {
     public static double derivTanh(double val, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
-        return diff / 2 * a * Math.pow(1 / Math.cosh(a * val), 2);
+        double t = 1 / Math.cosh(a * val);
+        return slope * t * t;
     }
 
     public static void derivTanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {

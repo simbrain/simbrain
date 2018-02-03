@@ -21,19 +21,19 @@ package org.simbrain.network.neuron_update_rules;
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.math.SquashingFunctionEnum;
 
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
  * neuron.
  * <p>
- * TODO: Possibly rename to "DiscreteSigmoidalRule" (after xstream is improved
- * to allow better backwards compat)
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
 public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunction {
+
+    // TODO: Possibly rename to "DiscreteSigmoidalRule"
 
     /**
      * Default sigmoidal.
@@ -47,7 +47,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
      *
      * @param sFunction the squashing function implementation to use.
      */
-    public SigmoidalRule(SquashingFunction sFunction) {
+    public SigmoidalRule(SquashingFunctionEnum sFunction) {
         super(sFunction);
     }
 

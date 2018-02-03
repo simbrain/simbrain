@@ -21,9 +21,11 @@ package org.simbrain.util;
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import org.apache.log4j.Logger;
+import org.simbrain.resource.ResourceManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -721,6 +723,30 @@ public class Utils {
         Set<T> setB = new HashSet<T>(B);
         setA.retainAll(setB);
         return setA.size() > 0;
+    }
+
+    /**
+     * Helper to create abstract actions.
+     *
+     * @param name Name to display in menus, etc.
+     * @param description tooltip
+     * @param iconFile name of icon. Must exist in {@link org.simbrain.resource}
+     * @param runnable the code to execute with this action
+     * @return the formatted action
+     */
+    public static Action createAction(String name, String description, String iconFile, Runnable runnable) {
+        return new AbstractAction() {
+            {
+                putValue(NAME, name);
+                putValue(SHORT_DESCRIPTION, description);
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconFile));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runnable.run();
+            }
+        };
     }
 
 }

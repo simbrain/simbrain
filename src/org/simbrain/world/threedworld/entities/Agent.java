@@ -196,6 +196,6 @@ public class Agent implements Entity {
 
     @Override
     public Editor getEditor() {
-        return new AgentEditor(this);
+        return model.getEditor();
     }
 }

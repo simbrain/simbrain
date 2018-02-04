@@ -175,7 +175,6 @@ public class BackpropTrainerTest {
      * Test based on this discussion.
      * https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
      * <p>
-     * TODO: Migrate to unit testing
      */
     @Test
     public void testMazur() {

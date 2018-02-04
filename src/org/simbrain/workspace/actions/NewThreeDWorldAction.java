@@ -21,7 +21,7 @@ public class NewThreeDWorldAction extends WorkspaceAction {
      * @param workspace The workspace in which the action will create ThreeDWorlds
      */
     public NewThreeDWorldAction(Workspace workspace) {
-        super("3D World", workspace);
+        super("3D World (beta)", workspace);
         this.workspace = workspace;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("World.png"));
     }

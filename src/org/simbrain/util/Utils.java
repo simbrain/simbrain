@@ -739,7 +739,7 @@ public class Utils {
             {
                 putValue(NAME, name);
                 putValue(SHORT_DESCRIPTION, description);
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconFile));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon(iconFile));
             }
 
             @Override

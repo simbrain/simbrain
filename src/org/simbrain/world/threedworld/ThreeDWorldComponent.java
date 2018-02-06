@@ -2,6 +2,7 @@ package org.simbrain.world.threedworld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.engine.ThreeDEngineConverter;
@@ -44,6 +45,14 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
         ThreeDWorld world = (ThreeDWorld) getXStream().fromXML(input);
         world.getEngine().queueState(ThreeDEngine.State.RenderOnly, false);
         return new ThreeDWorldComponent(name, world);
+    }
+
+    public static ThreeDWorldComponent create(Workspace workspace, String name) {
+        if (workspace.getComponentList(ThreeDWorldComponent.class).isEmpty()) {
+            return new ThreeDWorldComponent(name);
+        } else {
+            throw new RuntimeException("Only one 3D World component is supported.");
+        }
     }
 
     private ThreeDWorld world;

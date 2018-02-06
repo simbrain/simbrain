@@ -30,7 +30,6 @@ import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
 /**

@@ -54,6 +54,11 @@ public class Workspace {
     private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(new ArrayList<WorkspaceComponent>());
 
     /**
+     * Component factory should be used to create new workspace and gui components.
+     */
+    private transient AbstractComponentFactory componentFactory = new AbstractComponentFactory(this);
+
+    /**
      * Flag to indicate workspace has been changed since last save.
      */
     private transient boolean workspaceChanged = false;
@@ -326,6 +331,10 @@ public class Workspace {
             }
             return hasChanged;
         }
+    }
+
+    public AbstractComponentFactory getComponentFactory() {
+         return componentFactory;
     }
 
     /**

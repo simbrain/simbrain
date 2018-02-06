@@ -266,7 +266,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @return a new component.
      */
     public static GuiComponent<?> open(final WorkspaceComponent component, final InputStream istream, final String name) {
-
         // SimbrainDesktop desktop =
         // SimbrainDesktop.getDesktop(component.getWorkspace());
         GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);

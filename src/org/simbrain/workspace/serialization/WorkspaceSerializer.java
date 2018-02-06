@@ -20,6 +20,8 @@ package org.simbrain.workspace.serialization;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -317,6 +319,17 @@ public class WorkspaceSerializer {
         }
     }
 
+    public static <T> WorkspaceComponent showOpenComponentDialog(Class<T> type) {
+        String defaultDirectory = SimbrainPreferences.getString("workspace" + type.getSimpleName() + "Directory");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "XML File", "xml");
+        File file = chooser.showOpenDialog();
+        if (file != null) {
+            return WorkspaceSerializer.open(type, file);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Helper method for openings workspace components from a file.
      * <p>
@@ -331,7 +344,8 @@ public class WorkspaceSerializer {
         String extension = file.getName().substring(file.getName().indexOf("."));
         try {
             Method method = fileClass.getMethod("open", InputStream.class, String.class, String.class);
-            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null, new FileInputStream(file), file.getName(), extension);
+            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null, new FileInputStream(file),
+                    file.getName(), extension);
             wc.setCurrentFile(file);
             wc.setChangedSinceLastSave(false);
             return wc;

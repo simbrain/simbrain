@@ -28,21 +28,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * Open data world in current workspace.
+ * Action to call workspace iterate once.
  */
-public final class GlobalUpdateAction extends WorkspaceAction {
+public final class WorkspaceIterateAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * Create an open data world with the specified workspace.
      *
-     * @param workspace
+     * @param workspace The workspace to update.
      */
-    public GlobalUpdateAction(Workspace workspace) {
-        super("Global update", workspace);
+    public WorkspaceIterateAction(Workspace workspace) {
+        super("Iterate", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-        putValue(SHORT_DESCRIPTION, "Global step network update algorithm");
+        putValue(SHORT_DESCRIPTION, "Iterate Workspace Once");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
@@ -50,21 +50,18 @@ public final class GlobalUpdateAction extends WorkspaceAction {
         // Listen to workspace updater so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
         workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
-
             public void changeNumThreads() {
-                // TODO Auto-generated method stub
             }
 
             public void changedUpdateController() {
-                // TODO Auto-generated method stub
             }
 
             public void updatingStarted() {
-                GlobalUpdateAction.this.setEnabled(false);
+                setEnabled(false);
             }
 
             public void updatingFinished() {
-                GlobalUpdateAction.this.setEnabled(true);
+                setEnabled(true);
             }
 
             public void updatedCouplings(int update) {
@@ -72,16 +69,14 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
             public void workspaceUpdated() {
             }
-
         });
-
     }
 
     /**
      * @param event
      * @see AbstractAction
      */
-    public void actionPerformed(final ActionEvent event) {
+    public void actionPerformed(ActionEvent event) {
         workspace.iterate();
     }
 }

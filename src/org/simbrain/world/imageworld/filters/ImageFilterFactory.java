@@ -4,7 +4,6 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.imageworld.ImageSource;
 
 import javax.swing.*;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -20,7 +19,7 @@ import java.util.Set;
  * custom filter types by extending this factory class, see e.g
  * {@link ThresholdFilterFactory}
  */
-public abstract class ImageFilterFactory extends XmlAdapter<String, FilteredImageSource> {
+public abstract class ImageFilterFactory {
     private static Map<String, ImageFilterFactory> factories = new HashMap<String, ImageFilterFactory>();
 
     /**
@@ -128,16 +127,6 @@ public abstract class ImageFilterFactory extends XmlAdapter<String, FilteredImag
 
     public void setHeight(int value) {
         height = value;
-    }
-
-    @Override
-    public FilteredImageSource unmarshal(String xml) {
-        return null;
-    }
-
-    @Override
-    public String marshal(FilteredImageSource filter) {
-        return null;
     }
 
     public LabelledItemPanel getEditorPanel() {

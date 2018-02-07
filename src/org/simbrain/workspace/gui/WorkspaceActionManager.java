@@ -234,7 +234,7 @@ public class WorkspaceActionManager {
         openWorldActions = Arrays.asList(
                 new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "Table.png", workspace),
                 new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "SwissIcon.png", workspace),
-                new OpenComponentAction<>(ImageWorldComponent.class, "Image World", "camera.png", workspace));
+                new OpenComponentAction<>(ImageWorldComponent.class, "Image Display", "camera.png", workspace));
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);

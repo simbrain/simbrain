@@ -29,6 +29,7 @@ import java.io.IOException;
  * @author Tim Shea, Jeff Yoshimi
  */
 public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
+
     private static final long serialVersionUID = 9019927108869839191L;
 
     /**

@@ -230,6 +230,11 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         // Respond to combo box changes
         cbSynapseType.addActionListener(new ActionListener() {
 
+            /**
+             * Update the synapse rule's property panel.  If it's the panel
+             * that was started with then don't overwrite those values with
+             * default values.
+             */
             @Override
             public void actionPerformed(ActionEvent arg0) {
 

@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>Probabilistic</b> spike responders produces a response with some
@@ -29,14 +30,22 @@ public class ProbabilisticResponder extends SpikeResponder {
     /**
      * Probability of producing an output; must be between 0 and 1.
      */
-    private double activationProbability = .5;
+    @UserParameter(label = "Activation Probability",
+            description = "Probability of producing an output; must be between 0 and 1.",
+            minimumValue = 0.0, maximumValue = 1.0,
+            defaultValue = "0.5", order = 1)
+    private double activationProbability;
 
     /**
      * Amount by which the synapse's strength will be scaled to determine the
      * post synaptic response of the synapse in the event that this responder is
      * actually active.
      */
-    private double responseValue = 1;
+    @UserParameter(label = "Response Value",
+            description = "Amount by which the synapse's strength will be scaled to determine the post synaptic "
+                    + "response of the synapse in the event that this responder is actually active.",
+            defaultValue = "1.0", order = 1)
+    private double responseValue;
 
     /**
      * {@inheritDoc}

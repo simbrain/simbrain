@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>RiseAndDecay</b>.
@@ -28,12 +29,16 @@ public class RiseAndDecay extends SpikeResponder {
     /**
      * Maximum response value.
      */
-    private double maximumResponse = 1;
+    @UserParameter(label = "Maximum Response", description = "Maximum response value.",
+            defaultValue = "1", order = 1)
+    private double maximumResponse;
 
     /**
      * The time constant of decay and recovery (ms).
      */
-    private double timeConstant = 3;
+    @UserParameter(label = "Time constant", description = "Rate at which synapse will decay (ms)",
+            defaultValue = "3", order = 1)
+    private double timeConstant;
 
     /**
      * Recovery value.

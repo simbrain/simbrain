@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>Step</b>.
@@ -34,12 +35,16 @@ public class Step extends SpikeResponder {
      * Response height: The value by which the strength of the synapse is scaled
      * to determine the post synaptic response.
      */
-    private double responseHeight = 1;
+    @UserParameter(label = "Response height", description = "This value is multiplied by"
+    		+ " the strength to determine the total instantaneous rise in a post-synaptic"
+    		+ " response to an action potential or spike.", defaultValue = "1", order = 1)
+    private double responseHeight;
 
     /**
      * Response duration (ms).
      */
-    private double responseDuration = 1;
+    @UserParameter(label = "Response time", description = "Response duration (ms)", defaultValue = "1", order = 1)
+    private double responseDuration;
 
     /**
      * {@inheritDoc}

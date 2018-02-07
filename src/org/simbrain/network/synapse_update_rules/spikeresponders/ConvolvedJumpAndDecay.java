@@ -46,9 +46,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
         return jad;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(final Synapse s) {
         value = s.getPsr();
         if (s.getSource().isSpike()) {
@@ -71,9 +69,6 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
         s.setPsr(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
         return "Convolved Jump and Decay";

@@ -57,7 +57,7 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
      * Spike responder type combo box.
      */
     private final JComboBox<String> cbResponderType = new JComboBox<String>(RESPONDER_MAP.keySet()
-            .toArray(new String[RESPONDER_MAP.size()]));
+        .toArray(new String[RESPONDER_MAP.size()]));
 
     /**
      * The synapses being modified.
@@ -97,9 +97,9 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
     static {
         RESPONDER_MAP.put(new JumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new JumpAndDecay()));
         RESPONDER_MAP.put(new ConvolvedJumpAndDecay().getDescription(),
-                new AnnotatedPropertyEditor(new ConvolvedJumpAndDecay()));
+            new AnnotatedPropertyEditor(new ConvolvedJumpAndDecay()));
         RESPONDER_MAP.put(new ProbabilisticResponder().getDescription(),
-                new AnnotatedPropertyEditor(new ProbabilisticResponder()));
+            new AnnotatedPropertyEditor(new ProbabilisticResponder()));
         RESPONDER_MAP.put(new RiseAndDecay().getDescription(), new AnnotatedPropertyEditor(new RiseAndDecay()));
         RESPONDER_MAP.put(new Step().getDescription(), new AnnotatedPropertyEditor(new Step()));
     }
@@ -126,7 +126,7 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
      * @param parent        the parent window
      */
     public SpikeResponderSettingsPanel(final Collection<Synapse> synapseList, final boolean startingState,
-            final Window parent) {
+                                       final Window parent) {
         this.synapseList = synapseList;
         this.parent = parent;
         displaySPTriangle = new DropDownTriangle(UpDirection.LEFT, startingState, "Settings", "Settings", parent);
@@ -220,6 +220,12 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
         });
 
         cbResponderType.addActionListener(new ActionListener() {
+
+            /**
+             * Update the spike responder's property panel.  If it's the panel
+             * that was started with then don't overwrite those values with
+             * default values.
+             */
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 spikeResponderPanel = RESPONDER_MAP.get(cbResponderType.getSelectedItem());
@@ -253,16 +259,16 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
     }
 
 
-    /**
-     * {@inheritDoc}
-     * Also enables/disables all UI sub-components
-     */
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        cbResponderType.setEnabled(enabled);
-        spikeResponderPanel.setEnabled(enabled);
-        startingPanel.setEnabled(enabled);
-    }
+//    /**
+//     * {@inheritDoc}
+//     * Also enables/disables all UI sub-components
+//     */
+//    public void setEnabled(boolean enabled) {
+//        super.setEnabled(enabled);
+//        cbResponderType.setEnabled(enabled);
+//        spikeResponderPanel.setEnabled(enabled);
+//        startingPanel.setEnabled(enabled);
+//    }
 
     /**
      * @return the name of the selected synapse update rule

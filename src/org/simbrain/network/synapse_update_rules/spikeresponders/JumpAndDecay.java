@@ -30,27 +30,26 @@ public class JumpAndDecay extends SpikeResponder {
      * Jump height value.
      */
     @UserParameter(label = "Jump Height",
-            description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
-                    + " post-synaptic response to an action potential or spike.",
-            defaultValue = "1", order = 1)
+        description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
+            + " post-synaptic response to an action potential or spike.",
+        defaultValue = "1", order = 1)
     private double jumpHeight;
-
 
     /**
      * Base line value.
      */
     @UserParameter(label = "Base-Line",
-            description = "The post-synaptic response value when no spike have occurred. Alternatively, the "
-                    + "post synaptic response to which decays to over time.",
-            defaultValue = "0.0001", order = 1)
+        description = "The post-synaptic response value when no spike have occurred. Alternatively, the "
+            + "post synaptic response to which decays to over time.",
+        defaultValue = "0.0001", order = 2)
     private double baseLine;
 
     /**
      * Rate at which synapse will decay (ms).
      */
     @UserParameter(label = "Time Constant",
-            description = "The time constant of decay and recovery (ms).",
-            defaultValue = "3", order = 1)
+        description = "The time constant of decay and recovery (ms).",
+        defaultValue = "3", order = 3)
     private double timeConstant;
 
     /**
@@ -65,9 +64,7 @@ public class JumpAndDecay extends SpikeResponder {
         return jad;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(final Synapse s) {
         value = s.getPsr();
         if (s.getSource().isSpike()) {
@@ -79,9 +76,6 @@ public class JumpAndDecay extends SpikeResponder {
         s.setPsr(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
         return "Jump and Decay";

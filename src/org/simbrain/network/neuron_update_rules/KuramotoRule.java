@@ -7,9 +7,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.randomizer.Randomizer;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
 /**
  * TODO
  * <p>
@@ -20,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * TODO: Contextual increment.  Proper randomize and bounds.
  * Remove un-needed overrides.  Finish GUI.   Include time step in gui.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
     /**

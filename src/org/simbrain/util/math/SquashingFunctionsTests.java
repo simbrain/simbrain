@@ -24,7 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * JUnit tests for static methods in {@link SquashingFunctions}
+ * JUnit tests for static methods in {@link SquashingFunctions}.
  *
  * @author Jeff Yoshimi
  */

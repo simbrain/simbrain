@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  */
 public interface ImageSource {
+
     /**
      * @return Returns whether the source will update the image when updateImage
      * is invoked.

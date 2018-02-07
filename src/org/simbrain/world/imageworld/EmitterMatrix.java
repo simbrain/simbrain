@@ -7,9 +7,12 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class EmitterMatrix extends ImageSourceAdapter {
+
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
+
     private double[][] channels;
+
     private int[] colors;
 
     public EmitterMatrix() {

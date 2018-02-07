@@ -1,6 +1,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * @author Zoë Tosi
@@ -10,17 +11,28 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     /**
      * Jump height value.
      */
-    private double jumpHeight = 1;
+    @UserParameter(label = "Jump Height",
+            description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
+                    + " post-synaptic response to an action potential or spike.",
+            defaultValue = "1", order = 1)
+    private double jumpHeight;
 
     /**
      * Base line value.
      */
-    private double baseLine = 0.0;
+    @UserParameter(label = "Base-Line",
+            description = "The post-synaptic response value when no spike have occurred. Alternatively, the "
+                    + "post synaptic response to which decays to over time.",
+            defaultValue = "0.0001", order = 1)
+    private double baseLine;
 
     /**
      * Rate at which synapse will decay (ms).
      */
-    private double timeConstant = 3;
+    @UserParameter(label = "Time Constant",
+            description = "The time constant of decay and recovery (ms).",
+            defaultValue = "3", order = 1)
+    private double timeConstant;
 
     /**
      * {@inheritDoc}

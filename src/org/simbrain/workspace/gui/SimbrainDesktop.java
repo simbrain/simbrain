@@ -1064,6 +1064,13 @@ public class SimbrainDesktop {
 
         final Workspace workspace = new Workspace();
 
+        try {
+            UIManager.setLookAndFeel(
+                UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
 
         workspace.setTaskSynchronizationManager(eventQueue);

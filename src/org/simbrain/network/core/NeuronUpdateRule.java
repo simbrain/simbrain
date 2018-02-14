@@ -21,13 +21,14 @@ package org.simbrain.network.core;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * A rule for updating a neuron.
  *
  * @author jyoshimi
  */
-public abstract class NeuronUpdateRule {
+public abstract class NeuronUpdateRule implements EditableObject {
 
     /**
      * An enum specifying how a neuron sums its inputs. The enum both specifies

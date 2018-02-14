@@ -25,6 +25,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
@@ -128,7 +129,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
      * displayed is manually set. This is the case when the number of neurons
      * (such as when adding multiple neurons) is unknown at the time of display.
      * In fact this is probably the only reason to use this factory method over
-     * {@link #createBasicNeuronInfoPanel(List, Window)}.
+     *
      *
      * @param neuronList    the neurons whose information is being displayed/made
      *                      available to edit on this panel
@@ -184,19 +185,20 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
 
         setLayout(new BorderLayout());
 
-        JPanel basicStatsPanel = new JPanel();
-        basicStatsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        GridLayout gL = new GridLayout(0, 2);
-        gL.setVgap(2);
-        basicStatsPanel.setLayout(gL);
-        if (displayIDInfo) {
-            basicStatsPanel.add(new JLabel("Neuron Id:"));
-            basicStatsPanel.add(idLabel);
-        }
-        basicStatsPanel.add(new JLabel("Activation:"));
-        basicStatsPanel.add(tfActivation);
-        basicStatsPanel.add(new JLabel("Label:"));
-        basicStatsPanel.add(tfNeuronLabel);
+        AnnotatedPropertyEditor basicStatsPanel = new AnnotatedPropertyEditor(neuronList);
+
+//        basicStatsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//        GridLayout gL = new GridLayout(0, 2);
+//        gL.setVgap(2);
+//        basicStatsPanel.setLayout(gL);
+//        if (displayIDInfo) {
+//            basicStatsPanel.add(new JLabel("Neuron Id:"));
+//            basicStatsPanel.add(idLabel);
+//        }
+//        basicStatsPanel.add(new JLabel("Activation:"));
+//        basicStatsPanel.add(tfActivation);
+//        basicStatsPanel.add(new JLabel("Label:"));
+//        basicStatsPanel.add(tfNeuronLabel);
 
         JPanel trianglePanel = new JPanel();
         trianglePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));

@@ -35,7 +35,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
+public final class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * Vertical gap between panel elements.
@@ -69,20 +69,18 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      *                    (editing) or being used to fill the panel with default values
      *                    (creation).
      * @param parent      the parent window, made available for easy resizing.
-     * @return
+     * @return the panel
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(final List<Synapse> synapseList, final Window parent) {
         return new SynapsePropertiesPanel(synapseList, parent);
     }
 
     /**
-     * {@link #createSynapsePropertiesPanel(List, Window, boolean)}
+     * {@link #createSynapsePropertiesPanel(List, Window)}
      *
-     * @param synapseList            the list of synapses either being edited (editing) or
-     *                               being used to fill the panel with default values (creation).
-     * @param parent                 the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams whether or not to display the synapse
-     *                               update rule's details initially.
+     * @param synapseList the list of synapses either being edited (editing) or
+     *                    being used to fill the panel with default values (creation).
+     * @param parent      the parent window, made available for easy resizing.
      */
     private SynapsePropertiesPanel(final List<Synapse> synapseList, final Window parent) {
 

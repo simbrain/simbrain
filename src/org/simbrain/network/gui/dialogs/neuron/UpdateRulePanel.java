@@ -35,6 +35,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
@@ -47,6 +49,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Main container for selecting and editing neuron / activity generator types.
@@ -84,7 +87,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     /**
      * Neuron update rule panel.
      */
-    private AbstractNeuronRulePanel neuronRulePanel;
+    private AnnotatedPropertyEditor neuronRulePanel;
 
     /**
      * For showing/hiding the neuron update rule panel.
@@ -102,55 +105,55 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * writing to already existing neuron update rules or replacing them with
      * new rules.
      */
-    private AbstractNeuronRulePanel startingPanel;
+    private AnnotatedPropertyEditor startingPanel;
 
     /**
      * Rule map that is either set to the RULE_MAP or GENERATOR_MAP depending on
      * what type of objects are contained in the main rule list.
      */
-    private LinkedHashMap<String, AbstractNeuronRulePanel> ruleMap;
+    private LinkedHashMap<String, AnnotatedPropertyEditor> ruleMap;
 
     /**
      * Associations between names of rules and panels for editing them.
      */
-    public static final LinkedHashMap<String, AbstractNeuronRulePanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronRulePanel>();
+    private static final LinkedHashMap<String, AnnotatedPropertyEditor> RULE_MAP = new LinkedHashMap<String, AnnotatedPropertyEditor>();
 
     // Populate the Rule Map. Note! Place items in alphabetical order so they
     // appear that way in the GUI combo box.
     static {
-        RULE_MAP.put(new AdExIFRule().getName(), new AdExIFRulePanel());
-        RULE_MAP.put(new BinaryRule().getName(), new BinaryRulePanel());
-        RULE_MAP.put(new DecayRule().getName(), new DecayRulePanel());
-        RULE_MAP.put(new FitzhughNagumo().getName(), new FitzhughNagumoRulePanel());
+//        RULE_MAP.put(new AdExIFRule().getName(), new AdExIFRulePanel());
+//        RULE_MAP.put(new BinaryRule().getName(), new BinaryRulePanel());
+//        RULE_MAP.put(new DecayRule().getName(), new DecayRulePanel());
+//        RULE_MAP.put(new FitzhughNagumo().getName(), new FitzhughNagumoRulePanel());
         //        RULE_MAP.put(new HodgkinHuxleyRule().getName(),
         //                new HodgkinHuxleyRulePanel());
-        RULE_MAP.put(new IACRule().getName(), new IACRulePanel());
-        RULE_MAP.put(new IntegrateAndFireRule().getName(), new IntegrateAndFireRulePanel());
-        RULE_MAP.put(new IzhikevichRule().getName(), new IzhikevichRulePanel());
-        RULE_MAP.put(new KuramotoRule().getName(), new KuramotoRulePanel());
-        RULE_MAP.put(new LinearRule().getName(), new LinearRulePanel());
-        RULE_MAP.put(new MorrisLecarRule().getName(), new MorrisLecarRulePanel());
-        RULE_MAP.put(new NakaRushtonRule().getName(), new NakaRushtonRulePanel());
-        RULE_MAP.put(new ProductRule().getName(), new ProductRulePanel());
-        RULE_MAP.put(new ContinuousSigmoidalRule().getName(), new ContinuousSigmoidalRulePanel());
-        RULE_MAP.put(new SigmoidalRule().getName(), new DiscreteSigmoidalRulePanel());
-        RULE_MAP.put(new SpikingThresholdRule().getName(), new SpikingThresholdRulePanel());
-        RULE_MAP.put(new ThreeValueRule().getName(), new ThreeValueRulePanel());
+//        RULE_MAP.put(new IACRule().getName(), new IACRulePanel());
+//        RULE_MAP.put(new IntegrateAndFireRule().getName(), new IntegrateAndFireRulePanel());
+//        RULE_MAP.put(new IzhikevichRule().getName(), new IzhikevichRulePanel());
+//        RULE_MAP.put(new KuramotoRule().getName(), new KuramotoRulePanel());
+        RULE_MAP.put(new LinearRule().getName(), new AnnotatedPropertyEditor(new LinearRule()));
+//        RULE_MAP.put(new MorrisLecarRule().getName(), new MorrisLecarRulePanel());
+//        RULE_MAP.put(new NakaRushtonRule().getName(), new NakaRushtonRulePanel());
+//        RULE_MAP.put(new ProductRule().getName(), new ProductRulePanel());
+//        RULE_MAP.put(new ContinuousSigmoidalRule().getName(), new ContinuousSigmoidalRulePanel());
+//        RULE_MAP.put(new SigmoidalRule().getName(), new DiscreteSigmoidalRulePanel());
+//        RULE_MAP.put(new SpikingThresholdRule().getName(), new SpikingThresholdRulePanel());
+//        RULE_MAP.put(new ThreeValueRule().getName(), new ThreeValueRulePanel());
     }
 
     /**
      * Associations between names of activity generators and panels for editing
      * them.
      */
-    public static final LinkedHashMap<String, AbstractNeuronRulePanel> GENERATOR_MAP = new LinkedHashMap<String, AbstractNeuronRulePanel>();
+    public static final LinkedHashMap<String, AnnotatedPropertyEditor> GENERATOR_MAP = new LinkedHashMap<String, AnnotatedPropertyEditor>();
 
     // Populate the Activity Generator Map. Note! Place items in alphabetical
     // order so they appear that way in the GUI combo box.
     static {
-        GENERATOR_MAP.put(new LogisticRule().getName(), new LogisticGeneratorPanel());
-        GENERATOR_MAP.put(new RandomNeuronRule().getName(), new RandomGeneratorPanel());
-        GENERATOR_MAP.put(new SinusoidalRule().getName(), new SinusoidalGeneratorPanel());
-        GENERATOR_MAP.put(new StochasticRule().getName(), new StochasticGeneratorPanel());
+//        GENERATOR_MAP.put(new LogisticRule().getName(), new LogisticGeneratorPanel());
+//        GENERATOR_MAP.put(new RandomNeuronRule().getName(), new RandomGeneratorPanel());
+//        GENERATOR_MAP.put(new SinusoidalRule().getName(), new SinusoidalGeneratorPanel());
+//        GENERATOR_MAP.put(new StochasticRule().getName(), new StochasticGeneratorPanel());
     }
 
     /**
@@ -183,37 +186,39 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         }
 
         neuronRulePanelTriangle = new DropDownTriangle(UpDirection.LEFT, startingState, "Settings", "Settings", parent);
-        checkNeuronConsistency();
-        startingPanel = neuronRulePanel;
+
+        //TODO: Do something like in SynapseRulePanel
+//        checkNeuronConsistency();
+//        startingPanel = neuronRulePanel;
         initializeLayout();
         addListeners();
         setRandomizerPanelParent();
     }
 
-    /**
-     * Initialize the main neuron panel based on whether all the neurons are the
-     * same type or not.
-     */
-    private void checkNeuronConsistency() {
-
-        // TODO: Better handling of mixed case with activity generators. Warn
-        // against it
-        // or if allowing it, change the shape of the neuron to match.
-
-        ParameterGetter<Neuron, Class<?>> typeGetter = (n) -> ((Neuron) n).getUpdateRule().getClass();
-
-        if (!NetworkUtils.isConsistent(neuronList, typeGetter)) {
-            cbNeuronType.addItem(SimbrainConstants.NULL_STRING);
-            cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
-            neuronRulePanel = new EmptyRulePanel();
-        } else {
-            String neuronName = neuronList.get(0).getUpdateRule().getName();
-            neuronRulePanel = ruleMap.get(neuronName);
-            neuronRulePanel.setReplacingUpdateRules(false);
-            neuronRulePanel.fillFieldValues(Neuron.getRuleList(neuronList));
-            cbNeuronType.setSelectedItem(neuronName);
-        }
-    }
+//    /**
+//     * Initialize the main neuron panel based on whether all the neurons are the
+//     * same type or not.
+//     */
+//    private void checkNeuronConsistency() {
+//
+//        // TODO: Better handling of mixed case with activity generators. Warn
+//        // against it
+//        // or if allowing it, change the shape of the neuron to match.
+//
+//        ParameterGetter<Neuron, Class<?>> typeGetter = (n) -> ((Neuron) n).getUpdateRule().getClass();
+//
+//        if (!NetworkUtils.isConsistent(neuronList, typeGetter)) {
+//            cbNeuronType.addItem(SimbrainConstants.NULL_STRING);
+//            cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
+////            neuronRulePanel = new EmptyRulePanel();
+//        } else {
+//            String neuronName = neuronList.get(0).getUpdateRule().getName();
+//            neuronRulePanel = ruleMap.get(neuronName);
+////            neuronRulePanel.setReplacingUpdateRules(false);
+////            neuronRulePanel.fillFieldValues(Neuron.getRuleList(neuronList));
+//            cbNeuronType.setSelectedItem(neuronName);
+//        }
+//    }
 
     /**
      * Lays out the components of the panel.
@@ -278,18 +283,21 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             // Is the current panel different from the starting panel?
             boolean replaceUpdateRules = neuronRulePanel != startingPanel;
 
+            List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
+
+
             // If so we have to fill the new panel with default values
             if (replaceUpdateRules) {
                 neuronRulePanel.fillDefaultValues();
             } else {
                 // If not we can fill the new panel with values from the
                 // neurons being edited.
-                neuronRulePanel.fillFieldValues(Neuron.getRuleList(neuronList));
+                neuronRulePanel.fillFieldValues(ruleList);
             }
 
             // Tell the panel whether it will have to replace neuron
             // update rules or edit them upon commit.
-            neuronRulePanel.setReplacingUpdateRules(replaceUpdateRules);
+//            neuronRulePanel.setReplacingUpdateRules(replaceUpdateRules);
 
             repaintPanel();
             repaint();
@@ -303,11 +311,11 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * Set window on randomizer panels.
      */
     private void setRandomizerPanelParent() {
-        if (neuronRulePanel.getPrototypeRule() instanceof NoisyUpdateRule) {
-            if (neuronRulePanel.getNoisePanel() != null) {
-                neuronRulePanel.getNoisePanel().setParent(parent);
-            }
-        }
+//        if (neuronRulePanel.getPrototypeRule() instanceof NoisyUpdateRule) {
+//            if (neuronRulePanel.getNoisePanel() != null) {
+//                neuronRulePanel.getNoisePanel().setParent(parent);
+//            }
+//        }
     }
 
     @Override
@@ -316,8 +324,8 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         // i.e. for apply button during editing, then set the original panel
         // to the selected one since for all intents and purposes it is now.
         // Prevents ClassCastExceptions for switching between panels.
-        startingPanel = neuronRulePanel;
-        neuronRulePanel.commitChanges(neuronList);
+//        startingPanel = neuronRulePanel;
+//        neuronRulePanel.commitChanges(neuronList);
         return true; // TODO:Finish implementation of CommittablePanel interface
     }
 
@@ -340,7 +348,8 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * @see AddNeuronsDialog
      */
     public AbstractNeuronRulePanel getNeuronRulePanel() {
-        return neuronRulePanel;
+        //TODO: Return annotated property editor and updated things that use this. They are broken for now.
+        return null;
     }
 
     /**
@@ -350,27 +359,9 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         return cbNeuronType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JPanel getPanel() {
         return this;
-    }
-
-    /**
-     * An empty panel displayed in cases where the selected neurons have more
-     * than one type of update rule.
-     *
-     * @author ztosi
-     */
-    private class EmptyRulePanel extends AbstractNeuronRulePanel {
-
-        @Override
-        protected NeuronUpdateRule getPrototypeRule() {
-            return null;
-        }
-
     }
 
     @Override

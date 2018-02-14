@@ -24,6 +24,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron {
+public class Neuron implements EditableObject {
 
     /**
      * The default neuron update rule. Neurons which are constructed without a
@@ -75,6 +77,8 @@ public class Neuron {
     /**
      * Activation value of the neuron. The main state variable.
      */
+    @UserParameter(label = "Activation", description = "Main activation property", minimumValue = -10, maximumValue = 10,
+        defaultValue = "0", order = 1)
     private double activation;
 
     /**

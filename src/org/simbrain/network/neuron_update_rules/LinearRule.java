@@ -22,6 +22,8 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -47,12 +49,16 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Slope.
      */
-    public double slope = 1;
+    @UserParameter(label = "Slope", description = "Slope of lienar rule", minimumValue = -10, maximumValue = 10,
+        defaultValue = "1", order = 2)
+    private double slope = 1;
 
     /**
      * Bias.
      */
-    public double bias = 0;
+    @UserParameter(label = "Bias", description = "Bias (constant added value) for linear rule", minimumValue = -10, maximumValue = 10,
+        defaultValue = "0", order = 1)
+    private double bias = 0;
 
     /**
      * Noise generator.

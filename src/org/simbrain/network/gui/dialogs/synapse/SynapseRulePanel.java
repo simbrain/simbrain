@@ -70,7 +70,8 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
     /**
      * Synapse type combo box.
      */
-    private final JComboBox<String> cbSynapseType = new JComboBox<String>(RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
+    private final JComboBox<String> cbSynapseType =
+            new JComboBox<String>(RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]));
 
     /**
      * Panel for editing synapses.

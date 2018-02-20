@@ -312,6 +312,10 @@ public class SimbrainDesktop {
 
         // Set up Desktop
         desktop = new JDesktopPane();
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            desktop.setBackground(Color.WHITE);
+            desktop.setBorder(BorderFactory.createLoweredBevelBorder());
+        }
         desktop.addMouseListener(mouseListener);
         desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
         desktop.setPreferredSize(new Dimension(screenSize.width - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 3)));

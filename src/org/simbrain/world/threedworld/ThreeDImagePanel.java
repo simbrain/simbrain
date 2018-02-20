@@ -16,13 +16,7 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
 
     private ImageSource nextSource;
     private ImageSource currentSource;
-    //private BufferStrategy strategy;
-    //private AffineTransformOp transformOp;
-    //private boolean hasNativePeer = false;
-    private boolean reshapeNeeded = true;
     private boolean destroyNeeded = false;
-    private boolean resizeSource = false;
-    private final Object lock = new Object();
 
     /**
      * Construct a new ImagePanel.
@@ -59,18 +53,7 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
     @Override
     public void addNotify() {
         super.addNotify();
-        synchronized (lock) {
-            //hasNativePeer = true;
-        }
         requestFocusInWindow();
-    }
-
-    @Override
-    public void removeNotify() {
-        synchronized (lock) {
-            //hasNativePeer = false;
-        }
-        super.removeNotify();
     }
 
     @Override
@@ -84,65 +67,11 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
         }
     }
 
-    // /**
-    // * Draw the contents of a BufferedImage to the canvas.
-    // *
-    // * @param image The image to draw.
-    // */
-    // public void drawImage(BufferedImage image) {
-    // Graphics2D graphics2d = (Graphics2D) strategy.getDrawGraphics();
-    // if (graphics2d == null) {
-    // return;
-    // }
-    // graphics2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-    // RenderingHints.VALUE_RENDER_SPEED);
-    // graphics2d.drawImage(image, transformOp, 0, 0);
-    // graphics2d.dispose();
-    // strategy.show();
-    // updateScreen();
-    // synchronized (lock) {
-    //
-    // if (!hasNativePeer) {
-    // if (strategy != null) {
-    // strategy = null;
-    // }
-    // return;
-    // }
-    // if (strategy == null) {
-    // try {
-    // createBufferStrategy(1,
-    // new BufferCapabilities(new ImageCapabilities(true),
-    // new ImageCapabilities(true),
-    // BufferCapabilities.FlipContents.UNDEFINED));
-    // } catch (AWTException ex) {
-    // ex.printStackTrace();
-    // }
-    // strategy = getBufferStrategy();
-    // }
-    // do {
-    // do {
-    // Graphics2D graphics2d = (Graphics2D) strategy
-    // .getDrawGraphics();
-    // if (graphics2d == null) {
-    // return;
-    // }
-    // graphics2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-    // RenderingHints.VALUE_RENDER_SPEED);
-    // graphics2d.drawImage(image, transformOp, 0, 0);
-    // graphics2d.dispose();
-    // strategy.show();
-    // } while (strategy.contentsRestored());
-    // } while (strategy.contentsLost());
-    // }
-    // }
-
     /**
      * Set a flag to destroy this ImagePanel on the next update.
      */
     public void destroy() {
-        if (currentSource == null) {
-            return;
-        } else {
+        if (currentSource != null) {
             destroyNeeded = true;
         }
     }

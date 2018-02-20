@@ -20,8 +20,6 @@ import java.util.Arrays;
 public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
     private static final long serialVersionUID = 8711925427252261845L;
 
-    private ThreeDWorldComponent component;
-
     /**
      * Construct a new ThreeDDesktopComponent to hold a ThreeDWorldComponent in a Frame.
      *
@@ -30,9 +28,7 @@ public class ThreeDDesktopComponent extends GuiComponent<ThreeDWorldComponent> {
      */
     public ThreeDDesktopComponent(GenericFrame frame, ThreeDWorldComponent component) {
         super(frame, component);
-        this.component = component;
         setLayout(new BorderLayout());
-
         frame.setJMenuBar(createMenus(component));
         add(createToolBar(component), BorderLayout.NORTH);
         Component panel = component.getWorld().getEngine().getPanel();

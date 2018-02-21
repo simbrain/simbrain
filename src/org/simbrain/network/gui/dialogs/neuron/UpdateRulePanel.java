@@ -19,15 +19,6 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.generator_panels.LogisticGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.generator_panels.RandomGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.generator_panels.SinusoidalGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.generator_panels.StochasticGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.*;
-import org.simbrain.network.gui.nodes.NeuronGroupNode.NeuronGroupInteractionBox;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
@@ -35,7 +26,6 @@ import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRu
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -62,6 +52,7 @@ import java.util.stream.Collectors;
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
+ * @author Yulin Li
  */
 @SuppressWarnings("serial")
 public class UpdateRulePanel extends JPanel implements EditablePanel {
@@ -375,19 +366,6 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         removeAll();
         initializeLayout();
         repaint();
-    }
-
-    /**
-     * Directly access the neuron rule panel to utilize its methods without
-     * using this class as an intermediary. An example of this can be seen in
-     * AddNeuronsDialog
-     *
-     * @return the currently displayed neuron update rule panel
-     * @see AddNeuronsDialog
-     */
-    public AbstractNeuronRulePanel getNeuronRulePanel() {
-        //TODO: Return annotated property editor and updated things that use this. They are broken for now.
-        return null;
     }
 
     /**

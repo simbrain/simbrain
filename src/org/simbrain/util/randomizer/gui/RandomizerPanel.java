@@ -18,8 +18,6 @@
  */
 package org.simbrain.util.randomizer.gui;
 
-import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
@@ -160,35 +158,35 @@ public class RandomizerPanel extends JPanel {
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
 
-        ParameterGetter<Randomizer, ProbDistribution> pdfGetter = (r) -> ((Randomizer) r).getPdf();
-        if (!NetworkUtils.isConsistent(randomizers, pdfGetter)) {
-            if (!(cbDistribution.getItemCount() == ProbDistribution.values().length)) {
-                cbDistribution.addItem(ProbDistribution.NULL);
-                cbDistribution.setSelectedIndex(cbDistribution.getItemCount() - 1);
-            }
-            cardPanel.removeAll();
-            cardPanel.add(new JPanel());
-            cardPanel.repaint();
-            if (parent != null) {
-                parent.pack();
-                parent.setLocationRelativeTo(null);
-            }
-        } else {
-            if (cbDistribution.getItemCount() == ProbDistribution.values().length) {
-                cbDistribution.removeItem(ProbDistribution.NULL);
-            }
-            Randomizer rand = (Randomizer) randomizers.get(0);
-            ProbDistPanel rp = cardMap.get(rand.getPdf());
-            cbDistribution.setSelectedItem(rand.getPdf());
-            rp.fillFieldValues(randomizers);
-            cardPanel.removeAll();
-            cardPanel.add(rp.getPanel());
-            cardPanel.repaint();
-            if (parent != null) {
-                parent.pack();
-                parent.setLocationRelativeTo(null);
-            }
-        }
+//        ParameterGetter<Randomizer, ProbDistribution> pdfGetter = (r) -> ((Randomizer) r).getPdf();
+//        if (!NetworkUtils.isConsistent(randomizers, pdfGetter)) {
+//            if (!(cbDistribution.getItemCount() == ProbDistribution.values().length)) {
+//                cbDistribution.addItem(ProbDistribution.NULL);
+//                cbDistribution.setSelectedIndex(cbDistribution.getItemCount() - 1);
+//            }
+//            cardPanel.removeAll();
+//            cardPanel.add(new JPanel());
+//            cardPanel.repaint();
+//            if (parent != null) {
+//                parent.pack();
+//                parent.setLocationRelativeTo(null);
+//            }
+//        } else {
+//            if (cbDistribution.getItemCount() == ProbDistribution.values().length) {
+//                cbDistribution.removeItem(ProbDistribution.NULL);
+//            }
+//            Randomizer rand = (Randomizer) randomizers.get(0);
+//            ProbDistPanel rp = cardMap.get(rand.getPdf());
+//            cbDistribution.setSelectedItem(rand.getPdf());
+//            rp.fillFieldValues(randomizers);
+//            cardPanel.removeAll();
+//            cardPanel.add(rp.getPanel());
+//            cardPanel.repaint();
+//            if (parent != null) {
+//                parent.pack();
+//                parent.setLocationRelativeTo(null);
+//            }
+//        }
 
     }
 

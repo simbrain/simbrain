@@ -120,10 +120,10 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     private void initializeLayout() {
 
         // Respond to update panel combo box changes here, so that general panel can be updated too
-        updateRulePanel.getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> {
-            generalNeuronPropertiesPanel.updateFieldVisibility(updateRulePanel.getNeuronRulePanel().getPrototypeRule());
-            repaint();
-        }));
+//        updateRulePanel.getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> {
+//            generalNeuronPropertiesPanel.updateFieldVisibility(updateRulePanel.getNeuronRulePanel().getPrototypeRule());
+//            repaint();
+//        }));
 
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);

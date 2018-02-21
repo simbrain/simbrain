@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.util.ParameterGetter;
-
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Method;
@@ -116,36 +114,6 @@ public class NetworkUtils {
         retPanel.add(theComponent);
 
         return retPanel;
-    }
-
-    /**
-     * Checks whether all the objects in a list return the same value for a
-     * getter method. Not based on reflection and so it outperforms its
-     * counterpart of the same name.
-     *
-     * @param <O>     the type of the source objects
-     * @param <V>     the value returned by the getter
-     * @param sources the source objects to check
-     * @param getter  the getter on the source objects
-     * @return true if the set of objects have the same getter value
-     */
-    public static <O, V> boolean isConsistent(Collection<O> sources, ParameterGetter<O, V> getter) {
-        if (sources.size() <= 0) {
-            throw new IllegalArgumentException("Source list is empty.");
-        }
-        // TODO: Redo using stream
-        // TODO: Deal with mixed activity generator / neuron case
-        Iterator<O> sourceIter = sources.iterator();
-        O sourceFirst = sourceIter.next();
-        V val = getter.getParameter(sourceFirst);
-        while (sourceIter.hasNext()) {
-            if (!val.equals(getter.getParameter(sourceIter.next()))) {
-                // Found an inconsistency
-                return false;
-            }
-        }
-        // No inconsistencies were found
-        return true;
     }
 
 

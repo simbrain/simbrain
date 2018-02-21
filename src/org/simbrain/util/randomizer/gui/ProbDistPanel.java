@@ -19,7 +19,6 @@
 package org.simbrain.util.randomizer.gui;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
@@ -129,42 +128,42 @@ public class ProbDistPanel {
      * @param randomizers List of randomizers
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
-        Randomizer rand = (Randomizer) randomizers.get(0);
-
-        ParameterGetter<Randomizer, Double> p1Getter = (r) -> ((Randomizer) r).getParam1();
-        if (NetworkUtils.isConsistent(randomizers, p1Getter)) {
-            tfParam1.setText(Double.toString(rand.getParam1()));
-        } else {
-            tfParam1.setText(SimbrainConstants.NULL_STRING);
-        }
-
-        ParameterGetter<Randomizer, Double> p2Getter = (r) -> ((Randomizer) r).getParam2();
-        if (NetworkUtils.isConsistent(randomizers, p2Getter)) {
-            tfParam2.setText(Double.toString(rand.getParam2()));
-        } else {
-            tfParam2.setText(SimbrainConstants.NULL_STRING);
-        }
-
-        if (!pdf.equals(ProbDistribution.UNIFORM)) {
-            ParameterGetter<Randomizer, Double> lbGetter = (r) -> ((Randomizer) r).getLowerBound();
-            if (NetworkUtils.isConsistent(randomizers, lbGetter)) {
-                tfLowBound.setText(Double.toString(rand.getLowerBound()));
-            } else {
-                tfLowBound.setText(SimbrainConstants.NULL_STRING);
-            }
-            ParameterGetter<Randomizer, Double> ubGetter = (r) -> ((Randomizer) r).getUpperBound();
-            if (NetworkUtils.isConsistent(randomizers, ubGetter)) {
-                tfUpBound.setText(Double.toString(rand.getUpperBound()));
-            } else {
-                tfUpBound.setText(SimbrainConstants.NULL_STRING);
-            }
-            ParameterGetter<Randomizer, Boolean> clippingGetter = (r) -> ((Randomizer) r).getClipping();
-            if (NetworkUtils.isConsistent(randomizers, clippingGetter)) {
-                tsClipping.setSelected(rand.getClipping());
-            } else {
-                tsClipping.setNull();
-            }
-        }
+//        Randomizer rand = (Randomizer) randomizers.get(0);
+//
+//        ParameterGetter<Randomizer, Double> p1Getter = (r) -> ((Randomizer) r).getParam1();
+//        if (NetworkUtils.isConsistent(randomizers, p1Getter)) {
+//            tfParam1.setText(Double.toString(rand.getParam1()));
+//        } else {
+//            tfParam1.setText(SimbrainConstants.NULL_STRING);
+//        }
+//
+//        ParameterGetter<Randomizer, Double> p2Getter = (r) -> ((Randomizer) r).getParam2();
+//        if (NetworkUtils.isConsistent(randomizers, p2Getter)) {
+//            tfParam2.setText(Double.toString(rand.getParam2()));
+//        } else {
+//            tfParam2.setText(SimbrainConstants.NULL_STRING);
+//        }
+//
+//        if (!pdf.equals(ProbDistribution.UNIFORM)) {
+//            ParameterGetter<Randomizer, Double> lbGetter = (r) -> ((Randomizer) r).getLowerBound();
+//            if (NetworkUtils.isConsistent(randomizers, lbGetter)) {
+//                tfLowBound.setText(Double.toString(rand.getLowerBound()));
+//            } else {
+//                tfLowBound.setText(SimbrainConstants.NULL_STRING);
+//            }
+//            ParameterGetter<Randomizer, Double> ubGetter = (r) -> ((Randomizer) r).getUpperBound();
+//            if (NetworkUtils.isConsistent(randomizers, ubGetter)) {
+//                tfUpBound.setText(Double.toString(rand.getUpperBound()));
+//            } else {
+//                tfUpBound.setText(SimbrainConstants.NULL_STRING);
+//            }
+//            ParameterGetter<Randomizer, Boolean> clippingGetter = (r) -> ((Randomizer) r).getClipping();
+//            if (NetworkUtils.isConsistent(randomizers, clippingGetter)) {
+//                tsClipping.setSelected(rand.getClipping());
+//            } else {
+//                tsClipping.setNull();
+//            }
+//        }
     }
 
     /**
@@ -339,7 +338,7 @@ public class ProbDistPanel {
      * Contains the specific error message that occurs if one tries to use this
      * panel to modify a Randomizer with a different Probability distribution.
      *
-     * @throws an IllegalArgumentException if this class is passed a randomizer
+     * @throws IllegalArgumentException if this class is passed a randomizer
      *            which cannot be altered sensibly by this class because it has
      *            a different probability distribution function
      */

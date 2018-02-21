@@ -25,9 +25,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.CondensedConnectionPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractSigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ContinuousSigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.DiscreteSigmoidalRulePanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -549,7 +546,7 @@ public class ESNCreationDialog extends StandardDialog {
         private JLabel typeLabel;
 
         /**
-         * The triangle that when clicked displays or hides {@link #rulePanel}
+         * The triangle that when clicked displays or hides the rule panel
          * so that specific attributes of the neuron update rule can be set.
          */
         private DropDownTriangle editTriangle;
@@ -557,7 +554,7 @@ public class ESNCreationDialog extends StandardDialog {
         /**
          * The sigmoidal rule panel: either discrete or continuous.
          */
-        private AbstractSigmoidalRulePanel rulePanel;
+//        private AbstractSigmoidalRulePanel rulePanel;
 
         /**
          * The parent dialog for resizing.
@@ -574,7 +571,7 @@ public class ESNCreationDialog extends StandardDialog {
         public static NeuronLayerPanel createNeuronLayerPanel(ESNCreationDialog parent, TimeType timeType, SquashingFunctionEnum initialFunc, int initPop) {
             NeuronLayerPanel nlp = new NeuronLayerPanel(parent, timeType, initialFunc, initPop);
             nlp.setTimeType(timeType);
-            nlp.rulePanel.getCbImplementation().setSelectedItem(initialFunc);
+//            nlp.rulePanel.getCbImplementation().setSelectedItem(initialFunc);
             nlp.initListeners();
             nlp.init();
             // TODO: Cleanup/generalize
@@ -608,7 +605,7 @@ public class ESNCreationDialog extends StandardDialog {
             JPanel basicPanel = new JPanel(gl);
             basicPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 5));
             basicPanel.add(new JLabel("Neuron Type: "));
-            typeLabel = new JLabel(rulePanel.getCbImplementation().getSelectedItem().toString());
+//            typeLabel = new JLabel(rulePanel.getCbImplementation().getSelectedItem().toString());
             JPanel tSub = new JPanel(new FlowLayout());
             tSub.add(typeLabel);
             basicPanel.add(tSub);
@@ -625,9 +622,9 @@ public class ESNCreationDialog extends StandardDialog {
             this.add(editWrapper, BorderLayout.CENTER);
 
             // Add the rule panel
-            rulePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            rulePanel.setVisible(editTriangle.isDown());
-            this.add(rulePanel, BorderLayout.SOUTH);
+//            rulePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//            rulePanel.setVisible(editTriangle.isDown());
+//            this.add(rulePanel, BorderLayout.SOUTH);
 
             resetLabelColors();
             repaint();
@@ -649,7 +646,7 @@ public class ESNCreationDialog extends StandardDialog {
             editTriangle.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    rulePanel.setVisible(editTriangle.isDown());
+//                    rulePanel.setVisible(editTriangle.isDown());
                     repaint();
                     parent.pack();
                 }
@@ -678,19 +675,19 @@ public class ESNCreationDialog extends StandardDialog {
          *
          */
         public void resetLabelColors() {
-            JComboBox impCb = rulePanel.getCbImplementation();
-            SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
-            typeLabel.setText(func.toString());
-            // TODO: Cleanup/generalize
-            if (func == SquashingFunctionEnum.TANH) {
-                typeLabel.setForeground(TANH_COLOR);
-            } else if (func == SquashingFunctionEnum.LOGISTIC) {
-                typeLabel.setForeground(LOG_COLOR);
-            } else {
-                // TODO: Better assertion. Check ALL Squashing functions.
-                assert func == SquashingFunctionEnum.ARCTAN : "No such squashing function";
-                typeLabel.setForeground(ARCT_COLOR);
-            }
+//            JComboBox impCb = rulePanel.getCbImplementation();
+//            SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
+//            typeLabel.setText(func.toString());
+//            // TODO: Cleanup/generalize
+//            if (func == SquashingFunctionEnum.TANH) {
+//                typeLabel.setForeground(TANH_COLOR);
+//            } else if (func == SquashingFunctionEnum.LOGISTIC) {
+//                typeLabel.setForeground(LOG_COLOR);
+//            } else {
+//                // TODO: Better assertion. Check ALL Squashing functions.
+//                assert func == SquashingFunctionEnum.ARCTAN : "No such squashing function";
+//                typeLabel.setForeground(ARCT_COLOR);
+//            }
         }
 
         /**
@@ -706,7 +703,7 @@ public class ESNCreationDialog extends StandardDialog {
             for (int i = 0; i < numNeurons; i++) {
                 neurons.add(new Neuron(parent.networkPanel.getNetwork()));
             }
-            rulePanel.commitChanges(neurons);
+//            rulePanel.commitChanges(neurons);
             return new NeuronGroup(parent.networkPanel.getNetwork(), neurons);
         }
 
@@ -717,24 +714,24 @@ public class ESNCreationDialog extends StandardDialog {
          * @param timeType
          */
         public void setTimeType(TimeType timeType) {
-            if (timeType == TimeType.DISCRETE) {
-                rulePanel = new DiscreteSigmoidalRulePanel();
-            } else {
-                rulePanel = new ContinuousSigmoidalRulePanel();
-            }
+//            if (timeType == TimeType.DISCRETE) {
+//                rulePanel = new DiscreteSigmoidalRulePanel();
+//            } else {
+//                rulePanel = new ContinuousSigmoidalRulePanel();
+//            }
             // Update the Type Label based on the selection in the combobox
-            final JComboBox impCb = rulePanel.getCbImplementation();
-            impCb.setSelectedIndex(SquashingFunctionEnum.getIndexFromFunction(DEFAULT_INITIAL_FUNCTION));
-            impCb.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
-                    typeLabel.setText(func.toString());
-                    // TODO: Cleanup/generalize
-                    resetLabelColors();
-                    repaint();
-                }
-            });
+//            final JComboBox impCb = rulePanel.getCbImplementation();
+//            impCb.setSelectedIndex(SquashingFunctionEnum.getIndexFromFunction(DEFAULT_INITIAL_FUNCTION));
+//            impCb.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    SquashingFunctionEnum func = SquashingFunctionEnum.getFunctionFromIndex(impCb.getSelectedIndex());
+//                    typeLabel.setText(func.toString());
+//                    // TODO: Cleanup/generalize
+//                    resetLabelColors();
+//                    repaint();
+//                }
+//            });
             removeAll();
             init();
             revalidate();

@@ -25,6 +25,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -45,11 +46,19 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     /**
      * Neuron decay.
      */
+    @UserParameter(
+            label = "Decay Rate",
+            description = "The rate at which activation decays to its resting value.",
+            defaultValue = "0.05", order = 1)
     private double decay = 0.05;
 
     /**
      * Rest.
      */
+    @UserParameter(
+            label = "Rest",
+            description = "The resting value which the activation decays to.",
+            defaultValue = "0.1", order = 2)
     private double rest = .1;
 
     /**
@@ -60,6 +69,12 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via a "
+                    + "noise generator. The random values are added after the sigmoidal activation "
+                    + "function is applied.",
+            defaultValue = "false", order = 3)
     private boolean addNoise = false;
 
     /**

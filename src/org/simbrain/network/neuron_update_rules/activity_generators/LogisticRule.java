@@ -24,6 +24,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
@@ -34,6 +35,12 @@ public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule,
     /**
      * Growth rate.
      */
+    @UserParameter(
+            label = "Growth Rate",
+            description = "A number that determines the exact form of the quadratic function. "
+                    + "It must be between 0 and 4.",
+            minimumValue = 0.0, maximumValue = 4.0,
+            defaultValue = "3.9", order = 1)
     private double growthRate = 3.9;
 
     private double ceiling = 10.0;

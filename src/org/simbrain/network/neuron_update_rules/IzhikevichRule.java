@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -39,26 +40,46 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * A.
      */
+    @UserParameter(
+            label = "A",
+            description = "Parameter for recovery variable.",
+            defaultValue = "0.02", order = 1)
     private double a = .02;
 
     /**
      * B.
      */
+    @UserParameter(
+            label = "B",
+            description = "Parameter for recovery variable.",
+            defaultValue = "0.2", order = 2)
     private double b = .2;
 
     /**
      * C.
      */
+    @UserParameter(
+            label = "C",
+            description = "The value for v which occurs after a spike.",
+            defaultValue = "-65", order = 3)
     private double c = -65;
 
     /**
      * D.
      */
+    @UserParameter(
+            label = "D",
+            description = "A constant value added to u after spikes.",
+            defaultValue = "8", order = 4)
     private double d = 8;
 
     /**
      * Constant background current.
      */
+    @UserParameter(
+            label = "Ibg",
+            description = "Constant background current.",
+            defaultValue = "14", order = 5)
     private double iBg = 14;
 
     /**
@@ -74,6 +95,11 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via a "
+                    + "noise generator.",
+            defaultValue = "false", order = 6)
     private boolean addNoise;
 
     // Backwards compatibility... to be removed

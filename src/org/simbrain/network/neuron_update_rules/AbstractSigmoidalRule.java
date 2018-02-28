@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -54,11 +55,20 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Bias.
      */
+    @UserParameter(
+            label = "Bias",
+            description = "The bias is a fixed amount of input to the node. This shifts the "
+                    + "inflection point to the left or right of the origin.",
+            defaultValue = "0", order = 2)
     protected double bias;
 
     /**
      * Slope.
      */
+    @UserParameter(
+            label = "Slope",
+            description = "This represents how steep the sigmoidal is.",
+            defaultValue = "1", order = 3)
     protected double slope = 1;
 
     /**
@@ -69,6 +79,11 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Adds noise to neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 4)
     protected boolean addNoise;
 
     /**

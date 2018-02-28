@@ -19,6 +19,7 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.util.UserParameter;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 
@@ -36,15 +37,31 @@ public class BinaryRule extends NeuronUpdateRule {
     /**
      * Threshold for binary neurons.
      */
+    @UserParameter(
+            label = "Threshold",
+            description = "Threshold for binary neurons.",
+            defaultValue = "0.5", order = 1)
     private double threshold = .5;
 
+    @UserParameter(
+            label = "On Value",
+            description = "The value that turns on neuron.",
+            defaultValue = "1.0", order = 2)
     private double ceiling = DEFAULT_CEILING;
 
+    @UserParameter(
+            label = "Off Value",
+            description = "The value that turns off neuron.",
+            defaultValue = "-1.0", order = 3)
     private double floor = DEFAULT_FLOOR;
 
     /**
      * Bias for binary neurons.
      */
+    @UserParameter(
+            label = "Bias",
+            description = "Bias for binary neurons.",
+            defaultValue = "0", order = 4)
     private double bias = 0;
 
     /**

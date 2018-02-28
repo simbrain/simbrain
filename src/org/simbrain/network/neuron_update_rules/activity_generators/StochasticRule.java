@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
@@ -40,6 +41,11 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityG
     /**
      * Probability the neuron will fire.
      */
+    @UserParameter(
+            label = "Firing Probability",
+            description = "This parameter determines the probability that the generator will fire, "
+                    + "causing it to have an activation equal to its upper bound, given an iteration.",
+            defaultValue = "" + DEFAULT_FIRING_PROBABILITY, order = 1)
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
     /**

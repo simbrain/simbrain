@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
@@ -140,6 +141,12 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         RULE_MAP.put(new SigmoidalRule().getName(), new AnnotatedPropertyEditor(new SigmoidalRule()));
         RULE_MAP.put(new SpikingThresholdRule().getName(), new AnnotatedPropertyEditor(new SpikingThresholdRule()));
         RULE_MAP.put(new ThreeValueRule().getName(), new AnnotatedPropertyEditor(new ThreeValueRule()));
+        
+        // GENERATOR_MAP may not be useful any more?
+        RULE_MAP.put(new LogisticRule().getName(), new AnnotatedPropertyEditor(new LogisticRule()));
+        RULE_MAP.put(new RandomNeuronRule().getName(), new AnnotatedPropertyEditor(new RandomNeuronRule()));
+        RULE_MAP.put(new SinusoidalRule().getName(), new AnnotatedPropertyEditor(new SinusoidalRule()));
+        RULE_MAP.put(new StochasticRule().getName(), new AnnotatedPropertyEditor(new StochasticRule()));
     }
 
     /**
@@ -327,10 +334,8 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * Set window on randomizer panels.
      */
     private void setRandomizerPanelParent() {
-        if (neuronRulePanel.getEditedObject() instanceof NoisyUpdateRule) {
-            if (noisePanel != null) {
-                noisePanel.setParent(parent);
-            }
+        if (noisePanel != null && neuronRulePanel.getEditedObject() instanceof NoisyUpdateRule) {
+            noisePanel.setParent(parent);
         }
     }
 
@@ -348,14 +353,27 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
     @Override
     public boolean commitChanges() {
-        // If the panel remains open after changes have been committed,
-        // i.e. for apply button during editing, then set the original panel
-        // to the selected one since for all intents and purposes it is now.
-        // Prevents ClassCastExceptions for switching between panels.
+        NeuronUpdateRule selectedRule = (NeuronUpdateRule) neuronRulePanel.getEditedObject();
+
+        // If an inconsistent set of objects is being edited return with no action
+        if (selectedRule == null) {
+            return true;
+        }
+
+        for (Neuron n : neuronList) {
+            // Only replace if this is a different rule (otherwise when
+            // editing multiple rules with different parameter values which
+            // have not been set those values will be replaced with the
+            // default).
+            if (!n.getUpdateRule().getClass().equals(selectedRule.getClass())) {
+                n.setUpdateRule(selectedRule.deepCopy());
+            }
+        }
+
         List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
         startingPanel = neuronRulePanel;
         neuronRulePanel.commitChanges(ruleList);
-        return true; // TODO:Finish implementation of CommittablePanel interface
+        return true;
     }
 
     /**

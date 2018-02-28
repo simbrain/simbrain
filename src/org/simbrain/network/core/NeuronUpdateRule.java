@@ -20,6 +20,7 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
@@ -190,6 +191,10 @@ public abstract class NeuronUpdateRule implements EditableObject {
     /**
      * Amount by which to increment or decrement neuron.
      */
+    @UserParameter(
+            label = "Increment",
+            description = "This sets the amount that a neuron is incremented when it is manually adjusted.",
+            defaultValue = "" + DEFAULT_INCREMENT, order = 6)
     protected double increment = DEFAULT_INCREMENT;
 
     /**

@@ -19,6 +19,7 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.util.UserParameter;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 
@@ -34,31 +35,61 @@ public class ThreeValueRule extends NeuronUpdateRule {
     /**
      * Bias field.
      */
+    @UserParameter(
+            label = "Bias",
+            description = "A fixed amount of input to the node.",
+//            minimumValue = -10, maximumValue = 10,
+            defaultValue = "0", order = 1)
     private double bias = 0;
 
     /**
      * Lower threshold field.
      */
+    @UserParameter(
+            label = "Lower Threshold",
+            description = "If the weighted input plus the bias is less than this value, the activation "
+                    + "is set to the Lower Value.",
+            defaultValue = "0", order = 2)
     private double lowerThreshold = 0;
 
     /**
      * Upper threshold field.
      */
+    @UserParameter(
+            label = "Upper Threshold",
+            description = "If the weighted input plus the bias is greater than this value, the activation "
+                    + "is set to the Upper Value.",
+            defaultValue = "1", order = 3)
     private double upperThreshold = 1;
 
     /**
      * Lower value field.
      */
+    @UserParameter(
+            label = "Lower Value",
+            description = "The activation is set to this value if the weighted input plus the bias exceeds "
+                    + "the Lower Threshold.",
+            defaultValue = "-1", order = 4)
     private double lowerValue = -1;
 
     /**
      * Middle value field.
      */
+    @UserParameter(
+            label = "Middle Value",
+            description = "If the weighted input plus the bias does not exceed the Upper or Lower Thresholds, "
+                    + "then the activation is set to this value.",
+            defaultValue = "0", order = 5)
     private double middleValue = 0;
 
     /**
      * Upper value field.
      */
+    @UserParameter(
+            label = "Upper Value",
+            description = "If the weighted input plus the bias is greater than the Upper Threshold, "
+                    + "then the activation is set to this value.",
+            defaultValue = "1", order = 6)
     private double upperValue = 1;
 
     /**

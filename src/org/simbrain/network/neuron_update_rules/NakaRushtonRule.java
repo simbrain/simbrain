@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -40,31 +41,57 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     /**
      * Steepness.
      */
+    @UserParameter(
+            label = "Steepness",
+            description = "This value controls the steepness of the sigmoidal-like function S(W).",
+            defaultValue = "2", order = 1)
     private double steepness = 2;
 
     /**
      * Semi saturation constant.
      */
+    @UserParameter(
+            label = "Semi-saturation constant",
+            description = "This value is the point at which S(W) reaches half of its maximum value.",
+            defaultValue = "120", order = 2)
     private double semiSaturationConstant = 120;
 
     /**
      * Time constant of spike rate adaptation.
      */
+    @UserParameter(
+            label = "Adaptation Time Constant",
+            description = "This value controls the rate at which the adaptation variable tends to "
+                    + "its minimum value.",
+            defaultValue = "1", order = 7)
     private double adaptationTimeConstant = 1;
 
     /**
      * Parameter of spike rate adaptation.
      */
+    @UserParameter(
+            label = "Adaptation Parameter",
+            description = "The parameter of spike rate adaptation.",
+            defaultValue = "0.7", order = 6)
     private double adaptationParameter = .7;
 
     /**
      * Whether to use spike rate adaptation or not.
      */
+    @UserParameter(
+            label = "Use Adaptation",
+            description = "If this is set to true, spike rate adaptation is utilized.",
+            defaultValue = "false", order = 5)
     private boolean useAdaptation = false;
 
     /**
      * Time constant.
      */
+    @UserParameter(
+            label = "Time constant",
+            description = "This valu controls the rate at which the activation tends to the fixed "
+                    + "point S(W).",
+            defaultValue = "1", order = 3)
     private double timeConstant = 1;
 
     /**
@@ -75,6 +102,11 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     /**
      * Add noise to neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 4)
     private boolean addNoise = false;
 
     /**

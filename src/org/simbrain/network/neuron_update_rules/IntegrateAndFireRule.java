@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -38,31 +39,60 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Resistance (M ohms).
      */
+    @UserParameter(
+            label = "Resistance (MΩ)",
+            description = "The resistance across the cell's membrane determines how much of an effect "
+                    + "currents have of the membrane potential.",
+            defaultValue = "1", order = 4)
     private double resistance = 1;
 
     /**
      * Time constant (ms)
      */
+    @UserParameter(
+            label = "Time-Constant (ms)",
+            description = "How quickly/slowly the neuron responds to external change and returns to its "
+                    + "resting potential.",
+            defaultValue = "30", order = 6)
     private double timeConstant = 30;
 
     /**
      * Threshold (mV)
      */
+    @UserParameter(
+            label = "Threshold (mV)",
+            description = "The value of the membrane potential that if met or exceeded triggers an "
+                    + "action-potential as well as the onset of the refractory period.",
+            defaultValue = "15", order = 1)
     private double threshold = 15;
 
     /**
      * Reset potential (mV)
      */
+    @UserParameter(
+            label = "Reset Potential (mV)",
+            description = "The value of the membrane potential to which it is set and held at immediately "
+                    + "after firing an action potential.",
+            defaultValue = "13.5", order = 2)
     private double resetPotential = 13.5;
 
     /**
      * Resting potential (mV) Default: 0.0
      */
-    private double restingPotential;
+    @UserParameter(
+            label = "Resting potential (mV)",
+            description = "In the absence of further perturbation, the voltage will exponentially return "
+                    + "to this value.",
+            defaultValue = "0.0", order = 3)
+    private double restingPotential = 0.0;
 
     /**
      * Background Current (nA) .
      */
+    @UserParameter(
+            label = "Background Current (nA)",
+            description = "A constant background current to the neuron.",
+            defaultValue = "13.5", order = 5)
     private double backgroundCurrent = 13.5;
 
     /**
@@ -78,6 +108,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Add noise to neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via a "
+                    + "noise generator.",
+            defaultValue = "false", order = 7)
     private boolean addNoise;
 
     /**

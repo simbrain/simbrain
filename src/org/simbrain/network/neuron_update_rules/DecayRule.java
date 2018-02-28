@@ -24,6 +24,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -51,24 +52,40 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
      */
     public static final int ABSOLUTE = 1;
 
+    //TODO: add drop down back
     /**
      * Relative absolute.
      */
     private int relAbs = RELATIVE;
 
+  //TODO: disable when RELATIVE
     /**
      * Decay amount.
      */
+    @UserParameter(
+            label = "Decay amount",
+            description = "The amount by which the activation is changed each iteration if absolute decay is chosen.",
+            defaultValue = "0.1", order = 3)
     private double decayAmount = .1;
 
+    //TODO: disable when ABSOLUTE
     /**
      * Decay fraction.
      */
+    @UserParameter(
+            label = "Decay fraction",
+            description = "The proportion of the distance between the current value and the base-line value, "
+                    + "by which the activation is changed each iteration if relative decay is chosen.",
+            defaultValue = "0.1", order = 4)
     private double decayFraction = .1;
 
     /**
      * Base line.
      */
+    @UserParameter(
+            label = "Base Line",
+            description = "An option to add noise.",
+            defaultValue = "0", order = 2)
     private double baseLine = 0;
 
     /**
@@ -84,6 +101,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "An option to add noise.",
+            defaultValue = "false", order = 5)
     private boolean addNoise = false;
 
     /**

@@ -24,6 +24,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -34,11 +35,19 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
     /**
      * Phase.
      */
+    @UserParameter(
+            label = "Phase",
+            description = "The phase tells us where we start in a period of the sinusoidal oscillation.",
+            defaultValue = "1", order = 1)
     private double phase = 1;
 
     /**
      * Frequency.
      */
+    @UserParameter(
+            label = "Frequency",
+            description = "The frequency tells us how frequently the activation oscillates.",
+            defaultValue = "0.1", order = 2)
     private double frequency = .1;
 
     /**
@@ -59,6 +68,11 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 3)
     private boolean addNoise = false;
 
     @Override

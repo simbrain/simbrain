@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -50,6 +51,10 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      * equivalent to discrete sigmoid. The larger the time constant relative to
      * the time-step, the more slowly inputs will be integrated.
      */
+    @UserParameter(
+            label = "Time Constant",
+            description = "The time constant controls how quickly the numerical integration occurs.",
+            defaultValue = "" + DEFAULT_TIME_CONSTANT, order = 1)
     private double tau = DEFAULT_TIME_CONSTANT;
 
     /**
@@ -57,6 +62,10 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      * activation. If <b>timeConstant * leakConstant == network time-step</b>
      * (or vice versa), behavior is equivalent to discrete sigmoid.
      */
+    @UserParameter(
+            label = "Leak Constant",
+            description = "An option to add noise.",
+            defaultValue = "" + DEFAULT_LEAK_CONSTANT, order = 2)
     private double leak = DEFAULT_LEAK_CONSTANT;
 
     /**

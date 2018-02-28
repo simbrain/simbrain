@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>Product rule</b> units compute the product of the activations of incoming
@@ -35,6 +36,12 @@ public class ProductRule extends LinearRule {
     /**
      * Whether to use weights or not.
      */
+    @UserParameter(
+            label = "Use Weights",
+            description = "If false, activation is a product of incoming activations. "
+                    + "If true, activation is a product of incoming activation / weight products, or "
+                    + "(in the case of spiking neurons) post-synaptic-responses.",
+            defaultValue = "flase", order = 0)
     private boolean useWeights = DEFAULT_USE_WEIGHTS;
 
     @Override

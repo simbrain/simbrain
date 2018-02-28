@@ -8,6 +8,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -16,56 +17,102 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     /**
      * Calcium channel conductance (micro Siemens/cm^2).
      */
+    @UserParameter(
+            label = "Ca²⁺ Conductance (µS/cm²)",
+            description = "Calcium conductance. If higher, voltage pulled more quickly to Ca2+ equilibrium.",
+            defaultValue = "4.0", order = 7)
     private double g_Ca = 4.0;
 
     /**
      * Potassium channel conductance (micro Siemens/cm^2).
      */
+    @UserParameter(
+            label = "K⁺ Conductance (µS/cm²)",
+            description = "Potassium conductance. If higher, voltage pulled more quickly to K+ equilibrium.",
+            defaultValue = "8.0", order = 8)
     private double g_K = 8.0;
 
     /**
      * Leak conductance (micro Siemens/cm^2).
      */
+    @UserParameter(
+            label = "Leak Conductance (µS/cm²)",
+            description = "Leak conductance. If higher, voltage pulled more quickly to Leak equilibrium.",
+            defaultValue = "2.0", order = 9)
     private double g_L = 2.0;
 
     /**
      * Resting potential calcium (mV).
      */
+    @UserParameter(
+            label = "Ca²⁺ Equilibrium (mV)",
+            description = "Calcium equilibrium.",
+            defaultValue = "120", order = 10)
     private double vRest_Ca = 120;
 
     /**
      * Resting potential potassium (mV).
      */
+    @UserParameter(
+            label = "K⁺ Equilibrium (mV)",
+            description = "An option to add noise.",
+            defaultValue = "-80", order = 11)
     private double vRest_k = -80;
 
     /**
      * Resting potential for leak current (mV).
      */
+    @UserParameter(
+            label = "Leak Equilibrium (mV)",
+            description = "An option to add noise.",
+            defaultValue = "-60", order = 12)
     private double vRest_L = -60;
 
     /**
      * Membrane capacitance per unit area (micro Farads/cm^2).
      */
+    @UserParameter(
+            label = "Capacitance (µF/cm²)",
+            description = "Behaves like a time constant. Higher capacitance leads to slower changes "
+                    + "in the cell.",
+            defaultValue = "5", order = 1)
     private double cMembrane = 5;
 
     /**
      * Membrane voltage constant 1.
      */
+    @UserParameter(
+            label = "Voltage const. 1",
+            description = "How does calcium respond to voltage.",
+            defaultValue = "-1.2", order = 2)
     private double v_m1 = -1.2;
 
     /**
      * Membrane voltage constant 2.
      */
+    @UserParameter(
+            label = "Voltage const. 2",
+            description = "How does calcium respond to voltage.",
+            defaultValue = "18", order = 3)
     private double v_m2 = 18;
 
     /**
      * Potassium channel constant 1.
      */
+    @UserParameter(
+            label = "K⁺  Const. 1",
+            description = "V3 on the Scholarpedia page, which roughly corresponds to how potassium current "
+                    + "responds to membrane voltage.",
+            defaultValue = "2", order = 13)
     private double v_w1 = 2;
 
     /**
      * Potassium channel constant 2.
      */
+    @UserParameter(
+            label = "K⁺  Const. 2",
+            description = "V4 on the Scholarpedia page.",
+            defaultValue = "17.4", order = 14)
     private double v_w2 = 17.4;
 
     /**
@@ -76,21 +123,37 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     /**
      * Potassium channel time constant/decay rate (s^-1).
      */
+    @UserParameter(
+            label = "K⁺ φ",
+            description = "Potassium channel time constant/decay rate. If higher, potassium changes more slowly.",
+            defaultValue = "0.06667", order = 15)
     private double phi = 0.06667; // 1/15
 
     /**
      * Background current (nA).
      */
+    @UserParameter(
+            label = "Background current (nA)",
+            description = "A constant level of current that can be set.",
+            defaultValue = "46", order = 5)
     private double i_bg = 46;
 
     /**
      * Threshold for neurotransmitter release (mV)
      */
+    @UserParameter(
+            label = "Threshold (mV)",
+            description = "Voltages above this make the neuron spike",
+            defaultValue = "40", order = 4)
     private double threshold = 40;
 
     /**
      * Add noise to neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "An option to add noise.",
+            defaultValue = "false", order = 6)
     private boolean addNoise;
 
     /**

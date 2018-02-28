@@ -22,8 +22,9 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
-
+// TODO: deal with ENa, EK
 /**
  * Hodgkin-Huxley Neuron.
  * <p>
@@ -35,11 +36,19 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     /**
      * Sodium Channels
      */
+    @UserParameter(
+            label = "Sodium Channels",
+            description = "Sodium Channels",
+            defaultValue = "100", order = 1)
     private float perNaChannels = 100f;
 
     /**
      * Potassium
      */
+    @UserParameter(
+            label = "Potassium Channels",
+            description = "Sodium Channels",
+            defaultValue = "100", order = 2)
     private float perKChannels = 100f;
 
     /**
@@ -113,6 +122,10 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "An option to add noise.",
+            defaultValue = "false", order = 5)
     private boolean addNoise = false;
 
     @Override

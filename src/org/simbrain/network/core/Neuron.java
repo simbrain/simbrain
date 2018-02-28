@@ -141,6 +141,11 @@ public class Neuron implements EditableObject {
     /**
      * If true then do not update this neuron.
      */
+    @UserParameter(
+            label = "Clamped",
+            description = "In general, a clamped neuron will not change over time; it is \"clamped\" "
+                    + "to its current value.",
+            defaultValue = "false", order = 3)
     private boolean clamped;
 
     /**

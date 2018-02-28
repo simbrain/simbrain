@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 
@@ -39,11 +40,19 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Constant background current. KEEP
      */
+    @UserParameter(
+            label = "Background Current (nA)",
+            description = "Background current to the cell.",
+            defaultValue = "1", order = 4)
     private double iBg = 1;
 
     /**
      * Threshold value to signal a spike. KEEP
      */
+    @UserParameter(
+            label = "Spike threshold",
+            description = "Threshold value to signal a spike.",
+            defaultValue = "1.9", order = 5)
     private double threshold = 1.9;
 
     /**
@@ -54,21 +63,37 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Add noise to the neuron.
      */
-    private boolean addNoise;
+    @UserParameter(
+            label = "Add noise",
+            description = "An option to add noise.",
+            defaultValue = "false", order = 6)
+    private  boolean addNoise = false;
 
     /**
      * Recovery rate
      */
+    @UserParameter(
+            label = "A (Recovery Rate)",
+            description = "Abstract measure of how much \"resource\" a cell is depleting in response to large changes in voltage.",
+            defaultValue = "0.08", order = 1)
     private double a = 0.08;
 
     /**
      * Recovery dependence on voltage.
      */
+    @UserParameter(
+            label = "B (Rec. Voltage Dependence)",
+            description = "How much the recovery variable w depends on voltage.",
+            defaultValue = "1", order = 2)
     private double b = 1;
 
     /**
      * Recovery self-dependence.
      */
+    @UserParameter(
+            label = "C (Rec. Self Dependence)",
+            description = "How quickly the recovery variable recovers to its baseline value.",
+            defaultValue = "0.8", order = 3)
     private double c = 0.8;
 
     @Override

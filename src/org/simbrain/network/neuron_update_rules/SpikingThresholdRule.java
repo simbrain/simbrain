@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 import java.util.Random;
@@ -34,6 +35,10 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Threshold.
      */
+    @UserParameter(
+            label = "Threshold",
+            description = "Input value above which the neuron spikes.",
+            defaultValue = "0.5", order = 1)
     private double threshold = .5;
 
     /**
@@ -44,6 +49,11 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Whether or not to add noise to the inputs .
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 2)
     private boolean addNoise;
 
     @Override

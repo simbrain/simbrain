@@ -49,15 +49,21 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Slope.
      */
-    @UserParameter(label = "Slope", description = "Slope of lienar rule", minimumValue = -10, maximumValue = 10,
-        defaultValue = "1", order = 2)
+    @UserParameter(
+            label = "Slope",
+            description = "Slope of lienar rule",
+            minimumValue = -10, maximumValue = 10,
+            defaultValue = "1", order = 2)
     private double slope = 1;
 
     /**
      * Bias.
      */
-    @UserParameter(label = "Bias", description = "Bias (constant added value) for linear rule", minimumValue = -10, maximumValue = 10,
-        defaultValue = "0", order = 1)
+    @UserParameter(
+            label = "Bias",
+            description = "Bias (constant added value) for linear rule",
+            minimumValue = -10, maximumValue = 10,
+            defaultValue = "0", order = 1)
     private double bias = 0;
 
     /**
@@ -68,6 +74,11 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Add noise to the neuron.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 3)
     private boolean addNoise = false;
 
     /**

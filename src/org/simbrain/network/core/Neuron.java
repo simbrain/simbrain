@@ -72,6 +72,8 @@ public class Neuron implements EditableObject {
     /**
      * An optional String description associated with this neuron.
      */
+    @UserParameter(label = "Label", description = "Optional String description associated with this neuron",
+        defaultValue = "", order = 2)
     private String label = "";
 
     /**

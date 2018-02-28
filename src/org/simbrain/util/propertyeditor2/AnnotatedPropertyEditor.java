@@ -52,17 +52,6 @@ import java.util.TreeSet;
 public class AnnotatedPropertyEditor extends JPanel {
 
     /**
-     * Extension of Standard Dialog for Editor Panel
-     */
-    private class EditorDialog extends StandardDialog {
-        @Override
-        protected void closeDialogOk() {
-            commitChanges();
-            dispose();
-        }
-    }
-
-    /**
      * The available parameters, as a map from Parameter to input gui component.
      */
     protected Set<ParameterWidget> widgets;
@@ -190,7 +179,7 @@ public class AnnotatedPropertyEditor extends JPanel {
     // TODO: Evaluate boolean returns from commmit as in EditablePanel
 
     /**
-     * Commit changes on the internal object or list of objects
+     * Commit changes on the internal object or list of objects.
      */
     public void commitChanges() {
         commitChanges(editedObjects);
@@ -223,10 +212,10 @@ public class AnnotatedPropertyEditor extends JPanel {
 
         // Re-initialize. Allows updating cached values calculated from
         // parameters.
-        for (Object o : objectsToEdit) {
-            // s.getLearningRule().init(s);
-            // TODO! If used add an init field to EditedObjects
-        }
+//        for (Object o : objectsToEdit) {
+//            // s.getLearningRule().init(s);
+//            // TODO! If used add an init field to EditedObjects
+//        }
     }
 
     /**
@@ -240,10 +229,10 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
         boolean objectsSameType = objectsToCheck.stream().allMatch(m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
         boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
-        //TODO: In exception say which condition failed and what the types are
-        // objectsToCheck.get(0).getClass() and  editedObjects.get(0).getClass()
         if (!objectsSameType || !objectsSameTypeAsInternal) {
-            throw new IllegalArgumentException("Committed objects must be of the same type as each other and" + "as the objects handled by this editor");
+            String exceptionString = "Commited objects of type " + objectsToCheck.get(0).getClass()
+                + "does not match edited object of type" + editedObjects.get(0).getClass();
+            throw new IllegalArgumentException(exceptionString);
         }
     }
 
@@ -276,6 +265,17 @@ public class AnnotatedPropertyEditor extends JPanel {
     }
 
     /**
+     * Extension of Standard Dialog for Editor Panel
+     */
+    private class EditorDialog extends StandardDialog {
+        @Override
+        protected void closeDialogOk() {
+            commitChanges();
+            dispose();
+        }
+    }
+
+    /**
      * Returns an dialog containing this property editor.
      *
      * @return parentDialog parent dialog
@@ -305,5 +305,30 @@ public class AnnotatedPropertyEditor extends JPanel {
     public List<? extends EditableObject> getEditedObjects() {
         return editedObjects;
     }
+
+    /**
+     * Returns the widgets, which can then be used to populate custom panels.
+     *
+     * @return the set of widgets representing user parameters
+     */
+    public Set<ParameterWidget> getWidgets() {
+        return widgets;
+    }
+
+    /**
+     * Returns a widget with a provided label, or null if none found.
+     *
+     * @param label the label to use for searching
+     * @return matching widget, or null if none found
+     */
+    public ParameterWidget getWidget(String label) {
+        for(ParameterWidget w : widgets) {
+            if (w.getLabel().equalsIgnoreCase(label)) {
+                return w;
+            }
+        }
+        return null;
+    }
+
 
 }

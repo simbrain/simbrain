@@ -32,151 +32,6 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 public abstract class NeuronUpdateRule implements EditableObject {
 
     /**
-     * An enum specifying how a neuron sums its inputs. The enum both specifies
-     * and provides the appropriate method for the distinct ways this can
-     * happen. At its core it represents the connectionist (matrix
-     * multiplication equivalent/algebraic) vs biological (convolution or other
-     * function of a "spike" represented as a Dirac delta function) weighted
-     * sums.
-     *
-     * @author Zoë Tosi
-     */
-    public static enum InputType {
-        WEIGHTED {
-            /**
-             * Gets the weighted sum of the pre-synaptic neurons' activation
-             * values.
-             */
-            @Override
-            public double getInput(Neuron n) {
-                return n.getWeightedInputs();
-            }
-
-            @Override
-            public double[] getSeparatedInput(Neuron n) {
-                double[] ei = new double[2];
-                for (Synapse s : n.getFanIn()) {
-                    double wt = s.calcWeightedSum();
-                    if (wt > 0) {
-                        ei[0] += wt;
-                    } else {
-                        ei[1] += wt;
-                    }
-                }
-                return ei;
-            }
-
-            @Override
-            public double[] getNormalizedSeparatedInput(Neuron n) {
-                double[] ei = new double[2];
-                double e = 0;
-                double i = 0;
-                for (Synapse s : n.getFanIn()) {
-                    double wt = s.calcWeightedSum();
-                    if (wt > 0) {
-                        ei[0] += wt;
-                        e++;
-                    } else {
-                        ei[1] += wt;
-                        i++;
-                    }
-                }
-                if (e > 1) {
-                    ei[0] /= e;
-                }
-                if (i > 1) {
-                    ei[1] /= i;
-                }
-                return ei;
-            }
-
-            @Override
-            public String toString() {
-                return "Weighted";
-            }
-
-        }, SYNAPTIC {
-            /**
-             * Gets the synaptic sum of the pre-synaptic neurons' firing state
-             * weighted by synapses and processed through a spike responder.
-             */
-            @Override
-            public double getInput(Neuron n) {
-                return n.getSynapticInput();
-            }
-
-            @Override
-            public double[] getSeparatedInput(Neuron n) {
-                double[] ei = new double[2];
-                for (Synapse s : n.getFanIn()) {
-                    double psr = s.calcPSR();
-                    if (psr > 0) {
-                        ei[0] += psr;
-                    } else {
-                        ei[1] += psr;
-                    }
-                }
-                return ei;
-            }
-
-
-            @Override
-            public double[] getNormalizedSeparatedInput(Neuron n) {
-                double[] ei = new double[2];
-                double e = 0;
-                double i = 0;
-                for (Synapse s : n.getFanIn()) {
-                    double psr = s.calcPSR();
-                    if (psr > 0) {
-                        ei[0] += psr;
-                        e++;
-                    } else {
-                        ei[1] += psr;
-                        i++;
-                    }
-                }
-                if (e > 1) {
-                    ei[0] /= e;
-                }
-                if (i > 1) {
-                    ei[1] /= i;
-                }
-                return ei;
-            }
-
-            @Override
-            public String toString() {
-                return "Synaptic";
-            }
-
-
-        };
-
-        /**
-         * Returns the total input to a neuron using either a post-synaptic
-         * response value calculated from each synapse and derived from the
-         * spike-train of the pre-synaptic neuron or a simple weighted sum of
-         * the product of the synapse values and their respective source
-         * neurons.
-         *
-         * @param n
-         * @return
-         */
-        public abstract double getInput(Neuron n);
-
-        /**
-         * Returns the total excitatory and inhibitory inputs to a neuron
-         * separated. Otherwise the same as {@link #getInput(Neuron)}.
-         *
-         * @param n
-         * @return
-         */
-        public abstract double[] getSeparatedInput(Neuron n);
-
-        public abstract double[] getNormalizedSeparatedInput(Neuron n);
-    }
-
-    /**
      * The maximum number of digits to display in the tool tip.
      */
     private static final int MAX_DIGITS = 9;
@@ -369,6 +224,152 @@ public abstract class NeuronUpdateRule implements EditableObject {
 
     public boolean isSkipsSynapticUpdates() {
         return false;
+    }
+
+
+    /**
+     * An enum specifying how a neuron sums its inputs. The enum both specifies
+     * and provides the appropriate method for the distinct ways this can
+     * happen. At its core it represents the connectionist (matrix
+     * multiplication equivalent/algebraic) vs biological (convolution or other
+     * function of a "spike" represented as a Dirac delta function) weighted
+     * sums.
+     *
+     * @author Zoë Tosi
+     */
+    public static enum InputType {
+        WEIGHTED {
+            /**
+             * Gets the weighted sum of the pre-synaptic neurons' activation
+             * values.
+             */
+            @Override
+            public double getInput(Neuron n) {
+                return n.getWeightedInputs();
+            }
+
+            @Override
+            public double[] getSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                for (Synapse s : n.getFanIn()) {
+                    double wt = s.calcWeightedSum();
+                    if (wt > 0) {
+                        ei[0] += wt;
+                    } else {
+                        ei[1] += wt;
+                    }
+                }
+                return ei;
+            }
+
+            @Override
+            public double[] getNormalizedSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                double e = 0;
+                double i = 0;
+                for (Synapse s : n.getFanIn()) {
+                    double wt = s.calcWeightedSum();
+                    if (wt > 0) {
+                        ei[0] += wt;
+                        e++;
+                    } else {
+                        ei[1] += wt;
+                        i++;
+                    }
+                }
+                if (e > 1) {
+                    ei[0] /= e;
+                }
+                if (i > 1) {
+                    ei[1] /= i;
+                }
+                return ei;
+            }
+
+            @Override
+            public String toString() {
+                return "Weighted";
+            }
+
+        }, SYNAPTIC {
+            /**
+             * Gets the synaptic sum of the pre-synaptic neurons' firing state
+             * weighted by synapses and processed through a spike responder.
+             */
+            @Override
+            public double getInput(Neuron n) {
+                return n.getSynapticInput();
+            }
+
+            @Override
+            public double[] getSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                for (Synapse s : n.getFanIn()) {
+                    double psr = s.calcPSR();
+                    if (psr > 0) {
+                        ei[0] += psr;
+                    } else {
+                        ei[1] += psr;
+                    }
+                }
+                return ei;
+            }
+
+
+            @Override
+            public double[] getNormalizedSeparatedInput(Neuron n) {
+                double[] ei = new double[2];
+                double e = 0;
+                double i = 0;
+                for (Synapse s : n.getFanIn()) {
+                    double psr = s.calcPSR();
+                    if (psr > 0) {
+                        ei[0] += psr;
+                        e++;
+                    } else {
+                        ei[1] += psr;
+                        i++;
+                    }
+                }
+                if (e > 1) {
+                    ei[0] /= e;
+                }
+                if (i > 1) {
+                    ei[1] /= i;
+                }
+                return ei;
+            }
+
+            @Override
+            public String toString() {
+                return "Synaptic";
+            }
+
+
+        };
+
+        /**
+         * Returns the total input to a neuron using either a post-synaptic
+         * response value calculated from each synapse and derived from the
+         * spike-train of the pre-synaptic neuron or a simple weighted sum of
+         * the product of the synapse values and their respective source
+         * neurons.
+         *
+         * @param n
+         * @return
+         */
+        public abstract double getInput(Neuron n);
+
+        /**
+         * Returns the total excitatory and inhibitory inputs to a neuron
+         * separated. Otherwise the same as {@link #getInput(Neuron)}.
+         *
+         * @param n
+         * @return
+         */
+        public abstract double[] getSeparatedInput(Neuron n);
+
+        public abstract double[] getNormalizedSeparatedInput(Neuron n);
     }
 
 }

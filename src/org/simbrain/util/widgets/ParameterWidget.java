@@ -182,4 +182,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public int hashCode() {
         return parameter.hashCode();
     }
+
+    /**
+     * Convenience method to get a label for this parameter
+     *
+     * @return the label
+     */
+    public String getLabel() {
+        return parameter.annotation.label();
+    }
 }

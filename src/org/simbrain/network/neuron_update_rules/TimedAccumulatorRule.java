@@ -85,7 +85,6 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
         tar.setCurrentState(currentState);
         tar.setMaxState(maxState);
         tar.setKappa(kappa);
-        tar.setIncrement(getIncrement());
         tar.setLastSpikeTime(getLastSpikeTime());
         return tar;
     }

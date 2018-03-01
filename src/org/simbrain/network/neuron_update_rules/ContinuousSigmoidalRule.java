@@ -174,7 +174,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();
         if (act < getUpperBound()) {
-            act += getIncrement();
+            act += n.getIncrement();
             if (act > getUpperBound()) {
                 act = getUpperBound();
             }
@@ -188,7 +188,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     public final void contextualDecrement(final Neuron n) {
         double act = n.getActivation();
         if (act > getLowerBound()) {
-            act -= getIncrement();
+            act -= n.getIncrement();
             if (act < getLowerBound()) {
                 act = getLowerBound();
             }

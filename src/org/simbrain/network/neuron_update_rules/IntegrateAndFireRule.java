@@ -132,7 +132,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         ifn.setBackgroundCurrent(getBackgroundCurrent());
         ifn.setTimeConstant(getTimeConstant());
         ifn.setResistance(getResistance());
-        ifn.setIncrement(getIncrement());
         ifn.setAddNoise(getAddNoise());
         ifn.noiseGenerator = new Randomizer(noiseGenerator);
         return ifn;

@@ -345,7 +345,7 @@ public class SOMGroup extends NeuronGroup {
     private Neuron getDefaultSOMNeuron() {
         LinearRule rule = new LinearRule();
         Neuron ret = new Neuron(getParentNetwork(), rule);
-        rule.setIncrement(1);
+        ret.setIncrement(1);
         rule.setLowerBound(0);
         return ret;
     }

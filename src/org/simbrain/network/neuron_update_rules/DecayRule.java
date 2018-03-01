@@ -171,7 +171,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         dn.setClipped(isClipped());
         dn.setUpperBound(getUpperBound());
         dn.setLowerBound(getLowerBound());
-        dn.setIncrement(getIncrement());
         dn.setAddNoise(getAddNoise());
         dn.noiseGenerator = new Randomizer(noiseGenerator);
         return dn;
@@ -195,9 +194,9 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             return;
         } else {
             if (isClipped()) {
-                act = clip(act + increment);
+                act = clip(act + n.getIncrement());
             } else {
-                act = act + increment;
+                act = act + n.getIncrement();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -211,9 +210,9 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             return;
         } else {
             if (isClipped()) {
-                act = clip(act - increment);
+                act = clip(act - n.getIncrement());
             } else {
-                act = act - increment;
+                act = act - n.getIncrement();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);

@@ -226,8 +226,6 @@ public class AddNeuronsDialog extends StandardDialog {
         super.closeDialogOk();
         combinedNeuronInfoPanel.commitChanges();
         selectLayout.commitChanges();
-        NeuronUpdateRule dbug = baseNeuron.getUpdateRule();
-        dbug.setIncrement(0.1);
         if (groupPanel.getAddToGroup().isSelected()) {
             addGroup();
         } else {

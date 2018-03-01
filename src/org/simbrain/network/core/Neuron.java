@@ -84,6 +84,17 @@ public class Neuron implements EditableObject {
     private double activation;
 
     /**
+     * The default increment of a neuron using this rule.
+     */
+    public static final double DEFAULT_INCREMENT = 0.1;
+
+    @UserParameter(
+        label = "Increment",
+        description = "This sets the amount that a neuron is incremented / decemented when it is manually adjusted.",
+        defaultValue = "1" + DEFAULT_INCREMENT, order = 6)
+    protected double increment = DEFAULT_INCREMENT;
+
+    /**
      * Whether or not this neuron has spiked. Specifically if the result of
      * integration of a spiking neuron update rule at time t, produced an action
      * potential at time t+1. True on t+1 in that case. Always false for
@@ -235,7 +246,7 @@ public class Neuron implements EditableObject {
         // current api changes would have to be made to add neuron update rule's
         // sub classes.
         getUpdateRule().setInputType(n.getUpdateRule().getInputType());
-        getUpdateRule().setIncrement(n.getUpdateRule().getIncrement());
+        setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
         setInputValue(n.getInputValue());
         setX(n.getX());
@@ -1116,13 +1127,19 @@ public class Neuron implements EditableObject {
     }
 
     /**
-     * Convenience method to set increment on the neuron's update rule.
-     *
-     * @param increment increment to set
+     * @return the increment
      */
-    public void setIncrement(final double increment) {
-        updateRule.setIncrement(increment);
+    public double getIncrement() {
+        return increment;
     }
+
+    /**
+     * @param increment the increment to set
+     */
+    public void setIncrement(double increment) {
+        this.increment = increment;
+    }
+
 
     /**
      * @return the auxValue

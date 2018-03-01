@@ -353,6 +353,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
     @Override
     public boolean commitChanges() {
+
         NeuronUpdateRule selectedRule = (NeuronUpdateRule) neuronRulePanel.getEditedObject();
 
         // If an inconsistent set of objects is being edited return with no action

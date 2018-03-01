@@ -194,7 +194,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
         if (act <= getUpperBound()) {
-            if (act + increment > getUpperBound()) {
+            if (act + n.getIncrement()> getUpperBound()) {
                 act = getUpperBound();
             }
             n.setActivation(act);

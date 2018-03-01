@@ -62,7 +62,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      * The objects whose annotated fields will be edited using the editor.
      * Passing in a single object to edit is fine.
      */
-    private List<? extends EditableObject> editedObjects;
+    private List<? extends EditableObject> editedObjects = Collections.EMPTY_LIST;
 
     /**
      * Main item panel.

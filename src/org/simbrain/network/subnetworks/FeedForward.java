@@ -72,7 +72,7 @@ public class FeedForward extends Subnetwork {
         super(network);
         LinearRule rule = new LinearRule();
         Neuron neuron = new Neuron(network, rule);
-        rule.setIncrement(1); // For easier testing
+        neuron.setIncrement(1); // For easier testing
         rule.setLowerBound(0);
         buildNetwork(network, nodesPerLayer, initialPosition, neuron);
     }

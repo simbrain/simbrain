@@ -88,7 +88,6 @@ public class BinaryRule extends NeuronUpdateRule {
         bn.setThreshold(getThreshold());
         bn.setCeiling(getUpperBound());
         bn.setFloor(getLowerBound());
-        bn.setIncrement(getIncrement());
         return bn;
     }
 

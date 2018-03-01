@@ -298,7 +298,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         cpy.addNoise = this.addNoise;
         cpy.b = this.b;
         cpy.g_L = this.g_L;
-        cpy.increment = this.increment;
         cpy.inputType = this.inputType;
         cpy.leakReversal = this.leakReversal;
         cpy.memCapacitance = this.memCapacitance;

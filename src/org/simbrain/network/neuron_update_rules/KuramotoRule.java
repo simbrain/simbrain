@@ -135,9 +135,9 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
             return;
         } else {
             if (isClipped()) {
-                act = clip(act + increment);
+                act = clip(act + n.getIncrement());
             } else {
-                act = act + increment;
+                act = act + n.getIncrement();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -151,9 +151,9 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
             return;
         } else {
             if (isClipped()) {
-                act = clip(act - increment);
+                act = clip(act - n.getIncrement());
             } else {
-                act = act - increment;
+                act = act - n.getIncrement();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);

@@ -37,20 +37,9 @@ public abstract class NeuronUpdateRule implements EditableObject {
     private static final int MAX_DIGITS = 9;
 
     /**
-     * The default increment of a neuron using this rule.
+     * The input type and also thing that computes an input value. TODO: rename
      */
-    public static final double DEFAULT_INCREMENT = 0.1;
-
     protected InputType inputType = InputType.WEIGHTED;
-
-    /**
-     * Amount by which to increment or decrement neuron.
-     */
-    @UserParameter(
-            label = "Increment",
-            description = "This sets the amount that a neuron is incremented when it is manually adjusted.",
-            defaultValue = "" + DEFAULT_INCREMENT, order = 6)
-    protected double increment = DEFAULT_INCREMENT;
 
     /**
      * Returns the type of time update (discrete or continuous) associated with
@@ -80,7 +69,7 @@ public abstract class NeuronUpdateRule implements EditableObject {
      * @param n neuron
      */
     public final void incrementActivation(Neuron n) {
-        n.forceSetActivation(n.getActivation() + increment);
+        n.forceSetActivation(n.getActivation() + n.getIncrement());
         n.getNetwork().fireNeuronChanged(n);
     }
 
@@ -90,7 +79,7 @@ public abstract class NeuronUpdateRule implements EditableObject {
      * @param n neuron
      */
     public final void decrementActivation(Neuron n) {
-        n.forceSetActivation(n.getActivation() - increment);
+        n.forceSetActivation(n.getActivation() - n.getIncrement());
         n.getNetwork().fireNeuronChanged(n);
     }
 
@@ -189,26 +178,19 @@ public abstract class NeuronUpdateRule implements EditableObject {
         return neuron.getId() + ".  Location: (" + (int) neuron.getX() + "," + (int) neuron.getY() + "). Activation: " + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
-    /**
-     * @return the increment
-     */
-    public double getIncrement() {
-        return increment;
-    }
-
-    /**
-     * @param increment the increment to set
-     */
-    public void setIncrement(double increment) {
-        this.increment = increment;
-    }
-
-    /**
-     * @return the defaultIncrement
-     */
-    public static double getDefaultIncrement() {
-        return DEFAULT_INCREMENT;
-    }
+//    /**
+//     * @return the increment
+//     */
+//    public double getIncrement() {
+//        return increment;
+//    }
+//
+//    /**
+//     * @param increment the increment to set
+//     */
+//    public void setIncrement(double increment) {
+//        this.increment = increment;
+//    }
 
     public InputType getInputType() {
         return inputType;
@@ -238,6 +220,7 @@ public abstract class NeuronUpdateRule implements EditableObject {
      * @author Zoë Tosi
      */
     public static enum InputType {
+
         WEIGHTED {
             /**
              * Gets the weighted sum of the pre-synaptic neurons' activation

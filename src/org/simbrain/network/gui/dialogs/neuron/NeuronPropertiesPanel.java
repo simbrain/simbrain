@@ -98,14 +98,6 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * {@link #createNeuronPropertiesPanel(List, Window, boolean, boolean)}
-     */
-    private NeuronPropertiesPanel(final List<Neuron> neuronList, final Window parent, final boolean displayUpdateRuleProperties, final boolean displayID) {
-        generalNeuronPropertiesPanel = GeneralNeuronPropertiesPanel.createPanel(neuronList, parent, displayID);
-        updateRulePanel = new UpdateRulePanel(neuronList, parent, displayUpdateRuleProperties);
-    }
-
-    /**
      * Construct the panel without specifying whether to display id (that is
      * done automatically).
      */

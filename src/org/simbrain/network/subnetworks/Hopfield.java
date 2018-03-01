@@ -102,8 +102,8 @@ public class Hopfield extends Subnetwork implements Trainable {
         binary.setThreshold(0);
         binary.setCeiling(1);
         binary.setFloor(0);
-        binary.setIncrement(1);
         neuronGroup.setNeuronType(binary);
+        neuronGroup.setIncrement(1);
 
         // Connect the neurons together
         AllToAll connection = new AllToAll();

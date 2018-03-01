@@ -81,7 +81,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();
         if (act < getUpperBound()) {
-            act += getIncrement();
+            act += n.getIncrement();
             if (act > getUpperBound()) {
                 act = getUpperBound();
             }
@@ -94,7 +94,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
         if (act > getLowerBound()) {
-            act -= getIncrement();
+            act -= n.getIncrement();
             if (act < getLowerBound()) {
                 act = getLowerBound();
             }

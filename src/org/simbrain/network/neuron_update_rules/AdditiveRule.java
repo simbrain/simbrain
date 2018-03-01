@@ -68,7 +68,6 @@ public class AdditiveRule extends NeuronUpdateRule {
         an.setResistance(getResistance());
         an.setAddNoise(getAddNoise());
         an.noiseGenerator = new Randomizer(noiseGenerator);
-        an.setIncrement(getIncrement());
         return an;
     }
 

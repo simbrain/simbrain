@@ -70,7 +70,7 @@ public class Neuron implements EditableObject {
     private String id;
 
     /**
-     * An optional String description associated with this neuron.
+     * Optional string description of neuron.
      */
     @UserParameter(label = "Label", description = "Optional String description associated with this neuron",
         defaultValue = "", order = 2)
@@ -88,6 +88,9 @@ public class Neuron implements EditableObject {
      */
     public static final double DEFAULT_INCREMENT = 0.1;
 
+    /**
+     * Amount to increment/decrement activation when manually adjusted.
+     */
     @UserParameter(
         label = "Increment",
         description = "This sets the amount that a neuron is incremented / decemented when it is manually adjusted.",

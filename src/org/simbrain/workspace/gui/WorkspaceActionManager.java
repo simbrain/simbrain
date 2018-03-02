@@ -42,65 +42,6 @@ import java.util.List;
 public class WorkspaceActionManager {
 
     /**
-     * Create an action based on the name of a script.
-     */
-    static class ScriptAction extends WorkspaceAction {
-
-        /**
-         * Name of script for use in actions (e.g. menu items).
-         */
-        private String scriptName;
-
-        /**
-         * Reference to workspace.
-         */
-        private Workspace workspace;
-
-        /**
-         * Reference to Simbrain Desktop.
-         */
-        private SimbrainDesktop desktop;
-
-        /**
-         * Create a new add gauge action with the specified workspace.
-         *
-         * @param desktop    Simbrain desktop
-         * @param scriptName name of script
-         */
-        public ScriptAction(final SimbrainDesktop desktop, final String scriptName) {
-            super(scriptName, desktop.getWorkspace());
-            // putValue(SHORT_DESCRIPTION, name);
-            this.scriptName = scriptName;
-            this.desktop = desktop;
-            this.workspace = desktop.getWorkspace();
-        }
-
-        /**
-         * @param event
-         * @see AbstractAction
-         */
-        public void actionPerformed(final ActionEvent event) {
-
-            Interpreter interpreter = new Interpreter();
-
-            try {
-                interpreter.set("workspace", workspace);
-                interpreter.set("desktop", desktop);
-                interpreter.source(SCRIPT_MENU_DIRECTORY + '/' + scriptName);
-            } catch (FileNotFoundException e) {
-                System.out.println("File not found");
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.out.println("IO Exception");
-                e.printStackTrace();
-            } catch (EvalError e) {
-                System.out.println("Evaluation error");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
      * Location of script menu directory.
      */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
@@ -412,6 +353,65 @@ public class WorkspaceActionManager {
 
     public Action getRepositionAllWindowsAction() {
         return repositionAllWindowsAction;
+    }
+
+    /**
+     * Create an action based on the name of a script.
+     */
+    static class ScriptAction extends WorkspaceAction {
+
+        /**
+         * Name of script for use in actions (e.g. menu items).
+         */
+        private String scriptName;
+
+        /**
+         * Reference to workspace.
+         */
+        private Workspace workspace;
+
+        /**
+         * Reference to Simbrain Desktop.
+         */
+        private SimbrainDesktop desktop;
+
+        /**
+         * Create a new add gauge action with the specified workspace.
+         *
+         * @param desktop    Simbrain desktop
+         * @param scriptName name of script
+         */
+        public ScriptAction(final SimbrainDesktop desktop, final String scriptName) {
+            super(scriptName, desktop.getWorkspace());
+            // putValue(SHORT_DESCRIPTION, name);
+            this.scriptName = scriptName;
+            this.desktop = desktop;
+            this.workspace = desktop.getWorkspace();
+        }
+
+        /**
+         * @param event
+         * @see AbstractAction
+         */
+        public void actionPerformed(final ActionEvent event) {
+
+            Interpreter interpreter = new Interpreter();
+
+            try {
+                interpreter.set("workspace", workspace);
+                interpreter.set("desktop", desktop);
+                interpreter.source(SCRIPT_MENU_DIRECTORY + '/' + scriptName);
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found");
+                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("IO Exception");
+                e.printStackTrace();
+            } catch (EvalError e) {
+                System.out.println("Evaluation error");
+                e.printStackTrace();
+            }
+        }
     }
 
 }

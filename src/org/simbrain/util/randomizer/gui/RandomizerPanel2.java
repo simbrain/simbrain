@@ -1,25 +1,23 @@
 package org.simbrain.util.randomizer.gui;
 
-import java.awt.Window;
+import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.widgets.EditablePanel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-
-import org.simbrain.network.core.Neuron;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.math.ProbDistribution;
-import org.simbrain.util.math.PropDistribution.NormalDistribution;
-import org.simbrain.util.math.PropDistribution.UniformDistribution;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.widgets.EditablePanel;
-
+//TODO: Avoid all neuron dependencies.
+// This is a panel that allows a randomizer or list of randomizers to be edited.
+// For example, a set of neurons might have different randomizers that all need to
+// be edited at once.  (Think more about this design...)
 public class RandomizerPanel2 extends JPanel implements EditablePanel{
     
     /**
@@ -40,12 +38,21 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
      * Distribution panel.
      */
     private AnnotatedPropertyEditor distributionPanel;
-    
+
+    /**
+     * Construct a panel to edit a single randomizer.
+     *
+     * @param rand the randomizer
+     * @param parent the parent window for nice resizing
+     */
+    public RandomizerPanel2(Randomizer rand, Window parent) {
+        this(Collections.singletonList(rand), parent);
+    }
+
     public RandomizerPanel2(List<Randomizer> randomizerList, Window parent) {
         this.randomizerList = randomizerList;
         cbDistribution = new JComboBox<String>(DISTRIBUTION_MAP.keySet().toArray(new String[DISTRIBUTION_MAP.size()]));
     }
-
     
     private void checkNeuronConsistency() {
 
@@ -75,11 +82,11 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
             // to the rules
-            String distributionName = randomizerRef.getPdf().getName();
-            distributionPanel = DISTRIBUTION_MAP.get(distributionName);
-            List<EditableObject> ruleList = randomizerList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
-            neuronRulePanel.fillFieldValues(ruleList);
-            cbNeuronType.setSelectedItem(neuronName);
+//            String distributionName = randomizerRef.getPdf().getName();
+//            distributionPanel = DISTRIBUTION_MAP.get(distributionName);
+//            List<EditableObject> ruleList = randomizerList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
+//            neuronRulePanel.fillFieldValues(ruleList);
+//            cbNeuronType.setSelectedItem(neuronName);
         }
     }
     
@@ -100,10 +107,19 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
         // TODO Auto-generated method stub
         return null;
     }
-    
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
 
+    /**
+     * Test main.
+     */
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
+        Randomizer rand = new Randomizer();
+        RandomizerPanel2 rp = new RandomizerPanel2(rand, frame);
+        rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        // rp.fillDefaultValues();
+        frame.setContentPane(rp);
+        frame.setVisible(true);
+        frame.pack();
     }
 
 }

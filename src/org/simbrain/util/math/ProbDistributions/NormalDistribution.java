@@ -1,9 +1,10 @@
-package org.simbrain.util.math.PropDistribution;
+package org.simbrain.util.math.ProbDistributions;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.simbrain.util.UserParameter;
 
+import org.simbrain.util.math.ProbabilityDistribution;
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 

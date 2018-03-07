@@ -20,6 +20,8 @@ package org.simbrain.util.randomizer;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
@@ -40,6 +42,12 @@ public class Randomizer implements EditableObject {
      * The probability distribution associated with this randomizer.
      */
     protected ProbDistribution pdf = DEFAULT_DISTRIBUTION;
+
+    //TODO
+    protected ProbabilityDistribution pdf2 = new NormalDistribution();
+
+
+    //TOOD: Get rid of param1, param2, etc.
 
     /**
      * First parameter of the selected probability distribution. E.g. mean of
@@ -174,7 +182,7 @@ public class Randomizer implements EditableObject {
     /**
      * @return the pdf
      */
-    public ProbabilityDistribution getPdf() {
+    public ProbDistribution getPdf() {
         return pdf;
     }
 

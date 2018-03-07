@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.gui.dialogs.neuron.rulepanels.MorrisLecarPanel;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
@@ -133,7 +134,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         RULE_MAP.put(new IzhikevichRule().getName(), new AnnotatedPropertyEditor(new IzhikevichRule()));
         RULE_MAP.put(new KuramotoRule().getName(), new AnnotatedPropertyEditor(new KuramotoRule()));
         RULE_MAP.put(new LinearRule().getName(), new AnnotatedPropertyEditor(new LinearRule()));
-        RULE_MAP.put(new MorrisLecarRule().getName(), new AnnotatedPropertyEditor(new MorrisLecarRule()));
+        RULE_MAP.put(new MorrisLecarRule().getName(), new MorrisLecarPanel(new MorrisLecarRule()));
         RULE_MAP.put(new NakaRushtonRule().getName(), new AnnotatedPropertyEditor(new NakaRushtonRule()));
         RULE_MAP.put(new ProductRule().getName(), new AnnotatedPropertyEditor(new ProductRule()));
         RULE_MAP.put(new ContinuousSigmoidalRule().getName(),

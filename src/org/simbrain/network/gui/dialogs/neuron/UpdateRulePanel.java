@@ -141,12 +141,6 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         RULE_MAP.put(new SigmoidalRule().getName(), new AnnotatedPropertyEditor(new SigmoidalRule()));
         RULE_MAP.put(new SpikingThresholdRule().getName(), new AnnotatedPropertyEditor(new SpikingThresholdRule()));
         RULE_MAP.put(new ThreeValueRule().getName(), new AnnotatedPropertyEditor(new ThreeValueRule()));
-        
-        // GENERATOR_MAP may not be useful any more?
-        RULE_MAP.put(new LogisticRule().getName(), new AnnotatedPropertyEditor(new LogisticRule()));
-        RULE_MAP.put(new RandomNeuronRule().getName(), new AnnotatedPropertyEditor(new RandomNeuronRule()));
-        RULE_MAP.put(new SinusoidalRule().getName(), new AnnotatedPropertyEditor(new SinusoidalRule()));
-        RULE_MAP.put(new StochasticRule().getName(), new AnnotatedPropertyEditor(new StochasticRule()));
     }
 
     /**

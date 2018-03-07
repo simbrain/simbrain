@@ -18,7 +18,9 @@
  */
 package org.simbrain.util.randomizer;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * <b>Randomizer</b> produces numbers drawn from a probability distribution
@@ -27,7 +29,7 @@ import org.simbrain.util.math.ProbDistribution;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class Randomizer {
+public class Randomizer implements EditableObject {
 
     /**
      * The default prob. distribution for this randomizer.
@@ -60,6 +62,10 @@ public class Randomizer {
      * clipping, to truncate the distribution. So if clipping is false this
      * value is not used.
      */
+    @UserParameter(
+            label = "Upper Bound",
+            description = "An artificial minimum value set by the user.",
+            defaultValue = "1", order = 1)
     protected double upperBound = 1;
 
     /**
@@ -67,12 +73,20 @@ public class Randomizer {
      * clipping, to truncate the distribution. So if clipping is false this
      * value is not used.
      */
+    @UserParameter(
+            label = "Lower Bound",
+            description = "An artificial minimum value set by the user.",
+            defaultValue = "0", order = 2)
     protected double lowerBound = 0;
 
     /**
      * Whether the Gaussian distribution should be clipped at upper / lower
      * bound values.
      */
+    @UserParameter(
+            label = "Clipping",
+            description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
+            defaultValue = "false", order = 1)
     protected boolean clipping = false;
 
     /**
@@ -160,7 +174,7 @@ public class Randomizer {
     /**
      * @return the pdf
      */
-    public ProbDistribution getPdf() {
+    public ProbabilityDistribution getPdf() {
         return pdf;
     }
 

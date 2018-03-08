@@ -95,13 +95,14 @@ public class AnnotatedPropertyEditor extends JPanel {
         fillFieldValues(editedObjects);
     }
 
+    //TODO: Consider a rename to layout panel given all the ways this is now being used
     /**
      * Initialize the editor. Use first editable object in the list to
      * initialize a set of widgets (JComponents) for editing, based on their
      * class. Then set the values on these widgets using the values of the
      * editable objects. If they have inconsistent values use a null value.
      */
-    private void initWidgets() {
+    protected void initWidgets() {
 
         // Can be implemented to "null" state.
         if (editedObjects.isEmpty()) {

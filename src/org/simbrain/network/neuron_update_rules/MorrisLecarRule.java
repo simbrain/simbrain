@@ -10,6 +10,7 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 
 public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
@@ -162,8 +163,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     private Randomizer noiseGenerator = new Randomizer();
 
     {
-        noiseGenerator.setPdf(ProbDistribution.NORMAL);
-        noiseGenerator.setParam2(1);
+        noiseGenerator.setPdf(new NormalDistribution());
+//        noiseGenerator.setParam2(1);
     }
 
     @Override
@@ -256,7 +257,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     }
 
     public void setNoiseAmplitude(double amp) {
-        noiseGenerator.setParam2(amp);
+//        noiseGenerator.setParam2(amp);
     }
 
     @Override

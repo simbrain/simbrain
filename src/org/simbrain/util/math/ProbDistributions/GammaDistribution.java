@@ -1,27 +1,26 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.simbrain.util.UserParameter;
-
 import org.simbrain.util.math.ProbabilityDistribution;
+
 import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.NormalDist;
+import umontreal.iro.lecuyer.probdist.GammaDist;
+import umontreal.iro.lecuyer.randvar.GammaGen;
 
-public class NormalDistribution extends ProbabilityDistribution {
-
-    @UserParameter(
-            label = "Mean (\u03BC)",
-            description = "The expected value of the distribution.",
-            defaultValue = "1.0", order = 1)
-    private double mean = 1.0;
-
+public class GammaDistribution extends ProbabilityDistribution {
 
     @UserParameter(
-            label = "Std. Dev. (\u03C3)",
-            description = "The average squared distance from the mean.",
-            defaultValue = "0.5", order = 2)
-    private double standardDeviation = 0.5;
+            label = "Shape (k)",
+            description = "Shape (k).",
+            defaultValue = "2.0", order = 1)
+    private double shape = 2.0;
+
+
+    @UserParameter(
+            label = "Scale (\u03B8)",
+            description = "Scale (\u03B8).",
+            defaultValue = "1.0", order = 2)
+    private double scale = 1.0;
 
 
     /**
@@ -32,8 +31,8 @@ public class NormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.NEGATIVE_INFINITY, order = 3)
-    private double floor = Double.NEGATIVE_INFINITY;
+            defaultValue = "0.0", order = 3)
+    private double floor = 0.0;
 
     /**
      * For all but uniform, lower bound is only used in conjunction with
@@ -52,43 +51,42 @@ public class NormalDistribution extends ProbabilityDistribution {
             defaultValue = "false", order = 5)
     private boolean clipping = false;
 
+    @Override
     public double nextRand() {
         return clipping(
-                (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,
+                GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale),
                 floor,
                 ceil
                 );
     }
 
+    @Override
     public int nextRandInt() {
         return (int) nextRand();
     }
 
-    public Distribution getBestFit(double[] observations, int numObs) {
-        return NormalDist.getInstanceFromMLE(observations, numObs);
-    }
-
-    public double[] getBestFitParams(double[] observations, int numObs) {
-        return NormalDist.getMLE(observations, numObs);
-    }
-
-    public String getName() {
-        return "Normal";
-    }
-
     @Override
-    public String toString() {
-        return "Normal";
-    }
-
-    @Override
-    public NormalDistribution deepCopy() {
-        NormalDistribution cpy = new NormalDistribution();
-        cpy.mean = this.mean;
-        cpy.standardDeviation = this.standardDeviation;
+    public GammaDistribution deepCopy() {
+        GammaDistribution cpy = new GammaDistribution();
+        cpy.shape = this.shape;
+        cpy.scale = this.scale;
         cpy.ceil = this.ceil;
         cpy.floor = this.floor;
         cpy.clipping = this.clipping;
         return cpy;
     }
+
+    @Override
+    public String getName() {
+        return "Gamma";
+    }
+    
+    public Distribution getBestFit(double[] observations, int numObs) {
+        return GammaDist.getInstanceFromMLE(observations, numObs);
+    }
+
+    public double[] getBestFitParams(double[] observations, int numObs) {
+        return GammaDist.getMLE(observations, numObs);
+    }
+
 }

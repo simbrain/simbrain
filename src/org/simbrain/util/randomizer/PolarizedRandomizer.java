@@ -20,6 +20,7 @@ package org.simbrain.util.randomizer;
 
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * Creates a randomizer that returns either positive or negative values
@@ -66,7 +67,7 @@ public class PolarizedRandomizer extends Randomizer {
      * @param polarity the polarity
      * @param pdf      the prob. distribution
      */
-    public PolarizedRandomizer(Polarity polarity, ProbDistribution pdf) {
+    public PolarizedRandomizer(Polarity polarity, ProbabilityDistribution pdf) {
         super();
         this.pdf = pdf;
         this.polarity = polarity;
@@ -165,7 +166,7 @@ public class PolarizedRandomizer extends Randomizer {
     /**
      * @return the pdf
      */
-    public ProbDistribution getPdf() {
+    public ProbabilityDistribution getPdf() {
         return pdf;
     }
 

@@ -21,6 +21,7 @@ package org.simbrain.util.randomizer;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
@@ -36,66 +37,12 @@ public class Randomizer implements EditableObject {
     /**
      * The default prob. distribution for this randomizer.
      */
-    public static final ProbDistribution DEFAULT_DISTRIBUTION = ProbDistribution.UNIFORM;
+    public static final UniformDistribution DEFAULT_DISTRIBUTION = new UniformDistribution();
 
     /**
      * The probability distribution associated with this randomizer.
      */
-    protected ProbDistribution pdf = DEFAULT_DISTRIBUTION;
-
-    //TODO
-    protected ProbabilityDistribution pdf2 = new NormalDistribution();
-
-
-    //TOOD: Get rid of param1, param2, etc.
-
-    /**
-     * First parameter of the selected probability distribution. E.g. mean of
-     * the normal. See <a href =
-     * "http://www.simbrain.net/Documentation/docs/Pages/Utils/Randomizers/Randomizers.html">.
-     * Also see {@link org.simbrain.util.math.ProbDistribution#getParam1Name()}.
-     */
-    protected double param1 = 0;
-
-    /**
-     * Second parameter of the selected probability distribution. E.g. stdev of
-     * the normal. See <a href =
-     * "http://www.simbrain.net/Documentation/docs/Pages/Utils/Randomizers/Randomizers.html">.
-     * Also see {@link org.simbrain.util.math.ProbDistribution#getParam1Name()}.
-     */
-    protected double param2 = 1;
-
-    /**
-     * For all but uniform, upper bound is only used in conjunction with
-     * clipping, to truncate the distribution. So if clipping is false this
-     * value is not used.
-     */
-    @UserParameter(
-            label = "Upper Bound",
-            description = "An artificial minimum value set by the user.",
-            defaultValue = "1", order = 1)
-    protected double upperBound = 1;
-
-    /**
-     * For all but uniform, lower bound is only used in conjunction with
-     * clipping, to truncate the distribution. So if clipping is false this
-     * value is not used.
-     */
-    @UserParameter(
-            label = "Lower Bound",
-            description = "An artificial minimum value set by the user.",
-            defaultValue = "0", order = 2)
-    protected double lowerBound = 0;
-
-    /**
-     * Whether the Gaussian distribution should be clipped at upper / lower
-     * bound values.
-     */
-    @UserParameter(
-            label = "Clipping",
-            description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
-            defaultValue = "false", order = 1)
-    protected boolean clipping = false;
+    protected ProbabilityDistribution pdf = DEFAULT_DISTRIBUTION;
 
     /**
      * Default constructor.
@@ -108,7 +55,7 @@ public class Randomizer implements EditableObject {
      *
      * @param pdf the probability density function.
      */
-    public Randomizer(ProbDistribution pdf) {
+    public Randomizer(ProbabilityDistribution pdf) {
         this.pdf = pdf;
     }
 
@@ -119,10 +66,6 @@ public class Randomizer implements EditableObject {
      */
     public Randomizer(final Randomizer dup) {
         setPdf(dup.getPdf());
-        setParams(dup.getParam1(), dup.getParam2());
-        setUpperBound(dup.getUpperBound());
-        setLowerBound(dup.getLowerBound());
-        setClipping(getClipping());
     }
 
     /**
@@ -131,204 +74,39 @@ public class Randomizer implements EditableObject {
      * @return the next random number
      */
     public double getRandom() {
-        if (clipping) {
-            return clip(pdf.nextRand(param1, param2));
-        } else {
-            return pdf.nextRand(param1, param2);
-        }
+        return pdf.nextRand();
     }
 
-    /**
-     * Clip <code>val</code> to upper and lower bounds.
-     *
-     * @param val the value to clip
-     * @return the clipped value
-     */
-    private double clip(final double val) {
-        double ret = val;
-
-        if (ret > upperBound) {
-            ret = upperBound;
-        } else if (ret < lowerBound) {
-            ret = lowerBound;
-        }
-
-        return ret;
-    }
-
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
-
-    /**
-     * @param clipping The useBounds to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    /**
-     * Returns the string name of the distribution.
-     *
-     * @return the distribution name.
-     */
-    public String getDistributionName() {
-        return pdf.toString();
-    }
 
     /**
      * @return the pdf
      */
-    public ProbDistribution getPdf() {
+    public ProbabilityDistribution getPdf() {
         return pdf;
     }
 
     /**
      * @param pdf the pdf to set
      */
-    public void setPdf(final ProbDistribution pdf) {
+    public void setPdf(final ProbabilityDistribution pdf) {
         this.pdf = pdf;
-    }
-
-    /**
-     * See the javadoc at {@link #param1}.
-     *
-     * @return the param1
-     */
-    public double getParam1() {
-        return param1;
-    }
-
-    /**
-     * See the javadoc at {@link #param2}.
-     *
-     * @return the param2
-     */
-    public double getParam2() {
-        return param2;
-    }
-
-    /**
-     * Set both parameters.
-     */
-    protected void setParams(double param1, double param2) {
-        this.param1 = param1;
-        this.param2 = param2;
-    }
-
-    /**
-     * Set the randomizer by specifying parameter names and parameters.
-     */
-    public void setParamsByName(String p1Name, double param1, String p2Name, double param2) {
-        // Not currently used and will probably be changed in a refactor.
-        if (!p1Name.equals(pdf.getParam1Name()) || !p2Name.equals(pdf.getParam2Name())) {
-            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
-        }
-        setParams(param1, param2);
-    }
-
-    /**
-     * Set the parameter using its string name.
-     *
-     * @param p1Name string name, must match exactly.
-     * @param param1 the parameter value.
-     */
-    public void setParam1ByName(String p1Name, double param1) {
-        if (!p1Name.equals(pdf.getParam1Name())) {
-            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
-        }
-        this.param1 = param1;
-    }
-
-    /**
-     * Set the parameter using its string name.
-     *
-     * @param p2Name string name, must match exactly.
-     * @param param2 the parameter value.
-     */
-    public void setParam2ByName(String p2Name, double param2) {
-        if (p2Name == null)
-            return; // TODO think about this, it's a hack
-        if (!p2Name.equals(pdf.getParam2Name())) {
-            throw new IllegalArgumentException("Parameter name/Distribution" + " mismatch.");
-        }
-        this.param2 = param2;
-    }
-
-    /**
-     * @return the upperBound
-     */
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * For all but uniform, upper bound is only used in conjunction with
-     * clipping, to truncate the distribution. So if clipping is false this
-     * value is not used.
-     *
-     * @param ub the upperBound to set
-     */
-    public void setUpperBound(final double ub) {
-        this.upperBound = ub;
-        if (pdf == ProbDistribution.UNIFORM) {
-            param2 = upperBound;
-        }
-    }
-
-    /**
-     * @return lower bound
-     */
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * For all but uniform, lower bound is only used in conjunction with
-     * clipping, to truncate the distribution. So if clipping is false this
-     * value is not used.
-     *
-     * @param lb the lowerBound to set
-     */
-    public void setLowerBound(final double lb) {
-        this.lowerBound = lb;
-        if (pdf == ProbDistribution.UNIFORM) {
-            param1 = lb;
-        }
-    }
-
-    /**
-     * @param param1 the param1 to set
-     */
-    public void setParam1(double param1) {
-        this.param1 = param1;
-    }
-
-    /**
-     * @param param2 the param2 to set
-     */
-    public void setParam2(double param2) {
-        this.param2 = param2;
     }
 
     /**
      * Test main.
      */
     public static void main(String[] args) {
-        Randomizer rand = new Randomizer();
-        rand.setUpperBound(5);
-        rand.setLowerBound(-5);
-        for (int i = 0; i < 10; i++) {
-            System.out.println(rand.getRandom());
-        }
-        System.out.println("-------");
-        rand.setPdf(ProbDistribution.NORMAL);
-        rand.setParam1(0);
-        rand.setParam2(100);
-        rand.setClipping(true);
+        Randomizer rand = new Randomizer(new NormalDistribution());
+//        rand.setUpperBound(5);
+//        rand.setLowerBound(-5);
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(rand.getRandom());
+//        }
+//        System.out.println("-------");
+//        rand.setPdf(ProbDistribution.NORMAL);
+//        rand.setParam1(0);
+//        rand.setParam2(100);
+//        rand.setClipping(true);
         for (int i = 0; i < 10; i++) {
             System.out.println(rand.getRandom());
         }

@@ -55,4 +55,12 @@ public class UniformDistribution extends ProbabilityDistribution {
     public String toString() {
         return "Uniform";
     }
+
+    @Override
+    public UniformDistribution deepCopy() {
+        UniformDistribution cpy = new UniformDistribution();
+        cpy.ceil = this.ceil;
+        cpy.floor = this.floor;
+        return cpy;
+    }
 }

@@ -172,16 +172,16 @@ public class ProbDistPanel {
      * @param rand
      */
     public void fillFieldValues(Randomizer rand) {
-        if (!rand.getPdf().equals(pdf)) {
-            throwBadPdfException();
-        }
-        tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setText(Double.toString(rand.getLowerBound()));
-        tfUpBound.setText(Double.toString(rand.getUpperBound()));
-        tfParam1.setText(Double.toString(rand.getParam1()));
-        tfParam2.setText(Double.toString(rand.getParam2()));
-        tfLowBound.setEnabled(rand.getClipping());
-        tfUpBound.setEnabled(rand.getClipping());
+//        if (!rand.getPdf().equals(pdf)) {
+//            throwBadPdfException();
+//        }
+//        tsClipping.setSelected(rand.getClipping());
+//        tfLowBound.setText(Double.toString(rand.getLowerBound()));
+//        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+//        tfParam1.setText(Double.toString(rand.getParam1()));
+//        tfParam2.setText(Double.toString(rand.getParam2()));
+//        tfLowBound.setEnabled(rand.getClipping());
+//        tfUpBound.setEnabled(rand.getClipping());
     }
 
     /**
@@ -203,35 +203,35 @@ public class ProbDistPanel {
      * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
-        rand.setPdf(pdf);
-
-        if (pdf == ProbDistribution.NULL) {
-            return;
-        }
-
-        double param1 = Utils.doubleParsable(tfParam1);
-        if (tfParam1.isEnabled() && !Double.isNaN(param1)) {
-            rand.setParam1ByName(pdf.getParam1Name(), param1);
-        }
-
-        double param2 = Utils.doubleParsable(tfParam2);
-        if (tfParam2.isEnabled() && !Double.isNaN(param2)) {
-            rand.setParam2ByName(pdf.getParam2Name(), param2);
-        }
-        if (!tsClipping.isNull()) {
-            rand.setClipping(tsClipping.isSelected());
-            if (tsClipping.isSelected()) {
-                double upperBound = Utils.doubleParsable(tfUpBound);
-                if (!Double.isNaN(upperBound)) {
-                    rand.setUpperBound(upperBound);
-                }
-                double lowerBound = Utils.doubleParsable(tfLowBound);
-                if (!Double.isNaN(lowerBound)) {
-                    rand.setLowerBound(lowerBound);
-                }
-            }
-
-        }
+//        rand.setPdf(pdf);
+//
+//        if (pdf == ProbDistribution.NULL) {
+//            return;
+//        }
+//
+//        double param1 = Utils.doubleParsable(tfParam1);
+//        if (tfParam1.isEnabled() && !Double.isNaN(param1)) {
+//            rand.setParam1ByName(pdf.getParam1Name(), param1);
+//        }
+//
+//        double param2 = Utils.doubleParsable(tfParam2);
+//        if (tfParam2.isEnabled() && !Double.isNaN(param2)) {
+//            rand.setParam2ByName(pdf.getParam2Name(), param2);
+//        }
+//        if (!tsClipping.isNull()) {
+//            rand.setClipping(tsClipping.isSelected());
+//            if (tsClipping.isSelected()) {
+//                double upperBound = Utils.doubleParsable(tfUpBound);
+//                if (!Double.isNaN(upperBound)) {
+//                    rand.setUpperBound(upperBound);
+//                }
+//                double lowerBound = Utils.doubleParsable(tfLowBound);
+//                if (!Double.isNaN(lowerBound)) {
+//                    rand.setLowerBound(lowerBound);
+//                }
+//            }
+//
+//        }
     }
 
     /**

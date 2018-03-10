@@ -79,11 +79,7 @@ public class PolarizedRandomizer extends Randomizer {
      * @param dup the <code>RandomSource</code> to duplicate.
      */
     public PolarizedRandomizer(final PolarizedRandomizer dup) {
-        setPdf(dup.getPdf());
-        setParams(dup.getParam1(), dup.getParam2());
-        setUpperBound(dup.getUpperBound());
-        setLowerBound(dup.getLowerBound());
-        setClipping(getClipping());
+        setPdf(dup.getPdf().deepCopy());
         setPolarity(dup.getPolarity());
     }
 
@@ -93,20 +89,21 @@ public class PolarizedRandomizer extends Randomizer {
      * @return
      */
     public String checkParamsNonNegative() {
-        String ret = "";
-        if (param1 < 0) {
-            ret = ret.concat(pdf.getParam1Name() + " is negative. \n");
-        }
-        if (param2 < 0) {
-            ret = ret.concat(pdf.getParam2Name() + " is negative. \n");
-        }
-        if (upperBound < 0) {
-            ret = ret.concat("Upper boundary is negative. \n");
-        }
-        if (lowerBound < 0) {
-            ret = ret.concat("Lower boundary is negative. \n");
-        }
-        return ret;
+//        String ret = "";
+//        if (param1 < 0) {
+//            ret = ret.concat(pdf.getParam1Name() + " is negative. \n");
+//        }
+//        if (param2 < 0) {
+//            ret = ret.concat(pdf.getParam2Name() + " is negative. \n");
+//        }
+//        if (upperBound < 0) {
+//            ret = ret.concat("Upper boundary is negative. \n");
+//        }
+//        if (lowerBound < 0) {
+//            ret = ret.concat("Lower boundary is negative. \n");
+//        }
+//        return ret;
+        return "checkParamsNonNegative method disabled";
     }
 
     /**
@@ -115,44 +112,40 @@ public class PolarizedRandomizer extends Randomizer {
      * @return the next random number
      */
     public double getRandom() {
-        if (clipping) {
-            return clip(pdf.nextRand(param1, param2));
-        } else {
-            return polarity.value(pdf.nextRand(param1, param2));
-        }
+        return polarity.value(pdf.nextRand());
     }
 
-    /**
-     * Clip <code>val</code> to upper and lower bounds.
-     *
-     * @param val the value to clip
-     * @return the clipped value
-     */
-    private double clip(final double val) {
-        double ret = val;
-
-        if (ret > upperBound) {
-            ret = upperBound;
-        } else if (ret < lowerBound) {
-            ret = lowerBound;
-        }
-
-        return ret;
-    }
-
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
-
-    /**
-     * @param clipping The useBounds to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
+//    /**
+//     * Clip <code>val</code> to upper and lower bounds.
+//     *
+//     * @param val the value to clip
+//     * @return the clipped value
+//     */
+//    private double clip(final double val) {
+//        double ret = val;
+//
+//        if (ret > upperBound) {
+//            ret = upperBound;
+//        } else if (ret < lowerBound) {
+//            ret = lowerBound;
+//        }
+//
+//        return ret;
+//    }
+//
+//    /**
+//     * @return Returns the clipping.
+//     */
+//    public boolean getClipping() {
+//        return clipping;
+//    }
+//
+//    /**
+//     * @param clipping The useBounds to set.
+//     */
+//    public void setClipping(final boolean clipping) {
+//        this.clipping = clipping;
+//    }
 
     /**
      * Returns the string name of the distribution.
@@ -160,7 +153,7 @@ public class PolarizedRandomizer extends Randomizer {
      * @return the distribution name.
      */
     public String getDistributionName() {
-        return pdf.toString();
+        return pdf.getName();
     }
 
     /**
@@ -170,23 +163,23 @@ public class PolarizedRandomizer extends Randomizer {
         return pdf;
     }
 
-    /**
-     * See the javadoc at {@link Randomizer#param1}.
-     *
-     * @return the param1
-     */
-    public double getParam1() {
-        return param1;
-    }
-
-    /**
-     * See the javadoc at {@link Randomizer#param2}.
-     *
-     * @return the param2
-     */
-    public double getParam2() {
-        return param2;
-    }
+//    /**
+//     * See the javadoc at {@link Randomizer#param1}.
+//     *
+//     * @return the param1
+//     */
+//    public double getParam1() {
+//        return param1;
+//    }
+//
+//    /**
+//     * See the javadoc at {@link Randomizer#param2}.
+//     *
+//     * @return the param2
+//     */
+//    public double getParam2() {
+//        return param2;
+//    }
 
     /**
      * @return the polarity

@@ -244,7 +244,7 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
     /**
      * Test main.
      */
-        JFrame frame = new JFrame();
+        static JFrame frame = new JFrame();
         public static void main(String[] args) {
         Randomizer rand = new Randomizer();
         RandomizerPanel2 rp = new RandomizerPanel2(rand, frame);

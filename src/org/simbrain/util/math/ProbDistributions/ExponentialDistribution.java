@@ -42,7 +42,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
             defaultValue = "false", order = 5)
     private boolean clipping = false;
-    
+
     @Override
     public double nextRand() {
         return clipping(
@@ -71,13 +71,45 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     public String getName() {
         return "Exponential";
     }
-    
+
     public Distribution getBestFit(double[] observations, int numObs) {
         return ExponentialDist.getInstanceFromMLE(observations, numObs);
     }
 
     public double[] getBestFitParams(double[] observations, int numObs) {
         return ExponentialDist.getMLE(observations, numObs);
+    }
+
+    public double getLambda() {
+        return lambda;
+    }
+
+    public void setLambda(double lambda) {
+        this.lambda = lambda;
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+        this.lambda = p1;
+    }
+
+    @Override
+    public void setParam2(double p2) {
     }
 
 }

@@ -34,7 +34,7 @@ public class UniformDistribution extends ProbabilityDistribution {
     public double nextRand() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);
     }
-    
+
     public int nextRandInt() {
         return (int) nextRand();
     }
@@ -52,15 +52,33 @@ public class UniformDistribution extends ProbabilityDistribution {
         return "Uniform";
     }
 
-    public String toString() {
-        return "Uniform";
-    }
-
     @Override
     public UniformDistribution deepCopy() {
         UniformDistribution cpy = new UniformDistribution();
         cpy.ceil = this.ceil;
         cpy.floor = this.floor;
         return cpy;
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+    }
+
+    @Override
+    public void setParam2(double p2) {
     }
 }

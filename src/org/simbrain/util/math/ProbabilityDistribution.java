@@ -15,6 +15,12 @@ public abstract class ProbabilityDistribution implements EditableObject{
     public abstract int nextRandInt();
     public abstract ProbabilityDistribution deepCopy();
     public abstract String getName();
+    public abstract void setClipping(boolean clipping);
+    public abstract void setUpperBound(double ceiling);
+    public abstract void setLowerbound(double floor);
+
+    public abstract void setParam1(double p1);
+    public abstract void setParam2(double p2);
 
     protected static double clipping(double value, double lowerBound, double upperBound) {
         double result = value;

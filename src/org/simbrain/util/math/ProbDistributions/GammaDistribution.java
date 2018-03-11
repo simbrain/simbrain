@@ -80,13 +80,54 @@ public class GammaDistribution extends ProbabilityDistribution {
     public String getName() {
         return "Gamma";
     }
-    
+
+    public double getShape() {
+        return shape;
+    }
+
+    public void setShape(double shape) {
+        this.shape = shape;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
     public Distribution getBestFit(double[] observations, int numObs) {
         return GammaDist.getInstanceFromMLE(observations, numObs);
     }
 
     public double[] getBestFitParams(double[] observations, int numObs) {
         return GammaDist.getMLE(observations, numObs);
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+        this.scale = p1;
+    }
+
+    @Override
+    public void setParam2(double p2) {
+        this.shape = p2;
     }
 
 }

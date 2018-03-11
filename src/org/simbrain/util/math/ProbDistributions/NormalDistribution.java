@@ -71,6 +71,22 @@ public class NormalDistribution extends ProbabilityDistribution {
     public double[] getBestFitParams(double[] observations, int numObs) {
         return NormalDist.getMLE(observations, numObs);
     }
+    
+    public double getMean() {
+        return mean;
+    }
+
+    public void setMean(double mean) {
+        this.mean = mean;
+    }
+
+    public double getStandardDeviation() {
+        return standardDeviation;
+    }
+
+    public void setStandardDeviation(double standardDeviation) {
+        this.standardDeviation = standardDeviation;
+    }
 
     public String getName() {
         return "Normal";
@@ -90,5 +106,30 @@ public class NormalDistribution extends ProbabilityDistribution {
         cpy.floor = this.floor;
         cpy.clipping = this.clipping;
         return cpy;
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+        this.mean = p1;
+    }
+
+    @Override
+    public void setParam2(double p2) {
+       this.standardDeviation = p2;
     }
 }

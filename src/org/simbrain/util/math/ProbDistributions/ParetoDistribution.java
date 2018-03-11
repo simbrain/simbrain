@@ -74,9 +74,50 @@ public class ParetoDistribution extends ProbabilityDistribution{
         return cpy;
     }
 
+    public double getSlope() {
+        return slope;
+    }
+
+    public void setSlope(double slope) {
+        this.slope = slope;
+    }
+
+    public double getMin() {
+        return min;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
     @Override
     public String getName() {
         return "Pareto";
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+        this.min = p1;
+    }
+
+    @Override
+    public void setParam2(double p2) {
+        this.slope = p2;
     }
 
 }

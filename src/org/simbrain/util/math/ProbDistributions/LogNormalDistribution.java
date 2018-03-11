@@ -79,12 +79,53 @@ public class LogNormalDistribution extends ProbabilityDistribution {
         return "Log-Normal";
     }
 
+    public double getLocation() {
+        return location;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setLocation(double location) {
+        this.location = location;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
     public Distribution getBestFit(double[] observations, int numObs) {
         return LognormalDist.getInstanceFromMLE(observations, numObs);
     }
 
     public double[] getBestFitParams(double[] observations, int numObs) {
         return LognormalDist.getMLE(observations, numObs);
+    }
+
+    @Override
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceil = ceiling;
+    }
+
+    @Override
+    public void setLowerbound(double floor) {
+        this.floor = floor;
+    }
+
+    @Override
+    public void setParam1(double p1) {
+        this.location = p1;
+    }
+
+    @Override
+    public void setParam2(double p2) {
+        this.scale = p2;
     }
 
 }

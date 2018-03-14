@@ -32,6 +32,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
@@ -42,9 +44,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,6 +64,11 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * The neurons being modified.
      */
     private final List<Neuron> neuronList;
+
+    /**
+     * List of randomizers for noisy neurons.
+     */
+    private List<Randomizer> randomizerList = new ArrayList<>();
 
     /**
      * Null string.
@@ -90,7 +95,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     /**
      * Noise panel if any, null otherwise.
      */
-    private NoiseGeneratorPanel noisePanel;
+    private RandomizerPanel2 noisePanel;
 
     /**
      * For showing/hiding the neuron update rule panel.
@@ -120,6 +125,16 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * Associations between names of rules and panels for editing them.
      */
     private static final LinkedHashMap<String, AnnotatedPropertyEditor> RULE_MAP = new LinkedHashMap<>();
+
+    /**
+     * Tabbed pane.
+     */
+    private JTabbedPane tabPane;
+
+    /**
+     * True if all nodes implement {@link NoisyUpdateRule}.
+     */
+    private boolean allNodesNoisy;
 
     // Populate the Rule Map. Note! Place items in alphabetical order so they
     // appear that way in the GUI combo box.
@@ -179,6 +194,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      *                      rule are initially visible
      */
     public UpdateRulePanel(List<Neuron> neuronList, Window parent, boolean startingState) {
+
         this.neuronList = neuronList;
         this.parent = parent;
         if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
@@ -191,29 +207,27 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
         neuronRulePanelTriangle = new DropDownTriangle(UpDirection.LEFT, startingState, "Settings", "Settings", parent);
 
-        checkNeuronConsistency();
         startingPanel = neuronRulePanel;
+
+        allNodesNoisy = neuronList.stream().allMatch(n -> n.getUpdateRule() instanceof NoisyUpdateRule);
+
+        initializePanel();
         initializeLayout();
         addListeners();
-        setRandomizerPanelParent();
     }
 
-    //TODO: Do something like in SynapseRulePanel
     /**
      * Initialize the main neuron panel based on whether all the neurons are the
      * same type or not.
      */
-    private void checkNeuronConsistency() {
+    private void initializePanel() {
 
-        // TODO: Better handling of mixed case with activity generators. Warn
-        // against it
-        // or if allowing it, change the shape of the neuron to match.
-
-        Iterator<Neuron> neuronIter = neuronList.iterator();
-        Neuron neuronRef = neuronIter.next();
+        // TODO: Better handling of mixed case with activity generators.
 
         // Check whether the set of synapses being edited are of the
         // same type or not
+        Iterator<Neuron> neuronIter = neuronList.iterator();
+        Neuron neuronRef = neuronIter.next();
         boolean discrepancy = false;
         while (neuronIter.hasNext()) {
             if (!neuronRef.getUpdateRule().getClass().equals(neuronIter.next().getUpdateRule().getClass())) {
@@ -222,22 +236,39 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             }
         }
 
+        // Create different panel elements depending on whether we are dealing with a consistent set
         if (discrepancy) {
+            // If dealing with mixed types just use empty panels
             cbNeuronType.addItem(SimbrainConstants.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
-            // Simply to serve as an empty panel
             neuronRulePanel = new AnnotatedPropertyEditor(Collections.emptyList());
+            if(allNodesNoisy) {
+                noisePanel = new RandomizerPanel2(Collections.emptyList(), parent);
+            }
         } else {
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
             // to the rules
             String neuronName = neuronRef.getUpdateRule().getName();
-            neuronRulePanel = RULE_MAP.get(neuronName);
+            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
+                neuronRulePanel = GENERATOR_MAP.get(neuronName);
+            } else {
+                neuronRulePanel = RULE_MAP.get(neuronName);
+            }
+
             List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
             neuronRulePanel.fillFieldValues(ruleList);
+
+            if(allNodesNoisy) {
+                randomizerList= ruleList.stream().map(r -> (NoisyUpdateRule) r).map(NoisyUpdateRule::getNoiseGenerator).collect(Collectors.toList());
+                noisePanel = new RandomizerPanel2(randomizerList, parent);
+            }
+
             cbNeuronType.setSelectedItem(neuronName);
         }
+
     }
+
 
     /**
      * Lays out the components of the panel.
@@ -248,29 +279,35 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
         Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-        JPanel tPanel = new JPanel();
-        tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
-        tPanel.add(cbNeuronType);
+        // Top Panel that contains the combo box, the triangle
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.add(cbNeuronType);
         int horzStrut = 30;
-
-        // Create a minimum spacing
-        tPanel.add(Box.createHorizontalStrut(horzStrut));
-
+        topPanel.add(Box.createHorizontalStrut(horzStrut)); // Create a minimum spacing
         // Give all extra space to the space between the components
-        tPanel.add(Box.createHorizontalGlue());
-
-        tPanel.add(neuronRulePanelTriangle);
-        tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tPanel.setBorder(padding);
-        this.add(tPanel);
-
+        topPanel.add(Box.createHorizontalGlue());
+        topPanel.add(neuronRulePanelTriangle);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topPanel.setBorder(padding);
         this.add(Box.createRigidArea(new Dimension(0, 5)));
+        this.add(topPanel);
 
+        // Create the tabbed pane
+        tabPane = new JTabbedPane();
+        this.add(tabPane);
+        tabPane.setVisible(neuronRulePanelTriangle.isDown()); // Set initial visibility
+
+        // Main tab with neuron rule panel
+        tabPane.addTab("Main",neuronRulePanel);
         neuronRulePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         neuronRulePanel.setBorder(padding);
-        neuronRulePanel.setVisible(neuronRulePanelTriangle.isDown());
-        this.add(neuronRulePanel);
 
+        // Noise tab with randomizer panel
+        tabPane.addTab("Noise", noisePanel);
+
+
+        //Format the whole panel
         TitledBorder tb = BorderFactory.createTitledBorder("Update Rule");
         this.setBorder(tb);
 
@@ -285,7 +322,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                neuronRulePanel.setVisible(neuronRulePanelTriangle.isDown());
+                tabPane.setVisible(neuronRulePanelTriangle.isDown());
                 repaint();
                 parent.pack();
                 parent.setLocationRelativeTo(null);
@@ -297,7 +334,6 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         cbNeuronType.addActionListener(e -> {
 
             neuronRulePanel = ruleMap.get(cbNeuronType.getSelectedItem());
-            setRandomizerPanelParent();
 
             // Is the current panel different from the starting panel?
             boolean replaceUpdateRules = neuronRulePanel != startingPanel;
@@ -308,10 +344,16 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             // If so we have to fill the new panel with default values
             if (replaceUpdateRules) {
                 neuronRulePanel.fillDefaultValues();
+                if(allNodesNoisy) {
+                    noisePanel.fillFieldValues();
+                }
             } else {
                 // If not we can fill the new panel with values from the
                 // neurons being edited.
                 neuronRulePanel.fillFieldValues(ruleList);
+                if(allNodesNoisy) {
+                    noisePanel.fillFieldValues(randomizerList);
+                }
             }
 
             // Tell the panel whether it will have to replace neuron
@@ -324,27 +366,6 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             parent.setLocationRelativeTo(null);
         });
 
-    }
-
-    /**
-     * Set window on randomizer panels.
-     */
-    private void setRandomizerPanelParent() {
-        if (noisePanel != null && neuronRulePanel.getEditedObject() instanceof NoisyUpdateRule) {
-            noisePanel.setParent(parent);
-        }
-    }
-
-    /**
-     * Get the noise generator panel for the edited noisy neuron rule.
-     *
-     * @return the noisePanel
-     */
-    public NoiseGeneratorPanel getNoisePanel() {
-        if (noisePanel == null) {
-            noisePanel = new NoiseGeneratorPanel();
-        }
-        return noisePanel;
     }
 
     @Override

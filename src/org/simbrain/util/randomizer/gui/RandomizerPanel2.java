@@ -24,17 +24,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//TODO: Avoid all neuron dependencies.
-// This is a panel that allows a randomizer or list of randomizers to be edited.
-// For example, a set of neurons might have different randomizers that all need to
-// be edited at once.  (Think more about this design...)
-public class RandomizerPanel2 extends JPanel implements EditablePanel{
+//TODO: Revisit name randomizer
+
+/**
+ * This is a panel that allows a randomizer or list of randomizers to be edited.
+ * For example, a set of neurons might have different randomizers that all need to
+ * be edited at once.  (Think more about this design...)
+ */
+public class RandomizerPanel2 extends JPanel implements EditablePanel {
 
     /**
      * The neurons being modified.
      */
     private final List<Randomizer> randomizerList;
 
+    /**
+     * Combo box for choosing which distribution to use.
+     */
     private final JComboBox<String> cbDistribution;
 
     /**
@@ -44,12 +50,20 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
     private final Window parent;
 
     /**
+     * Main editor panel.
+     */
+    private AnnotatedPropertyEditor randomizerPanel;
+
+    /**
      * A reference to the original panel, so that we can easily know if we are
      * writing to already existing randomizer or replacing them with
      * new rules.
      */
     private AnnotatedPropertyEditor startingPanel;
 
+    /**
+     * Associate names with property editor panels. Used in combo box.
+     */
     private static final LinkedHashMap<String, AnnotatedPropertyEditor> DISTRIBUTION_MAP = new LinkedHashMap<>();
 
     static {
@@ -62,40 +76,38 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
     }
 
     /**
-     * Distribution panel.
-     */
-    private AnnotatedPropertyEditor randomizerPanel;
-
-    /**
      * Construct a panel to edit a single randomizer.
      *
-     * @param rand the randomizer
+     * @param rand   the randomizer
      * @param parent the parent window for nice resizing
      */
     public RandomizerPanel2(Randomizer rand, Window parent) {
         this(Collections.singletonList(rand), parent);
     }
 
+    /**
+     * Construct the randomize panel.
+     *
+     * @param randomizerList
+     * @param parent
+     */
     public RandomizerPanel2(List<Randomizer> randomizerList, Window parent) {
         this.randomizerList = randomizerList;
         this.parent = parent;
         cbDistribution = new JComboBox<String>(DISTRIBUTION_MAP.keySet().toArray(new String[DISTRIBUTION_MAP.size()]));
-        checkNeuronConsistency();
+        checkRandomizerConsistency();
         startingPanel = randomizerPanel;
         addListeners();
         initializeLayout();
     }
 
-    private void checkNeuronConsistency() {
+    private void checkRandomizerConsistency() {
 
-        // TODO: Better handling of mixed case with activity generators. Warn
-        // against it
-        // or if allowing it, change the shape of the neuron to match.
 
         Iterator<Randomizer> randomizerItr = randomizerList.iterator();
         Randomizer randomizerRef = randomizerItr.next();
 
-        // Check whether the set of synapses being edited are of the
+        // Check whether the set of randomizers being edited are of the
         // same type or not
         boolean discrepancy = false;
         while (randomizerItr.hasNext()) {
@@ -117,8 +129,8 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
             String distributionName = randomizerRef.getPdf().getName();
             randomizerPanel = DISTRIBUTION_MAP.get(distributionName);
             List<EditableObject> ruleList = randomizerList.stream()
-                    .map(Randomizer::getPdf)
-                    .collect(Collectors.toList());
+                .map(Randomizer::getPdf)
+                .collect(Collectors.toList());
             randomizerPanel.fillFieldValues(ruleList);
             cbDistribution.setSelectedItem(distributionName);
         }
@@ -168,7 +180,7 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
             boolean replaceDistribution = randomizerPanel != startingPanel;
 
             List<EditableObject> distributionList =
-                    randomizerList.stream()
+                randomizerList.stream()
                     .map(Randomizer::getPdf)
                     .collect(Collectors.toList());
 
@@ -203,15 +215,24 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
         repaint();
     }
 
+    /**
+     * Fill field values using specified list
+     * @param randList list of randomizers
+     */
+    public void fillFieldValues(List<Randomizer> randList) {
+        randomizerPanel.fillFieldValues(randList);
+    }
+
     @Override
     public void fillFieldValues() {
+        randomizerPanel.fillDefaultValues();
 
     }
 
     @Override
     public boolean commitChanges() {
         ProbabilityDistribution selectedDistribution =
-                (ProbabilityDistribution) randomizerPanel.getEditedObject();
+            (ProbabilityDistribution) randomizerPanel.getEditedObject();
 
         // If an inconsistent set of objects is being edited return with no action
         if (selectedDistribution == null) {
@@ -229,8 +250,8 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
         }
 
         List<EditableObject> distributionList = randomizerList.stream().
-                map(Randomizer::getPdf).
-                collect(Collectors.toList());
+            map(Randomizer::getPdf).
+            collect(Collectors.toList());
         startingPanel = randomizerPanel;
         randomizerPanel.commitChanges(distributionList);
         return true;
@@ -244,8 +265,9 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
     /**
      * Test main.
      */
-        static JFrame frame = new JFrame();
-        public static void main(String[] args) {
+    static JFrame frame = new JFrame();
+
+    public static void main(String[] args) {
         Randomizer rand = new Randomizer();
         RandomizerPanel2 rp = new RandomizerPanel2(rand, frame);
         rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -253,6 +275,8 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel{
         frame.setContentPane(rp);
         frame.setVisible(true);
         frame.pack();
+        frame.setLocationRelativeTo(null);
+        rp.repaintPanel();
     }
 
 }

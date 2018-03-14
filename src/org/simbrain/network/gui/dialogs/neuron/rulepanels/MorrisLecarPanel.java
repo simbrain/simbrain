@@ -47,12 +47,25 @@ public class MorrisLecarPanel extends AnnotatedPropertyEditor {
         this.add(tabbedPane);
 
         LabelledItemPanel cellPanel = new LabelledItemPanel();
-        cellPanel.add(new JLabel("Capacitance (µF/cm²):"));
-        cellPanel.add(getWidget("Capacitance (µF/cm²)").component);
+        cellPanel.addItem("Capacitance (µF/cm²):", getWidget("Capacitance (µF/cm²)").component);
+        cellPanel.addItem("Voltage const. 1", getWidget("Voltage const. 1").component);
+        cellPanel.addItem("Voltage const. 2", getWidget("Voltage const. 2").component);
+        cellPanel.addItem("Threshold (mV)",  getWidget("Threshold (mV)").component);
+        cellPanel.addItem("Background current (nA)", getWidget("Background current (nA)").component);
+        cellPanel.addItem("Add noise", getWidget("Add noise").component);
 
         LabelledItemPanel ionPanel = new LabelledItemPanel();
+        ionPanel.addItem("Ca²⁺ Conductance (µS/cm²)", getWidget("Ca²⁺ Conductance (µS/cm²)").component);
+        ionPanel.addItem("K⁺ Conductance (µS/cm²)", getWidget("K⁺ Conductance (µS/cm²)").component);
+        ionPanel.addItem("Leak Conductance (µS/cm²)", getWidget("Leak Conductance (µS/cm²)").component);
+        ionPanel.addItem("Ca²⁺ Equilibrium (mV)", getWidget("Ca²⁺ Equilibrium (mV)").component);
+        ionPanel.addItem("K⁺ Equilibrium (mV)", getWidget("K⁺ Equilibrium (mV)").component);
+        ionPanel.addItem("Leak Equilibrium (mV)", getWidget("Leak Equilibrium (mV)").component);
 
         LabelledItemPanel potas = new LabelledItemPanel();
+        potas.addItem("K⁺  Const. 1", getWidget("K⁺  Const. 1").component);
+        potas.addItem("K⁺  Const. 2", getWidget("K⁺  Const. 2").component);
+        potas.addItem("K⁺ φ", getWidget("K⁺ φ").component);
 
         tabbedPane.add(cellPanel, "Membrane Properties");
         tabbedPane.add(ionPanel, "Ion Properties");

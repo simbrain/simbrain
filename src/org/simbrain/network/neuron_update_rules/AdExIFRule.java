@@ -98,7 +98,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
      * Maximal inhibitory conductance. (nS)
      */
     @UserParameter(
-            label = " Max In. Conductance (nS)",
+            label = "Max In. Conductance (nS)",
             description = "The inhibitory conductance if all inhibitory channels are open.",
             defaultValue = "10", order = 8)
     private double g_i_bar = 10;

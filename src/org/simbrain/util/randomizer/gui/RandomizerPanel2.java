@@ -1,22 +1,15 @@
 package org.simbrain.util.randomizer.gui;
 
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.math.ProbDistributions.ExponentialDistribution;
-import org.simbrain.util.math.ProbDistributions.GammaDistribution;
-import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbDistributions.ParetoDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-
 import java.awt.*;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +24,7 @@ import java.util.stream.Collectors;
  * For example, a set of neurons might have different randomizers that all need to
  * be edited at once.  (Think more about this design...)
  */
-public class RandomizerPanel2 extends JPanel implements EditablePanel {
+public class RandomizerPanel2 extends JPanel {
 
     /**
      * The neurons being modified.
@@ -103,6 +96,15 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel {
 
     private void checkRandomizerConsistency() {
 
+
+        //TODO: Ugly overlap with discrepancy case
+        if(randomizerList.isEmpty()) {
+            cbDistribution.addItem(SimbrainConstants.NULL_STRING);
+            cbDistribution.setSelectedIndex(cbDistribution.getItemCount() - 1);
+            // Simply to serve as an empty panel
+            randomizerPanel = new AnnotatedPropertyEditor(Collections.emptyList());
+            return;
+        }
 
         Iterator<Randomizer> randomizerItr = randomizerList.iterator();
         Randomizer randomizerRef = randomizerItr.next();
@@ -216,20 +218,26 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel {
     }
 
     /**
-     * Fill field values using specified list
+     * Fill field values using specified list.
+     *
      * @param randList list of randomizers
      */
     public void fillFieldValues(List<Randomizer> randList) {
         randomizerPanel.fillFieldValues(randList);
     }
 
-    @Override
-    public void fillFieldValues() {
+    /**
+     * Fill fields to default values.
+     */
+    public void fillDefaultValues() {
         randomizerPanel.fillDefaultValues();
-
     }
 
-    @Override
+
+
+    /**
+     * Commit changes to randomizers
+     */
     public boolean commitChanges() {
         ProbabilityDistribution selectedDistribution =
             (ProbabilityDistribution) randomizerPanel.getEditedObject();
@@ -255,11 +263,6 @@ public class RandomizerPanel2 extends JPanel implements EditablePanel {
         startingPanel = randomizerPanel;
         randomizerPanel.commitChanges(distributionList);
         return true;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
     /**

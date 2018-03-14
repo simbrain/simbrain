@@ -345,7 +345,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             if (replaceUpdateRules) {
                 neuronRulePanel.fillDefaultValues();
                 if(allNodesNoisy) {
-                    noisePanel.fillFieldValues();
+                    noisePanel.fillDefaultValues();
                 }
             } else {
                 // If not we can fill the new panel with values from the

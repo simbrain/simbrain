@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  *
  * @author ztosi
  */
-public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel {
+public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -303,15 +303,6 @@ public class SpikeResponderSettingsPanel extends JPanel implements EditablePanel
         spikeResponderPanel.commitChanges(responderList);
 
         return true;
-    }
-
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
 }

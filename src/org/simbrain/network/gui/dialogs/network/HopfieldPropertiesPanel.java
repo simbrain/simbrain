@@ -209,17 +209,11 @@ public class HopfieldPropertiesPanel extends JPanel implements GroupPropertiesPa
         return true; // Success
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getHelpPath() {
         return "Pages/Network/network/hopfieldnetwork.html";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Group getGroup() {
         return hopfield;

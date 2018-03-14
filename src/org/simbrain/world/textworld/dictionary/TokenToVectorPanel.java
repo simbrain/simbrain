@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Jeff Yoshimi
  */
-public class TokenToVectorPanel extends VectorDictionaryPanel implements EditablePanel {
+public class TokenToVectorPanel extends VectorDictionaryPanel {
 
     /**
      * The world to edit.
@@ -82,18 +82,4 @@ public class TokenToVectorPanel extends VectorDictionaryPanel implements Editabl
         }
     }
 
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public boolean commitChanges() {
-        world.loadTokenToVectorDict(table.getData().asStringArray());
-        return true;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 }

@@ -32,7 +32,7 @@ import javax.swing.*;
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
  * Self organizing map.
  */
-public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel, EditablePanel {
+public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
 
     // TODO: This class takes care of SOM network and group. Not sure that's
     // good. Some things are conflated, e.g. help page.

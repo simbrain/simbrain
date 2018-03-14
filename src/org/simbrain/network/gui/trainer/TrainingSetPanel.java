@@ -16,7 +16,6 @@ package org.simbrain.network.gui.trainer;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +26,7 @@ import java.util.List;
  *
  * @author jyoshimi
  */
-public class TrainingSetPanel extends JPanel implements EditablePanel {
+public class TrainingSetPanel extends JPanel {
 
     /**
      * Representation of input data.
@@ -154,18 +153,9 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
         targetPanel.setFrame(frame);
     }
 
-    @Override
     public boolean commitChanges() {
         return inputPanel.commitChanges() && targetPanel.commitChanges();
     }
 
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 
 }

@@ -19,7 +19,6 @@ import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
-import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -34,7 +33,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class DataPanel extends JPanel implements EditablePanel {
+public class DataPanel extends JPanel {
 
     /**
      * Scrollpane.
@@ -146,7 +145,6 @@ public class DataPanel extends JPanel implements EditablePanel {
      *
      * @return
      */
-    @Override
     public boolean commitChanges() {
         //System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
@@ -207,13 +205,5 @@ public class DataPanel extends JPanel implements EditablePanel {
         this.table = table;
     }
 
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 
 }

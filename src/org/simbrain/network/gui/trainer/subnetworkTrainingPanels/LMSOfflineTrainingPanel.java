@@ -34,7 +34,7 @@ import java.awt.*;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
+public class LMSOfflineTrainingPanel extends JPanel {
 
     /**
      * Reference to trainer object.
@@ -95,20 +95,6 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(trainingSetPanel, gbc);
-    }
-
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public boolean commitChanges() {
-        return trainingSetPanel.commitChanges();
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
 }

@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
  * network or to edit an existing competitive network.
  */
 @SuppressWarnings("serial")
-public class CompetitivePropertiesPanel extends JPanel implements ActionListener, GroupPropertiesPanel, EditablePanel {
+public class CompetitivePropertiesPanel extends JPanel implements ActionListener, GroupPropertiesPanel {
 
     /**
      * Default number of competitive neurons.
@@ -326,9 +326,6 @@ public class CompetitivePropertiesPanel extends JPanel implements ActionListener
         return "Pages/Network/network/competitivenetwork.html";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean commitChanges() {
         try {
@@ -375,17 +372,11 @@ public class CompetitivePropertiesPanel extends JPanel implements ActionListener
         ((CompetitiveNetwork) competitive).getCompetitive().setNormalizeInputs(cbNormalizeInputs.isSelected());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Group getGroup() {
         return competitive;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JPanel getPanel() {
         return this;

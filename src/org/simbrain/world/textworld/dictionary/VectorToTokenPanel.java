@@ -35,7 +35,7 @@ import javax.swing.*;
  *
  * @author Jeff Yoshimi
  */
-public class VectorToTokenPanel extends VectorDictionaryPanel implements EditablePanel {
+public class VectorToTokenPanel extends VectorDictionaryPanel {
 
     /**
      * The world to edit.
@@ -83,18 +83,4 @@ public class VectorToTokenPanel extends VectorDictionaryPanel implements Editabl
         }
     }
 
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public boolean commitChanges() {
-        world.loadVectorToTokenDict(table.getData().asStringArray());
-        return true;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 }

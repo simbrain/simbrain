@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 public class RandomizerPanel2 extends JPanel {
 
     /**
-     * The neurons being modified.
+     * The probability distributions being modified.
      */
-    private final List<Randomizer> randomizerList;
+    private final List<ProbabilityDistribution> randomizerList; //TODO Rename
 
     /**
      * Combo box for choosing which distribution to use.
@@ -74,7 +74,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param rand   the randomizer
      * @param parent the parent window for nice resizing
      */
-    public RandomizerPanel2(Randomizer rand, Window parent) {
+    public RandomizerPanel2(ProbabilityDistribution rand, Window parent) {
         this(Collections.singletonList(rand), parent);
     }
 
@@ -84,7 +84,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param randomizerList
      * @param parent
      */
-    public RandomizerPanel2(List<Randomizer> randomizerList, Window parent) {
+    public RandomizerPanel2(List<ProbabilityDistribution> randomizerList, Window parent) {
         this.randomizerList = randomizerList;
         this.parent = parent;
         cbDistribution = new JComboBox<String>(DISTRIBUTION_MAP.keySet().toArray(new String[DISTRIBUTION_MAP.size()]));
@@ -106,14 +106,14 @@ public class RandomizerPanel2 extends JPanel {
             return;
         }
 
-        Iterator<Randomizer> randomizerItr = randomizerList.iterator();
-        Randomizer randomizerRef = randomizerItr.next();
+        Iterator<ProbabilityDistribution> randomizerItr = randomizerList.iterator();
+        ProbabilityDistribution randomizerRef = randomizerItr.next();
 
         // Check whether the set of randomizers being edited are of the
         // same type or not
         boolean discrepancy = false;
         while (randomizerItr.hasNext()) {
-            if (!randomizerRef.getPdf().getClass().equals(randomizerItr.next().getPdf().getClass())) {
+            if (!randomizerRef.getClass().equals(randomizerItr.next().getClass())) {
                 discrepancy = true;
                 break;
             }
@@ -128,12 +128,9 @@ public class RandomizerPanel2 extends JPanel {
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
             // to the rules
-            String distributionName = randomizerRef.getPdf().getName();
+            String distributionName = randomizerRef.getName();
             randomizerPanel = DISTRIBUTION_MAP.get(distributionName);
-            List<EditableObject> ruleList = randomizerList.stream()
-                .map(Randomizer::getPdf)
-                .collect(Collectors.toList());
-            randomizerPanel.fillFieldValues(ruleList);
+            randomizerPanel.fillFieldValues(randomizerList);
             cbDistribution.setSelectedItem(distributionName);
         }
     }
@@ -181,11 +178,6 @@ public class RandomizerPanel2 extends JPanel {
             // Is the current panel different from the starting panel?
             boolean replaceDistribution = randomizerPanel != startingPanel;
 
-            List<EditableObject> distributionList =
-                randomizerList.stream()
-                    .map(Randomizer::getPdf)
-                    .collect(Collectors.toList());
-
 
             // If so we have to fill the new panel with default values
             if (replaceDistribution) {
@@ -193,7 +185,7 @@ public class RandomizerPanel2 extends JPanel {
             } else {
                 // If not we can fill the new panel with values from the
                 // neurons being edited.
-                randomizerPanel.fillFieldValues(distributionList);
+                randomizerPanel.fillFieldValues(randomizerList);
             }
 
             // Tell the panel whether it will have to replace neuron
@@ -222,8 +214,17 @@ public class RandomizerPanel2 extends JPanel {
      *
      * @param randList list of randomizers
      */
-    public void fillFieldValues(List<Randomizer> randList) {
+    public void fillFieldValues(List<ProbabilityDistribution> randList) {
         randomizerPanel.fillFieldValues(randList);
+    }
+
+    /**
+     * Commit changes to provided list of randomizers.
+     *
+     * @param randList list of randomizers
+     */
+    public void commitChanges(List<ProbabilityDistribution> randList) {
+        randomizerPanel.commitChanges(randList);
     }
 
     /**
@@ -232,7 +233,6 @@ public class RandomizerPanel2 extends JPanel {
     public void fillDefaultValues() {
         randomizerPanel.fillDefaultValues();
     }
-
 
 
     /**
@@ -247,21 +247,18 @@ public class RandomizerPanel2 extends JPanel {
             return true;
         }
 
-        for (Randomizer r : randomizerList) {
+        for (ProbabilityDistribution r : randomizerList) {
             // Only replace if this is a different rule (otherwise when
             // editing multiple rules with different parameter values which
             // have not been set those values will be replaced with the
             // default).
-            if (!r.getPdf().getClass().equals(selectedDistribution.getClass())) {
-                r.setPdf(selectedDistribution.deepCopy());
+            if (!r.getClass().equals(selectedDistribution.getClass())) {
+                r = selectedDistribution.deepCopy();
             }
         }
 
-        List<EditableObject> distributionList = randomizerList.stream().
-            map(Randomizer::getPdf).
-            collect(Collectors.toList());
         startingPanel = randomizerPanel;
-        randomizerPanel.commitChanges(distributionList);
+        randomizerPanel.commitChanges(randomizerList);
         return true;
     }
 
@@ -271,8 +268,8 @@ public class RandomizerPanel2 extends JPanel {
     static JFrame frame = new JFrame();
 
     public static void main(String[] args) {
-        Randomizer rand = new Randomizer();
-        RandomizerPanel2 rp = new RandomizerPanel2(rand, frame);
+        NormalDistribution nd = new NormalDistribution();
+        RandomizerPanel2 rp = new RandomizerPanel2(nd, frame);
         rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         // rp.fillDefaultValues();
         frame.setContentPane(rp);

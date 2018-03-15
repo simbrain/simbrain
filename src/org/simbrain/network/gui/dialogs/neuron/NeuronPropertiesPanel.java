@@ -136,7 +136,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
         // This must be the first change committed, as other neuron panels
         // make assumptions about the type of the neuron update rule being
         // edited that can result in ClassCastExceptions otherwise.
-        success &= updateRulePanel.commitChanges();
+        updateRulePanel.commitChanges();
 
         success &= generalNeuronPropertiesPanel.commitChanges();
 

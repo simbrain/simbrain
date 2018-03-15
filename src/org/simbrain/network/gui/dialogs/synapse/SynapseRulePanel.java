@@ -47,8 +47,7 @@ import java.util.stream.Collectors;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-@SuppressWarnings("serial")
-public class SynapseRulePanel extends JPanel implements EditablePanel {
+public class SynapseRulePanel extends JPanel {
 
     /**
      * The synapses being modified.
@@ -264,14 +263,13 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
 
     }
 
-    @Override
-    public boolean commitChanges() {
+    public void commitChanges() {
 
         SynapseUpdateRule selectedRule = (SynapseUpdateRule) synapsePanel.getEditedObject();
 
         // If an inconsistent set of objects is being edited return with no action
         if (selectedRule == null) {
-            return true;
+            return;
         }
 
         // TODO: Replace check
@@ -288,7 +286,6 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         // TODO: Think about this in relation to above
         List<EditableObject> ruleList = synapseCollection.stream().map(Synapse::getLearningRule).collect(Collectors.toList());
         synapsePanel.commitChanges(ruleList);
-        return true;
     }
 
     /**
@@ -308,13 +305,5 @@ public class SynapseRulePanel extends JPanel implements EditablePanel {
         return cbSynapseType;
     }
 
-    @Override
-    public void fillFieldValues() {
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 
 }

@@ -139,7 +139,7 @@ public final class SynapsePropertiesPanel extends JPanel implements EditablePane
         // This must be the first change committed, as other synapse panels
         // make assumptions about the type of the synapse update rule being
         // edited that can result in ClassCastExceptions otherwise.
-        success &= synapseRulePanel.commitChanges();
+        synapseRulePanel.commitChanges();
 
         generalSynapseProperties.commitChanges();
 

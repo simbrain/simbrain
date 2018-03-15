@@ -30,6 +30,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.randomizer.Randomizer;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
  * @author Yulin Li
  */
 @SuppressWarnings("serial")
-public class UpdateRulePanel extends JPanel implements EditablePanel {
+public class UpdateRulePanel extends JPanel {
 
     /**
      * The neurons being modified.
@@ -68,7 +69,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     /**
      * List of randomizers for noisy neurons.
      */
-    private List<Randomizer> randomizerList = new ArrayList<>();
+    private List<ProbabilityDistribution> randomizerList = new ArrayList<>();
 
     /**
      * Null string.
@@ -95,7 +96,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     /**
      * Noise panel if any, null otherwise.
      */
-    private RandomizerPanel2 noisePanel;
+    private JPanel noisePanel;
 
     /**
      * For showing/hiding the neuron update rule panel.
@@ -135,6 +136,11 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
      * True if all nodes implement {@link NoisyUpdateRule}.
      */
     private boolean allNodesNoisy;
+
+    /**
+     * True if an inconsistent set of neurons is being edited.
+     */
+    private boolean inconsistentNeurons;
 
     // Populate the Rule Map. Note! Place items in alphabetical order so they
     // appear that way in the GUI combo box.
@@ -242,9 +248,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             cbNeuronType.addItem(SimbrainConstants.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
             neuronRulePanel = new AnnotatedPropertyEditor(Collections.emptyList());
-            if(allNodesNoisy) {
-                noisePanel = new RandomizerPanel2(Collections.emptyList(), parent);
-            }
+            noisePanel = new JPanel();
         } else {
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
@@ -260,7 +264,11 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             neuronRulePanel.fillFieldValues(ruleList);
 
             if(allNodesNoisy) {
-                randomizerList= ruleList.stream().map(r -> (NoisyUpdateRule) r).map(NoisyUpdateRule::getNoiseGenerator).collect(Collectors.toList());
+                randomizerList= ruleList.stream().
+                    map(r -> (NoisyUpdateRule) r).
+                    map(NoisyUpdateRule::getNoiseGenerator).
+                    map(Randomizer::getPdf).
+                    collect(Collectors.toList());
                 noisePanel = new RandomizerPanel2(randomizerList, parent);
             }
 
@@ -336,29 +344,26 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             neuronRulePanel = ruleMap.get(cbNeuronType.getSelectedItem());
 
             // Is the current panel different from the starting panel?
-            boolean replaceUpdateRules = neuronRulePanel != startingPanel;
-
-            List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
-
-
             // If so we have to fill the new panel with default values
+            boolean replaceUpdateRules = neuronRulePanel != startingPanel;
             if (replaceUpdateRules) {
                 neuronRulePanel.fillDefaultValues();
-                if(allNodesNoisy) {
-                    noisePanel.fillDefaultValues();
-                }
+//                if(allNodesNoisy) {
+//                    noisePanel.fillDefaultValues();
+//                }
             } else {
                 // If not we can fill the new panel with values from the
                 // neurons being edited.
+                List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
                 neuronRulePanel.fillFieldValues(ruleList);
-                if(allNodesNoisy) {
-                    noisePanel.fillFieldValues(randomizerList);
-                }
+//                if(allNodesNoisy) {
+//                    noisePanel.fillFieldValues(randomizerList);
+//                }
             }
 
             // Tell the panel whether it will have to replace neuron
             // update rules or edit them upon commit.
-//            neuronRulePanel.setReplacingUpdateRules(replaceUpdateRules);
+            // neuronRulePanel.setReplacingUpdateRules(replaceUpdateRules);
 
             repaintPanel();
             repaint();
@@ -368,14 +373,13 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
 
     }
 
-    @Override
-    public boolean commitChanges() {
+    public void commitChanges() {
 
         NeuronUpdateRule selectedRule = (NeuronUpdateRule) neuronRulePanel.getEditedObject();
 
         // If an inconsistent set of objects is being edited return with no action
         if (selectedRule == null) {
-            return true;
+            return;
         }
 
         for (Neuron n : neuronList) {
@@ -391,7 +395,17 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
         startingPanel = neuronRulePanel;
         neuronRulePanel.commitChanges(ruleList);
-        return true;
+
+        // TODO: Not working
+        // Also note that in case of discrepant neurons we should just ignore this
+        if(noisePanel instanceof RandomizerPanel2) {
+            randomizerList = ruleList.stream().
+                map(r -> (NoisyUpdateRule) r).
+                map(NoisyUpdateRule::getNoiseGenerator).
+                map(Randomizer::getPdf).
+                collect(Collectors.toList());
+            ((RandomizerPanel2) noisePanel).commitChanges(randomizerList);
+        }
     }
 
     /**
@@ -411,13 +425,5 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
         return cbNeuronType;
     }
 
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
-
-    @Override
-    public void fillFieldValues() {
-    }
 
 }

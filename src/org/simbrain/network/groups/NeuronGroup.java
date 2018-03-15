@@ -739,6 +739,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @param inputs the input vector as a double array.
      */
+    @Consumable(idMethod = "getId")
     public void forceSetActivations(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {

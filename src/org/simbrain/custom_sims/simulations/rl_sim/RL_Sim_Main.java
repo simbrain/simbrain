@@ -13,6 +13,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.BasicEntity;
@@ -265,7 +266,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Helper method for "combined input" coupling.
      */
-    // @Producible
+     @Producible
     public double[] getCombinedInputs() {
         System.arraycopy(leftInputs.getActivations(), 0, combinedInputs, 0, leftInputs.size() - 1);
         System.arraycopy(rightInputs.getActivations(), 0, combinedInputs, leftInputs.size(), rightInputs.size());
@@ -276,7 +277,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Helper method for getting combined prediction.
      */
-    // @Producible
+     @Producible
     public double[] getCombinedPredicted() {
         System.arraycopy(predictionLeft.getActivations(), 0, combinedPredicted, 0, leftInputs.size() - 1);
         System.arraycopy(predictionRight.getActivations(), 0, combinedPredicted, leftInputs.size(), rightInputs.size());

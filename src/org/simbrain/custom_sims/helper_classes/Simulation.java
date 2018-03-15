@@ -271,7 +271,7 @@ public class Simulation {
      * @param ng     The neuron group
      */
     public void couple(SmellSensor sensor, NeuronGroup ng) {
-        Producer sensoryProducer = couplingFactory.getProducer(sensor, "getCurrentValue");
+        Producer sensoryProducer = couplingFactory.getProducer(sensor, "getCurrentValues");
         Consumer sensoryConsumer = couplingFactory.getConsumer(ng, "forceSetActivations");
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
@@ -286,7 +286,7 @@ public class Simulation {
      * @param consumingNeuron   The neuron to write the values to
      */
     public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
-        Producer agentSensor = couplingFactory.getProducer(producingSensor, "getCurrentValue");
+        Producer agentSensor = couplingFactory.getProducer(producingSensor, "getCurrentValues");
         Consumer sensoryNeuron = couplingFactory.getConsumer(consumingNeuron, "forceSetActivation");
         tryCoupling(agentSensor, sensoryNeuron);
     }

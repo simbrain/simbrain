@@ -232,7 +232,7 @@ public class AnnotatedPropertyEditor extends JPanel {
         boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
         if (!objectsSameType || !objectsSameTypeAsInternal) {
             String exceptionString = "Commited objects of type " + objectsToCheck.get(0).getClass()
-                + "does not match edited object of type" + editedObjects.get(0).getClass();
+                + " does not match edited object of type" + editedObjects.get(0).getClass();
             throw new IllegalArgumentException(exceptionString);
         }
     }

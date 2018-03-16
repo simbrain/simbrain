@@ -17,8 +17,8 @@ public class UniformDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "1", order = 1)
-    private double floor = 1;
+            defaultValue = "0", order = 1)
+    private double floor = 0;
 
     /**
      * For all but uniform, lower bound is only used in conjunction with
@@ -28,8 +28,8 @@ public class UniformDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "0", order = 2)
-    private double ceil = 0;
+            defaultValue = "1", order = 2)
+    private double ceil = 1;
 
     public double nextRand() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);

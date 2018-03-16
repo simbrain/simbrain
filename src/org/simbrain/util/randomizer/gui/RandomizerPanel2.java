@@ -1,5 +1,6 @@
 package org.simbrain.util.randomizer.gui;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -29,7 +30,7 @@ public class RandomizerPanel2 extends JPanel {
     /**
      * The probability distributions being modified.
      */
-    private final List<ProbabilityDistribution> randomizerList; //TODO Rename
+    private final List<Randomizer> randomizerList; //TODO Rename
 
     /**
      * Combo box for choosing which distribution to use.
@@ -74,7 +75,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param rand   the randomizer
      * @param parent the parent window for nice resizing
      */
-    public RandomizerPanel2(ProbabilityDistribution rand, Window parent) {
+    public RandomizerPanel2(Randomizer rand, Window parent) {
         this(Collections.singletonList(rand), parent);
     }
 
@@ -84,7 +85,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param randomizerList
      * @param parent
      */
-    public RandomizerPanel2(List<ProbabilityDistribution> randomizerList, Window parent) {
+    public RandomizerPanel2(List<Randomizer> randomizerList, Window parent) {
         this.randomizerList = randomizerList;
         this.parent = parent;
         cbDistribution = new JComboBox<String>(DISTRIBUTION_MAP.keySet().toArray(new String[DISTRIBUTION_MAP.size()]));
@@ -106,14 +107,14 @@ public class RandomizerPanel2 extends JPanel {
             return;
         }
 
-        Iterator<ProbabilityDistribution> randomizerItr = randomizerList.iterator();
-        ProbabilityDistribution randomizerRef = randomizerItr.next();
+        Iterator<Randomizer> randomizerItr = randomizerList.iterator();
+        Randomizer randomizerRef = randomizerItr.next();
 
         // Check whether the set of randomizers being edited are of the
         // same type or not
         boolean discrepancy = false;
         while (randomizerItr.hasNext()) {
-            if (!randomizerRef.getClass().equals(randomizerItr.next().getClass())) {
+            if (!randomizerRef.getPdf().getClass().equals(randomizerItr.next().getPdf().getClass())) {
                 discrepancy = true;
                 break;
             }
@@ -128,9 +129,9 @@ public class RandomizerPanel2 extends JPanel {
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
             // to the rules
-            String distributionName = randomizerRef.getName();
+            String distributionName = randomizerRef.getPdf().getName();
             randomizerPanel = DISTRIBUTION_MAP.get(distributionName);
-            randomizerPanel.fillFieldValues(randomizerList);
+//            randomizerPanel.fillFieldValues(randomizerList);
             cbDistribution.setSelectedItem(distributionName);
         }
     }
@@ -212,10 +213,10 @@ public class RandomizerPanel2 extends JPanel {
     /**
      * Fill field values using specified list.
      *
-     * @param randList list of randomizers
+     * @param randomizerList2 list of randomizers
      */
-    public void fillFieldValues(List<ProbabilityDistribution> randList) {
-        randomizerPanel.fillFieldValues(randList);
+    public void fillFieldValues(List<Randomizer> randomizerList2) {
+        randomizerPanel.fillFieldValues(randomizerList2);
     }
 
     /**
@@ -247,18 +248,21 @@ public class RandomizerPanel2 extends JPanel {
             return true;
         }
 
-        for (ProbabilityDistribution r : randomizerList) {
+        for (Randomizer r : randomizerList) {
             // Only replace if this is a different rule (otherwise when
             // editing multiple rules with different parameter values which
             // have not been set those values will be replaced with the
             // default).
-            if (!r.getClass().equals(selectedDistribution.getClass())) {
-                r = selectedDistribution.deepCopy();
+            if (!r.getPdf().getClass().equals(selectedDistribution.getClass())) {
+                r.setPdf(selectedDistribution.deepCopy());
             }
         }
 
+        List<EditableObject> distributionList = randomizerList.stream()
+                .map(Randomizer::getPdf)
+                .collect(Collectors.toList());
         startingPanel = randomizerPanel;
-        randomizerPanel.commitChanges(randomizerList);
+        randomizerPanel.commitChanges(distributionList);
         return true;
     }
 
@@ -268,8 +272,8 @@ public class RandomizerPanel2 extends JPanel {
     static JFrame frame = new JFrame();
 
     public static void main(String[] args) {
-        NormalDistribution nd = new NormalDistribution();
-        RandomizerPanel2 rp = new RandomizerPanel2(nd, frame);
+        Randomizer rd = new Randomizer(new NormalDistribution());
+        RandomizerPanel2 rp = new RandomizerPanel2(rd, frame);
         rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         // rp.fillDefaultValues();
         frame.setContentPane(rp);

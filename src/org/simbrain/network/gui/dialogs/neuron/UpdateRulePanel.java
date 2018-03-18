@@ -367,7 +367,6 @@ public class UpdateRulePanel extends JPanel {
             repaintPanel();
             repaint();
             parent.pack();
-            parent.setLocationRelativeTo(null);
         });
 
     }

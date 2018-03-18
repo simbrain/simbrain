@@ -185,8 +185,11 @@ public class RandomizerPanel2 extends JPanel {
                 randomizerPanel.fillDefaultValues();
             } else {
                 // If not we can fill the new panel with values from the
-                // neurons being edited.
-                randomizerPanel.fillFieldValues(randomizerList);
+                // randomizer being edited.
+                List<EditableObject> distributionList = randomizerList.stream()
+                        .map(Randomizer::getPdf)
+                        .collect(Collectors.toList());
+                randomizerPanel.fillFieldValues(distributionList);
             }
 
             // Tell the panel whether it will have to replace neuron
@@ -195,7 +198,6 @@ public class RandomizerPanel2 extends JPanel {
             repaintPanel();
             repaint();
             parent.pack();
-            parent.setLocationRelativeTo(null);
         });
 
     }

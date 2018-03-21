@@ -1,3 +1,5 @@
+SIMBRAIN 3.1 README
+
 RUNNING SIMBRAIN
 
 To run double click Simbrain.jar.   

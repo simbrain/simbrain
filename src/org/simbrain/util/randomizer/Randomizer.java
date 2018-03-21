@@ -147,6 +147,8 @@ public class Randomizer implements EditableObject {
         return null;
     }
 
+    // TODO: Remove. Here for backwards compatibility
+
     /**
      * @param param1 the param1 to set
      */
@@ -168,6 +170,11 @@ public class Randomizer implements EditableObject {
         pdf.setParam1(param1);
         pdf.setParam2(param2);
     }
+
+    // End remove
+
+
+
 
     /**
      * For all but uniform, lower bound is only used in conjunction with

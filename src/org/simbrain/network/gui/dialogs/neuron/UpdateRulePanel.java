@@ -347,9 +347,6 @@ public class UpdateRulePanel extends JPanel {
             boolean replaceUpdateRules = neuronRulePanel != startingPanel;
             if (replaceUpdateRules) {
                 neuronRulePanel.fillDefaultValues();
-//                if(allNodesNoisy) {
-//                    noisePanel.fillDefaultValues();
-//                }
             } else {
                 // If not we can fill the new panel with values from the
                 // neurons being edited.
@@ -393,18 +390,8 @@ public class UpdateRulePanel extends JPanel {
         List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
         startingPanel = neuronRulePanel;
         neuronRulePanel.commitChanges(ruleList);
+        noisePanel.commitChanges();
 
-        // TODO: Not working
-        // Also note that in case of discrepant neurons we should just ignore this
-        if(noisePanel instanceof RandomizerPanel2) {
-//            randomizerList = ruleList.stream().
-//                map(r -> (NoisyUpdateRule) r).
-//                map(NoisyUpdateRule::getNoiseGenerator).
-//                map(Randomizer::getPdf).
-//                collect(Collectors.toList());
-//            ((RandomizerPanel2) noisePanel).commitChanges(randomizerList);
-            ((RandomizerPanel2) noisePanel).commitChanges();
-        }
     }
 
     /**

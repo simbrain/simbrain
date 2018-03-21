@@ -28,6 +28,7 @@ import umontreal.iro.lecuyer.rng.RandomStream;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+// TODO: Remove.  Here for backwards compatibility
 public enum ProbDistribution {
 
     // Zoë has ideas about a refactor. Could use an interface or abstract

@@ -41,6 +41,7 @@ import java.util.HashMap;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
+//TODO: Here for backwards compatibility.Remove.
 public class RandomizerPanel extends JPanel {
 
     /**

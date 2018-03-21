@@ -203,7 +203,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
                 detailPanel.setVisible(detailTriangle.isDown());
                 detailPanel.repaint();
                 parent.pack();
-                parent.setLocationRelativeTo(null);
+                // parent.setLocationRelativeTo(null);
             }
         });
     }

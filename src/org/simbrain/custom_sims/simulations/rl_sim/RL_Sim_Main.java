@@ -28,8 +28,12 @@ import java.util.concurrent.Executors;
 
 /**
  * Class to build RL Simulation.
+ *
  * <p>
  * TODO: Add .htmlfile to folder and make docs based on that
+ * TODO: Good lord this is a mess
+ *
+ * At any time, only the "winning" vehicle subnetwork is updated.
  */
 // CHECKSTYLE:OFF
 public class RL_Sim_Main extends RegisteredSimulation {
@@ -76,7 +80,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * Distance in pixels within which a goal object is counted as being arrived
      * at.
      */
-    double hitRadius = 50;
+    double hitRadius = 80;
 
     /**
      * GUI Variables.
@@ -112,7 +116,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     Neuron deltaReward;
     NeuronGroup rightInputs, leftInputs;
     SynapseGroup rightInputOutput, leftInputOutput;
-    WinnerTakeAll outputs;
+    WinnerTakeAll wtaNet;
     JTextField trialField = new JTextField();
     JTextField discountField = new JTextField();
     JTextField alphaField = new JTextField();
@@ -138,7 +142,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     }
 
     /**
-     * Run the simulation!
+     * Initialize the simulation
      */
     public void run() {
 
@@ -159,7 +163,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         controlPanel.addBottomComponent(tabbedPane);
 
         // Create the odor world builder with default vals
-        ob = sim.addOdorWorld(803, 1, 724, 318, "Virtual World");
+        ob = sim.addOdorWorld(803, 1, 350, 350, "Virtual World");
         world = ob.getWorld();
         world.setObjectsBlockMovement(true);
         world.setWrapAround(false);
@@ -167,15 +171,14 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Load initial simulation
         initializeWorldObjects();
 
-        // Add all simulations
-        CheeseFlower defaultInitSim = new CheeseFlower(this);
-        addSim("Cheese-Flower", defaultInitSim);
-        addSim("Two Cheese", new TwoCheese(this));
+        // Add all simulations (first added is default)
         addSim("One Object", new OneCheese(this));
-        defaultInitSim.load();
+        addSim("Cheese-Flower", new CheeseFlower(this));
+        addSim("Two Cheese", new TwoCheese(this));
+        simList.get(0).load();
 
         // Set up the main input-output network that is trained via RL
-        setUpInputOutputNetwork(net);
+        setupNetworks(net);
 
         // Set up the reward and td error nodes
         setUpRLNodes(net);
@@ -186,27 +189,19 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Set up the vehicle networks
         setUpVehicleNets(net, ob);
 
-        // Set up the time series plot
-        setUpTimeSeries(net);
-
         // Initialize arrays for concatenating left/right inputs
         combinedInputs = new double[leftInputs.size() + rightInputs.size()];
         combinedPredicted = new double[leftInputs.size() + rightInputs.size()];
 
+        // Set up the time series plot
+        //setUpTimeSeries(net);
+
         // Set up projection plot
-        plot = sim.addProjectionPlot(798, 326, 355, 330, "Sensory states + Predictions");
-        plot.getProjectionModel().init(leftInputs.size() + rightInputs.size());
-        plot.getProjectionModel().getProjector().setTolerance(.01);
-        Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
-        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
-        sim.tryCoupling(inputProducer, plotConsumer);
+        //setUpProjectionPlot();
 
         // Set custom network update
         updateMethod = new RL_Update(this);
         addCustomAction();
-
-        // Add workspace level update action
-        sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
     }
 
@@ -218,98 +213,29 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse = ob.addAgent(43, 110, "Mouse");
         mouse.setHeading(0);
 
-        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif", new double[]{0, 1, 0, 0, 0, 1});
+        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif", new double[] {0, 1, 0, 0, 0, 1});
         cheese_1.getSmellSource().setDispersion(350);
-        //cheese_2 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif",
-        //        new double[] { 0, 1, 0, 0, 0, 1 });
-        //cheese_2.getSmellSource().setDispersion(350);
-        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif", new double[]{0, 0, 0, 0, 1, 1});
+        cheese_2 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif",
+                new double[] { 0, 1, 0, 0, 0, 1 });
+        cheese_2.getSmellSource().setDispersion(350);
+        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif", new double[] {0, 0, 0, 0, 1, 1});
         flower.getSmellSource().setDispersion(350);
     }
 
-    /**
-     * Returns a reference to the currently open RL Sim
-     *
-     * @return the rl sim in the current tab
-     */
-    public RL_Sim getCurrentSim() {
-        return simList.get(tabbedPane.getSelectedIndex());
-    }
 
     /**
-     * Add a new RL Sim to the tab at the bottom of the control panel.
-     *
-     * @param simName the name of the sim
-     * @param sim     the sim itself
+     * Set up main networks
      */
-    private void addSim(String simName, RL_Sim sim) {
-        simList.add(sim);
-        tabbedPane.add(simName, sim.controls);
-    }
+    private void setupNetworks(NetBuilder net) {
 
-    /**
-     * Add the custom action which handles RL updates.
-     */
-    void addCustomAction() {
-        network.getUpdateManager().clear();
-        network.addUpdateAction(updateMethod);
-    }
-
-    /**
-     * Remove the custom action which handles RL Updates. Useful to be able to
-     * remove it sometimes while running other simulations.
-     */
-    void removeCustomAction() {
-        network.getUpdateManager().clear();
-    }
-
-    /**
-     * Helper method for "combined input" coupling.
-     */
-     @Producible
-    public double[] getCombinedInputs() {
-        System.arraycopy(leftInputs.getActivations(), 0, combinedInputs, 0, leftInputs.size() - 1);
-        System.arraycopy(rightInputs.getActivations(), 0, combinedInputs, leftInputs.size(), rightInputs.size());
-        // System.out.println(Arrays.toString(combinedInputs));
-        return combinedInputs;
-    }
-
-    /**
-     * Helper method for getting combined prediction.
-     */
-     @Producible
-    public double[] getCombinedPredicted() {
-        System.arraycopy(predictionLeft.getActivations(), 0, combinedPredicted, 0, leftInputs.size() - 1);
-        System.arraycopy(predictionRight.getActivations(), 0, combinedPredicted, leftInputs.size(), rightInputs.size());
-        return combinedPredicted;
-    }
-
-    /**
-     * Set up the time series plot.
-     */
-    private void setUpTimeSeries(NetBuilder net) {
-        // Create a time series plot
-        PlotBuilder plot = sim.addTimeSeriesPlot(0, 328, 293, 332, "Reward, TD Error");
-        sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
-        sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
-        plot.getTimeSeriesModel().setAutoRange(false);
-        plot.getTimeSeriesModel().setRangeUpperBound(2);
-        plot.getTimeSeriesModel().setRangeLowerBound(-1);
-    }
-
-    /**
-     * Add main input-output network to be trained by RL.
-     */
-    private void setUpInputOutputNetwork(NetBuilder net) {
-
-        // Outputs
-        outputs = net.addWTAGroup(-234, 58, 4);
-        outputs.setUseRandom(true);
-        outputs.setRandomProb(epsilon);
+        // WTA network that routes to vehicles
+        wtaNet = net.addWTAGroup(-234, 58, 6);
+        wtaNet.setUseRandom(true);
+        wtaNet.setRandomProb(epsilon);
         // Add a little extra spacing between neurons to accommodate labels
-        outputs.setLayout(new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
-        outputs.applyLayout();
-        outputs.setLabel("Outputs");
+        wtaNet.setLayout(new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
+        wtaNet.applyLayout();
+        wtaNet.setLabel("Outputs");
 
         // Inputs
         rightInputs = net.addNeuronGroup(-104, 350, 5);
@@ -319,22 +245,24 @@ public class RL_Sim_Main extends RegisteredSimulation {
         leftInputs.setLabel("Left Inputs");
         leftInputs.setClamped(true);
 
-        // Connections
-        rightInputOutput = net.addSynapseGroup(rightInputs, outputs);
-        sim.couple((SmellSensor) mouse.getSensors().get(2), rightInputs);
-        leftInputOutput = net.addSynapseGroup(leftInputs, outputs);
-        sim.couple((SmellSensor) mouse.getSensors().get(1), leftInputs);
-
-        // TODO: Move to a new method
         // Prediction Network
         predictionLeft = net.addNeuronGroup(-589.29, 188.50, 5);
         predictionLeft.setLabel("Predicted (L)");
         predictionRight = net.addNeuronGroup(126, 184, 5);
         predictionRight.setLabel("Predicted (R)");
+
+        // Connect input networks to prediction networks
         rightInputToRightPrediction = net.addSynapseGroup(rightInputs, predictionRight);
-        outputToRightPrediction = net.addSynapseGroup(outputs, predictionRight);
+        outputToRightPrediction = net.addSynapseGroup(wtaNet, predictionRight);
         leftInputToLeftPrediction = net.addSynapseGroup(leftInputs, predictionLeft);
-        outputToLeftPrediction = net.addSynapseGroup(outputs, predictionLeft);
+        outputToLeftPrediction = net.addSynapseGroup(wtaNet, predictionLeft);
+
+        // Connect input nodes to wta network
+        rightInputOutput = net.addSynapseGroup(rightInputs, wtaNet);
+        sim.couple((SmellSensor) mouse.getSensors().get(2), rightInputs);
+        leftInputOutput = net.addSynapseGroup(leftInputs, wtaNet);
+        sim.couple((SmellSensor) mouse.getSensors().get(1), leftInputs);
+
     }
 
     /**
@@ -353,7 +281,6 @@ public class RL_Sim_Main extends RegisteredSimulation {
         tdError = net.addNeuron(400, 0);
         tdError.setLabel("TD Error");
 
-        // TODO
         deltaReward = net.addNeuron(300, -50);
         deltaReward.setClamped(true);
         deltaReward.setLabel("Delta Reward");
@@ -366,10 +293,10 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Labels for vehicles, which must be the same as the label for
         // the corresponding output node
         String strPursueCheese = "Pursue Cheese";
-        String strAvoidCheese = "Avoid Cheese";
         String strPursueFlower = "Pursue Flower";
-        String strAvoidFlower = "Avoid Flower";
         String strPursueCandle = "Pursue Candle";
+        String strAvoidFlower = "Avoid Flower";
+        String strAvoidCheese = "Avoid Cheese";
         String strAvoidCandle = "Avoid Candle";
 
         // Make the vehicle networks
@@ -378,42 +305,41 @@ public class RL_Sim_Main extends RegisteredSimulation {
         Vehicle vehicleBuilder = new Vehicle(sim, net, world);
         NeuronGroup pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, 1);
         pursueCheese.setLabel(strPursueCheese);
-        setUpVehicle(pursueCheese);
-        NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, 1);
-        avoidCheese.setLabel(strAvoidCheese);
-        setUpVehicle(avoidCheese);
         NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, 4);
         pursueFlower.setLabel(strPursueFlower);
-        setUpVehicle(pursueFlower);
-        NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, 4);
-        avoidFlower.setLabel(strAvoidFlower);
-        setUpVehicle(avoidFlower);
         NeuronGroup pursueCandle = vehicleBuilder.addAvoider(163, -475, mouse, 3);
         pursueCandle.setLabel(strPursueCandle);
-        setUpVehicle(pursueCandle);
+
+        NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, 1);
+        avoidCheese.setLabel(strAvoidCheese);
+        NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, 4);
+        avoidFlower.setLabel(strAvoidFlower);
         NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, 3);
         avoidCandle.setLabel(strAvoidCandle);
+
+        setUpVehicle(pursueCheese);
+        setUpVehicle(pursueFlower);
+        setUpVehicle(pursueCandle);
+        setUpVehicle(avoidCheese);
+        setUpVehicle(avoidFlower);
         setUpVehicle(avoidCandle);
 
         // Label output nodes according to the subnetwork they control.
-        // The label is also used in RL_Update to enable or disable vehicle
-        // subnets
-        outputs.getNeuronList().get(0).setLabel(strPursueCheese);
-        outputs.getNeuronList().get(1).setLabel(strAvoidCheese);
-        outputs.getNeuronList().get(2).setLabel(strPursueFlower);
-        outputs.getNeuronList().get(3).setLabel(strAvoidFlower);
-        // outputs.getNeuronList().get(4).setLabel(strPursueCandle);
-        // outputs.getNeuronList().get(5).setLabel(strAvoidCandle);
+        // The label is also used in RL_Update to enable or disable vehicle nets
+        wtaNet.getNeuronList().get(0).setLabel(strPursueCheese);
+        wtaNet.getNeuronList().get(1).setLabel(strPursueFlower);
+        wtaNet.getNeuronList().get(2).setLabel(strPursueCandle);
+        wtaNet.getNeuronList().get(3).setLabel(strAvoidCheese);
+        wtaNet.getNeuronList().get(4).setLabel(strAvoidFlower);
+        wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
 
         // Connect output nodes to vehicle nodes
-        net.connect(outputs.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
-        net.connect(outputs.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
-        net.connect(outputs.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
-        net.connect(outputs.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
-        //         net.connect(outputs.getNeuronByLabel(strPursueCandle),
-        //         pursueCandle.getNeuronByLabel("Speed"), 10);
-        //         net.connect(outputs.getNeuronByLabel(strAvoidCandle),
-        //         avoidCandle.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strPursueCandle), pursueCandle.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
+        net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);
     }
 
     /**
@@ -422,11 +348,11 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * @param vehicle vehicle to modify
      */
     private void setUpVehicle(NeuronGroup vehicle) {
-        Neuron toUpdate = vehicle.getNeuronByLabel("Speed");
-        toUpdate.setUpdateRule("LinearRule");
-        toUpdate.setActivation(0);
-        toUpdate.setUpperBound(100);
-        toUpdate.setClamped(false);
+        Neuron speedNeuron = vehicle.getNeuronByLabel("Speed");
+        speedNeuron.setUpdateRule("LinearRule");
+        // ((LinearRule)speedNeuron.getUpdateRule()).setBias(1); // Just so things move a bit
+        speedNeuron.setUpperBound(100);
+        speedNeuron.setClamped(false);
         Neuron turnLeft = vehicle.getNeuronByLabel("Left");
         turnLeft.setUpperBound(200);
         Neuron turnRight = vehicle.getNeuronByLabel("Right");
@@ -463,7 +389,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
                 lambda = Double.parseDouble(lambdaField.getText());
                 epsilon = Double.parseDouble(epsilonField.getText());
                 alpha = Double.parseDouble(alphaField.getText());
-                outputs.setRandomProb(epsilon);
+                wtaNet.setRandomProb(epsilon);
                 stop = false;
 
                 // Run the trials
@@ -550,11 +476,93 @@ public class RL_Sim_Main extends RegisteredSimulation {
         });
 
         // Clear Weights Button
-        controlPanel.addButton("Clear", () -> {
+        controlPanel.addButton("Clear Weights", () -> {
             clearWeights();
         });
 
     }
+
+    /**
+     * Returns a reference to the currently open RL Sim
+     *
+     * @return the rl sim in the current tab
+     */
+    public RL_Sim getCurrentSim() {
+        return simList.get(tabbedPane.getSelectedIndex());
+    }
+
+    /**
+     * Add a new RL Sim to the tab at the bottom of the control panel.
+     *
+     * @param simName the name of the sim
+     * @param sim     the sim itself
+     */
+    private void addSim(String simName, RL_Sim sim) {
+        simList.add(sim);
+        tabbedPane.add(simName, sim.controls);
+    }
+
+    /**
+     * Add the custom action which handles RL updates.
+     */
+    void addCustomAction() {
+        network.getUpdateManager().clear();
+        network.addUpdateAction(updateMethod);
+    }
+
+    /**
+     * Remove the custom action which handles RL Updates. Useful to be able to
+     * remove it sometimes while running other simulations.
+     */
+    void removeCustomAction() {
+        network.getUpdateManager().clear();
+    }
+
+    /**
+     * Helper method for "combined input" coupling.
+     */
+    @Producible
+    public double[] getCombinedInputs() {
+        System.arraycopy(leftInputs.getActivations(), 0, combinedInputs, 0, leftInputs.size() - 1);
+        System.arraycopy(rightInputs.getActivations(), 0, combinedInputs, leftInputs.size(), rightInputs.size());
+        // System.out.println(Arrays.toString(combinedInputs));
+        return combinedInputs;
+    }
+
+    /**
+     * Helper method for getting combined prediction.
+     */
+    @Producible
+    public double[] getCombinedPredicted() {
+        System.arraycopy(predictionLeft.getActivations(), 0, combinedPredicted, 0, leftInputs.size() - 1);
+        System.arraycopy(predictionRight.getActivations(), 0, combinedPredicted, leftInputs.size(), rightInputs.size());
+        return combinedPredicted;
+    }
+
+    /**
+     * Set up the time series plot.
+     */
+    private void setUpTimeSeries(NetBuilder net) {
+        // Create a time series plot
+        PlotBuilder plot = sim.addTimeSeriesPlot(0, 328, 293, 332, "Reward, TD Error");
+        sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
+        sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
+        plot.getTimeSeriesModel().setAutoRange(false);
+        plot.getTimeSeriesModel().setRangeUpperBound(2);
+        plot.getTimeSeriesModel().setRangeLowerBound(-1);
+    }
+
+
+    private void setUpProjectionPlot() {
+        plot = sim.addProjectionPlot(798, 326, 355, 330, "Sensory states + Predictions");
+        plot.getProjectionModel().init(leftInputs.size() + rightInputs.size());
+        plot.getProjectionModel().getProjector().setTolerance(.01);
+        Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
+        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
+        sim.tryCoupling(inputProducer, plotConsumer);
+        sim.getWorkspace().addUpdateAction(new ColorPlot(this));
+    }
+
 
     @Override
     public String getName() {

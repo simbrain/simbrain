@@ -359,6 +359,7 @@ public class Neuron implements EditableObject {
      *
      * @param act Activation
      */
+    @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setActivation(final double act) {
         lastActivation = getActivation();
         if (isClamped()) {

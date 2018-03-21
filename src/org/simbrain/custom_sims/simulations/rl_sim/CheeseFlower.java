@@ -29,7 +29,7 @@ public class CheeseFlower extends RL_Sim {
 
         // Initialize world size
         sim.world.setHeight(250);
-        sim.world.setWidth(700);
+        sim.world.setWidth(350);
 
         // Initialize mouse
         mouse_x = 43;

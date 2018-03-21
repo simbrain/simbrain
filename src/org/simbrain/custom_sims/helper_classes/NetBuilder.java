@@ -143,6 +143,8 @@ public class NetBuilder {
         return sg;
     }
 
+    //TODO: These redundant methods are a mess!
+
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons, String layoutName, NeuronUpdateRule rule) {
 
         NeuronGroup ng;
@@ -181,6 +183,7 @@ public class NetBuilder {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
         wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
+        network.addGroup(wta);
         return wta;
     }
 

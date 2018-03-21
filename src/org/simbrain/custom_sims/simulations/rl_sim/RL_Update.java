@@ -58,10 +58,12 @@ public class RL_Update implements NetworkUpdateAction {
 
     /* Iterations to leave vehicle on between weight updates. */
     private final int iterationsBetweenWeightUpdates = 15;
+
     // Variables to help with the above
     private double previousReward;
     double[] previousInput;
     int counter = 0;
+
     // Helper which associates neurons with integer indices of the array that
     // tracks past states
     Map<Neuron, Integer> neuronIndices = new HashMap();
@@ -96,15 +98,15 @@ public class RL_Update implements NetworkUpdateAction {
     @Override
     public void invoke() {
 
-        // Update inputs nodes
+        // Update input nodes
         sim.leftInputs.update();
         sim.rightInputs.update();
 
-        // Update Prediction subnets
+        // Update prediction nodes
         sim.predictionLeft.update();
         sim.predictionRight.update();
 
-        // Train predition subnets
+        // Train prediction nodes
         trainPredictionNodes();
 
         // Outputs and vehicles
@@ -119,8 +121,8 @@ public class RL_Update implements NetworkUpdateAction {
         if (counter++ % iterationsBetweenWeightUpdates == 0) {
 
             // Find the winning output neuron
-            sim.outputs.update();
-            winner = sim.outputs.getWinner();
+            sim.wtaNet.update();
+            winner = sim.wtaNet.getWinner();
 
             // Update the reward neuron and the change in reward
             Network.updateNeurons(Collections.singletonList(sim.reward));
@@ -221,7 +223,7 @@ public class RL_Update implements NetworkUpdateAction {
      * connection led to reward, reinforce that connection.
      */
     void updateActor() {
-        for (Neuron neuron : sim.outputs.getNeuronList()) {
+        for (Neuron neuron : sim.wtaNet.getNeuronList()) {
             // Just update the last winner
             if (neuron.getLastActivation() > 0) {
                 for (Synapse synapse : neuron.getFanIn()) {

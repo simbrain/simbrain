@@ -363,8 +363,11 @@ public class SynapseGroup extends Group {
         targetNeuronGroup.addIncomingSg(this);
         connectionManager.connectNeurons(this);
         if (size() == 0) {
-            System.out.println("Creation failed, conditions of connection" + " resulted in zero synapses being created.");
+            String errMessage = "Synapse group creation failed because there are no synapses;";
+            errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
+            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
             delete();
+            throw new IllegalStateException(errMessage);
         }
     }
 

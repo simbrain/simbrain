@@ -137,7 +137,7 @@ public class ActorCritic extends RegisteredSimulation {
     }
 
     /**
-     * Run the simulation!
+     * Initialize the simulation
      */
     @Override
     public void run() {
@@ -326,7 +326,7 @@ public class ActorCritic extends RegisteredSimulation {
         effectorCouplings.add(westCoupling);
 
         // Add reward smell coupling
-        Producer smell = sim.getProducer(world.getSensor(mouse.getId(), "Sensor_2"), "getCurrentValue");
+        Producer smell = sim.getProducer(world.getSensor(mouse.getId(), "Sensor_2"), "getCurrentValues");
         smell.setDescription("Reward");
         Consumer rewardConsumer = sim.getConsumer(reward, "forceSetActivation");
         Coupling rewardCoupling = sim.tryCoupling(smell, rewardConsumer);

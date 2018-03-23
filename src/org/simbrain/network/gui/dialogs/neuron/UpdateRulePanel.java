@@ -332,7 +332,6 @@ public class UpdateRulePanel extends JPanel {
                 tabPane.setVisible(neuronRulePanelTriangle.isDown());
                 repaint();
                 parent.pack();
-                parent.setLocationRelativeTo(null);
             }
 
         });
@@ -346,6 +345,7 @@ public class UpdateRulePanel extends JPanel {
             // If so we have to fill the new panel with default values
             boolean replaceUpdateRules = neuronRulePanel != startingPanel;
             if (replaceUpdateRules) {
+                noisePanel = new RandomizerPanel2(new Randomizer(), parent);
                 neuronRulePanel.fillDefaultValues();
             } else {
                 // If not we can fill the new panel with values from the

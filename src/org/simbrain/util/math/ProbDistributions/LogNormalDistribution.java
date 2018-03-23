@@ -10,13 +10,13 @@ import umontreal.iro.lecuyer.randvar.LognormalGen;
 public class LogNormalDistribution extends ProbabilityDistribution {
 
     @UserParameter(
-            label = "Location (\\u03BC)",
+            label = "Location (\u03BC)",
             description = "The mean of the logarithm of this distribution.",
             defaultValue = "1.0", order = 1)
     private double location = 1.0;
 
     @UserParameter(
-            label = "Scale (\\u03C3)",
+            label = "Scale (\u03C3)",
             description = "The standard deviation of the logarithm of this distribution.",
             defaultValue = "0.5", order = 2)
     private double scale = 0.5;

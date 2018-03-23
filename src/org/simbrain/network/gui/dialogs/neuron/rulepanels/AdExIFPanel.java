@@ -6,7 +6,7 @@ import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
-public class AdExIFPanel extends AnnotatedPropertyEditor{
+public class AdExIFPanel extends AnnotatedPropertyEditor {
     
     /** Organize the giant cauldron of params for this rule. */
     private JTabbedPane tabbedPane;

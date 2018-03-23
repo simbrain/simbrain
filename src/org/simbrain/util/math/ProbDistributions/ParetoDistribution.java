@@ -8,7 +8,7 @@ import umontreal.iro.lecuyer.randvar.ParetoGen;
 public class ParetoDistribution extends ProbabilityDistribution{
 
     @UserParameter(
-            label = "Slope (\\u03B1)",
+            label = "Slope (\u03B1)",
             description = "The power of the distribution.",
             defaultValue = "2.0", order = 1)
     private double slope = 2.0;

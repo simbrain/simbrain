@@ -196,7 +196,6 @@ public class RandomizerPanel2 extends JPanel {
             // update rules or edit them upon commit.
 
             repaintPanel();
-            repaint();
             parent.pack();
         });
 

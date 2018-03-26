@@ -1,6 +1,7 @@
 Release Notes for Simbrain 3.03
 
-
+- This is a last or nearly last release in the Simbrain 3.0 series. Development efforts are shifting to 3.1
+- It may be possible to open some 3.02 workspace or networks in 3.03, but results will vary.
 - Improved clamping. Select nodes and / or synapses and click Shift-F.  Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
 - Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.
 Shift-drag > Command/Contrl-Drag`

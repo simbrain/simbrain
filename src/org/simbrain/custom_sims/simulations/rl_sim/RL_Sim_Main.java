@@ -9,7 +9,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -31,7 +30,8 @@ import java.util.concurrent.Executors;
  *
  * <p>
  * TODO: Add .htmlfile to folder and make docs based on that
- * TODO: Good lord this is a mess
+ * TODO: A number of things have been disabled (e.g. right/left prediction nets)
+ * while I rebuild the original simulation in the new 3.1 framework.
  *
  * At any time, only the "winning" vehicle subnetwork is updated.
  */
@@ -80,7 +80,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * Distance in pixels within which a goal object is counted as being arrived
      * at.
      */
-    double hitRadius = 80;
+    double hitRadius = 70;
 
     /**
      * GUI Variables.
@@ -103,7 +103,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     RotatingEntity mouse;
     BasicEntity flower;
     BasicEntity cheese_1;
-    BasicEntity cheese_2;
+    BasicEntity candle_1;
 
     /**
      * Neural net variables.
@@ -126,7 +126,10 @@ public class RL_Sim_Main extends RegisteredSimulation {
     double[] combinedInputs;
     double[] combinedPredicted;
     NeuronGroup predictionLeft, predictionRight;
-    SynapseGroup rightInputToRightPrediction, outputToRightPrediction, leftInputToLeftPrediction, outputToLeftPrediction;
+    // TODO: synapse group broken now so the sgs below not used
+    // SynapseGroup rightInputToRightPrediction, outputToRightPrediction, leftInputToLeftPrediction, outputToLeftPrediction;
+    List<Synapse> rightToWta;
+    List<Synapse> leftToWta;
 
     /**
      * Construct the reinforcement learning simulation.
@@ -174,7 +177,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Add all simulations (first added is default)
         addSim("One Object", new OneCheese(this));
         addSim("Cheese-Flower", new CheeseFlower(this));
-        addSim("Two Cheese", new TwoCheese(this));
+        addSim("Chese-Candle", new CheeseCandle(this));
         simList.get(0).load();
 
         // Set up the main input-output network that is trained via RL
@@ -210,15 +213,16 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * "sub-simulation."
      */
     private void initializeWorldObjects() {
+
         mouse = ob.addAgent(43, 110, "Mouse");
         mouse.setHeading(0);
 
-        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif", new double[] {0, 1, 0, 0, 0, 1});
+        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif", new double[] {1, 0, 0, 0, 0, 1});
         cheese_1.getSmellSource().setDispersion(350);
-        cheese_2 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif",
+        candle_1 = (BasicEntity) ob.addEntity(350, 29, "Candle.png",
                 new double[] { 0, 1, 0, 0, 0, 1 });
-        cheese_2.getSmellSource().setDispersion(350);
-        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif", new double[] {0, 0, 0, 0, 1, 1});
+        candle_1.getSmellSource().setDispersion(350);
+        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif", new double[] {0, 0, 1, 0, 0, 1});
         flower.getSmellSource().setDispersion(350);
     }
 
@@ -229,7 +233,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     private void setupNetworks(NetBuilder net) {
 
         // WTA network that routes to vehicles
-        wtaNet = net.addWTAGroup(-234, 58, 6);
+        wtaNet = net.addWTAGroup(-234, 58, 3);
         wtaNet.setUseRandom(true);
         wtaNet.setRandomProb(epsilon);
         // Add a little extra spacing between neurons to accommodate labels
@@ -238,29 +242,29 @@ public class RL_Sim_Main extends RegisteredSimulation {
         wtaNet.setLabel("Outputs");
 
         // Inputs
-        rightInputs = net.addNeuronGroup(-104, 350, 5);
+        rightInputs = net.addNeuronGroup(-104, 350, 6);
         rightInputs.setLabel("Right Inputs");
         rightInputs.setClamped(true);
-        leftInputs = net.addNeuronGroup(-481, 350, 5);
+        leftInputs = net.addNeuronGroup(-481, 350, 6);
         leftInputs.setLabel("Left Inputs");
         leftInputs.setClamped(true);
 
         // Prediction Network
-        predictionLeft = net.addNeuronGroup(-589.29, 188.50, 5);
-        predictionLeft.setLabel("Predicted (L)");
-        predictionRight = net.addNeuronGroup(126, 184, 5);
-        predictionRight.setLabel("Predicted (R)");
+//        predictionLeft = net.addNeuronGroup(-589.29, 188.50, 5);
+//        predictionLeft.setLabel("Predicted (L)");
+//        predictionRight = net.addNeuronGroup(126, 184, 5);
+//        predictionRight.setLabel("Predicted (R)");
 
         // Connect input networks to prediction networks
-        rightInputToRightPrediction = net.addSynapseGroup(rightInputs, predictionRight);
-        outputToRightPrediction = net.addSynapseGroup(wtaNet, predictionRight);
-        leftInputToLeftPrediction = net.addSynapseGroup(leftInputs, predictionLeft);
-        outputToLeftPrediction = net.addSynapseGroup(wtaNet, predictionLeft);
+//        net.connectAllToAll(rightInputs, predictionRight);
+//        net.connectAllToAll(wtaNet, predictionRight);
+//        net.connectAllToAll(leftInputs, predictionLeft);
+//        net.connectAllToAll(wtaNet, predictionLeft);
 
         // Connect input nodes to wta network
-        rightInputOutput = net.addSynapseGroup(rightInputs, wtaNet);
+        rightToWta  = net.connectAllToAll(rightInputs, wtaNet);
         sim.couple((SmellSensor) mouse.getSensors().get(2), rightInputs);
-        leftInputOutput = net.addSynapseGroup(leftInputs, wtaNet);
+        leftToWta = net.connectAllToAll(leftInputs, wtaNet);
         sim.couple((SmellSensor) mouse.getSensors().get(1), leftInputs);
 
     }
@@ -272,7 +276,8 @@ public class RL_Sim_Main extends RegisteredSimulation {
         reward = net.addNeuron(300, 0);
         reward.setClamped(true);
         reward.setLabel("Reward");
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 5, reward);
+        //sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), reward);
+        net.connect(leftInputs.getNeuron(5),reward,1);
         value = net.addNeuron(350, 0);
         value.setLabel("Value");
         net.connectAllToAll(rightInputs, value);
@@ -305,14 +310,14 @@ public class RL_Sim_Main extends RegisteredSimulation {
         Vehicle vehicleBuilder = new Vehicle(sim, net, world);
         NeuronGroup pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, 1);
         pursueCheese.setLabel(strPursueCheese);
-        NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, 4);
+        NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, 2);
         pursueFlower.setLabel(strPursueFlower);
         NeuronGroup pursueCandle = vehicleBuilder.addAvoider(163, -475, mouse, 3);
         pursueCandle.setLabel(strPursueCandle);
 
         NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, 1);
         avoidCheese.setLabel(strAvoidCheese);
-        NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, 4);
+        NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, 2);
         avoidFlower.setLabel(strAvoidFlower);
         NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, 3);
         avoidCandle.setLabel(strAvoidCandle);
@@ -320,26 +325,26 @@ public class RL_Sim_Main extends RegisteredSimulation {
         setUpVehicle(pursueCheese);
         setUpVehicle(pursueFlower);
         setUpVehicle(pursueCandle);
-        setUpVehicle(avoidCheese);
-        setUpVehicle(avoidFlower);
-        setUpVehicle(avoidCandle);
+//        setUpVehicle(avoidCheese);
+//        setUpVehicle(avoidFlower);
+//        setUpVehicle(avoidCandle);
 
         // Label output nodes according to the subnetwork they control.
         // The label is also used in RL_Update to enable or disable vehicle nets
         wtaNet.getNeuronList().get(0).setLabel(strPursueCheese);
         wtaNet.getNeuronList().get(1).setLabel(strPursueFlower);
         wtaNet.getNeuronList().get(2).setLabel(strPursueCandle);
-        wtaNet.getNeuronList().get(3).setLabel(strAvoidCheese);
-        wtaNet.getNeuronList().get(4).setLabel(strAvoidFlower);
-        wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
+//        wtaNet.getNeuronList().get(3).setLabel(strAvoidCheese);
+//        wtaNet.getNeuronList().get(4).setLabel(strAvoidFlower);
+//        wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
 
         // Connect output nodes to vehicle nodes
         net.connect(wtaNet.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
         net.connect(wtaNet.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
         net.connect(wtaNet.getNeuronByLabel(strPursueCandle), pursueCandle.getNeuronByLabel("Speed"), 10);
-        net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
-        net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
-        net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);
+//        net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
+//        net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
+//        net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);
     }
 
     /**
@@ -364,8 +369,8 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * Clear all learnable weights
      */
     void clearWeights() {
-        rightInputOutput.setStrength(0, Polarity.BOTH);
-        leftInputOutput.setStrength(0, Polarity.BOTH);
+//        rightInputOutput.setStrength(0, Polarity.BOTH);
+//        leftInputOutput.setStrength(0, Polarity.BOTH);
         for (Synapse synapse : value.getFanIn()) {
             synapse.setStrength(0);
         }

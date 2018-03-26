@@ -301,7 +301,7 @@ public class Simulation {
     }
 
     /**
-     * Creates a coupling from a hearing sensor to a neuron
+     * Creates a coupling from a hearing sensor to a neuron.
      *
      * @param sensor The hearing sensor
      * @param neuron The neuron
@@ -327,4 +327,5 @@ public class Simulation {
     public void iterate(int iterations) {
         workspace.iterate(iterations);
     }
+
 }

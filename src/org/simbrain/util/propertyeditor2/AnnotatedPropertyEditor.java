@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * A panel for editing objects based on objects. Draws on annotations. Handles
+ * A panel for editing objects based on annotations. Handles
  * inconsistent cases with null widgets.
  * <p>
  * To use simply initialize with a single object or list of objects to edit,
@@ -109,6 +109,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             return;
         }
 
+        // TODO: Below is all match the first item in the string...
         // Check that the objects given are of the same type
         boolean objectsSameType = editedObjects.stream().allMatch(m -> m.getClass().equals(editedObjects.get(0).getClass()));
         if (!objectsSameType) {

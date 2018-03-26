@@ -145,20 +145,6 @@ public class PolarizedRandomizer extends Randomizer {
 //
 //        return ret;
 //    }
-//
-//    /**
-//     * @return Returns the clipping.
-//     */
-//    public boolean getClipping() {
-//        return clipping;
-//    }
-//
-//    /**
-//     * @param clipping The useBounds to set.
-//     */
-//    public void setClipping(final boolean clipping) {
-//        this.clipping = clipping;
-//    }
 
     /**
      * Returns the string name of the distribution.
@@ -175,24 +161,6 @@ public class PolarizedRandomizer extends Randomizer {
     public ProbabilityDistribution getPdf() {
         return pdf;
     }
-
-//    /**
-//     * See the javadoc at {@link Randomizer#param1}.
-//     *
-//     * @return the param1
-//     */
-//    public double getParam1() {
-//        return param1;
-//    }
-//
-//    /**
-//     * See the javadoc at {@link Randomizer#param2}.
-//     *
-//     * @return the param2
-//     */
-//    public double getParam2() {
-//        return param2;
-//    }
 
     /**
      * @return the polarity

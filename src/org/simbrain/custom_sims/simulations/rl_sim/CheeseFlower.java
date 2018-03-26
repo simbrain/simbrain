@@ -48,7 +48,7 @@ public class CheeseFlower extends RL_Sim {
         sim.world.addEntity(sim.flower);
 
         // Don't use cheese 2
-        sim.world.deleteEntity(sim.cheese_2);
+        sim.world.deleteEntity(sim.candle_1);
 
         // Update the world
         sim.world.fireUpdateEvent();

@@ -9,6 +9,7 @@ import org.simbrain.network.groups.SynapseGroup;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,8 +79,8 @@ public class RL_Update implements NetworkUpdateAction {
         value = sim.value;
         tdError = sim.tdError;
         initMap();
-        lastPredictionLeft = sim.predictionLeft.getActivations();
-        lastPredictionRight = sim.predictionRight.getActivations();
+//        lastPredictionLeft = sim.predictionLeft.getActivations();
+//        lastPredictionRight = sim.predictionRight.getActivations();
     }
 
     @Override
@@ -103,11 +104,11 @@ public class RL_Update implements NetworkUpdateAction {
         sim.rightInputs.update();
 
         // Update prediction nodes
-        sim.predictionLeft.update();
-        sim.predictionRight.update();
+//        sim.predictionLeft.update();
+//        sim.predictionRight.update();
 
         // Train prediction nodes
-        trainPredictionNodes();
+//        trainPredictionNodes();
 
         // Outputs and vehicles
         Network.updateNeurons(Collections.singletonList(sim.value));
@@ -146,13 +147,15 @@ public class RL_Update implements NetworkUpdateAction {
      */
     private void trainPredictionNodes() {
 
-        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft);
-        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight);
+//        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft);
+//        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight);
 
-        trainDeltaRule(sim.leftInputToLeftPrediction);
-        trainDeltaRule(sim.outputToLeftPrediction);
-        trainDeltaRule(sim.rightInputToRightPrediction);
-        trainDeltaRule(sim.outputToRightPrediction);
+        trainDeltaRule(sim.rightToWta);
+        trainDeltaRule(sim.leftToWta);
+
+//        trainDeltaRule(sim.outputToLeftPrediction);
+//        trainDeltaRule(sim.rightInputToRightPrediction);
+//        trainDeltaRule(sim.outputToRightPrediction);
 
         lastPredictionLeft = sim.predictionLeft.getActivations();
         lastPredictionRight = sim.predictionRight.getActivations();
@@ -179,6 +182,14 @@ public class RL_Update implements NetworkUpdateAction {
      */
     void trainDeltaRule(SynapseGroup group) {
         for (Synapse synapse : group.getAllSynapses()) {
+            double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
+            synapse.setStrength(newStrength);
+        }
+    }
+
+    void trainDeltaRule(List<Synapse> synapses) {
+
+        for (Synapse synapse : synapses) {
             double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
             synapse.setStrength(newStrength);
         }

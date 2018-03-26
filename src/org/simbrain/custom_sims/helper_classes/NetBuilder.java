@@ -127,9 +127,9 @@ public class NetBuilder {
         connector.connectOneToOne(source.getNeuronList(), target.getNeuronList());
     }
 
-    public void connectAllToAll(NeuronGroup source, NeuronGroup target) {
+    public List<Synapse> connectAllToAll(NeuronGroup source, NeuronGroup target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
+        return connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
     }
 
     public void connectAllToAll(NeuronGroup inputs, Neuron target) {

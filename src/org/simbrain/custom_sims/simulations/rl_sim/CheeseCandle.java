@@ -1,9 +1,10 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
+//TODO:RENAME
 //CHECKSTYLE:OFF
-public class TwoCheese extends RL_Sim {
+public class CheeseCandle extends RL_Sim {
 
-    public TwoCheese(RL_Sim_Main mainSim) {
+    public CheeseCandle(RL_Sim_Main mainSim) {
         super(mainSim);
         controls.addButton("Load", () -> {
             load();
@@ -28,10 +29,10 @@ public class TwoCheese extends RL_Sim {
         sim.cheese_1.getSmellSource().setDispersion(400);
         sim.world.addEntity(sim.cheese_1);
 
-        // Set up cheese 2
-        sim.cheese_2.setLocation(215, 215);
-        sim.cheese_2.getSmellSource().setDispersion(400);
-        sim.world.addEntity(sim.cheese_2);
+        // Set up candle
+        sim.candle_1.setLocation(215, 215);
+        sim.candle_1.getSmellSource().setDispersion(400);
+        sim.world.addEntity(sim.candle_1);
 
         // Don't use flower
         sim.world.deleteEntity(sim.flower);
@@ -42,7 +43,7 @@ public class TwoCheese extends RL_Sim {
         // Set goal states
         goalEntities.clear();
         goalEntities.add(sim.cheese_1);
-        goalEntities.add(sim.cheese_2);
+        goalEntities.add(sim.candle_1);
     }
 
 }

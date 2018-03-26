@@ -362,13 +362,15 @@ public class SynapseGroup extends Group {
         sourceNeuronGroup.addOutgoingSg(this);
         targetNeuronGroup.addIncomingSg(this);
         connectionManager.connectNeurons(this);
-        if (size() == 0) {
-            String errMessage = "Synapse group creation failed because there are no synapses;";
-            errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
-            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
-            delete();
-            throw new IllegalStateException(errMessage);
-        }
+
+        //TODO: This is a temp disable so I can test RL Sim.
+//        if (size() == 0) {
+//            String errMessage = "Synapse group creation failed because there are no synapses;";
+//            errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
+//            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
+//            delete();
+//            throw new IllegalStateException(errMessage);
+//        }
     }
 
     /**

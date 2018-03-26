@@ -31,7 +31,7 @@ public class OneCheese extends RL_Sim {
 
         // Don't use flower or second cheese
         sim.world.deleteEntity(sim.flower);
-        sim.world.deleteEntity(sim.cheese_2);
+        sim.world.deleteEntity(sim.candle_1);
 
         // Update the world
         sim.world.fireUpdateEvent();

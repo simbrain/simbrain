@@ -63,17 +63,18 @@ public abstract class RegisteredSimulation {
     protected final Simulation sim;
 
     static {
-        REGISTERED_SIMS.add(new EdgeOfChaos());
-        REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
-        REGISTERED_SIMS.add(new Hippocampus());
-        REGISTERED_SIMS.add(new RL_Sim_Main());
-        REGISTERED_SIMS.add(new Cerebellum());
+        // TODO: Commented out items are not ready for prime time
+        // REGISTERED_SIMS.add(new EdgeOfChaos());
+        // REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
+        // REGISTERED_SIMS.add(new Hippocampus());
+        // REGISTERED_SIMS.add(new RL_Sim_Main());
+        // REGISTERED_SIMS.add(new Cerebellum());
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new CortexSimple());
-        REGISTERED_SIMS.add(new CreaturesSim());
-        REGISTERED_SIMS.add(new MpfsSOM());
-        REGISTERED_SIMS.add(new SimpleNeuroevolution());
+        // REGISTERED_SIMS.add(new CreaturesSim());
+        // REGISTERED_SIMS.add(new MpfsSOM());
+        // REGISTERED_SIMS.add(new SimpleNeuroevolution());
 
         // Alphabetize
         REGISTERED_SIMS

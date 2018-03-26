@@ -1,3 +1,5 @@
+SIMBRAIN 3.03
+
 RUNNING SIMBRAIN
 
 To run double click Simbrain.jar.   
@@ -17,3 +19,7 @@ Some things you can do to get a quick sense of how Simbrain works.
 1) Open different workspaces using File > Open Workspace and press play in the in the workspace toolbar.
 
 2) Run different scripts using the Script menu in the workspace menu, and pressing play in the workspace toolbar.
+
+WHAT'S NEW
+
+See release notes.

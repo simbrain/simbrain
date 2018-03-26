@@ -42,7 +42,7 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
      * @param desktop
      */
     public RepositionAllWindowsAction(final SimbrainDesktop desktop) {
-        super("Reposition All Windows", desktop.getWorkspace());
+        super("Gather Windows", desktop.getWorkspace());
         putValue(SHORT_DESCRIPTION,
                 "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.");
         this.desktop = desktop;

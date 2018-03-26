@@ -18,9 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
+import javax.swing.*;
 
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -31,7 +33,6 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-    // TODO
     private SimbrainDesktop desktop;
 
     /**
@@ -41,6 +42,10 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
     public ClearWorkspaceAction(SimbrainDesktop desktop) {
         super("Clear Workspace", desktop.getWorkspace());
         this.desktop = desktop;
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_K,
+            toolkit.getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
     /** @see AbstractAction 

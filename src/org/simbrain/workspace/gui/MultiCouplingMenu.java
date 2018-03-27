@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * MultiCouplingMenu creates coupling menus for multiple model objects.
+ * TODO: Needs a refactor
+ */
 public class MultiCouplingMenu {
     private JPopupMenu parentMenu;
     private List<CouplingMenu> menus;

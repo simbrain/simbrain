@@ -45,12 +45,9 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.CouplingFactory;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.CouplingMenuConsumer;
-import org.simbrain.workspace.gui.CouplingMenuProducer;
+import org.simbrain.workspace.gui.CouplingMenu;
+import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -266,15 +263,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
         JPopupMenu contextMenu = super.getNeuronContextMenu(neuron);
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-        CouplingFactory factory = workspace.getCouplingFactory();
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            Producer producer = factory.getProducer(neuron, "getActivation");
-            Consumer consumer = factory.getConsumer(neuron, "setInputValue");
-            JMenu producerMenu = new CouplingMenuProducer("Send Scalar Coupling to", workspace, producer);
-            contextMenu.add(producerMenu);
-            JMenu consumerMenu = new CouplingMenuConsumer("Receive Scalar Coupling from", workspace, consumer);
-            contextMenu.add(consumerMenu);
+            CouplingMenu menu = new CouplingMenu(workspace);
+            menu.setSourceModel(neuron);
+            contextMenu.add(menu);
         }
         return contextMenu;
     }
@@ -294,15 +287,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
         contextMenu.add(new SetSynapsePropertiesAction(this));
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-        CouplingFactory factory = workspace.getCouplingFactory();
         if (getSelectedSynapses().size() == 1) {
             contextMenu.addSeparator();
-            Producer<?> producer = factory.getProducer(synapse, "getStrength");
-            Consumer<?> consumer = factory.getConsumer(synapse, "setStrength");
-            JMenu producerMenu = new CouplingMenuProducer("Send Scalar Coupling to", workspace, producer);
-            contextMenu.add(producerMenu);
-            JMenu consumerMenu = new CouplingMenuConsumer("Receive Scalar Coupling from", workspace, consumer);
-            contextMenu.add(consumerMenu);
+            CouplingMenu menu = new CouplingMenu(workspace);
+            menu.setSourceModel(synapse);
+            contextMenu.add(menu);
         }
         return contextMenu;
     }
@@ -390,45 +379,25 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     @Override
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
-
         if (component.getWorkspaceComponent() != null) {
-            JMenu topMenu = new JMenu("Send Vector Coupling to");
-            // Activations
-            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-            CouplingFactory factory = workspace.getCouplingFactory();
-            Producer<?> producer = factory.getProducer(neuronGroup, "getExternalActivations");
-            JMenu producerMenu = new CouplingMenuProducer("Activations", component.getWorkspaceComponent().getWorkspace(), producer);
-            topMenu.add(producerMenu);
-
-            // Spikes
-            Producer<?> producer2 = factory.getProducer(neuronGroup, "getSpikeIndexes");
-            JMenu producerMenu2 = new CouplingMenuProducer("Spike Indices", component.getWorkspaceComponent().getWorkspace(), producer2);
-            topMenu.add(producerMenu2);
-            return topMenu;
-        }
-        return null;
-    }
-
-    @Override
-    public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
-        if (component.getWorkspaceComponent() != null) {
-            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-            CouplingFactory factory = workspace.getCouplingFactory();
-            Consumer<?> consumer = factory.getConsumer(neuronGroup, "setInputValues");
-            JMenu menu = new CouplingMenuConsumer("Receive Vector Coupling from", workspace, consumer);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent().getWorkspace());
+            menu.setSourceModel(neuronGroup);
             return menu;
         }
         return null;
     }
 
     @Override
-    public JMenu getSynapseGroupProducerMenu(SynapseGroup sg) {
+    public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
+        return null;
+    }
+
+    @Override
+    public JMenu getSynapseGroupProducerMenu(SynapseGroup synapseGroup) {
         if (component.getWorkspaceComponent() != null) {
-            Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-            CouplingFactory factory = workspace.getCouplingFactory();
-            Producer<?> producer = factory.getProducer(sg, "getWeightVector");
-            JMenu producerMenu = new CouplingMenuProducer("Send Vector Coupling to", workspace, producer);
-            return producerMenu;
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent().getWorkspace());
+            menu.setSourceModel(synapseGroup);
+            return menu;
         }
         return null;
     }

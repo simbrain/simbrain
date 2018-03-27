@@ -9,6 +9,11 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CouplingMenu creates a JMenu containing an entry for every available consumer and producer from
+ * a given model object.
+ * TODO: Limit the total number of entries in the coupling menus.
+ */
 public class CouplingMenu extends JMenu {
 
     private Workspace workspace;
@@ -20,7 +25,7 @@ public class CouplingMenu extends JMenu {
 
     public void setSourceModel(Object source) {
         this.source = source;
-        setText(source.toString());
+        setText("Create " + source.getClass().getSimpleName() + " Coupling");
         updateItems();
     }
 
@@ -41,7 +46,7 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createProducerSubmenu(Producer<?> producer) {
-        JMenu producerSubmenu = new JMenu("Send:" + producer.getDescription());
+        JMenu producerSubmenu = new JMenu("Send " + producer.getTypeName() + " To");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
@@ -64,14 +69,14 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createConsumerSubmenu(Consumer<?> consumer) {
-        JMenu consumerSubmenu = new JMenu("Receive:" + consumer.getDescription());
+        JMenu consumerSubmenu = new JMenu("Receive " + consumer.getTypeName() + " From");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
             List<Producer<?>> producers = workspace.getCouplingFactory().getAllProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, producer.getId() + ":" + producer.getDescription(), producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace, producer.getId() + " " + producer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {

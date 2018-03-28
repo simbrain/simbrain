@@ -41,6 +41,13 @@ public class ImageWorld {
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
+    public enum SourceType {
+        STATIC_SOURCE,
+        EMITTER_SOURCE
+    }
+
+    private final SourceType sourceType;
+
     private StaticImageSource staticSource;
 
     private EmitterMatrix emitterMatrix;
@@ -78,11 +85,16 @@ public class ImageWorld {
     /**
      * Construct the image world.
      */
-    public ImageWorld() {
+    public ImageWorld(SourceType sourceType) {
+        this.sourceType = sourceType;
         // Setup ImageSources
         staticSource = new StaticImageSource();
         emitterMatrix = new EmitterMatrix();
-        compositeSource = new CompositeImageSource(staticSource);
+        if (sourceType == SourceType.EMITTER_SOURCE) {
+            compositeSource = new CompositeImageSource(emitterMatrix);
+        } else {
+            compositeSource = new CompositeImageSource(staticSource);
+        }
         staticSource.loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
         imagePanel = new ImagePanel();
         clipboard = new ImageClipboard(this);
@@ -103,7 +115,6 @@ public class ImageWorld {
         sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
-
     }
 
     /**
@@ -116,6 +127,10 @@ public class ImageWorld {
         clipboard = new ImageClipboard(this);
         compositeSource.notifyImageUpdate();
         return this;
+    }
+
+    public SourceType getSourceType() {
+        return sourceType;
     }
 
     /**

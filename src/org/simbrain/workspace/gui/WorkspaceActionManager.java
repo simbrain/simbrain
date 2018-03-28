@@ -200,8 +200,9 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "3D World", "World.png"),
                 createComponentFactoryAction(workspace, "Text Display", "Text.png"),
                 createComponentFactoryAction(workspace, "Text Reader", "Text.png"),
-                createComponentFactoryAction(workspace, "Image Display", "camera.png"),
-                createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));
+                createComponentFactoryAction(workspace, "Image Display", "photo.png"),
+                createComponentFactoryAction(workspace, "Image Emitter", "PaintView.png"));
+                //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 

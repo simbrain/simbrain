@@ -50,9 +50,9 @@ public class ImageWorldComponent extends WorkspaceComponent {
     /**
      * Construct a new ImageWorldComponent.
      */
-    public ImageWorldComponent() {
+    public ImageWorldComponent(ImageWorld.SourceType sourceType) {
         super("");
-        world = new ImageWorld();
+        world = new ImageWorld(sourceType);
     }
 
     /**

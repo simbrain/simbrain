@@ -96,9 +96,11 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenu fileMenu = new JMenu("File  ");
         menuBar.add(fileMenu);
 
-        JMenuItem loadImage = new JMenuItem("Load Image...");
-        loadImage.addActionListener(this::loadImage);
-        fileMenu.add(loadImage);
+        if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
+            JMenuItem loadImage = new JMenuItem("Load Image...");
+            loadImage.addActionListener(this::loadImage);
+            fileMenu.add(loadImage);
+        }
         JMenuItem saveImage = new JMenuItem("Save Image...");
         saveImage.addActionListener(this::saveImage);
         fileMenu.add(saveImage);
@@ -160,32 +162,24 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void setupToolbars() {
-        JButton selectEmitterButton = new JButton();
-        selectEmitterButton.setIcon(ResourceManager.getSmallIcon("light-bulb.png"));
-        selectEmitterButton.setToolTipText("View Emitter Matrix");
-        selectEmitterButton.addActionListener(evt -> component.getWorld().selectEmitterMatrix());
-        sourceToolbar.add(selectEmitterButton);
+        if (component.getWorld().getSourceType() == ImageWorld.SourceType.EMITTER_SOURCE) {
+            JButton editEmitterButton = new JButton();
+            editEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
+            editEmitterButton.setToolTipText("Edit Emitter Matrix");
+            editEmitterButton.addActionListener(evt -> {
+                ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
+                dialog.setVisible(true);
+            });
+            sourceToolbar.add(editEmitterButton);
+        }
 
-        JButton editEmitterButton = new JButton();
-        editEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
-        editEmitterButton.setToolTipText("Edit Emitter Matrix");
-        editEmitterButton.addActionListener(evt -> {
-            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
-            dialog.setVisible(true);
-        });
-        sourceToolbar.add(editEmitterButton);
-
-        JButton viewImageButton = new JButton();
-        viewImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
-        viewImageButton.setToolTipText("View Image");
-        viewImageButton.addActionListener(evt -> component.getWorld().selectStaticSource());
-        sourceToolbar.add(viewImageButton);
-
-        JButton loadImageButton = new JButton();
-        loadImageButton.setIcon(ResourceManager.getSmallIcon("Open.png"));
-        loadImageButton.setToolTipText("Load Image");
-        loadImageButton.addActionListener(this::loadImage);
-        sourceToolbar.add(loadImageButton);
+        if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
+            JButton loadImageButton = new JButton();
+            loadImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
+            loadImageButton.setToolTipText("Load Image");
+            loadImageButton.addActionListener(this::loadImage);
+            sourceToolbar.add(loadImageButton);
+        }
 
         JButton saveImageButton = new JButton();
         saveImageButton.setIcon(ResourceManager.getSmallIcon("Save.png"));

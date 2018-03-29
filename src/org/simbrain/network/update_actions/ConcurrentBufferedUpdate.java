@@ -36,6 +36,8 @@ import org.simbrain.network.update_actions.concurrency_tools.Task;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -565,7 +567,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         upRule.setiBg(0);
         upRule.setAddNoise(true);
         ng.setNeuronType(upRule);
-        Randomizer rand = new Randomizer(ProbDistribution.NORMAL);
+        Randomizer rand = new Randomizer(new NormalDistribution());
         for (Neuron neuron : ng.getNeuronList()) {
             IzhikevichRule iz = new IzhikevichRule();
             if (Math.random() < 0.2) {
@@ -576,7 +578,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
                 iz.setB(0.25 - (0.05 * rVal));
                 iz.setC(-65);
                 iz.setD(2);
-                rand.setParam2(0.5);
+                ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.5);
             } else {
                 neuron.setPolarity(Polarity.EXCITATORY);
                 iz.setRefractoryPeriod(2.0);
@@ -586,7 +588,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
                 rVal *= rVal;
                 iz.setC(-65.0 + (15.0 * rVal));
                 iz.setD(8.0 - (6 * rVal));
-                rand.setParam2(1.2);
+                ((NormalDistribution) rand.getPdf()).setStandardDeviation(1.2);
             }
             iz.setiBg(3.5);
             iz.setAddNoise(true);
@@ -595,14 +597,17 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         }
         GridLayout gl = new GridLayout();
         gl.layoutNeurons(ng.getNeuronList());
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(.25);
-        exRand.setParam2(1);
-        inRand.setParam1(2);
-        inRand.setParam2(2);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution(0.25, 1));
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new LogNormalDistribution(2, 2));
         System.out.println("Begin Network Construction...");
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(density, false, false), .8, exRand, inRand);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(
+                ng,
+                ng,
+                new Sparse(density, false, false),
+                .8,
+                exRand,
+                inRand
+                );
         for (Synapse s : sg.getAllSynapses()) {
             s.setId(null);
             s.setFrozen(true);

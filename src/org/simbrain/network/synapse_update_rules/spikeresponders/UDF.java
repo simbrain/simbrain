@@ -21,6 +21,7 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -141,63 +142,63 @@ public class UDF extends JumpAndDecay {
      */
     public void init(Synapse s) {
         Randomizer rand = new Randomizer();
-        rand.setPdf(ProbDistribution.NORMAL);
+        rand.setPdf(new NormalDistribution());
         rand.setClipping(true);
         rand.setUpperBound(Double.MAX_VALUE);
         rand.setLowerBound(0.0000001);
         if (s.getSource().getPolarity() == Polarity.EXCITATORY && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
-            rand.setParam1(0.5);
-            rand.setParam2(0.25);
+            ((NormalDistribution) rand.getPdf()).setMean(0.5);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.25);
             U = rand.getRandom();
-            rand.setParam1(1100);
-            rand.setParam2(550);
+            ((NormalDistribution) rand.getPdf()).setMean(1100);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(550);
             D = rand.getRandom();
-            rand.setParam1(50);
-            rand.setParam2(25);
+            ((NormalDistribution) rand.getPdf()).setMean(50);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(25);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
         } else if (s.getSource().getPolarity() == Polarity.EXCITATORY && s.getTarget().getPolarity() == Polarity.INHIBITORY) {
-            rand.setParam1(0.05);
-            rand.setParam2(0.025);
+            ((NormalDistribution) rand.getPdf()).setMean(0.05);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.025);
             U = rand.getRandom();
-            rand.setParam1(125);
-            rand.setParam2(62.5);
+            ((NormalDistribution) rand.getPdf()).setMean(125);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(62.5);
             D = rand.getRandom();
-            rand.setParam1(120);
-            rand.setParam2(60);
+            ((NormalDistribution) rand.getPdf()).setMean(120);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(60);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
         } else if (s.getSource().getPolarity() == Polarity.INHIBITORY && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
-            rand.setParam1(0.25);
-            rand.setParam2(0.125);
+            ((NormalDistribution) rand.getPdf()).setMean(0.25);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.125);
             U = rand.getRandom();
-            rand.setParam1(700);
-            rand.setParam2(350);
+            ((NormalDistribution) rand.getPdf()).setMean(700);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(350);
             D = rand.getRandom();
-            rand.setParam1(20);
-            rand.setParam2(10);
+            ((NormalDistribution) rand.getPdf()).setMean(20);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(10);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(6);
         } else if (s.getSource().getPolarity() == Polarity.INHIBITORY && s.getTarget().getPolarity() == Polarity.INHIBITORY) {
-            rand.setParam1(0.32);
-            rand.setParam2(0.16);
+            ((NormalDistribution) rand.getPdf()).setMean(0.32);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.16);
             U = rand.getRandom();
-            rand.setParam1(144);
-            rand.setParam2(72);
+            ((NormalDistribution) rand.getPdf()).setMean(144);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(72);
             D = rand.getRandom();
-            rand.setParam1(60);
-            rand.setParam2(30);
+            ((NormalDistribution) rand.getPdf()).setMean(60);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(30);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(6);
         } else {
-            rand.setParam1(0.5);
-            rand.setParam2(0.25);
+            ((NormalDistribution) rand.getPdf()).setMean(0.5);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.25);
             U = rand.getRandom();
-            rand.setParam1(1100);
-            rand.setParam2(550);
+            ((NormalDistribution) rand.getPdf()).setMean(1100);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(550);
             D = rand.getRandom();
-            rand.setParam1(50);
-            rand.setParam2(25);
+            ((NormalDistribution) rand.getPdf()).setMean(50);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(25);
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
         }

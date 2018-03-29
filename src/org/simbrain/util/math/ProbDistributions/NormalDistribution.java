@@ -52,6 +52,13 @@ public class NormalDistribution extends ProbabilityDistribution {
             defaultValue = "false", order = 5)
     private boolean clipping = false;
 
+    public NormalDistribution() {}
+
+    public NormalDistribution(double mean, double standardDeviation) {
+        setMean(mean);
+        setStandardDeviation(standardDeviation);
+    }
+
     public double nextRand() {
         return clipping(
                 (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,
@@ -123,13 +130,4 @@ public class NormalDistribution extends ProbabilityDistribution {
         this.floor = floor;
     }
 
-    @Override
-    public void setParam1(double p1) {
-        this.mean = p1;
-    }
-
-    @Override
-    public void setParam2(double p2) {
-       this.standardDeviation = p2;
-    }
 }

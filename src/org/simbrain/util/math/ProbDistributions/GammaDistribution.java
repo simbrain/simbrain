@@ -120,14 +120,4 @@ public class GammaDistribution extends ProbabilityDistribution {
         this.floor = floor;
     }
 
-    @Override
-    public void setParam1(double p1) {
-        this.scale = p1;
-    }
-
-    @Override
-    public void setParam2(double p2) {
-        this.shape = p2;
-    }
-
 }

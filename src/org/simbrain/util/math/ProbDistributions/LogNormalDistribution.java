@@ -49,6 +49,13 @@ public class LogNormalDistribution extends ProbabilityDistribution {
             defaultValue = "false", order = 5)
     private boolean clipping = false;
 
+    public LogNormalDistribution() {}
+
+    public LogNormalDistribution(double location, double scale) {
+        setLocation(location);
+        setScale(scale);
+    }
+
     @Override
     public double nextRand() {
         return clipping(
@@ -116,16 +123,6 @@ public class LogNormalDistribution extends ProbabilityDistribution {
     @Override
     public void setLowerbound(double floor) {
         this.floor = floor;
-    }
-
-    @Override
-    public void setParam1(double p1) {
-        this.location = p1;
-    }
-
-    @Override
-    public void setParam2(double p2) {
-        this.scale = p2;
     }
 
 }

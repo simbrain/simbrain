@@ -18,6 +18,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.environment.SmellSource.DecayFunction;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -146,14 +147,19 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.NORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.NORMAL);
-        exRand.setParam1(0);
-        exRand.setParam2(Math.sqrt(variance));
-        inRand.setParam1(0);
-        inRand.setParam2(Math.sqrt(variance));
+        PolarizedRandomizer exRand = new PolarizedRandomizer(
+                Polarity.EXCITATORY,
+                new NormalDistribution(0, Math.sqrt(variance))
+                );
+        PolarizedRandomizer inRand = new PolarizedRandomizer(
+                Polarity.INHIBITORY,
+                new NormalDistribution(0, Math.sqrt(variance))
+                );
 
-        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(kIn, (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
+        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(
+                kIn,
+                (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2)
+                );
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con, 0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addGroup(reservoir);

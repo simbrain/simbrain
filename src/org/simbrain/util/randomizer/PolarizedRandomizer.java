@@ -74,19 +74,6 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
-     * Construct a randomizer with a specified polarity and probability
-     * distribution.
-     *
-     * @param polarity the polarity
-     * @param pdf      the prob. distribution
-     */
-    public PolarizedRandomizer(Polarity polarity, ProbDistribution pdf) {
-        super();
-        this.pdf = probDistributionEnumToProbabilityDistributionObject(pdf);
-        this.polarity = polarity;
-    }
-
-    /**
      * Copy constructor.
      *
      * @param dup the <code>RandomSource</code> to duplicate.

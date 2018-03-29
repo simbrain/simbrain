@@ -64,15 +64,6 @@ public class Randomizer implements EditableObject {
     }
 
     /**
-     * Construct a randomizer with a specific probability density function.
-     *
-     * @param pdf the probability density function enum.
-     */
-    public Randomizer(ProbDistribution pdf) {
-        this.pdf = probDistributionEnumToProbabilityDistributionObject(pdf);
-    }
-
-    /**
      * Copy constructor.
      *
      * @param dup the <code>RandomSource</code> to duplicate.
@@ -126,57 +117,6 @@ public class Randomizer implements EditableObject {
     }
 
     /**
-     * Converting ProbDistribution Enum to ProbabilityDistribution Object
-     * @param pd a ProbDistribution Enum
-     * @return a ProbabilityDistribution Object
-     */
-    protected ProbabilityDistribution probDistributionEnumToProbabilityDistributionObject(ProbDistribution pd) {
-        if (pd == ProbDistribution.EXPONENTIAL) {
-            return new ExponentialDistribution();
-        } else if (pd == ProbDistribution.GAMMA) {
-            return new GammaDistribution();
-        } else if (pd == ProbDistribution.LOGNORMAL) {
-            return new LogNormalDistribution();
-        } else if (pd == ProbDistribution.NORMAL) {
-            return new NormalDistribution();
-        } else if (pd == ProbDistribution.PARETO) {
-            return new ParetoDistribution();
-        } else if (pd == ProbDistribution.UNIFORM) {
-            return new UniformDistribution();
-        }
-        return null;
-    }
-
-    // TODO: Remove. Here for backwards compatibility
-
-    /**
-     * @param param1 the param1 to set
-     */
-    public void setParam1(double param1) {
-        pdf.setParam1(param1);
-    }
-
-    /**
-     * @param param2 the param2 to set
-     */
-    public void setParam2(double param2) {
-        pdf.setParam2(param2);
-    }
-
-    /**
-     * Set both parameters.
-     */
-    protected void setParams(double param1, double param2) {
-        pdf.setParam1(param1);
-        pdf.setParam2(param2);
-    }
-
-    // End remove
-
-
-
-
-    /**
      * For all but uniform, lower bound is only used in conjunction with
      * clipping, to truncate the distribution. So if clipping is false this
      * value is not used.
@@ -198,13 +138,6 @@ public class Randomizer implements EditableObject {
         this.pdf.setUpperBound(ub);
     }
 
-    /**
-     * @param pdf the pdf to set
-     */
-    public void setPdf(final ProbDistribution pdf) {
-        this.pdf = probDistributionEnumToProbabilityDistributionObject(pdf);
-    }
-    
     /**
      * @param clipping The useBounds to set.
      */

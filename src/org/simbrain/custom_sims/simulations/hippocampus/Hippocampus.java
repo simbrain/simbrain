@@ -9,6 +9,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -68,7 +69,7 @@ public class Hippocampus extends RegisteredSimulation {
      */
     public Hippocampus(SimbrainDesktop desktop) {
         super(desktop);
-        exRand.setParam2(0.02); // Set up randomizer
+        ((UniformDistribution) exRand.getPdf()).setUpperBound(0.02); // Set up randomizer
     }
 
     /**

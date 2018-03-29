@@ -26,6 +26,7 @@ import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 
 import java.io.File;
 
@@ -56,9 +57,7 @@ public class BackpropTrainerTest {
         trainer.setLearningRate(.1);
         trainer.setMomentum(.9);
         trainer.getRandomizer().ifPresent(rnd -> {
-            rnd.setPdf(ProbDistribution.NORMAL);
-            rnd.setParam1(0);
-            rnd.setParam2(.1);
+            rnd.setPdf(new NormalDistribution(0, 0.1));
         });
         trainer.randomize();
         trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.STOCHASTIC);
@@ -85,9 +84,7 @@ public class BackpropTrainerTest {
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.getRandomizer().ifPresent(rnd -> {
-            rnd.setPdf(ProbDistribution.NORMAL);
-            rnd.setParam1(0);
-            rnd.setParam2(.1);
+            rnd.setPdf(new NormalDistribution(0, 0.1));
         });
         trainer.randomize();
         trainer.initData();
@@ -117,9 +114,7 @@ public class BackpropTrainerTest {
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.getRandomizer().ifPresent(rnd -> {
-            rnd.setPdf(ProbDistribution.NORMAL);
-            rnd.setParam1(0);
-            rnd.setParam2(.1);
+            rnd.setPdf(new NormalDistribution(0, 0.1));
         });
         trainer.randomize();
         trainer.initData();
@@ -153,9 +148,7 @@ public class BackpropTrainerTest {
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
         trainer.getRandomizer().ifPresent(rnd -> {
-            rnd.setPdf(ProbDistribution.NORMAL);
-            rnd.setParam1(0);
-            rnd.setParam2(.1);
+            rnd.setPdf(new NormalDistribution(0, 0.1));
         });
         trainer.randomize();
         trainer.setLearningRate(0.05);

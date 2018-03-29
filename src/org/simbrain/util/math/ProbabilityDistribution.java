@@ -19,10 +19,6 @@ public abstract class ProbabilityDistribution implements EditableObject{
     public abstract void setUpperBound(double ceiling);
     public abstract void setLowerbound(double floor);
 
-    // TODO: Remove. Here for backwards compatibility
-    public abstract void setParam1(double p1);
-    public abstract void setParam2(double p2);
-
     protected static double clipping(double value, double lowerBound, double upperBound) {
         double result = value;
 

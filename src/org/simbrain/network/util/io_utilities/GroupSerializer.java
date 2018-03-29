@@ -27,6 +27,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 import java.io.BufferedOutputStream;
@@ -222,10 +223,10 @@ public class GroupSerializer {
 
         Network net = new Network();
         NeuronGroup ng1 = new NeuronGroup(net, 2048);
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(2.5);
-        inRand.setParam1(3.5);
+        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution());
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new LogNormalDistribution());
+        ((LogNormalDistribution) exRand.getPdf()).setLocation(2.5);
+        ((LogNormalDistribution) inRand.getPdf()).setLocation(3.5);
 
         Sparse rCon = new Sparse(0.01, false, false);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);

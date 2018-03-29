@@ -31,6 +31,13 @@ public class UniformDistribution extends ProbabilityDistribution {
             defaultValue = "1", order = 2)
     private double ceil = 1;
 
+    public UniformDistribution(double floor, double ceil) {
+        setUpperBound(ceil);
+        setLowerbound(floor);
+    }
+
+    public UniformDistribution() {}
+
     public double nextRand() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);
     }
@@ -74,11 +81,4 @@ public class UniformDistribution extends ProbabilityDistribution {
         this.floor = floor;
     }
 
-    @Override
-    public void setParam1(double p1) {
-    }
-
-    @Override
-    public void setParam2(double p2) {
-    }
 }

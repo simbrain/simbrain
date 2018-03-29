@@ -16,8 +16,8 @@ public class AdExIFPanel extends AnnotatedPropertyEditor {
     }
 
     @Override
-    protected void initWidgets() {
-        super.initWidgets();
+    protected void initPanel() {
+        super.initPanel();
         this.removeAll();
         tabbedPane = new JTabbedPane();
         this.add(tabbedPane);

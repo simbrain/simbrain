@@ -389,8 +389,8 @@ public class UpdateRulePanel extends JPanel {
 
         List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
         startingPanel = neuronRulePanel;
-        neuronRulePanel.commitChanges(ruleList);
-        noisePanel.commitChanges();
+//        neuronRulePanel.commitChanges(ruleList);
+//        noisePanel.commitChanges();
 
     }
 

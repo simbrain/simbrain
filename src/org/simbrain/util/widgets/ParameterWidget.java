@@ -18,10 +18,14 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
+import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
  * @author O. J. Coleman
  */
 public class ParameterWidget implements Comparable<ParameterWidget> {
+
     /**
      * The parameter for this widget.
      */
@@ -42,17 +47,25 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     public final JComponent component;
 
-
+    /**
+     * Construct an parameter widget from a parameter, which in turn represents a field.
+     *
+     * @param param the parameter object
+     */
     public ParameterWidget(Parameter param) {
         parameter = param;
         component = makeWidget();
     }
 
-
     /**
      * Create an appropriate widget for this parameter.
      */
     protected JComponent makeWidget() {
+
+        if (parameter.isMultiState()) {
+                return ObjectTypeEditor.createUninitializedEditor(parameter.getTypeMap(), parameter.annotation.label());
+        }
+
         if (parameter.isBoolean()) {
             return new YesNoNull();
         }
@@ -82,12 +95,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 double initialStep = range / 100; // aiming for about 100 steps between min and max.
                 double magnitude = Math.pow(10, Math.floor(Math.log10(initialStep)));
                 double msd = initialStep / magnitude;
-                if (msd > 5)
+                if (msd > 5) {
                     msd = 10;
-                else if (msd > 2)
+                } else if (msd > 2) {
                     msd = 5;
-                else if (msd > 1)
+                } else if (msd > 1) {
                     msd = 2;
+                }
                 stepSize = msd * magnitude;
             }
 
@@ -123,14 +137,15 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.hasMaxValue()) {
             tips.add("Maximum: " + (parameter.isNumericInteger() ? "" + ((int) anot.maximumValue()) : "" + anot.maximumValue()));
         }
-        if (tips.isEmpty())
+        if (tips.isEmpty()) {
             return "";
+        }
         return "<html>" + tips.stream().collect(Collectors.joining("<br/>")) + "</html>";
     }
 
-
     /**
-     * Set the value of the widget.
+     * Set the value of the widget. If value is null then the "null" state of the
+     * widget is displayed.
      */
     public void setWidgetValue(Object value) {
         if (parameter.isBoolean()) {
@@ -141,11 +156,17 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         } else if (parameter.isNumeric()) {
             ((JNumberSpinnerWithNull) component).setValue(value);
+        } else if (parameter.annotation.isMultiState()) {
+            if (value == null) {
+                ((ObjectTypeEditor) component).setNull();
+            } else {
+                ((ObjectTypeEditor) component).setValue(value);
+            }
+
         } else {
             ((JTextField) component).setText(value == null ? "" : value.toString());
         }
     }
-
 
     /**
      * Get the value of the widget.
@@ -156,9 +177,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
         if (parameter.isNumeric()) {
             return ((JNumberSpinnerWithNull) component).getValue();
-        } else {
-            return ((JTextField) component).getText();
         }
+        if (parameter.annotation.isMultiState()) {
+            return ((ObjectTypeEditor)component).getValue();
+        }
+
+        return ((JTextField) component).getText();
     }
 
 
@@ -184,7 +208,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
-     * Convenience method to get a label for this parameter
+     * Convenience method to get a label for this parameter.
      *
      * @return the label
      */

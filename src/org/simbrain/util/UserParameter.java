@@ -19,6 +19,7 @@
 package org.simbrain.util;
 
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 
 import java.lang.annotation.*;
 
@@ -33,6 +34,7 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserParameter {
+
     /**
      * Label for the parameter.
      */
@@ -88,4 +90,26 @@ public @interface UserParameter {
      * ordered according to the field name.
      */
     int order() default 0;
+
+    /**
+     * Whether the parameter represents a multi-state object to be edited by
+     * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
+     */
+    boolean isMultiState() default false;
+
+    /**
+     * String reference to the class holding the type map for a multi-state object,
+     * e.g. "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel".
+     *
+     * @return the string path to the classss
+     */
+    String typeMapClass() default "";
+
+    /**
+     * Method name for static method returning the type map for a multi-state object,
+     * e.g. "getTypeMap".
+     *
+     * @return the string method name
+     */
+    String typeMapMethod() default "";
 }

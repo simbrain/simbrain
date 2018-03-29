@@ -22,6 +22,10 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
@@ -29,12 +33,18 @@ import org.simbrain.util.propertyeditor2.EditableObject;
  *
  * @author jyoshimi
  */
-public abstract class NeuronUpdateRule implements EditableObject {
+public abstract class NeuronUpdateRule implements CopyableObject {
 
     /**
      * The maximum number of digits to display in the tool tip.
      */
     private static final int MAX_DIGITS = 9;
+
+    //TODO: This field is temporary, and is being used for now to test the ObjectType editor.
+    @UserParameter(label = "Randomizer", isMultiState = true,
+        typeMapClass = "org.simbrain.util.randomizer.gui.RandomizerPanel2",
+        typeMapMethod = "getTypeMap", order = 1000)
+    private ProbabilityDistribution randomizer = new NormalDistribution();
 
     /**
      * The input type and also thing that computes an input value. TODO: rename
@@ -354,5 +364,11 @@ public abstract class NeuronUpdateRule implements EditableObject {
 
         public abstract double[] getNormalizedSeparatedInput(Neuron n);
     }
+
+    @Override
+    public EditableObject copy() {
+        return deepCopy();
+    }
+
 
 }

@@ -18,9 +18,12 @@
  */
 package org.simbrain.util;
 
+import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -32,6 +35,9 @@ import java.util.regex.Pattern;
  * @author O. J. Coleman
  */
 public class Parameter implements Comparable<Parameter> {
+
+    //TODO: Make these private or protected
+
     /**
      * TheAnnotation for this Parameter.
      */
@@ -43,11 +49,42 @@ public class Parameter implements Comparable<Parameter> {
     public final Field field;
 
 
+    /**
+     * Construct a parameter object from a field.
+     *
+     * @param field the field
+     */
     public Parameter(Field field) {
         this.field = field;
         annotation = field.getAnnotation(UserParameter.class);
     }
 
+    /**
+     * Returns true if this is an annotation for a multi-state object.
+     */
+    public boolean isMultiState() {
+        return annotation.isMultiState();
+    }
+
+    /**
+     * Uses reflection to get the type map for a multi-state object.
+     */
+    public BiMap<String, Class>  getTypeMap() {
+        if (annotation == null) {
+            return null;
+        }
+        String className = annotation.typeMapClass();
+        String methodName = annotation.typeMapMethod();
+        try {
+            Class c = Class.forName(className);
+            Method m = c.getDeclaredMethod(methodName);
+            BiMap<String, Class> typeMap = (BiMap<String, Class>) m.invoke(null, null);
+            return typeMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * Returns true iff the type of the field is numeric (integer or floating-point).
@@ -151,8 +188,12 @@ public class Parameter implements Comparable<Parameter> {
         try {
             field.setAccessible(true);
             return field.get(instance);
-        } catch (Exception e) {
-            throw new RuntimeException("Something went wrong getting the value: " + e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("IllegalAccessException: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("IllegalArgumentException: " + e.getMessage(), e);
+        } catch (SecurityException e) {
+            throw new RuntimeException("SecurityException: " + e.getMessage(), e);
         }
     }
 
@@ -280,13 +321,16 @@ public class Parameter implements Comparable<Parameter> {
      * @return The available Parameters, sorted according to {@link UserParameter#weight()}.
      */
     public static Set<Parameter> getParameters(final Class<?> paramClass) {
+        //System.out.println("Parameter.getParameters");
         if (!classParameters.containsKey(paramClass)) {
             Set<Parameter> params = new TreeSet<>();
             Set<String> fieldNames = new HashSet<>();
 
             // Get all super-classes too so that we can set their fields.
             for (Class<?> clazz : getSuperClasses(paramClass)) {
+                //System.out.println("paramClass = [" + paramClass + "]");
                 for (Field f : clazz.getDeclaredFields()) {
+                    //System.out.println("declaredField = [" + f + "]");
                     if (f.isAnnotationPresent(UserParameter.class)) {
                         if (fieldNames.contains(f.getName())) {
                             // TODO Make a special exception? Probably not, it's only for developers when making update rules etc.

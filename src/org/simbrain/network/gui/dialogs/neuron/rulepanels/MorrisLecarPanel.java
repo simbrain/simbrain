@@ -21,11 +21,8 @@ package org.simbrain.network.gui.dialogs.neuron.rulepanels;
 import org.simbrain.network.neuron_update_rules.MorrisLecarRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.EditableObject;
-import javax.swing.JTabbedPane;
 
-import javax.swing.*;
-import java.util.List;
+import javax.swing.JTabbedPane;
 
 public class MorrisLecarPanel extends AnnotatedPropertyEditor {
 
@@ -40,8 +37,8 @@ public class MorrisLecarPanel extends AnnotatedPropertyEditor {
     // https://github.com/simbrain/simbrain/blob/master/src/org/simbrain/network/gui/dialogs/neuron/rule_panels/MorrisLecarRulePanel.java
 
     @Override
-    protected void initWidgets() {
-        super.initWidgets();
+    protected void initPanel() {
+        super.initPanel();
         this.removeAll();
         tabbedPane = new JTabbedPane();
         this.add(tabbedPane);

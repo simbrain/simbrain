@@ -148,42 +148,10 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
         basicStatsPanel.add(new JLabel("Label:"));
         basicStatsPanel.add(neuronPropertyWidgets.getWidget("Label").component);
 
-        JPanel trianglePanel = new JPanel();
-        trianglePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
-        trianglePanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-        trianglePanel.add(detailTriangle);
-
-        BoxLayout layout = new BoxLayout(detailPanel, BoxLayout.Y_AXIS);
-        detailPanel.setLayout(layout);
-
-        GridLayout gl = new GridLayout(0, 2);
-        gl.setVgap(5);
-
-        JPanel clampP = new JPanel(gl);
-        clampP.add(new JLabel("Clamped: "));
-        clampP.add(neuronPropertyWidgets.getWidget("Clamped").component);
-        clampP.setAlignmentX(CENTER_ALIGNMENT);
-        detailPanel.add(clampP);
-
-        detailPanel.add(Box.createVerticalStrut(5));
-
-        detailPanel.add(boundsClippingPanel);
-
-        JPanel subP = new JPanel(gl);
-        subP.add(new JLabel("Increment: "));
-        subP.add(neuronPropertyWidgets.getWidget("Increment").component);
-//        subP.add(new JLabel("Priority:"));
-//        subP.add(neuronRulePropertyWidgets.getWidget("Priority").component);
-//        subP.add(new JLabel("Input Type:"));
-//        subP.add(neuronRulePropertyWidgets.getWidget("Input Type").component);
-        subP.setAlignmentX(CENTER_ALIGNMENT);
-        detailPanel.add(subP);
-
-        this.add(trianglePanel, BorderLayout.CENTER);
-        detailPanel.setVisible(detailTriangle.isDown());
-        this.add(detailPanel, BorderLayout.SOUTH);
-
         this.add(basicStatsPanel, BorderLayout.NORTH);
+
+        this.add(neuronPropertyWidgets.getWidget("Update Rule").component,
+            BorderLayout.CENTER);
 
         TitledBorder tb = BorderFactory.createTitledBorder("Neuron Properties");
         this.setBorder(tb);
@@ -230,59 +198,6 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
             return;
         }
 
-//        // Handle Activation
-//        ParameterGetter<Neuron, Double> actGetter = (n) -> ((Neuron) n).getActivation();
-//        if (!NetworkUtils.isConsistent(neuronList, actGetter)) {
-//            tfActivation.setValue(SimbrainConstants.NULL_STRING);
-//        } else {
-//            tfActivation.setValue(neuronRef.getActivation());
-//        }
-//
-//        // Handle Label
-//        ParameterGetter<Neuron, String> lblGetter = (n) -> ((Neuron) n).getLabel();
-//        if (!NetworkUtils.isConsistent(neuronList, lblGetter)) {
-//            tfNeuronLabel.setValue(SimbrainConstants.NULL_STRING);
-//        } else {
-//            tfNeuronLabel.setValue(neuronRef.getLabel());
-//        }
-//
-//        // Handle bounds and clipping
-//        boundsClippingPanel.fillFieldValues();
-//
-//        // Handle Priority
-//        ParameterGetter<Neuron, Integer> priorityGetter = (n) -> ((Neuron) n).getUpdatePriority();
-//        if (!NetworkUtils.isConsistent(neuronList, priorityGetter)) {
-//            tfPriority.setValue(SimbrainConstants.NULL_STRING);
-//        } else {
-//            tfPriority.setValue(neuronRef.getUpdatePriority());
-//        }
-//
-//        // Handle Clamped
-//        ParameterGetter<Neuron, Boolean> clampedGetter = (n) -> ((Neuron) n).isClamped();
-//        if (!NetworkUtils.isConsistent(neuronList, clampedGetter)) {
-//            clamped.setNull();
-//        } else {
-//            clamped.setSelected(neuronList.get(0).isClamped());
-//        }
-//
-//        // Get list of rules to fill field vales on
-//        List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
-//
-//        // Handle Increment
-//        ParameterGetter<NeuronUpdateRule, Double> incGeter = (n) -> ((NeuronUpdateRule) n).getIncrement();
-//        if (!NetworkUtils.isConsistent(ruleList, incGeter)) {
-//            tfIncrement.setValue(SimbrainConstants.NULL_STRING);
-//        } else {
-//            tfIncrement.setValue(neuronRef.getUpdateRule().getIncrement());
-//        }
-//
-//        // Handle input type
-//        ParameterGetter<NeuronUpdateRule, InputType> itGeter = (n) -> ((NeuronUpdateRule) n).getInputType();
-//        if (!NetworkUtils.isConsistent(ruleList, itGeter)) {
-//            inputType.setNull();
-//        } else {
-//            inputType.setSelectedItem(ruleList.get(0).getInputType().toString());
-//        }
     }
 
     /**
@@ -297,73 +212,6 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
 
         neuronPropertyWidgets.commitChanges(neuronList);
 
-//        for (Neuron n : neuronList) {
-//            // Only replace if this is a different rule (otherwise when
-//            // editing multiple rules with different parameter values which
-//            // have not been set those values will be replaced with the
-//            // default).
-//            if (!n.getUpdateRule().getClass().equals(selectedRule.getClass())) {
-//                s.setLearningRule(selectedRule.deepCopy());
-//            }
-//        }
-
-        // Only commit rule properties if we have a consistent set of update rules
-//        List<EditableObject> ruleList = neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
-//        neuronRulePropertyWidgets.commitChanges(ruleList);
-
-
-//        // Commit activations
-//        double act = Utils.doubleParsable(tfActivation);
-//        if (!Double.isNaN(act)) {
-//            neuronList.stream().forEach(n -> n.forceSetActivation(Utils.doubleParsable(tfActivation.getText())));
-//        } else {
-//            // Only successful if the field can't be parsed because
-//            // it is a NULL_STRING standing in for multiple values
-//            success &= tfActivation.getText().matches(SimbrainConstants.NULL_STRING);
-//        }
-//
-//        // Label
-//        if (!tfNeuronLabel.getText().equals(SimbrainConstants.NULL_STRING)) {
-//            neuronList.stream().forEach(n -> n.setLabel(tfNeuronLabel.getText()));
-//        }
-//
-//        // Clamped
-//        if (!clamped.isNull()) {
-//            neuronList.stream().forEach(n -> n.setClamped(clamped.isSelected()));
-//        }
-//
-//        // Bounds and clipping
-//        success &= boundsClippingPanel.commitChanges();
-//
-//        // Increment
-//        double increment = Utils.doubleParsable(tfIncrement);
-//        if (!Double.isNaN(increment)) {
-//            neuronList.stream().forEach(n -> n.setIncrement(increment));
-//        } else {
-//            // Only successful if the field can't be parsed because
-//            // it is a NULL_STRING standing in for multiple values
-//            success &= tfIncrement.getText().matches(SimbrainConstants.NULL_STRING);
-//        }
-//
-//        // Priority
-//        Integer priority = Utils.parseInteger(tfPriority);
-//        if (priority != null) {
-//            // for integers to use as a flag).
-//            neuronList.stream().forEach(n -> n.setUpdatePriority(priority));
-//        } else {
-//            // Only successful if the field can't be parsed because
-//            // it is a NULL_STRING standing in for multiple values
-//            success &= tfPriority.getText().matches(SimbrainConstants.NULL_STRING);
-//        }
-//
-//        // Input type
-//        if (((String) inputType.getSelectedItem()).matches(InputType.WEIGHTED.toString())) {
-//            neuronList.stream().forEach(n -> n.getUpdateRule().setInputType(InputType.WEIGHTED));
-//
-//        } else if (((String) inputType.getSelectedItem()).matches(InputType.SYNAPTIC.toString())) {
-//            neuronList.stream().forEach(n -> n.getUpdateRule().setInputType(InputType.SYNAPTIC));
-//        }
-//
         // TODO: Below a hack. Why only needed for labels and not activation? And what if no change to labels?
         // Update neuron labels only
         if (!neuronList.isEmpty()) {

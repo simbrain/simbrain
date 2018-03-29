@@ -120,7 +120,9 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                parent.pack();
+                if(parent != null) {
+                    parent.pack();
+                }
             }
         });
     }

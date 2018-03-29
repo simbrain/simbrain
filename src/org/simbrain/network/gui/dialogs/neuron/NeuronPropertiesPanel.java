@@ -19,7 +19,10 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.util.BiMap;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
@@ -120,8 +123,8 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);
         this.add(generalNeuronPropertiesPanel);
-        this.add(Box.createVerticalStrut(DEFAULT_VGAP));
-        this.add(updateRulePanel);
+        //this.add(Box.createVerticalStrut(DEFAULT_VGAP));
+        //this.add(updateRulePanel);
     }
 
     /**
@@ -196,5 +199,44 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     //                "Add noise " + ((LinearRule) neuronList.get(1).getUpdateRule())
     //                        .getAddNoise());
     //    }
+
+
+    /**
+     * Associations between names of rules and panels for editing them.
+     * Used in {@link CopyableObject}.
+     */
+    private static final BiMap<String, Class> RULE_MAP = new BiMap<>();
+
+
+    /**
+     * Populate the Rule Map. Note! Place items in alphabetical order so they
+     * appear that way in the GUI combo box.
+     */
+    static {
+        RULE_MAP.put(new AdExIFRule().getName(), AdExIFRule.class);
+        RULE_MAP.put(new BinaryRule().getName(), BinaryRule.class);
+        RULE_MAP.put(new DecayRule().getName(), DecayRule.class);
+        RULE_MAP.put(new FitzhughNagumo().getName(), FitzhughNagumo.class);
+        RULE_MAP.put(new IACRule().getName(), IACRule.class);
+        RULE_MAP.put(new IntegrateAndFireRule().getName(), IntegrateAndFireRule.class);
+        RULE_MAP.put(new IzhikevichRule().getName(), IzhikevichRule.class);
+        //RULE_MAP.put(new KuramotoRule().getName(), KuramotoRule.class);
+        RULE_MAP.put(new LinearRule().getName(), LinearRule.class);
+        RULE_MAP.put(new MorrisLecarRule().getName(), MorrisLecarRule.class);
+        RULE_MAP.put(new NakaRushtonRule().getName(), NakaRushtonRule.class);
+        RULE_MAP.put(new ProductRule().getName(), ProductRule.class);
+        RULE_MAP.put(new ContinuousSigmoidalRule().getName(),
+            ContinuousSigmoidalRule.class);
+        RULE_MAP.put(new SigmoidalRule().getName(), SigmoidalRule.class);
+        RULE_MAP.put(new SpikingThresholdRule().getName(), SpikingThresholdRule.class);
+        RULE_MAP.put(new ThreeValueRule().getName(), ThreeValueRule.class);
+
+    }
+
+    //TODO: Alphabetize
+    public static BiMap<String, Class> getTypeMap() {
+        return RULE_MAP;
+    }
+
 
 }

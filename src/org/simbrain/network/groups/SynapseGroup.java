@@ -362,15 +362,13 @@ public class SynapseGroup extends Group {
         sourceNeuronGroup.addOutgoingSg(this);
         targetNeuronGroup.addIncomingSg(this);
         connectionManager.connectNeurons(this);
-
-        //TODO: This is a temp disable so I can test RL Sim.
-//        if (size() == 0) {
-//            String errMessage = "Synapse group creation failed because there are no synapses;";
-//            errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
-//            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
-//            delete();
-//            throw new IllegalStateException(errMessage);
-//        }
+        if (size() == 0) {
+            String errMessage = "Synapse group creation failed because there are no synapses;";
+            errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
+            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
+            delete();
+            throw new IllegalStateException(errMessage);
+        }
     }
 
     /**
@@ -386,7 +384,11 @@ public class SynapseGroup extends Group {
      */
     public void preAllocateSynapses(int expectedNumSynapses) throws IllegalStateException {
         if (!exSynapseSet.isEmpty() || !inSynapseSet.isEmpty()) {
-            throw new IllegalArgumentException("Cannot pre-allocate space" + " for some expected number of synapses when the synapse" + " when one or both synapse sets are already populated." + " Pre-allocations can only occur before connections" + " have been initialized.");
+            throw new IllegalArgumentException("Cannot pre-allocate space for"
+               + " some expected number of synapses when the synapse"
+               + " when one or both synapse sets are already populated."
+               + " Pre-allocations can only occur before connections"
+               + " have been initialized.");
         }
         // Using /0.8 instead of /0.75 because expected number is _expected_
         // but not precisely known.

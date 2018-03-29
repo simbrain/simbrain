@@ -1,10 +1,11 @@
 package org.simbrain.util.randomizer.gui;
 
-import org.simbrain.network.core.Neuron;
+import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -284,4 +285,25 @@ public class RandomizerPanel2 extends JPanel {
         rp.repaintPanel();
     }
 
+    /**
+     * Associations between names of rules and panels for editing them.
+     * Used in {@link CopyableObject}.
+     */
+    private static final BiMap<String, Class> DISTRIBUTION_MAP2 = new BiMap<>();
+
+    // TODO: Finish
+    // Populate the Rule Map. Note! Place items in alphabetical order so they
+    // appear that way in the GUI combo box.
+    static {
+        DISTRIBUTION_MAP2.put(new ExponentialDistribution().getName(), ExponentialDistribution.class);
+        DISTRIBUTION_MAP2.put(new GammaDistribution().getName(), GammaDistribution.class);
+        DISTRIBUTION_MAP2.put(new LogNormalDistribution().getName(), LogNormalDistribution.class);
+        DISTRIBUTION_MAP2.put(new NormalDistribution().getName(), NormalDistribution.class);
+        DISTRIBUTION_MAP2.put(new ParetoDistribution().getName(), ParetoDistribution.class);
+        DISTRIBUTION_MAP2.put(new UniformDistribution().getName(), UniformDistribution.class);
+    }
+
+    public static BiMap<String, Class> getTypeMap() {
+        return DISTRIBUTION_MAP2;
+    }
 }

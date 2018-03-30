@@ -263,7 +263,7 @@ public class ObjectTypeEditor extends JComponent {
 
     /**
      * Set the current object type being edited, and update the property editor
-     * accordingly.
+     * accordingly. (Editing a consistent set of objects).
      * <p>
      * Should only be called once.
      *
@@ -276,7 +276,7 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * Set the editor to a null state.
+     * Set the editor to a null state (editing an inconsistent set of objects)
      * <p>
      * Should only be called once.
      */

@@ -28,9 +28,14 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Clear selected neurons action.
+ * Set all node activations to zero.
  */
-public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction {
+public final class ClearNodeActivationsAction extends AbstractAction {
+
+    /**
+     * Reference to network panel.
+     */
+    private NetworkPanel networkPanel;
 
     /**
      * Create a new clear selected neurons action with the specified network
@@ -38,12 +43,15 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
      *
      * @param networkPanel network panel, must not be null
      */
-    public ZeroSelectedObjectsAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Set selected objects to zero", EnablingCondition.ALLITEMS);
+    public ClearNodeActivationsAction(final NetworkPanel networkPanel) {
+        super("Clear activations of all nodes");
+        this.networkPanel = networkPanel;
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-        putValue(SHORT_DESCRIPTION, "Set selected neurons and synapses to zero (c)");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('c'), this);
+        putValue(SHORT_DESCRIPTION,
+                "Clear all node activations (k)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('k'), this);
         networkPanel.getActionMap().put(this, this);
     }
 
@@ -52,13 +60,6 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        for (NeuronNode node : networkPanel.getSelectedNeurons()) {
-            node.getNeuron().clear();
-        }
-        for (SynapseNode node : networkPanel.getSelectedSynapses()) {
-            node.getSynapse().forceSetStrength(0);
-        }
-        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModelSynapses());
-        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModelNeurons());
+        networkPanel.clearNeurons();
     }
 }

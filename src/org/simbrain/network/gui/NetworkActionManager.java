@@ -87,7 +87,7 @@ public final class NetworkActionManager {
     /**
      * Clear neurons action.
      */
-    private final Action zeroSelectedObjectsAction;
+    private final Action clearNodesAction;
 
     /**
      * Randomize objects action.
@@ -333,7 +333,7 @@ public final class NetworkActionManager {
 
         newNeuronAction = new NewNeuronAction(networkPanel);
         activityGeneratorAction = new NewActivityGeneratorAction(networkPanel);
-        zeroSelectedObjectsAction = new ZeroSelectedObjectsAction(networkPanel);
+        clearNodesAction = new ClearNodeActivationsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
@@ -583,8 +583,8 @@ public final class NetworkActionManager {
      *
      * @return the clear neurons action
      */
-    public Action getZeroSelectedObjectsAction() {
-        return zeroSelectedObjectsAction;
+    public Action getClearNodesAction() {
+        return clearNodesAction;
     }
 
     /**

@@ -101,7 +101,7 @@ public class NetworkMenuBar {
         selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
         editMenu.add(selectionMenu);
         editMenu.addSeparator();
-        editMenu.add(actionManager.getZeroSelectedObjectsAction());
+        editMenu.add(actionManager.getClearNodesAction());
         editMenu.addSeparator();
         editMenu.addSeparator();
         //editMenu.add(actionManager.getGroupAction());

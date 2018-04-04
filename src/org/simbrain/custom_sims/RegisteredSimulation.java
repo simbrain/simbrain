@@ -18,25 +18,15 @@
  */
 package org.simbrain.custom_sims;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
-import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
 import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
-import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
-import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
-import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM;
-import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
-import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
-import com.sun.org.apache.regexp.internal.RE;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Super class for all custom simulations. Also has code to manage custom

@@ -4,10 +4,12 @@ Release Notes for Simbrain 3.03
 - It may be possible to open some 3.02 workspace or networks in 3.03, but results will vary.
 - Improved clamping. Select nodes and / or synapses and click Shift-F.  Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
 - Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.
+- Key command to clear workspace: Command/Control-K
 - Key command to duplicate items: Command/ Control-D.
 - Key command to create neuron groups: G
 - Key command to "convert" loose neurons to neuron group: Shift-G
-- Key command to clear workspace: Command/Control-K
+- Key command to unselect: Escape
+- Eraser button repurposed to set nodes only (selected or not) to 0; associated with key command 'k'
 - Improved Lasso selection of self-connections and weights generally
 - Improved coloring for wand on PC
 - Extending internationalization fix to synapse groups

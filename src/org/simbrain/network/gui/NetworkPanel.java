@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
@@ -1597,7 +1596,7 @@ public class NetworkPanel extends JPanel {
         for (Action action : actionManager.getNetworkEditingActions()) {
             editTools.add(action);
         }
-        editTools.add(actionManager.getZeroSelectedObjectsAction());
+        editTools.add(actionManager.getClearNodesAction());
         editTools.add(actionManager.getRandomizeObjectsAction());
 
         return editTools;
@@ -3376,4 +3375,38 @@ public class NetworkPanel extends JPanel {
         return ((NeuronNode) objectNodeMap.get(neuron));
     }
 
+    /**
+     * Unselect everything and clear source elements.
+     */
+    public void unselectAll() {
+        selectionModel.clear();
+        clearSourceElements();
+    }
+
+    /**
+     * Set all node activations to 0.
+     */
+    public void clearNeurons() {
+        for (NeuronNode node : getNeuronNodes()) {
+            node.getNeuron().clear();
+        }
+        this.setSelection(getNeuronNodes());
+        network.fireNeuronsUpdated();
+    }
+
+    /**
+     * Set all selected items (nodes / weights) to 0. Dangerous for weights!
+     */
+    public void clearSelectedObjects() {
+        for (NeuronNode node : getSelectedNeurons()) {
+            node.getNeuron().clear();
+        }
+        for (SynapseNode node : getSelectedSynapses()) {
+            node.getSynapse().forceSetStrength(0);
+        }
+        network.fireSynapsesUpdated(
+            getSelectedModelSynapses());
+        network.fireNeuronsUpdated(
+            getSelectedModelNeurons());
+    }
 }

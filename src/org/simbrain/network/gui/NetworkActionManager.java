@@ -54,7 +54,7 @@ import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.edit.TextEditModeAction;
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom;
 import org.simbrain.network.gui.actions.edit.WandEditModeAction;
-import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
+import org.simbrain.network.gui.actions.edit.ClearNodeActivationsAction;
 import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
@@ -124,7 +124,7 @@ public final class NetworkActionManager {
     private final Action newNeuronAction;
 
     /** Clear neurons action. */
-    private final Action zeroSelectedObjectsAction;
+    private final Action clearNodesAction;
 
     /** Randomize objects action. */
     private final Action randomizeObjectsAction;
@@ -285,7 +285,7 @@ public final class NetworkActionManager {
 
         newNeuronAction = new NewNeuronAction(networkPanel);
         activityGeneratorAction = new NewActivityGeneratorAction(networkPanel);
-        zeroSelectedObjectsAction = new ZeroSelectedObjectsAction(networkPanel);
+        clearNodesAction = new ClearNodeActivationsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
@@ -589,8 +589,8 @@ public final class NetworkActionManager {
      *
      * @return the clear neurons action
      */
-    public Action getZeroSelectedObjectsAction() {
-        return zeroSelectedObjectsAction;
+    public Action getClearNodesAction() {
+        return clearNodesAction;
     }
 
     /**

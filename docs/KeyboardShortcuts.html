@@ -3,9 +3,7 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
     <link href="Styles.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -36,75 +34,49 @@
                 <br>
             </span>
         </p>
-
         <p>Command-o: Open a file of the given workspace type
             <br>Command-s: Save the current file
             <br>Command-w: Close the component</p>
         <p>
-            <span class="heading2">Network Component</span>
-            <br>
+            <span class="heading2">Network Component (Network must be in focus)</span>
         </p>
-        <p>
-            <span style="text-decoration: underline;">Selection of Items</span>
-            <br>
-        </p>
-        <div style="margin-left: 40px;">a: Select all items (neurons, weights, text objects)
-            <br>n: Select all neurons
-            <br>w: Select all weights
-            <br>
-        </div>
-        <br>
-        <p>
-            <span style="text-decoration: underline;">Building and Editing Networks</span>
-            <br>
-        </p>
-        <div style="margin-left: 40px;">c: Clear all
-            <br>p: Add or "put" a new node. Nodes will be added next to selected nodes or where you last clicked in the network panel
-            <br>r: Randomize selected objects.
-            <br>f: Fit camera to screen
+        <div style="margin-left: 40px;">
             <br>1: Set selected nodes to source nodes
             <br>2: Connect source to target nodes using current connection (by default all to all)
+            <br>5: Turn display of weights on and off. Performance goes way up when weights are off so this is a good one to know!
+            <br>c: "Clear" all. Set selected nodes and weights to zero. WARNING! Setting weights to zero is not always a desired outcome!
+            <br>Command-c: Copy selected items (groups and subnetworks are not copied and pasted)
+            <br>Command-d: Duplicate selected items
+            <br>Control-d: print debug info in console (only works if Simbrain is run from a terminal command).
+            <br>Command-e: Edit selected neurons or weights
+            <br>f: Fit camera to screen
+            <br>F: Freeze / clamp selected nodes and weights. Repeat to toggle freezing / clamping.
+            <br>g: Create a new neuron group
+            <br>G: Add selected loose neurons to a neuron group
+            <br>i: Wand mode
+            <br>k: Clear all node activations. Leaves nodes selected so that, for example, this can be followed by a randomization (r).
+            <br>n: Select all neurons
+            <br>p: Add or "put" a new node. Nodes will be added next to selected nodes or where you last clicked in the network panel
+            <br>r: Randomize selected objects.
+            <br>s: Selection mode (the default mode)
+            <br>t: Text mode
+            <br>w: Select all weights
+            <br>Command-v: Paste selected items
+            <br>Command-x: Cut selected items
+            <br>Delete: Delete selected items
+            <br>Escape: Unselect all objects
             <br>Arrows: <a href="Pages/Network/neuron.html#incrementing">Increment or decrement</a> selected items (neurons or synapses).
             <br>Option-Arrows: <a href="Pages/Network/neuron.html#contextualIncrementing">Contextually increment or decrement</a> selected neurons.
             <br>Shift-Arrow: Nudge objects (move them a few pixels)
-            <br>Command-c: Copy selected items (groups and subnetworks are not copied and pasted)
-            <br>Command-x: Cut selected items
-            <br>Command-d: Duplicate selected items
-            <br>Command-v: Paste selected items
-            <br>Command-e: Edit selected neurons or weights
-            <br>Delete: Delete selected items
-            <br>G: Create a neuron group
-            <br>Shift-G: Add selected loose neurons to a neuron group
-            <br>
+            <br>Space-bar: Update network
         </div>
         <br>
-        <p>
-            <span style="text-decoration: underline;">Other Network Command (Network must be in focus) </span>
-        </p>
-        <div style="margin-left: 40px;">
-            Space-bar: Update network
-            <br>CTRL-d: print debug info in console (only works if Simbrain is run from a terminal command).
-            <br>5: Turn display of weights on and off. Performance goes way up when weights are off so this is a good one to know!
-            <br>
-        </div>
-        <br>
-        <p>
-            <span style="text-decoration: underline;">Network Modes</span>
-        </p>
-        <p style="margin-left: 40px;">
-            s: Selection mode (the default mode)
-            <br>t: Text mode
-            <br>i: Wand mode
-            <br>(Note that to zoom in the network use the scroll wheel or pinch gesture; to pan use command or control while left-click dragging).
-        </p>
         <p>
             <span style="text-decoration: underline;">Some Useful Key Sequences</span>
             <br>
         </p>
-
         <p style="margin-left: 40px;">n &gt; c&nbsp;&nbsp; to clear all neurons (set them to 0)
             <br>n &gt; r &nbsp;&nbsp; to randomize all neurons
-            <br>w &gt; c&nbsp;&nbsp; to clear all weights (set them to 0)
             <br>w &gt; r&nbsp;&nbsp; to randomize all weights
             <br>a &gt; r&nbsp;&nbsp; to randomize all weights and neurons
             <br>n &gt; 1 &gt; 2&nbsp; &gt; r (to create a recurrent network where each node connects to all others)
@@ -119,9 +91,6 @@
             <br>(Repeat as needed; when done, click in an empty part of the network window to-deselect all neurons, and press 1)
             <br>
         </p>
-
-
-
         <p>
             <span class="heading2">Dataworld Component</span>
         </p>
@@ -132,18 +101,15 @@
             <span class="heading2">Notes</span>
             <br>
         </p>
-
         <ul>
             <li>"Command" is a different key on different systems:
                 <br>&nbsp;&nbsp;&nbsp; PC: Control or "CTRL" key
                 <br>&nbsp;&nbsp;&nbsp; Mac: The "command" or "Apple" key.
                 <br>&nbsp;&nbsp;&nbsp; Linux: The "CTRL" key.
                 <br>
-
             </li>
             <li>The component-specific commands only work if that component is in focus (click on the component to place it in focus)
                 <br>
-
             </li>
             <li>The network key commands are especially useful for rapidly building networks!
             </li>
@@ -164,7 +130,6 @@
             </div>
         </a>
     </div>
-
 </body>
 
 </html>

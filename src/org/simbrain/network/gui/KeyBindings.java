@@ -122,8 +122,7 @@ public class KeyBindings {
             }
         });
 
-        // Clamp/unclamp nodes and freeze/unfreeize synapses using Shift-F /
-        // Shift-U
+        // Clamp/unclamp nodes and freeze/unfreeize synapses using Shift-F
         inputMap.put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.SHIFT_MASK),
                 "toggleClamping");
@@ -140,6 +139,26 @@ public class KeyBindings {
         panel.getActionMap().put("duplicate", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.duplicate();
+            }
+        });
+
+        // Unselect current selection using the escape key
+        inputMap.put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            "unselectAll");
+        panel.getActionMap().put("unselectAll", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.unselectAll();
+            }
+        });
+
+        // Set selected objects to zero
+        inputMap.put(
+            KeyStroke.getKeyStroke("C"),
+            "zeroSelection");
+        panel.getActionMap().put("zeroSelection", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.clearSelectedObjects();
             }
         });
 

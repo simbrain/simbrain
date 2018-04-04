@@ -79,7 +79,7 @@ public class WorkspaceActionManager {
     private final Action newDisplayWorldAction;
 
     /** New vision world action. */
-    private final Action newVisionWorldAction;
+//    private final Action newVisionWorldAction;
 
     /** New device interaction world action. */
     private final Action newDeviceInteractionWorldAction;
@@ -209,7 +209,7 @@ public class WorkspaceActionManager {
         newGameWorldAction = new NewGameWorldAction(workspace);
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
-        newVisionWorldAction = new NewVisionWorldAction(workspace);
+//        newVisionWorldAction = new NewVisionWorldAction(workspace);
         newDeviceInteractionWorldAction = new NewDeviceInteractionWorldAction(workspace);
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
@@ -266,7 +266,7 @@ public class WorkspaceActionManager {
                 newOdorWorldAction, newDisplayWorldAction,
                 newReaderWorldAction,
                 // newThreeDeeWorldAction,
-                newVisionWorldAction });
+                });
     }
 
     /**
@@ -394,9 +394,9 @@ public class WorkspaceActionManager {
     /**
      * @return the newVisionWorldAction.
      */
-    public Action getNewVisionWorldAction() {
-        return newVisionWorldAction;
-    }
+//    public Action getNewVisionWorldAction() {
+//        return newVisionWorldAction;
+//    }
 
     /**
      * @return the newDeviceInteractionWorldAction.

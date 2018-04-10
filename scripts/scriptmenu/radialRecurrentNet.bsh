@@ -86,7 +86,7 @@ import org.simbrain.workspace.*;
     // Optional code to distribute neurons in 3D space with random z values
     // Random rand = new Random();
     Randomizer rand = new Randomizer();
-    rand.setPdf(ProbDistribution.NORMAL);
+    rand.setPdf(new NormalDistribution());
     for (int i = 0; i < NUM_NEURONS; i++) {
     	Neuron neuron = new Neuron(network);
         neurons.add(neuron);
@@ -99,7 +99,7 @@ import org.simbrain.workspace.*;
             iz.setB(0.25 - (0.05 * rVal));
             iz.setC(-65);
             iz.setD(2);
-            rand.setParam2(0.5);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.5);
         } else {
             neuron.setPolarity(Polarity.EXCITATORY);
             iz.setRefractoryPeriod(2.0);
@@ -109,7 +109,7 @@ import org.simbrain.workspace.*;
             rVal *= rVal;
             iz.setC(-65.0 + (15.0 * rVal));
             iz.setD(8.0 - (6 * rVal));
-            rand.setParam2(1.2);
+            ((NormalDistribution) rand.getPdf()).setStandardDeviation(1.2);
         }
         iz.setiBg(3.5);
         iz.setAddNoise(true);
@@ -132,13 +132,9 @@ import org.simbrain.workspace.*;
     network.addGroup(outs);
     
 	PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY,
-		ProbDistribution.LOGNORMAL);
+		new LogNormalDistribution(0.8, 1.0));
 	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
-		ProbDistribution.LOGNORMAL);
-	exRand.setParam1(0.8);
-	exRand.setParam2(1.0);
-	inRand.setParam1(1.5);	
-	inRand.setParam2(1.0);
+		new LogNormalDistribution(1.5, 1.0));
 
 	Radial rCon = new Radial(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
 	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);

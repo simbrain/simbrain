@@ -121,13 +121,9 @@ import org.simbrain.workspace.*;
     ngIn.applyLayout(new Point(x_loc, 10));
 
     PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY,
-		ProbDistribution.UNIFORM);
+		new UniformDistribution(0, 1));
 	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
-		ProbDistribution.UNIFORM);
-	exRand.setParam1(0);
-	exRand.setParam2(1);
-	inRand.setParam1(0);	
-	inRand.setParam2(1);
+		new UniformDistribution(0, 1));
 
     RadialSimpleConstrainedKIn ee_con = new RadialSimpleConstrainedKIn(EE_KIN, RADIUS);
     SynapseGroup sg_ee = SynapseGroup.createSynapseGroup(ng, ng, ee_con, 1.0, exRand, inRand);

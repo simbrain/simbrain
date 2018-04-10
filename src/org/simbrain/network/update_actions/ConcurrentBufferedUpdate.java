@@ -34,7 +34,6 @@ import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 import org.simbrain.network.update_actions.concurrency_tools.Consumer;
 import org.simbrain.network.update_actions.concurrency_tools.Task;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;

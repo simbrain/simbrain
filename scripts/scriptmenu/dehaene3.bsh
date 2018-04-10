@@ -137,11 +137,11 @@ void addSynapseGroup(Network network, NeuronGroup source, NeuronGroup target, St
 
     // Create randomizers (param1 is mean, param2 is stdev)
     PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
-    exciteRand.setPdf(ProbDistribution.NORMAL);
-    exciteRand.setParam2(meanSynStrength);
+    exciteRand.setPdf(new NormalDistribution());
+    ((NormalDistribution) exciteRand.getPdf()).setStandardDeviation(meanSynStrength);
     PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
-    inhibRand.setPdf(ProbDistribution.NORMAL);
-    inhibRand.setParam2(meanSynStrength);
+    inhibRand.setPdf(new NormalDistribution());
+    ((NormalDistribution) inhibRand.getPdf()).setStandardDeviation(meanSynStrength);
 
     // Spike responder
     JumpAndDecay responder = new JumpAndDecay();

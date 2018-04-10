@@ -12,7 +12,6 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;

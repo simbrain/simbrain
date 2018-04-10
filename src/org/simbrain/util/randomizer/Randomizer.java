@@ -18,13 +18,7 @@
  */
 package org.simbrain.util.randomizer;
 
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistribution;
-import org.simbrain.util.math.ProbDistributions.ExponentialDistribution;
-import org.simbrain.util.math.ProbDistributions.GammaDistribution;
-import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbDistributions.ParetoDistribution;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;

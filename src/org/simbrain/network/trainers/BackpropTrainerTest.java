@@ -24,7 +24,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 

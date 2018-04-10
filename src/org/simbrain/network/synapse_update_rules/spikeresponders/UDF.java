@@ -20,7 +20,6 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 

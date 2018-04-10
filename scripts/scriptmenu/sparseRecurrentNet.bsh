@@ -32,13 +32,13 @@ import org.simbrain.workspace.*;
     }
     layout.layoutNeurons(network.getNeuronList());
 
-    // Create randomizers (param1 is mean, param2 is stdev)
+    // Create randomizers
     PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
-    exciteRand.setPdf(ProbDistribution.NORMAL);
-    exciteRand.setParam2(EXCITATORY_MEAN);
+    exciteRand.setPdf(new NormalDistribution());
+    ((NormalDistribution) exciteRand.getPdf()).setStandardDeviation(EXCITATORY_MEAN);
     PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
-    inhibRand.setPdf(ProbDistribution.NORMAL);
-    inhibRand.setParam2(INHIBITORY_MEAN);
+    inhibRand.setPdf(new NormalDistribution());
+    ((NormalDistribution) inhibRand.getPdf()).setStandardDeviation(INHIBITORY_MEAN);
 
     // Make sparse connections and randomize neurons
     List synapses = Sparse.connectSparse(network.getFlatNeuronList(),

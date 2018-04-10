@@ -19,7 +19,6 @@
 package org.simbrain.util.randomizer;
 
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 
 /**

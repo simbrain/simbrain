@@ -3,6 +3,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.randomizer.*;
 import org.simbrain.util.math.*;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 
 /**
  * An implementation of the specific type of threshold neuron used in Lazar,
@@ -22,8 +23,9 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     private Randomizer noiseGenerator = new Randomizer();
 
     {
-        noiseGenerator.setPdf(ProbDistribution.NORMAL);
-        noiseGenerator.setParam2(0.05);
+        NormalDistribution nd = new NormalDistribution();
+        nd.setStandardDeviation(0.05);
+        noiseGenerator.setPdf(nd);
     }
 
     /** Whether or not to add noise to the inputs . */

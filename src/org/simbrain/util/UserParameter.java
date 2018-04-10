@@ -18,7 +18,8 @@
  */
 package org.simbrain.util;
 
-import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 
 import java.lang.annotation.*;
@@ -76,7 +77,7 @@ public @interface UserParameter {
      * The probability distribution to use when generating random values for
      * this parameter. Optional. NOT IMPLEMENTED YET.
      */
-    ProbDistribution probDistribution() default ProbDistribution.UNIFORM;
+    Class<? extends ProbabilityDistribution> probDistribution() default UniformDistribution.class;
 
     /**
      * The standard deviation to use when generating random values for this

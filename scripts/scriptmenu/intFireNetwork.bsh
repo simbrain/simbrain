@@ -35,14 +35,8 @@ import org.simbrain.util.math.*;
     Sparse.connectSparse(network.getFlatNeuronList(),
             network.getFlatNeuronList(), SPARSITY, false, false, true);
      //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
-    PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
-    exciteRand.setPdf(ProbDistribution.NORMAL);
-    exciteRand.setParam1(1); // Mean
-    exciteRand.setParam2(.1); // STD
-    PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
-    inhibRand.setPdf(ProbDistribution.NORMAL);
-    inhibRand.setParam1(5); 
-    inhibRand.setParam2(.1);
+    PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY, new NormalDistribution(1, 0.1));
+    PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY, new NormalDistribution(0.5, 0.1));
 
     ConnectionUtilities.randomizeAndPolarizeSynapses(network.getFlatSynapseList(), 
         exciteRand, inhibRand, excitatoryRatio);

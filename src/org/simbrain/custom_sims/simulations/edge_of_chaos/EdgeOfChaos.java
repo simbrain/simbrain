@@ -17,7 +17,6 @@ import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.environment.SmellSource.DecayFunction;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;

@@ -79,10 +79,7 @@ import org.simbrain.workspace.*;
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
 
-    Randomizer rand = new Randomizer();
-    rand.setPdf(ProbDistribution.NORMAL);
-    rand.setParam1(0);
-    rand.setParam2(200);
+    Randomizer rand = new Randomizer(new NormalDistribution(0, 200));
     Random randi = new Random();
     for (int i = 0; i < NUM_NEURONS; i++) {
         Neuron neuron = new Neuron(network);

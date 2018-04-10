@@ -12,9 +12,8 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -140,7 +139,7 @@ public class TestSim extends RegisteredSimulation {
         ng1.applyLayout(new Point2D.Double(0.0, 0.0));
 
         PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution(2, 1));
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new NormalDistribution(1.5, 3));
+        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new UniformDistribution(1.5, 3));
 
         RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0, exRand, inRand);

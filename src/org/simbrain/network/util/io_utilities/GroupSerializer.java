@@ -25,7 +25,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;

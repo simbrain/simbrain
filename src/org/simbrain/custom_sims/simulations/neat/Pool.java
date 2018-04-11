@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.simbrain.custom_sims.simulations.neat.procedureActions.InstanceProcedureAction;
 import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
 
 import static java.util.Objects.requireNonNull;
@@ -89,9 +89,9 @@ public class Pool {
     private double connectionStrengthCeiling = 10;
 
     /**
-     * The list of procedure action to be run to evaluate the instances of genome
+     * The method to set the fitness score of the agent being evaluated.
      */
-    private List<InstanceProcedureAction> evaluationMethod;
+    private Consumer<Agent> evaluationMethod;
 
     /**
      * Construct a pool based on input output count with a specified seed.
@@ -99,10 +99,10 @@ public class Pool {
      * @param outputCount Number os output nodes
      * @param seed Seed for randomizer
      * @param instanceCount Number of genomes
-     * @param evaluationMethod List of procedure action to be run to evaluate the instances of genome
+     * @param evaluationMethod The method to set the fitness score
      */
     public Pool(int inputCount, int outputCount, long seed, int instanceCount,
-            List<InstanceProcedureAction> evaluationMethod) {
+            Consumer<Agent> evaluationMethod) {
         rand = new NEATRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>();
@@ -119,10 +119,10 @@ public class Pool {
      * @param inputCount Number of input nodes
      * @param outputCount Number os output nodes
      * @param instanceCount Number of genomes
-     * @param evaluationMethod List of procedure action to be run to evaluate the instances of genome
+     * @param evaluationMethod The method to set the fitness score
      */
     public Pool(int inputCount, int outputCount, int instanceCount,
-            List<InstanceProcedureAction> evaluationMethod) {
+            Consumer<Agent> evaluationMethod) {
         this(inputCount, outputCount, System.currentTimeMillis(), instanceCount, evaluationMethod);
     }
 
@@ -131,18 +131,20 @@ public class Pool {
      * Run the evolutionary algorithm on this pool.
      *
      * @param maxGenerations give up after this many generations
-     * @param threshold if the top agent's fitnes is above this value, stop the evolutionary process.
+     * @param threshold if the top agent's fitness is above this value, stop the evolutionary process.
+     *
+     * @return top genome
      */
-    public void evolve(int maxGenerations, double threshold) {
+    public Genome evolve(int maxGenerations, double threshold) {
 
         for (int i = 0; i < maxGenerations; i++) {
             evaluate();
 
-            // Get top genome
-            double fitness = getTopGenome().getFitness();
-            if (fitness > threshold) {
-                System.out.println(getTopGenome());
-                break;
+            sort();
+
+            // Early termination if fitness is above threshold
+            if (getTopGenome().getFitness() > threshold) {
+                return getTopGenome();
             }
 
             // Eliminate the least fit
@@ -152,6 +154,7 @@ public class Pool {
             replenishPool();
 
         }
+        return getTopGenome();
     }
 
 
@@ -173,14 +176,13 @@ public class Pool {
         // Set fitness for all agents
         agents.parallelStream()
             .forEach(agent -> {
-                InstanceProcedure task = new InstanceProcedure(agent, evaluationMethod);
-                task.run();
+                evaluationMethod.accept(agent);
             });
         poolState = PoolState.evaluated;
     }
 
     /**
-     * Sort the genomes base on fitness score.
+     * Sort the genomes base on fitness score in descending order.
      */
     public void sort() {
         if (poolState == PoolState.sorted) {
@@ -323,11 +325,11 @@ public class Pool {
         this.connectionStrengthCeiling = connectionStrengthCeiling;
     }
 
-    public List<InstanceProcedureAction> getEvaluationMethod() {
+    public Consumer<Agent> getEvaluationMethod() {
         return evaluationMethod;
     }
 
-    public void setEvaluationMethod(List<InstanceProcedureAction> evaluationMethod) {
+    public void setEvaluationMethod(Consumer<Agent> evaluationMethod) {
         this.evaluationMethod = requireNonNull(evaluationMethod);
     }
 }

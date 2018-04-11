@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.neat.procedureActions.instance;
 
-import org.simbrain.custom_sims.simulations.neat.Instance;
+import org.simbrain.custom_sims.simulations.neat.Agent;
 import org.simbrain.custom_sims.simulations.neat.procedureActions.InstanceProcedureAction;
 import org.simbrain.network.core.Network;
 
@@ -16,7 +16,7 @@ public class IterateNetworkAction implements InstanceProcedureAction {
     }
 
     @Override
-    public void run(Instance i) {
+    public void run(Agent i) {
         Network n = i.getNet();
         for (int j = 0; j < iterationCount; j++) {
             n.bufferedUpdateAllNeurons();

@@ -2,6 +2,9 @@ package org.simbrain.custom_sims.simulations.neat.util;
 
 /**
  * Some math utility for NEAT use.
+ *
+ * TODO: Utils like this may already exist; if not move these to Simbrain util classes.
+ *
  * @author LeoYulinLi
  *
  */

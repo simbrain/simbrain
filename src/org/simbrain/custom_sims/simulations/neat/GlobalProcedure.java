@@ -6,7 +6,7 @@ import java.util.List;
 import org.simbrain.custom_sims.simulations.neat.procedureActions.GlobalProcedureAction;
 
 /**
- * Procedure for global use (does not require a Instance argument).
+ * Procedure for global use (does not require a Agent argument).
  * @author LeoYulinLi
  *
  */

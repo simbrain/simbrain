@@ -4,12 +4,19 @@ import org.simbrain.network.core.Network;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Instance holds the Genome and the Network generated from that genome.
- * In the future, it may also hold multiple network instances and world instances.
+ * Agent holds the Genome and the Network generated from that genome.
+ * Provides a convenient abstraction for describing an agent in an environment
+ * and tracking its fitness.
+ *
+ * May add world references here in which case possibly rename to "embodied agent".
+ *
+ * May even add mutliple networks, using the same genome, to support evolution of
+ * coupled behaviors.
+ *
  * @author LeoYulinLi
  *
  */
-public class Instance implements Comparable<Instance> {
+public class Agent implements Comparable<Agent> {
     /**
      * Reference of the genome this instance uses
      */
@@ -29,7 +36,7 @@ public class Instance implements Comparable<Instance> {
      * Create a instance and build the network from a genome.
      * @param genome A genome to build this instance
      */
-    public Instance(Genome genome) {
+    public Agent(Genome genome) {
         setGenome(genome);
         net = genome.buildNetwork();
     }
@@ -60,7 +67,7 @@ public class Instance implements Comparable<Instance> {
     }
 
     @Override
-    public int compareTo(Instance o) {
+    public int compareTo(Agent o) {
         return this.fitness.compareTo(o.fitness);
     }
 }

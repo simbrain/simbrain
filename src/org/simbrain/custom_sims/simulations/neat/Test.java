@@ -14,50 +14,41 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
 public class Test {
+
     public static void main(String arg0[]) throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        List<InstanceProcedureAction> evaluationMethod = new ArrayList<>();
-        evaluationMethod.add(i -> {
+        List<InstanceProcedureAction> evaluationMethods = new ArrayList<>();
+        evaluationMethods.add(agent -> {
             // initializing fitness score
             // TODO: it is easy to forget initialize fitness. make default fitness configurable in pool.
-            i.setFitness(0);
+            agent.setFitness(0);
 
-            Network n = i.getNet();
+            Network n = agent.getNet();
 
             // inputing 00, 01, 10, 11 to input nodes.
             for (int j = 0; j < 2; j++) {
                 for (int k = 0; k < 2; k++) {
-                    i.getNet().getNeuron(0).forceSetActivation(j);
-                    i.getNet().getNeuron(1).forceSetActivation(k);
+                    agent.getNet().getNeuron(0).forceSetActivation(j);
+                    agent.getNet().getNeuron(1).forceSetActivation(k);
                     for (int l = 0; l < 100; l++) {
                         n.bufferedUpdateAllNeurons();
                     }
                     n.update();
 
                     // calculating sse
-                    double err = (j ^ k) - i.getNet().getNeuron(2).getActivation();
-                    double fitness = i.getFitness() - (err * err);
-                    i.setFitness(fitness);
+                    double err = (j ^ k) - agent.getNet().getNeuron(2).getActivation();
+                    double fitness = agent.getFitness() - (err * err);
+                    agent.setFitness(fitness);
                 }
             }
         });
 
         // construct a pool of 100 genomes with 2 inputs 1 outputs
-        Pool pool = new Pool(2, 1, 100, evaluationMethod);
+        Pool pool = new Pool(2, 1, 1L, 100, evaluationMethods);
 
-        // run 1000 generation max
-        // TODO: put this in a Environment or Engine class
-        for (int i = 0; i < 1000; i++) {
-            pool.evaluate();
-            double fitness = pool.getTopGenome().getFitness();
-            if (fitness > -0.01) {
-                System.out.println(pool.getTopGenome());
-                break;
-            }
-            pool.eliminate();
-            pool.reproduce();
-        }
+        // Run the evolutionary algorithm
+        pool.evolve(1000, -.01);
 
 
         long endTime = System.currentTimeMillis();

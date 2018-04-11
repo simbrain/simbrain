@@ -20,8 +20,11 @@ import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
  *
  */
 public class Pool {
+
     /**
      * Pool State. Used to check before the execution of some method. Will be used for GUI.
+     *
+     * TODO: Add more docs to explain these.
      */
     public enum PoolState { newGen, evaluated, sorted, eliminated };
 
@@ -51,7 +54,7 @@ public class Pool {
     private int instanceCount;
 
     /**
-     * The percentage of the population to eliminate at each new generation.
+     * The percentage of the population to eliminateLeastFit at each new generation.
      * Ranging from 0 to 1.
      */
     private double eliminationRate = 0.5;
@@ -90,7 +93,6 @@ public class Pool {
      */
     private List<InstanceProcedureAction> evaluationMethod;
 
-
     /**
      * Construct a pool based on input output count with a specified seed.
      * @param inputCount Number of input nodes
@@ -124,21 +126,54 @@ public class Pool {
         this(inputCount, outputCount, System.currentTimeMillis(), instanceCount, evaluationMethod);
     }
 
+
     /**
-     * Build instances and evaluate genomes.
+     * Run the evolutionary algorithm on this pool.
+     *
+     * @param maxGenerations give up after this many generations
+     * @param threshold if the top agent's fitnes is above this value, stop the evolutionary process.
+     */
+    public void evolve(int maxGenerations, double threshold) {
+
+        for (int i = 0; i < maxGenerations; i++) {
+            evaluate();
+
+            // Get top genome
+            double fitness = getTopGenome().getFitness();
+            if (fitness > threshold) {
+                System.out.println(getTopGenome());
+                break;
+            }
+
+            // Eliminate the least fit
+            eliminateLeastFit();
+
+            // Refill pool using mutations of the most fit
+            replenishPool();
+
+        }
+    }
+
+
+    /**
+     * Create agents from genomes and determine their fitness.
      */
     public void evaluate() {
         if (poolState == PoolState.evaluated) {
             return;
         }
         assertPoolState(PoolState.newGen);
-        List<Instance> instances = new ArrayList<>();
+        List<Agent> agents = new ArrayList<>();
+
+        // Create agents from genomes
         for (Genome g : genomes) {
-            instances.add(new Instance(g));
+            agents.add(new Agent(g));
         }
-        instances.parallelStream()
-            .forEach(i -> {
-                InstanceProcedure task = new InstanceProcedure(i, evaluationMethod);
+
+        // Set fitness for all agents
+        agents.parallelStream()
+            .forEach(agent -> {
+                InstanceProcedure task = new InstanceProcedure(agent, evaluationMethod);
                 task.run();
             });
         poolState = PoolState.evaluated;
@@ -157,9 +192,9 @@ public class Pool {
     }
 
     /**
-     * Eliminate genomes base on the pool {@code eliminationRate} config.
+     * Eliminate the least fit genomes base on the pool {@code eliminationRate} config.
      */
-    public void eliminate() {
+    public void eliminateLeastFit() {
         if (poolState == PoolState.eliminated) {
             return;
         }
@@ -174,24 +209,15 @@ public class Pool {
      * Reproduce genomes to fill the population.
      * Currently the reproduction is simply making a mutated offspring from the successors.
      */
-    public void reproduce() {
+    public void replenishPool() {
         assertPoolState(PoolState.eliminated);
         int remainingPopulation = genomes.size();
         int reproduceSize = instanceCount - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
             genomes.add(new Genome(genomes.get(rand.nextInt(remainingPopulation)), true));
         }
-        generation += 1;
         poolState = PoolState.newGen;
-    }
-
-    /**
-     * Create new generation.
-     */
-    public void newGeneration() {
-        sort();
-        eliminate();
-        reproduce();
+        generation += 1;
     }
 
     /**

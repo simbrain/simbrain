@@ -52,7 +52,7 @@ public class Test {
             pool.evaluate();
             double fitness = pool.getTopGenome().getFitness();
             if (fitness > -0.01) {
-                System.out.println(fitness);
+                System.out.println(pool.getTopGenome());
                 break;
             }
             pool.eliminate();

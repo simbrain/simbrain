@@ -83,4 +83,8 @@ public class NodeGene {
         this.updateRule = requireNonNull(updateRule);
     }
 
+    @Override
+    public String toString() {
+        return type + ": " + updateRule.getName();
+    }
 }

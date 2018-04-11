@@ -231,4 +231,11 @@ public class Genome implements Comparable<Genome> {
     public int compareTo(Genome o) {
         return this.fitness.compareTo(o.fitness);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Fitness: %.8f", fitness)
+                + "\nNode genes: " + nodeGenes
+                + "\nConnection genes: " + connectionGenes;
+    }
 }

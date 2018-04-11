@@ -127,4 +127,9 @@ public class ConnectionGene {
     public void setUpdateRule(SynapseUpdateRule updateRule) {
         this.updateRule = updateRule;
     }
+
+    @Override
+    public String toString() {
+        return inNode + "-[" + String.format("%.2f", weightStrength) + "]-" + (enabled ? ">" : "×") + outNode;
+    }
 }

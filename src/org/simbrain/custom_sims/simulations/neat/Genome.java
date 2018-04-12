@@ -234,8 +234,17 @@ public class Genome implements Comparable<Genome> {
 
     @Override
     public String toString() {
-        return String.format("Fitness: %.8f", fitness)
-                + "\nNode genes: " + nodeGenes
-                + "\nConnection genes: " + connectionGenes;
+        String ret = "---- Genome ----\n";
+        ret += String.format("Fitness: %.8f", fitness) + "\n";
+        ret += "\nNode genes: \n";
+        int i = 0;
+        for(NodeGene ng : nodeGenes) {
+            ret +=  ng +  "\n";
+        }
+        ret += "\nConnection genes: \n";
+        for(ConnectionGene cg : connectionGenes) {
+            ret += cg +  "\n";
+        }
+        return ret;
     }
 }

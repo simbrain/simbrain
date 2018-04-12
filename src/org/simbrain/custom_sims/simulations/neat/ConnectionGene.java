@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.neat;
 
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.util.Utils;
 
 /**
  * ConnectionGene holds the instruction of how to create synapses in a network.
@@ -130,6 +131,7 @@ public class ConnectionGene {
 
     @Override
     public String toString() {
-        return inNode + "-[" + String.format("%.2f", weightStrength) + "]-" + (enabled ? ">" : "×") + outNode;
+        return "Input " + inNode + " -" + (enabled ? "-" : "×") + "-> Output " + outNode
+            + " (" + Utils.round(weightStrength, 2) + ")";
     }
 }

@@ -43,7 +43,7 @@ public class Test {
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
 
-        System.out.println("Took " + duration / 1000.0 + " seconds.");
+        System.out.println("Elapsed time:" + duration / 1000.0 + " seconds.");
     }
 
 }

@@ -2,6 +2,10 @@ package org.simbrain.custom_sims.simulations.neat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import static java.util.Objects.requireNonNull;
 import org.simbrain.custom_sims.simulations.neat.NodeGene.NodeType;
 import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
@@ -41,7 +45,12 @@ public class Genome implements Comparable<Genome> {
     /**
      * List of all connection genes
      */
-    private List<ConnectionGene> connectionGenes;
+    private ArrayList<ConnectionGene> connectionGenes;
+
+    /**
+     * A {@code innovationNumber} to {@link ConnectionGene} map for faster lookup during crossover
+     */
+    private Map<Integer, ConnectionGene> connectionGeneMap;
 
     /**
      * Fitness of this genome. Default to NaN. To be set after evaluation in {@code Environment}.
@@ -55,6 +64,7 @@ public class Genome implements Comparable<Genome> {
 
     /**
      * Construct a new genome.
+     *
      * @param inputCount Number of input(sensor) nodes
      * @param outputCount Number of output nodes
      * @param seed Seed for randomizer used in mutation
@@ -73,6 +83,7 @@ public class Genome implements Comparable<Genome> {
             outNodes.add(nodeGenes.size() - 1);
         }
         connectionGenes = new ArrayList<>();
+        connectionGeneMap = new TreeMap<>();
         rand = new NEATRandomizer(seed);
         this.pool = requireNonNull(pool);
         fitness = Double.NaN;
@@ -81,6 +92,7 @@ public class Genome implements Comparable<Genome> {
 
     /**
      * Construct a copy of genome from an existing genome.
+     *
      * @param cpy The genome to copy
      */
     public Genome(Genome cpy) {
@@ -89,10 +101,9 @@ public class Genome implements Comparable<Genome> {
             this.nodeGenes.add(new NodeGene(ng));
         }
 
-        this.connectionGenes = new ArrayList<>();
-        for (ConnectionGene cg : cpy.connectionGenes) {
-            this.connectionGenes.add(new ConnectionGene(cg));
-        }
+        Map<Integer, ConnectionGene> newMap = new TreeMap<>();
+        newMap.putAll(cpy.connectionGeneMap);
+        this.connectionGeneMap = newMap;
 
         inNodes = new ArrayList<>();
         for (int in : cpy.inNodes) {
@@ -110,13 +121,96 @@ public class Genome implements Comparable<Genome> {
     }
 
     /**
+     * Crossover constructor.
+     * Construct a new genome by crossing over two existing genmoes.
+     *
+     * @param g1 parent 1
+     * @param g2 parent 2
+     */
+    public Genome(Genome g1, Genome g2) {
+        if (g1.getPool() != g2.getPool()) {
+            throw new IllegalStateException("g1 and g2 have to be in the same pool.");
+        }
+
+        // make g1 always the more fit parent.
+        if (g2.getFitness() > g1.getFitness()) {
+            Genome temp = g1;
+            g1 = g2;
+            g2 = temp;
+        }
+
+        this.nodeGenes = new ArrayList<>();
+
+        Genome longerNodeGeneGenome = g1.nodeGenes.size() > g2.nodeGenes.size() ? g1 : g2;
+
+        // It is only okay for now to just pick the longer list to copy, because the neuron update rule is constant.
+        // In the future, find an alternative way that takes inconsistent neuron update rules into consideration.
+        for (NodeGene ng : longerNodeGeneGenome.nodeGenes) {
+            this.nodeGenes.add(new NodeGene(ng));
+        }
+
+        connectionGenes = new ArrayList<>();
+        connectionGeneMap = new TreeMap<>();
+
+        inNodes = new ArrayList<>();
+        for (int in : longerNodeGeneGenome.inNodes) {
+            inNodes.add(in);
+        }
+
+        outNodes = new ArrayList<>();
+        for (int ou : longerNodeGeneGenome.outNodes) {
+            outNodes.add(ou);
+        }
+
+        this.rand = new NEATRandomizer(g1.rand.nextLong());
+        this.pool = g1.pool;
+        fitness = Double.NaN;
+
+        Set<Integer> allInnovationNumber = new TreeSet<>(g1.connectionGeneMap.keySet());
+
+        allInnovationNumber.addAll(g2.connectionGeneMap.keySet());
+
+        for (int innov : allInnovationNumber) {
+            if (g1.connectionGeneMap.containsKey(innov) && g2.connectionGeneMap.containsKey(innov)) {
+                if (rand.nextBoolean()) {
+                    addConnectionGene(new ConnectionGene(g1.connectionGeneMap.get(innov)));
+                } else {
+                    addConnectionGene(new ConnectionGene(g2.connectionGeneMap.get(innov)));
+                }
+            } else {
+                if (g1.connectionGeneMap.containsKey(innov)) {
+                    addConnectionGene(new ConnectionGene(g1.connectionGeneMap.get(innov)));
+                } else {
+                    addConnectionGene(new ConnectionGene(g2.connectionGeneMap.get(innov)));
+                }
+            }
+        }
+    }
+
+    /**
      * Construct a copy of genome from an existing genome and allow mutation during creation.
      * Useful for creating offspring.
+     *
      * @param cpy The genome to copy
      * @param mutate Indicator for mutation
      */
     public Genome(Genome cpy, boolean mutate) {
         this(cpy);
+        if (mutate) {
+            mutate();
+        }
+    }
+
+    /**
+     * Crossover and mutate constructor.
+     * Construct a new genome by crossing over two existing genmoes and allow mutation during creation.
+     *
+     * @param g1 parent 1
+     * @param g2 parent 2
+     * @param mutate indicator for mutation
+     */
+    public Genome(Genome g1, Genome g2, boolean mutate) {
+        this(g1, g2);
         if (mutate) {
             mutate();
         }
@@ -147,9 +241,9 @@ public class Genome implements Comparable<Genome> {
         inNodes.add(nodeGenes.size() - 1);
         outNodes.add(nodeGenes.size() - 1);
 
-        ConnectionGene existingConnectionGene = connectionGenes.get(rand.nextInt(connectionGenes.size()));
+        ConnectionGene existingConnectionGene = connectionGenes.get(rand.nextInt(connectionGeneMap.size()));
         while (!existingConnectionGene.isEnabled()) {
-            existingConnectionGene = connectionGenes.get(rand.nextInt(connectionGenes.size()));
+            existingConnectionGene = connectionGenes.get(rand.nextInt(connectionGeneMap.size()));
         }
 
         int inNodeIndex = existingConnectionGene.getInNode();
@@ -157,8 +251,12 @@ public class Genome implements Comparable<Genome> {
 
         // TODO: add innovation number
         // TODO: consider non-static synapse update rule
-        connectionGenes.add(new ConnectionGene(inNodeIndex, newNodeIndex, randConnectionStrength()));
-        connectionGenes.add(new ConnectionGene(newNodeIndex, outNodeIndex, randConnectionStrength()));
+        ConnectionGene newCG = new ConnectionGene(inNodeIndex, newNodeIndex, randConnectionStrength());
+        pool.assignNextInnovationNumber(newCG);
+        addConnectionGene(newCG);
+        newCG = new ConnectionGene(newNodeIndex, outNodeIndex, randConnectionStrength());
+        pool.assignNextInnovationNumber(newCG);
+        addConnectionGene(newCG);
         existingConnectionGene.setEnabled(false);
     }
 
@@ -171,11 +269,19 @@ public class Genome implements Comparable<Genome> {
 
         // TODO: add innovation number
         // TODO: consider non-static synapse update rule
-        connectionGenes.add(new ConnectionGene(inNodeIndex, outNodeIndex, randConnectionStrength()));
+        ConnectionGene newCG = new ConnectionGene(inNodeIndex, outNodeIndex, randConnectionStrength());
+
+        // if the new connection gene with the same innovation number already existed in the genome, don't add.
+        if (pool.getInnovationNumber(newCG) != null && connectionGeneMap.containsKey(pool.getInnovationNumber(newCG))) {
+            return;
+        }
+        pool.assignNextInnovationNumber(newCG);
+        addConnectionGene(newCG);
     }
 
     /**
      * Apply a mutation to a specific connection that changes the weight strength.
+     *
      * @param cg {@code ConnectionGene} to mutate
      */
     private void weightStrengthMutation(ConnectionGene cg) {
@@ -200,6 +306,7 @@ public class Genome implements Comparable<Genome> {
 
     /**
      * Construct a network from the genome.
+     *
      * @return The network that this genome encoded
      */
     public Network buildNetwork() {
@@ -219,8 +326,22 @@ public class Genome implements Comparable<Genome> {
         return net;
     }
 
+    /**
+     * Add connection gene to both the map and the list.
+     *
+     * @param cg the connection gene to be added
+     */
+    private void addConnectionGene(ConnectionGene cg) {
+        connectionGeneMap.put(cg.getInnovationNumber(), cg);
+        connectionGenes.add(cg);
+    }
+
     public double getFitness() {
         return fitness;
+    }
+
+    public Pool getPool() {
+        return pool;
     }
 
     public void setFitness(double fitness) {
@@ -237,12 +358,11 @@ public class Genome implements Comparable<Genome> {
         String ret = "---- Genome ----\n";
         ret += String.format("Fitness: %.8f", fitness) + "\n";
         ret += "\nNode genes: \n";
-        int i = 0;
-        for(NodeGene ng : nodeGenes) {
+        for (NodeGene ng : nodeGenes) {
             ret +=  ng +  "\n";
         }
         ret += "\nConnection genes: \n";
-        for(ConnectionGene cg : connectionGenes) {
+        for (ConnectionGene cg : connectionGenes) {
             ret += cg +  "\n";
         }
         return ret;

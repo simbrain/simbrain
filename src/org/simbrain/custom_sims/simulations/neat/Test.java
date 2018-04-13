@@ -6,7 +6,7 @@ public class Test {
 
     public static void evaluationMethod(Agent agent) {
         // initializing fitness score
-        // TODO: it is easy to forget initialize fitness. make default fitness configurable in pool.
+        // TODO: it is easy to forget to initialize fitness. make default fitness configurable in pool.
         agent.setFitness(0);
 
         Network n = agent.getNet();
@@ -33,7 +33,7 @@ public class Test {
         long startTime = System.currentTimeMillis();
 
         // construct a pool of 100 genomes with 2 inputs 1 outputs
-        Pool pool = new Pool(2, 1, 1L, 100, Test::evaluationMethod);
+        Pool pool = new Pool(2, 1, 500, Test::evaluationMethod);
 
         // Run the evolutionary algorithm
         Genome topGenome = pool.evolve(1000, -.01);

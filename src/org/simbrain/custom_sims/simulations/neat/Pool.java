@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.neat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -42,6 +43,17 @@ public class Pool {
      * Current pool state.
      */
     private PoolState poolState;
+
+    /**
+     * Current historical marking for {@link ConnectionGene} use.
+     */
+    private int innovationNumber;
+
+    /**
+     * Mapping hashcodes to connection genes for faster innovation number look up
+     * when calling {@code newConnectionMutation()}.
+     */
+    private HashMap<ConnectionGene, Integer> innovationNumberLookupTable;
 
     /**
      * A collection of all genomes of this pool.
@@ -106,6 +118,8 @@ public class Pool {
         rand = new NEATRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>();
+        innovationNumber = 1;
+        innovationNumberLookupTable = new HashMap<>();
         for (int i = 0; i < instanceCount; i++) {
             Genome newGenome = new Genome(inputCount, outputCount, rand.nextLong(), this);
             genomes.add(newGenome);
@@ -144,6 +158,8 @@ public class Pool {
 
             // Early termination if fitness is above threshold
             if (getTopGenome().getFitness() > threshold) {
+                // TODO: make a evolution report. avoid printing in pool.
+                System.out.println("Generation: " + i);
                 return getTopGenome();
             }
 
@@ -216,7 +232,10 @@ public class Pool {
         int remainingPopulation = genomes.size();
         int reproduceSize = instanceCount - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
-            genomes.add(new Genome(genomes.get(rand.nextInt(remainingPopulation)), true));
+            genomes.add(new Genome(
+                    genomes.get(rand.nextInt(remainingPopulation)),
+                    genomes.get(rand.nextInt(remainingPopulation)),
+                    true));
         }
         poolState = PoolState.newGen;
         generation += 1;
@@ -245,6 +264,20 @@ public class Pool {
 
     public int getGeneration() {
         return generation;
+    }
+
+    /**
+     * Assign a innovation number to a connection gene.
+     * @param cg the connection gene that will be getting the innovation number
+     */
+    public void assignNextInnovationNumber(ConnectionGene cg) {
+        if (getInnovationNumber(cg) != null) {
+            cg.setInnovationNumber(getInnovationNumber(cg));
+        } else {
+            cg.setInnovationNumber(innovationNumber);
+            innovationNumberLookupTable.put(cg, cg.getInnovationNumber());
+            innovationNumber++;
+        }
     }
 
     public PoolState getPoolState() {
@@ -320,7 +353,7 @@ public class Pool {
      * @param connectionStrengthCeiling The upper bound to set
      */
     public void setconnectionStrengthBound(double connectionStrengthFloor, double connectionStrengthCeiling) {
-        assertBound(this.connectionStrengthFloor, connectionStrengthCeiling);
+        assertBound(connectionStrengthFloor, connectionStrengthCeiling);
         this.connectionStrengthFloor = connectionStrengthFloor;
         this.connectionStrengthCeiling = connectionStrengthCeiling;
     }
@@ -331,5 +364,22 @@ public class Pool {
 
     public void setEvaluationMethod(Consumer<Agent> evaluationMethod) {
         this.evaluationMethod = requireNonNull(evaluationMethod);
+    }
+
+    /**
+     * Get the innovation number of a connection gene.
+     * @param key the connection gene to look up
+     * @return the innovation number
+     */
+    public Integer getInnovationNumber(ConnectionGene key) {
+        return innovationNumberLookupTable.get(key);
+    }
+
+    /**
+     * Add a new innovation number to the table.
+     * @param key the connection gene
+     */
+    public void addInnovationNumber(ConnectionGene key) {
+        innovationNumberLookupTable.put(key, key.getInnovationNumber());
     }
 }

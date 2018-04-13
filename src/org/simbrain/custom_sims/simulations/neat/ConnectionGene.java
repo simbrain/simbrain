@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.neat;
 
+import static java.util.Objects.requireNonNull;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.util.Utils;
@@ -74,11 +75,13 @@ public class ConnectionGene {
      * @param cpy The connection gene to be copied
      */
     public ConnectionGene(ConnectionGene cpy) {
+        requireNonNull(cpy);
         this.inNode = cpy.inNode;
         this.outNode = cpy.outNode;
         this.weightStrength = cpy.weightStrength;
         this.updateRule = cpy.updateRule.deepCopy();
         this.enabled = cpy.enabled;
+        this.innovationNumber = cpy.innovationNumber;
     }
 
     public int getInnovationNumber() {
@@ -131,7 +134,45 @@ public class ConnectionGene {
 
     @Override
     public String toString() {
-        return "Input " + inNode + " -" + (enabled ? "-" : "×") + "-> Output " + outNode
+        return "Innov " + innovationNumber + ": Input " + inNode + " -" + (enabled ? "-" : "×") + "-> Output " + outNode
             + " (" + Utils.round(weightStrength, 2) + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + inNode;
+        result = prime * result + outNode;
+        result = prime * result + ((updateRule == null) ? 0 : updateRule.getName().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ConnectionGene)) {
+            return false;
+        }
+        ConnectionGene other = (ConnectionGene) obj;
+        if (inNode != other.inNode) {
+            return false;
+        }
+        if (outNode != other.outNode) {
+            return false;
+        }
+        if (updateRule == null) {
+            if (other.updateRule != null) {
+                return false;
+            }
+        } else if (!updateRule.getName().equals(other.updateRule.getName())) {
+            return false;
+        }
+        return true;
     }
 }

@@ -45,13 +45,21 @@ public class Pool {
     private PoolState poolState;
 
     /**
-     * Current historical marking for {@link ConnectionGene} use.
+     * Global innovation number. Used to set {@link ConnectionGene#innovationNumber}.
      */
     private int innovationNumber;
 
     /**
-     * Mapping hashcodes to connection genes for faster innovation number look up
-     * when calling {@code newConnectionMutation()}.
+     * Mapping connection genes to innovation number. When a new
+     * connection gene is introduced, it should receive a unique
+     * innovoation number. This map ensures there are no duplicates.
+     *
+     * When you create a new connection gene, this map is first checked
+     * to find its innovation number. If there is none a new innovation number
+     * is added.
+     *
+     * NOTE: The original neat paper suggests this should be done within
+     * generations; we are implementing this across generations.
      */
     private HashMap<ConnectionGene, Integer> innovationNumberLookupTable;
 

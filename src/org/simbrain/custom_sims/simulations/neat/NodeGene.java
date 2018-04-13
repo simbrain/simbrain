@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
  *
  */
 public class NodeGene {
+
     /**
      * Types of Node.
      */
@@ -19,6 +20,12 @@ public class NodeGene {
      * The type of this node
      */
     private NodeType type;
+
+    /**
+     * Index for this node; used in {@link ConnectionGene}.
+     * TODO: Implement. 
+     */
+    private int nodeIndex;
 
     /**
      * The {@code NeuronUpdateRule} the neuron will be using

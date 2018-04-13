@@ -14,20 +14,19 @@ import org.simbrain.util.Utils;
 public class ConnectionGene {
 
     /**
-     * Innovation Number
-     * Currently not implemented
+     * Innovation Number.
      */
     private int innovationNumber;
 
     /**
-     * The index of the source node on the node gene list
+     * The index of the source node in the node gene list maintained in {@link Genome}
      */
-    private int inNode;
+    private int sourceNode;
 
     /**
-     * The index of the target node on the node gene list
+     * The index of the target node in the node gene list maintained in {@link Genome}
      */
-    private int outNode;
+    private int targetNode;
 
     /**
      * The weight strength the synapse will have
@@ -47,14 +46,15 @@ public class ConnectionGene {
 
     /**
      * Construct a ConnectionGene. The connection is always enabled.
-     * @param inNode The index of the source node on the node gene list
-     * @param outNode The index of the target node on the node gene list
+     *
+     * @param sourceNode The index of the source node on the node gene list
+     * @param targetNode The index of the target node on the node gene list
      * @param weightStrength The weight strength the synapse will have
      * @param updateRule The learning rule the synapse will have
      */
-    public ConnectionGene(int inNode, int outNode, double weightStrength, SynapseUpdateRule updateRule) {
-        this.inNode = inNode;
-        this.outNode = outNode;
+    public ConnectionGene(int sourceNode, int targetNode, double weightStrength, SynapseUpdateRule updateRule) {
+        this.sourceNode = sourceNode;
+        this.targetNode = targetNode;
         this.weightStrength = weightStrength;
         this.updateRule = updateRule;
         this.enabled = true;
@@ -62,24 +62,21 @@ public class ConnectionGene {
 
     /**
      * Construct a ConnectionGene with static learning rule. The connection is always enabled.
-     * @param inNode The index of the source node on the node gene list
-     * @param outNode The index of the target node on the node gene list
+     * @param sourceNode The index of the source node on the node gene list
+     * @param targetNode The index of the target node on the node gene list
      * @param weightStrength The weight strength the synapse will have
      */
-    public ConnectionGene(int inNode, int outNode, double weightStrength) {
-        this(inNode, outNode, weightStrength, new StaticSynapseRule());
+    public ConnectionGene(int sourceNode, int targetNode, double weightStrength) {
+        this(sourceNode, targetNode, weightStrength, new StaticSynapseRule());
     }
 
     /**
      * Copy constructor.
+     *
      * @param cpy The connection gene to be copied
      */
     public ConnectionGene(ConnectionGene cpy) {
-        requireNonNull(cpy);
-        this.inNode = cpy.inNode;
-        this.outNode = cpy.outNode;
-        this.weightStrength = cpy.weightStrength;
-        this.updateRule = cpy.updateRule.deepCopy();
+        this(cpy.sourceNode, cpy.targetNode, cpy.weightStrength, cpy.updateRule.deepCopy());
         this.enabled = cpy.enabled;
         this.innovationNumber = cpy.innovationNumber;
     }
@@ -92,20 +89,20 @@ public class ConnectionGene {
         this.innovationNumber = innovationNumber;
     }
 
-    public int getInNode() {
-        return inNode;
+    public int getSourceNode() {
+        return sourceNode;
     }
 
-    public void setInNode(int inNode) {
-        this.inNode = inNode;
+    public void setSourceNode(int sourceNode) {
+        this.sourceNode = sourceNode;
     }
 
-    public int getOutNode() {
-        return outNode;
+    public int getTargetNode() {
+        return targetNode;
     }
 
-    public void setOutNode(int outNode) {
-        this.outNode = outNode;
+    public void setTargetNode(int targetNode) {
+        this.targetNode = targetNode;
     }
 
     public double getWeightStrength() {
@@ -134,7 +131,7 @@ public class ConnectionGene {
 
     @Override
     public String toString() {
-        return "Innov " + innovationNumber + ": Input " + inNode + " -" + (enabled ? "-" : "×") + "-> Output " + outNode
+        return "Innov " + innovationNumber + ": Input " + sourceNode + " -" + (enabled ? "-" : "×") + "-> Output " + targetNode
             + " (" + Utils.round(weightStrength, 2) + ")";
     }
 
@@ -142,8 +139,8 @@ public class ConnectionGene {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + inNode;
-        result = prime * result + outNode;
+        result = prime * result + sourceNode;
+        result = prime * result + targetNode;
         result = prime * result + ((updateRule == null) ? 0 : updateRule.getName().hashCode());
         return result;
     }
@@ -160,10 +157,10 @@ public class ConnectionGene {
             return false;
         }
         ConnectionGene other = (ConnectionGene) obj;
-        if (inNode != other.inNode) {
+        if (sourceNode != other.sourceNode) {
             return false;
         }
-        if (outNode != other.outNode) {
+        if (targetNode != other.targetNode) {
             return false;
         }
         if (updateRule == null) {

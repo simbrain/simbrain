@@ -120,9 +120,10 @@ public class AgentTrails extends RegisteredSimulation {
         sim.couple(leftNeuron, mouse.getEffector("Go-right"));
 
         // Couple agent to network
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0, cheeseNeuron);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1, flowerNeuron);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2, fishNeuron);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"),sensoryNet);
+//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0, cheeseNeuron);
+//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1, flowerNeuron);
+//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2, fishNeuron);
 
         setUpControlPanel();
 

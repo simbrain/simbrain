@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNull;
  *
  */
 public class Agent implements Comparable<Agent> {
+
     /**
      * Reference of the genome this instance uses
      */
@@ -43,6 +44,12 @@ public class Agent implements Comparable<Agent> {
 
     public void setGenome(Genome genome) {
         this.genome = requireNonNull(genome);
+    }
+
+    @Override
+    public String toString() {
+        //TODO: If this is used, print fitness and maybe some genome info
+        return net.toString();
     }
 
     public Genome getGenome() {

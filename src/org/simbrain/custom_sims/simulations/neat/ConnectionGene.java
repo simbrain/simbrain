@@ -18,6 +18,11 @@ public class ConnectionGene {
      */
     private int innovationNumber;
 
+    // TODO: Alternative to integer indices.  Discuss
+    public NodeGene sourceGene;
+    public NodeGene targetGene;
+
+    // directly to source and target genes?
     /**
      * The index of the source node in the node gene list maintained in {@link Genome}
      */

@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations.neat;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 
 import static java.util.Objects.requireNonNull;
@@ -26,6 +28,10 @@ public class NodeGene {
      * TODO: Implement. 
      */
     private int nodeIndex;
+
+    //TODO: Discuss. If used could replace updateRule.  Eitehr way be clear
+    // that these are prototype objects from which copies should be made
+    public Neuron neuron;
 
     /**
      * The {@code NeuronUpdateRule} the neuron will be using
@@ -55,14 +61,14 @@ public class NodeGene {
      * @param type Type of neuron
      */
     public NodeGene(NodeType type) {
-        this(type, new SigmoidalRule());
+        this(type, new LinearRule());
     }
 
     /**
      * Construct a hidden nodes that uses SigmoidalRule.
      */
     public NodeGene() {
-        this(NodeType.hidden, new SigmoidalRule());
+        this(NodeType.hidden, new LinearRule());
     }
 
     /**
@@ -88,6 +94,7 @@ public class NodeGene {
 
     public void setUpdateRule(NeuronUpdateRule updateRule) {
         this.updateRule = requireNonNull(updateRule);
+
     }
 
     @Override

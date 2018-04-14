@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.neat;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,9 @@ import static org.simbrain.custom_sims.simulations.neat.util.Math.clipping;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.layouts.LineLayout;
 
 /**
  * This class consists of the list of node genes, connection genes to build a
@@ -36,6 +40,11 @@ public class Genome implements Comparable<Genome> {
      * {@link ConnectionGene}.
      */
     private List<NodeGene> nodeGenes;
+
+    //TODO: Discuss below, which replaces integer lists with list of direct references. Not fully tested or implemented.
+    public List<NodeGene> potentialSources = new ArrayList<>();
+    public List<NodeGene> potentialTargets = new ArrayList<>();
+
 
     /**
      * List of {@link #nodeGenes} indices that can be source nodes of a
@@ -80,25 +89,41 @@ public class Genome implements Comparable<Genome> {
      * @param inputCount  Number of input(sensor) nodes
      * @param outputCount Number of output nodes
      * @param seed        Seed for randomizer used in mutation
-     * @param pool        The pool this genome belongs
+     * @param pool        The pool this genome belongs to
      */
     public Genome(int inputCount, int outputCount, long seed, Pool pool) {
         nodeGenes = new ArrayList<>();
+
+        // TODO: Init at field declaration?
         potentialSourceNodes = new ArrayList<>();
         potentialTargetNodes = new ArrayList<>();
+
+        // Create input node genes
         for (int i = 0; i < inputCount; i++) {
-            nodeGenes.add(new NodeGene(NodeType.input));
+            NodeGene nodeGene = new NodeGene(NodeType.input);
+            nodeGenes.add(nodeGene);
+
             potentialSourceNodes.add(nodeGenes.size() - 1);
+            potentialTargets.add(nodeGene); // NEW
+
         }
+
+        // Create output node genes
         for (int i = 0; i < outputCount; i++) {
-            nodeGenes.add(new NodeGene(NodeType.output));
+            NodeGene nodeGene = new NodeGene(NodeType.output);
+            nodeGenes.add(nodeGene);
             potentialTargetNodes.add(nodeGenes.size() - 1);
+            potentialTargets.add(nodeGene); // NEW
         }
+
+        // TODO: Init at field declaration?
         connectionGenes = new ArrayList<>();
         connectionGeneMap = new TreeMap<>();
         rand = new NEATRandomizer(seed);
         this.pool = requireNonNull(pool);
         fitness = Double.NaN;
+
+        // TODO: Discuss. Why is this the default starting state?
         newConnectionMutation();
     }
 
@@ -112,6 +137,9 @@ public class Genome implements Comparable<Genome> {
         for (NodeGene ng : cpy.nodeGenes) {
             this.nodeGenes.add(new NodeGene(ng));
         }
+
+        potentialSources.addAll(cpy.potentialSources); // new
+        potentialTargets.addAll(cpy.potentialTargets);
 
         Map<Integer, ConnectionGene> newMap = new TreeMap<>();
         newMap.putAll(cpy.connectionGeneMap);
@@ -134,7 +162,7 @@ public class Genome implements Comparable<Genome> {
 
     /**
      * Crossover constructor. Construct a new genome by crossing over two
-     * existing genmoes.
+     * existing genomes.
      *
      * @param g1 parent 1
      * @param g2 parent 2
@@ -153,24 +181,29 @@ public class Genome implements Comparable<Genome> {
 
         this.nodeGenes = new ArrayList<>();
 
-        Genome longerNodeGeneGenome = g1.nodeGenes.size() > g2.nodeGenes.size() ? g1 : g2;
+        Genome largerGenome = g1.nodeGenes.size() > g2.nodeGenes.size() ? g1 : g2;
 
         // It is only okay for now to just pick the longer list to copy, because the neuron update rule is constant.
         // In the future, find an alternative way that takes inconsistent neuron update rules into consideration.
-        for (NodeGene ng : longerNodeGeneGenome.nodeGenes) {
+        for (NodeGene ng : largerGenome.nodeGenes) {
             this.nodeGenes.add(new NodeGene(ng));
         }
 
+        potentialSources.addAll(largerGenome.potentialSources);
+        potentialTargets.addAll(largerGenome.potentialTargets);
+
+
+        // TODO: Init at field declaration
         connectionGenes = new ArrayList<>();
         connectionGeneMap = new TreeMap<>();
 
         potentialSourceNodes = new ArrayList<>();
-        for (int in : longerNodeGeneGenome.potentialSourceNodes) {
+        for (int in : largerGenome.potentialSourceNodes) {
             potentialSourceNodes.add(in);
         }
 
         potentialTargetNodes = new ArrayList<>();
-        for (int ou : longerNodeGeneGenome.potentialTargetNodes) {
+        for (int ou : largerGenome.potentialTargetNodes) {
             potentialTargetNodes.add(ou);
         }
 
@@ -229,7 +262,7 @@ public class Genome implements Comparable<Genome> {
     }
 
     /**
-     * Mutate the current genome base on the pool config.
+     * Mutate the current genome based.  The pool holds config info.
      */
     public void mutate() {
         if (rand.nextDouble() < pool.getNewNodeMutationRate()) {
@@ -244,8 +277,7 @@ public class Genome implements Comparable<Genome> {
     }
 
     /**
-     * Apply a mutation to current genome that insert a new node into an
-     * existing connection.
+     * Mutation that inserts a new node into an existing connection.
      */
     private void newNodeMutation() {
         int newNodeIndex = nodeGenes.size();
@@ -328,19 +360,47 @@ public class Genome implements Comparable<Genome> {
      */
     public Network buildNetwork() {
         Network net = new Network();
+
+        tempUpdateNodeRefs();
+
+        //TODO: Discuss
+        NeuronGroup inputNg = new NeuronGroup(net);
+        NeuronGroup outputNg = new NeuronGroup(net);
+
         for (NodeGene n : nodeGenes) {
             Neuron newNeuron = new Neuron(net, n.getUpdateRule());
+
+            n.neuron = newNeuron;
+
             if (n.getType() == NodeType.input) {
-                newNeuron.setClamped(true);
+                inputNg.addNeuron(newNeuron);
+                newNeuron.setClamped(true);  // TODO: Here?
+                newNeuron.setIncrement(1);
+            } else if (n.getType() == NodeType.output) {
+                outputNg.addNeuron(newNeuron);
+            } else {
+                net.addNeuron(newNeuron);
             }
-            net.addNeuron(newNeuron);
         }
+        net.addGroup(inputNg);
+        net.addGroup(outputNg);
+        inputNg.applyLayout();
+        outputNg.applyLayout();
+
         for (ConnectionGene c : connectionGenes) {
-            Synapse newConnection = new Synapse(net.getNeuron(c.getSourceNode()), net.getNeuron(c.getTargetNode()));
+            Synapse newConnection = new Synapse(c.sourceGene.neuron, c.targetGene.neuron);
             newConnection.setStrength(c.getWeightStrength());
             net.addSynapse(newConnection);
         }
         return net;
+    }
+
+    //TODO
+    void tempUpdateNodeRefs() {
+        for (ConnectionGene cg : connectionGenes) {
+            cg.sourceGene = nodeGenes.get(cg.getSourceNode());
+            cg.targetGene = nodeGenes.get(cg.getTargetNode());
+        }
     }
 
     /**

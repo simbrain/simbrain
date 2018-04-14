@@ -52,7 +52,7 @@ public class Pool {
     /**
      * Mapping connection genes to innovation number. When a new
      * connection gene is introduced, it should receive a unique
-     * innovoation number. This map ensures there are no duplicates.
+     * innovation number. This map ensures there are no duplicates.
      *
      * When you create a new connection gene, this map is first checked
      * to find its innovation number. If there is none a new innovation number
@@ -69,9 +69,16 @@ public class Pool {
     private List<Genome> genomes;
 
     /**
+     * Collection of agents.
+     * TODO: JKY added this. Keep? Discuss this and its uses.
+     */
+    private List<Agent> agents  = new ArrayList<>();
+
+    /**
      * Number of genomes in this pool.
      */
     private int instanceCount;
+    //TODO: replace with getInstanceCount() { return genomes.size();}?
 
     /**
      * The percentage of the population to eliminateLeastFit at each new generation.
@@ -80,7 +87,7 @@ public class Pool {
     private double eliminationRate = 0.5;
 
     /**
-     * The probability of applying newNodeMutation on a offspring genome during a new generation.
+     * The probability of applying newNodeMutation to an offspring genome during a new generation.
      * Ranging from 0 to 1.
      */
     private double newNodeMutationRate = 0.05;
@@ -115,6 +122,7 @@ public class Pool {
 
     /**
      * Construct a pool based on input output count with a specified seed.
+     *
      * @param inputCount Number of input nodes
      * @param outputCount Number os output nodes
      * @param seed Seed for randomizer
@@ -157,7 +165,7 @@ public class Pool {
      *
      * @return top genome
      */
-    public Genome evolve(int maxGenerations, double threshold) {
+    public Agent evolve(int maxGenerations, double threshold) {
 
         for (int i = 0; i < maxGenerations; i++) {
             evaluate();
@@ -168,7 +176,7 @@ public class Pool {
             if (getTopGenome().getFitness() > threshold) {
                 // TODO: make a evolution report. avoid printing in pool.
                 System.out.println("Generation: " + i);
-                return getTopGenome();
+                return getTopAgent();
             }
 
             // Eliminate the least fit
@@ -178,22 +186,26 @@ public class Pool {
             replenishPool();
 
         }
-        return getTopGenome();
+        return getTopAgent();
     }
-
 
     /**
      * Create agents from genomes and determine their fitness.
      */
     public void evaluate() {
+
         if (poolState == PoolState.evaluated) {
             return;
         }
         assertPoolState(PoolState.newGen);
-        List<Agent> agents = new ArrayList<>();
+
+
 
         // Create agents from genomes
         for (Genome g : genomes) {
+
+            // TODO: genomes don't have input nodes
+            //System.out.println("-->" + g);
             agents.add(new Agent(g));
         }
 
@@ -250,6 +262,18 @@ public class Pool {
     }
 
     /**
+     * Returns the most fit agent.
+     *
+     * @return the most fit agent
+     */
+    public Agent getTopAgent() {
+        if (poolState == PoolState.evaluated) {
+            sort();
+        }
+        return agents.get(0);
+    }
+
+    /**
      * Get the genome with the highest fitness score.
      * @return The genome with the highest fitness score
      */
@@ -260,6 +284,7 @@ public class Pool {
         return genomes.get(0);
     }
 
+    //TODO: Rename to assertValidPoolState?
     /**
      * Check if poolState is the expected state.
      * @param ps The expected state.
@@ -275,7 +300,8 @@ public class Pool {
     }
 
     /**
-     * Assign a innovation number to a connection gene.
+     * Assign an innovation number to a connection gene.
+     *
      * @param cg the connection gene that will be getting the innovation number
      */
     public void assignNextInnovationNumber(ConnectionGene cg) {

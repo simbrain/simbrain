@@ -25,7 +25,7 @@ public class NodeGene {
 
     /**
      * Index for this node; used in {@link ConnectionGene}.
-     * TODO: Implement. 
+     * TODO: Implement.
      */
     private int nodeIndex;
 
@@ -61,14 +61,14 @@ public class NodeGene {
      * @param type Type of neuron
      */
     public NodeGene(NodeType type) {
-        this(type, new LinearRule());
+        this(type, new SigmoidalRule());
     }
 
     /**
      * Construct a hidden nodes that uses SigmoidalRule.
      */
     public NodeGene() {
-        this(NodeType.hidden, new LinearRule());
+        this(NodeType.hidden, new SigmoidalRule());
     }
 
     /**

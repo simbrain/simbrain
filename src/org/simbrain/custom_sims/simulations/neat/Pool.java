@@ -138,7 +138,7 @@ public class Pool {
         innovationNumberLookupTable = new HashMap<>();
         for (int i = 0; i < instanceCount; i++) {
             Genome newGenome = new Genome(inputCount, outputCount, rand.nextLong(), this);
-            genomes.add(newGenome);
+            agents.add(new Agent(newGenome));
         }
         poolState = PoolState.newGen;
         setEvaluationMethod(evaluationMethod);
@@ -173,7 +173,7 @@ public class Pool {
             sort();
 
             // Early termination if fitness is above threshold
-            if (getTopGenome().getFitness() > threshold) {
+            if (getTopAgent().getFitness() > threshold) {
                 // TODO: make a evolution report. avoid printing in pool.
                 System.out.println("Generation: " + i);
                 return getTopAgent();
@@ -226,6 +226,7 @@ public class Pool {
         }
         assertPoolState(PoolState.evaluated);
         Collections.sort(genomes, Comparator.reverseOrder());
+        Collections.sort(agents, Comparator.reverseOrder());
         poolState = PoolState.sorted;
     }
 
@@ -237,8 +238,8 @@ public class Pool {
             return;
         }
         assertPoolState(PoolState.sorted);
-        genomes = genomes.stream()
-                .limit((long) (genomes.size() * (1.0 - eliminationRate)))
+        agents = agents.stream()
+                .limit((long) (agents.size() * (1.0 - eliminationRate)))
                 .collect(Collectors.toList());
         poolState = PoolState.eliminated;
     }
@@ -249,13 +250,16 @@ public class Pool {
      */
     public void replenishPool() {
         assertPoolState(PoolState.eliminated);
-        int remainingPopulation = genomes.size();
+        int remainingPopulation = agents.size();
         int reproduceSize = instanceCount - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
-            genomes.add(new Genome(
-                    genomes.get(rand.nextInt(remainingPopulation)),
-                    genomes.get(rand.nextInt(remainingPopulation)),
-                    true));
+            agents.add(new Agent(
+                        new Genome(
+                            agents.get(rand.nextInt(remainingPopulation)).getGenome(),
+                            agents.get(rand.nextInt(remainingPopulation)).getGenome(),
+                            true)
+                    )
+            );
         }
         poolState = PoolState.newGen;
         generation += 1;

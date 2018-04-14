@@ -46,9 +46,12 @@ public class Test {
                 n.update();
 
                 // calculating sse
-                double err = (j ^ k) - outputGroup.getNeuron(0).getActivation();
-                double fitness = agent.getFitness() - (err * err);
-                agent.setFitness(fitness);
+                for (int l = 0; l < 5; l++) {
+                    double err = (j ^ k) - outputGroup.getNeuron(0).getActivation();
+                    double fitness = agent.getFitness() - (err * err);
+                    agent.setFitness(fitness);
+                    n.update();
+                }
             }
         }
     }
@@ -60,7 +63,7 @@ public class Test {
         Pool pool = new Pool(2, 1, 500, Test::evaluationMethod);
 
         // Run the evolutionary algorithm
-        Agent topAgent = pool.evolve(100, -.01);
+        Agent topAgent = pool.evolve(1000, -.01);
         System.out.println(topAgent.getGenome());
 
         long endTime = System.currentTimeMillis();

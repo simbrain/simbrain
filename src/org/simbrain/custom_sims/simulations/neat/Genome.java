@@ -41,7 +41,7 @@ public class Genome implements Comparable<Genome> {
      */
     private List<NodeGene> nodeGenes;
 
-    //TODO: Discuss below, which replaces integer lists with list of direct references. Not fully tested or implemented.
+    //TODO: Remove now that we have direct references to node genes?
     public List<NodeGene> potentialSources = new ArrayList<>();
     public List<NodeGene> potentialTargets = new ArrayList<>();
 

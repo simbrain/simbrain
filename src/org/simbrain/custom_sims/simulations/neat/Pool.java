@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -128,12 +127,6 @@ public class Pool {
     private Consumer<Agent> evaluationMethod;
 
     /**
-     * Counted down when a run of the evolutionary algorithm is done
-     */
-    private CountDownLatch latch;
-
-
-    /**
      * Construct a pool based on input output count with a specified seed.
      *
      * @param inputCount       Number of input nodes
@@ -161,18 +154,15 @@ public class Pool {
      * Construct a pool based on input output count with automatically generated
      * seed.
      *
-     * @param syncObject
      * @param inputCount       Number of input nodes
      * @param outputCount      Number os output nodes
      * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(CountDownLatch syncObject, int inputCount, int outputCount, int instanceCount,
+    public Pool(int inputCount, int outputCount, int instanceCount,
                 Consumer<Agent> evaluationMethod) {
         this(inputCount, outputCount, System.currentTimeMillis(), instanceCount, evaluationMethod);
-        this.latch = syncObject;
     }
-
 
     /**
      * Run the evolutionary algorithm on this pool.
@@ -231,8 +221,6 @@ public class Pool {
             .forEach(agent -> {
                 evaluationMethod.accept(agent);
             });
-
-        latch.countDown();
 
         poolState = PoolState.evaluated;
     }

@@ -1021,16 +1021,10 @@ public class NetworkPanel extends JPanel {
 
         SynapseNode node = new SynapseNode(NetworkPanel.this, source, target, synapse);
 
-        // TODO: Figure out why code below is needed when called from Genome.java
-        // SynapseNode created in a bad state
-        if(Double.isNaN(node.getGlobalFullBounds().x)) {
-            return;
-        }
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());
         node.lowerToBottom();
-        System.out.println("sn-->" + node);
     }
 
     /**

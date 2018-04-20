@@ -26,8 +26,8 @@ public class Test {
         NeuronGroup outputGroup = agent.getGenome().getOutputNg();
 
         TrainingSet ts = new TrainingSet(
-            new double[][]{{0,0},{0,1},{1,0},{1,1}},
-            new double[][]{{0},{1},{1},{0}});
+            new double[][] {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
+            new double[][] {{0}, {1}, {1}, {0}});
 
         // Create table of output values, one for each input
         double outputs[][] = new double[4][1];
@@ -40,6 +40,7 @@ public class Test {
             n.update();
             outputs[i] = outputGroup.getActivations();
         }
+
 
         //TODO Below not working
 //        // Compute MSE and use it to set agent's fitness
@@ -72,13 +73,11 @@ public class Test {
 
 
     public static void main(String arg0[]) {
+
         long startTime = System.currentTimeMillis();
-
-        // To confirm evolution is done before opening network panel.
-        final CountDownLatch latch = new CountDownLatch(1);
-
+        
         // construct a pool of genomes with 2 inputs and 1 output
-        Pool pool = new Pool(latch, 2, 1, 500, Test::evaluationMethod);
+        Pool pool = new Pool(2, 1, 500, Test::evaluationMethod);
 
         // Run the evolutionary algorithm
         Agent topAgent = pool.evolve(1000, -.01);
@@ -88,25 +87,17 @@ public class Test {
 
         System.out.println("Elapsed time:" + duration / 1000.0 + " seconds.");
 
+        // TODO: Should be able to set these in Genome
+        topAgent.getGenome().getInputNg().setLocation(0, 225);
+        topAgent.getGenome().getOutputNg().setLocation(0, 0);
 
-        // Once evolution is finished, view the winning network
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
+        NetworkPanel np = NetworkPanel.createNetworkPanel(topAgent.getNet());
 
-            // TODO: Should be able to set these in Genome
-            topAgent.getGenome().getInputNg().setLocation(0,225);
-            topAgent.getGenome().getOutputNg().setLocation(0,0);
-
-            NetworkPanel np = NetworkPanel.createNetworkPanel(topAgent.getNet());
-            JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
-            dialog.setSize(500, 500);
-            // TODO: Pack should work. Override preferred size in netpanel?
-            // dialog.pack();
-
-        }
+        System.out.println(np.debugString());
+        JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
+        dialog.setSize(500, 500);
+        // TODO: Pack should work. Override preferred size in netpanel?
+        // dialog.pack();
 
     }
 

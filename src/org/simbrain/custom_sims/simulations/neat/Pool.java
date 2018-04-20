@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -15,19 +16,25 @@ import static org.simbrain.custom_sims.simulations.neat.util.Math.probClipping;
 import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
 
 /**
- * This class consists of the config for evolution, status of the evolution, and the implementation
- * of the evolution process after evaluation in {@code Environment}.
- * @author LeoYulinLi
+ * This class consists of the config for evolution, status of the evolution, and
+ * the implementation of the evolution process after evaluation in {@code
+ * Environment}.
  *
+ * @author LeoYulinLi
  */
 public class Pool {
 
     /**
-     * Pool State. Used to check before the execution of some method. Will be used for GUI.
-     *
+     * Pool State. Used to check before the execution of some method. Will be
+     * used for GUI.
+     * <p>
      * TODO: Add more docs to explain these.
      */
-    public enum PoolState { newGen, evaluated, sorted, eliminated };
+    public enum PoolState {
+        newGen, evaluated, sorted, eliminated
+    }
+
+    ;
 
     /**
      * Randomizer for mutation
@@ -50,14 +57,14 @@ public class Pool {
     private int innovationNumber;
 
     /**
-     * Mapping connection genes to innovation number. When a new
-     * connection gene is introduced, it should receive a unique
-     * innovation number. This map ensures there are no duplicates.
-     *
-     * When you create a new connection gene, this map is first checked
-     * to find its innovation number. If there is none a new innovation number
-     * is added.
-     *
+     * Mapping connection genes to innovation number. When a new connection gene
+     * is introduced, it should receive a unique innovation number. This map
+     * ensures there are no duplicates.
+     * <p>
+     * When you create a new connection gene, this map is first checked to find
+     * its innovation number. If there is none a new innovation number is
+     * added.
+     * <p>
      * NOTE: The original neat paper suggests this should be done within
      * generations; we are implementing this across generations.
      */
@@ -69,10 +76,10 @@ public class Pool {
     private List<Genome> genomes;
 
     /**
-     * Collection of agents.
-     * TODO: JKY added this. Keep? Discuss this and its uses.
+     * Collection of agents. TODO: JKY added this. Keep? Discuss this and its
+     * uses.
      */
-    private List<Agent> agents  = new ArrayList<>();
+    private List<Agent> agents = new ArrayList<>();
 
     /**
      * Number of genomes in this pool.
@@ -81,27 +88,27 @@ public class Pool {
     //TODO: replace with getInstanceCount() { return genomes.size();}?
 
     /**
-     * The percentage of the population to eliminateLeastFit at each new generation.
-     * Ranging from 0 to 1.
+     * The percentage of the population to eliminateLeastFit at each new
+     * generation. Ranging from 0 to 1.
      */
     private double eliminationRate = 0.5;
 
     /**
-     * The probability of applying newNodeMutation to an offspring genome during a new generation.
-     * Ranging from 0 to 1.
+     * The probability of applying newNodeMutation to an offspring genome during
+     * a new generation. Ranging from 0 to 1.
      */
     private double newNodeMutationRate = 0.05;
 
     /**
-     * The probability of applying newConnectionMutation on a offspring genome during a new generation.
-     * Ranging from 0 to 1.
+     * The probability of applying newConnectionMutation on a offspring genome
+     * during a new generation. Ranging from 0 to 1.
      */
     private double newConnectionMutationRate = 0.05;
 
     /**
      * The range of the strength can change during a connectionStrengthMutation.
-     * Use as in {@code newStrength = currentStrength ± randConnectionStrength() * connectionStrengthMutationAmplitude}
-     * Ranging from 0 to 1.
+     * Use as in {@code newStrength = currentStrength ± randConnectionStrength()
+     * * connectionStrengthMutationAmplitude} Ranging from 0 to 1.
      */
     private double connectionStrengthMutationAmplitude = 0.1;
 
@@ -121,16 +128,22 @@ public class Pool {
     private Consumer<Agent> evaluationMethod;
 
     /**
+     * Counted down when a run of the evolutionary algorithm is done
+     */
+    private CountDownLatch latch;
+
+
+    /**
      * Construct a pool based on input output count with a specified seed.
      *
-     * @param inputCount Number of input nodes
-     * @param outputCount Number os output nodes
-     * @param seed Seed for randomizer
-     * @param instanceCount Number of genomes
+     * @param inputCount       Number of input nodes
+     * @param outputCount      Number os output nodes
+     * @param seed             Seed for randomizer
+     * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
     public Pool(int inputCount, int outputCount, long seed, int instanceCount,
-            Consumer<Agent> evaluationMethod) {
+                Consumer<Agent> evaluationMethod) {
         rand = new NEATRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>();
@@ -145,15 +158,19 @@ public class Pool {
     }
 
     /**
-     * Construct a pool based on input output count with automatically generated seed.
-     * @param inputCount Number of input nodes
-     * @param outputCount Number os output nodes
-     * @param instanceCount Number of genomes
+     * Construct a pool based on input output count with automatically generated
+     * seed.
+     *
+     * @param syncObject
+     * @param inputCount       Number of input nodes
+     * @param outputCount      Number os output nodes
+     * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(int inputCount, int outputCount, int instanceCount,
-            Consumer<Agent> evaluationMethod) {
+    public Pool(CountDownLatch syncObject, int inputCount, int outputCount, int instanceCount,
+                Consumer<Agent> evaluationMethod) {
         this(inputCount, outputCount, System.currentTimeMillis(), instanceCount, evaluationMethod);
+        this.latch = syncObject;
     }
 
 
@@ -161,11 +178,12 @@ public class Pool {
      * Run the evolutionary algorithm on this pool.
      *
      * @param maxGenerations give up after this many generations
-     * @param threshold if the top agent's fitness is above this value, stop the evolutionary process.
-     *
+     * @param threshold      if the top agent's fitness is above this value,
+     *                       stop the evolutionary process.
      * @return top genome
      */
     public Agent evolve(int maxGenerations, double threshold) {
+
 
         for (int i = 0; i < maxGenerations; i++) {
             evaluate();
@@ -200,7 +218,6 @@ public class Pool {
         assertPoolState(PoolState.newGen);
 
 
-
         // Create agents from genomes
         for (Genome g : genomes) {
 
@@ -214,6 +231,9 @@ public class Pool {
             .forEach(agent -> {
                 evaluationMethod.accept(agent);
             });
+
+        latch.countDown();
+
         poolState = PoolState.evaluated;
     }
 
@@ -231,7 +251,8 @@ public class Pool {
     }
 
     /**
-     * Eliminate the least fit genomes base on the pool {@code eliminationRate} config.
+     * Eliminate the least fit genomes base on the pool {@code eliminationRate}
+     * config.
      */
     public void eliminateLeastFit() {
         if (poolState == PoolState.eliminated) {
@@ -239,14 +260,14 @@ public class Pool {
         }
         assertPoolState(PoolState.sorted);
         agents = agents.stream()
-                .limit((long) (agents.size() * (1.0 - eliminationRate)))
-                .collect(Collectors.toList());
+            .limit((long) (agents.size() * (1.0 - eliminationRate)))
+            .collect(Collectors.toList());
         poolState = PoolState.eliminated;
     }
 
     /**
-     * Reproduce genomes to fill the population.
-     * Currently the reproduction is simply making a mutated offspring from the successors.
+     * Reproduce genomes to fill the population. Currently the reproduction is
+     * simply making a mutated offspring from the successors.
      */
     public void replenishPool() {
         assertPoolState(PoolState.eliminated);
@@ -254,11 +275,11 @@ public class Pool {
         int reproduceSize = instanceCount - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
             agents.add(new Agent(
-                        new Genome(
-                            agents.get(rand.nextInt(remainingPopulation)).getGenome(),
-                            agents.get(rand.nextInt(remainingPopulation)).getGenome(),
-                            true)
-                    )
+                    new Genome(
+                        agents.get(rand.nextInt(remainingPopulation)).getGenome(),
+                        agents.get(rand.nextInt(remainingPopulation)).getGenome(),
+                        true)
+                )
             );
         }
         poolState = PoolState.newGen;
@@ -279,6 +300,7 @@ public class Pool {
 
     /**
      * Get the genome with the highest fitness score.
+     *
      * @return The genome with the highest fitness score
      */
     public Genome getTopGenome() {
@@ -289,8 +311,10 @@ public class Pool {
     }
 
     //TODO: Rename to assertValidPoolState?
+
     /**
      * Check if poolState is the expected state.
+     *
      * @param ps The expected state.
      */
     private void assertPoolState(PoolState ps) {
@@ -364,6 +388,7 @@ public class Pool {
 
     /**
      * Setting the minimum value of connection strength.
+     *
      * @param connectionStrengthFloor The lower bound to set
      */
     public void setConnectionStrengthFloor(double connectionStrengthFloor) {
@@ -377,6 +402,7 @@ public class Pool {
 
     /**
      * Setting the maximum value of connection strength.
+     *
      * @param connectionStrengthCeiling The upper bound to set
      */
     public void setConnectionStrengthCeiling(double connectionStrengthCeiling) {
@@ -385,9 +411,11 @@ public class Pool {
     }
 
     /**
-     * Setting the minimum and maximum value of connection strength at the same time.
-     * Mainly here to avoid unintentionally trigger of the bound check due to invalid old value.
-     * @param connectionStrengthFloor The lower bound to set
+     * Setting the minimum and maximum value of connection strength at the same
+     * time. Mainly here to avoid unintentionally trigger of the bound check due
+     * to invalid old value.
+     *
+     * @param connectionStrengthFloor   The lower bound to set
      * @param connectionStrengthCeiling The upper bound to set
      */
     public void setconnectionStrengthBound(double connectionStrengthFloor, double connectionStrengthCeiling) {
@@ -406,6 +434,7 @@ public class Pool {
 
     /**
      * Get the innovation number of a connection gene.
+     *
      * @param key the connection gene to look up
      * @return the innovation number
      */
@@ -415,6 +444,7 @@ public class Pool {
 
     /**
      * Add a new innovation number to the table.
+     *
      * @param key the connection gene
      */
     public void addInnovationNumber(ConnectionGene key) {

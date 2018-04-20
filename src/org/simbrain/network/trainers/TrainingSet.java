@@ -18,8 +18,10 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -203,4 +205,13 @@ public class TrainingSet {
         }
     }
 
+    // TODO: Experimental for now
+    public static double getMSE(TrainingSet ts, double[][] outputs) {
+        double mse = 0;
+        int i = 0;
+        for(double[] target : ts.getTargetData()) {
+            mse += SimbrainMath.getMeanSquaredError(target, outputs[i++]);
+        }
+        return mse;
+    }
 }

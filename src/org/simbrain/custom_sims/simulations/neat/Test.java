@@ -3,9 +3,14 @@ package org.simbrain.custom_sims.simulations.neat;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.network.util.NetworkLayoutManager;
+import org.simbrain.network.util.NetworkLayoutManager.*;
 import org.simbrain.util.genericframe.GenericFrame;
 
 import javax.swing.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Test {
 
@@ -16,25 +21,34 @@ public class Test {
 
         Network n = agent.getNet();
 
-        // TODO: Add neuron group
-        // getNet().getInputGroup().set([0,0]);..
-        // network.update()
-        // Utils.getMSE(trainingSet).
+        // Get MSE
+        NeuronGroup inputGroup = agent.getGenome().getInputNg();
+        NeuronGroup outputGroup = agent.getGenome().getOutputNg();
 
+        TrainingSet ts = new TrainingSet(
+            new double[][]{{0,0},{0,1},{1,0},{1,1}},
+            new double[][]{{0},{1},{1},{0}});
 
-        //TODO: get named groups agent
-        // inputing 00, 01, 10, 11 to input nodes.
-        NeuronGroup inputGroup = (NeuronGroup) agent.getNet().getGroupList().get(0);
-        NeuronGroup outputGroup = (NeuronGroup) agent.getNet().getGroupList().get(1);
-
-        if(inputGroup.size() == 0 || outputGroup.size() == 0) {
-            agent.setFitness(0);
-            return;
+        // Create table of output values, one for each input
+        double outputs[][] = new double[4][1];
+        int i = 0;
+        for (double[] input : ts.getInputData()) {
+            inputGroup.forceSetActivations(input);
+            for (int l = 0; l < 100; l++) {
+                n.bufferedUpdateAllNeurons();
+            }
+            n.update();
+            outputs[i] = outputGroup.getActivations();
         }
 
-        //TODO: Use existing Simbrain utils or add them.
-        //  TrainingSet ts = new TrainingSet(new Double[][]{{0,0},{1,0}....}
-        //  TrainingUtils.getMSE(network, ts)
+        //TODO Below not working
+//        // Compute MSE and use it to set agent's fitness
+//        double err = TrainingSet.getMSE(ts, outputs);
+//        double fitness = agent.getFitness() - (err * err);
+//        agent.setFitness(fitness);
+//        System.out.println(TrainingSet.getMSE(ts, outputs));
+//        agent.setFitness(TrainingSet.getMSE(ts, outputs));
+//
 
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 2; k++) {
@@ -56,30 +70,44 @@ public class Test {
         }
     }
 
+
     public static void main(String arg0[]) {
         long startTime = System.currentTimeMillis();
 
+        // To confirm evolution is done before opening network panel.
+        final CountDownLatch latch = new CountDownLatch(1);
+
         // construct a pool of genomes with 2 inputs and 1 output
-        Pool pool = new Pool(2, 1, 500, Test::evaluationMethod);
+        Pool pool = new Pool(latch, 2, 1, 500, Test::evaluationMethod);
 
         // Run the evolutionary algorithm
         Agent topAgent = pool.evolve(1000, -.01);
-        System.out.println(topAgent.getGenome());
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
 
         System.out.println("Elapsed time:" + duration / 1000.0 + " seconds.");
 
-        NetworkPanel np = new NetworkPanel(topAgent.getNet());
-        // TODO: Not sure why calls below are needed. Issue in netpanel init
-        ((NeuronGroup)topAgent.getNet().getGroupList().get(0)).setLocation(10,100);
-        ((NeuronGroup)topAgent.getNet().getGroupList().get(1)).setLocation(10,0);
-        JDialog dialog = np.displayPanelInWindow(np, "NEAT Test");
-        np.syncToModel();
-        // TODO: Pack should work. Override preferred size in netpanel?
-        dialog.setBounds(10,10,400,400);
-        // TODO: NetworkPanel inits to bad state. Can't zoom.
+
+        // Once evolution is finished, view the winning network
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+
+            // TODO: Should be able to set these in Genome
+            topAgent.getGenome().getInputNg().setLocation(0,225);
+            topAgent.getGenome().getOutputNg().setLocation(0,0);
+
+            NetworkPanel np = NetworkPanel.createNetworkPanel(topAgent.getNet());
+            JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
+            dialog.setSize(500, 500);
+            // TODO: Pack should work. Override preferred size in netpanel?
+            // dialog.pack();
+
+        }
+
     }
 
 }

@@ -354,6 +354,16 @@ public class Genome implements Comparable<Genome> {
     }
 
     /**
+     * Reference to input neuron group.
+     */
+    private NeuronGroup inputNg;
+
+    /**
+     * Reference to output neuron group.
+     */
+    private NeuronGroup outputNg;
+
+    /**
      * Construct a network from the genome.
      *
      * @return The network that this genome encoded
@@ -363,9 +373,8 @@ public class Genome implements Comparable<Genome> {
 
         tempUpdateNodeRefs();
 
-        //TODO: Discuss
-        NeuronGroup inputNg = new NeuronGroup(net);
-        NeuronGroup outputNg = new NeuronGroup(net);
+        inputNg = new NeuronGroup(net);
+        outputNg = new NeuronGroup(net);
 
         for (NodeGene n : nodeGenes) {
             Neuron newNeuron = new Neuron(net, n.getUpdateRule());
@@ -379,6 +388,9 @@ public class Genome implements Comparable<Genome> {
             } else if (n.getType() == NodeType.output) {
                 outputNg.addNeuron(newNeuron);
             } else {
+                //TODO
+                newNeuron.setX(200*Math.random());
+                newNeuron.setY(200*Math.random());
                 net.addNeuron(newNeuron);
             }
         }
@@ -389,8 +401,10 @@ public class Genome implements Comparable<Genome> {
 
         for (ConnectionGene c : connectionGenes) {
             Synapse newConnection = new Synapse(c.sourceGene.neuron, c.targetGene.neuron);
-            newConnection.setStrength(c.getWeightStrength());
-            net.addSynapse(newConnection);
+            if (c.isEnabled()) {
+                newConnection.setStrength(c.getWeightStrength());
+                net.addSynapse(newConnection);
+            }
         }
         return net;
     }
@@ -423,6 +437,14 @@ public class Genome implements Comparable<Genome> {
 
     public void setFitness(double fitness) {
         this.fitness = fitness;
+    }
+
+    public NeuronGroup getInputNg() {
+        return inputNg;
+    }
+
+    public NeuronGroup getOutputNg() {
+        return outputNg;
     }
 
     @Override

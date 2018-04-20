@@ -106,7 +106,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * Also note that NetworkPanel can be used separately from the Simbrain
  * workspace, e.g. in an applet. Thus all dependencies on workspace classes
- * (e.g. handling coupling menus) are in NetworkPanelDesktop, which explains
+ * (e.g. handling coupling menus) are in {@link org.simbrain.network.desktop.NetworkPanelDesktop}, which explains
  * some of the methods here that are stubs overridden in that class.
  */
 public class NetworkPanel extends JPanel {
@@ -375,6 +375,20 @@ public class NetworkPanel extends JPanel {
      */
     private AtomicInteger updateComplete = new AtomicInteger(0);
 
+    /**
+     * Create a network panel given a model network
+     *
+     * @param network the model network to view
+     * @return the network panel view of the model
+     */
+    public static NetworkPanel createNetworkPanel(Network network) {
+        // TODO: Creation outside of desktop lacks menus
+        NetworkPanel np = new NetworkPanel(network);
+        np.syncToModel();
+        return np;
+    }
+
+    //TODO: Make constructor private and just use static creation method?
     /**
      * Create a new Network panel.
      *
@@ -1006,10 +1020,17 @@ public class NetworkPanel extends JPanel {
         }
 
         SynapseNode node = new SynapseNode(NetworkPanel.this, source, target, synapse);
+
+        // TODO: Figure out why code below is needed when called from Genome.java
+        // SynapseNode created in a bad state
+        if(Double.isNaN(node.getGlobalFullBounds().x)) {
+            return;
+        }
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());
         node.lowerToBottom();
+        System.out.println("sn-->" + node);
     }
 
     /**

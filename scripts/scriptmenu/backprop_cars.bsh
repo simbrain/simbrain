@@ -74,7 +74,7 @@ void buildTrainNetwork() {
   System.out.println("------ Training ------ ");
   for (int i = 0; i < numIterations; i++) {
     trainer.iterate();
-    if (i % numIterations/10 == 0) {
+    if (i % (numIterations/10) == 0) {
       System.out.println("MSE: " + trainer.getError());          
     }
   }

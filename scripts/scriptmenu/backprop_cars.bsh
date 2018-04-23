@@ -75,9 +75,10 @@ void buildTrainNetwork() {
   for (int i = 0; i < numIterations; i++) {
     trainer.iterate();
     if (i % (numIterations/10) == 0) {
-      System.out.println("MSE: " + trainer.getError());          
+      System.out.println("MSE: " + trainer.getError() + ", Num Iterations = " + i + "/" + numIterations);          
     }
   }
+  System.out.println("FINAL MSE: " + trainer.getError());
 
   // Update network
   network.clearActivations();

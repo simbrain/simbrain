@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.neat;
 
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
 import org.simbrain.network.core.Network;
 import org.simbrain.workspace.CouplingFactory;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -38,10 +39,17 @@ public class Agent implements Comparable<Agent> {
 
     private OdorWorld world = new OdorWorldBuilder(new OdorWorldComponent("Hi")).getWorld();
 
+    private NEATRandomizer rand;
+
     /**
      * The fitness to be evaluated from the evaluation method.
      */
     private Double fitness;
+
+    public Agent(Genome genome, long seed) {
+        this(genome);
+        rand = new NEATRandomizer(seed);
+    }
 
     /**
      * Create a instance and build the network from a genome.
@@ -80,6 +88,10 @@ public class Agent implements Comparable<Agent> {
             return 0.0;
         }
         return fitness;
+    }
+    
+    public NEATRandomizer getRandomizer() {
+        return rand;
     }
 
     /**

@@ -49,6 +49,11 @@ public class Pool {
     private PoolState poolState;
 
     /**
+     * A common seed for all {@link Agent} to use during evaluation.
+     */
+    private long evaluationRandomizerSeed;
+
+    /**
      * Global innovation number. Used to set {@link ConnectionGene#innovationNumber}.
      */
     private int innovationNumber;
@@ -149,6 +154,7 @@ public class Pool {
             genomeToAdd.newConnectionMutation();
             genomes.add(genomeToAdd);
         }
+        evaluationRandomizerSeed = rand.nextLong();
         poolState = PoolState.newGen;
         setEvaluationMethod(evaluationMethod);
     }
@@ -184,6 +190,7 @@ public class Pool {
         }
         poolState = PoolState.newGen;
         setEvaluationMethod(evaluationMethod);
+        System.out.println("Seed: " + seed);
     }
 
     /**
@@ -224,8 +231,8 @@ public class Pool {
      */
     public Genome evolve(int maxGenerations, double threshold) {
 
-
         for (int i = 0; i < maxGenerations; i++) {
+            evaluationRandomizerSeed = rand.nextLong();
             evaluate();
 
             sort();
@@ -264,7 +271,7 @@ public class Pool {
         for (Genome g : genomes) {
             // TODO: genomes don't have input nodes
             //System.out.println("-->" + g);
-            agents.add(new Agent(g));
+            agents.add(new Agent(g, evaluationRandomizerSeed));
         }
 
         // Set fitness for all agents
@@ -377,6 +384,10 @@ public class Pool {
             innovationNumberLookupTable.put(cg, cg.getInnovationNumber());
             innovationNumber++;
         }
+    }
+
+    public long getEvaluationRandomizerSeed() {
+        return evaluationRandomizerSeed;
     }
 
     public PoolState getPoolState() {

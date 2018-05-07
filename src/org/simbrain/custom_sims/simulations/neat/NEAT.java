@@ -66,13 +66,18 @@ public class NEAT extends RegisteredSimulation {
       // construct a pool of genomes with 2 inputs and 1 output
 //      Pool pool = new Pool(protoGene, 2, Test::worldTestingMethod);
         Pool pool = new Pool(24, 9, 1525711735340L, 250, Test::worldTestingMethod);
-      // Run the evolutionary algorithm
+        
+        // run the pretrain (one mouse getting as many cheese as possible), max 40 generation
         pool.evolve(40, 20);
+        
+        // run the actual training (2 mice communicating to find the best path to get cheese)
+        // max 10 generation. this one runs too slow
         pool.setEvaluationMethod(Test::worldTestingMethod2);
         Genome topGenome = pool.evolve(10, 20);
         Agent topAgent = new Agent(topGenome, pool.getEvaluationRandomizerSeed());
         agent = topAgent;
-        System.out.println(topGenome.connectionGenes.size());
+        
+        // see Test#worldTestingIteration2
         w = topAgent.getWorld();
         n = topAgent.getNet();
         Network n2 = topAgent.getGenome().buildNetwork();

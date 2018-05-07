@@ -1021,6 +1021,12 @@ public class NetworkPanel extends JPanel {
 
         SynapseNode node = new SynapseNode(NetworkPanel.this, source, target, synapse);
 
+        // TODO: Figure out why code below is needed at all.
+        //  NEAT.java is an example of code that creates nodes in this bad state
+        // Don't add synpase nodes when they are created in a bad state.
+        if (Double.isNaN(node.getGlobalFullBounds().x) || Double.isNaN(node.getGlobalFullBounds().y)) {
+            return;
+        }
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());

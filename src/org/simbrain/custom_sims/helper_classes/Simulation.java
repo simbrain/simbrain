@@ -201,6 +201,24 @@ public class Simulation {
     }
 
     /**
+     * Add an existing odor world and return an odor world builder.
+     * @param x      x location on screen
+     * @param y      y location on screen
+     * @param width  width of component
+     * @param height height of component
+     * @param name   title to display at top of panel
+     * @param world  the odor world to add
+     * @return the component the odor world builder
+     */
+    public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name, OdorWorld world) {
+        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name, world);
+        workspace.addWorkspaceComponent(odorWorldComponent);
+        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setBounds(x, y, width, height);
+        odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
+        return new OdorWorldBuilder(odorWorldComponent);
+    }
+
+    /**
      * Add an internal frame to a sim.
      *
      * @param x    x location on screen

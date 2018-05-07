@@ -28,6 +28,7 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM;
+import org.simbrain.custom_sims.simulations.neat.NEAT;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -73,6 +74,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new CreaturesSim());
         REGISTERED_SIMS.add(new MpfsSOM());
         REGISTERED_SIMS.add(new SimpleNeuroevolution());
+        REGISTERED_SIMS.add(new NEAT());
 
         // Alphabetize
         REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getName));

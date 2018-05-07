@@ -1,6 +1,14 @@
 package org.simbrain.custom_sims.simulations.neat;
 
+import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.Network;
+import org.simbrain.workspace.CouplingFactory;
+import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -27,6 +35,8 @@ public class Agent implements Comparable<Agent> {
      * The network to be created from the genome
      */
     private Network net;
+
+    private OdorWorld world = new OdorWorldBuilder(new OdorWorldComponent("Hi")).getWorld();
 
     /**
      * The fitness to be evaluated from the evaluation method.
@@ -60,7 +70,15 @@ public class Agent implements Comparable<Agent> {
         return net;
     }
 
+    public OdorWorld getWorld() {
+        world.setWrapAround(false); // TODO: move. not a place to set thing.
+        return world;
+    }
+
     public double getFitness() {
+        if (fitness == null) { // TODO: remove. just to deal with a NullPointerException in worldTestingIteration
+            return 0.0;
+        }
         return fitness;
     }
 

@@ -34,9 +34,37 @@ public class NodeGene {
     public Neuron neuron;
 
     /**
-     * The {@code NeuronUpdateRule} the neuron will be using
+     * The {@link NeuronUpdateRule} the neuron will be using. Defaults to {@link LinearRule}.
      */
-    private NeuronUpdateRule updateRule;
+    private NeuronUpdateRule updateRule = new LinearRule();
+
+    /**
+     * See {@link Neuron#increment}.
+     */
+    private double increment = Neuron.DEFAULT_INCREMENT;
+
+    /**
+     * See {@link Neuron#clamped}.
+     */
+    private boolean clamped = false;
+
+    /**
+     * The group name this node gene is in, if it is in one.
+     */
+    private String groupName = null;
+
+    /**
+     * Construct a node gene by specifying NodeType and NeuronUpdateRule.
+     * @param type Type of neuron
+     * @param updateRule NeuronUpdateRule to use
+     * @param increment See {@link Neuron#increment}.
+     * @param clamped See {@link Neuron#clamped}.
+     */
+    public NodeGene(NodeType type, NeuronUpdateRule updateRule, double increment, boolean clamped) {
+        this(type, updateRule);
+        this.increment = increment;
+        this.clamped = clamped;
+    }
 
     /**
      * Construct a node gene by specifying NodeType and NeuronUpdateRule.
@@ -94,11 +122,38 @@ public class NodeGene {
 
     public void setUpdateRule(NeuronUpdateRule updateRule) {
         this.updateRule = requireNonNull(updateRule);
+    }
 
+    public NodeGene deepCopy() {
+        return new NodeGene(this);
     }
 
     @Override
     public String toString() {
         return type + ": " + updateRule.getName();
+    }
+
+    public double getIncrement() {
+        return increment;
+    }
+
+    public void setIncrement(double increment) {
+        this.increment = increment;
+    }
+
+    public boolean isClamped() {
+        return clamped;
+    }
+
+    public void setClamped(boolean clamped) {
+        this.clamped = clamped;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

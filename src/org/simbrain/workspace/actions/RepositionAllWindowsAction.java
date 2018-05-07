@@ -18,9 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
+
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 /**
@@ -52,7 +55,45 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        // TODO: How did this get in here?
-        //desktop.repositionAllWindows();
+        int maxX = 0;
+        int maxY = 0;
+        double desktopHeight = desktop.getFrame().getSize().getHeight();
+        double desktopWidth = desktop.getFrame().getSize().getWidth();
+
+        for (GuiComponent<?> c : desktop.getDesktopComponents()) {
+            c.getParentFrame().pack();
+            System.out.println("x "  + c.getLocation().getX());
+            int bottomRightX = (int) (c.getSize().getWidth() + c.getX());
+            int bottomRightY = (int) (c.getSize().getHeight() + c.getY());
+
+            if (maxX < bottomRightX) {
+                maxX = bottomRightX;
+            }
+            if (maxY < bottomRightY) {
+                maxY = bottomRightY;
+            }
+        }
+
+        double xScalingRatio = maxX / desktopWidth;
+        double yScalingRatio = maxY / desktopHeight;
+
+        double finalScalingRatio = xScalingRatio > yScalingRatio ? 1 / xScalingRatio : 1 / yScalingRatio;
+
+        if (finalScalingRatio < 1) {
+            for (GuiComponent<?> c : desktop.getDesktopComponents()) {
+                double orignalTopLeftX = c.getX();
+                double orignalTopLeftY = c.getY();
+                double orignalBottomRightX = c.getX() + c.getSize().getWidth();
+                double orignalBottomRightY = c.getX() + c.getSize().getHeight();
+
+                c.getParentFrame().setBounds(
+                        (int) (orignalTopLeftX * finalScalingRatio),
+                        (int) (orignalTopLeftY * finalScalingRatio),
+                        (int) (orignalBottomRightX * finalScalingRatio),
+                        (int) (orignalBottomRightY * finalScalingRatio)
+                );
+                c.getParentFrame().toFront();
+            }
+        }
     }
 }

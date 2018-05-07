@@ -31,9 +31,7 @@ public class Pool {
      */
     public enum PoolState {
         newGen, evaluated, sorted, eliminated
-    }
-
-    ;
+    };
 
     /**
      * Randomizer for mutation
@@ -74,17 +72,19 @@ public class Pool {
      */
     private List<Genome> genomes;
 
-    /**
-     * Collection of agents. TODO: JKY added this. Keep? Discuss this and its
-     * uses.
-     */
-    private List<Agent> agents = new ArrayList<>();
+    // TODO: I still want to create agents every round. At least for now. It is hard to deal with resetting.
+//    /**
+//     * Collection of agents. TODO: JKY added this. Keep? Discuss this and its
+//     * uses.
+//     */
+//    private List<Agent> agents = new ArrayList<>();
 
     /**
      * Number of genomes in this pool.
      */
     private int instanceCount;
     //TODO: replace with getInstanceCount() { return genomes.size();}?
+    // +1, I don't know why I need this now... - Yulin
 
     /**
      * The percentage of the population to eliminateLeastFit at each new
@@ -126,6 +126,66 @@ public class Pool {
      */
     private Consumer<Agent> evaluationMethod;
 
+    // TODO: too much duplicated instructions in constructors. simplify.
+    /**
+     * Construct a pool using protogene. Note: the genome seed generation method is different
+     * from other constructors.
+     * @param protogene        Genome prototype to clone from
+     * @param seed             Seed for randomizer
+     * @param instanceCount    Number of genomes
+     * @param evaluationMethod The method to set the fitness score
+     */
+    public Pool(Genome protogene, long seed, int instanceCount, Consumer<Agent> evaluationMethod) {
+        System.out.println("Seed: " + seed);
+        rand = new NEATRandomizer(seed);
+        this.instanceCount = instanceCount;
+        genomes = new ArrayList<>(); // TODO: initialize in field
+        innovationNumber = 1;  // TODO: initialize in field
+        innovationNumberLookupTable = new HashMap<>();  // TODO: initialize in field
+        protogene.setSeed(seed);
+        protogene.setPool(this);
+        for (int i = 0; i < instanceCount; i++) {
+            Genome genomeToAdd = protogene.deepCopy();
+            genomeToAdd.newConnectionMutation();
+            genomes.add(genomeToAdd);
+        }
+        poolState = PoolState.newGen;
+        setEvaluationMethod(evaluationMethod);
+    }
+
+    public Pool(Genome protogene, int instanceCount, Consumer<Agent> evaluationMethod) {
+        this(protogene, System.currentTimeMillis(), instanceCount, evaluationMethod);
+    }
+
+    /**
+     * Construct a pool based on input output count with a specified seed.
+     *
+     * @param inputCount       Number of input nodes per group
+     * @param inputGroupCount  Number of input neuron group
+     * @param outputCount      Number of output nodes
+     * @param outputGroupCount Number of output neuron group
+     * @param seed             Seed for randomizer
+     * @param instanceCount    Number of genomes
+     * @param evaluationMethod The method to set the fitness score
+     */
+    public Pool(int inputCount, int inputGroupCount,
+                int outputCount, int outputGroupCount,
+                long seed, int instanceCount,
+                Consumer<Agent> evaluationMethod) {
+        rand = new NEATRandomizer(seed);
+        this.instanceCount = instanceCount;
+        genomes = new ArrayList<>();
+        innovationNumber = 1;
+        innovationNumberLookupTable = new HashMap<>();
+        for (int i = 0; i < instanceCount; i++) {
+            Genome newGenome = new Genome(inputCount, outputCount, rand.nextLong(), this);
+            genomes.add(newGenome);
+//            agents.add(new Agent(newGenome));
+        }
+        poolState = PoolState.newGen;
+        setEvaluationMethod(evaluationMethod);
+    }
+
     /**
      * Construct a pool based on input output count with a specified seed.
      *
@@ -136,18 +196,8 @@ public class Pool {
      * @param evaluationMethod The method to set the fitness score
      */
     public Pool(int inputCount, int outputCount, long seed, int instanceCount,
-                Consumer<Agent> evaluationMethod) {
-        rand = new NEATRandomizer(seed);
-        this.instanceCount = instanceCount;
-        genomes = new ArrayList<>();
-        innovationNumber = 1;
-        innovationNumberLookupTable = new HashMap<>();
-        for (int i = 0; i < instanceCount; i++) {
-            Genome newGenome = new Genome(inputCount, outputCount, rand.nextLong(), this);
-            agents.add(new Agent(newGenome));
-        }
-        poolState = PoolState.newGen;
-        setEvaluationMethod(evaluationMethod);
+            Consumer<Agent> evaluationMethod) {
+        this(inputCount, 1, outputCount, 1, seed, instanceCount, evaluationMethod);
     }
 
     /**
@@ -172,19 +222,21 @@ public class Pool {
      *                       stop the evolutionary process.
      * @return top genome
      */
-    public Agent evolve(int maxGenerations, double threshold) {
+    public Genome evolve(int maxGenerations, double threshold) {
 
 
         for (int i = 0; i < maxGenerations; i++) {
             evaluate();
 
             sort();
-
+            System.out.println("Generation: " + i);
+            System.out.println(getTopGenome().getFitness());
+            System.out.println("size: " + getTopGenome().connectionGenes.size());
             // Early termination if fitness is above threshold
-            if (getTopAgent().getFitness() > threshold) {
+            if (getTopGenome().getFitness() > threshold) {
                 // TODO: make a evolution report. avoid printing in pool.
                 System.out.println("Generation: " + i);
-                return getTopAgent();
+                return getTopGenome();
             }
 
             // Eliminate the least fit
@@ -194,7 +246,7 @@ public class Pool {
             replenishPool();
 
         }
-        return getTopAgent();
+        return getTopGenome();
     }
 
     /**
@@ -207,10 +259,9 @@ public class Pool {
         }
         assertPoolState(PoolState.newGen);
 
-
+        List<Agent> agents = new ArrayList<>();
         // Create agents from genomes
         for (Genome g : genomes) {
-
             // TODO: genomes don't have input nodes
             //System.out.println("-->" + g);
             agents.add(new Agent(g));
@@ -221,7 +272,6 @@ public class Pool {
             .forEach(agent -> {
                 evaluationMethod.accept(agent);
             });
-
         poolState = PoolState.evaluated;
     }
 
@@ -234,7 +284,7 @@ public class Pool {
         }
         assertPoolState(PoolState.evaluated);
         Collections.sort(genomes, Comparator.reverseOrder());
-        Collections.sort(agents, Comparator.reverseOrder());
+//        Collections.sort(agents, Comparator.reverseOrder());
         poolState = PoolState.sorted;
     }
 
@@ -247,8 +297,8 @@ public class Pool {
             return;
         }
         assertPoolState(PoolState.sorted);
-        agents = agents.stream()
-            .limit((long) (agents.size() * (1.0 - eliminationRate)))
+        genomes = genomes.stream()
+            .limit((long) (genomes.size() * (1.0 - eliminationRate)))
             .collect(Collectors.toList());
         poolState = PoolState.eliminated;
     }
@@ -259,32 +309,31 @@ public class Pool {
      */
     public void replenishPool() {
         assertPoolState(PoolState.eliminated);
-        int remainingPopulation = agents.size();
+        int remainingPopulation = genomes.size();
         int reproduceSize = instanceCount - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
-            agents.add(new Agent(
+            genomes.add(
                     new Genome(
-                        agents.get(rand.nextInt(remainingPopulation)).getGenome(),
-                        agents.get(rand.nextInt(remainingPopulation)).getGenome(),
+                        genomes.get(rand.nextInt(remainingPopulation)),
+                        genomes.get(rand.nextInt(remainingPopulation)),
                         true)
-                )
             );
         }
         poolState = PoolState.newGen;
         generation += 1;
     }
 
-    /**
-     * Returns the most fit agent.
-     *
-     * @return the most fit agent
-     */
-    public Agent getTopAgent() {
-        if (poolState == PoolState.evaluated) {
-            sort();
-        }
-        return agents.get(0);
-    }
+//    /**
+//     * Returns the most fit agent.
+//     *
+//     * @return the most fit agent
+//     */
+//    public Agent getTopAgent() {
+//        if (poolState == PoolState.evaluated) {
+//            sort();
+//        }
+//        return agents.get(0);
+//    }
 
     /**
      * Get the genome with the highest fitness score.

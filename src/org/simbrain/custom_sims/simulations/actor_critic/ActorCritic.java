@@ -171,7 +171,8 @@ public class ActorCritic extends RegisteredSimulation {
         network.addUpdateAction(updateMethod);
 
         // Add docviewer
-        sim.addDocViewer(0, 301, 253, 313, "Information", "src/org/simbrain/custom_sims/simulations/actor_critic/ActorCritic.html");
+        sim.addDocViewer(0, 301, 253, 313, "Information",
+                "ActorCritic.html");
 
         // Add method for custom update
         addCustomWorkspaceUpdate();

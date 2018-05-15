@@ -55,10 +55,10 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * The four main network patterns.
      */
-    double[] pattern1 = new double[]{1, 0, 0, 0};
-    double[] pattern2 = new double[]{0, 1, 0, 0};
-    double[] pattern3 = new double[]{0, 0, 1, 0};
-    double[] pattern4 = new double[]{0, 0, 0, 1};
+    double[] pattern1 = new double[] {1, 0, 0, 0};
+    double[] pattern2 = new double[] {0, 1, 0, 0};
+    double[] pattern3 = new double[] {0, 0, 1, 0};
+    double[] pattern4 = new double[] {0, 0, 0, 1};
 
     public Hippocampus() {
         super();
@@ -87,7 +87,8 @@ public class Hippocampus extends RegisteredSimulation {
         setUpControlPanel();
 
         // Add docviewer
-        sim.addDocViewer(807, 12, 307, 591, "Information", "src/org/simbrain/custom_sims/simulations/hippocampus/Hippocampus.html");
+        sim.addDocViewer(807, 12, 307, 591, "Information",
+            "Hippocampus.html");
 
     }
 
@@ -134,7 +135,8 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Add and properly initialize a competitive neuron group.
      */
-    private AlvarezSquire addCompetitiveGroup(String label, double x, double y) {
+    private AlvarezSquire addCompetitiveGroup(String label, double x,
+                                              double y) {
         AlvarezSquire cg = new AlvarezSquire(this, 4);
         cg.setLabel(label);
         cg.applyLayout();
@@ -147,10 +149,12 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Add and properly initialize a synapse group.
      */
-    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target, String name) {
+    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target,
+                                         String name) {
 
         // Initialize with uniform distribution from 0 to .1
-        SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target, SynapseGroup.DEFAULT_CONNECTION_MANAGER, 1);
+        SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target,
+            SynapseGroup.DEFAULT_CONNECTION_MANAGER, 1);
         synGroup.setLabel(name);
         synGroup.setLowerBound(0, Polarity.EXCITATORY);
         synGroup.setUpperBound(1, Polarity.EXCITATORY);
@@ -330,7 +334,7 @@ public class Hippocampus extends RegisteredSimulation {
         LC2.forceSetActivations(activations);
         RC1.forceSetActivations(activations);
         RC2.forceSetActivations(activations);
-        hippocampus.forceSetActivations(new double[]{0, 0, 0, 0});
+        hippocampus.forceSetActivations(new double[] {0, 0, 0, 0});
 
         // Iterate 3 times
         sim.iterate(3);
@@ -344,7 +348,8 @@ public class Hippocampus extends RegisteredSimulation {
 
     /**
      * Set up a test button that will clamp half of the cortical neurons, then
-     * runs the network for three iterations, then unclamp the cortical neurons.
+     * runs the network for three iterations, then unclamp the cortical
+     * neurons.
      *
      * @param network
      * @param activations

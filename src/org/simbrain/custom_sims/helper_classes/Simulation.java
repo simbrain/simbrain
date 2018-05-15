@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.helper_classes;
 
+import org.simbrain.custom_sims.resources.CustomSimResourceManager;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -134,14 +135,13 @@ public class Simulation {
      * @param y        y location on screen
      * @param width    width of component
      * @param height   height of component
-     * @param name     title to display at top of panel
-     * @param filePath path to html file
+     * @param title    title to display at top of panel
+     * @param fileName name of the html file, e.g. "ActorCritic.html"
      * @return the component
      */
-    public DocViewerComponent addDocViewer(int x, int y, int width, int height, String name, String filePath) {
-        DocViewerComponent docViewer = new DocViewerComponent(name);
-
-        String html = Utils.readFileContents(new File(filePath));
+    public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
+        DocViewerComponent docViewer = new DocViewerComponent(title);
+        String html = CustomSimResourceManager.getDocString(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
         desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);

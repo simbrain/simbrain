@@ -38,9 +38,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Workspace action manager.
@@ -57,118 +55,192 @@ import java.util.List;
  */
 public class WorkspaceActionManager {
 
-    /** New network action. */
+    /**
+     * New network action.
+     */
     private final Action newNetworkAction;
 
-    /** New odor world action. */
+    /**
+     * New odor world action.
+     */
     private final Action newOdorWorldAction;
 
-    /** New odor world action. */
+    /**
+     * New odor world action.
+     */
     private final Action newGameWorldAction;
 
-    /** New data world action. */
+    /**
+     * New data world action.
+     */
     private final Action newDataWorldAction;
 
-    /** New MIDI world action. */
+    /**
+     * New MIDI world action.
+     */
     private final Action newMidiWorldAction;
 
-    /** New text world action. */
+    /**
+     * New text world action.
+     */
     private final Action newReaderWorldAction;
 
-    /** New text world action. */
+    /**
+     * New text world action.
+     */
     private final Action newDisplayWorldAction;
 
     /** New vision world action. */
 //    private final Action newVisionWorldAction;
 
-    /** New device interaction world action. */
+    /**
+     * New device interaction world action.
+     */
     private final Action newDeviceInteractionWorldAction;
 
-    /** New bar chart action. */
+    /**
+     * New bar chart action.
+     */
     private final Action newBarChartAction;
 
-    /** New histogram chart action. */
+    /**
+     * New histogram chart action.
+     */
     private final Action newHistogramAction;
 
-    /** New raster chart action. */
+    /**
+     * New raster chart action.
+     */
     private final Action newRasterPlotAction;
 
-    /** New pie chart action. */
+    /**
+     * New pie chart action.
+     */
     private final Action newPieChartAction;
 
-    /** New projection plot action. */
+    /**
+     * New projection plot action.
+     */
     private final Action newProjectionPlotAction;
 
-    /** New scatter plot action. */
+    /**
+     * New scatter plot action.
+     */
     private final Action newScatterPlotAction;
 
-    /** New time series plot action. */
+    /**
+     * New time series plot action.
+     */
     private final Action newTimeSeriesAction;
 
-    /** New console action. */
+    /**
+     * New console action.
+     */
     private final Action newConsoleAction;
 
-    /** New document viewer. */
+    /**
+     * New document viewer.
+     */
     private final Action newDocViewerAction;
 
-    /** Clear workspace action. */
+    /**
+     * Clear workspace action.
+     */
     private final Action clearWorkspaceAction;
 
-    /** Open data world action. */
+    /**
+     * Open data world action.
+     */
     private final Action openDataWorldAction;
 
-    /** Open network action. */
+    /**
+     * Open network action.
+     */
     private final Action openNetworkAction;
 
-    /** Open odor world action. */
+    /**
+     * Open odor world action.
+     */
     private final Action openOdorWorldAction;
 
-    /** Open workspace action. */
+    /**
+     * Open workspace action.
+     */
     private final Action openWorkspaceAction;
 
-    /** Save workspace action. */
+    /**
+     * Save workspace action.
+     */
     private final Action saveWorkspaceAction;
 
-    /** Save workspace as action. */
+    /**
+     * Save workspace as action.
+     */
     private final Action saveWorkspaceAsAction;
 
-    /** Quit workspace action. */
+    /**
+     * Quit workspace action.
+     */
     private final Action quitWorkspaceAction;
 
-    /** Global workspace update action. */
+    /**
+     * Global workspace update action.
+     */
     private final Action globalUpdateAction;
 
-    /** Show workspace dialog. */
+    /**
+     * Show workspace dialog.
+     */
     private final Action showPropertyDialogAction;
 
-    /** Opens the coupling manager. */
+    /**
+     * Opens the coupling manager.
+     */
     private final Action openCouplingManagerAction;
 
-    /** Global workspace run action. */
+    /**
+     * Global workspace run action.
+     */
     private final Action globalRunAction;
 
-    /** Global workspace stop action. */
+    /**
+     * Global workspace stop action.
+     */
     private final Action globalStopAction;
 
-    /** Opens the coupling list. */
+    /**
+     * Opens the coupling list.
+     */
     private final Action openCouplingListAction;
 
-    /** Opens the list of workspace components. */
+    /**
+     * Opens the list of workspace components.
+     */
     private final Action openWorkspaceComponentListAction;
 
-    /** Show hide property tab. */
+    /**
+     * Show hide property tab.
+     */
     private final Action propertyTabAction;
 
-    /** Open script editor action. */
+    /**
+     * Open script editor action.
+     */
     private final Action showScriptEditorAction;
 
-    /** Open script editor action. */
+    /**
+     * Open script editor action.
+     */
     private final Action showUpdaterDialog;
 
-    /** Reposition windows action. */
+    /**
+     * Reposition windows action.
+     */
     private final Action repositionAllWindowsAction;
 
-    /** Location of script menu directory. */
+    /**
+     * Location of script menu directory.
+     */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
     /**
@@ -178,7 +250,7 @@ public class WorkspaceActionManager {
      */
     public WorkspaceActionManager(final SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
-                
+
         clearWorkspaceAction = new ClearWorkspaceAction(desktop);
 
         openDataWorldAction = new OpenDataWorldAction(workspace);
@@ -224,7 +296,7 @@ public class WorkspaceActionManager {
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
         openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(
-                desktop);
+            desktop);
 
         propertyTabAction = new PropertyTabAction(desktop);
 
@@ -239,53 +311,54 @@ public class WorkspaceActionManager {
      */
     public List<Action> getGlobalControlActions() {
         return Arrays
-                .asList(new Action[] { globalRunAction, globalStopAction });
+            .asList(new Action[] {globalRunAction, globalStopAction});
     }
 
     /**
      * @return Open and save workspace actions.
      */
     public List<Action> getOpenSaveWorkspaceActions() {
-        return Arrays.asList(new Action[] { openWorkspaceAction,
-                saveWorkspaceAction, saveWorkspaceAsAction });
+        return Arrays.asList(new Action[] {openWorkspaceAction,
+            saveWorkspaceAction, saveWorkspaceAsAction});
     }
 
     /**
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] { openDataWorldAction,
-                openOdorWorldAction });
+        return Arrays.asList(new Action[] {openDataWorldAction,
+            openOdorWorldAction});
     }
 
     /**
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] { newDataWorldAction,
-                newOdorWorldAction, newDisplayWorldAction,
-                newReaderWorldAction,
-                // newThreeDeeWorldAction,
-                });
+        return Arrays.asList(new Action[] {newDataWorldAction,
+            newOdorWorldAction, newDisplayWorldAction,
+            newReaderWorldAction,
+            // newThreeDeeWorldAction,
+        });
     }
 
     /**
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] { newBarChartAction,
-                newHistogramAction, newPieChartAction, newProjectionPlotAction,
-                newRasterPlotAction, newTimeSeriesAction });
+        return Arrays.asList(new Action[] {newBarChartAction,
+            newHistogramAction, newPieChartAction, newProjectionPlotAction,
+            newRasterPlotAction, newTimeSeriesAction});
     }
 
     /**
-     * Make a list of script actions by iterating through script menu directory.
+     * Make a list of script actions by iterating through script menu
+     * directory.
      *
      * @param desktop workspace reference
      * @return script action
      */
-    public List<Action> getScriptActions(final SimbrainDesktop desktop) {
-        ArrayList<Action> list = new ArrayList<Action>();
+    public List<ScriptAction> getScriptActions(final SimbrainDesktop desktop) {
+        ArrayList<ScriptAction> list = new ArrayList();
         File dir = new File(SCRIPT_MENU_DIRECTORY);
         if (!dir.isDirectory()) {
             return null; // Throw exception instead?
@@ -300,31 +373,38 @@ public class WorkspaceActionManager {
                 list.add(new ScriptAction(desktop, file.getName()));
             }
         }
+        Collections.sort(list);
         return list;
     }
 
     /**
      * Create an action based on the name of a script.
      */
-    public final class ScriptAction extends WorkspaceAction {
+    public final class ScriptAction extends WorkspaceAction implements Comparable<ScriptAction> {
 
-        /** Name of script for use in actions (e.g. menu items). */
+        /**
+         * Name of script for use in actions (e.g. menu items).
+         */
         private String scriptName;
 
-        /** Reference to workspace. */
+        /**
+         * Reference to workspace.
+         */
         private Workspace workspace;
 
-        /** Reference to Simbrain Desktop. */
+        /**
+         * Reference to Simbrain Desktop.
+         */
         private SimbrainDesktop desktop;
 
         /**
          * Create a new add gauge action with the specified workspace.
          *
-         * @param desktop Simbrain desktop
+         * @param desktop    Simbrain desktop
          * @param scriptName name of script
          */
         public ScriptAction(final SimbrainDesktop desktop,
-                final String scriptName) {
+                            final String scriptName) {
             super(scriptName, desktop.getWorkspace());
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = scriptName;
@@ -332,8 +412,9 @@ public class WorkspaceActionManager {
             this.workspace = desktop.getWorkspace();
         }
 
-        /** @see AbstractAction 
+        /**
          * @param event
+         * @see AbstractAction
          */
         public void actionPerformed(final ActionEvent event) {
 
@@ -353,6 +434,11 @@ public class WorkspaceActionManager {
                 System.out.println("Evaluation error");
                 e.printStackTrace();
             }
+        }
+
+        @Override
+        public int compareTo(ScriptAction scriptAction) {
+            return this.scriptName.toLowerCase().compareTo(scriptAction.scriptName.toLowerCase());
         }
     }
 
@@ -401,7 +487,9 @@ public class WorkspaceActionManager {
     /**
      * @return the newDeviceInteractionWorldAction.
      */
-    public Action getNewDeviceInteractionWorldAction() {return newDeviceInteractionWorldAction; }
+    public Action getNewDeviceInteractionWorldAction() {
+        return newDeviceInteractionWorldAction;
+    }
 
     /**
      * @return the clearWorkspaceAction.

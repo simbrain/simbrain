@@ -18,23 +18,21 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
- * neuron.
+ * <b>SigmoidalRule</b> provides various implementations of a standard
+ * sigmoidal neuron.
  *
- * TODO: Possibly rename to "DiscreteSigmoidalRule" (after xstream is improved
- * to allow better backwards compat)
+ * TODO: Discuss renaming "DiscreteSigmoidalRule"
  *
- * @author Zoë Tosi
+ * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunction {
+public class SigmoidalRule extends AbstractSigmoidalRule {
 
     /**
      * Default sigmoidal.
@@ -53,16 +51,16 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
         super(sFunction);
     }
 
-    @Override
-    public final TimeType getTimeType() {
+    public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
     @Override
-    public final void update(Neuron neuron) {
+    public void update(Neuron neuron) {
 
         double val = inputType.getInput(neuron) + bias;
 
+        // TODO: Discuss how noise is added
         if (addNoise) {
             val += noiseGenerator.getRandom();
         }
@@ -75,14 +73,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     }
 
     @Override
-    public final SigmoidalRule deepCopy() {
-        SigmoidalRule sr = new SigmoidalRule();
-        sr = (SigmoidalRule) super.baseDeepCopy(sr);
-        return sr;
-    }
-    
-    @Override
-    public final void contextualIncrement(final Neuron n) {
+    public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
         if (act < getUpperBound()) {
             act += getIncrement();
@@ -108,6 +99,11 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     }
 
     @Override
+    public String getName() {
+        return "Sigmoidal (Discrete)";
+    }
+
+    @Override
     public double getDerivative(final double val) {
         double up = getUpperBound();
         double lw = getLowerBound();
@@ -116,25 +112,14 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     }
 
     @Override
-    public final String getName() {
-        return "Sigmoidal (Discrete)";
-    }
-
-	@Override
-	public void applyFunctionInPlace(DoubleMatrix input) {
-		applyFunction(input, input);		
-	}
-
-    @Override
-    public void applyFunction(DoubleMatrix input, DoubleMatrix output) {
-        this.sFunction.valueOf(input, output, getUpperBound(), getLowerBound(),
-                slope);
-    }
-
-    @Override
-    public void getDerivative(DoubleMatrix input, DoubleMatrix output) {
-        this.sFunction.derivVal(input, output, getUpperBound(), getLowerBound(),
-                slope);
+    public SigmoidalRule deepCopy() {
+        SigmoidalRule sn = new SigmoidalRule();
+        sn.setBias(getBias());
+        sn.setSquashFunctionType(getSquashFunctionType());
+        sn.setSlope(getSlope());
+        sn.setAddNoise(getAddNoise());
+        sn.noiseGenerator = new Randomizer(noiseGenerator);
+        return sn;
     }
 
 }

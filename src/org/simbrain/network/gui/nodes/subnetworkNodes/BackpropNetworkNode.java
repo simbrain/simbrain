@@ -34,7 +34,6 @@ import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer2;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 

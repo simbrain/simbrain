@@ -18,13 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.*;
+import org.simbrain.network.trainers.BackpropTrainer;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
@@ -33,14 +30,9 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
     /** Reference to the backprop network being edited. */
     private BackpropNetwork backprop;
-    
-    /**
-     * Make it easy to switch between the new, experimental trainer
-     * (BackpropTrainer2), and the old one. Once that's stabilized this code can
-     * be removed.
-     */
-    private boolean useExperimentalTrainer = false;
-    private IterableTrainer currentTrainer;
+
+    /** Reference to backprop trainer. */
+    private BackpropTrainer trainer;
 
     /**
      * Default constructor.
@@ -49,12 +41,11 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * @param backprop edited network
      */
     public BackpropEditorDialog(final NetworkPanel np,
-        final BackpropNetwork backprop) {
+                                final BackpropNetwork backprop) {
         super(np, backprop);
         this.backprop = backprop;
         init();
         initDefaultTabs();
-        updateData();
     }
 
     /**
@@ -64,31 +55,18 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        if(useExperimentalTrainer) {
-            currentTrainer = new BackpropTrainer2(backprop);
-        } else {
-            currentTrainer = new BackpropTrainer(backprop);
-        }
+        trainer = new BackpropTrainer(backprop,
+            backprop.getNeuronGroupsAsList());
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-            networkPanel, currentTrainer);
+            networkPanel, trainer);
         addTab("Train", iterativeControls);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                currentTrainer.commitChanges();
-            }
-        });
+
     }
 
     @Override
     protected void stopTrainer() {
-        if (currentTrainer != null) {
-            currentTrainer.setUpdateCompleted(true);
+        if (trainer != null) {
+            trainer.setUpdateCompleted(true);
         }
-    }
-    
-    @Override
-    void updateData() {
-        currentTrainer.initData();
     }
 }

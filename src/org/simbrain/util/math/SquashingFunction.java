@@ -18,28 +18,24 @@
  */
 package org.simbrain.util.math;
 
-import org.jblas.DoubleMatrix;
-
 /**
  * An enumerated type containing methods for calculating values of different
  * squashing functions, their inverses, and their derivatives.
  *
  * @author Scott Hotton
- * @author Zoë Tosi
+ * @author Zach Tosi
  * @author Jeff Yoshimi
  */
 public enum SquashingFunction {
-    
-    // TODO:Rename to SquashingFunctionEnum?
 
     /** Arctangent. */
     ARCTAN {
 
-        /** The max value as x -> inf of f(x) = arctan(x) . */
-        private static final double DEFAULT_ARCTAN_CEIL = Math.PI / 2;
+        /** The max value as x -> inf of f(x) = arctan(x) .*/
+        private static final double DEFAULT_ARCTAN_CEIL = Math.PI/2;
 
-        /** The min value as x -> -inf of f(x) = arctan(x) . */
-        private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI / 2;
+        /** The min value as x -> -inf of f(x) = arctan(x) .*/
+        private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI/2;
 
         @Override
         public String toString() {
@@ -48,20 +44,20 @@ public enum SquashingFunction {
 
         @Override
         public double valueOf(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.atan(val, ceil, floor, slope);
+                              double slope) {
+            return atan(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.invAtan(val, ceil, floor, slope);
+                                 double slope) {
+            return invAtan(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.derivAtan(val, ceil, floor, slope);
+                               double slope) {
+            return derivAtan(val, ceil, floor, slope);
         }
 
         @Override
@@ -73,24 +69,6 @@ public enum SquashingFunction {
         public double getDefaultLowerBound() {
             return DEFAULT_ARCTAN_FLOOR;
         }
-
-		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
 
     },
 
@@ -110,20 +88,20 @@ public enum SquashingFunction {
 
         @Override
         public double valueOf(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.logistic(val, ceil, floor, slope);
+                              double slope) {
+            return logistic(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.invLogistic(val, ceil, floor, slope);
+                                 double slope) {
+            return invLogistic(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.derivLogistic(val, ceil, floor, slope);
+                               double slope) {
+            return derivLogistic(val, ceil, floor, slope);
         }
 
         @Override
@@ -136,22 +114,6 @@ public enum SquashingFunction {
             return DEFAULT_LOGISTIC_FLOOR;
         }
 
-		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-		    SquashingFunctions.logistic(valIn, valOut, ceil, floor, slope);
-		}
-
-		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-		    SquashingFunctions.derivLogistic(valIn, valOut, ceil, floor, slope);
-		}
-
     },
 
     /** Hyperbolic Tangent. */
@@ -160,7 +122,7 @@ public enum SquashingFunction {
         /** The max value as x -> inf of f(x) = tanh(x). */
         private static final double DEFAULT_TANH_CEIL = 1.0;
 
-        /** The max value as x -> -inf of f(x) = tanh(x). */
+        /** The max value as x -> -inf of f(x) = tanh(x).*/
         private static final double DEFAULT_TANH_FLOOR = -1.0;
 
         @Override
@@ -170,20 +132,20 @@ public enum SquashingFunction {
 
         @Override
         public double valueOf(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.tanh(val, ceil, floor, slope);
+                              double slope) {
+            return tanh(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.invTanh(val, ceil, floor, slope);
+                                 double slope) {
+            return invTanh(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor,
-                double slope) {
-            return SquashingFunctions.derivTanh(val, ceil, floor, slope);
+                               double slope) {
+            return derivTanh(val, ceil, floor, slope);
         }
 
         @Override
@@ -195,30 +157,11 @@ public enum SquashingFunction {
         public double getDefaultLowerBound() {
             return DEFAULT_TANH_FLOOR;
         }
-
-		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
     },
 
     /**
      * The Null String "..." used in cases where neurons with different
-     * squashing functions are selected simultaneously. Note this must be the
-     * last item for consistency with the names function below.
+     * squashing functions are selected simultaneously.
      */
     NULL_STRING {
 
@@ -229,19 +172,19 @@ public enum SquashingFunction {
 
         @Override
         public double valueOf(double val, double ceil, double floor,
-                double slope) {
+                              double slope) {
             return 0;
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor,
-                double slope) {
+                                 double slope) {
             return 0;
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor,
-                double slope) {
+                               double slope) {
             return 0;
         }
 
@@ -254,25 +197,8 @@ public enum SquashingFunction {
         public double getDefaultLowerBound() {
             return 0;
         }
-
-		@Override
-		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
-		}
     };
+
 
     /*
      * ****************************************************************
@@ -291,11 +217,8 @@ public enum SquashingFunction {
      * @return the output of the given squashing function
      */
     public abstract double valueOf(double val, double ceil, double floor,
-            double slope);
+                                   double slope);
 
-    public abstract void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
-            double slope);
-    
     /**
      * Gives the value of the inverse of the given squashing function for some
      * input value, a ceiling, floor, and slope.
@@ -307,10 +230,7 @@ public enum SquashingFunction {
      * @return the output of the given squashing function's inverse
      */
     public abstract double inverseVal(double val, double ceil, double floor,
-            double slope);
-    
-    public abstract void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
-            double slope);
+                                      double slope);
 
     /**
      * Gives the value of the derivative of the given squashing function for
@@ -325,29 +245,178 @@ public enum SquashingFunction {
      * @return the output of the given squashing function's derivative
      */
     public abstract double derivVal(double val, double ceil, double floor,
-            double slope);
-    
-    public abstract void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
+                                    double slope);
 
     /**
-     * @return the default upper boundary (ceiling) of this particular squashing
-     *         function.
+     * @return the default upper boundary (ceiling) of this particular
+     * squashing function.
      */
     public abstract double getDefaultUpperBound();
 
     /**
      * @return the default lower boundary (floor) of this particular squashing
-     *         function.
+     * function.
      */
     public abstract double getDefaultLowerBound();
 
+    /*
+     * ****************************************************************
+     * _____________________Function Methods__________________________*
+     * ****************************************************************
+     */
 
     /**
-     * Helper method to get the list of squashing function names as an array
-     * Used to populate combo box.
+     * The hyperbolic tangent given an upper and lower limit and slope for a
+     * particular value.
      *
-     * @return list of squashing function names, as an array.
+     * @param val the input to the tanh function
+     * @param ceil the desired maximum value (upper boundary) of tanh
+     * @param floor the desired minimum value (lower boundary) of tanh
+     * @param slope the desired slope of the tanh function for val == 0
+     * @return the value of val after being passed through a tanh function with
+     *         these parameters
      */
+    public static double tanh(double val, double ceil, double floor,
+                              double slope) {
+        double diff = ceil - floor;
+        double a = (2 * slope) / diff;
+        return (diff / 2) * Math.tanh(a * val) + ((ceil + floor) / 2);
+    }
+
+    /**
+     * The logistic function given an upper and lower limit and slope for a
+     * particular value.
+     *
+     * @param val the input to the logistic function
+     * @param ceil the desired maximum value (upper boundary) of logistic
+     * @param floor the desired minimum value (lower boundary) of logistic
+     * @param slope the desired slope of the logistic function for val == 0
+     * @return the value of val after being passed through a logistic function
+     *         with these parameters
+     */
+    public static double logistic(double val, double ceil, double floor,
+                                  double slope) {
+        double diff = ceil - floor;
+        return diff * logisticFunc(slope * val / diff) + floor;
+    }
+
+    /**
+     * Returns the standard logistic. Helper method so that the full logistic
+     * function doesn't have to be written out every time it's invoked.
+     *
+     * @param x input argument
+     * @return result of logistic
+     */
+    private static double logisticFunc(double x) {
+        return 1 / (1 + Math.exp(-x));
+    }
+
+    /**
+     * The arctan function given an upper and lower limit and slope for a
+     * particular value.
+     *
+     * @param val the input to the arctan function
+     * @param ceil the desired maximum value (upper boundary) of arctan
+     * @param floor the desired minimum value (lower boundary) of arctan
+     * @param slope the desired slope of the arctan function for val == 0
+     * @return the value of val after being passed through a arctan function
+     *         with these parameters
+     */
+    public static double atan(double val, double ceil, double floor,
+                              double slope) {
+        double diff = ceil - floor;
+        double a = (Math.PI * slope) / diff;
+        return (diff / Math.PI) * Math.atan(a * val) + ((ceil + floor) / 2);
+    }
+
+    /*
+     * ****************************************************************
+     * _____________________Inverse Functions ________________________*
+     * ****************************************************************
+     */
+
+    /**
+     * The inverse hyperbolic tangent given an upper and lower limit and slope
+     * for a particular value for the hyperbolic tangent before being inverted.
+     *
+     * @param val the input to the inverse tanh function
+     * @param ceil the desired maximum value (upper boundary) of the tanh
+     *            function that this is an inverse of
+     * @param floor the desired minimum value (lower boundary) of the tanh
+     *            function that this is an inverse of
+     * @param slope the desired slope of the tanh function function that this is
+     *            an inverse of for val == 0
+     * @return the value of val after being passed through the inverse tanh
+     *         function with these parameters
+     */
+    public static double invTanh(double val, double ceil, double floor,
+                                 double slope) {
+        double z = 0.5 * (((val - floor) / (ceil - floor)) - 0.5);
+        return (Math.log((1 + z)) / (1 - z));
+    }
+
+    /**
+     * Returns the results of the inverse of the standard sigmoidal (logistic)
+     * function.
+     *
+     * @param val the input to the inverse logistic function
+     * @param ceil the desired maximum value (upper boundary) of the logistic
+     *            function that this is an inverse of
+     * @param floor the desired minimum value (lower boundary) of the logistic
+     *            function that this is an inverse of
+     * @param slope the desired slope of the logistic function function that
+     *            this is an inverse of for val == 0
+     * @return the value of val after being passed through the inverse logistic
+     *         function with these parameters.
+     */
+    public static double invLogistic(double val, double ceil, double floor,
+                                     double slope) {
+        double diff = ceil - floor;
+        return diff * -Math.log(diff / (val - floor) - 1) / slope;
+    }
+
+    /**
+     * Returns the result of the inverse arctangent or tangent function.
+     *
+     * @param val the input to the inverse arctan (tan) function
+     * @param ceil the desired maximum value (upper boundary) of the arctan
+     *            function that this is an inverse of
+     * @param floor the desired minimum value (lower boundary) of the arctan
+     *            function that this is an inverse of
+     * @param slope the desired slope of the arctan function function that this
+     *            is an inverse of for val == 0
+     * @return the value of val after being passed through the inverse arctan
+     *         function with these parameters
+     */
+    public static double invAtan(double val, double ceil, double floor,
+                                 double slope) {
+        double a = (Math.PI * slope) / (ceil - floor);
+        double diff = ceil - floor;
+        double z = ((val - ((ceil + floor) / 2)) * (Math.PI / diff));
+        return Math.tan(z) / a;
+    }
+
+    /*
+     * ****************************************************************
+     * _____________________Derivative Functions _____________________*
+     * ****************************************************************
+     */
+
+    /**
+     * The derivative of the hyperbolic tangent given the original function's
+     * upper and lower bounds, and slope for a given value.
+     *
+     * @param val the input to the derivative of the tanh function
+     * @param ceil the desired maximum value (upper boundary) of the tanh
+     *            function that this is the derivative of
+     * @param floor the desired minimum value (lower boundary) of the tanh
+     */
+        double diff = ceil - floor;
+    /**
+     *         logistic function with these parameters.
+
+    /**
+        double diff = ceil - floor;
     public static String[] names() {
         SquashingFunction[] states = values();
         String[] names = new String[states.length - 1];
@@ -358,26 +427,13 @@ public enum SquashingFunction {
         return names;
     }
 
-    /**
-     * Helper function to make it easy to go from integer index to Squashing
-     * function (so that choiceboxes can interact with this).
-     * 
-     * @param index integer index
-     * @return the associated squashing function
-     */
     public static SquashingFunction getFunctionFromIndex(int index) {
         return SquashingFunction.values()[index];
     }
-    
-    /**
-     * Another helper function for, in this case, going from functions
-     * to indices.
-     *
-     * @param function the Squashing Function who index is sought
-     * @return the index of that function
-     */
+
     public static int getIndexFromFunction(SquashingFunction function) {
         return function.ordinal();
     }
+
 
 }

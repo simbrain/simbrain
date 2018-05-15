@@ -32,9 +32,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
@@ -265,13 +263,14 @@ public class WorkspaceActionManager {
     }
 
     /**
-     * Make a list of script actions by iterating through script menu directory.
+     * Make a list of script actions by iterating through script menu
+     * directory.
      *
      * @param desktop workspace reference
      * @return script action
      */
-    public List<Action> getScriptActions(final SimbrainDesktop desktop) {
-        ArrayList<Action> list = new ArrayList<Action>();
+    public List<ScriptAction> getScriptActions(final SimbrainDesktop desktop) {
+        ArrayList<ScriptAction> list = new ArrayList();
         File dir = new File(SCRIPT_MENU_DIRECTORY);
         if (!dir.isDirectory()) {
             return null; // Throw exception instead?
@@ -286,6 +285,7 @@ public class WorkspaceActionManager {
                 list.add(new ScriptAction(desktop, file.getName()));
             }
         }
+        Collections.sort(list);
         return list;
     }
 
@@ -367,7 +367,7 @@ public class WorkspaceActionManager {
     /**
      * Create an action based on the name of a script.
      */
-    static class ScriptAction extends WorkspaceAction {
+    public final class ScriptAction extends WorkspaceAction implements Comparable<ScriptAction> {
 
         /**
          * Name of script for use in actions (e.g. menu items).
@@ -390,7 +390,8 @@ public class WorkspaceActionManager {
          * @param desktop    Simbrain desktop
          * @param scriptName name of script
          */
-        public ScriptAction(final SimbrainDesktop desktop, final String scriptName) {
+        public ScriptAction(final SimbrainDesktop desktop,
+                            final String scriptName) {
             super(scriptName, desktop.getWorkspace());
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = scriptName;
@@ -420,6 +421,11 @@ public class WorkspaceActionManager {
                 System.out.println("Evaluation error");
                 e.printStackTrace();
             }
+        }
+
+        @Override
+        public int compareTo(ScriptAction scriptAction) {
+            return this.scriptName.toLowerCase().compareTo(scriptAction.scriptName.toLowerCase());
         }
     }
 

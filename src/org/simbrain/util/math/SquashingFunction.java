@@ -410,13 +410,61 @@ public enum SquashingFunction {
      * @param ceil the desired maximum value (upper boundary) of the tanh
      *            function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the tanh
+     *            function that this is the derivative of
+     * @param slope the desired slope of the tanh function function that this is
+     *            the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         tanh function with these parameters
      */
+    public static double derivTanh(double val, double ceil, double floor,
+                                   double slope) {
         double diff = ceil - floor;
-    /**
-     *         logistic function with these parameters.
+        double a = (2 * slope) / diff;
+        return diff / 2 * a * Math.pow(1 / Math.cosh(a * val), 2);
+    }
 
     /**
+     * The derivative of the logistic function given the original function's
+     * upper and lower bounds, and slope for a given value.
+     *
+     * @param val the input to the derivative of the logistic function
+     * @param ceil the desired maximum value (upper boundary) of the logistic
+     *            function that this is the derivative of
+     * @param floor the desired minimum value (lower boundary) of the logistic
+     *            function that this is the derivative of
+     * @param slope the desired slope of the logistic function function that
+     *            this is the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         logistic function with these parameters.
+     */
+    public static double derivLogistic(double val, double ceil, double floor,
+                                       double slope) {
         double diff = ceil - floor;
+        return slope * logisticFunc(slope * val / diff)
+            * (1 - logisticFunc(slope * val / diff));
+    }
+
+    /**
+     * The derivative of the arc tangent given the original function's upper and
+     * lower bounds, and slope for a given value.
+     *
+     * @param val the input to the derivative of arctan (tan) function
+     * @param ceil the desired maximum value (upper boundary) of the arctan
+     *            function that this is the derivative of
+     * @param floor the desired minimum value (lower boundary) of the arctan
+     *            function that this is the derivative of
+     * @param slope the desired slope of the arctan function function that this
+     *            is the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         arctan function with these parameters
+     */
+    public static double derivAtan(double val, double ceil, double floor,
+                                   double slope) {
+        double diff = ceil - floor;
+        double a = (Math.PI * slope) / diff;
+        return a * (diff / Math.PI) * (1 / (1 + Math.pow(a * val, 2)));
+    }
+
     public static String[] names() {
         SquashingFunction[] states = values();
         String[] names = new String[states.length - 1];

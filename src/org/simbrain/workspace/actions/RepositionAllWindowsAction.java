@@ -56,8 +56,8 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
     public void actionPerformed(final ActionEvent event) {
         int maxX = 0;
         int maxY = 0;
-        double desktopHeight = desktop.getFrame().getSize().getHeight();
-        double desktopWidth = desktop.getFrame().getSize().getWidth();
+        double desktopHeight = desktop.getDesktop().getSize().getHeight();
+        double desktopWidth = desktop.getDesktop().getSize().getWidth();
 
         for (Component c : desktop.getDesktop().getComponents()) {
             int bottomRightX = (int) (c.getWidth() + c.getX());

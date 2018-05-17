@@ -604,6 +604,7 @@ public class SimbrainDesktop {
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(actionManager.getPropertyTabAction());
         viewMenu.addSeparator();
+        viewMenu.add(new JMenuItem(actionManager.getResizeAllWindowsAction()));
         viewMenu.add(new JMenuItem(actionManager.getRepositionAllWindowsAction()));
         return viewMenu;
     }
@@ -1268,4 +1269,58 @@ public class SimbrainDesktop {
         return desktop;
     }
 
+    /**
+     * Position a component given an index. Lays out components in a pattern
+     * moving diagonally and downward across the desktop.
+     *
+     * Note that this is overridden when individual components are opened.
+     *
+     * @param positionIndex
+     * @param guiComponent
+     */
+    public void positionComponent(int positionIndex,
+                                  GuiComponent<?> guiComponent) {
+
+        // TODO: Some better logic that detects whether some existing slot is
+        // open would be nice, but this does well enough for now...
+
+        if (positionIndex == 0) {
+            // If this is the first window at it at a default position
+            guiComponent.getParentFrame().setBounds(DEFAULT_WINDOW_OFFSET,
+                DEFAULT_WINDOW_OFFSET,
+                (int) guiComponent.getPreferredSize().getWidth(),
+                (int) guiComponent.getPreferredSize().getHeight());
+        } else {
+            // Add window below the current window at a slight offent
+            guiComponent.getParentFrame().setBounds(
+                (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
+                    % (desktop.getWidth() - guiComponent
+                    .getPreferredSize().getWidth())),
+                (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
+                    % (desktop.getHeight() - guiComponent
+                    .getPreferredSize().getHeight())),
+                (int) guiComponent.getPreferredSize().getWidth(),
+                (int) guiComponent.getPreferredSize().getHeight());
+            // Focus the last positioned frame to have the focus
+            try {
+                ((JInternalFrame) guiComponent.getParentFrame())
+                    .setSelected(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * Reposition all the windows. Useful when windows get resized and can't be
+     * "recaptured".
+     */
+    public void repositionAllWindows() {
+        // TODO: Do this for non-component internal frames as well?
+        int i = 0;
+        for (GuiComponent<?> component : getDesktopComponents()) {
+            positionComponent(i++, component);
+        }
+    }
 }

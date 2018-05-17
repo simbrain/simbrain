@@ -147,6 +147,11 @@ public class WorkspaceActionManager {
     private final Action repositionAllWindowsAction;
 
     /**
+     * Resize windows action.
+     */
+    private final Action resizeAllWindowsAction;
+
+    /**
      * List of actions which create charts.
      */
     private List<Action> newChartActions;
@@ -220,7 +225,7 @@ public class WorkspaceActionManager {
         propertyTabAction = new PropertyTabAction(desktop);
 
         repositionAllWindowsAction = new RepositionAllWindowsAction(desktop);
-
+        resizeAllWindowsAction= new ResizeAllWindowsAction(desktop);
     }
 
     /**
@@ -354,6 +359,9 @@ public class WorkspaceActionManager {
 
     public Action getRepositionAllWindowsAction() {
         return repositionAllWindowsAction;
+    }
+    public Action getResizeAllWindowsAction() {
+        return resizeAllWindowsAction;
     }
 
     /**

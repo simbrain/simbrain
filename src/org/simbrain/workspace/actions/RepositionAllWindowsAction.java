@@ -38,7 +38,7 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
 
     /**
      * Construct the action.
-     * 
+     *
      * @param desktop
      */
     public RepositionAllWindowsAction(final SimbrainDesktop desktop) {

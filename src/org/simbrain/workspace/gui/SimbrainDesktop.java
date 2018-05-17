@@ -673,7 +673,9 @@ public class SimbrainDesktop {
         viewMenu.add(actionManager.getPropertyTabAction());
         viewMenu.addSeparator();
         viewMenu.add(
-                new JMenuItem(actionManager.getRepositionAllWindowsAction()));
+            new JMenuItem(actionManager.getResizeAllWindowsAction()));
+        viewMenu.add(
+            new JMenuItem(actionManager.getRepositionAllWindowsAction()));
         return viewMenu;
     }
 

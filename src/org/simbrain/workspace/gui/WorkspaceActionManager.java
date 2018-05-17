@@ -239,6 +239,11 @@ public class WorkspaceActionManager {
     private final Action repositionAllWindowsAction;
 
     /**
+     * Resize windows action.
+     */
+    private final Action resizeAllWindowsAction;
+
+    /**
      * Location of script menu directory.
      */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
@@ -301,6 +306,7 @@ public class WorkspaceActionManager {
         propertyTabAction = new PropertyTabAction(desktop);
 
         repositionAllWindowsAction = new RepositionAllWindowsAction(desktop);
+        resizeAllWindowsAction= new ResizeAllWindowsAction(desktop);
 
     }
 
@@ -650,6 +656,13 @@ public class WorkspaceActionManager {
      */
     public Action getRepositionAllWindowsAction() {
         return repositionAllWindowsAction;
+    }
+
+    /**
+     * @return the resizeAllWindowsAction
+     */
+    public Action getResizeAllWindowsAction() {
+        return resizeAllWindowsAction;
     }
 
 }

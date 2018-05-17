@@ -36,43 +36,43 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Swing component that manages editing the types of a collection of objects,
- * where those objects have a field whose value can be objects of a variety of
- * specific types. The types are displayed using a combo-box and an {@link
- * AnnotatedPropertyEditor} sub panel for editing the objects themselves.  This
- * editor can be revealed using a drop-down triangle. Examples:
+ * Panel for editing the type of a set of objects with a drop-down, and for
+ * editing the properties of that type based on annotations (with an {@link
+ * AnnotatedPropertyEditor}). The top of the panel has the dropdown, and the
+ * main panel has the property editor. For example, the update rule (Linear,
+ * Binary, etc) associated with a set of neurons can be selected using the
+ * dropdown, and then the properties of that rule (e.g the Linear Rule) can be
+ * edited using the property editor.
  * <p>
- * Neuron.neuronUpdateRule --> Linear, Integrateandfire, etc.
+ * The value of this is that all the headaches for dealing with inconsistent
+ * states are managed by this class.  The interface is also pretty simple and
+ * clean. Finally, the internal property editor can itself contain
+ * ObjectTypeEditor, so that we can edit some fairly complex objects using this
+ * widget.
  * <p>
- * Synapse.learningRule --> Static, Hebbian,...
+ * If the objects being edited are in a consistent state then they can be edited
+ * directly with the annotated property editor.
  * <p>
- * Synapse.spikeResponder --> JumpAndDecay
+ * If the objects are in an inconsistent state (e.g. some neurons are linear,
+ * some are Decay), then a "..." appears in the combo box and no editor panel is
+ * displayed. If at this point "ok" is pressed, then nothing is written to the
+ * objects. If the dropdown box is changed the default values for the new type
+ * are shown, and pressing "ok" then writes those values to every object being
+ * edited.
  * <p>
- * ProbabilityDistribution --> Uniform, Normal,...
+ * To use this class:
+ * <ul>
+ * <li>Designate the relevant type of object (e.g. NeuronUpdateRule,
+ * LearningRule, etc.) as a {@link
+ * CopyableObject}</li>
+ * <li>Annotate the object field (e.g. Neuron.neuronUpdateRule) using the
+ * {@link
+ * org.simbrain.util.UserParameter} annotation, with "multi-state" set to
+ * true.</li>
+ * <li> Embed the object itself in a higher level AnnotatedPropertyEditor.</li>
+ * </ul>
+ *
  * <p>
- * When loading the editor, if the objects are in in a consistent state then
- * they can be edited as usual with an annotated property editor. If they are in
- * an inconsistent state (e.g. some neurons are linear, some are Decay), then a
- * "..." appears in the combo box and no editor panel is displayed. If "ok" is
- * pressed at this point nothing is written to the objects. If the combo box is
- * changed at any point the default values for the new type are shown, and
- * pressing ok writes those values to every object being edited.
- * <p>
- * HOW TO USE IT. To use this class (1) be sure designate the relevant type
- * superclass (e.g. NeuronUpdateRule, LearningRule, etc.) as a {@link
- * CopyableObject}, and (2) annotate the field itself (e.g.
- * Neuron.neuronUpdateRule) using the {@link org.simbrain.util.UserParameter}
- * annotation with "multi-state" set to true. Then (3) use it as part of a
- * higher level AnnotatedPropertyEditor.
- * <p>
- * The ObjectTypeEditor can be used on its own but is currently written to be
- * used inside a a higher level {@link AnnotatedPropertyEditor} as the widget
- * created by {@link org.simbrain.util.widgets.ParameterWidget} for fields with
- * the {@link org.simbrain.util.UserParameter} annotation with "multi-state" set
- * to true.  So the ObjecTypeEditor is both inside an AnnotatedPropertyEditor
- * and has one as a field, allowing for hierarchies of editors within one
- * another (e.g. editing a neuron's update rule, and within that, its noise
- * generator).
  */
 public class ObjectTypeEditor extends JComponent {
 
@@ -391,8 +391,9 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * Helper to sync the prototype object to the current {@link AnnotatedPropertyEditor}
-     * (whose state may have been set before the object was created).
+     * Helper to sync the prototype object to the current {@link
+     * AnnotatedPropertyEditor} (whose state may have been set before the object
+     * was created).
      */
     public void syncPrototype() {
         editorPanel.commitChanges(Arrays.asList(prototypeObject));

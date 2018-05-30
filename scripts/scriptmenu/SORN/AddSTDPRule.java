@@ -12,7 +12,7 @@ public class AddSTDPRule extends STDPRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "STDP";
     }
 

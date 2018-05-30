@@ -28,6 +28,8 @@ package org.simbrain.workspace.gui;
  * This software is in the public domain.
  */
 
+import org.simbrain.resource.ResourceManager;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -108,6 +110,7 @@ public final class SplashWindow extends Window {
 
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
+        setIconImage(ResourceManager.getImage("simbrain-icon.png"));
 
         // Users shall be able to close the splash window by
         // clicking on its display area. This mouse listener

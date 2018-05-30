@@ -23,7 +23,6 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -41,7 +40,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     private static final int MAX_DIGITS = 9;
 
     //TODO: This field is temporary, and is being used for now to test the ObjectType editor.
-    @UserParameter(label = "Randomizer", isMultiState = true,
+    @UserParameter(label = "Randomizer", isObjectType = true,
         typeMapClass = "org.simbrain.util.randomizer.gui.RandomizerPanel2",
         typeMapMethod = "getTypeMap", order = 1000)
     private ProbabilityDistribution randomizer = new NormalDistribution();

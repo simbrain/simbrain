@@ -129,7 +129,7 @@ public class AnnotatedPropertyEditor extends JPanel {
 
         for (Parameter param : Parameter.getParameters(editedObjects.get(0).getClass())) {
 
-            if (param.isMultiState()) {
+            if (param.isObjectType()) {
 
                 // ObjectTypeEditors require special initialization
 
@@ -142,10 +142,6 @@ public class AnnotatedPropertyEditor extends JPanel {
 
                 ParameterWidget pw = new ParameterWidget(param, objectList);
 
-
-//                // Use this list of objects to complete the initalization of the
-//                // ObjectTypeEditor.
-//                ((ObjectTypeEditor) pw.component).setObjects(subList);
                 widgets.add(pw);
             } else {
                 ParameterWidget pw = new ParameterWidget(param);
@@ -157,7 +153,7 @@ public class AnnotatedPropertyEditor extends JPanel {
         // Add parameter widgets after collecting list of params so they're in
         // the right order.
         for (ParameterWidget pw : widgets) {
-            if (pw.parameter.isMultiState()) {
+            if (pw.parameter.isObjectType()) {
                 itemPanel.addSpanningItem(pw.component);
             } else {
                 JLabel label = new JLabel(pw.parameter.annotation.label());
@@ -200,30 +196,19 @@ public class AnnotatedPropertyEditor extends JPanel {
             return;
         }
 
-//        if (!checkTypes(objectList)) {
-//            // TODO: Without this, can't change randomizers, but CAN change neuron type.
-//            // This is a HACK to get it to work...
-//            for (ParameterWidget pw : widgets) {
-//                if (pw.parameter.isMultiState()) {
-//                    ((ObjectTypeEditor) pw.component).setNull();
-//                }
-//            }
-//            return;
-//        }
-
         // Check to see if the field values are consistent over all given
         // instances.
         for (ParameterWidget pw : widgets) {
 
             Object refValue = pw.parameter.getFieldValue(objectList.get(0));
-            if (pw.parameter.isMultiState()) {
+            if (pw.parameter.isObjectType()) {
                 refValue = refValue.getClass();
             }
 
             for (int i = 1; i < objectList.size(); i++) {
                 Object obj = objectList.get(i);
                 Object objValue = pw.parameter.getFieldValue(obj);
-                if (pw.parameter.isMultiState()) {
+                if (pw.parameter.isObjectType()) {
                     objValue = objValue.getClass();
                 }
                 // System.out.println("ref value:" + refValue + " == object value:" + objValue + "\n");
@@ -241,7 +226,7 @@ public class AnnotatedPropertyEditor extends JPanel {
                 pw.setWidgetValue(null);
             } else {
                 pw.setWidgetValue(refValue);
-                if (pw.parameter.isMultiState()) {
+                if (pw.parameter.isObjectType()) {
                     ((ObjectTypeEditor) pw.component).fillFieldValues();
                 }
 
@@ -312,7 +297,7 @@ public class AnnotatedPropertyEditor extends JPanel {
                 break;
             }
 
-            if (pw.parameter.isMultiState()) {
+            if (pw.parameter.isObjectType()) {
 
                 ((ObjectTypeEditor) pw.component).commitChanges();
 

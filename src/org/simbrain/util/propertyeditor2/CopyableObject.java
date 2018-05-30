@@ -13,8 +13,7 @@ import java.util.HashMap;
 public interface CopyableObject extends EditableObject {
 
     /**
-     * Return a deep copy of this object. Used when resetting the "state" of
-     * the multi-state field.
+     * Return a deep copy of this object.
      *
      * @return a copy of the object.
      */

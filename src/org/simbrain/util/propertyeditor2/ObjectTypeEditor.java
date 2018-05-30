@@ -65,7 +65,7 @@ import java.util.List;
  * <li>Designate the relevant type of object (e.g. NeuronUpdateRule,
  * LearningRule, etc.) as a {@link CopyableObject}</li>
  * <li>Annotate the object field (e.g. Neuron.neuronUpdateRule) using the
- * {@link org.simbrain.util.UserParameter} annotation, with "multi-state" set to
+ * {@link org.simbrain.util.UserParameter} annotation, with "objectType" set to
  * true.</li>
  * <li> Embed the object itself in a higher level AnnotatedPropertyEditor.</li>
  * </ul>

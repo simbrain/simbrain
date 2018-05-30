@@ -18,8 +18,6 @@
  */
 package org.simbrain.util;
 
-import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -59,10 +57,11 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Returns true if this is an annotation for a multi-state object.
+     * Returns true if this is an annotation for an object type field to
+     * be edited by an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
      */
-    public boolean isMultiState() {
-        return annotation.isMultiState();
+    public boolean isObjectType() {
+        return annotation.isObjectType();
     }
 
     /**

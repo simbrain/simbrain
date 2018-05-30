@@ -93,21 +93,21 @@ public @interface UserParameter {
     int order() default 0;
 
     /**
-     * Whether the parameter represents a multi-state object to be edited by
+     * Whether the parameter represents an object to be edited by
      * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
      */
-    boolean isMultiState() default false;
+    boolean isObjectType() default false;
 
     /**
-     * String reference to the class holding the type map for a multi-state object,
+     * String reference to the class holding the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
      * e.g. "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel".
      *
-     * @return the string path to the classss
+     * @return the string path to the class
      */
     String typeMapClass() default "";
 
     /**
-     * Method name for static method returning the type map for a multi-state object,
+     * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
      * e.g. "getTypeMap".
      *
      * @return the string method name

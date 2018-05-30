@@ -25,10 +25,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -65,7 +62,7 @@ public class Neuron implements EditableObject {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", isMultiState = true,
+    @UserParameter(label = "Update Rule", isObjectType = true,
         typeMapClass = "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel",
         typeMapMethod = "getTypeMap")
     private NeuronUpdateRule updateRule;

@@ -18,15 +18,12 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
-import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,7 +78,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     protected JComponent makeWidget() {
 
-        if (parameter.isMultiState()) {
+        if (parameter.isObjectType()) {
                 return ObjectTypeEditor.createEditor(editedObjects, parameter.getTypeMap(), parameter.annotation.label());
         }
 
@@ -175,7 +172,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         } else if (parameter.isNumeric()) {
             ((JNumberSpinnerWithNull) component).setValue(value);
-        } else if (parameter.annotation.isMultiState()) {
+        } else if (parameter.annotation.isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
         } else {
             ((JTextField) component).setText(value == null ? "" : value.toString());
@@ -192,7 +189,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.isNumeric()) {
             return ((JNumberSpinnerWithNull) component).getValue();
         }
-        if (parameter.annotation.isMultiState()) {
+        if (parameter.annotation.isObjectType()) {
             return ((ObjectTypeEditor)component).getValue();
         }
 

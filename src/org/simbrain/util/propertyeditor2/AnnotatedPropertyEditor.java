@@ -43,9 +43,11 @@ import java.util.List;
  * <p>
  * To use simply initialize with a single object or list of objects to edit,
  * which contain the {@link UserParameter} annotation. When ready to write the
- * values of the panel to the underlying objects call commitChanges. The class
- * can also be used in a kind of "apply" mode: the editor values can be used to
- * set the values of a set of compatible objects using fillFieldValues(List<EditableObject>).
+ * values of the panel to the underlying objects call commitChanges.
+ * <p>
+ * The class can also be used in "apply" mode: the editor values can be used to
+ * set the values of a set of compatible objects using fillFieldValues(List<EditableObject>)
+ * and commitChanges(List<EditableObject>)
  * <p>
  * You can also use the editor to build a more customized panel but using the
  * property editor as a holder that can then return JComponents for specific
@@ -106,8 +108,8 @@ public class AnnotatedPropertyEditor extends JPanel {
     }
 
     /**
-     * Initialize the editor. Use the first editable object in the object list to
-     * initialize a set of widgets (JComponents) for editing, based on their
+     * Initialize the editor. Use the first editable object in the object list
+     * to initialize a set of widgets (JComponents) for editing, based on their
      * classes.
      */
     protected void initPanel() {
@@ -126,24 +128,30 @@ public class AnnotatedPropertyEditor extends JPanel {
         widgets = new TreeSet<>();
 
         for (Parameter param : Parameter.getParameters(editedObjects.get(0).getClass())) {
-            //System.out.println("-->" + param.annotation.label());
-            ParameterWidget pw = new ParameterWidget(param);
 
-            if (pw.parameter.isMultiState()) {
+            if (param.isMultiState()) {
+
                 // ObjectTypeEditors require special initialization
 
                 // Create a list of objects corresponding to the field associated with the parameter
                 // E.g. a list of neuronupdaterules objects within a list of neuron objects
-                List subList = new ArrayList();
+                List objectList = new ArrayList();
                 for (Object o : editedObjects) {
-                    subList.add(param.getFieldValue(o));
+                    objectList.add(param.getFieldValue(o));
                 }
-                // Use this list of objects to complete the initalization of the
-                // ObjectTypeEditor.
-                ((ObjectTypeEditor) pw.component).setObjects(subList);
+
+                ParameterWidget pw = new ParameterWidget(param, objectList);
+
+
+//                // Use this list of objects to complete the initalization of the
+//                // ObjectTypeEditor.
+//                ((ObjectTypeEditor) pw.component).setObjects(subList);
+                widgets.add(pw);
+            } else {
+                ParameterWidget pw = new ParameterWidget(param);
+                widgets.add(pw);
             }
 
-            widgets.add(pw);
         }
 
         // Add parameter widgets after collecting list of params so they're in
@@ -177,11 +185,11 @@ public class AnnotatedPropertyEditor extends JPanel {
      * maintained by the dialog (and then used in conjunction with
      * commitChanges(list)).
      * <p>
-     * Check for consistency happens here. If the objects are inconsistent,
-     * a null value is set.
+     * Check for consistency happens here. If the objects are inconsistent, a
+     * null value is set.
      *
-     * @objectList the objects whose values should be set using this panel.
-     * All objects must be of the same type as the objects maintained by this
+     * @objectList the objects whose values should be set using this panel. All
+     * objects must be of the same type as the objects maintained by this
      * panel.
      */
     public void fillFieldValues(List<? extends EditableObject> objectList) {
@@ -192,16 +200,16 @@ public class AnnotatedPropertyEditor extends JPanel {
             return;
         }
 
-        if (!checkTypes(objectList)) {
-            // TODO: Without this, can't change randomizers, but CAN change neuron type.
-            // This is a HACK to get it to work...
-            for (ParameterWidget pw : widgets) {
-                if (pw.parameter.isMultiState()) {
-                    ((ObjectTypeEditor) pw.component).setNull();
-                }
-            }
-            return;
-        }
+//        if (!checkTypes(objectList)) {
+//            // TODO: Without this, can't change randomizers, but CAN change neuron type.
+//            // This is a HACK to get it to work...
+//            for (ParameterWidget pw : widgets) {
+//                if (pw.parameter.isMultiState()) {
+//                    ((ObjectTypeEditor) pw.component).setNull();
+//                }
+//            }
+//            return;
+//        }
 
         // Check to see if the field values are consistent over all given
         // instances.
@@ -255,8 +263,8 @@ public class AnnotatedPropertyEditor extends JPanel {
     // Also again we are not checking all to all, but all to one.
 
     /**
-     * Check whether objects are the same type as each other and as the
-     * objects maintained by the panel.
+     * Check whether objects are the same type as each other and as the objects
+     * maintained by the panel.
      */
     private boolean checkTypes(List<? extends EditableObject> objectsToCheck) {
         // Check that the objects given are of the same type
@@ -306,20 +314,17 @@ public class AnnotatedPropertyEditor extends JPanel {
 
             if (pw.parameter.isMultiState()) {
 
+                ((ObjectTypeEditor) pw.component).commitChanges();
+
+                // TODO: Can this be migrated to the object type editor?
                 // Only overrwrite objects if combo box has changed
-                if (((ObjectTypeEditor) pw.component).prototypeMode()) {
-
-                    // First need to sync the prototype object to widget
-                    ((ObjectTypeEditor) pw.component).syncPrototype();
-
+                if (((ObjectTypeEditor) pw.component).isPrototypeMode()) {
                     // Reset the types of all the objects to copies of the displayed object
                     for (EditableObject o : objectsToEdit) {
                         pw.parameter.setFieldValue(o, ((CopyableObject) widgetValue).copy());
                         // System.out.println("Rewriting object " + o + "," + widgetValue);
                     }
-
                 }
-                ((ObjectTypeEditor) pw.component).commitChanges();
                 continue;
             }
 
@@ -408,9 +413,9 @@ public class AnnotatedPropertyEditor extends JPanel {
     }
 
     /**
-     * Returns the widgets, which can then be used to populate custom panels,
-     * in which case the AnnotatedPropertyEditor is used as a container for
-     * holding field editors but editor itself is not displayed.
+     * Returns the widgets, which can then be used to populate custom panels, in
+     * which case the AnnotatedPropertyEditor is used as a container for holding
+     * field editors but editor itself is not displayed.
      *
      * @return the set of widgets representing user parameters
      */
@@ -419,8 +424,8 @@ public class AnnotatedPropertyEditor extends JPanel {
     }
 
     /**
-     * Returns a widget with a provided label, or null if none found. Used
-     * in building custom panels (see {@link #getWidgets()}).
+     * Returns a widget with a provided label, or null if none found. Used in
+     * building custom panels (see {@link #getWidgets()}).
      *
      * @param label the label to use for searching
      * @return matching widget, or null if none found

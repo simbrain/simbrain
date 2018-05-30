@@ -37,12 +37,12 @@ import java.util.List;
 
 /**
  * Panel for editing the type of a set of objects with a drop-down, and for
- * editing the properties of that type based on annotations (with an {@link
- * AnnotatedPropertyEditor}). The top of the panel has the dropdown, and the
- * main panel has the property editor. For example, the update rule (Linear,
- * Binary, etc) associated with a set of neurons can be selected using the
- * dropdown, and then the properties of that rule (e.g the Linear Rule) can be
- * edited using the property editor.
+ * editing the properties of an object of that type based on class annotations
+ * (with an {@link AnnotatedPropertyEditor}). The top of the panel has the
+ * dropdown, and the main panel has the property editor. For example, the update
+ * rule (Linear, Binary, etc) associated with a set of neurons can be selected
+ * using the dropdown, and then the properties of that rule (e.g the Linear
+ * Rule) can be edited using the property editor.
  * <p>
  * The value of this is that all the headaches for dealing with inconsistent
  * states are managed by this class.  The interface is also pretty simple and
@@ -63,11 +63,9 @@ import java.util.List;
  * To use this class:
  * <ul>
  * <li>Designate the relevant type of object (e.g. NeuronUpdateRule,
- * LearningRule, etc.) as a {@link
- * CopyableObject}</li>
+ * LearningRule, etc.) as a {@link CopyableObject}</li>
  * <li>Annotate the object field (e.g. Neuron.neuronUpdateRule) using the
- * {@link
- * org.simbrain.util.UserParameter} annotation, with "multi-state" set to
+ * {@link org.simbrain.util.UserParameter} annotation, with "multi-state" set to
  * true.</li>
  * <li> Embed the object itself in a higher level AnnotatedPropertyEditor.</li>
  * </ul>
@@ -77,24 +75,18 @@ import java.util.List;
 public class ObjectTypeEditor extends JComponent {
 
     /**
-     * The main collection of objects being edited
+     * The main collection of objects being edited.
      */
     private List<CopyableObject> objectList;
 
     /**
-     * The prototype object that is used to set the values of the object list
-     * whe committing.
-     */
-    private CopyableObject prototypeObject;
-
-    /**
-     * The possible types of this object
+     * The possible types of this object.
      */
     private JComboBox<String> cbObjectType;
 
     /**
      * Editor panel for the set of objects (null panel if they are
-     * inconsistent)
+     * inconsistent).
      */
     private AnnotatedPropertyEditor editorPanel;
 
@@ -104,12 +96,12 @@ public class ObjectTypeEditor extends JComponent {
     private BiMap<String, Class> typeMap;
 
     /**
-     * Label for border around editor
+     * Label for border around editor.
      */
     private String label;
 
     /**
-     * For showing/hiding the property editor
+     * For showing/hiding the property editor.
      */
     private DropDownTriangle detailTriangle;
 
@@ -131,31 +123,33 @@ public class ObjectTypeEditor extends JComponent {
     private JPanel editorPanelContainer;
 
     /**
-     * Used to track whether the combo box has changed
+     * Initial state of the combo box.
      */
-    private Object cbStartState;
+    private String cbStartState;
 
     /**
-     * Create the editor with a type map, but no list of objects yet.  The
-     * editor is uninitalized!
+     * The prototype object that is used to set the values of the object list
+     * whe committing.
+     */
+    private CopyableObject prototypeObject;
+
+    /**
+     * If true, when closing the dialog and calling {@link #commitChanges()}, a
+     * prototype object, which is also a {@link CopyableObject}, is used to set
+     * the types of all objects in edited list.
+     */
+    private boolean prototypeMode = false;
+
+    /**
+     * Create the editor.
      *
-     * @param tm    type map
-     * @param label label to use for display
+     * @param objects the objects to edit
+     * @param tm      type map
+     * @param label   label to use for display
      * @return the editor object
      */
-    public static ObjectTypeEditor createUninitializedEditor(BiMap<String, Class> tm, String label) {
-        return new ObjectTypeEditor(tm, label);
-    }
-
-    /**
-     * Create the editor in an uninitalized state using only the type map.
-     * Assumes objects will be loaded using the setObjects method.
-     *
-     * @param typeMap the type map
-     */
-    private ObjectTypeEditor(BiMap<String, Class> typeMap, String label) {
-        this.typeMap = typeMap;
-        this.label = label;
+    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, BiMap<String, Class> tm, String label) {
+        return new ObjectTypeEditor(objects, tm, label, null);
     }
 
     /**
@@ -166,31 +160,24 @@ public class ObjectTypeEditor extends JComponent {
      * @param typeMap    the mapping from strings to types
      * @param parent     the parent window
      */
-    private ObjectTypeEditor(List objectList, BiMap<String, Class> typeMap, Window parent) {
-        this.objectList = objectList;
-        this.parent = parent;
-        this.typeMap = typeMap;
-        setObjects(objectList);
-    }
-
-    /**
-     * Initialize the editor with a list of objects.
-     *
-     * @param objects the list of objects to edit
-     */
-    public void setObjects(List<CopyableObject> objects) {
-        this.objectList = objects;
+    private ObjectTypeEditor(List objectList, BiMap<String, Class> typeMap, String label, Window parent) {
         if (objectList.isEmpty()) {
             throw new IllegalStateException("Can't edit empty list of objects");
         }
-        //TODO: Feels redundant with check in APE.fillFieldValues. Can this check be ommitted?
+        this.objectList = objectList;
+        this.parent = parent;
+        this.label = label;
+        this.typeMap = typeMap;
         boolean consistent = objectList.stream().allMatch(o -> o.getClass() == objectList.get(0).getClass());
         if (!consistent) {
+            cbStartState = SimbrainConstants.NULL_STRING;
             editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
         } else {
+            cbStartState = typeMap.getInverse(objectList.get(0).getClass());
             editorPanel = new AnnotatedPropertyEditor(objectList);
         }
         layoutPanel();
+
     }
 
     /**
@@ -216,6 +203,11 @@ public class ObjectTypeEditor extends JComponent {
         cbObjectType = new JComboBox<String>();
         for (String label : typeMap.keySet()) {
             cbObjectType.addItem(label);
+        }
+        if (cbStartState == SimbrainConstants.NULL_STRING) {
+            setNull();
+        } else  {
+            cbObjectType.setSelectedItem(cbStartState);
         }
         topPanel.add(cbObjectType);
         addDropDownListener();
@@ -245,7 +237,7 @@ public class ObjectTypeEditor extends JComponent {
         editorPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         editorPanel.setBorder(padding);
         editorPanelContainer.add(editorPanel);
-
+        editorPanel.setVisible(detailTriangle.isDown());
     }
 
     /**
@@ -256,31 +248,12 @@ public class ObjectTypeEditor extends JComponent {
         editorPanel.fillFieldValues(objectList);
     }
 
-    //TODO: Methods below are confusing / states of this dialog should be made more clear.
-    // They are called once at startup (which "changes" the combo box, which in turn
-    // makes it hard to track "first change" to combo box).  But then can also be
-    // called at other times too, so they can't be assumed to just be for initialization.
-
-    /**
-     * Set the current object type being edited, and update the property editor
-     * accordingly. (Editing a consistent set of objects).
-     * <p>
-     * Should only be called once.
-     *
-     * @param object current object value
-     */
-    public void setValue(Object object) {
-        cbObjectType.setSelectedItem(typeMap.getInverse((Class) object));
-        cbStartState = cbObjectType.getSelectedItem();
-        resetStuff();
-    }
-
     /**
      * Set the editor to a null state (editing an inconsistent set of objects)
      * <p>
      * Should only be called once.
      */
-    public void setNull() {
+    private void setNull() {
         cbObjectType.removeAllItems();
         cbObjectType.addItem(SimbrainConstants.NULL_STRING);
         for (String label : typeMap.keySet()) {
@@ -288,55 +261,22 @@ public class ObjectTypeEditor extends JComponent {
         }
         cbObjectType.setSelectedIndex(0);
         cbObjectType.repaint();
-        Object cbStartState = cbObjectType.getSelectedItem();
-        editorPanelContainer.removeAll(); // TODO More hacking
-        resetStuff();
     }
-
-    //TODO: besides the obviously bad name, this is managing some
-    // state information.
-    private void resetStuff() {
-        editorPanel.setVisible(detailTriangle.isDown());
-        prototypeObject = null; // This is needed for prototype mode to be correct
-    }
-
-    // TODO: This is used alongside start state to determine if the combo box
-    // has chnaged. There must be a less ugly way to do this.
-    private boolean neverChanged = true;
-
-    // TODO: Make sure the below is called just once per component.
 
     /**
      * Initialize the combo box to react to events.
      */
     private void addDropDownListener() {
-
         cbObjectType.addActionListener(e -> {
 
-            // Handle change logic.  We need to know when the drop down box is
-            // changed.  If it is not change there is no need to change the
-            // types of any objects when closing.
-            if (neverChanged) {
-                cbChanged = cbStartState != cbObjectType.getSelectedItem();
-                if (!cbChanged) {
-                    return;
-                }
-            }
-            neverChanged = false;
+            // As soon as the dropdown is changed once, it's in prototype mode. User
+            // should cancel to get out of it.
 
-            // TODO: The null string should not be around, so this should  not be
-            // needed.
-            if (cbObjectType.getSelectedItem() == SimbrainConstants.NULL_STRING) {
-                return;
-            }
+            prototypeMode = true;
 
-            // Create a prototype object and refresh editor panel
+            // Create the prototype object and refresh editor panel
             try {
                 Class proto = typeMap.get((String) cbObjectType.getSelectedItem());
-                // TODO: This shouldn't happen. Maybe remove and document any error that occurs.
-                if (proto == null) {
-                    return;
-                }
                 prototypeObject = (CopyableObject) proto.newInstance();
                 editorPanel = new AnnotatedPropertyEditor(prototypeObject);
                 editorPanelContainer.removeAll();
@@ -348,7 +288,7 @@ public class ObjectTypeEditor extends JComponent {
             // Can't go back to null once leaving it
             cbObjectType.removeItem(SimbrainConstants.NULL_STRING);
 
-            // TODO: Remove or at least simplify reliance on this utter crap
+            // TODO: Remove or at least simplify
             // Maybe move to some utility class.  Like Simbrain.pack().
             if (parent == null) {
                 parent = SwingUtilities.getWindowAncestor(this);
@@ -361,17 +301,6 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * If true,then the combo box now holds a prototype object which will be
-     * used to write the values of edited objects on close.
-     *
-     * @return true if in prototype mode, false otherwise
-     */
-    public boolean prototypeMode() {
-        // TODO: Bad using null for state?
-        return prototypeObject != null;
-    }
-
-    /**
      * The current value of this widget. It should be the object that can be
      * copied, or null.
      *
@@ -381,7 +310,7 @@ public class ObjectTypeEditor extends JComponent {
         if (cbObjectType.getSelectedItem() == SimbrainConstants.NULL_STRING) {
             return null;
         } else {
-            if (prototypeMode()) {
+            if (prototypeMode) {
                 return prototypeObject;
             } else {
                 return objectList.get(0);
@@ -391,31 +320,34 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * Helper to sync the prototype object to the current {@link
-     * AnnotatedPropertyEditor} (whose state may have been set before the object
-     * was created).
-     */
-    public void syncPrototype() {
-        editorPanel.commitChanges(Arrays.asList(prototypeObject));
-    }
-
-    /**
      * Commit any changes made.
      */
     public void commitChanges() {
 
-        //System.out.println("ObjectTypeEditor.commitChanges");
-        //System.out.println("Prototype Mode: " + prototypeMode());
+        if (cbObjectType.getSelectedItem() == SimbrainConstants.NULL_STRING) {
+            return;
+        }
+        if (prototypeMode) {
+            // Sync prototype object to editor panel
+            editorPanel.commitChanges(Arrays.asList(prototypeObject));
+            // TODO: The object type change happens in the ape. Not sure why it has to happen there
+            //for (EditableObject o : objectList) {
+            //    o = prototypeObject.copy();
+            //}
+        } else {
+            editorPanel.commitChanges(objectList);
+        }
 
-        editorPanel.commitChanges(objectList);
+    }
 
+    public boolean isPrototypeMode() {
+        return prototypeMode;
     }
 
     /**
      * Test main.
      */
     public static void main(String[] args) {
-
 
         //LinearRule rule = new LinearRule();
         //rule.setBias(.5);
@@ -427,7 +359,7 @@ public class ObjectTypeEditor extends JComponent {
         System.out.println(Arrays.asList(objectList));
 
         JFrame frame = new JFrame();
-        ObjectTypeEditor editor = new ObjectTypeEditor(objectList, NeuronPropertiesPanel.getTypeMap(), frame);
+        ObjectTypeEditor editor = new ObjectTypeEditor(objectList, NeuronPropertiesPanel.getTypeMap(), "test", frame);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent arg) {
                 System.out.println("After committ:");
@@ -441,6 +373,5 @@ public class ObjectTypeEditor extends JComponent {
         frame.setVisible(true);
         frame.pack();
     }
-
 
 }

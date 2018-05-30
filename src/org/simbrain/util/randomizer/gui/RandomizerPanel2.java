@@ -239,7 +239,7 @@ public class RandomizerPanel2 extends JPanel {
 
 
     /**
-     * Commit changes to randomizers
+     * Commit changes to randomizers.
      */
     public boolean commitChanges() {
         ProbabilityDistribution selectedDistribution =

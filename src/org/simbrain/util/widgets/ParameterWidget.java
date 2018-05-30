@@ -21,6 +21,7 @@ package org.simbrain.util.widgets;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
@@ -48,6 +49,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public final JComponent component;
 
     /**
+     * List of edited objects. Used in conjunction with {@link ObjectTypeEditor},
+     * which must be initialized with edited objects.
+     */
+    private List<CopyableObject> editedObjects;
+
+    /**
      * Construct an parameter widget from a parameter, which in turn represents a field.
      *
      * @param param the parameter object
@@ -58,12 +65,24 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
+     * Construct a widget with a parameter object and a list of objects to edit.
+     *
+     * @param param parameter to wrap
+     * @param editedObjects objects to edit
+     */
+    public ParameterWidget(Parameter param, List<CopyableObject> editedObjects ) {
+        parameter = param;
+        this.editedObjects = editedObjects;
+        component = makeWidget();
+    }
+
+    /**
      * Create an appropriate widget for this parameter.
      */
     protected JComponent makeWidget() {
 
         if (parameter.isMultiState()) {
-                return ObjectTypeEditor.createUninitializedEditor(parameter.getTypeMap(), parameter.annotation.label());
+                return ObjectTypeEditor.createEditor(editedObjects, parameter.getTypeMap(), parameter.annotation.label());
         }
 
         if (parameter.isBoolean()) {
@@ -157,12 +176,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else if (parameter.isNumeric()) {
             ((JNumberSpinnerWithNull) component).setValue(value);
         } else if (parameter.annotation.isMultiState()) {
-            if (value == null) {
-                ((ObjectTypeEditor) component).setNull();
-            } else {
-                ((ObjectTypeEditor) component).setValue(value);
-            }
-
+            // No action. ObjectTypeEditor handles its own init
         } else {
             ((JTextField) component).setText(value == null ? "" : value.toString());
         }

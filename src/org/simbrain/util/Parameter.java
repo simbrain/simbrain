@@ -48,7 +48,6 @@ public class Parameter implements Comparable<Parameter> {
      */
     public final Field field;
 
-
     /**
      * Construct a parameter object from a field.
      *
@@ -67,7 +66,9 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Uses reflection to get the type map for a multi-state object.
+     * Uses reflection to call a method that returns a mapping
+     * from strings to classes.  Used in drop-down boxes for setting
+     * the types of objects.
      */
     public BiMap<String, Class>  getTypeMap() {
         if (annotation == null) {

@@ -25,7 +25,7 @@ import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 /**
@@ -595,12 +596,12 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * The PolaraizedRandomizer this panel will either use to fill field
          * values and edit, or which this panel will create and then edit.
          */
-        private final PolarizedRandomizer randomizer;
+        private PolarizedRandomizer randomizer;
 
         /**
          * The randomizer panel used as a basis for this panel.
          */
-        private final RandomizerPanel randomizerPanel = new RandomizerPanel(parent);
+        private RandomizerPanel2 randomizerPanel;
 
         /**
          * A DropDownTriangle used to show or hide {@link #randomizerPanel}. The
@@ -659,7 +660,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * Initializes the layout of the panel
          */
         private void init() {
-            randomizerPanel.fillFieldValues(randomizer);
+            randomizerPanel = new RandomizerPanel2(Arrays.asList(randomizer), parent);
             setLayout(new GridBagLayout());
             Border colorBorder = BorderFactory.createLineBorder(Polarity.EXCITATORY.equals(polarity) ? Color.red : Color.blue);
             this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));
@@ -713,7 +714,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
                     if (enableStatusTriangle.isDown()) {
-                        randomizerPanel.commitRandom(randomizer);
+                        randomizerPanel.commitChanges();
                         if (Polarity.EXCITATORY.equals(polarity)) {
                             exRandomizer = randomizer;
                             if (synapseGroup != null) {
@@ -779,7 +780,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         public void commitChanges() {
             if (enableStatusTriangle.isDown() || randomizerState == RandBehavior.FORCE_ON) {
-                randomizerPanel.commitRandom(randomizer);
+                randomizerPanel.commitChanges();
                 if (Polarity.EXCITATORY.equals(polarity)) {
                     exRandomizer = randomizer;
                 } else {

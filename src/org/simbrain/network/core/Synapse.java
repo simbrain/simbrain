@@ -336,18 +336,11 @@ public class Synapse implements EditableObject {
     }
 
     /**
-     * Set a default spike responder if the source neuron is a spiking neuron,
-     * else set the spikeResponder to null.
+     * Set a default spike responder if the spike responder has not been initialized.
      */
     public void initSpikeResponder() {
-        if (source != null) {
-            if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-                if (getSpikeResponder() == null) {
-                    setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
-                }
-            } else {
-                setSpikeResponder(null);
-            }
+        if (getSpikeResponder() == null) {
+            setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
         }
     }
 

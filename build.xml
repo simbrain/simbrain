@@ -12,9 +12,9 @@
 	<property name="build.jars" location="${build}/jars" />
 	<property name="docs" location="docs" />
 	<property name="scripts" location="scripts" />
-	<property name="resources" value="org/simbrain/resource" />
-	<property name="odorworldresources" value="org/simbrain/world/odorworld/resources"/>
-	<property name="simresources" value="org/simbrain/custom_sims/resources" />
+	<property name="resource" value="org/simbrain/resource" />
+	<property name="odorworldresource" value="org/simbrain/world/odorworld/resources"/>
+	<property name="simresource" value="org/simbrain/custom_sims/resources" />
 	<property name="commands" value="org/simbrain/console" />
 	<property name="workspace" value="org/simbrain/workspace" />
 	<property name="network" value="org/simbrain/network" />
@@ -38,7 +38,7 @@
 	<target name="compile" description="Compile code">
 		<mkdir dir="${bin}" />
 		<mkdir dir="${lib}" />
-		<javac source="1.8" target = "1.8" srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" debug="${compile.debug}">
+		<javac source="1.10" target = "1.10" srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" debug="${compile.debug}">
 		</javac>
 		<copy todir="${bin}/${resource}">
 			<fileset dir="${src}/${resource}">
@@ -49,7 +49,7 @@
 			<fileset dir="${src}/${odorworldresource}">
 			</fileset>
 		</copy>
-		<copy todir="${build.main}/threedassets">
+<!-- 		<copy todir="${build.main}/threedassets">
 			<fileset dir="${src}/${threedassets}">
 				<exclude name="build.xml" />
 				<exclude name="nbproject/*" />
@@ -58,7 +58,7 @@
 				<exclude name="master-application.jnlp" />
 			</fileset>
 		</copy>
-		<copy todir="${bin}/${commands}">
+ -->		<copy todir="${bin}/${commands}">
 			<fileset dir="${src}/${commands}">
 			</fileset>
 		</copy>

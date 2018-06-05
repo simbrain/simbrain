@@ -34,17 +34,15 @@ import java.util.regex.Pattern;
  */
 public class Parameter implements Comparable<Parameter> {
 
-    //TODO: Make these private or protected
-
     /**
-     * TheAnnotation for this Parameter.
+     * The annotation for this Parameter.
      */
-    public final UserParameter annotation;
+    private final UserParameter annotation;
 
     /**
      * The Field for this Parameter.
      */
-    public final Field field;
+    private final Field field;
 
     /**
      * Construct a parameter object from a field.
@@ -413,6 +411,10 @@ public class Parameter implements Comparable<Parameter> {
             return field.equals(((Parameter) other).field);
         }
         return false;
+    }
+
+    public UserParameter getAnnotation() {
+        return annotation;
     }
 
     @Override

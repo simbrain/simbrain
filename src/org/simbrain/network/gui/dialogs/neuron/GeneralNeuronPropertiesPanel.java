@@ -144,13 +144,13 @@ public class GeneralNeuronPropertiesPanel extends JPanel implements EditablePane
             basicStatsPanel.add(new JLabel(""+ neuronList.get(0).getId()));
         }
         basicStatsPanel.add(new JLabel("Activation:"));
-        basicStatsPanel.add(neuronPropertyWidgets.getWidget("Activation").component);
+        basicStatsPanel.add(neuronPropertyWidgets.getWidget("Activation").getComponent());
         basicStatsPanel.add(new JLabel("Label:"));
-        basicStatsPanel.add(neuronPropertyWidgets.getWidget("Label").component);
+        basicStatsPanel.add(neuronPropertyWidgets.getWidget("Label").getComponent());
 
         this.add(basicStatsPanel, BorderLayout.NORTH);
 
-        this.add(neuronPropertyWidgets.getWidget("Update Rule").component,
+        this.add(neuronPropertyWidgets.getWidget("Update Rule").getComponent(),
             BorderLayout.CENTER);
 
         TitledBorder tb = BorderFactory.createTitledBorder("Neuron Properties");

@@ -43,12 +43,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     /**
      * The parameter for this widget.
      */
-    public final Parameter parameter;
+
+    private final Parameter parameter;
 
     /**
      * The GUI element for this widget.
      */
-    public final JComponent component;
+    private final JComponent component;
 
     /**
      * List of edited objects. Used in conjunction with {@link ObjectTypeEditor},
@@ -86,7 +87,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.isObjectType()) {
 
             // Get a map from labels to types using the type list
-            String className = parameter.annotation.typeMapClass();
+            String className = parameter.getAnnotation().typeMapClass();
             Class clazz = null;
             if (className.isEmpty()) {
                 clazz = editedObjects.get(0).getClass().getSuperclass();
@@ -98,9 +99,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                     e.printStackTrace();
                 }
             }
-            String methodName = parameter.annotation.typeMapMethod();
+            String methodName = parameter.getAnnotation().typeMapMethod();
             BiMap<String, Class> typeMap = getTypeMap(clazz, methodName);
-            return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.annotation.label());
+            return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.getAnnotation().label());
         }
 
         if (parameter.isBoolean()) {
@@ -112,8 +113,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             SpinnerNumberModelWithNull spinnerModel;
 
-            Double minValue = parameter.hasMinValue() ? parameter.annotation.minimumValue() : null;
-            Double maxValue = parameter.hasMaxValue() ? parameter.annotation.maximumValue() : null;
+            Double minValue = parameter.hasMinValue() ? parameter.getAnnotation().minimumValue() : null;
+            Double maxValue = parameter.hasMaxValue() ? parameter.getAnnotation().maximumValue() : null;
             double range;
             double stepSize = 0.1;
 
@@ -185,7 +186,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * Returns tooltip text for this parameter.
      */
     public String getToolTipText() {
-        UserParameter anot = parameter.annotation;
+        UserParameter anot = parameter.getAnnotation();
         List<String> tips = new ArrayList<>();
         if (!"".equals(anot.description())) {
             tips.add(anot.description());
@@ -218,7 +219,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         } else if (parameter.isNumeric()) {
             ((JNumberSpinnerWithNull) component).setValue(value);
-        } else if (parameter.annotation.isObjectType()) {
+        } else if (parameter.getAnnotation().isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
         } else {
             ((JTextField) component).setText(value == null ? "" : value.toString());
@@ -235,7 +236,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.isNumeric()) {
             return ((JNumberSpinnerWithNull) component).getValue();
         }
-        if (parameter.annotation.isObjectType()) {
+        if (parameter.getAnnotation().isObjectType()) {
             return ((ObjectTypeEditor)component).getValue();
         }
 
@@ -258,6 +259,14 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         return false;
     }
 
+    public Parameter getParameter() {
+        return parameter;
+    }
+
+    public JComponent getComponent() {
+        return component;
+    }
+
     @Override
     public int hashCode() {
         return parameter.hashCode();
@@ -269,6 +278,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * @return the label
      */
     public String getLabel() {
-        return parameter.annotation.label();
+        return parameter.getAnnotation().label();
     }
 }

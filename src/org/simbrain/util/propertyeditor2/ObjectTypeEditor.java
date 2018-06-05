@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.propertyeditor2;
 
-import org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
@@ -32,7 +31,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -344,34 +344,35 @@ public class ObjectTypeEditor extends JComponent {
         return prototypeMode;
     }
 
-    /**
-     * Test main.
-     */
-    public static void main(String[] args) {
-
-        //LinearRule rule = new LinearRule();
-        //rule.setBias(.5);
-        //List objectList = Arrays.asList(rule);
-        List objectList = Arrays.asList(new LinearRule(), new LinearRule());
-        //List objectList = Arrays.asList(new LinearRule(), new ThreeValueRule() );
-
-        System.out.println("Initialize:");
-        System.out.println(Arrays.asList(objectList));
-
-        JFrame frame = new JFrame();
-        ObjectTypeEditor editor = new ObjectTypeEditor(objectList, NeuronPropertiesPanel.getTypeMap(), "test", frame);
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent arg) {
-                System.out.println("After committ:");
-                editor.commitChanges();
-                System.out.println(Arrays.asList(objectList));
-                //System.out.println(rule.getBias());
-                frame.dispose();
-            }
-        });
-        frame.setContentPane(editor);
-        frame.setVisible(true);
-        frame.pack();
-    }
+//    /**
+//     * Test main.
+//     */
+//    public static void main(String[] args) {
+//
+//        //LinearRule rule = new LinearRule();
+//        //rule.setBias(.5);
+//        //List objectList = Arrays.asList(rule);
+//        List objectList = Arrays.asList(new LinearRule(), new LinearRule());
+//        //List objectList = Arrays.asList(new LinearRule(), new ThreeValueRule() );
+//
+//        System.out.println("Initialize:");
+//        System.out.println(Arrays.asList(objectList));
+//
+//        JFrame frame = new JFrame();
+//        // TODO: Redo using lists
+//        ObjectTypeEditor editor = new ObjectTypeEditor(objectList, NeuronPropertiesPanel.getTypeMap(), "test", frame);
+//        frame.addWindowListener(new WindowAdapter() {
+//            public void windowClosing(WindowEvent arg) {
+//                System.out.println("After committ:");
+//                editor.commitChanges();
+//                System.out.println(Arrays.asList(objectList));
+//                //System.out.println(rule.getBias());
+//                frame.dispose();
+//            }
+//        });
+//        frame.setContentPane(editor);
+//        frame.setVisible(true);
+//        frame.pack();
+//    }
 
 }

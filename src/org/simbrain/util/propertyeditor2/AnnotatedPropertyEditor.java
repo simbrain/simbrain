@@ -153,12 +153,12 @@ public class AnnotatedPropertyEditor extends JPanel {
         // Add parameter widgets after collecting list of params so they're in
         // the right order.
         for (ParameterWidget pw : widgets) {
-            if (pw.parameter.isObjectType()) {
-                itemPanel.addSpanningItem(pw.component);
+            if (pw.getParameter().isObjectType()) {
+                itemPanel.addSpanningItem(pw.getComponent());
             } else {
-                JLabel label = new JLabel(pw.parameter.annotation.label());
+                JLabel label = new JLabel(pw.getParameter().getAnnotation().label());
                 label.setToolTipText(pw.getToolTipText());
-                itemPanel.addItemLabel(label, pw.component);
+                itemPanel.addItemLabel(label, pw.getComponent());
             }
         }
     }
@@ -200,15 +200,15 @@ public class AnnotatedPropertyEditor extends JPanel {
         // instances.
         for (ParameterWidget pw : widgets) {
 
-            Object refValue = pw.parameter.getFieldValue(objectList.get(0));
-            if (pw.parameter.isObjectType()) {
+            Object refValue = pw.getParameter().getFieldValue(objectList.get(0));
+            if (pw.getParameter().isObjectType()) {
                 refValue = refValue.getClass();
             }
 
             for (int i = 1; i < objectList.size(); i++) {
                 Object obj = objectList.get(i);
-                Object objValue = pw.parameter.getFieldValue(obj);
-                if (pw.parameter.isObjectType()) {
+                Object objValue = pw.getParameter().getFieldValue(obj);
+                if (pw.getParameter().isObjectType()) {
                     objValue = objValue.getClass();
                 }
                 // System.out.println("ref value:" + refValue + " == object value:" + objValue + "\n");
@@ -226,8 +226,8 @@ public class AnnotatedPropertyEditor extends JPanel {
                 pw.setWidgetValue(null);
             } else {
                 pw.setWidgetValue(refValue);
-                if (pw.parameter.isObjectType()) {
-                    ((ObjectTypeEditor) pw.component).fillFieldValues();
+                if (pw.getParameter().isObjectType()) {
+                    ((ObjectTypeEditor) pw.getComponent()).fillFieldValues();
                 }
 
             }
@@ -239,7 +239,7 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public void fillDefaultValues() {
         for (ParameterWidget pw : widgets) {
-            pw.setWidgetValue(pw.parameter.getDefaultValue());
+            pw.setWidgetValue(pw.getParameter().getDefaultValue());
         }
     }
 
@@ -297,16 +297,16 @@ public class AnnotatedPropertyEditor extends JPanel {
                 break;
             }
 
-            if (pw.parameter.isObjectType()) {
+            if (pw.getParameter().isObjectType()) {
 
-                ((ObjectTypeEditor) pw.component).commitChanges();
+                ((ObjectTypeEditor) pw.getComponent()).commitChanges();
 
                 // TODO: Can this be migrated to the object type editor?
                 // Only overrwrite objects if combo box has changed
-                if (((ObjectTypeEditor) pw.component).isPrototypeMode()) {
+                if (((ObjectTypeEditor) pw.getComponent()).isPrototypeMode()) {
                     // Reset the types of all the objects to copies of the displayed object
                     for (EditableObject o : objectsToEdit) {
-                        pw.parameter.setFieldValue(o, ((CopyableObject) widgetValue).copy());
+                        pw.getParameter().setFieldValue(o, ((CopyableObject) widgetValue).copy());
                         // System.out.println("Rewriting object " + o + "," + widgetValue);
                     }
                 }
@@ -318,7 +318,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             // empty string.
             if ((!(widgetValue instanceof String) || !((String) widgetValue).equals(""))) {
                 for (Object o : objectsToEdit) {
-                    pw.parameter.setFieldValue(o, widgetValue);
+                    pw.getParameter().setFieldValue(o, widgetValue);
                 }
             }
 

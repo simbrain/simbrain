@@ -20,7 +20,7 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -62,9 +62,7 @@ public class Neuron implements EditableObject {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", isObjectType = true,
-        typeMapClass = "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel",
-        typeMapMethod = "getTypeMap")
+    @UserParameter(label = "Update Rule", isObjectType = true, order = 100)
     private NeuronUpdateRule updateRule;
 
     /**
@@ -75,7 +73,7 @@ public class Neuron implements EditableObject {
     /**
      * Optional string description of neuron.
      */
-    @UserParameter(label = "Label", description = "Optional String description associated with this neuron",
+    @UserParameter(label = "Label", description = "Optional string description associated with this neuron",
         defaultValue = "", order = 2)
     private String label = "";
 
@@ -96,7 +94,7 @@ public class Neuron implements EditableObject {
      */
     @UserParameter(
         label = "Increment",
-        description = "This sets the amount that a neuron is incremented / decemented when it is manually adjusted.",
+        description = "Amount that a neuron is incremented / decemented when it is manually adjusted.",
         defaultValue = "1" + DEFAULT_INCREMENT, order = 6)
     protected double increment = DEFAULT_INCREMENT;
 

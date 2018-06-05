@@ -84,11 +84,13 @@ public class Synapse implements EditableObject {
      * The update method of this synapse, which corresponds to what kind of
      * synapse it is.
      */
+    @UserParameter(label = "Learning Rule", isObjectType = true, order = 100)
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /**
      * Only used of source neuron is a spiking neuron.
      */
+    @UserParameter(label = "Spike Responder", isObjectType = true, order = 200)
     private SpikeResponder spikeResponder;
 
     /**

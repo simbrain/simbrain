@@ -18,6 +18,10 @@
  */
 package org.simbrain.util.propertyeditor2;
 
+import org.simbrain.util.BiMap;
+
+import java.util.List;
+
 /**
  * Objects that implement this interface have annotations that can be read
  * by the {@link AnnotatedPropertyEditor}.
@@ -26,9 +30,12 @@ package org.simbrain.util.propertyeditor2;
  */
 public interface EditableObject {
 
-    // TODO: If methods are added keep it.  If not, consider as a marker
-    // interface but it might not be needed.
+    /**
+     * Returns the name of this object. Useful as a description in dropdowns.
+     */
+    default String getName() {
+        return "no-name";
+    }
 
-    //    public EditableObject copy();
 
 }

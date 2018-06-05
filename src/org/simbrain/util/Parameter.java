@@ -65,28 +65,6 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Uses reflection to call a method that returns a mapping
-     * from strings to classes.  Used in drop-down boxes for setting
-     * the types of objects.
-     */
-    public BiMap<String, Class>  getTypeMap() {
-        if (annotation == null) {
-            return null;
-        }
-        String className = annotation.typeMapClass();
-        String methodName = annotation.typeMapMethod();
-        try {
-            Class c = Class.forName(className);
-            Method m = c.getDeclaredMethod(methodName);
-            BiMap<String, Class> typeMap = (BiMap<String, Class>) m.invoke(null, null);
-            return typeMap;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
      * Returns true iff the type of the field is numeric (integer or floating-point).
      */
     public boolean isNumeric() {
@@ -360,6 +338,10 @@ public class Parameter implements Comparable<Parameter> {
             classes.add(superClass);
             superClass = classes.get(classes.size() - 1).getSuperclass();
         }
+        // for(Class<?> i : clazz.getInterfaces()) {
+        //    //System.out.println("-->"+i);
+        //    classes.add(i);
+        // }
 
         Collections.reverse(classes);
         return classes;

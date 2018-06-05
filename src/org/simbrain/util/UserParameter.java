@@ -98,6 +98,8 @@ public @interface UserParameter {
      */
     boolean isObjectType() default false;
 
+    //TODO: Rename to say list.
+
     /**
      * String reference to the class holding the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
      * e.g. "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel".
@@ -112,5 +114,5 @@ public @interface UserParameter {
      *
      * @return the string method name
      */
-    String typeMapMethod() default "";
+    String typeMapMethod() default "getTypes";
 }

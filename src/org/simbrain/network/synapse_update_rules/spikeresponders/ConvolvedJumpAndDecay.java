@@ -105,7 +105,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     /**
      * @return Name of synapse type.
      */
-    public static String getName() {
+    public String getName() {
         return "Convolved Jump and decay";
     }
 

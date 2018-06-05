@@ -19,16 +19,36 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * <b>SpikeResponder</b>.
  */
-public abstract class SpikeResponder implements EditableObject {
+public abstract class SpikeResponder implements CopyableObject {
+
+    /**
+     * Spike responders for drop-down list used by
+     * {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * to set the spike responder on a synapse.
+     */
+    public static List<Class> RESPONDER_LIST = Arrays.asList(JumpAndDecay.class,
+        ConvolvedJumpAndDecay.class, ProbabilisticResponder.class,
+        RiseAndDecay.class, Step.class);
+
+
+    /**
+     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return RESPONDER_LIST;
+    }
 
     /**
      * Value.
@@ -63,7 +83,8 @@ public abstract class SpikeResponder implements EditableObject {
      * A method which takes in a list of synapses and returns a list of their
      * spike responder, if they have any.
      *
-     * @param synapses The list of synapses whose spike responders we want to query.
+     * @param synapses The list of synapses whose spike responders we want to
+     *                 query.
      * @return Returns a list of spike responders associated with the group of
      * synapses
      */
@@ -89,6 +110,11 @@ public abstract class SpikeResponder implements EditableObject {
      */
     public void setValue(final double value) {
         this.value = value;
+    }
+
+    @Override
+    public EditableObject copy() {
+        return deepCopy();
     }
 
 }

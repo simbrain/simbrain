@@ -19,6 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -26,6 +27,9 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A rule for updating a neuron.
@@ -35,14 +39,30 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 public abstract class NeuronUpdateRule implements CopyableObject {
 
     /**
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * to set the update rule on a neuron.
+     */
+    public static List<Class> RULE_LIST = Arrays.asList(AdExIFRule.class,
+        BinaryRule.class, DecayRule.class, FitzhughNagumo.class, IACRule.class,
+        IntegrateAndFireRule.class, IzhikevichRule.class, KuramotoRule.class,
+        LinearRule.class, MorrisLecarRule.class, NakaRushtonRule.class,
+        ProductRule.class, ContinuousSigmoidalRule.class, SigmoidalRule.class,
+        SpikingThresholdRule.class, ThreeValueRule.class);
+
+    /**
+     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return RULE_LIST;
+    }
+
+    /**
      * The maximum number of digits to display in the tool tip.
      */
     private static final int MAX_DIGITS = 9;
 
     //TODO: This field is temporary, and is being used for now to test the ObjectType editor.
-    @UserParameter(label = "Randomizer", isObjectType = true,
-        typeMapClass = "org.simbrain.util.randomizer.gui.RandomizerPanel2",
-        typeMapMethod = "getTypeMap", order = 1000)
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
     private ProbabilityDistribution randomizer = new NormalDistribution();
 
     /**
@@ -368,6 +388,5 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     public EditableObject copy() {
         return deepCopy();
     }
-
 
 }

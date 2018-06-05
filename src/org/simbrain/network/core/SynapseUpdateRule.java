@@ -18,15 +18,37 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A rule for updating a synapse. A learning rule.
  *
  * @author jyoshimi
  */
-public abstract class SynapseUpdateRule implements EditableObject {
+public abstract class SynapseUpdateRule implements CopyableObject {
+
+    /**
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * to set the learning rule on a synapse.
+     */
+    public static List<Class> RULE_LIST = Arrays.asList(StaticSynapseRule.class,
+        HebbianRule.class, HebbianCPCARule.class, HebbianThresholdRule.class,
+        OjaRule.class, PfisterGerstner2006Rule.class, ShortTermPlasticityRule.class,
+        STDPRule.class, SubtractiveNormalizationRule.class);
+
+    /**
+     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return RULE_LIST;
+    }
 
     /**
      * The maximum number of digits to display in the tool tip.
@@ -83,5 +105,11 @@ public abstract class SynapseUpdateRule implements EditableObject {
     public String getToolTipText(final Synapse synapse) {
         return "(" + synapse.getId() + ") Strength: " + Utils.round(synapse.getStrength(), MAX_DIGITS);
     }
+
+    @Override
+    public EditableObject copy() {
+        return deepCopy();
+    }
+
 
 }

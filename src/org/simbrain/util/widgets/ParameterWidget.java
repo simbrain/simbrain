@@ -18,13 +18,18 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +57,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     private List<CopyableObject> editedObjects;
 
     /**
-     * Construct an parameter widget from a parameter, which in turn represents a field.
+     * Construct a parameter widget from a parameter, which in turn represents a field.
      *
      * @param param the parameter object
      */
@@ -79,7 +84,23 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     protected JComponent makeWidget() {
 
         if (parameter.isObjectType()) {
-                return ObjectTypeEditor.createEditor(editedObjects, parameter.getTypeMap(), parameter.annotation.label());
+
+            // Get a map from labels to types using the type list
+            String className = parameter.annotation.typeMapClass();
+            Class clazz = null;
+            if (className.isEmpty()) {
+                clazz = editedObjects.get(0).getClass().getSuperclass();
+            } else {
+                // TODO: Handle exception here or throw it?
+                try {
+                    clazz = Class.forName(className);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            String methodName = parameter.annotation.typeMapMethod();
+            BiMap<String, Class> typeMap = getTypeMap(clazz, methodName);
+            return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.annotation.label());
         }
 
         if (parameter.isBoolean()) {
@@ -134,6 +155,31 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         return new JTextField();
     }
 
+    /**
+     * Takes a class and method name and returns a type map.
+     */
+    private BiMap<String, Class>  getTypeMap(Class c, String methodName) {
+        BiMap<String, Class> typeMap = new BiMap<>();
+        try {
+            Method m = c.getDeclaredMethod(methodName);
+            List<Class> types = (List<Class>) m.invoke(null, null);
+            for(Class type : types) {
+                try {
+                    EditableObject inst = (EditableObject) type.newInstance();
+                    typeMap.put(inst.getName(), type);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return typeMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * Returns tooltip text for this parameter.
@@ -196,7 +242,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         return ((JTextField) component).getText();
     }
 
-
     /**
      * Impose ordering by {@link UserParameter#order()} and then field name.
      */
@@ -219,7 +264,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
-     * Convenience method to get a label for this parameter.
+     * Convenience method to get the label for this parameter.
      *
      * @return the label
      */

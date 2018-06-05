@@ -23,6 +23,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -45,7 +46,7 @@ public final class NeuronDialog extends StandardDialog {
     /**
      * The main panel for editing neuron properties.
      */
-    private NeuronPropertiesPanel neuronPropertiesPanel;
+    private AnnotatedPropertyEditor neuronPropertiesPanel;
 
     /**
      * Help Button. Links to information about the currently selected neuron
@@ -67,7 +68,7 @@ public final class NeuronDialog extends StandardDialog {
      */
     public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
@@ -88,7 +89,7 @@ public final class NeuronDialog extends StandardDialog {
      */
     public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons, final Frame parent) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons, parent);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
@@ -103,7 +104,7 @@ public final class NeuronDialog extends StandardDialog {
      */
     public static NeuronDialog createNeuronDialog(final List<Neuron> neurons) {
         NeuronDialog nd = new NeuronDialog(neurons);
-        nd.neuronPropertiesPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(nd.neuronList, nd);
+        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
@@ -168,7 +169,7 @@ public final class NeuronDialog extends StandardDialog {
      * update rule.
      */
     private void addListeners() {
-        neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
+//        neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     @Override
@@ -182,26 +183,26 @@ public final class NeuronDialog extends StandardDialog {
      */
     private void updateHelp() {
 
-        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
-            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
-        } else {
-
-            // Use combo box label (with spaces removed) for doc page.
-            String name = (String) neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
-            name = name.replaceAll("\\s", ""); // Remove white space
-
-            // Docs are in different places for activity generators and neurons
-            String docFolder = "";
-            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
-                docFolder = "activity_generator";
-            } else {
-                docFolder = "neuron";
-            }
-
-            // Create the help action
-            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
-        }
-        helpButton.setAction(helpAction);
+//        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
+//            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+//        } else {
+//
+//            // Use combo box label (with spaces removed) for doc page.
+//            String name = (String) neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
+//            name = name.replaceAll("\\s", ""); // Remove white space
+//
+//            // Docs are in different places for activity generators and neurons
+//            String docFolder = "";
+//            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
+//                docFolder = "activity_generator";
+//            } else {
+//                docFolder = "neuron";
+//            }
+//
+//            // Create the help action
+//            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
+//        }
+//        helpButton.setAction(helpAction);
     }
 
     /**

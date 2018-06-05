@@ -23,6 +23,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * Main panel for editing synapses.
      */
-    private SynapsePropertiesPanel synapseEditingPanel;
+    private AnnotatedPropertyEditor synapseEditingPanel;
 
     /**
      * Help Button. Links to information about the currently selected synapse
@@ -104,7 +105,7 @@ public final class SynapseDialog extends StandardDialog {
      */
     private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        synapseEditingPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(synapseList, this);
+        synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
         initializeLayout();
         updateHelp();
     }
@@ -118,7 +119,7 @@ public final class SynapseDialog extends StandardDialog {
     private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        synapseEditingPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(synapseList, this);
+        synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
         initializeLayout();
         updateHelp();
     }
@@ -146,21 +147,21 @@ public final class SynapseDialog extends StandardDialog {
      * update rule.
      */
     private void addListeners() {
-        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
+//        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     /**
      * Set the help page based on the currently selected synapse type.
      */
     public void updateHelp() {
-        if (synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
-            helpAction = new ShowHelpAction("Pages/Network/synapse.html");
-        } else {
-            String name = (String) synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem();
-            name = name.replaceAll("\\s", ""); // Remove white space
-            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
-        }
-        helpButton.setAction(helpAction);
+//        if (synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
+//            helpAction = new ShowHelpAction("Pages/Network/synapse.html");
+//        } else {
+//            String name = (String) synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().getSelectedItem();
+//            name = name.replaceAll("\\s", ""); // Remove white space
+//            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
+//        }
+//        helpButton.setAction(helpAction);
     }
 
     /**

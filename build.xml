@@ -115,7 +115,7 @@
 
 	<!--  Javadocs. -->
 	<target name="javadocs" description="Create API documentation">
-		<javadoc encoding="ISO-8859-1" packagenames="org.*" sourcepath="${src}" classpathref="lib.path" destdir="${build}/apidocs/" author="true" version="true" use="true" source="1.7" package="true" overview="${src}/overview.html" windowtitle="Simbrain API" doctitle="Simbrain API">
+		<javadoc encoding="ISO-8859-1" packagenames="org.*" sourcepath="${src}" classpathref="lib.path" destdir="${build}/apidocs/" author="true" version="true" use="true" source="1.8" package="true" overview="${src}/overview.html" windowtitle="Simbrain API" doctitle="Simbrain API">
 		</javadoc>
 	</target>
 

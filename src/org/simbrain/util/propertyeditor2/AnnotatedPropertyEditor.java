@@ -190,8 +190,6 @@ public class AnnotatedPropertyEditor extends JPanel {
      */
     public void fillFieldValues(List<? extends EditableObject> objectList) {
 
-        boolean consistent = true;
-
         if (objectList.isEmpty()) {
             return;
         }
@@ -199,6 +197,8 @@ public class AnnotatedPropertyEditor extends JPanel {
         // Check to see if the field values are consistent over all given
         // instances.
         for (ParameterWidget pw : widgets) {
+
+            boolean consistent = true;
 
             Object refValue = pw.getParameter().getFieldValue(objectList.get(0));
             if (pw.getParameter().isObjectType()) {

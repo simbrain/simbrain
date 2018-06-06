@@ -73,7 +73,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronRulePanel
                 (r) -> ((NakaRushtonRule) r).getSteepness(),
                 (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
         tfSemiSaturation = createTextField(
-                (r) -> ((NakaRushtonRule) r).getSteepness(),
+                (r) -> ((NakaRushtonRule) r).getSemiSaturationConstant(),
                 (r, val) -> ((NakaRushtonRule) r).setSteepness((double) val));
         tfTimeConstant = createTextField(
                 (r) -> ((NakaRushtonRule) r).getTimeConstant(),

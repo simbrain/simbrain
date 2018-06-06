@@ -184,15 +184,15 @@ public class KeyBindings {
         // });
 
         // Print debug info
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
-                "debug");
-        panel.getActionMap().put("debug", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(panel.getNetwork());
-                // System.out.println(panel);
-            }
-        });
+//        inputMap.put(
+//                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
+//                "debug");
+//        panel.getActionMap().put("debug", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println(panel.getNetwork());
+//                // System.out.println(panel);
+//            }
+//        });
 
         // Show piccolo scene-graph browser (for debugging piccolo issues)
         inputMap.put(

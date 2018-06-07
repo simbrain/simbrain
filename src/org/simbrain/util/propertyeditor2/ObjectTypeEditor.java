@@ -311,6 +311,14 @@ public class ObjectTypeEditor extends JComponent {
         });
     }
 
+
+    /**
+     * Returns the dropdown box. Not sure it's a good idea to expose this, but it's helpful.
+     */
+    public JComboBox<String> getDropDown() {
+        return cbObjectType;
+    }
+
     /**
      * The current value of this widget. It should be the object that can be
      * copied, or null.

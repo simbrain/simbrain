@@ -24,6 +24,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
+import org.simbrain.util.widgets.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -60,8 +62,8 @@ public final class NeuronDialog extends StandardDialog {
     private ShowHelpAction helpAction;
 
     /**
-     * Creates a neuron dialog from a collection of NeuronNodes.
-     * No frame available.
+     * Creates a neuron dialog from a collection of NeuronNodes. No frame
+     * available.
      *
      * @param selectedNeurons the neurons to edit
      * @return the dialog.
@@ -143,8 +145,9 @@ public final class NeuronDialog extends StandardDialog {
     /**
      * Get the logical neurons from the NeuronNodes.
      *
-     * @param selectedNeurons the selected gui neurons (pnodes) from which the neuron model
-     *                        objects will be extracted and then edited by this panel
+     * @param selectedNeurons the selected gui neurons (pnodes) from which the
+     *                        neuron model objects will be extracted and then
+     *                        edited by this panel
      * @return the neuron model objects represented by the selected pnodes
      */
     private static List<Neuron> getNeuronList(final Collection<NeuronNode> selectedNeurons) {
@@ -169,7 +172,9 @@ public final class NeuronDialog extends StandardDialog {
      * update rule.
      */
     private void addListeners() {
-//        neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
+        JComponent component = neuronPropertiesPanel.getWidget("Update Rule").getComponent();
+        ((ObjectTypeEditor) component).getDropDown().addActionListener(
+            e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     @Override
@@ -183,28 +188,28 @@ public final class NeuronDialog extends StandardDialog {
      */
     private void updateHelp() {
 
-        // TODO: from APE, get access to a named component.  Then check it's name.
+        ParameterWidget pw = neuronPropertiesPanel.getWidget("Update Rule");
+        String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
 
-//        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
-//            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
-//        } else {
-//
-//            // Use combo box label (with spaces removed) for doc page.
-//            String name = (String) neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
-//            name = name.replaceAll("\\s", ""); // Remove white space
-//
-//            // Docs are in different places for activity generators and neurons
-//            String docFolder = "";
-//            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
-//                docFolder = "activity_generator";
-//            } else {
-//                docFolder = "neuron";
-//            }
-//
-//            // Create the help action
-//            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
-//        }
-//        helpButton.setAction(helpAction);
+        if (selection == SimbrainConstants.NULL_STRING) {
+            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+        } else {
+
+            // Use combo box label (with spaces removed) for doc page.
+            String name = selection.replaceAll("\\s", ""); // Remove white space
+
+            // Docs are in different places for activity generators and neurons
+            String docFolder = "";
+            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
+                docFolder = "activity_generator";
+            } else {
+                docFolder = "neuron";
+            }
+
+            // Create the help action
+            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
+        }
+        helpButton.setAction(helpAction);
     }
 
     /**

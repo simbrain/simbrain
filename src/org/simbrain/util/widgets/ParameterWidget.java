@@ -20,6 +20,7 @@ package org.simbrain.util.widgets;
 
 import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -34,7 +35,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A wrapper class for a {@link Parameter} and an associated GUI widget (JComponent).
+ * A wrapper class for a {@link Parameter} and an associated GUI widget
+ * (JComponent).
  *
  * @author O. J. Coleman
  */
@@ -52,13 +54,14 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     private final JComponent component;
 
     /**
-     * List of edited objects. Used in conjunction with {@link ObjectTypeEditor},
-     * which must be initialized with edited objects.
+     * List of edited objects. Used in conjunction with {@link
+     * ObjectTypeEditor}, which must be initialized with edited objects.
      */
     private List<CopyableObject> editedObjects;
 
     /**
-     * Construct a parameter widget from a parameter, which in turn represents a field.
+     * Construct a parameter widget from a parameter, which in turn represents a
+     * field.
      *
      * @param param the parameter object
      */
@@ -68,12 +71,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
-     * Construct a widget with a parameter object and a list of objects to edit.
+     * Construct a widget with a parameter object and a list of objects to
+     * edit.
      *
-     * @param param parameter to wrap
+     * @param param         parameter to wrap
      * @param editedObjects objects to edit
      */
-    public ParameterWidget(Parameter param, List<CopyableObject> editedObjects ) {
+    public ParameterWidget(Parameter param, List<CopyableObject> editedObjects) {
         parameter = param;
         this.editedObjects = editedObjects;
         component = makeWidget();
@@ -159,12 +163,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     /**
      * Takes a class and method name and returns a type map.
      */
-    private BiMap<String, Class>  getTypeMap(Class c, String methodName) {
+    private BiMap<String, Class> getTypeMap(Class c, String methodName) {
         BiMap<String, Class> typeMap = new BiMap<>();
         try {
             Method m = c.getDeclaredMethod(methodName);
             List<Class> types = (List<Class>) m.invoke(null, null);
-            for(Class type : types) {
+            for (Class type : types) {
                 try {
                     EditableObject inst = (EditableObject) type.newInstance();
                     typeMap.put(inst.getName(), type);
@@ -207,8 +211,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
-     * Set the value of the widget. If value is null then the "null" state of the
-     * widget is displayed.
+     * Set the value of the widget. If value is null then the "null" state of
+     * the widget is displayed.
      */
     public void setWidgetValue(Object value) {
         if (parameter.isBoolean()) {
@@ -222,7 +226,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else if (parameter.getAnnotation().isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
         } else {
-            ((JTextField) component).setText(value == null ? "" : value.toString());
+            ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         }
     }
 
@@ -237,11 +241,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ((JNumberSpinnerWithNull) component).getValue();
         }
         if (parameter.getAnnotation().isObjectType()) {
-            return ((ObjectTypeEditor)component).getValue();
+            return ((ObjectTypeEditor) component).getValue();
         }
 
         return ((JTextField) component).getText();
     }
+
 
     /**
      * Impose ordering by {@link UserParameter#order()} and then field name.
@@ -279,5 +284,33 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     public String getLabel() {
         return parameter.getAnnotation().label();
+    }
+
+    /**
+     * If true the widget is representing fields with different values.
+     * Generally some version of "..." is displayed.
+     */
+    public boolean isInconsistent() {
+        if (parameter.isBoolean()) {
+            return ((YesNoNull) component).isNull();
+        }
+        if (parameter.isNumeric()) {
+            Object val = ((JNumberSpinnerWithNull) component).getValue();
+            if (val == null) {
+                return true;
+            }
+        }
+        if (parameter.isString()) {
+            if (((JTextField) component).getText().equalsIgnoreCase(SimbrainConstants.NULL_STRING)) {
+                return true;
+            }
+        }
+        if (parameter.getAnnotation().isObjectType()) {
+            if (((ObjectTypeEditor) component).isInconsistent()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

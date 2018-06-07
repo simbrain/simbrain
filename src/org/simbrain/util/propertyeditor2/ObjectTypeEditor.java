@@ -264,6 +264,17 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
+     * If true the editor is representing objects of different types
+     * and the combo box has "..." in it.
+     */
+    public boolean isInconsistent() {
+        if (cbObjectType.getSelectedItem() == SimbrainConstants.NULL_STRING) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Initialize the combo box to react to events.
      */
     private void addDropDownListener() {

@@ -183,6 +183,8 @@ public final class NeuronDialog extends StandardDialog {
      */
     private void updateHelp() {
 
+        // TODO: from APE, get access to a named component.  Then check it's name.
+
 //        if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
 //            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
 //        } else {
@@ -213,6 +215,11 @@ public final class NeuronDialog extends StandardDialog {
 
         // Notify the network that changes have been made
         neuronList.get(0).getNetwork().fireNeuronsUpdated(neuronList);
+        // TODO: Below is not great. Need to refactor networkpanel events
+        if (!neuronList.isEmpty()) {
+            neuronList.forEach(neuronList.get(0).getNetwork()::fireNeuronLabelChanged);
+        }
+
     }
 
 }

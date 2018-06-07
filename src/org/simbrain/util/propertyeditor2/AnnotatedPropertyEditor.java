@@ -313,10 +313,9 @@ public class AnnotatedPropertyEditor extends JPanel {
                 continue;
             }
 
-            // Ignore unspecified values.
-            // If the value isn't null and it's either not a String or not an
-            // empty string.
-            if ((!(widgetValue instanceof String) || !((String) widgetValue).equals(""))) {
+
+            // If the widget is in "..." mode don't do anything with it
+            if (!pw.isInconsistent()) {
                 for (Object o : objectsToEdit) {
                     pw.getParameter().setFieldValue(o, widgetValue);
                 }

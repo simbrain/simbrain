@@ -62,7 +62,8 @@ public class Neuron implements EditableObject {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", isObjectType = true, order = 100)
+    @UserParameter(label = "Update Rule", isObjectType = true,
+        typeMapClass = "org.simbrain.network.core.NeuronUpdateRule", order = 100)
     private NeuronUpdateRule updateRule;
 
     /**

@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.util.SimbrainConstants;
+
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
@@ -129,7 +131,7 @@ public class JNumberSpinnerWithNull extends JSpinner {
         @Override
         public String valueToString(Object value) throws ParseException {
             if (value == null) {
-                return "...";
+                return SimbrainConstants.NULL_STRING;
             }
             return super.valueToString(value);
         }

@@ -40,6 +40,8 @@ import org.simbrain.util.StandardDialog;
  */
 public class KeyBindings {
 
+    // NOTE. Do not use control bindings, since they conflict with meta on mac
+
     /**
      * Add key bindings.
      *
@@ -184,19 +186,19 @@ public class KeyBindings {
         // });
 
         // Print debug info
-//        inputMap.put(
-//                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
-//                "debug");
-//        panel.getActionMap().put("debug", new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println(panel.getNetwork());
-//                // System.out.println(panel);
-//            }
-//        });
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.ALT_MASK),
+                "debug");
+        panel.getActionMap().put("debug", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(panel.getNetwork());
+                // System.out.println(panel);
+            }
+        });
 
         // Show piccolo scene-graph browser (for debugging piccolo issues)
         inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK),
                 "scenegraph");
         panel.getActionMap().put("scenegraph", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

@@ -142,7 +142,7 @@ void buildButtonPanel() {
 							goalAchieved = true;
 						}
 						CountDownLatch latch = new CountDownLatch(1);
-						workspace.iterate(latch);
+						workspace.iterate(latch, 1);
 						try {
 							latch.await();
 						} catch (InterruptedException e) {

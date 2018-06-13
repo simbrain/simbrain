@@ -38,7 +38,7 @@
 	<target name="compile" description="Compile code">
 		<mkdir dir="${bin}" />
 		<mkdir dir="${lib}" />
-		<javac source="1.10" target = "1.10" srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" debug="${compile.debug}">
+		<javac source="1.9" target = "1.9" srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" debug="${compile.debug}">
 		</javac>
 		<copy todir="${bin}/${resource}">
 			<fileset dir="${src}/${resource}">

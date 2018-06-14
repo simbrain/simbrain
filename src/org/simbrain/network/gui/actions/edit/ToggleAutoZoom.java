@@ -48,32 +48,37 @@ public final class ToggleAutoZoom extends JToggleButton {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
         this.networkPanel = np;
-        setIcon(ResourceManager.getImageIcon("ZoomFitPage.png"));
-        setToolTipText("Single click fits objects on screen; " + "double-click toggles auto-zoom mode");
 
-        setSelected(networkPanel.getAutoZoomMode());
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    networkPanel.setAutoZoomMode(!networkPanel.getAutoZoomMode());
-                    setButtonBorder();
-                }
+        // Initialize the button
+        setIcon(ResourceManager.getImageIcon("ZoomFitPage.png"));
+        updateButton();
+
+        // React to button presses
+        this.addActionListener(e -> {
+            JToggleButton button = (JToggleButton)e.getSource();
+            if (button.isSelected()) {
+                networkPanel.setAutoZoomMode(true);
+            } else {
+                networkPanel.setAutoZoomMode(false);
             }
+            updateButton();
         });
 
-        setButtonBorder();
     }
 
     /**
-     * Sets the button border based on whether the button is pressed.
+     * Sets the button border based on whether the button is pressed, and update
+     * tooltip text.
      */
-    private void setButtonBorder() {
+    private void updateButton() {
+        setSelected(networkPanel.getAutoZoomMode());
         if (networkPanel.getAutoZoomMode()) {
             setBorder(BorderFactory.createLoweredBevelBorder());
         } else {
             setBorder(BorderFactory.createEmptyBorder());
         }
+        String onOff = networkPanel.getAutoZoomMode() ? "on" : "off";
+        setToolTipText("Autozoom is " + onOff);
     }
 
 }

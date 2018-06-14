@@ -3,8 +3,8 @@ Release Notes for Simbrain 3.03
 - This is a last or nearly last release in the Simbrain 3.0 series. Development efforts are shifting to 3.1
 - It may be possible to open some 3.02 workspace or networks in 3.03, but results will vary.
 - Improved clamping. Select nodes and / or synapses and click Shift-F.  Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
-- Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.
-Shift-drag > Command/Contrl-Drag`
+- Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.  Also auto-zoom mode changes are now based on single clicks, which is more intuitive.
+Shift-drag > Command/Control-Drag`
 - Key command to clear workspace: Command/Control-k.
 - Key command to duplicate items: Command/ Control-d.
 - Key command to create neuron groups: G
@@ -14,7 +14,7 @@ Shift-drag > Command/Contrl-Drag`
 - Improved Lasso selection of self-connections and weights generally
 - Improved coloring for wand on PC
 - Extending internationalization fix to synapse groups
-- New Simulation Framework, to supplement scripting. Custom simulations are now made using an IDE.  See org.simbrain.simulation in the source. Simulations will have to eventually be ported to 3.1 (where development efforts are shifting), but since simulations are developed in an IDE the porting should be much easier.
+- New simulation framework, to supplement scripting. Custom simulations are now made using an IDE.  See org.simbrain.simulation in the source. Simulations will have to eventually be ported to 3.1 (where development efforts are shifting), but since simulations are developed in an IDE the porting should be much easier.
 - Misc. bug fixes (e.g. control-w no longer closes windows without asking whether they should be saved; odor worlds no longer retain coupling values when closed, etc.). 
 - Misc. documentation improvements, e.g. in integrate and fire.
 

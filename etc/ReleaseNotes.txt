@@ -4,7 +4,9 @@ Release Notes for Simbrain 3.03 (Summer 2018)
 - It may be possible to open some 3.02 workspace or networks in 3.03, but results will vary.
 - Improved clamping. Select nodes and / or synapses and click Shift-F.  Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
 - Improved zooming / panning.  Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in.  Also auto-zoom mode changes are now based on single clicks, which is more intuitive.
-Shift-drag > Command/Control-Drag`
+- Added a command for resizing all windows. Renamed old window-gathering method "gather windows"
+- Improved lasso selection of self-connections and weights generally
+- Improved coloring for wand on PC
 - Key command to clear workspace: Command/Control-k.
 - Key command to duplicate items: Command/ Control-d.
 - Key command to create neuron groups: g
@@ -18,6 +20,7 @@ Shift-drag > Command/Control-Drag`
 
 Release Notes for Simbrain 3.02 (Winter 2016)
 
+- This release is discussed in Tosi and Yoshimi 2016, DOI: 10.1016/j.neunet.2016.07.005
 - Some changes to the user interface.   Removing toggle auto-zoom command.   Repositioning and toggling auto-zoom are now done by single or double-clicking the same button.
 - Localized Neuron Text Fields to address issue #35
 - Getting rid of extranneous labels in plots

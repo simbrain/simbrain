@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -39,8 +40,6 @@ import org.simbrain.util.StandardDialog;
  * action package
  */
 public class KeyBindings {
-
-    // NOTE. Do not use control bindings, since they conflict with meta on mac
 
     /**
      * Add key bindings.
@@ -135,9 +134,9 @@ public class KeyBindings {
         });
         
         // Duplicate selected objects
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.META_MASK),
-                "duplicate");
+        KeyStroke cmdD = KeyStroke.getKeyStroke(KeyEvent.VK_D,
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        inputMap.put(cmdD,"duplicate");
         panel.getActionMap().put("duplicate", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.duplicate();

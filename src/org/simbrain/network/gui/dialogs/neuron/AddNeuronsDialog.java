@@ -25,6 +25,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -103,7 +104,7 @@ public class AddNeuronsDialog extends StandardDialog {
      * The panel containing basic information on the neurons as well as options
      * for setting their update rule and its parameters.
      */
-    private NeuronPropertiesPanel combinedNeuronInfoPanel;
+    private AnnotatedPropertyEditor combinedNeuronInfoPanel;
 
     /**
      * A panel where layout settings can be edited.
@@ -129,9 +130,10 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     public static AddNeuronsDialog createAddNeuronsDialog(final NetworkPanel networkPanel) {
         final AddNeuronsDialog addND = new AddNeuronsDialog(networkPanel);
-        addND.combinedNeuronInfoPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(Collections.singletonList(addND.baseNeuron), addND, false);
+        addND.combinedNeuronInfoPanel = new AnnotatedPropertyEditor(Collections.singletonList(addND.baseNeuron));
+        addND.combinedNeuronInfoPanel.setBorder(BorderFactory.createTitledBorder("Neuron Type"));
         addND.init();
-        addND.combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().addActionListener(e -> SwingUtilities.invokeLater(() -> addND.updateHelp()));
+
         return addND;
     }
 
@@ -240,23 +242,6 @@ public class AddNeuronsDialog extends StandardDialog {
     protected void closeDialogCancel() {
         super.closeDialogCancel();
         dispose();
-    }
-
-    /**
-     * Set the help page based on the currently selected neuron type.
-     */
-    private void updateHelp() {
-        if (combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem() == SimbrainConstants.NULL_STRING) {
-            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
-        } else {
-            String name = (String) combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType().getSelectedItem();
-            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name + ".html");
-        }
-        helpButton.setAction(helpAction);
-    }
-
-    public void tickGroupifyOption(boolean gropify) {
-        groupPanel.addToGroup.setSelected(gropify);
     }
 
     /**

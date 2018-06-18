@@ -27,12 +27,12 @@ import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -97,7 +97,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
      * The neuron group panel containing both a basic neuron info panel and a
      * neuron update settings panel.
      */
-    private EditablePanel combinedNeuronInfoPanel;
+    private AnnotatedPropertyEditor combinedNeuronInfoPanel;
 
     /**
      * If true this is a creation panel. Otherwise it is an edit panel.
@@ -192,25 +192,26 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
             specificNeuronGroupPanel = ApplyPanel.createApplyPanel(specificNeuronGroupPanel);
         }
 
-        combinedNeuronInfoPanel = ApplyPanel.createApplyPanel(NeuronPropertiesPanel.createNeuronPropertiesPanel(neuronGroup.getNeuronList(), parent));
-        ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        boolean spiking = true;
-                        for (Neuron n : neuronGroup.getNeuronList()) {
-                            if (!n.getUpdateRule().isSpikingNeuron()) {
-                                spiking = false;
-                                break;
-                            }
-                        }
-                        neuronGroup.setSpikingNeuronGroup(spiking);
-                    }
-                });
-            }
-        });
+        combinedNeuronInfoPanel = new AnnotatedPropertyEditor(neuronGroup.getNeuronList());
+        // TODO: Re-implement?  If all nodes spiking, making it a spiking neuron group
+//        ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        boolean spiking = true;
+//                        for (Neuron n : neuronGroup.getNeuronList()) {
+//                            if (!n.getUpdateRule().isSpikingNeuron()) {
+//                                spiking = false;
+//                                break;
+//                            }
+//                        }
+//                        neuronGroup.setSpikingNeuronGroup(spiking);
+//                    }
+//                });
+//            }
+//        });
 
         layoutPanelWrapper = ApplyPanel.createApplyPanel(new EditablePanel() {
             @Override
@@ -256,7 +257,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
 
-            combinedNeuronInfoPanel = NeuronPropertiesPanel.createNeuronPropertiesPanel(neuronGroup.getNeuronList(), parent);
+            combinedNeuronInfoPanel = new AnnotatedPropertyEditor(neuronGroup.getNeuronList());
 
             layoutPanelWrapper = new JPanel();
             layoutPanelWrapper.add(layoutPanel);
@@ -389,7 +390,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
         boolean success = true;
         if (isCreationPanel) {
             success &= summaryPanel.commitChanges();
-            success &= combinedNeuronInfoPanel.commitChanges();
             Neuron template = neuronGroup.getNeuronList().get(0);
             try {
                 neuronGroup.clearNeuronList();

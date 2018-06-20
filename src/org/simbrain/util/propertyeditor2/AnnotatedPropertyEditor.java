@@ -118,7 +118,7 @@ public class AnnotatedPropertyEditor extends JPanel {
             return;
         }
 
-        // TODO: This only checks whether all objects are the same as the first object in the list. Maybe that is enough...
+        // If any two objects are different, then one will match the first element in the list and the other won't.
         boolean objectsSameType = editedObjects.stream().allMatch(m -> m.getClass().equals(editedObjects.get(0).getClass()));
         if (!objectsSameType) {
             throw new IllegalArgumentException("Edited objects must be of the same type as each other");

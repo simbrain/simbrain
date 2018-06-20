@@ -390,6 +390,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
         boolean success = true;
         if (isCreationPanel) {
             success &= summaryPanel.commitChanges();
+            combinedNeuronInfoPanel.commitChanges();
             Neuron template = neuronGroup.getNeuronList().get(0);
             try {
                 neuronGroup.clearNeuronList();

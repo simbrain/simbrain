@@ -34,7 +34,8 @@ import java.lang.annotation.*;
  * When used in a method, it should be used on a getter, and the interface that
  * contains the getter should have an appropriately named corresponding setter.
  * E.g. <code>getLowerBound</code> will try to find a setter named
- * <code>setUpperBound</code>.
+ * <code>setUpperBound</code> or <code>isClipped</code> will be associated with
+ * <code>setClipped</code>.
  *
  * @author O. J. Coleman
  */

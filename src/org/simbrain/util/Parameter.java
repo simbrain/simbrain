@@ -82,8 +82,16 @@ public class Parameter implements Comparable<Parameter> {
         this.getter = getter;
         annotation = getter.getAnnotation(UserParameter.class);
 
-        // Assume setter is named as one would expect given the getter, with a "set" in place of a "get"
-        String setterName = "set" + getter.getName().substring(3);
+        String setterName = "";
+        if(getter.getName().startsWith("is")) {
+            setterName = "set" + getter.getName().substring(2);
+        } else if (getter.getName().startsWith("get")) {
+            setterName = "set" + getter.getName().substring(3);
+        } else {
+            throw new RuntimeException("The getter must begin with 'is' or 'get'. " + getter.getName() + " is what was provided.");
+        }
+
+        // Assume setter is named as one would expect given the getter, with a "set" in place of a "get" or "is"
         Class<?> retType = getter.getReturnType();
         try {
             setter = getter.getDeclaringClass().getDeclaredMethod(setterName, retType);

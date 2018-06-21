@@ -77,42 +77,6 @@ public final class NeuronDialog extends StandardDialog {
         return nd;
     }
 
-    // Can't recall what having vs. not having a frame implies.  
-    // If someone remembers, document it!  (JKY 1/16)
-
-
-    /**
-     * Creates a neuron dialog from a collection of NeuronNodes with a frame
-     * specified.
-     *
-     * @param selectedNeurons neurons to edit.
-     * @param parent          the parent frame
-     * @return the dialog.
-     */
-    public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons, final Frame parent) {
-        NeuronDialog nd = new NeuronDialog(selectedNeurons, parent);
-        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
-        nd.init();
-        nd.addListeners();
-        nd.updateHelp();
-        return nd;
-    }
-
-    /**
-     * Create a neuron dialog for a list of logical neurons.
-     *
-     * @param neurons the neurons to edit
-     * @return the dialog
-     */
-    public static NeuronDialog createNeuronDialog(final List<Neuron> neurons) {
-        NeuronDialog nd = new NeuronDialog(neurons);
-        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
-        nd.init();
-        nd.addListeners();
-        nd.updateHelp();
-        return nd;
-    }
-
     /**
      * Construct the dialog object with no frame.
      *

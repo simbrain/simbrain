@@ -339,14 +339,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     @Override
-    public StandardDialog getNeuronDialog(Collection<NeuronNode> nns) {
-        SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns, current.getFrame());
-        dialog.setModalityType(Dialog.ModalityType.MODELESS);
-        return dialog;
-    }
-
-    @Override
     public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {
         SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
         SynapseDialog dialog = SynapseDialog.createSynapseDialog(sns, current.getFrame());

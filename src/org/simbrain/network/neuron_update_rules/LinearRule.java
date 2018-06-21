@@ -51,7 +51,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
      */
     @UserParameter(
             label = "Slope",
-            description = "Slope of lienar rule",
+            description = "Slope of linear rule",
             minimumValue = -10, maximumValue = 10,
             defaultValue = "1", order = 2)
     private double slope = 1;

@@ -29,10 +29,17 @@ import java.lang.annotation.*;
  * specifying meta-data such as label, description, and validation criteria.
  * This information may be used by dialog builders to construct input fields.
  *
+ * The annotation can be used on fields, or on methods of interfaces.
+ *
+ * When used in a method, it should be used on a getter, and the interface that
+ * contains the getter should have an appropriately named corresponding setter.
+ * E.g. <code>getLowerBound</code> will try to find a setter named
+ * <code>setUpperBound</code>.
+ *
  * @author O. J. Coleman
  */
 @Documented
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserParameter {
 

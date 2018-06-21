@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import org.simbrain.util.UserParameter;
+
 /**
  * An interface for updates rules that make use of an upper and lower bound,
  * either for clipping or for setting intrinsic bounds.
@@ -41,6 +43,11 @@ public interface BoundedUpdateRule {
      *
      * @return the upper boud
      */
+    @UserParameter(
+        label = "Upper Bound",
+        description = "Upper bound for neuron",
+        minimumValue = -100, maximumValue = 100,
+        defaultValue = "10", order = 2)
     double getUpperBound();
 
     /**

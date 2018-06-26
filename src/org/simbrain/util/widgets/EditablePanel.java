@@ -29,29 +29,19 @@ import javax.swing.*;
  *
  * @author ztosi
  */
-public interface EditablePanel {
+public abstract class EditablePanel extends JPanel {
 
     /**
      * Initialize the panel with field values.
      */
-    void fillFieldValues();
+    public abstract void fillFieldValues();
 
     /**
      * Uses the data in the fields of the panel which implements this to alter
      * the data of an appropriate model object accordingly.
      *
-     * @return whether or not the commit was successful
+     * @return whether or not the commit was successful. Not always used.
      */
-    boolean commitChanges();
-
-    /**
-     * This interface is only meant to be implemented by panels which edit
-     * model values. However, if some class wants to have an instance of
-     * this interface, there must be some way to retrieve the panel it
-     * corresponds to.
-     *
-     * @return the panel implementing this interface
-     */
-    JPanel getPanel();
+    public abstract boolean commitChanges();
 
 }

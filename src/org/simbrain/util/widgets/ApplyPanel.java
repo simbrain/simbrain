@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class ApplyPanel extends JPanel implements EditablePanel {
+public class ApplyPanel extends EditablePanel {
 
     /**
      * The committable panel which is being wrapped around, and to which changes
@@ -85,7 +85,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
      * Lay out the panel. It is assumed that the editable main panel has
      * already been laid out.
      */
-    protected void masterLayout() {
+    private void masterLayout() {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
@@ -94,13 +94,13 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         gbc.gridy = 0;
         int jbHeight = applyButton.getPreferredSize().height;
         int jbWidth = applyButton.getPreferredSize().width;
-        int mpHeight = mainPanel.getPanel().getPreferredSize().height;
-        int mpWidth = mainPanel.getPanel().getPreferredSize().width;
+        int mpHeight = mainPanel.getPreferredSize().height;
+        int mpWidth = mainPanel.getPreferredSize().width;
 
         gbc.gridheight = (int) Math.ceil((double) mpHeight / jbHeight);
         gbc.gridwidth = (int) Math.ceil((double) mpWidth / jbWidth);
 
-        this.add(mainPanel.getPanel(), gbc);
+        this.add(mainPanel, gbc);
 
         gbc.gridy += gbc.gridheight;
         gbc.weighty = 1.0;
@@ -122,10 +122,6 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         this.add(applyButton, gbc);
     }
 
-    /**
-     * {@inheritDoc} Specifically: commits changes to the committable panel
-     * {@link #mainPanel}.
-     */
     @Override
     public boolean commitChanges() {
         return mainPanel.commitChanges();
@@ -139,11 +135,6 @@ public class ApplyPanel extends JPanel implements EditablePanel {
      */
     public void addActionListener(ActionListener l) {
         applyButton.addActionListener(l);
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return (JPanel) mainPanel;
     }
 
     @Override

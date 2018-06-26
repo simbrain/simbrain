@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * winner take all network.
  */
-public class WTAPropertiesPanel extends JPanel implements GroupPropertiesPanel {
+public class WTAPropertiesPanel extends GroupPropertiesPanel {
 
     /**
      * Default number of neurons.
@@ -172,11 +172,6 @@ public class WTAPropertiesPanel extends JPanel implements GroupPropertiesPanel {
     @Override
     public Group getGroup() {
         return wta;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
 }

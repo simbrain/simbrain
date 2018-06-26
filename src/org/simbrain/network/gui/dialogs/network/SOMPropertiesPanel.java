@@ -32,7 +32,7 @@ import javax.swing.*;
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
  * Self organizing map.
  */
-public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
+public class SOMPropertiesPanel extends GroupPropertiesPanel {
 
     // TODO: This class takes care of SOM network and group. Not sure that's
     // good. Some things are conflated, e.g. help page.
@@ -243,28 +243,15 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
         ((SOMNetwork) som).getSom().setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getHelpPath() {
         return "Pages/Network/network/som.html";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Group getGroup() {
         return som;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 
 }

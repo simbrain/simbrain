@@ -17,20 +17,18 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
- * Interface for panels that allow the properties of neuron groups to be edited.
+ * Class for panels that allow the properties of neuron groups to be edited.
  * These must often be shared between dialogs for creation and editing of a
- * group, hence the interface. Also there is a generic neuron group dialog, with
- * a tab for properties specific to a given type of group: that tab refers only
- * to this interface.
+ * group.
  *
  * @author Jeff Yoshimi
  */
-public interface GroupPropertiesPanel extends EditablePanel {
+public abstract class GroupPropertiesPanel extends EditablePanel {
 
     /**
      * @return the group associated with this panel.
      */
-    Group getGroup();
+    public abstract Group getGroup();
 
     /**
      * Returns a string path to the documentation page for this group, relative
@@ -38,6 +36,6 @@ public interface GroupPropertiesPanel extends EditablePanel {
      *
      * @return the path to the docs
      */
-    String getHelpPath();
+    public abstract String getHelpPath();
 
 }

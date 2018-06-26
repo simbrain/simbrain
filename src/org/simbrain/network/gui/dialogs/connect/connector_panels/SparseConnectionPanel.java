@@ -55,7 +55,7 @@ import java.util.Set;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class SparseConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
+public class SparseConnectionPanel extends AbstractConnectionPanel {
 
     /**
      * A slider for setting the sparsity of the connections.
@@ -596,20 +596,10 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
         this.repaint();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ConnectNeurons getConnection() {
         return connection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JPanel getPanel() {
-        return this;
-    }
 
 }

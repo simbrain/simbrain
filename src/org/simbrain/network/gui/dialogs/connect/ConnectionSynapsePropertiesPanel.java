@@ -44,7 +44,7 @@ import java.util.List;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class ConnectionSynapsePropertiesPanel extends JPanel implements EditablePanel {
+public class ConnectionSynapsePropertiesPanel extends EditablePanel {
 
     /**
      * A synapse info panel containing basic synapse properties and synapse
@@ -221,7 +221,6 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
      * A constructor specifically for creating loose connections.
      *
      * @param parentWindow
-     * @param synapses
      */
     private ConnectionSynapsePropertiesPanel(final Window parentWindow) {
         synapseGroup = null;
@@ -375,14 +374,6 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
             excitatoryInfoPanel.fillFieldValues();
             inhibitoryInfoPanel.fillFieldValues();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JPanel getPanel() {
-        return mainPanel;
     }
 
     /**

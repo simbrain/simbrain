@@ -187,8 +187,6 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * @param parent
      * @param np
-     * @param src
-     * @param tar
      */
     private SynapseGroupDialog(final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
         super(parent, "Synapse Group Dialog");
@@ -311,7 +309,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             editSynapsesPanel.addApplyListenerEx(al);
             editSynapsesPanel.addApplyListenerIn(al);
         }
-        JScrollPane editSynapseScrollPane = new JScrollPane(((EditablePanel) editSynapsesPanel).getPanel());
+        JScrollPane editSynapseScrollPane = new JScrollPane(editSynapsesPanel);
         editSynapseScrollPane.setBorder(null);
         storedComponents.add(editSynapseScrollPane);
         tabbedPane.addTab("Synapse Type", new JPanel());

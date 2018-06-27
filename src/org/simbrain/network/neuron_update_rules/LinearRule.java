@@ -59,11 +59,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Bias.
      */
-    @UserParameter(
-            label = "Bias",
-            description = "Bias (constant added value) for linear rule",
-            minimumValue = -10, maximumValue = 10,
-            defaultValue = "0", order = 1)
     private double bias = 0;
 
     /**

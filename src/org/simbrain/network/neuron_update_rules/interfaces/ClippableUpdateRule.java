@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import org.simbrain.util.UserParameter;
+
 /**
  * Interface for update rules which can clip their values above and below upper
  * and lower bounds (clipping can be turned on or off). Thus
@@ -38,6 +40,10 @@ public interface ClippableUpdateRule {
      *
      * @return true if clipping is on; false if it's turned off
      */
+    @UserParameter(
+        label = "Clipping",
+        description = " If a neuron uses clipping, then if its activation exceeds its upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength",
+        defaultValue = "true", order = -1)
     boolean isClipped();
 
     /**

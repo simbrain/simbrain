@@ -51,7 +51,7 @@ import java.util.ArrayList;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, EditablePanel {
+public class NeuronGroupPanel extends GroupPropertiesPanel {
 
     /**
      * Parent network panel.
@@ -173,7 +173,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
         this.parent = parent;
         neuronGroup = ng;
         isCreationPanel = false;
-        layoutPanel = new MainLayoutPanel(ng.getLayout(), false, parent);
+        layoutPanel = new MainLayoutPanel(ng.getLayout(), true, parent);
     }
 
     /**
@@ -227,11 +227,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
             }
 
             @Override
-            public JPanel getPanel() {
-                return layoutPanel;
-            }
-
-            @Override
             public void fillFieldValues() {
             }
         });
@@ -259,7 +254,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
 
             combinedNeuronInfoPanel = new AnnotatedPropertyEditor(neuronGroup.getNeuronList());
 
-            layoutPanelWrapper = new JPanel();
             layoutPanelWrapper.add(layoutPanel);
 
         } else {
@@ -314,7 +308,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
             // Set up help button
             Action helpAction;
             if (specificNeuronGroupPanel != null) {
-                helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel.getPanel()).getHelpPath());
+                helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
             } else {
                 helpAction = new ShowHelpAction(this.getHelpPath());
             }
@@ -381,7 +375,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
     @Override
     public void fillFieldValues() {
         if (specificNeuronGroupPanel != null) {
-            ((GroupPropertiesPanel) specificNeuronGroupPanel.getPanel()).fillFieldValues();
+            specificNeuronGroupPanel.fillFieldValues();
         }
     }
 
@@ -406,7 +400,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
                 neuronGroup.applyLayout();
             } catch (NumberFormatException nfe) {
                 System.err.println("Class: " + this.getClass().getSimpleName() + " Method: commitChanges " + "NumberFormatException: " + nfe.getMessage());
-                ((SummaryPanel) summaryPanel.getPanel()).getPopLabel().setForeground(Color.RED);
+                ((SummaryPanel) summaryPanel).getPopLabel().setForeground(Color.RED);
                 repaint();
                 return false;
             }
@@ -414,7 +408,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
         }
 
         if (specificNeuronGroupPanel != null) {
-            success &= ((GroupPropertiesPanel) specificNeuronGroupPanel.getPanel()).commitChanges();
+            success &= ((GroupPropertiesPanel) specificNeuronGroupPanel).commitChanges();
         }
         networkPanel.repaint();
         return success;
@@ -439,11 +433,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel, Ed
     @Override
     public Group getGroup() {
         return neuronGroup;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
 }

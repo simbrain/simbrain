@@ -35,7 +35,7 @@ import java.awt.event.ActionListener;
  * properties of a discrete Hopfield network. Can be used in creation or
  * editing.
  */
-public class HopfieldPropertiesPanel extends JPanel implements GroupPropertiesPanel {
+public class HopfieldPropertiesPanel extends GroupPropertiesPanel {
 
     /**
      * Parent Network Panel.
@@ -217,11 +217,6 @@ public class HopfieldPropertiesPanel extends JPanel implements GroupPropertiesPa
     @Override
     public Group getGroup() {
         return hopfield;
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
 }

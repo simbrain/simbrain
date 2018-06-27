@@ -37,7 +37,7 @@ import java.util.Iterator;
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class SummaryPanel extends JPanel implements EditablePanel {
+public class SummaryPanel extends EditablePanel {
 
     /**
      * The default name for this type of panel.
@@ -504,14 +504,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
 
     public void setGroup(Group group) {
         this.group = group;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
     public boolean isEditable() {

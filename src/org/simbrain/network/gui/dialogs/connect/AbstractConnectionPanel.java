@@ -17,6 +17,7 @@ import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.util.List;
  * for setting connection properties.
  */
 @SuppressWarnings("serial")
-public abstract class AbstractConnectionPanel extends JPanel {
+public abstract class AbstractConnectionPanel extends EditablePanel {
 
     /**
      * Main panel.

@@ -35,7 +35,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public final class SynapsePropertiesPanel extends JPanel implements EditablePanel {
+public final class SynapsePropertiesPanel extends EditablePanel {
 
     /**
      * Vertical gap between panel elements.
@@ -149,11 +149,6 @@ public final class SynapsePropertiesPanel extends JPanel implements EditablePane
 
         return success;
 
-    }
-
-    @Override
-    public JPanel getPanel() {
-        return this;
     }
 
     @Override

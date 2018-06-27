@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
@@ -29,10 +28,7 @@ import org.simbrain.util.widgets.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * <b>NeuronDialog</b> is a dialog box for setting the properties of neurons.
@@ -62,60 +58,30 @@ public final class NeuronDialog extends StandardDialog {
     private ShowHelpAction helpAction;
 
     /**
-     * Creates a neuron dialog from a collection of NeuronNodes. No frame
-     * available.
-     *
-     * @param selectedNeurons the neurons to edit
-     * @return the dialog.
-     */
-    public static NeuronDialog createNeuronDialog(final Collection<NeuronNode> selectedNeurons) {
-        NeuronDialog nd = new NeuronDialog(selectedNeurons);
-        nd.neuronPropertiesPanel = new AnnotatedPropertyEditor(nd.neuronList);
-        nd.init();
-        nd.addListeners();
-        nd.updateHelp();
-        return nd;
-    }
-
-    /**
-     * Construct the dialog object with no frame.
-     *
-     * @param selectedNeurons neurons to edit
-     */
-    private NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
-        neuronList = getNeuronList(selectedNeurons);
-    }
-
-    /**
      * Construct a dialog for a set of neurons.
      *
      * @param neurons
      */
-    private NeuronDialog(final List<Neuron> neurons) {
+    public NeuronDialog(final List<Neuron> neurons) {
+
         neuronList = neurons;
-    }
 
-    /**
-     * Construct the dialog object with a frame.
-     *
-     * @param selectedNeurons neurons to edit
-     * @param parent          parent frame
-     */
-    private NeuronDialog(final Collection<NeuronNode> selectedNeurons, final Frame parent) {
-        super(parent, "Neuron Dialog");
-        neuronList = getNeuronList(selectedNeurons);
-    }
+        // Not used yet...
+//        long numGenerators = neurons.stream().filter(n -> n.getUpdateRule() instanceof ActivityGenerator).count();
+//        if (numGenerators == 0) {
+//            System.out.println("All neurons");
+//        } else if (numGenerators == neurons.size()) {
+//            System.out.println("All generators");
+//            // create generatorPropertiesPanel = new new AnnotatedPropertyEditor((List<ActivityGenerator>)nd.neuronList);
+//        } else {
+//            System.out.println("Mixed");
+//            // Create error message and somehow prevent dialog from being created
+//        }
+        neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
+        init();
+        addListeners();
+        updateHelp();
 
-    /**
-     * Get the logical neurons from the NeuronNodes.
-     *
-     * @param selectedNeurons the selected gui neurons (pnodes) from which the
-     *                        neuron model objects will be extracted and then
-     *                        edited by this panel
-     * @return the neuron model objects represented by the selected pnodes
-     */
-    private static List<Neuron> getNeuronList(final Collection<NeuronNode> selectedNeurons) {
-        return selectedNeurons.stream().map(NeuronNode::getNeuron).collect(Collectors.toList());
     }
 
     /**

@@ -49,11 +49,6 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Whether or not to add noise to the inputs .
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via "
-                    + "a noise generator.",
-            defaultValue = "false", order = 2)
     private boolean addNoise;
 
     @Override

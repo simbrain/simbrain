@@ -150,10 +150,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     /**
      * Add noise to neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "An option to add noise.",
-            defaultValue = "false", order = 6)
     private boolean addNoise;
 
     /**

@@ -69,12 +69,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     /**
      * Add noise to the neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via a "
-                    + "noise generator. The random values are added after the sigmoidal activation "
-                    + "function is applied.",
-            defaultValue = "false", order = 3)
     private boolean addNoise = false;
 
     /**

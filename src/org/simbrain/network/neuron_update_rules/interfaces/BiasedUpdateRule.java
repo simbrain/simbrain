@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import org.simbrain.util.UserParameter;
+
 /**
  * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
  * neurons.
@@ -28,6 +30,10 @@ public interface BiasedUpdateRule {
     /**
      * @return the neuron's bias
      */
+    @UserParameter(
+            label = "Bias",
+            description = "A fixed amount of input to this node.",
+            defaultValue = "0", order = 2)
     double getBias();
 
     /**

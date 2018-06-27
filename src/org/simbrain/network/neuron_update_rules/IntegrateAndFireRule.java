@@ -108,11 +108,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Add noise to neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via a "
-                    + "noise generator.",
-            defaultValue = "false", order = 7)
     private boolean addNoise;
 
     /**

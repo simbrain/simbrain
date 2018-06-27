@@ -74,11 +74,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Add noise to the neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via "
-                    + "a noise generator.",
-            defaultValue = "false", order = 3)
     private boolean addNoise = false;
 
     /**

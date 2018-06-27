@@ -102,11 +102,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     /**
      * Add noise to neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via "
-                    + "a noise generator.",
-            defaultValue = "false", order = 4)
     private boolean addNoise = false;
 
     /**

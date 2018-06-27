@@ -63,10 +63,6 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Add noise to the neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "An option to add noise.",
-            defaultValue = "false", order = 6)
     private  boolean addNoise = false;
 
     /**

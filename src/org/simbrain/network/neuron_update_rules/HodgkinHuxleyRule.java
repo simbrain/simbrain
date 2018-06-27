@@ -122,10 +122,6 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     /**
      * Add noise to the neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "An option to add noise.",
-            defaultValue = "false", order = 5)
     private boolean addNoise = false;
 
     @Override

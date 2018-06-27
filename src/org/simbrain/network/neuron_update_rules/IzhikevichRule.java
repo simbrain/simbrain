@@ -95,11 +95,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Add noise to the neuron.
      */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via a "
-                    + "noise generator.",
-            defaultValue = "false", order = 6)
     private boolean addNoise;
 
     // Backwards compatibility... to be removed

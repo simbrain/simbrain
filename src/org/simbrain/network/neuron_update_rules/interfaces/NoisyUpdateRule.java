@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -47,6 +48,11 @@ public interface NoisyUpdateRule {
      *
      * @return true if add noise is on; false otherwise.
      */
+    @UserParameter(
+            label = "Add noise",
+            description = "If this is set to true, random values are added to the activation via "
+                    + "a noise generator.",
+            defaultValue = "false", order = 99)
     boolean getAddNoise();
 
     /**

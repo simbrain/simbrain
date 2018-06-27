@@ -512,11 +512,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @see ScreenElement
      */
     protected JDialog getPropertyDialog() {
-        Collection<NeuronNode> neurons = this.getNetworkPanel().getSelectedNeurons();
-        if (neurons == null || neurons.isEmpty()) {
-            return null;
-        }
-        NeuronDialog dialog = (NeuronDialog) getNetworkPanel().getNeuronDialog(neurons);
+        NeuronDialog dialog = getNetworkPanel().getNeuronDialog();
         return dialog;
     }
 

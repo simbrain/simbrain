@@ -351,7 +351,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     @Override
     public void showSelectedNeuronProperties() {
-        StandardDialog dialog = getNeuronDialog(getSelectedNeurons());
+        NeuronDialog dialog = getNeuronDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

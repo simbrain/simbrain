@@ -1840,7 +1840,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the neuron properties dialog.
      */
     public void showSelectedNeuronProperties() {
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(getSelectedNeurons());
+        NeuronDialog dialog = new NeuronDialog(getSelectedModelNeurons());
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
@@ -2978,8 +2978,18 @@ public class NetworkPanel extends JPanel {
         return sgd;
     }
 
-    public StandardDialog getNeuronDialog(Collection<NeuronNode> nns) {
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns);
+    /**
+     * Returns a dialog for editing the current selected neurons.
+     *
+     * @return the NeuronDialog
+     */
+    public NeuronDialog getNeuronDialog() {
+
+        List<Neuron> neurons = getSelectedModelNeurons();
+        if (neurons == null || neurons.isEmpty()) {
+            return null;
+        }
+        NeuronDialog dialog = new NeuronDialog(neurons);
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
     }

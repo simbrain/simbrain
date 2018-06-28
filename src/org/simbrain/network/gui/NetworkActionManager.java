@@ -282,7 +282,7 @@ public final class NetworkActionManager {
     /**
      * Shows dialog to edit randomizer properties.
      */
-    private final Action setRandomizerPropertiesAction;
+//    private final Action setRandomizerPropertiesAction;
 
     /**
      * Shows dialog to adjust group of synapses.
@@ -396,7 +396,7 @@ public final class NetworkActionManager {
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
 
-        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(networkPanel);
+//        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
         showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
         showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
@@ -885,12 +885,12 @@ public final class NetworkActionManager {
         return selectionEditModeAction;
     }
 
-    /**
-     * @return the getSetRandomPropsAction
-     */
-    public Action getSetRandomizerPropsAction() {
-        return setRandomizerPropertiesAction;
-    }
+//    /**
+//     * @return the getSetRandomPropsAction
+//     */
+//    public Action getSetRandomizerPropsAction() {
+//        return setRandomizerPropertiesAction;
+//    }
 
     /**
      * @return the showAdjustSynapsesDialog

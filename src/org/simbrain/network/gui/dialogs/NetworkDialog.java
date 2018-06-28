@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -136,12 +136,12 @@ public class NetworkDialog extends StandardDialog {
         /**
          * The activation randomizer panel.
          */
-        private RandomizerPanel activationRandomizer;
+        private RandomizerPanel2 activationRandomizer;
 
         /**
          * The weight randomizer panel.
          */
-        private RandomizerPanel weightRandomizer;
+        private RandomizerPanel2 weightRandomizer;
 
         /**
          * Construct the panel.

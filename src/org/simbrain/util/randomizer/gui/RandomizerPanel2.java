@@ -7,6 +7,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.Randomizer;
 
 import javax.swing.*;
@@ -69,6 +70,8 @@ public class RandomizerPanel2 extends JPanel {
         DISTRIBUTION_MAP.put(new ParetoDistribution().getName(), new AnnotatedPropertyEditor(new ParetoDistribution()));
         DISTRIBUTION_MAP.put(new UniformDistribution().getName(), new AnnotatedPropertyEditor(new UniformDistribution()));
     }
+
+    //TODO: Try to remove these dependencies on parent
 
     /**
      * Construct a panel to edit a single randomizer.
@@ -305,5 +308,14 @@ public class RandomizerPanel2 extends JPanel {
 
     public static BiMap<String, Class> getTypeMap() {
         return DISTRIBUTION_MAP2;
+    }
+
+    //TODO
+    public void fillFieldValues(Randomizer randomizer) {
+    }
+    public void commitRandom(Randomizer randomizer) {
+    }
+    public String getSummary() {
+        return "Todo!";
     }
 }

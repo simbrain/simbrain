@@ -22,7 +22,8 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -87,7 +88,7 @@ public class LMSOfflineControlPanel extends JPanel {
         alpha.setMaximumSize(alpha.getPreferredSize());
     }
 
-    private RandomizerPanel noisePanel;
+    private RandomizerPanel2 noisePanel;
 
     private DropDownTriangle noiseTri;
 
@@ -108,7 +109,7 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(Window frame) {
         this.frame = frame;
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
-        noisePanel = new RandomizerPanel(frame);
+        noisePanel = new RandomizerPanel2(new Randomizer(), frame); //TODO
         noisePanel.fillDefaultValues();
         init();
     }
@@ -122,7 +123,7 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {
         this.frame = frame;
         this.trainer = trainer;
-        noisePanel = new RandomizerPanel(frame);
+        noisePanel = new RandomizerPanel2(new Randomizer(), frame);
         noisePanel.fillFieldValues(trainer.getNoiseGen());
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
         String text = noisePanel.getSummary();
@@ -200,34 +201,35 @@ public class LMSOfflineControlPanel extends JPanel {
      * trainer, applyButton, solutionTypes, and regSwitch.
      */
     private void addActionListeners() {
-        // If focus is lost from one of the fields in the noise panel
-        // change the summary description.
-        noisePanel.addFocusListenerToFields(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent arg0) {
-            }
+        //TODO
+//        // If focus is lost from one of the fields in the noise panel
+//        // change the summary description.
+//        noisePanel.addFocusListenerToFields(new FocusListener() {
+//            @Override
+//            public void focusGained(FocusEvent arg0) {
+//            }
+//
+//            @Override
+//            public void focusLost(FocusEvent arg0) {
+//                String text = noisePanel.getSummary();
+//                noiseTri.setBothTexts(text, text);
+//            }
+//        });
 
-            @Override
-            public void focusLost(FocusEvent arg0) {
-                String text = noisePanel.getSummary();
-                noiseTri.setBothTexts(text, text);
-            }
-        });
-
-        // If the noise distribution has been changed, change the summary
-        // description.
-        noisePanel.getCbDistribution().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        String text = noisePanel.getSummary();
-                        noiseTri.setBothTexts(text, text);
-                    }
-                });
-            }
-        });
+//        // If the noise distribution has been changed, change the summary
+//        // description.
+//        noisePanel.getCbDistribution().addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent arg0) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        String text = noisePanel.getSummary();
+//                        noiseTri.setBothTexts(text, text);
+//                    }
+//                });
+//            }
+//        });
 
         // Adds a listener for the start button: executes training upon firing.
         // Also activates ridge regression in LMSOffline and sets the alpha.

@@ -27,7 +27,6 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 import javax.swing.*;
 import java.util.concurrent.Executors;
@@ -280,24 +279,24 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     private void editRandomizerProperties() {
-        StandardDialog dialog = new StandardDialog(null, "Randomizer Properties") {
-            RandomizerPanel randomPanel = new RandomizerPanel(this);
-
-            // Initializer
-            {
-                setContentPane(randomPanel);
-                trainer.getRandomizer().ifPresent(randomPanel::fillFieldValues);
-            }
-
-            @Override
-            protected void closeDialogOk() {
-                super.closeDialogOk();
-                trainer.getRandomizer().ifPresent(randomPanel::commitRandom);
-            }
-        };
-        dialog.setLocationRelativeTo(null);
-        dialog.pack();
-        dialog.setVisible(true);
+//        StandardDialog dialog = new StandardDialog(null, "Randomizer Properties") {
+//            RandomizerPanel randomPanel = new RandomizerPanel(this);
+//
+//            // Initializer
+//            {
+//                setContentPane(randomPanel);
+//                trainer.getRandomizer().ifPresent(randomPanel::fillFieldValues);
+//            }
+//
+//            @Override
+//            protected void closeDialogOk() {
+//                super.closeDialogOk();
+//                trainer.getRandomizer().ifPresent(randomPanel::commitRandom);
+//            }
+//        };
+//        dialog.setLocationRelativeTo(null);
+//        dialog.pack();
+//        dialog.setVisible(true);
     }
 
 }

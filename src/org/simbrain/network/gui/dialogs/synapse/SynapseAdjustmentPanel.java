@@ -27,7 +27,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 
 import javax.swing.*;
 import java.awt.*;
@@ -185,12 +185,12 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * A random panel for randomizing the synapse strengths.
      */
-    private RandomizerPanel randomPanel = new RandomizerPanel();
+    private RandomizerPanel2 randomPanel = new RandomizerPanel2(new Randomizer(), null);
 
     /**
      * A random panel for randomizing perturbations to synapse strengths.
      */
-    private RandomizerPanel perturberPanel = new RandomizerPanel();
+    private RandomizerPanel2 perturberPanel = new RandomizerPanel2(new Randomizer(), null);
 
     /**
      * Fills the fields of the random panels to default values.

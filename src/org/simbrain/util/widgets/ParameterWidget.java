@@ -119,33 +119,42 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             Double minValue = parameter.hasMinValue() ? parameter.getAnnotation().minimumValue() : null;
             Double maxValue = parameter.hasMaxValue() ? parameter.getAnnotation().maximumValue() : null;
-            double range;
+
+            // Step size if bounds are missing
             double stepSize = 0.1;
 
-            // If there's a min and/or max value then we can base the spinner step size on it.
-            if (minValue != null || maxValue != null || defaultValue != null) {
-                if (minValue != null && maxValue != null) {
-                    range = maxValue.doubleValue() - minValue.doubleValue();
-                } else if (minValue != null) {
-                    range = Math.abs(minValue.doubleValue());
-                } else if (maxValue != null) {
-                    range = Math.abs(maxValue.doubleValue());
-                } else {
-                    range = Math.abs(defaultValue.doubleValue());
-                }
-
-                double initialStep = range / 100; // aiming for about 100 steps between min and max.
-                double magnitude = Math.pow(10, Math.floor(Math.log10(initialStep)));
-                double msd = initialStep / magnitude;
-                if (msd > 5) {
-                    msd = 10;
-                } else if (msd > 2) {
-                    msd = 5;
-                } else if (msd > 1) {
-                    msd = 2;
-                }
-                stepSize = msd * magnitude;
+            // If bounds are given divide the spinner can step numsteps from top to bottom
+            if(minValue != null && maxValue != null) {
+                int numSteps = 100;
+                stepSize = Math.abs(minValue-maxValue)/numSteps;
             }
+
+            // TODO: Evaluate the original code below (which produced some Nans).  The code above works well enough for now
+            // double range;
+//            // If there's a min and/or max value then we can base the spinner step size on it.
+//            if (minValue != null || maxValue != null || defaultValue != null) {
+//                if (minValue != null && maxValue != null) {
+//                    range = maxValue.doubleValue() - minValue.doubleValue();
+//                } else if (minValue != null) {
+//                    range = Math.abs(minValue.doubleValue());
+//                } else if (maxValue != null) {
+//                    range = Math.abs(maxValue.doubleValue());
+//                } else {
+//                    range = Math.abs(defaultValue.doubleValue());
+//                }
+//
+//                double initialStep = range / 100; // aiming for about 100 steps between min and max.
+//                double magnitude = Math.pow(10, Math.floor(Math.log10(initialStep)));
+//                double msd = initialStep / magnitude;
+//                if (msd > 5) {
+//                    msd = 10;
+//                } else if (msd > 2) {
+//                    msd = 5;
+//                } else if (msd > 1) {
+//                    msd = 2;
+//                }
+//                stepSize = msd * magnitude;
+//            }
 
             if (parameter.isNumericInteger()) {
                 int step = (int) Math.max(1, stepSize);

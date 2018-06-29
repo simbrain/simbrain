@@ -51,7 +51,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Reset voltage (mV)",
             description = "This represents the voltage to which the membrane potential will be reset after "
                     + "an action potential has fired.",
-            defaultValue = "-47.7", order = 3)
+            defaultValue = "-47.7", order = 3, tab = "Membrane Voltage")
     private double v_Reset = -47.7;
 
     /**
@@ -64,7 +64,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Threshold voltage (mV)",
             description = "This determines when a neuron will start a divergent change in voltage that will tend "
                     + "toward infinity and is not the voltage at which we consider the neuron to have spiked.",
-            defaultValue = "-50.4", order = 2)
+            defaultValue = "-50.4", order = 2, tab = "Membrane Voltage")
     private double v_Th = -50.4;
 
     /**
@@ -74,7 +74,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Peak Voltage (mV)",
             description = "The peak voltage after which we say with certainty that an action potential has occurred (mV).",
-            defaultValue = "20", order = 1)
+            defaultValue = "20", order = 1, tab = "Membrane Voltage")
     private double v_Peak = 20;
 
     /**
@@ -83,7 +83,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Leak Conductance (nS)",
             description = "The inverse of the resistance of the channels through which current leaks from the neuron.",
-            defaultValue = "30", order = 6)
+            defaultValue = "30", order = 6, tab = "Input Currents")
     private double g_L = 30;
 
     /**
@@ -92,7 +92,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Max Ex. Conductance (nS)",
             description = "The excitatory conductance if all excitatory channels are open.",
-            defaultValue = "10", order = 7)
+            defaultValue = "10", order = 7, tab = "Input Currents")
     private double g_e_bar = 10;
 
     /**
@@ -101,7 +101,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Max In. Conductance (nS)",
             description = "The inhibitory conductance if all inhibitory channels are open.",
-            defaultValue = "10", order = 8)
+            defaultValue = "10", order = 8, tab = "Input Currents")
     private double g_i_bar = 10;
 
     /**
@@ -111,7 +111,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Leak Reversal (mV)",
             description = "The membrane potential at which leak currents would no longer have "
                     + "any effect on the neuron's membrane potential.",
-            defaultValue = "-70.6", order = 9)
+            defaultValue = "-70.6", order = 9, tab = "Input Currents")
     private double leakReversal = -70.6;
 
     /**
@@ -121,7 +121,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Excitatory Reversal (mV)",
             description = "The membrane potential at which impinging excitatory (depolarizing) "
                     + "inputs reach equilibrium.",
-            defaultValue = "0", order = 10)
+            defaultValue = "0", order = 10, tab = "Input Currents")
     private double exReversal = 0;
 
     /**
@@ -131,7 +131,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Inbitatory Reversal (mV)",
             description = "The membrane potential at which impinging inhibitory (hyperpolarizing) "
                     + "inputs reach equilibrium.",
-            defaultValue = "-75", order = 11)
+            defaultValue = "-75", order = 11, tab = "Input Currents")
     private double inReversal = -75;
 
     /**
@@ -150,7 +150,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Reset (nA)",
             description = "Adaptation reset parameter (nA)",
-            defaultValue = "0.0805", order = 12)
+            defaultValue = "0.0805", order = 12, tab = "Adaptation")
     private double b = 0.0805;
 
     /**
@@ -159,7 +159,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Time constant (ms)",
             description = "Controls the rate at which the neuron attains its resting potential.",
-            defaultValue = "40", order = 13)
+            defaultValue = "40", order = 13, tab = "Adaptation")
     private double tauW = 40;
 
     /**
@@ -169,7 +169,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Slope Factor",
             description = "A value which regulates the overall effect of the exponential term on "
                     + "the membrane potential equation.",
-            defaultValue = "2", order = 99)
+            defaultValue = "2", order = 6, tab = "Membrane Voltage")
     private double slopeFactor = 2;
 
     /**
@@ -179,7 +179,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Coupling Const.",
             description = "This represents the voltage to which the membrane potential will be reset after "
                     + "an action potential has fired.",
-            defaultValue = "4", order = 14)
+            defaultValue = "4", order = 14, tab = "Adaptation")
     private double a = 4;
 
     /**
@@ -188,7 +188,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Capacitance (μF)",
             description = "A paramter designating the overall ability of the neuron's membrane to retain a charge.",
-            defaultValue = "281", order = 4)
+            defaultValue = "281", order = 4, tab = "Membrane Voltage")
     private double memCapacitance = 281;
 
     /**
@@ -197,7 +197,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Background Current (nA)",
             description = "A tunable parameter in some ways similar to a bias parameter for non-spiking neurons.",
-            defaultValue = "0", order = 5)
+            defaultValue = "0", order = 5, tab = "Membrane Voltage")
     private double i_bg = 0;
 
     /**

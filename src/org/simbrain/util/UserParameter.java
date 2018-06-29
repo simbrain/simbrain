@@ -123,4 +123,10 @@ public @interface UserParameter {
      * @return the string method name
      */
     String typeMapMethod() default "getTypes";
+
+    /**
+     * The name of the tab this parameter associated with.
+     * @return the label of the tab
+     */
+    String tab() default "Main";
 }

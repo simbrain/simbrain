@@ -77,9 +77,14 @@ public class AnnotatedPropertyEditor extends JPanel {
     private List<? extends EditableObject> editedObjects = Collections.EMPTY_LIST;
 
     /**
-     * Main item panel.
+     * Main panel.
      */
-    private LabelledItemPanel itemPanel = new LabelledItemPanel();
+    private JComponent mainPanel = new JTabbedPane();
+
+    /**
+     * All tab panels.
+     */
+    private Map<String, LabelledItemPanel> tabPanels = new TreeMap<>();
 
     /**
      * Construct with one object.
@@ -102,8 +107,8 @@ public class AnnotatedPropertyEditor extends JPanel {
         }
         this.editedObjects = objects;
         setLayout(new BorderLayout());
-        add(itemPanel, BorderLayout.CENTER);
         initPanel();
+        add(mainPanel, BorderLayout.CENTER);
         fillFieldValues(editedObjects);
     }
 
@@ -154,12 +159,49 @@ public class AnnotatedPropertyEditor extends JPanel {
         // the right order.
         for (ParameterWidget pw : widgets) {
             if (pw.getParameter().isObjectType()) {
-                itemPanel.addSpanningItem(pw.getComponent());
+                addItemToTabPanel(pw);
             } else {
                 JLabel label = new JLabel(pw.getParameter().getAnnotation().label());
                 label.setToolTipText(pw.getToolTipText());
-                itemPanel.addItemLabel(label, pw.getComponent());
+                addItemToTabPanel(label, pw);
             }
+        }
+
+        // If there is only one tab panel, do not create tab bar and use that one panel as main panel
+        if (tabPanels.size() == 1) {
+            mainPanel = tabPanels.values().iterator().next();
+        }
+    }
+
+    /**
+     * Add a ParameterWidget to its corresponding tab panel.
+     * @param pw the ParameterWidget to add
+     */
+    private void addItemToTabPanel(ParameterWidget pw) {
+        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addSpanningItem(pw.getComponent());
+    }
+
+    /**
+     * Add a labeled ParameterWidget to its corresponding tab panel.
+     * @param pw the ParameterWidget to add
+     */
+    private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
+        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
+    }
+
+    /**
+     * Creates if not exists a tab panel with a specified name.
+     * @param tabName the name for the tab
+     */
+    private void addTabPanel(String tabName) {
+        if (!tabPanels.containsKey(tabName)) {
+            LabelledItemPanel newLabelledItemPanel = new LabelledItemPanel();
+            tabPanels.put(tabName, newLabelledItemPanel);
+            ((JTabbedPane) mainPanel).addTab(tabName, newLabelledItemPanel);
         }
     }
 

@@ -34,7 +34,7 @@ public interface NoisyUpdateRule {
      *
      * @return the noise generator.
      */
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000, tab="Noise")
     ProbabilityDistribution getNoiseGenerator();
 
     /**
@@ -53,7 +53,7 @@ public interface NoisyUpdateRule {
             label = "Add noise",
             description = "If this is set to true, random values are added to the activation via "
                     + "a noise generator.",
-            defaultValue = "false", order = 99)
+            defaultValue = "false", order = 99, tab="Noise")
     boolean getAddNoise();
 
     /**

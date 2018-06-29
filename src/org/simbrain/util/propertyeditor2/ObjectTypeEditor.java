@@ -31,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -201,7 +202,9 @@ public class ObjectTypeEditor extends JComponent {
 
         // Set up the combo box
         cbObjectType = new JComboBox<String>();
-        for (String label : typeMap.keySet()) {
+        List<String> labels = new ArrayList(typeMap.keySet());
+        Collections.sort(labels);
+        for (String label : labels) {
             cbObjectType.addItem(label);
         }
         if (cbStartState == SimbrainConstants.NULL_STRING) {

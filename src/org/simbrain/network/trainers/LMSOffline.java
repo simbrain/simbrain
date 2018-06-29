@@ -36,8 +36,8 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.Matrices;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.util.randomizer.Randomizer;
 
 import javax.swing.*;
 
@@ -73,7 +73,7 @@ public class LMSOffline extends Trainer {
      * The noise generator from which random values are taken if randomizing
      * the input state matrix.
      */
-    private Randomizer noiseGen = new Randomizer(new UniformDistribution(-0.001, 0.001));
+    private ProbabilityDistribution noiseGen = new UniformDistribution();
 
     /**
      * Construct the LMSOOffline object, with a trainable network the Synapse
@@ -340,7 +340,7 @@ public class LMSOffline extends Trainer {
         this.noiseAdded = noiseAdded;
     }
 
-    public Randomizer getNoiseGen() {
+    public ProbabilityDistribution getNoiseGen() {
         return noiseGen;
     }
     //

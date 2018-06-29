@@ -8,7 +8,6 @@ import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.Randomizer;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//TODO: Revisit name randomizer
+//TODO: Remove and replace with annotated property editor
 
 /**
  * This is a panel that allows a randomizer or list of randomizers to be edited.
@@ -32,7 +31,7 @@ public class RandomizerPanel2 extends JPanel {
     /**
      * The probability distributions being modified.
      */
-    private final List<Randomizer> randomizerList; //TODO Rename
+    private final List<ProbabilityDistribution> randomizerList; //TODO Rename
 
     /**
      * Combo box for choosing which distribution to use.
@@ -79,7 +78,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param rand   the randomizer
      * @param parent the parent window for nice resizing
      */
-    public RandomizerPanel2(Randomizer rand, Window parent) {
+    public RandomizerPanel2(ProbabilityDistribution rand, Window parent) {
         this(Collections.singletonList(rand), parent);
     }
 
@@ -89,7 +88,7 @@ public class RandomizerPanel2 extends JPanel {
      * @param randomizerList
      * @param parent
      */
-    public RandomizerPanel2(List<Randomizer> randomizerList, Window parent) {
+    public RandomizerPanel2(List<ProbabilityDistribution> randomizerList, Window parent) {
         this.randomizerList = randomizerList;
         this.parent = parent;
         cbDistribution = new JComboBox<String>(DISTRIBUTION_MAP.keySet().toArray(new String[DISTRIBUTION_MAP.size()]));
@@ -111,14 +110,14 @@ public class RandomizerPanel2 extends JPanel {
             return;
         }
 
-        Iterator<Randomizer> randomizerItr = randomizerList.iterator();
-        Randomizer randomizerRef = randomizerItr.next();
+        Iterator<ProbabilityDistribution> randomizerItr = randomizerList.iterator();
+        ProbabilityDistribution randomizerRef = randomizerItr.next();
 
         // Check whether the set of randomizers being edited are of the
         // same type or not
         boolean discrepancy = false;
         while (randomizerItr.hasNext()) {
-            if (!randomizerRef.getPdf().getClass().equals(randomizerItr.next().getPdf().getClass())) {
+            if (!randomizerRef.getClass().equals(randomizerItr.next().getClass())) {
                 discrepancy = true;
                 break;
             }
@@ -133,7 +132,7 @@ public class RandomizerPanel2 extends JPanel {
             // If they are the same type, use the appropriate editor panel.
             // Later if ok is pressed the values from that panel will be written
             // to the rules
-            String distributionName = randomizerRef.getPdf().getName();
+            String distributionName = randomizerRef.getName();
             randomizerPanel = DISTRIBUTION_MAP.get(distributionName);
 //            randomizerPanel.fillFieldValues(randomizerList);
             cbDistribution.setSelectedItem(distributionName);
@@ -184,17 +183,17 @@ public class RandomizerPanel2 extends JPanel {
             boolean replaceDistribution = randomizerPanel != startingPanel;
 
 
-            // If so we have to fill the new panel with default values
-            if (replaceDistribution) {
-                randomizerPanel.fillDefaultValues();
-            } else {
-                // If not we can fill the new panel with values from the
-                // randomizer being edited.
-                List<EditableObject> distributionList = randomizerList.stream()
-                        .map(Randomizer::getPdf)
-                        .collect(Collectors.toList());
-                randomizerPanel.fillFieldValues(distributionList);
-            }
+//            // If so we have to fill the new panel with default values
+//            if (replaceDistribution) {
+//                randomizerPanel.fillDefaultValues();
+//            } else {
+//                // If not we can fill the new panel with values from the
+//                // randomizer being edited.
+//                List<EditableObject> distributionList = randomizerList.stream()
+//                        .map(Randomizer::getPdf)
+//                        .collect(Collectors.toList());
+//                randomizerPanel.fillFieldValues(distributionList);
+//            }
 
             // Tell the panel whether it will have to replace neuron
             // update rules or edit them upon commit.
@@ -220,7 +219,7 @@ public class RandomizerPanel2 extends JPanel {
      *
      * @param randomizerList2 list of randomizers
      */
-    public void fillFieldValues(List<Randomizer> randomizerList2) {
+    public void fillFieldValues(List<ProbabilityDistribution> randomizerList2) {
         randomizerPanel.fillFieldValues(randomizerList2);
     }
 
@@ -252,22 +251,22 @@ public class RandomizerPanel2 extends JPanel {
         if (selectedDistribution == null) {
             return true;
         }
-
-        for (Randomizer r : randomizerList) {
-            // Only replace if this is a different rule (otherwise when
-            // editing multiple rules with different parameter values which
-            // have not been set those values will be replaced with the
-            // default).
-            if (!r.getPdf().getClass().equals(selectedDistribution.getClass())) {
-                r.setPdf(selectedDistribution.deepCopy());
-            }
-        }
-
-        List<EditableObject> distributionList = randomizerList.stream()
-                .map(Randomizer::getPdf)
-                .collect(Collectors.toList());
-        startingPanel = randomizerPanel;
-        randomizerPanel.commitChanges(distributionList);
+//
+//        for (Randomizer r : randomizerList) {
+//            // Only replace if this is a different rule (otherwise when
+//            // editing multiple rules with different parameter values which
+//            // have not been set those values will be replaced with the
+//            // default).
+//            if (!r.getPdf().getClass().equals(selectedDistribution.getClass())) {
+//                r.setPdf(selectedDistribution.deepCopy());
+//            }
+//        }
+//
+//        List<EditableObject> distributionList = randomizerList.stream()
+//                .map(Randomizer::getPdf)
+//                .collect(Collectors.toList());
+//        startingPanel = randomizerPanel;
+//        randomizerPanel.commitChanges(distributionList);
         return true;
     }
 
@@ -275,18 +274,18 @@ public class RandomizerPanel2 extends JPanel {
      * Test main.
      */
     static JFrame frame = new JFrame();
-
-    public static void main(String[] args) {
-        Randomizer rd = new Randomizer(new NormalDistribution());
-        RandomizerPanel2 rp = new RandomizerPanel2(rd, frame);
-        rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        // rp.fillDefaultValues();
-        frame.setContentPane(rp);
-        frame.setVisible(true);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        rp.repaintPanel();
-    }
+//
+//    public static void main(String[] args) {
+//        Randomizer rd = new Randomizer(new NormalDistribution());
+//        RandomizerPanel2 rp = new RandomizerPanel2(rd, frame);
+//        rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//        // rp.fillDefaultValues();
+//        frame.setContentPane(rp);
+//        frame.setVisible(true);
+//        frame.pack();
+//        frame.setLocationRelativeTo(null);
+//        rp.repaintPanel();
+//    }
 
     /**
      * Associations between names of rules and panels for editing them.
@@ -311,11 +310,12 @@ public class RandomizerPanel2 extends JPanel {
     }
 
     //TODO
-    public void fillFieldValues(Randomizer randomizer) {
+    public void fillFieldValues(ProbabilityDistribution randomizer) {
     }
-    public void commitRandom(Randomizer randomizer) {
+    public void commitRandom(ProbabilityDistribution randomizer) {
     }
     public String getSummary() {
         return "Todo!";
     }
+
 }

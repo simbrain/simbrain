@@ -24,7 +24,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to
@@ -95,9 +96,9 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     private double timeConstant = 1;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to neuron.
@@ -149,7 +150,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         rn.setUseAdaptation(getUseAdaptation());
         rn.setAdaptationParameter(getAdaptationParameter());
         rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
-        rn.noiseGenerator = new Randomizer(noiseGenerator);
+        rn.noiseGenerator = noiseGenerator.deepCopy();
         return rn;
     }
 
@@ -253,18 +254,14 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     /**

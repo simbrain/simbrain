@@ -24,8 +24,9 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.util.randomizer.Randomizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +164,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     /**
      * Parameter randomizer.
      */
-    private final Randomizer rand = new Randomizer();
+    private ProbabilityDistribution rand = new UniformDistribution();
 
     /**
      * List of activation functions for easy reference.
@@ -652,7 +653,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     }
 
     @Override
-    public Optional<Randomizer> getRandomizer() {
+    public Optional<ProbabilityDistribution> getRandomizer() {
         return Optional.of(rand);
     }
 

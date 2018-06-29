@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * Linear <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
@@ -101,9 +102,9 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     private double refractoryPeriod = 3;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to neuron.
@@ -128,7 +129,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         ifn.setTimeConstant(getTimeConstant());
         ifn.setResistance(getResistance());
         ifn.setAddNoise(getAddNoise());
-        ifn.noiseGenerator = new Randomizer(noiseGenerator);
+        ifn.noiseGenerator = noiseGenerator.deepCopy();
         return ifn;
     }
 
@@ -229,25 +230,14 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         this.addNoise = addNoise;
     }
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setAddNoise(final Randomizer noise) {
-        this.noiseGenerator = noise;
-    }
-
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     /**

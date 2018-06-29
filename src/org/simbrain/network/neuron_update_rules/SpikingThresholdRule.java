@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 import java.util.Random;
 
@@ -44,7 +45,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * The noise generating randomizer.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Whether or not to add noise to the inputs .
@@ -102,13 +103,13 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
-        this.noiseGenerator = rand;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     @Override

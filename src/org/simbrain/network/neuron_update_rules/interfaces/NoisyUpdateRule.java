@@ -19,7 +19,7 @@
 package org.simbrain.network.neuron_update_rules.interfaces;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * An interface which should be implemented by any neuron update rule that uses
@@ -34,14 +34,15 @@ public interface NoisyUpdateRule {
      *
      * @return the noise generator.
      */
-    Randomizer getNoiseGenerator();
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
+    ProbabilityDistribution getNoiseGenerator();
 
     /**
      * Set the noise generator.
      *
      * @param rand the generator to set
      */
-    void setNoiseGenerator(Randomizer rand);
+    void setNoiseGenerator(ProbabilityDistribution rand);
 
     /**
      * Return true if add noise is turned on.

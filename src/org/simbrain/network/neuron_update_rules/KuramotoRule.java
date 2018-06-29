@@ -5,7 +5,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * TODO
@@ -47,7 +48,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     /**
      * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -124,7 +125,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         kr.setAddNoise(getAddNoise());
         kr.setUpperBound(getUpperBound());
         kr.setLowerBound(getLowerBound());
-        kr.noiseGenerator = new Randomizer(noiseGenerator);
+        kr.noiseGenerator = noiseGenerator.deepCopy();
         return kr;
     }
 
@@ -189,12 +190,12 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(final Randomizer noise) {
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 

@@ -22,8 +22,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>Continuous Sigmoidal Rule</b> provides various squashing function
@@ -230,17 +230,13 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         this.slope = inflectionPointSlope;
     }
 
-    /**
-     * @return Returns the noise.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 

@@ -23,8 +23,9 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
@@ -64,7 +65,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -127,7 +128,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
         ln.setAddNoise(getAddNoise());
         ln.setUpperBound(getUpperBound());
         ln.setLowerBound(getLowerBound());
-        ln.noiseGenerator = new Randomizer(noiseGenerator);
+        ln.noiseGenerator = noiseGenerator.deepCopy();
         return ln;
     }
 
@@ -192,12 +193,12 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(final Randomizer noise) {
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 

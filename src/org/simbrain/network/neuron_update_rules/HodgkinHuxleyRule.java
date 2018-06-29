@@ -23,7 +23,9 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
+
 // TODO: deal with ENa, EK
 /**
  * Hodgkin-Huxley Neuron.
@@ -115,9 +117,9 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     float vClampValue = convertV(0F);
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -339,12 +341,12 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
+    public void setNoiseGenerator(ProbabilityDistribution rand) {
         noiseGenerator = rand;
     }
 

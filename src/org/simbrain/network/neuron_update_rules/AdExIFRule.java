@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * An implementation of adaptive exponential integrate and fire. This version
@@ -207,7 +208,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     /**
      * The noise generator randomizer.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * An absolute refractory period. Not normally a part of AdEx, but can
@@ -297,7 +298,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         cpy.inputType = this.inputType;
         cpy.leakReversal = this.leakReversal;
         cpy.memCapacitance = this.memCapacitance;
-        cpy.noiseGenerator = new Randomizer(noiseGenerator);
+        cpy.noiseGenerator = noiseGenerator.deepCopy();
         cpy.slopeFactor = this.slopeFactor;
         cpy.tauW = this.tauW;
         cpy.v_mem = this.v_mem;
@@ -313,13 +314,13 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
-        this.noiseGenerator = rand;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     @Override

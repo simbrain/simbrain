@@ -24,6 +24,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
@@ -660,7 +661,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * Initializes the layout of the panel
          */
         private void init() {
-            randomizerPanel = new RandomizerPanel2(Arrays.asList(randomizer), parent);
+            randomizerPanel = new RandomizerPanel2(new UniformDistribution(), parent);
             setLayout(new GridBagLayout());
             Border colorBorder = BorderFactory.createLineBorder(Polarity.EXCITATORY.equals(polarity) ? Color.red : Color.blue);
             this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));

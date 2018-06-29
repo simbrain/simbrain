@@ -22,13 +22,15 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>AdditiveNeuron</b> See Haykin (2002), section 14.5. Used with continuous
  * Hopfield networks.
  */
-public class AdditiveRule extends NeuronUpdateRule {
+public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
 
     //TODO: May need clipping and bounds.
 
@@ -43,9 +45,9 @@ public class AdditiveRule extends NeuronUpdateRule {
     private double resistance = 1;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * For adding noise to the neuron.
@@ -67,7 +69,7 @@ public class AdditiveRule extends NeuronUpdateRule {
         an.setLambda(getLambda());
         an.setResistance(getResistance());
         an.setAddNoise(getAddNoise());
-        an.noiseGenerator = new Randomizer(noiseGenerator);
+        an.noiseGenerator = noiseGenerator.deepCopy();
         return an;
     }
 
@@ -134,17 +136,13 @@ public class AdditiveRule extends NeuronUpdateRule {
         this.resistance = resistance;
     }
 
-    /**
-     * @return Noise generator dialog.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 

@@ -24,7 +24,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
@@ -34,7 +35,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
     /**
      * Noise source.
      */
-    private Randomizer randomizer = new Randomizer();
+    private ProbabilityDistribution randomizer = new UniformDistribution();
 
     private double ceiling = 1.0;
 
@@ -54,12 +55,12 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
     public RandomNeuronRule(Neuron n) {
         super();
         randomizer.setUpperBound(getUpperBound());
-        randomizer.setLowerBound(getLowerBound());
+//        randomizer.setLowerBound(getLowerBound());//TODO
     }
 
     public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
         super();
-        setNoiseGenerator(new Randomizer(rn.randomizer));
+        setNoiseGenerator(rn.randomizer.deepCopy());
     }
 
     /**
@@ -72,7 +73,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
      */
     public RandomNeuronRule deepCopy() {
         RandomNeuronRule rn = new RandomNeuronRule();
-        rn.randomizer = new Randomizer(randomizer);
+        rn.randomizer = randomizer.deepCopy();
         return rn;
     }
 
@@ -115,13 +116,13 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return randomizer;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
-        randomizer = rand;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.randomizer = noise;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.simbrain.util.math;
 
+import org.simbrain.custom_sims.simulations.creatures.Creature;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.propertyeditor2.CopyableObject;
@@ -63,4 +64,10 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
         return result;
     }
+
+    //TODO
+    public double getRandom() {
+        return nextRand();
+    }
+
 }

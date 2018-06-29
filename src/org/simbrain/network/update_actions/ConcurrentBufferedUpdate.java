@@ -34,11 +34,11 @@ import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 import org.simbrain.network.update_actions.concurrency_tools.Consumer;
 import org.simbrain.network.update_actions.concurrency_tools.Task;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.Randomizer;
 
 import java.io.File;
 import java.util.*;
@@ -566,7 +566,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         upRule.setiBg(0);
         upRule.setAddNoise(true);
         ng.setNeuronType(upRule);
-        Randomizer rand = new Randomizer(new NormalDistribution());
+        ProbabilityDistribution rand = new NormalDistribution();
         for (Neuron neuron : ng.getNeuronList()) {
             IzhikevichRule iz = new IzhikevichRule();
             if (Math.random() < 0.2) {
@@ -577,7 +577,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
                 iz.setB(0.25 - (0.05 * rVal));
                 iz.setC(-65);
                 iz.setD(2);
-                ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.5);
+                ((NormalDistribution) rand).setStandardDeviation(0.5);
             } else {
                 neuron.setPolarity(Polarity.EXCITATORY);
                 iz.setRefractoryPeriod(2.0);
@@ -587,7 +587,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
                 rVal *= rVal;
                 iz.setC(-65.0 + (15.0 * rVal));
                 iz.setD(8.0 - (6 * rVal));
-                ((NormalDistribution) rand.getPdf()).setStandardDeviation(1.2);
+                ((NormalDistribution) rand).setStandardDeviation(1.2);
             }
             iz.setiBg(3.5);
             iz.setAddNoise(true);

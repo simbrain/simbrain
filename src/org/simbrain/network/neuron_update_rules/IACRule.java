@@ -26,7 +26,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
@@ -62,9 +63,9 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     private double rest = .1;
 
     /**
-     * Noise dialog box.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -109,7 +110,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         iac.setUpperBound(getUpperBound());
         iac.setLowerBound(getLowerBound());
         iac.setAddNoise(getAddNoise());
-        iac.noiseGenerator = new Randomizer(noiseGenerator);
+        iac.noiseGenerator = noiseGenerator.deepCopy();
         return iac;
     }
 
@@ -243,18 +244,14 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     @Override

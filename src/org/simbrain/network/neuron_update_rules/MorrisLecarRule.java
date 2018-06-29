@@ -10,7 +10,7 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
@@ -155,12 +155,10 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     /**
      * A source of noise (nA).
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new NormalDistribution();
 
     {
-        NormalDistribution nd = new NormalDistribution();
-        nd.setStandardDeviation(1);
-        noiseGenerator.setPdf(nd);
+        ((NormalDistribution)noiseGenerator).setStandardDeviation(1);
     }
 
     @Override
@@ -232,7 +230,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         cpy.vRest_k = this.vRest_k;
         cpy.vRest_L = this.vRest_L;
         cpy.w_K = this.w_K;
-        cpy.noiseGenerator = new Randomizer(this.noiseGenerator);
+        cpy.noiseGenerator = noiseGenerator.deepCopy();
 
         return cpy;
     }
@@ -243,17 +241,17 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
-        this.noiseGenerator = rand;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     public void setNoiseAmplitude(double amp) {
-        ((NormalDistribution) noiseGenerator.getPdf()).setStandardDeviation(amp);
+        ((NormalDistribution) noiseGenerator).setStandardDeviation(amp);
     }
 
     @Override

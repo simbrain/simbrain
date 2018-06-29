@@ -36,8 +36,9 @@ import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
-import org.simbrain.util.randomizer.Randomizer;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -147,7 +148,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * A noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Input data. The sequence of inputs to be fed to the ESN's input layer.
@@ -640,12 +641,12 @@ public class EchoStateNetwork extends Subnetwork {
         this.noise = noise;
     }
 
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    public void setNoiseGenerator(Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     public void setNoise(boolean noise) {

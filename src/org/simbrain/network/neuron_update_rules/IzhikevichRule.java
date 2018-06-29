@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking". TODO:
@@ -88,9 +89,9 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     private double threshold = 30;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -120,7 +121,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         in.setD(getD());
         in.setiBg(getiBg());
         in.setAddNoise(getAddNoise());
-        in.noiseGenerator = new Randomizer(noiseGenerator);
+        in.noiseGenerator = noiseGenerator.deepCopy();
         return in;
     }
 
@@ -242,19 +243,16 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
+
 
     @Override
     public String getName() {

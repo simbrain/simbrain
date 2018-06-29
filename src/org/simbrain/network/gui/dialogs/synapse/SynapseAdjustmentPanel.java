@@ -24,9 +24,10 @@ import org.simbrain.plot.histogram.HistogramModel;
 import org.simbrain.plot.histogram.HistogramPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 
 import javax.swing.*;
@@ -67,12 +68,12 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Random source for randomizing all synapses.
      */
-    private Randomizer allRandomizer = new Randomizer();
+    private ProbabilityDistribution allRandomizer = new UniformDistribution();
 
     /**
      * Random source for perturbing.
      */
-    private Randomizer perturber = new Randomizer();
+    private ProbabilityDistribution perturber = new UniformDistribution();
 
     /**
      * Current Mean label.
@@ -185,12 +186,12 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * A random panel for randomizing the synapse strengths.
      */
-    private RandomizerPanel2 randomPanel = new RandomizerPanel2(new Randomizer(), null);
+    private RandomizerPanel2 randomPanel = new RandomizerPanel2(new UniformDistribution(), null);
 
     /**
      * A random panel for randomizing perturbations to synapse strengths.
      */
-    private RandomizerPanel2 perturberPanel = new RandomizerPanel2(new Randomizer(), null);
+    private RandomizerPanel2 perturberPanel = new RandomizerPanel2(new UniformDistribution(), null);
 
     /**
      * Fills the fields of the random panels to default values.
@@ -384,20 +385,20 @@ public class SynapseAdjustmentPanel extends JPanel {
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 // Commit appropriate randomizer to panel
                 switch (view) {
-                    case ALL:
-                        // TODO: Deal with changes in polarity...
-                        randomPanel.commitRandom(allRandomizer);
-                        break;
-                    case OVERLAY:
-                        randomPanel.commitRandom(excitatoryRandomizer);
-                        randomPanel.commitRandom(inhibitoryRandomizer);
-                        break;
-                    case INHIBITORY:
-                        randomPanel.commitRandom(inhibitoryRandomizer);
-                        break;
-                    case EXCITATORY:
-                        randomPanel.commitRandom(excitatoryRandomizer);
-                        break;
+//                    case ALL:
+//                        // TODO: Deal with changes in polarity...
+//                        randomPanel.commitRandom(allRandomizer);
+//                        break;
+//                    case OVERLAY:
+//                        randomPanel.commitRandom(excitatoryRandomizer);
+//                        randomPanel.commitRandom(inhibitoryRandomizer);
+//                        break;
+//                    case INHIBITORY:
+//                        randomPanel.commitRandom(inhibitoryRandomizer);
+//                        break;
+//                    case EXCITATORY:
+//                        randomPanel.commitRandom(excitatoryRandomizer);
+//                        break;
                 }
                 // Randomize synapses appropriately
                 for (Synapse synapse : synapses) {
@@ -439,14 +440,14 @@ public class SynapseAdjustmentPanel extends JPanel {
                 getParent().repaint();
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 switch (view) {
-                    case ALL:
-                        randomPanel.fillFieldValues(allRandomizer);
-                    case OVERLAY:
-                        randomPanel.fillFieldValues(allRandomizer);
-                    case INHIBITORY:
-                        randomPanel.fillFieldValues(inhibitoryRandomizer);
-                    case EXCITATORY:
-                        randomPanel.fillFieldValues(excitatoryRandomizer);
+//                    case ALL:
+//                        randomPanel.fillFieldValues(allRandomizer);
+//                    case OVERLAY:
+//                        randomPanel.fillFieldValues(allRandomizer);
+//                    case INHIBITORY:
+//                        randomPanel.fillFieldValues(inhibitoryRandomizer);
+//                    case EXCITATORY:
+//                        randomPanel.fillFieldValues(excitatoryRandomizer);
                 }
             }
         });

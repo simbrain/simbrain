@@ -25,7 +25,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
@@ -94,9 +95,9 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private boolean clipping = true;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -168,7 +169,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         dn.setUpperBound(getUpperBound());
         dn.setLowerBound(getLowerBound());
         dn.setAddNoise(getAddNoise());
-        dn.noiseGenerator = new Randomizer(noiseGenerator);
+        dn.noiseGenerator = noiseGenerator.deepCopy();
         return dn;
     }
 
@@ -268,13 +269,13 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     /**

@@ -13,8 +13,8 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.util.randomizer.Randomizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -364,7 +364,7 @@ public abstract class IterableTrainer extends Trainer {
     public void commitChanges() {
     }
 
-    public Optional<Randomizer> getRandomizer() {
+    public Optional<ProbabilityDistribution> getRandomizer() {
         return Optional.empty();
     }
 

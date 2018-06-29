@@ -61,10 +61,6 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      */
     private static final int MAX_DIGITS = 9;
 
-    //TODO: This field is temporary, and is being used for now to test the ObjectType editor.
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
-    private ProbabilityDistribution randomizer = new NormalDistribution();
-
     /**
      * The input type and also thing that computes an input value. TODO: rename
      */

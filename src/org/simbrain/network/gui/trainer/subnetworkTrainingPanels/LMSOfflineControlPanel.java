@@ -22,7 +22,6 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
@@ -109,8 +108,8 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(Window frame) {
         this.frame = frame;
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
-        noisePanel = new RandomizerPanel2(new Randomizer(), frame); //TODO
-        noisePanel.fillDefaultValues();
+//        noisePanel = new RandomizerPanel2(new Randomizer(), frame); //TODO
+//        noisePanel.fillDefaultValues();
         init();
     }
 
@@ -123,8 +122,8 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {
         this.frame = frame;
         this.trainer = trainer;
-        noisePanel = new RandomizerPanel2(new Randomizer(), frame);
-        noisePanel.fillFieldValues(trainer.getNoiseGen());
+//        noisePanel = new RandomizerPanel2(new Randomizer(), frame);
+//        noisePanel.fillFieldValues(trainer.getNoiseGen());
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
         String text = noisePanel.getSummary();
         noiseTri.setBothTexts(text, text);

@@ -21,7 +21,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -418,6 +418,8 @@ public class Radial extends Sparse {
             this.loose = loose;
         }
 
+        UniformDistribution rand = new UniformDistribution(0,1);
+
         @Override
         public Collection<Synapse> call() throws Exception {
             // Attempting to pre-allocate... assumes that connection density
@@ -425,7 +427,7 @@ public class Radial extends Sparse {
             List<Synapse> synapses = new ArrayList<Synapse>((int) Math.ceil(srcColl.size() * targColl.size() * 0.2 * 0.75));
             for (Neuron src : srcColl) {
                 for (Neuron tar : targColl) {
-                    double randVal = ProbDistribution.UNIFORM.nextRand(0, 1);
+                    double randVal = rand.nextRand();
                     double probability;
                     if (src.getPolarity() == Polarity.EXCITATORY) {
                         if (tar.getPolarity() == Polarity.EXCITATORY) {

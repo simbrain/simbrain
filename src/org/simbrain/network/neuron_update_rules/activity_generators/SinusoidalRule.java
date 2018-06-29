@@ -25,7 +25,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
@@ -61,9 +62,9 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
     private double floor = -1.0;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -81,7 +82,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
         sn.setPhase(getPhase());
         sn.setFrequency(getFrequency());
         sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator = new Randomizer(noiseGenerator);
+        sn.noiseGenerator = noiseGenerator.deepCopy();
         return sn;
     }
 
@@ -100,17 +101,13 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
         neuron.setBuffer(val);
     }
 
-    /**
-     * @return Random noise generator dialog.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 

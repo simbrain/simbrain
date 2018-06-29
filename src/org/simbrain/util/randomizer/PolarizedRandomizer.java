@@ -29,7 +29,13 @@ import org.simbrain.util.math.ProbabilityDistribution;
  *
  * @author Zoë Tosi
  */
-public class PolarizedRandomizer extends Randomizer {
+public class PolarizedRandomizer {
+
+
+    /**
+     * The pdf backing this randomizer.
+     */
+    private ProbabilityDistribution pdf;
 
     /**
      * Default polarity for this randomizer.
@@ -78,7 +84,7 @@ public class PolarizedRandomizer extends Randomizer {
      * @param dup the <code>RandomSource</code> to duplicate.
      */
     public PolarizedRandomizer(final PolarizedRandomizer dup) {
-        setPdf(dup.getPdf().deepCopy());
+       pdf = dup.getPdf().deepCopy();
         setPolarity(dup.getPolarity());
     }
 
@@ -162,4 +168,13 @@ public class PolarizedRandomizer extends Randomizer {
         this.polarity = polarity;
     }
 
+    //TODO
+
+    public void setUpperBound(double ub) {
+        pdf.setUpperBound(ub);
+    }
+
+    public void setLowerBound(double lb) {
+        pdf.setLowerbound(lb);
+    }
 }

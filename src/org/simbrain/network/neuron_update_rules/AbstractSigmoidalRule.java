@@ -21,8 +21,9 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * An abstract superclass for discrete and continuous time sigmodial squashing
@@ -72,9 +73,9 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     protected double slope = 1;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    protected Randomizer noiseGenerator = new Randomizer();
+    protected ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Adds noise to neuron.
@@ -165,17 +166,13 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         this.slope = inflectionPointSlope;
     }
 
-    /**
-     * @return Returns the noise.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
 
@@ -204,7 +201,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         sr.setSquashFunctionType(getSquashFunctionType());
         sr.setSlope(getSlope());
         sr.setAddNoise(getAddNoise());
-        sr.noiseGenerator = new Randomizer(noiseGenerator);
+        sr.noiseGenerator = noiseGenerator.deepCopy();
         return sr;
     }
 

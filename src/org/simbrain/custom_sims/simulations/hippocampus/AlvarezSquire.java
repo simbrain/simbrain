@@ -5,7 +5,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * Extends competitive group with functions specific to the hippocampus
@@ -16,7 +16,7 @@ public class AlvarezSquire extends CompetitiveGroup {
     /**
      * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Reference to parent simulation.
@@ -32,8 +32,7 @@ public class AlvarezSquire extends CompetitiveGroup {
     public AlvarezSquire(Hippocampus hippo, int numNeurons) {
         super(hippo.network, numNeurons);
         this.hippo = hippo;
-        // TODO
-        noiseGenerator.setPdf(new UniformDistribution(-0.05, 0.05));
+        noiseGenerator = new UniformDistribution(-0.05, 0.05);
     }
 
     @Override

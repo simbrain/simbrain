@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 
 public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
@@ -56,9 +57,9 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     private double threshold = 1.9;
 
     /**
-     * Noise dialog.
+     * Noise generator.
      */
-    private Randomizer noiseGenerator = new Randomizer();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.
@@ -102,8 +103,7 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         in.setC(getC());
         in.setThreshold(getThreshold());
         in.setAddNoise(getAddNoise());
-        in.setNoiseGenerator(new Randomizer(noiseGenerator)); //TODO: think
-
+        in.setNoiseGenerator(noiseGenerator.deepCopy());
         return in;
     }
 
@@ -198,18 +198,14 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
+    @Override
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
+    @Override
+    public void setNoiseGenerator(final ProbabilityDistribution noise) {
+        this.noiseGenerator = noise;
     }
 
     @Override

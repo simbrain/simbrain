@@ -13,7 +13,7 @@ import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.geom.Point2D;
@@ -125,8 +125,18 @@ public class CortexSimple extends RegisteredSimulation {
 
     private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar, double sparsity) {
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution(location, scale));
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new LogNormalDistribution(location, scale));
+        ProbabilityDistribution exRand =
+                LogNormalDistribution.builder()
+                        .ofPolarity(Polarity.EXCITATORY)
+                        .ofLocation(location)
+                        .ofScale(scale)
+                        .build();
+        ProbabilityDistribution inRand =
+                LogNormalDistribution.builder()
+                        .ofPolarity(Polarity.INHIBITORY)
+                        .ofLocation(location)
+                        .ofScale(scale)
+                        .build();
 
         Sparse con = new Sparse(sparsity, false, false);
 

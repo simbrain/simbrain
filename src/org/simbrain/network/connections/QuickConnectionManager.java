@@ -21,7 +21,8 @@ package org.simbrain.network.connections;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 import java.util.List;
 
@@ -81,12 +82,18 @@ public class QuickConnectionManager {
     /**
      * The randomizer for excitatory synapses.
      */
-    private PolarizedRandomizer exRandomizer = new PolarizedRandomizer(Polarity.EXCITATORY);
+    private ProbabilityDistribution exRandomizer =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.EXCITATORY)
+                    .build();
 
     /**
      * The randomizer for inhibitory synapses.
      */
-    private PolarizedRandomizer inRandomizer = new PolarizedRandomizer(Polarity.INHIBITORY);
+    private ProbabilityDistribution inRandomizer =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.INHIBITORY)
+                    .build();
 
     /**
      * Construct the quick connection manager.
@@ -189,28 +196,28 @@ public class QuickConnectionManager {
     /**
      * @return the exRandomizer
      */
-    public PolarizedRandomizer getExRandomizer() {
+    public ProbabilityDistribution getExRandomizer() {
         return exRandomizer;
     }
 
     /**
      * @param exRandomizer the exRandomizer to set
      */
-    public void setExRandomizer(PolarizedRandomizer exRandomizer) {
+    public void setExRandomizer(ProbabilityDistribution exRandomizer) {
         this.exRandomizer = exRandomizer;
     }
 
     /**
      * @return the inRandomizer
      */
-    public PolarizedRandomizer getInRandomizer() {
+    public ProbabilityDistribution getInRandomizer() {
         return inRandomizer;
     }
 
     /**
      * @param inRandomizer the inRandomizer to set
      */
-    public void setInRandomizer(PolarizedRandomizer inRandomizer) {
+    public void setInRandomizer(ProbabilityDistribution inRandomizer) {
         this.inRandomizer = inRandomizer;
     }
 

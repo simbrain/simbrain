@@ -175,6 +175,6 @@ public class PolarizedRandomizer {
     }
 
     public void setLowerBound(double lb) {
-        pdf.setLowerbound(lb);
+        pdf.setLowerBound(lb);
     }
 }

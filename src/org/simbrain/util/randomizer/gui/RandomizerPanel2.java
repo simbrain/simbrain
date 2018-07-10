@@ -7,7 +7,6 @@ import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 import javax.swing.*;
 import javax.swing.border.Border;

@@ -27,7 +27,6 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 
 import javax.swing.*;
@@ -58,12 +57,18 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Random source for randomizing inhibitory synapses.
      */
-    private PolarizedRandomizer inhibitoryRandomizer = new PolarizedRandomizer(Polarity.INHIBITORY);
+    private ProbabilityDistribution inhibitoryRandomizer =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.INHIBITORY)
+                    .build();
 
     /**
      * Random source for randomizing excitatory synapses.
      */
-    private PolarizedRandomizer excitatoryRandomizer = new PolarizedRandomizer(Polarity.EXCITATORY);
+    private ProbabilityDistribution excitatoryRandomizer =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.EXCITATORY)
+                    .build();
 
     /**
      * Random source for randomizing all synapses.

@@ -29,7 +29,8 @@ import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,13 +50,19 @@ public class SynapseGroup extends Group {
      * <p>
      * synapse strengths for all synapse groups.
      */
-    private static final PolarizedRandomizer DEFAULT_EX_RANDOMIZER = new PolarizedRandomizer(Polarity.EXCITATORY);
+    private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.EXCITATORY)
+                    .build();
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory
      * synapse strengths for all synapse groups.
      */
-    private static final PolarizedRandomizer DEFAULT_IN_RANDOMIZER = new PolarizedRandomizer(Polarity.INHIBITORY);
+    private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.INHIBITORY)
+                    .build();
 
     /**
      * The default ratio (all excitatory) for all synapse groups.
@@ -144,13 +151,13 @@ public class SynapseGroup extends Group {
      * The randomizer governing excitatory synapses. If null new synapses are
      * not randomized.
      */
-    private PolarizedRandomizer exciteRand;
+    private ProbabilityDistribution exciteRand;
 
     /**
      * The randomizer governing inhibitory synapses. If null new synapses are
      * not randomized.
      */
-    private PolarizedRandomizer inhibRand;
+    private ProbabilityDistribution inhibRand;
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of
@@ -300,7 +307,14 @@ public class SynapseGroup extends Group {
      *                          inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectNeurons connectionManager, double excitatoryRatio, final PolarizedRandomizer exciteRand, final PolarizedRandomizer inhibRand) {
+    public static SynapseGroup createSynapseGroup(
+            final NeuronGroup source,
+            final NeuronGroup target,
+            final ConnectNeurons connectionManager,
+            double excitatoryRatio,
+            final ProbabilityDistribution exciteRand,
+            final ProbabilityDistribution inhibRand
+    ) {
         SynapseGroup synGroup = new SynapseGroup(source, target, connectionManager);
         synGroup.setExcitatoryRatio(excitatoryRatio);
         synGroup.setRandomizers(exciteRand, inhibRand);
@@ -1261,7 +1275,7 @@ public class SynapseGroup extends Group {
      * @param excitatoryRandomizer the randomizer to be used to determine the
      *                             weights of excitatory synapses.
      */
-    public void setExcitatoryRandomizer(PolarizedRandomizer excitatoryRandomizer) {
+    public void setExcitatoryRandomizer(ProbabilityDistribution excitatoryRandomizer) {
         this.exciteRand = excitatoryRandomizer;
     }
 
@@ -1269,7 +1283,7 @@ public class SynapseGroup extends Group {
      * @param inhibitoryRandomizer the randomizer to be used to determine the
      *                             weights of inbihitory synapses.
      */
-    public void setInhibitoryRandomizer(PolarizedRandomizer inhibitoryRandomizer) {
+    public void setInhibitoryRandomizer(ProbabilityDistribution inhibitoryRandomizer) {
         this.inhibRand = inhibitoryRandomizer;
     }
 
@@ -1277,7 +1291,7 @@ public class SynapseGroup extends Group {
      * @param excitatoryRandomizer
      * @param inhibitoryRandomizer
      */
-    public void setRandomizers(PolarizedRandomizer excitatoryRandomizer, PolarizedRandomizer inhibitoryRandomizer) {
+    public void setRandomizers(ProbabilityDistribution excitatoryRandomizer, ProbabilityDistribution inhibitoryRandomizer) {
         setExcitatoryRandomizer(excitatoryRandomizer);
         setInhibitoryRandomizer(inhibitoryRandomizer);
     }
@@ -1285,14 +1299,14 @@ public class SynapseGroup extends Group {
     /**
      * @return
      */
-    public PolarizedRandomizer getExcitatoryRandomizer() {
+    public ProbabilityDistribution getExcitatoryRandomizer() {
         return exciteRand;
     }
 
     /**
      * @return
      */
-    public PolarizedRandomizer getInhibitoryRandomizer() {
+    public ProbabilityDistribution getInhibitoryRandomizer() {
         return inhibRand;
     }
 

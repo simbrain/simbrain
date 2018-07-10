@@ -18,7 +18,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.environment.SmellSource.DecayFunction;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -146,14 +146,19 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY,
-                new NormalDistribution(0, Math.sqrt(variance))
-                );
-        PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY,
-                new NormalDistribution(0, Math.sqrt(variance))
-                );
+        ProbabilityDistribution exRand =
+            NormalDistribution.builder()
+                    .ofPolarity(Polarity.EXCITATORY)
+                    .ofMean(0)
+                    .ofStandardDeviation(Math.sqrt(variance))
+                    .build();
+
+        ProbabilityDistribution inRand =
+                NormalDistribution.builder()
+                        .ofPolarity(Polarity.INHIBITORY)
+                        .ofMean(0)
+                        .ofStandardDeviation(Math.sqrt(variance))
+                        .build();
 
         RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(
                 kIn,

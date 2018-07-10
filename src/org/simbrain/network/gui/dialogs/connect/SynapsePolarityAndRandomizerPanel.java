@@ -25,6 +25,8 @@ import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
@@ -118,9 +120,9 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      */
     private SwitchableChangeListener sliderListener;
 
-    private PolarizedRandomizer exRandomizer;
+    private ProbabilityDistribution exRandomizer;
 
-    private PolarizedRandomizer inRandomizer;
+    private ProbabilityDistribution inRandomizer;
 
     /**
      * Whether or not this panel is being used to create or edit synapses.
@@ -200,7 +202,13 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return prPanel;
     }
 
-    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, PolarizedRandomizer exRandomizer2, PolarizedRandomizer inRandomizer2, boolean useExcitatoryRandomization, boolean useInhibitoryRandomization) {
+    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(
+            final Window parent,
+            ProbabilityDistribution exRandomizer2,
+            ProbabilityDistribution inRandomizer2,
+            boolean useExcitatoryRandomization,
+            boolean useInhibitoryRandomization
+    ) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
         prPanel.exRandomizer = exRandomizer2;
@@ -573,11 +581,11 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         sliderApply.addActionListener(al);
     }
 
-    public PolarizedRandomizer getExRandomizer() {
+    public ProbabilityDistribution getExRandomizer() {
         return exRandomizer;
     }
 
-    public PolarizedRandomizer getInRandomizer() {
+    public ProbabilityDistribution getInRandomizer() {
         return inRandomizer;
     }
 
@@ -597,12 +605,12 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * The PolaraizedRandomizer this panel will either use to fill field
          * values and edit, or which this panel will create and then edit.
          */
-        private PolarizedRandomizer randomizer;
+        private ProbabilityDistribution randomizer;
 
         /**
          * The randomizer panel used as a basis for this panel.
          */
-        private RandomizerPanel2 randomizerPanel;
+        private AnnotatedPropertyEditor randomizerPanel;
 
         /**
          * A DropDownTriangle used to show or hide {@link #randomizerPanel}. The
@@ -622,7 +630,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * @param enabled    start out enabled (w/ {@link #randomizerPanel}
          *                   visible)
          */
-        public EditableRandomizerPanel(Window parent, PolarizedRandomizer randomizer, boolean enabled) {
+        public EditableRandomizerPanel(Window parent, ProbabilityDistribution randomizer, boolean enabled) {
             this.randomizer = randomizer;
             polarity = randomizer.getPolarity();
             enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, enabled, "Disabled", "Enabled", parent);
@@ -635,7 +643,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * @param parent
          * @param randomizer
          */
-        public EditableRandomizerPanel(Window parent, PolarizedRandomizer randomizer) {
+        public EditableRandomizerPanel(Window parent, ProbabilityDistribution randomizer) {
             this.randomizer = randomizer;
             polarity = randomizer.getPolarity();
             enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, true, "Disabled", "Enabled", parent);
@@ -650,7 +658,12 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         public EditableRandomizerPanel(Window parent, Polarity polarity) {
             this.polarity = polarity;
-            randomizer = new PolarizedRandomizer(polarity);
+
+            randomizer =
+                    UniformDistribution.builder()
+                            .ofPolarity(polarity)
+                            .build();
+
             enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);
             enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
             enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
@@ -661,7 +674,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * Initializes the layout of the panel
          */
         private void init() {
-            randomizerPanel = new RandomizerPanel2(new UniformDistribution(), parent);
+            randomizerPanel = new AnnotatedPropertyEditor(randomizer);
             setLayout(new GridBagLayout());
             Border colorBorder = BorderFactory.createLineBorder(Polarity.EXCITATORY.equals(polarity) ? Color.red : Color.blue);
             this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));

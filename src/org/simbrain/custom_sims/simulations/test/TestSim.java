@@ -14,7 +14,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
@@ -138,8 +138,19 @@ public class TestSim extends RegisteredSimulation {
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0, 0.0));
 
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution(2, 1));
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new UniformDistribution(1.5, 3));
+        ProbabilityDistribution exRand =
+                LogNormalDistribution.builder()
+                        .ofPolarity(Polarity.EXCITATORY)
+                        .ofLocation(2)
+                        .ofScale(1)
+                        .build();
+
+        ProbabilityDistribution inRand =
+                UniformDistribution.builder()
+                        .ofPolarity(Polarity.INHIBITORY)
+                        .ofLowerBound(1.5)
+                        .ofUpperBound(3)
+                        .build();
 
         RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0, exRand, inRand);

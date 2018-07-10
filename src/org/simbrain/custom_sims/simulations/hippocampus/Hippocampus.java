@@ -8,9 +8,9 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -32,7 +32,10 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Randomizer for creating new synapse groups.
      */
-    PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY);
+    ProbabilityDistribution exRand =
+            UniformDistribution.builder()
+                    .ofPolarity(Polarity.EXCITATORY)
+                    .build();
 
     /**
      * Other variables.
@@ -69,7 +72,7 @@ public class Hippocampus extends RegisteredSimulation {
      */
     public Hippocampus(SimbrainDesktop desktop) {
         super(desktop);
-        ((UniformDistribution) exRand.getPdf()).setUpperBound(0.02); // Set up randomizer
+        exRand.setUpperBound(0.02); // Set up randomizer
     }
 
     /**

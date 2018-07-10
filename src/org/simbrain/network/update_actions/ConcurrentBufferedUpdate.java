@@ -38,7 +38,6 @@ import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 import java.io.File;
 import java.util.*;
@@ -596,8 +595,20 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         }
         GridLayout gl = new GridLayout();
         gl.layoutNeurons(ng.getNeuronList());
-        PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY, new LogNormalDistribution(0.25, 1));
-        PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY, new LogNormalDistribution(2, 2));
+        ProbabilityDistribution exRand =
+                LogNormalDistribution.builder()
+                        .ofPolarity(Polarity.EXCITATORY)
+                        .ofLocation(0.25)
+                        .ofScale(1)
+                        .build();
+
+        ProbabilityDistribution inRand =
+                LogNormalDistribution.builder()
+                        .ofPolarity(Polarity.INHIBITORY)
+                        .ofLocation(2)
+                        .ofScale(2)
+                        .build();
+
         System.out.println("Begin Network Construction...");
         SynapseGroup sg = SynapseGroup.createSynapseGroup(
                 ng,

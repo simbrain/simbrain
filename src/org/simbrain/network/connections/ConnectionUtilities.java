@@ -22,7 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +73,7 @@ public class ConnectionUtilities {
      * @param synapses        the synapses to modify
      * @throws IllegalArgumentException
      */
-    public static void randomizeAndPolarizeSynapses(Collection<Synapse> synapses, PolarizedRandomizer exciteRand, PolarizedRandomizer inhibRand, double excitatoryRatio) throws IllegalArgumentException {
+    public static void randomizeAndPolarizeSynapses(Collection<Synapse> synapses, ProbabilityDistribution exciteRand, ProbabilityDistribution inhibRand, double excitatoryRatio) throws IllegalArgumentException {
         if (exciteRand.equals(inhibRand)) {
             throw new IllegalArgumentException("Randomization has failed." + " The excitatory and inhibitory randomizers cannot be" + " the same object.");
         } else if (excitatoryRatio > 1 || excitatoryRatio < 0) {
@@ -111,8 +112,17 @@ public class ConnectionUtilities {
      * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
      */
     public static void randomizeAndPolarizeSynapses(Collection<Synapse> synapses, double excitatoryRatio) {
-        PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
-        PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
+
+        ProbabilityDistribution exciteRand =
+                UniformDistribution.builder()
+                        .ofPolarity(Polarity.EXCITATORY)
+                        .build();
+
+        ProbabilityDistribution inhibRand =
+                UniformDistribution.builder()
+                        .ofPolarity(Polarity.INHIBITORY)
+                        .build();
+
         randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio);
     }
 
@@ -121,7 +131,7 @@ public class ConnectionUtilities {
      * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
      * @param inhibRand  the randomizer to be used to determine the weights of inhibitory synapses.
      */
-    public static void randomizeSynapses(Collection<Synapse> synapses, PolarizedRandomizer exciteRand, PolarizedRandomizer inhibRand) {
+    public static void randomizeSynapses(Collection<Synapse> synapses, ProbabilityDistribution exciteRand, ProbabilityDistribution inhibRand) {
         if (exciteRand.equals(inhibRand)) {
             throw new IllegalArgumentException("Randomization has failed." + " The excitatory and inhibitory randomizers cannot be" + " the same object.");
         } else {
@@ -147,7 +157,7 @@ public class ConnectionUtilities {
      * @param synapses   the synapses to modify
      * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
      */
-    public static void randomizeExcitatorySynapses(Collection<Synapse> synapses, PolarizedRandomizer exciteRand) {
+    public static void randomizeExcitatorySynapses(Collection<Synapse> synapses, ProbabilityDistribution exciteRand) {
         checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
         for (Synapse s : synapses) {
             if (Polarity.EXCITATORY.equals(s.getSource().getPolarity()) || s.getStrength() > 0) {
@@ -165,7 +175,7 @@ public class ConnectionUtilities {
      * @param synapses   the synapses to modify
      * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
      */
-    public static void randomizeExcitatorySynapsesUnsafe(Collection<Synapse> synapses, PolarizedRandomizer exciteRand) {
+    public static void randomizeExcitatorySynapsesUnsafe(Collection<Synapse> synapses, ProbabilityDistribution exciteRand) {
         checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
         for (Synapse s : synapses) {
             s.setStrength(exciteRand != null ? exciteRand.getRandom() : DEFAULT_EXCITATORY_STRENGTH);
@@ -179,7 +189,7 @@ public class ConnectionUtilities {
      * @param synapses  the synapses to modify
      * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      */
-    public static void randomizeInhibitorySynapses(Collection<Synapse> synapses, PolarizedRandomizer inhibRand) {
+    public static void randomizeInhibitorySynapses(Collection<Synapse> synapses, ProbabilityDistribution inhibRand) {
         checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
         for (Synapse s : synapses) {
             if (Polarity.INHIBITORY.equals(s.getSource().getPolarity()) || s.getStrength() < 0) {
@@ -197,7 +207,7 @@ public class ConnectionUtilities {
      * @param synapses  the synapses to modify
      * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      */
-    public static void randomizeInhibitorySynapsesUnsafe(Collection<Synapse> synapses, PolarizedRandomizer inhibRand) {
+    public static void randomizeInhibitorySynapsesUnsafe(Collection<Synapse> synapses, ProbabilityDistribution inhibRand) {
         checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
         for (Synapse s : synapses) {
             s.setStrength(inhibRand != null ? inhibRand.getRandom() : DEFAULT_INHIBITORY_STRENGTH);
@@ -328,7 +338,7 @@ public class ConnectionUtilities {
      * @param expectedPolarity
      * @throws IllegalArgumentException
      */
-    private static void checkPolarityMatches(PolarizedRandomizer inQuestion, Polarity expectedPolarity) throws IllegalArgumentException {
+    private static void checkPolarityMatches(ProbabilityDistribution inQuestion, Polarity expectedPolarity) throws IllegalArgumentException {
         // TODO: Use "optional" instead when upgrade to Java 8
         if (inQuestion == null)
             return;

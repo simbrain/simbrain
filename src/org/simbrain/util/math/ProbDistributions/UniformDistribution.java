@@ -1,7 +1,7 @@
 package org.simbrain.util.math.ProbDistributions;
 
 import java.util.concurrent.ThreadLocalRandom;
-
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -31,12 +31,16 @@ public class UniformDistribution extends ProbabilityDistribution {
             defaultValue = "1", order = 2)
     private double ceil = 1;
 
+    private Polarity polarity = Polarity.BOTH;
+
     public UniformDistribution(double floor, double ceil) {
         setUpperBound(ceil);
-        setLowerbound(floor);
+        setLowerBound(floor);
     }
 
-    public UniformDistribution() {}
+    public UniformDistribution() {
+
+    }
 
     public double nextRand() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);
@@ -77,8 +81,44 @@ public class UniformDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
+    }
+
+    public static UniformDistributionBuilder builder() {
+        return new UniformDistributionBuilder();
+    }
+
+    public static UniformDistribution create() {
+        return new UniformDistribution();
+    }
+
+    public static class UniformDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            UniformDistributionBuilder,
+            UniformDistribution> {
+
+        private UniformDistribution product = new UniformDistribution();
+
+        @Override
+        public UniformDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected UniformDistribution product() {
+            return product;
+        }
     }
 
 }

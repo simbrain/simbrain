@@ -1,7 +1,7 @@
 package org.simbrain.util.math.ProbDistributions;
 
 import java.util.concurrent.ThreadLocalRandom;
-
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -51,6 +51,8 @@ public class NormalDistribution extends ProbabilityDistribution {
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
             defaultValue = "false", order = 5)
     private boolean clipping = false;
+
+    private Polarity polarity = Polarity.BOTH;
 
     public NormalDistribution() {}
 
@@ -126,8 +128,54 @@ public class NormalDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
+    }
+
+    public static NormalDistributionBuilder builder() {
+        return new NormalDistributionBuilder();
+    }
+
+    public static NormalDistribution create() {
+        return new NormalDistribution();
+    }
+
+    public static class NormalDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            NormalDistributionBuilder,
+            NormalDistribution> {
+
+        NormalDistribution product = new NormalDistribution();
+
+        public NormalDistributionBuilder ofMean(double mean) {
+            product.setMean(mean);
+            return this;
+        }
+
+        public NormalDistributionBuilder ofStandardDeviation(double standardDeviation) {
+            product.setStandardDeviation(standardDeviation);
+            return this;
+        }
+
+        @Override
+        public NormalDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected NormalDistribution product() {
+            return product;
+        }
     }
 
 }

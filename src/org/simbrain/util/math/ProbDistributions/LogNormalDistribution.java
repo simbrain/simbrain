@@ -1,5 +1,6 @@
 package org.simbrain.util.math.ProbDistributions;
 
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -48,6 +49,8 @@ public class LogNormalDistribution extends ProbabilityDistribution {
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
             defaultValue = "false", order = 5)
     private boolean clipping = false;
+
+    private Polarity polarity = Polarity.BOTH;
 
     public LogNormalDistribution() {}
 
@@ -121,8 +124,53 @@ public class LogNormalDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
     }
 
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
+    }
+
+    public static LogNormalDistributionBuilder builder() {
+        return new LogNormalDistributionBuilder();
+    }
+
+    public static LogNormalDistribution create() {
+        return new LogNormalDistribution();
+    }
+
+    public static class LogNormalDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            LogNormalDistributionBuilder,
+            LogNormalDistribution> {
+
+        LogNormalDistribution product = new LogNormalDistribution();
+
+        public LogNormalDistributionBuilder ofLocation(double location) {
+            product.setLocation(location);
+            return this;
+        }
+
+        public LogNormalDistributionBuilder ofScale(double scale) {
+            product.setScale(scale);
+            return this;
+        }
+
+        @Override
+        public LogNormalDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected LogNormalDistribution product() {
+            return product;
+        }
+    }
 }

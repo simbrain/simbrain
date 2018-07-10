@@ -1,5 +1,6 @@
 package org.simbrain.util.math.ProbDistributions;
 
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -42,6 +43,8 @@ public class ExponentialDistribution extends ProbabilityDistribution {
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
             defaultValue = "false", order = 5)
     private boolean clipping = false;
+
+    private Polarity polarity = Polarity.BOTH;
 
     @Override
     public double nextRand() {
@@ -99,8 +102,49 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
+    }
+
+    public static ExponentialDistributionBuilder builder() {
+        return new ExponentialDistributionBuilder();
+    }
+
+    public static ExponentialDistribution create() {
+        return new ExponentialDistribution();
+    }
+
+    public static class ExponentialDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            ExponentialDistributionBuilder,
+            ExponentialDistribution> {
+
+        ExponentialDistribution product = new ExponentialDistribution();
+
+        public ExponentialDistributionBuilder ofLambda(double lambda) {
+            product.setLambda(lambda);
+            return this;
+        }
+
+        @Override
+        public ExponentialDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected ExponentialDistribution product() {
+            return product;
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 package org.simbrain.util.math;
 
-import org.simbrain.custom_sims.simulations.creatures.Creature;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.propertyeditor2.CopyableObject;
@@ -31,7 +31,6 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         return DIST_LIST;
     }
 
-
     public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR113();
 
     public abstract double nextRand();
@@ -46,7 +45,11 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     public abstract void setUpperBound(double ceiling);
 
-    public abstract void setLowerbound(double floor);
+    public abstract void setLowerBound(double floor);
+
+    public abstract void setPolarity(Polarity polarity);
+
+    public abstract Polarity getPolarity();
 
     @Override
     public EditableObject copy() {
@@ -67,7 +70,43 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     //TODO
     public double getRandom() {
-        return nextRand();
+        return getPolarity().value(nextRand());
     }
 
+    interface Buildable<T> {
+        T build();
+    }
+
+    public static abstract class ProbabilityDistributionBuilder<
+            B extends ProbabilityDistributionBuilder,
+            T extends ProbabilityDistribution
+            > implements Buildable<T> {
+
+        /**
+         * Uniform access to the product being build. Only used in this abstract class
+         * where the product cannot be instantiate yet.
+         * @return the product being build
+         */
+        protected abstract T product();
+
+        public B ofUpperBound(double upperBound) {
+            product().setUpperBound(upperBound);
+            return (B) this;
+        }
+
+        public B ofLowerBound(double lowerBound) {
+            product().setLowerBound(lowerBound);
+            return (B) this;
+        }
+
+        public B ofClipping(boolean clipping) {
+            product().setClipping(clipping);
+            return (B) this;
+        }
+
+        public B ofPolarity(Polarity polarity) {
+            product().setPolarity(polarity);
+            return (B) this;
+        }
+    }
 }

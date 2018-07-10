@@ -51,6 +51,8 @@ public class GammaDistribution extends ProbabilityDistribution {
             defaultValue = "false", order = 5)
     private boolean clipping = false;
 
+    private Polarity polarity = Polarity.NONE;
+
     @Override
     public double nextRand() {
         return clipping(
@@ -116,8 +118,18 @@ public class GammaDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.simbrain.util.math.ProbDistributions;
 
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -47,6 +48,8 @@ public class ParetoDistribution extends ProbabilityDistribution{
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
             defaultValue = "false", order = 5)
     private boolean clipping = false;
+
+    private Polarity polarity = Polarity.BOTH;
 
 
     @Override
@@ -106,8 +109,54 @@ public class ParetoDistribution extends ProbabilityDistribution{
     }
 
     @Override
-    public void setLowerbound(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+
+    @Override
+    public void setPolarity(Polarity polarity) {
+        this.polarity = polarity;
+    }
+
+    @Override
+    public Polarity getPolarity() {
+        return this.polarity;
+    }
+
+    public static ParetoDistributionBuilder builder() {
+        return new ParetoDistributionBuilder();
+    }
+
+    public static ParetoDistribution create() {
+        return new ParetoDistribution();
+    }
+
+    public static class ParetoDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            ParetoDistributionBuilder,
+            ParetoDistribution> {
+
+        ParetoDistribution product = new ParetoDistribution();
+
+        public ParetoDistributionBuilder ofSlope(double slope) {
+            product.setSlope(slope);
+            return this;
+        }
+
+        public ParetoDistributionBuilder ofMin(double min) {
+            product.setMin(min);
+            return this;
+        }
+
+        @Override
+        public ParetoDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected ParetoDistribution product() {
+            return product;
+        }
     }
 
 }

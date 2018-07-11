@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 public abstract class Attribute {
+
     protected Object baseObject;
     protected Method method;
     protected Method idMethod;

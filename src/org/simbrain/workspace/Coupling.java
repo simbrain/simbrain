@@ -3,16 +3,10 @@ package org.simbrain.workspace;
 import java.lang.reflect.Type;
 
 public class Coupling<T> {
-    static <S> Coupling<S> create(Producer<S> producer, Consumer<S> consumer) throws MismatchedAttributesException {
-        if (producer.getType() == consumer.getType()) {
-            return new Coupling<S>(producer, consumer);
-        } else {
-            throw new MismatchedAttributesException(String.format("Producer type %s does not match consumer type %s", producer.getType(), consumer.getType()));
-        }
-    }
 
-    private Producer<T> producer;
-    private Consumer<T> consumer;
+    private final Producer<T> producer;
+
+    private final Consumer<T> consumer;
 
     private Coupling(Producer<T> producer, Consumer<T> consumer) {
         this.producer = producer;
@@ -23,6 +17,10 @@ public class Coupling<T> {
         return producer.getType();
     }
 
+    /**
+     * This is the main action!  Set the value of the consumer based on the
+     * value of the producer.
+     */
     public void update() {
         consumer.setValue(producer.getValue());
     }
@@ -52,4 +50,12 @@ public class Coupling<T> {
         return consumer;
     }
 
+    //TODO: Discuss the value of a static creation method here
+    static <S> Coupling<S> create(Producer<S> producer, Consumer<S> consumer) throws MismatchedAttributesException {
+        if (producer.getType() == consumer.getType()) {
+            return new Coupling<S>(producer, consumer);
+        } else {
+            throw new MismatchedAttributesException(String.format("Producer type %s does not match consumer type %s", producer.getType(), consumer.getType()));
+        }
+    }
 }

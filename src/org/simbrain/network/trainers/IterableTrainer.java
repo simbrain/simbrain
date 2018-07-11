@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -49,6 +51,10 @@ public abstract class IterableTrainer extends Trainer {
      */
     // TODO
     private boolean stochasticIteration = false;
+
+    //TODO
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
+    private ProbabilityDistribution randomizer = UniformDistribution.create();
 
     /** If used, stopped iterating if validation error is below this. */
     //private double validationErrorThreshold = .2;
@@ -364,8 +370,8 @@ public abstract class IterableTrainer extends Trainer {
     public void commitChanges() {
     }
 
-    public Optional<ProbabilityDistribution> getRandomizer() {
-        return Optional.empty();
+    public ProbabilityDistribution getRandomizer() {
+        return randomizer;
     }
 
 }

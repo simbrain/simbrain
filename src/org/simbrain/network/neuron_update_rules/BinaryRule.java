@@ -104,9 +104,6 @@ public class BinaryRule extends NeuronUpdateRule {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         Random rand = new Random();

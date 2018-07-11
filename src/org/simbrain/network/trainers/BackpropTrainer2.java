@@ -24,13 +24,10 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -160,11 +157,6 @@ public class BackpropTrainer2 extends IterableTrainer {
      * Targets.
      */
     private DoubleMatrix targetData;
-
-    /**
-     * Parameter randomizer.
-     */
-    private ProbabilityDistribution rand = new UniformDistribution();
 
     /**
      * List of activation functions for easy reference.
@@ -399,7 +391,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     public void randomize() {
         for (int kk = 0; kk < weightMatrices.size(); ++kk) {
             for (int ii = 0; ii < weightMatrices.get(kk).data.length; ii++) {
-                weightMatrices.get(kk).data[ii] = rand.getRandom();
+                weightMatrices.get(kk).data[ii] = getRandomizer().getRandom();
             }
         }
 
@@ -652,9 +644,5 @@ public class BackpropTrainer2 extends IterableTrainer {
         this.updateMethod = updateMethod;
     }
 
-    @Override
-    public Optional<ProbabilityDistribution> getRandomizer() {
-        return Optional.of(rand);
-    }
 
 }

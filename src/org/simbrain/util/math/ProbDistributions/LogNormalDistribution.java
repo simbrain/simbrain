@@ -3,9 +3,6 @@ package org.simbrain.util.math.ProbDistributions;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.LognormalDist;
 import umontreal.iro.lecuyer.randvar.LognormalGen;
 
 public class LogNormalDistribution extends ProbabilityDistribution {
@@ -105,14 +102,6 @@ public class LogNormalDistribution extends ProbabilityDistribution {
         this.scale = scale;
     }
 
-    public Distribution getBestFit(double[] observations, int numObs) {
-        return LognormalDist.getInstanceFromMLE(observations, numObs);
-    }
-
-    public double[] getBestFitParams(double[] observations, int numObs) {
-        return LognormalDist.getMLE(observations, numObs);
-    }
-
     @Override
     public void setClipping(boolean clipping) {
         this.clipping = clipping;
@@ -146,6 +135,9 @@ public class LogNormalDistribution extends ProbabilityDistribution {
         return new LogNormalDistribution();
     }
 
+    /**
+     * {@inheritDoc}.
+     */
     public static class LogNormalDistributionBuilder
         extends ProbabilityDistributionBuilder<
             LogNormalDistributionBuilder,

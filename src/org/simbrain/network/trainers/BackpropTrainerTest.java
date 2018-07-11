@@ -55,9 +55,10 @@ public class BackpropTrainerTest {
         trainer.initData();
         trainer.setLearningRate(.1);
         trainer.setMomentum(.9);
-        trainer.getRandomizer().ifPresent(rnd -> {
-            rnd = new NormalDistribution(0, 0.1);
-        });
+        //TODO
+//        trainer.getRandomizer().ifPresent(rnd -> {
+//            rnd = new NormalDistribution(0, 0.1);
+//        });
         trainer.randomize();
         trainer.setUpdateMethod(BackpropTrainer2.UpdateMethod.STOCHASTIC);
         trainer.apply();
@@ -82,9 +83,9 @@ public class BackpropTrainerTest {
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
-        trainer.getRandomizer().ifPresent(rnd -> {
-            rnd = new NormalDistribution(0, 0.1);
-        });
+//        trainer.getRandomizer().ifPresent(rnd -> {
+//            rnd = new NormalDistribution(0, 0.1);
+//        });
         trainer.randomize();
         trainer.initData();
         trainer.setLearningRate(.15);
@@ -112,9 +113,9 @@ public class BackpropTrainerTest {
 
         // BackpropTrainer trainer = new BackpropTrainer(network);
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
-        trainer.getRandomizer().ifPresent(rnd -> {
-            rnd = new NormalDistribution(0, 0.1);
-        });
+//        trainer.getRandomizer().ifPresent(rnd -> {
+//            rnd = new NormalDistribution(0, 0.1);
+//        });
         trainer.randomize();
         trainer.initData();
         trainer.setLearningRate(.1);
@@ -146,9 +147,9 @@ public class BackpropTrainerTest {
 
         BackpropTrainer2 trainer = new BackpropTrainer2(network);
         trainer.initData();
-        trainer.getRandomizer().ifPresent(rnd -> {
-            rnd = new NormalDistribution(0, 0.1);
-        });
+//        trainer.getRandomizer().ifPresent(rnd -> {
+//            rnd = new NormalDistribution(0, 0.1);
+//        });
         trainer.randomize();
         trainer.setLearningRate(0.05);
         trainer.setMomentum(0.5);

@@ -31,6 +31,7 @@ public class CouplingFactory {
         return coupling;
     }
 
+    //TODO: Consider removing this. It seems to just be a convenience method to avoid dealing with exceptions.
     /**
      * Try to create a coupling from a producer and consumer of the same type, but
      * do nothing if the types do not match and return null.
@@ -62,20 +63,6 @@ public class CouplingFactory {
         for (Producer producer : producers) {
             for (Consumer consumer : consumers) {
                 createCoupling(producer, consumer);
-            }
-        }
-    }
-
-    /**
-     * Try to create a coupling from each producer to every consumer, but ignore any mismatched types.
-     *
-     * @param producers A collection of producers to couple
-     * @param consumers A collection of consumers to couple
-     */
-    public void tryOneToManyCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) {
-        for (Producer producer : producers) {
-            for (Consumer consumer : consumers) {
-                tryCoupling(producer, consumer);
             }
         }
     }

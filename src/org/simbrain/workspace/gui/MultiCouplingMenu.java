@@ -12,7 +12,9 @@ import java.util.List;
  * TODO: Needs a refactor
  */
 public class MultiCouplingMenu {
+
     private JPopupMenu parentMenu;
+
     private List<CouplingMenu> menus;
 
     public MultiCouplingMenu(Workspace workspace, JPopupMenu parentMenu, int numMenus) {

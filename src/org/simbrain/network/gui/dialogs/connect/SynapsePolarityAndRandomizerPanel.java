@@ -27,8 +27,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 

@@ -1,7 +1,9 @@
 package org.simbrain.util.math.ProbDistributions;
 
+import org.ojalgo.random.Gamma;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.SimbrainConstants.Polarity;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.GammaDist;
@@ -51,7 +53,7 @@ public class GammaDistribution extends ProbabilityDistribution {
             defaultValue = "false", order = 5)
     private boolean clipping = false;
 
-    private Polarity polarity = Polarity.NONE;
+    private Polarity polarity = Polarity.BOTH;
 
     @Override
     public double nextRand() {
@@ -132,4 +134,39 @@ public class GammaDistribution extends ProbabilityDistribution {
         return this.polarity;
     }
 
+    public static GammaDistributionBuilder builder() {
+        return new GammaDistributionBuilder();
+    }
+
+    public static GammaDistribution create() {
+        return new GammaDistribution();
+    }
+
+    public static class GammaDistributionBuilder
+        extends ProbabilityDistributionBuilder<
+            GammaDistributionBuilder,
+            GammaDistribution> {
+
+        GammaDistribution product = new GammaDistribution();
+
+        public GammaDistributionBuilder ofShape(double shape) {
+            product.setShape(shape);
+            return this;
+        }
+
+        public GammaDistributionBuilder ofScale(double scale) {
+            product.setScale(scale);
+            return this;
+        }
+
+        @Override
+        public GammaDistribution build() {
+            return product;
+        }
+
+        @Override
+        protected GammaDistribution product() {
+            return product;
+        }
+    }
 }

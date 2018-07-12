@@ -101,6 +101,16 @@ public @interface UserParameter {
     int order() default 0;
 
     /**
+     * The name of the tab this parameter associated with.
+     *
+     * @return the label of the tab
+     */
+    String tab() default "Main";
+
+    // TODO: The stuff below is for object types.  Move to a new annotation?
+    // Or if extending annotations is ever possible, put these in a subclass
+
+    /**
      * Whether the parameter represents an object to be edited by
      * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
      */
@@ -109,8 +119,10 @@ public @interface UserParameter {
     //TODO: Rename to say list.
 
     /**
-     * String reference to the class holding the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
-     * e.g. "org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel".
+     * String reference to the class holding the type list for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     *
+     * If not specified, then it is assumed that the class itself (e.g. SpikeResponder)
+     * maintains the list.
      *
      * @return the string path to the class
      */
@@ -124,9 +136,5 @@ public @interface UserParameter {
      */
     String typeMapMethod() default "getTypes";
 
-    /**
-     * The name of the tab this parameter associated with.
-     * @return the label of the tab
-     */
-    String tab() default "Main";
+
 }

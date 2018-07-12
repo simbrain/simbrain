@@ -28,6 +28,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -282,8 +283,10 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     private void editRandomizerProperties() {
-        AnnotatedPropertyEditor randomizerPanel = new AnnotatedPropertyEditor(trainer.getRandomizer());
-        randomizerPanel.getDialog();
+
+        //TODO: This is a temporary fix. Preferred approach will be to get rid of this button
+        // and just edit the entire control panel
+        AnnotatedPropertyEditor randomizerPanel = new AnnotatedPropertyEditor(trainer);
         StandardDialog dialog = randomizerPanel.getDialog();
         dialog.pack();
         dialog.setVisible(true);

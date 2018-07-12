@@ -482,6 +482,20 @@ public class Parameter implements Comparable<Parameter> {
         integerTypes.add(Long.class);
     }
 
+    /**
+     * Returns the type of the object represented by this parameter. For a field
+     * annotation it's the field's type. For a method annotation it's the type of the
+     * object returned by the setter (and passed in to the setter).
+     *
+     * @return the type of the represented objet
+     */
+    public Class<?> getAnnotatedType() {
+        if (field != null) {
+            return field.getType();
+        } else {
+            return getter.getReturnType();
+        }
+    }
 
     /**
      * Impose ordering by {@link UserParameter#order()} and then field name.

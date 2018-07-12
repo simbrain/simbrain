@@ -94,7 +94,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             String className = parameter.getAnnotation().typeMapClass();
             Class clazz = null;
             if (className.isEmpty()) {
-                clazz = editedObjects.get(0).getClass().getSuperclass();
+                // Default is to assume the type list is contained in
+                // the class corresponding to the type.  E.g. NeuronUpdateRule or
+                // ProbabilityDistribution
+                clazz = parameter.getAnnotatedType();
             } else {
                 // TODO: Handle exception here or throw it?
                 try {

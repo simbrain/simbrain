@@ -42,7 +42,6 @@ public abstract class SpikeResponder implements CopyableObject {
         ConvolvedJumpAndDecay.class, ProbabilisticResponder.class,
         RiseAndDecay.class, Step.class);
 
-
     /**
      * Called via reflection using {@link UserParameter#typeMapMethod()}.
      */

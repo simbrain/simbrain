@@ -17,6 +17,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,7 @@ import java.util.Optional;
  *
  * @author jyoshimi
  */
-public abstract class IterableTrainer extends Trainer {
+public abstract class IterableTrainer extends Trainer implements EditableObject {
 
     /**
      * Flag used for iterative training methods.
@@ -52,8 +53,8 @@ public abstract class IterableTrainer extends Trainer {
     // TODO
     private boolean stochasticIteration = false;
 
-    //TODO
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000,
+        typeMapClass="org.simbrain.util.math.ProbabilityDistribution")
     private ProbabilityDistribution randomizer = UniformDistribution.create();
 
     /** If used, stopped iterating if validation error is below this. */
@@ -92,8 +93,6 @@ public abstract class IterableTrainer extends Trainer {
             }
         }
     }
-
-    ;
 
     /**
      * Current stopping condition.

@@ -12,6 +12,8 @@ import umontreal.iro.lecuyer.rng.RandomStream;
 import java.util.Arrays;
 import java.util.List;
 
+//TODO: Allow seed to be set
+
 //  This will take the place of probdistribution.  Possibly change its name later
 public abstract class ProbabilityDistribution implements CopyableObject {
 
@@ -107,6 +109,27 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         public B ofPolarity(Polarity polarity) {
             product().setPolarity(polarity);
             return (B) this;
+        }
+    }
+
+    /**
+     * Utility class that encapsulates a probability distribution so that it
+     * can be used in an {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
+     * so that it's easy to create a property editor to edit a probability distribution.
+     */
+    public static class Randomizer implements EditableObject {
+
+        @UserParameter(label = "Randomizer", isObjectType = true)
+        private ProbabilityDistribution probabilityDistribution = new UniformDistribution();
+
+        /**
+         * Returns a random number from the underlying probabiliyt distribution,
+         * whose properties are set by the property editor.
+         *
+         * @return the random number
+         */
+        public double getRandom() {
+            return probabilityDistribution.nextRand();
         }
     }
 }

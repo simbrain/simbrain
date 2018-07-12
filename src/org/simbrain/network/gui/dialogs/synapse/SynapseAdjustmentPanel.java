@@ -27,6 +27,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 
 import javax.swing.*;
@@ -73,7 +74,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Random source for randomizing all synapses.
      */
-    private ProbabilityDistribution allRandomizer = new UniformDistribution();
+    private ProbabilityDistribution.Randomizer allRandomizer = new ProbabilityDistribution.Randomizer();
 
     /**
      * Random source for perturbing.
@@ -191,7 +192,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * A random panel for randomizing the synapse strengths.
      */
-    private RandomizerPanel2 randomPanel = new RandomizerPanel2(new UniformDistribution(), null);
+    private AnnotatedPropertyEditor randomPanel = new AnnotatedPropertyEditor(allRandomizer);
 
     /**
      * A random panel for randomizing perturbations to synapse strengths.
@@ -201,7 +202,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Fills the fields of the random panels to default values.
      */ {
-        randomPanel.fillFieldValues(allRandomizer);
+//        randomPanel.fillFieldValues(allRandomizer);
         perturberPanel.fillFieldValues(perturber);
         inhibitoryRandomizer.setUpperBound(0);
         excitatoryRandomizer.setLowerBound(0);
@@ -372,7 +373,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         perturbButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                randomPanel.commitRandom(perturber);
+                randomPanel.commitChanges();
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 for (Synapse synapse : synapses) {
                     if (view.synapseIsAdjustable(synapse)) {
@@ -387,6 +388,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         randomizeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                randomPanel.commitChanges();
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 // Commit appropriate randomizer to panel
                 switch (view) {

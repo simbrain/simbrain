@@ -23,8 +23,6 @@ import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
@@ -50,7 +48,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         SpikingThresholdRule.class, ThreeValueRule.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
      */
     public static List<Class> getTypes() {
         return RULE_LIST;

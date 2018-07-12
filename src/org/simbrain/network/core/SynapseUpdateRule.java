@@ -44,7 +44,7 @@ public abstract class SynapseUpdateRule implements CopyableObject {
         STDPRule.class, SubtractiveNormalizationRule.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
      */
     public static List<Class> getTypes() {
         return RULE_LIST;

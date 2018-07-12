@@ -43,7 +43,7 @@ public abstract class SpikeResponder implements CopyableObject {
         RiseAndDecay.class, Step.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
      */
     public static List<Class> getTypes() {
         return RESPONDER_LIST;

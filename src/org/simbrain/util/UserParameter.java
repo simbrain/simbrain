@@ -107,34 +107,24 @@ public @interface UserParameter {
      */
     String tab() default "Main";
 
-    // TODO: The stuff below is for object types.  Move to a new annotation?
-    // Or if extending annotations is ever possible, put these in a subclass
-
     /**
      * Whether the parameter represents an object to be edited by
-     * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
+     * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}. Assumes
+     * the relevant object is an abstract class and the user wants to specify
+     * the type of that class: examples include NeuronUpdateRules and their types,
+     * SynapseUpdateRules and their types, etc.
      */
     boolean isObjectType() default false;
 
-    //TODO: Rename to say list.
-
-    /**
-     * String reference to the class holding the type list for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
-     *
-     * If not specified, then it is assumed that the class itself (e.g. SpikeResponder)
-     * maintains the list.
-     *
-     * @return the string path to the class
-     */
-    String typeMapClass() default "";
-
     /**
      * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
-     * e.g. "getTypeMap".
+     * e.g. "getTypeMap".  Defaults to "getTypes". This method should be contained in the
+     * class whose types are being edited. For example {@link ProbabilityDistribution} has a {@code getTypes()} method that
+     * returns a list of the types of its subclasses.
      *
-     * @return the string method name
+     * @return the name of the method that returns types.  The default is usually fine.
      */
-    String typeMapMethod() default "getTypes";
+    String typeListMethod() default "getTypes";
 
 
 }

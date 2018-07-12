@@ -53,8 +53,7 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
     // TODO
     private boolean stochasticIteration = false;
 
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000,
-        typeMapClass="org.simbrain.util.math.ProbabilityDistribution")
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
     private ProbabilityDistribution randomizer = UniformDistribution.create();
 
     /** If used, stopped iterating if validation error is below this. */

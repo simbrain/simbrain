@@ -25,7 +25,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         NormalDistribution.class, ParetoDistribution.class, UniformDistribution.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeMapMethod()}.
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
      */
     public static List<Class> getTypes() {
         return DIST_LIST;

@@ -29,8 +29,6 @@ import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 import javax.swing.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,25 +87,11 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     protected JComponent makeWidget() {
 
         if (parameter.isObjectType()) {
-
-            // Get a map from labels to types using the type list
-            String className = parameter.getAnnotation().typeMapClass();
-            Class clazz = null;
-            if (className.isEmpty()) {
-                // Default is to assume the type list is contained in
-                // the class corresponding to the type.  E.g. NeuronUpdateRule or
-                // ProbabilityDistribution
-                clazz = parameter.getAnnotatedType();
-            } else {
-                // TODO: Handle exception here or throw it?
-                try {
-                    clazz = Class.forName(className);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            String methodName = parameter.getAnnotation().typeMapMethod();
-            BiMap<String, Class> typeMap = getTypeMap(clazz, methodName);
+            // Assumes the type list is contained in
+            // the class corresponding to the type.  E.g. NeuronUpdateRule maintains a list of types  of neuronupdaterules, and
+            // ProbabilityDistribution maintains a list of types of prob distributions
+            String methodName = parameter.getAnnotation().typeListMethod();
+            BiMap<String, Class> typeMap = getTypeMap(parameter.getAnnotatedType(), methodName);
             return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.getAnnotation().label());
         }
 
@@ -127,9 +111,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             double stepSize = 0.1;
 
             // If bounds are given divide the spinner can step numsteps from top to bottom
-            if(minValue != null && maxValue != null) {
+            if (minValue != null && maxValue != null) {
                 int numSteps = 100;
-                stepSize = Math.abs(minValue-maxValue)/numSteps;
+                stepSize = Math.abs(minValue - maxValue) / numSteps;
             }
 
             // TODO: Evaluate the original code below (which produced some Nans).  The code above works well enough for now

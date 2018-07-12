@@ -29,7 +29,7 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
  *
  * @author jyoshimi
  */
-public class SRNTrainer extends BackpropTrainer2 {
+public class SRNTrainer extends BackpropTrainer {
 
     /**
      * Reference to srn being trained.

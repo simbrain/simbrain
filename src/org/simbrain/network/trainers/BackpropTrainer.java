@@ -39,7 +39,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class BackpropTrainer2 extends IterableTrainer {
+public class BackpropTrainer extends IterableTrainer {
 
     /**
      * Specifies the method for batching data when calculating network outputs and errors.
@@ -189,7 +189,7 @@ public class BackpropTrainer2 extends IterableTrainer {
      *
      * @param network the network to train
      */
-    public BackpropTrainer2(BackpropNetwork network) {
+    public BackpropTrainer(BackpropNetwork network) {
         super(network);
         net = network;
 
@@ -233,7 +233,7 @@ public class BackpropTrainer2 extends IterableTrainer {
      * @param network the network
      * @param layers  the layers to train
      */
-    public BackpropTrainer2(Trainable network, List<List<Neuron>> layers) {
+    public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
         super(network);
 //        this.layers = layers;
 //        errorMap = new HashMap<Neuron, Double>();

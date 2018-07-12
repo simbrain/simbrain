@@ -483,21 +483,6 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Returns the type of the object represented by this parameter. For a field
-     * annotation it's the field's type. For a method annotation it's the type of the
-     * object returned by the setter (and passed in to the setter).
-     *
-     * @return the type of the represented objet
-     */
-    public Class<?> getAnnotatedType() {
-        if (field != null) {
-            return field.getType();
-        } else {
-            return getter.getReturnType();
-        }
-    }
-
-    /**
      * Impose ordering by {@link UserParameter#order()} and then field name.
      */
     @Override
@@ -521,23 +506,26 @@ public class Parameter implements Comparable<Parameter> {
         return false;
     }
 
+    /**
+     * Returns the type of the object represented by this parameter. For a field
+     * annotation it's the field's type. For a method annotation it's the type of the
+     * object returned by the setter (and passed in to the setter).
+     *
+     * @return the type of the represented objet
+     */
+    public Class<?> getType() {
+        return isFieldAnnotation() ? field.getType() : getter.getReturnType();
+    }
+
     public UserParameter getAnnotation() {
         return annotation;
     }
-
 
     /**
      * @return true if this annotation is field based, false oterwise
      */
     private boolean isFieldAnnotation() {
         return field == null ? false : true;
-    }
-
-    /**
-     * Abstract over methods and fields.
-     */
-    private Class<?> getType() {
-        return isFieldAnnotation() ? field.getType() : getter.getReturnType();
     }
 
     /**

@@ -91,7 +91,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // the class corresponding to the type.  E.g. NeuronUpdateRule maintains a list of types  of neuronupdaterules, and
             // ProbabilityDistribution maintains a list of types of prob distributions
             String methodName = parameter.getAnnotation().typeListMethod();
-            BiMap<String, Class> typeMap = getTypeMap(parameter.getAnnotatedType(), methodName);
+            BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
             return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.getAnnotation().label());
         }
 
@@ -149,6 +149,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 spinnerModel = new SpinnerNumberModelWithNull((Double) defaultValue, minValue, maxValue, stepSize);
             }
+
 
             return new JNumberSpinnerWithNull(spinnerModel);
         }

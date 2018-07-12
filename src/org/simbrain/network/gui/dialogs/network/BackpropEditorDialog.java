@@ -22,7 +22,6 @@ import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.network.trainers.BackpropTrainer2;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer;
@@ -41,6 +40,10 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * Reference to the backprop network being edited.
      */
     private BackpropNetwork backprop;
+
+    // TODO: Is this needed? Are there choices?
+    private IterableTrainer currentTrainer;
+
 
     /**
      * An update action to update the backprop trainer when the network is updated.
@@ -67,14 +70,6 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     };
 
     /**
-     * Make it easy to switch between the new, experimental trainer
-     * (BackpropTrainer2), and the old one. Once that's stabilized this code can
-     * be removed.
-     */
-    private boolean useExperimentalTrainer = true;
-    private IterableTrainer currentTrainer;
-
-    /**
      * Default constructor.
      *
      * @param networkPanel parent panel
@@ -95,11 +90,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        if (useExperimentalTrainer) {
-            currentTrainer = new BackpropTrainer2(backprop);
-        } else {
-            currentTrainer = new BackpropTrainer(backprop);
-        }
+        currentTrainer = new BackpropTrainer2(backprop);
         networkPanel.getNetwork().getUpdateManager().addAction(updater);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, currentTrainer);
         addTab("Train", iterativeControls);

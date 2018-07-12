@@ -29,7 +29,7 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
  *
  * @author jyoshimi
  */
-public class SRNTrainer extends BackpropTrainer {
+public class SRNTrainer extends BackpropTrainer2 {
 
     /**
      * Reference to srn being trained.
@@ -48,11 +48,10 @@ public class SRNTrainer extends BackpropTrainer {
 
     @Override
     public void randomize() {
-        randomize(srn.getHiddenLayer().getNeuronList());
-        randomize(srn.getOutputNeurons());
+//        randomize(srn.getHiddenLayer().getNeuronList());
+//        randomize(srn.getOutputNeurons());
     }
 
-    @Override
     protected void updateNetwork() {
         srn.update();
     }

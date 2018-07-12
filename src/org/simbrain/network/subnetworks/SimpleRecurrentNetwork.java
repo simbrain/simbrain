@@ -209,9 +209,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<List<Neuron>> getNeuronGroupsAsList() {
         List<List<Neuron>> ret = new ArrayList<List<Neuron>>();

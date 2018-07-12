@@ -19,6 +19,7 @@
 package org.simbrain.network.trainers;
 
 import org.jblas.DoubleMatrix;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
@@ -222,6 +223,25 @@ public class BackpropTrainer2 extends IterableTrainer {
         batchErrors = DoubleMatrix.zeros(getOutputLayer().length);
         setLearningRate(DEFAULT_LEARNING_RATE);
         setMomentum(DEFAULT_MOMENTUM);
+    }
+
+
+    //TODO: Here to appease SRNTrainer.  Not yet re-implemented.
+    /**
+     * Construct the backprop trainer.
+     *
+     * @param network the network
+     * @param layers  the layers to train
+     */
+    public BackpropTrainer2(Trainable network, List<List<Neuron>> layers) {
+        super(network);
+//        this.layers = layers;
+//        errorMap = new HashMap<Neuron, Double>();
+//        weightDeltaMap = new HashMap<Synapse, Double>();
+//        biasDeltaMap = new HashMap<Neuron, Double>();
+//        this.setIteration(0);
+//        mse = 0;
+        // SimnetUtils.printLayers(layers);
     }
 
     @Override

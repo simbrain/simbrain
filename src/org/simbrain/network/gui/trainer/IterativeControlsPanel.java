@@ -103,11 +103,6 @@ public class IterativeControlsPanel extends JPanel {
     private Action setPropertiesAction = Utils.createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
 
     /**
-     * Action for setting randomizer properties.
-     */
-    private Action randPropertiesAction = Utils.createAction("Edit Randomizer", "Edit randomizer properties.", "Prefs.png", this::editRandomizerProperties);
-
-    /**
      * Construct the panel.
      *
      * @param networkPanel the parent network panel
@@ -135,9 +130,6 @@ public class IterativeControlsPanel extends JPanel {
         JButton propertiesButton = new JButton(setPropertiesAction);
         propertiesButton.setHideActionText(true);
         runTools.add(propertiesButton);
-
-        JButton randPropertiesButton = new JButton(randPropertiesAction);
-        runTools.add(randPropertiesButton);
 
         JButton randomizeButton = new JButton(randomizeAction);
         randomizeButton.setHideActionText(true);
@@ -270,26 +262,11 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     private void editTrainerProperties() {
-        initTrainer(false);
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        // TODO: un-exclude once those features are implemented!
-        editor.setExcludeList(new String[] {"iteration", "updateCompleted", "stoppingCond", "stoppingCondition", "iterationsBeforeStopping", "errorThreshold"});
-        editor.setObjectToEdit(trainer);
-        JDialog dialog = editor.getDialog();
-        dialog.setModal(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-    }
-
-    private void editRandomizerProperties() {
-
-        //TODO: This is a temporary fix. Preferred approach will be to get rid of this button
-        // and just edit the entire control panel
-        AnnotatedPropertyEditor randomizerPanel = new AnnotatedPropertyEditor(trainer);
-        StandardDialog dialog = randomizerPanel.getDialog();
+        AnnotatedPropertyEditor trainerProps = new AnnotatedPropertyEditor(trainer);
+        StandardDialog dialog = trainerProps.getDialog();
         dialog.pack();
         dialog.setVisible(true);
     }
+
 
 }

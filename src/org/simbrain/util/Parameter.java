@@ -127,14 +127,21 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Returns true if the type of the field is boolean.
+     * Returns true if the type of field or method is an enum
+     */
+    public boolean isEnum() {
+        return getType().isEnum();
+    }
+
+    /**
+     * Returns true if the type of the field or method is boolean.
      */
     public boolean isBoolean() {
         return getType().equals(Boolean.TYPE) || getType().equals(Boolean.class);
     }
 
     /**
-     * Returns true iff the type of the field is String.
+     * Returns true iff the type of the field or method is String.
      */
     public boolean isString() {
         return getType().equals(String.class);

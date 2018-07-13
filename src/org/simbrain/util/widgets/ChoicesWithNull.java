@@ -29,7 +29,7 @@ import javax.swing.*;
  * return different states, the null "..." is shown.
  */
 @SuppressWarnings("serial")
-public class ChoicesWithNull extends JComboBox<String> {
+public class ChoicesWithNull extends JComboBox {
 
     /**
      * Whether the combo box has the null string in it.
@@ -41,6 +41,13 @@ public class ChoicesWithNull extends JComboBox<String> {
      */
     public ChoicesWithNull() {
         super();
+    }
+
+    /**
+     * Initialize with items (drop down choices).
+     */
+    public ChoicesWithNull(Object[] items) {
+        super(items);
     }
 
     /**
@@ -63,19 +70,6 @@ public class ChoicesWithNull extends JComboBox<String> {
             hasNull = true;
         }
     }
-    // /**
-    // * Sets the tristate drop down box to null. If the box does not have a
-    // null
-    // * entry (i.e. has only 2 items), adds a null entry and sets it as the
-    // * selected item.
-    // */
-    // public void setNull() {
-    // if (this.getItemCount() == 2) {
-    // addItem(SimbrainConstants.NULL_STRING);
-    // }
-    // setSelectedIndex(NULL);
-    // }
-    //
 
     /**
      * Remove the null state from the combo box.
@@ -87,14 +81,6 @@ public class ChoicesWithNull extends JComboBox<String> {
             hasNull = false;
         }
     }
-    // /**
-    // * Remove the null item.
-    // */
-    // public void removeNull() {
-    // if (this.getItemCount() == 3) {
-    // removeItem(SimbrainConstants.NULL_STRING);
-    // }
-    // }
 
     /**
      * Determines if the combo box is currently set to the null state.
@@ -107,17 +93,5 @@ public class ChoicesWithNull extends JComboBox<String> {
         }
         return false;
     }
-    // /**
-    // * Determines if value is null.
-    // *
-    // * @return true or false if value is null
-    // */
-    // public boolean isNull() {
-    // if (this.getSelectedIndex() == NULL) {
-    // return true;
-    // } else {
-    // return false;
-    // }
-    // }
 
 }

@@ -19,6 +19,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,6 +97,9 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
     /**
      * Current stopping condition.
      */
+    @UserParameter(
+        label = "Stopping condition",
+        description = "Stopping condition", order = 2)
     private StoppingCondition stoppingCondition = StoppingCondition.NONE;
 
     /**

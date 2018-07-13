@@ -27,8 +27,10 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     /**
      * The parameter for this widget.
      */
-
     private final Parameter parameter;
 
     /**
@@ -97,6 +98,23 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isBoolean()) {
             return new YesNoNull();
+        }
+
+        if (parameter.isEnum()) {
+            try {
+                Class<?> clazz = parameter.getType();
+                Method method = clazz.getDeclaredMethod("values");
+                Object[] enumValues = (Object[]) method.invoke(parameter.getDefaultValue());
+                ChoicesWithNull comboBox = new ChoicesWithNull(enumValues);
+                return comboBox;
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         if (parameter.isNumeric()) {
@@ -222,6 +240,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             ((JNumberSpinnerWithNull) component).setValue(value);
         } else if (parameter.getAnnotation().isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
+        } else if (parameter.isEnum()) {
+            if(value == null) {
+                ((ChoicesWithNull) component).setNull();
+            } else {
+                ((ChoicesWithNull) component).setSelectedItem(value);
+            }
         } else {
             ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         }
@@ -239,6 +263,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
         if (parameter.getAnnotation().isObjectType()) {
             return ((ObjectTypeEditor) component).getValue();
+        }
+        if (parameter.isEnum()) {
+            return ((ChoicesWithNull) component).isNull() ? null : ((ChoicesWithNull) component).getSelectedItem();
         }
 
         return ((JTextField) component).getText();

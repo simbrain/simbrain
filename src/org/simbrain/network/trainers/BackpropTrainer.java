@@ -25,7 +25,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.UserParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,14 +169,21 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private UpdateMethod updateMethod = UpdateMethod.STOCHASTIC;
 
-    /**
-     * Learning rate.
-     */
+    @UserParameter(
+        label = "Learning Rate",
+        description = "Learning Rate",
+        minimumValue = 0, maximumValue = 10,
+        defaultValue = ".01", order = 2)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Momentum. Must be between 0 and 1.
      */
+    @UserParameter(
+        label = "Momentum",
+        description = "Momentum",
+        minimumValue = 0, maximumValue = 10,
+        defaultValue = ".25", order = 2)
     private double momentum = DEFAULT_MOMENTUM;
 
     /**
@@ -568,33 +575,6 @@ public class BackpropTrainer extends IterableTrainer {
             _y.rows = _y.columns;
             _y.columns = 1;
         }
-    }
-
-    /**
-     * Returns the current solution type inside a comboboxwrapper. Used by
-     * preference dialog.
-     *
-     * @return the the comboBox
-     */
-    public ComboBoxWrapper getUpdateMethod() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return updateMethod;
-            }
-
-            public Object[] getObjects() {
-                return UpdateMethod.values();
-            }
-        };
-    }
-
-    /**
-     * Set the current update method. Used by preference dialog.
-     *
-     * @param umw update method wrapper
-     */
-    public void setUpdateMethod(final ComboBoxWrapper umw) {
-        updateMethod = ((UpdateMethod) umw.getCurrentObject());
     }
 
     /**

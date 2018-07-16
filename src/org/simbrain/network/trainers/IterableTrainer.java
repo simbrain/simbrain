@@ -33,6 +33,8 @@ import java.util.Optional;
  */
 public abstract class IterableTrainer extends Trainer implements EditableObject {
 
+    //TODO: Fine-tune the useparameter annotations to optimize the editor dialog
+
     /**
      * Flag used for iterative training methods.
      */
@@ -49,9 +51,18 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
     private int iteration;
 
     /**
+     * Current stopping condition.
+     */
+    @UserParameter(
+        label = "Stopping condition",
+        description = "Stopping condition", order = 2)
+    private StoppingCondition stoppingCondition = StoppingCondition.NONE;
+
+    /**
      * Iterate through the dataset polling random rows.
      */
-    // TODO
+    // TODO: use this
+    @UserParameter(label = "Stochastic Iteration")
     private boolean stochasticIteration = false;
 
     @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
@@ -63,12 +74,14 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
     /**
      * If used, stop iterating if error is below this value.
      */
+    @UserParameter(label = "Error Threshold")
     private double errorThreshold = .2;
 
     /**
      * When stopping condition is based on iterations, stop when iterations
      * exceeds this value.
      */
+    @UserParameter(label = "Iterations for Before Stopping")
     private int iterationsBeforeStopping = 1000;
 
     /**
@@ -93,14 +106,6 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
             }
         }
     }
-
-    /**
-     * Current stopping condition.
-     */
-    @UserParameter(
-        label = "Stopping condition",
-        description = "Stopping condition", order = 2)
-    private StoppingCondition stoppingCondition = StoppingCondition.NONE;
 
     /**
      * Construct the iterable trainer.
@@ -331,19 +336,6 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
         setStoppingCondition((StoppingCondition) stoppingConditionWrapper.getCurrentObject());
     }
 
-    //    /**
-    //     * @return the validationErrorThreshold
-    //     */
-    //    public double getValidationErrorThreshold() {
-    //        return validationErrorThreshold;
-    //    }
-    //
-    //    /**
-    //     * @param validationErrorThreshold the validationErrorThreshold to set
-    //     */
-    //    public void setValidationErrorThreshold(double validationErrorThreshold) {
-    //        this.validationErrorThreshold = validationErrorThreshold;
-    //    }
 
     /**
      * @return the errorThreshold

@@ -167,6 +167,9 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Current update method.
      */
+   @UserParameter(
+        label = "Update Method",
+        description = "Update Method")
     private UpdateMethod updateMethod = UpdateMethod.STOCHASTIC;
 
     @UserParameter(

@@ -207,7 +207,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public String getToolTipText() {
         UserParameter anot = parameter.getAnnotation();
         List<String> tips = new ArrayList<>();
-        if (!"".equals(anot.description())) {
+        if(anot.description().isEmpty()) {
+            tips.add(anot.label());
+        } else {
             tips.add(anot.description());
         }
         if (parameter.hasDefaultValue()) {

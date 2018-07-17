@@ -425,9 +425,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             // TODO: Create a delete smell source action
             if (entity.getSmellSource() == null) {
                 contextMenu.add(new JMenuItem(new AddSmellSourceAction(this, entity)));
+                contextMenu.addSeparator();
             }
 
-            contextMenu.addSeparator();
 
             CouplingMenu couplingMenu = new CouplingMenu(component.getWorkspace());
             couplingMenu.setSourceModel(entity);

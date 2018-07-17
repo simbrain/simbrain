@@ -46,14 +46,16 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createProducerSubmenu(Producer<?> producer) {
-        JMenu producerSubmenu = new JMenu("Send " + producer.getTypeName() + " To");
+        // TODO: Verbose but maybe good enough for now...
+        JMenu producerSubmenu = new JMenu(producer.getMethod().getName() + "() send " + producer.getTypeName() + " to");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
             List<Consumer<?>> consumers = workspace.getCouplingFactory().getAllConsumers(targetComponent);
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, consumer.getId() + ":" + consumer.getDescription(), producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace, targetComponent.getName() + "/" + consumer.getId()
+                        + ":" + consumer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {
@@ -69,14 +71,16 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createConsumerSubmenu(Consumer<?> consumer) {
-        JMenu consumerSubmenu = new JMenu("Receive " + consumer.getTypeName() + " From");
+        // TODO: Verbose but maybe good enough for now...
+        JMenu consumerSubmenu = new JMenu(consumer.getMethod().getName() + "() receive " + consumer.getTypeName() + " from");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
             List<Producer<?>> producers = workspace.getCouplingFactory().getAllProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, producer.getId() + " " + producer.getDescription(), producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getId()
+                        + ":" + producer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {

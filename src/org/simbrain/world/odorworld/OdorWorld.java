@@ -30,6 +30,7 @@ import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -163,6 +164,7 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
             entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
             entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
+
         }
         addEntity(entity);
     }

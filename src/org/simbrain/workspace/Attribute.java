@@ -18,20 +18,20 @@ public abstract class Attribute {
     protected Object key;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Attribute() {
     }
 
     /**
-     * Initializing constructor
+     * Initializing constructor.
      */
     public Attribute(Object baseObject, Method method) {
         this(baseObject, method, method.getName());
     }
 
     /**
-     * Initializing constructor
+     * Initializing constructor.
      */
     public Attribute(Object baseObject, Method method, String description) {
         this.baseObject = baseObject;
@@ -40,14 +40,14 @@ public abstract class Attribute {
     }
 
     /**
-     * Initializing constructor
+     * Initializing constructor.
      */
     public Attribute(Object baseObject, Method method, Method idMethod) {
         this(baseObject, method, method.getName(), idMethod);
     }
 
     /**
-     * Initializing constructor
+     * Initializing constructor.
      */
     public Attribute(Object baseObject, Method method, String description, Method idMethod) {
         this.baseObject = baseObject;

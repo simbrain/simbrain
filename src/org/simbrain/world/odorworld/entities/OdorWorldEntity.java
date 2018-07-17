@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.environment.ScalarSmellSource;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.workspace.Consumable;
@@ -102,6 +103,11 @@ public abstract class OdorWorldEntity {
     private SmellSource smellSource;
 
     /**
+     * "Scalar" smell source, associated with the type of this object.
+     */
+    private ScalarSmellSource scalarSmell = new ScalarSmellSource(1);
+
+    /**
      * True if a collision occurred in the last time step.
      */
     private boolean collision;
@@ -135,12 +141,6 @@ public abstract class OdorWorldEntity {
      * Things currently being said by talking entities.
      */
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
-
-    // Un-implemented code for using lifcycle.
-    // private LifeCycle cycle;
-    // private boolean usesLifeCycle = false;
-    // Requires all constructors and post-serialization init include cycle = new
-    // LifeCycle(this);
 
     /**
      * Construct an entity from an animation.
@@ -186,9 +186,7 @@ public abstract class OdorWorldEntity {
         if (currentlyHeardPhrases != null) {
             currentlyHeardPhrases.clear();
         }
-        // if (usesLifeCycle) {
-        // cycle.update();
-        // }
+
     }
 
     /**
@@ -943,6 +941,7 @@ public abstract class OdorWorldEntity {
         if (smellSource != null) {
             smellSource.update();
         }
+        scalarSmell.update();
     }
 
     /**
@@ -959,6 +958,21 @@ public abstract class OdorWorldEntity {
      */
     public List<String> getCurrentlyHeardPhrases() {
         return currentlyHeardPhrases;
+    }
+
+    /**
+     * Returns the "type" of the object in the sense of the image name associated with it.
+     *
+     * @return the object's type
+     */
+    public String getObjectType() {
+        String imageName = getAnimation().getImageLocations()[0];
+        String[] truncatedName = imageName.split("/");
+        return truncatedName[truncatedName.length - 1];
+    }
+
+    public ScalarSmellSource getScalarSmell() {
+        return scalarSmell;
     }
 
 }

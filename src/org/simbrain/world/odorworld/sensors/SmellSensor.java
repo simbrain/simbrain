@@ -63,7 +63,8 @@ public class SmellSensor extends Sensor {
     /**
      * Current value of this sensor, as an array of doubles.
      */
-    // TODO: Settable numDims!
+    // TODO: Settable numDims! Problem: what if the largest smell vector has more than
+    //    10 components.
     private double[] currentValue = new double[10];
 
     /**
@@ -103,7 +104,8 @@ public class SmellSensor extends Sensor {
             if (entity != parent) {
                 SmellSource smell = entity.getSmellSource();
                 if (smell != null) {
-                    temp = SimbrainMath.addVector(temp, smell.getStimulus(SimbrainMath.distance(getLocation(), entity.getCenterLocation())));
+                    temp = SimbrainMath.addVector(temp, smell.getStimulus(SimbrainMath.distance(getLocation(),
+                        entity.getCenterLocation())));
                 }
             }
         }
@@ -116,21 +118,6 @@ public class SmellSensor extends Sensor {
     @Producible(idMethod = "getId")
     public double[] getCurrentValues() {
         return currentValue;
-    }
-
-    //TODO. Rename...
-    public List<Integer> getDimensionList() {
-        return IntStream.range(1, this.getCurrentValues().length).boxed().collect(Collectors.toList());
-    }
-
-    /**
-     * The current value at an index.
-     *
-     * @param index
-     * @return the currentValue
-     */
-    public double getCurrentValue(Integer index) {
-        return currentValue[index];
     }
 
     /**

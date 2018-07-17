@@ -45,7 +45,6 @@ public class BasicEntity extends OdorWorldEntity {
      */
     public BasicEntity(final Animation anim, final OdorWorld world) {
         super(anim, world);
-        // behavior = new StationaryBehavior();
     }
 
     /**
@@ -82,9 +81,7 @@ public class BasicEntity extends OdorWorldEntity {
     public ComboBoxWrapper getType() {
         return new ComboBoxWrapper() {
             public Object getCurrentObject() {
-                String imageName = getAnimation().getImageLocations()[0];
-                String[] truncatedName = imageName.split("/");
-                return truncatedName[truncatedName.length - 1];
+                return BasicEntity.super.getObjectType();
             }
 
             public Object[] getObjects() {
@@ -99,16 +96,17 @@ public class BasicEntity extends OdorWorldEntity {
      * @param imageData the data from the combo box
      */
     public void setType(ComboBoxWrapper imageData) {
-        setImage((String) imageData.getCurrentObject());
+        setImageName((String) imageData.getCurrentObject());
     }
 
     /**
-     * Set type of object.
+     * Set the name of the object's image, e.g. "Fish.gif".
      *
-     * @param fileName file name. //TODO! Better doc
+     * @param fileName file name.
      */
-    public void setImage(String fileName) {
+    public void setImageName(String fileName) {
         this.setAnimation(new Animation(STATIC_IMAGE_DIR + fileName));
     }
+
 
 }

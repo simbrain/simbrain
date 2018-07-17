@@ -7,8 +7,12 @@ import java.util.List;
 /**
  * ChartCouplingListener listens for couplings to a ChartModel, then destroys those couplings and replaces them with
  * couplings to new data sources. This allows charts to dynamically plot as much data as they have available.
+ *
+ * Example: send a scalar coupling from a neuron to a time series using addValue. This creates
+ * a new series automatically.
  */
 public class ChartCouplingListener implements CouplingListener {
+
     private Workspace workspace;
     private CouplingFactory couplingFactory;
     private ChartModel model;

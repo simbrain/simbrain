@@ -110,9 +110,4 @@ public abstract class Sensor {
         this.label = label;
     }
 
-    //TODO
-    public String getMixedId() {
-        return this.getParent().getId() + ":" + this.getId();
-    }
-
 }

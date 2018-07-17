@@ -60,9 +60,6 @@ import java.util.List;
  */
 public class AnnotatedPropertyEditor extends JPanel {
 
-    // TODO: Make constructors private and use creation methods
-    // TODO: Handle single object editing separately from editing a list
-    // TODO: Allow conditions to be introduced where one component disables /enables another
     // TODO: Deal explicitly with empty list case using "null window"
     // TODO: Use a collection instead of a list of editable objects?
 
@@ -92,6 +89,12 @@ public class AnnotatedPropertyEditor extends JPanel {
      * @param toEdit the object to edit
      */
     public AnnotatedPropertyEditor(EditableObject toEdit) {
+        // TODO: Possibly treat this as a special case, since it does not
+        // require any consistency checks. This would make it
+        // possible, for example, to use a regular checkbox
+        // If so, put it in a special creation method, like
+        // createSingleObjectEditor, and document that it doesn't handle
+        // consistency checks.
         this(Collections.singletonList(toEdit));
     }
 

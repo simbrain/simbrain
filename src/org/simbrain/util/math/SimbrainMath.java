@@ -115,8 +115,8 @@ public class SimbrainMath {
     }
 
     /**
-     * Finds the entry-wise product of a vector and scalar.  Analogous
-     * to matlab's .* operator.   E.g. a .* (b c) = (ab ac).
+     * Finds the entry-wise product of a vector and scalar.  Analogous to
+     * matlab's .* operator.   E.g. a .* (b c) = (ab ac).
      *
      * @param theVec the vector
      * @param val    the scalar
@@ -348,13 +348,13 @@ public class SimbrainMath {
      * @param u1 the start point of the second line segment
      * @param v1 the end point of the second line segment
      * @return the intersection parameters for the two line segments. If null,
-     * the line segments are parallel, else the parameterized equations
-     * of the two lines intersect at the vector contained in the
-     * returned Point2D. If the either of the returned parameters is not
-     * on [0, 1], then the line <i>segments</i> do not intersect over
-     * their respective ranges. The X value in the point returned
-     * represents where the first line intersects the second and the Y
-     * value represents where the second line intersects the first.
+     * the line segments are parallel, else the parameterized equations of the
+     * two lines intersect at the vector contained in the returned Point2D. If
+     * the either of the returned parameters is not on [0, 1], then the line
+     * <i>segments</i> do not intersect over their respective ranges. The X
+     * value in the point returned represents where the first line intersects
+     * the second and the Y value represents where the second line intersects
+     * the first.
      */
     public static Point2D intersectParam(Point2D u0, Point2D v0, Point2D u1, Point2D v1) {
 
@@ -599,8 +599,8 @@ public class SimbrainMath {
     }
 
     /**
-     * Returns the Euclidean distance between src and target vectors.
-     * TODO: Generalize to arbitrary dimensions and deal with redundant
+     * Returns the Euclidean distance between src and target vectors. TODO:
+     * Generalize to arbitrary dimensions and deal with redundant
      * distance(Point,Point) method.
      *
      * @param src source vector.
@@ -618,43 +618,43 @@ public class SimbrainMath {
         return Math.sqrt(distance);
     }
 
-        /**
-         * Returns the mean squared error between a source and target vector.
-         *
-         * @param src source vector
-         * @param tar target vector
-         * @return the mse
-         * @throws IllegalArgumentException if src and tar have different lengths
-         */
-        public static double getMeanSquaredError(final double[] src,
-                final double[] tar) throws IllegalArgumentException {
+    /**
+     * Returns the mean squared error between a source and target vector.
+     *
+     * @param src source vector
+     * @param tar target vector
+     * @return the mse
+     * @throws IllegalArgumentException if src and tar have different lengths
+     */
+    public static double getMeanSquaredError(final double[] src,
+                                             final double[] tar) throws IllegalArgumentException {
 
-            if (src.length != tar.length) {
-                String srcVec = Arrays.toString(src);
-                String tarVec = Arrays.toString(tar);
-                throw new IllegalArgumentException("Source vector " + srcVec
-                        + " has " + src.length + " components.  Target vector "
-                        + tarVec + " has " + tar.length + " components.");
-            }
-
-            double retVal = 0;
-            double n = src.length;
-            if (n == 0) {
-                return 0;
-            }
-            for (int i = 0; i < n; i++) {
-                retVal += Math.pow(tar[i] - src[i], 2);
-            }
-            return retVal / n;
+        if (src.length != tar.length) {
+            String srcVec = Arrays.toString(src);
+            String tarVec = Arrays.toString(tar);
+            throw new IllegalArgumentException("Source vector " + srcVec
+                + " has " + src.length + " components.  Target vector "
+                + tarVec + " has " + tar.length + " components.");
         }
+
+        double retVal = 0;
+        double n = src.length;
+        if (n == 0) {
+            return 0;
+        }
+        for (int i = 0; i < n; i++) {
+            retVal += Math.pow(tar[i] - src[i], 2);
+        }
+        return retVal / n;
+    }
 
     /**
      * Returns a row compressed representation of a weight matrix represented as
-     * a 2D array of doubles. This particular row compression begins with
-     * the first element of the returned array containing the total number of
-     * non-zero elements in <b>wtMatrix</b>. The next <b>NZ + N</b> elements
-     * of the returned array (indices 1 to  <b>NZ + N</b>) where <b>NZ</b> is
-     * the number of non-zero elements and <b>N</b> is the number of rows of
+     * a 2D array of doubles. This particular row compression begins with the
+     * first element of the returned array containing the total number of
+     * non-zero elements in <b>wtMatrix</b>. The next <b>NZ + N</b> elements of
+     * the returned array (indices 1 to  <b>NZ + N</b>) where <b>NZ</b> is the
+     * number of non-zero elements and <b>N</b> is the number of rows of
      * <b>wtMatrix</b>, contain all the column index values for the non-zero
      * entries with row changes separated by a marker (-1), hence NZ + N values.
      * The remaining N entries in the returned array contain (in the same order
@@ -662,22 +662,18 @@ public class SimbrainMath {
      * <p>
      * So the matrix:
      * <p>
-     * 0    2    1    0    0    7
-     * 0    0    0    0    0    0
-     * 0    5    6    0    1    1
-     * 0    2    0    0    3    0
-     * 2    0    0    1    2    0
+     * 0    2    1    0    0    7 0    0    0    0    0    0 0    5    6    0
+     * 1    1 0    2    0    0    3    0 2    0    0    1    2    0
      * <p>
-     * Would have its indices stored as:
-     * 1  2  5  -1  -1  1  2  4  5  -1  1 4  -1  0  3  4
+     * Would have its indices stored as: 1  2  5  -1  -1  1  2  4  5  -1  1 4
+     * -1  0  3  4
      * <p>
-     * And its values stored as:
-     * 2  1  7  5  6  1  1  2  3  2  1  2
+     * And its values stored as: 2  1  7  5  6  1  1  2  3  2  1  2
      * <p>
      * Thus the returned array would be:
      * <p>
-     * [12  1  2  5  -1  -1  1  2  4  5  -1  1  4  -1  0  3  4  2  1  7  5 ...
-     * 6  1  1  2  3  2  1  2 ]
+     * [12  1  2  5  -1  -1  1  2  4  5  -1  1  4  -1  0  3  4  2  1  7  5 ... 6
+     * 1  1  2  3  2  1  2 ]
      * <p>
      * While this ultimately doesn't save any memory, consider that the example
      * array has a sparsity of 0.4. Sparse matrix compression should usually be
@@ -713,7 +709,8 @@ public class SimbrainMath {
         for (int w = 1, n = colIndArrL.size(); w <= n; w++) {
             rowCompression[w] = colIndArrL.get(w - 1).intValue();
         }
-        for (int w = colIndArrL.size() + 1, n = rowCompression.length; w < n; w++) {
+        for (int w = colIndArrL.size() + 1, n = rowCompression.length; w < n; w++)
+        {
             rowCompression[w] = wts.get(w - colIndArrL.size() - 1);
         }
         return rowCompression;

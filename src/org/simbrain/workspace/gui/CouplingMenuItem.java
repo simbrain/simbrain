@@ -27,7 +27,7 @@ import javax.swing.*;
 
 /**
  * A menu item corresponding to a potential coupling. When the menuitem is
- * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java).
+ * invoked, a coupling is created (See ActionPerformed in CouplingMenuItem.java).
  */
 public class CouplingMenuItem extends JMenuItem {
 

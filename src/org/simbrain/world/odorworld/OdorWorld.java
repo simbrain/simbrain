@@ -165,6 +165,9 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
             entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
 
+            // Temp testing
+            entity.addSensor(new ObjectSensor(entity, "Swiss","Swiss.gif"));
+
         }
         addEntity(entity);
     }

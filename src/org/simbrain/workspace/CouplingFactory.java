@@ -275,9 +275,10 @@ public class CouplingFactory {
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not producible.", method.getName()));
         }
-        Method idMethod = getIdMethod(model, annotation.idMethod());
-        String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
-        return new Producer(model, method, description, idMethod);
+        Method idMethod = getMethod(model, annotation.idMethod());
+        Method customDescriptionMethod = getMethod(model, annotation.customDescriptionMethod());
+        String description = annotation.description();
+        return new Producer(model, method, description, idMethod, customDescriptionMethod );
     }
 
     /**
@@ -288,16 +289,21 @@ public class CouplingFactory {
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
         }
-        Method idMethod = getIdMethod(model, annotation.idMethod());
-        String description = annotation.description().isEmpty() ? method.getName() : annotation.description();
-        return new Consumer(model, method, description, idMethod);
+        Method idMethod = getMethod(model, annotation.idMethod());
+        Method customDescriptionMethod = getMethod(model, annotation.customDescriptionMethod());
+        String description = annotation.description();
+        return new Consumer(model, method, description, idMethod, customDescriptionMethod);
     }
 
-    private Method getIdMethod(Object model, String idMethodName) {
+    /**
+     * Helper to get a method object given the object and methodname
+     */
+    private Method getMethod(Object model, String methodName) {
         try {
-            return model.getClass().getMethod(idMethodName);
+            return model.getClass().getMethod(methodName);
         } catch (NoSuchMethodException ex) {
             return null;
         }
     }
+
 }

@@ -4,23 +4,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+/**
+ * {@inheritDoc}.
+ *
+ * @param <V> The type of value to be consumed.  Mostly double or double[].
+ */
 public class Producer<V> extends Attribute {
 
-    public Producer(Object baseObject, Method method, String description) {
-        super(baseObject, method, description);
+    /**
+     * {@inheritDoc}.
+     */
+    public Producer(Object baseObject, Method method, String description, Method idMethod, Method customMethod) {
+        super(baseObject, method, description, idMethod, customMethod);
     }
 
-    public Producer(Object baseObject, Method method, String description, Method idMethod) {
-        super(baseObject, method, description, idMethod);
-    }
-
+    /**
+     * Return the value of the producer.
+     *
+     * @return current value
+     */
     V getValue() {
         try {
-            if (key == null) {
-                return (V) method.invoke(baseObject);
-            } else {
-                return (V) method.invoke(baseObject, new Object[]{key});
-            }
+            return (V) method.invoke(baseObject);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Should never happen
             throw new RuntimeException(ex);

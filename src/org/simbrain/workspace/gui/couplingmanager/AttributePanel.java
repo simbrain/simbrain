@@ -57,8 +57,6 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         Producing, Consuming
     }
 
-    ;
-
     private ProducerOrConsumer producerOrConsumer;
 
     /**
@@ -69,7 +67,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
     /**
      * Creates a new attribute list panel.
      *
-     * @param workspace     reference to workspace
+     * @param workspace reference to workspace
      * @param attributeType
      */
     public AttributePanel(Workspace workspace, ProducerOrConsumer attributeType) {
@@ -170,10 +168,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         }
     }
 
-    /**
-     * @param event
-     * @see ActionListener
-     */
+    @Override
     public void actionPerformed(ActionEvent event) {
         // Refresh component list
         if (event.getSource() instanceof JComboBox) {
@@ -255,15 +250,6 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      */
     private class AttributeCellRenderer extends DefaultListCellRenderer {
 
-        /**
-         * @param list
-         * @param object
-         * @param index
-         * @param isSelected
-         * @param cellHasFocus
-         * @return
-         * @overrides java.awt.Component
-         */
         public java.awt.Component getListCellRendererComponent(JList list, Object object, int index, boolean isSelected, boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             // Set text color based on data type

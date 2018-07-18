@@ -20,6 +20,13 @@ public class ObjectSensor extends Sensor {
      */
     private String objectType;
 
+    /**
+     * Instantiate an object sensor.
+     *
+     * @param parent parent entity
+     * @param label label for the sensor
+     * @param objectType the type (e.g. Swiss.gif)
+     */
     public ObjectSensor(OdorWorldEntity parent, String label, String objectType) {
         super(parent, label);
         this.objectType = objectType;
@@ -37,13 +44,21 @@ public class ObjectSensor extends Sensor {
         }
     }
 
-    @Producible(idMethod = "getId")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
     public double getCurrentValue() {
         return value;
     }
 
     @Override
     public String getTypeDescription() {
-        return objectType;
+        return objectType.substring(0, objectType.lastIndexOf('.'));
+    }
+
+    /**
+     * Called by reflection to return a custom description for the {@link org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
+     * corresponding to object sensors.
+     */
+    public String getSensorDescription() {
+        return getId() + ":" + getTypeDescription() + " sensor";
     }
 }

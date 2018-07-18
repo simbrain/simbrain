@@ -46,7 +46,7 @@ public class CouplingMenu extends JMenu {
     }
 
     private void createProducerSubmenu(Producer<?> producer) {
-        // TODO: Verbose but maybe good enough for now...
+        // TODO: Verbose description but maybe good enough for now...
         JMenu producerSubmenu = new JMenu(producer.getMethod().getName() + "() send " + producer.getTypeName() + " to");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {

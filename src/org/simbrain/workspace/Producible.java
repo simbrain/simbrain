@@ -15,14 +15,20 @@ import java.lang.annotation.Target;
 public @interface Producible {
 
     /**
-     * The description to use for this producible instead of the method name.
+     * Use this if you would like the producer to be described by a simple name.
+     * For more complex descriptions you can use {@link #customDescriptionMethod()}.
      */
     String description() default "";
 
     /**
-     * The name of a method that returns a custom id for the base object of this producible.
+     * The name of a method that returns a custom id for the base object of the producer.
      */
     String idMethod() default "";
+
+    /**
+     * The name of a method that returns a custom description for the producer.
+     */
+    String customDescriptionMethod() default "";
 
     /**
      * Whether this method should be visible in the coupling panels and menus by default. User

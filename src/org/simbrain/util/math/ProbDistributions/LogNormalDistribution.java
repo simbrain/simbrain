@@ -49,8 +49,11 @@ public class LogNormalDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    private LogNormalDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public LogNormalDistribution() {
     }
 
     @Override

@@ -54,8 +54,11 @@ public class NormalDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    private NormalDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public NormalDistribution() {
     }
 
     public double nextRand() {

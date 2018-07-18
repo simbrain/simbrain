@@ -46,8 +46,11 @@ public class ExponentialDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    private ExponentialDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public ExponentialDistribution() {
     }
 
     @Override

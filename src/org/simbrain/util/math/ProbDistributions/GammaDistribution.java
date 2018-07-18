@@ -24,7 +24,6 @@ public class GammaDistribution extends ProbabilityDistribution {
             defaultValue = "1.0", order = 2)
     private double scale = 1.0;
 
-
     /**
      * For all but uniform, upper bound is only used in conjunction with
      * clipping, to truncate the distribution. So if clipping is false this
@@ -55,8 +54,11 @@ public class GammaDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    private GammaDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public GammaDistribution() {
     }
 
     @Override

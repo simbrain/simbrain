@@ -22,6 +22,8 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
+import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
@@ -60,7 +62,6 @@ public class LMSOfflineControlPanel extends JPanel {
      */
     private final JComboBox<SolutionType> solutionTypes = new JComboBox<SolutionType>(SolutionType.values());
 
-    // This is flashy a checkbox could do the work... but this is more pretty...
     /**
      * A button regulating the use of ridge regression.
      */
@@ -87,7 +88,7 @@ public class LMSOfflineControlPanel extends JPanel {
         alpha.setMaximumSize(alpha.getPreferredSize());
     }
 
-    private RandomizerPanel2 noisePanel;
+    private AnnotatedPropertyEditor noisePanel;
 
     private DropDownTriangle noiseTri;
 
@@ -108,8 +109,6 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(Window frame) {
         this.frame = frame;
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
-//        noisePanel = new RandomizerPanel2(new Randomizer(), frame); //TODO
-//        noisePanel.fillDefaultValues();
         init();
     }
 
@@ -122,11 +121,8 @@ public class LMSOfflineControlPanel extends JPanel {
     public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {
         this.frame = frame;
         this.trainer = trainer;
-//        noisePanel = new RandomizerPanel2(new Randomizer(), frame);
-//        noisePanel.fillFieldValues(trainer.getNoiseGen());
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
-        String text = noisePanel.getSummary();
-        noiseTri.setBothTexts(text, text);
+        //noiseTri.setBothTexts(text, text);
         init();
     }
 
@@ -163,12 +159,14 @@ public class LMSOfflineControlPanel extends JPanel {
         noiseBx.add(noiseChkBx);
         noiseBx.add(Box.createHorizontalGlue());
         noiseBx.add(noiseTri);
-        String text = noisePanel.getSummary();
-        noiseTri.setBothTexts(text, text);
+//        String text = noisePanel.getSummary();
+//        noiseTri.setBothTexts(text, text);
         this.add(noiseBx);
         this.add(Box.createVerticalStrut(5));
 
         // Noise panel
+        noisePanel = new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer());
+
         noisePanel.setVisible(noiseTri.isDown());
         noisePanel.setEnabled(noiseChkBx.isSelected());
         this.add(noisePanel);
@@ -200,35 +198,6 @@ public class LMSOfflineControlPanel extends JPanel {
      * trainer, applyButton, solutionTypes, and regSwitch.
      */
     private void addActionListeners() {
-        //TODO
-//        // If focus is lost from one of the fields in the noise panel
-//        // change the summary description.
-//        noisePanel.addFocusListenerToFields(new FocusListener() {
-//            @Override
-//            public void focusGained(FocusEvent arg0) {
-//            }
-//
-//            @Override
-//            public void focusLost(FocusEvent arg0) {
-//                String text = noisePanel.getSummary();
-//                noiseTri.setBothTexts(text, text);
-//            }
-//        });
-
-//        // If the noise distribution has been changed, change the summary
-//        // description.
-//        noisePanel.getCbDistribution().addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent arg0) {
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        String text = noisePanel.getSummary();
-//                        noiseTri.setBothTexts(text, text);
-//                    }
-//                });
-//            }
-//        });
 
         // Adds a listener for the start button: executes training upon firing.
         // Also activates ridge regression in LMSOffline and sets the alpha.
@@ -347,7 +316,7 @@ public class LMSOfflineControlPanel extends JPanel {
         }
         trainer.setNoiseAdded(noiseChkBx.isSelected());
         if (noiseChkBx.isSelected()) {
-            noisePanel.commitRandom(trainer.getNoiseGen());
+            noisePanel.commitChanges();
         }
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             public Void doInBackground() {

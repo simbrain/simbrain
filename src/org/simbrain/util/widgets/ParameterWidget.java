@@ -22,7 +22,6 @@ import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
@@ -31,7 +30,6 @@ import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -190,13 +188,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             List<Class> types = (List<Class>) m.invoke(null, null);
             for (Class type : types) {
                 try {
-                    EditableObject inst;
-                    if (ProbabilityDistribution.class.isAssignableFrom(type)) {
-                        inst = (ProbabilityDistribution)
-                                type.getMethod("create").invoke(null, null);
-                    } else {
-                        inst = (EditableObject) type.newInstance();
-                    }
+                    EditableObject inst = (EditableObject) type.newInstance();
                     typeMap.put(inst.getName(), type);
                 } catch (InstantiationException e) {
                     e.printStackTrace();

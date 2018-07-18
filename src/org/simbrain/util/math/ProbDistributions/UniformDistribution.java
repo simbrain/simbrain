@@ -33,9 +33,11 @@ public class UniformDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-
-    private UniformDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public UniformDistribution() {
     }
 
     public double nextRand() {

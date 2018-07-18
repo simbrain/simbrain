@@ -51,8 +51,11 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
     private Polarity polarity = Polarity.BOTH;
 
-    private ParetoDistribution() {
-
+    /**
+     * Public constructor for reflection-based creation. You are encourage to use
+     * the builder pattern provided for ProbabilityDistributions.
+     */
+    public ParetoDistribution() {
     }
 
     @Override

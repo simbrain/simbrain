@@ -60,14 +60,14 @@ public class RandomizerPanel2 extends JPanel {
      */
     private static final LinkedHashMap<String, AnnotatedPropertyEditor> DISTRIBUTION_MAP = new LinkedHashMap<>();
 
-    static {
-        DISTRIBUTION_MAP.put(new ExponentialDistribution().getName(), new AnnotatedPropertyEditor(new ExponentialDistribution()));
-        DISTRIBUTION_MAP.put(new GammaDistribution().getName(), new AnnotatedPropertyEditor(new GammaDistribution()));
-        DISTRIBUTION_MAP.put(new LogNormalDistribution().getName(), new AnnotatedPropertyEditor(new LogNormalDistribution()));
-        DISTRIBUTION_MAP.put(new NormalDistribution().getName(), new AnnotatedPropertyEditor(new NormalDistribution()));
-        DISTRIBUTION_MAP.put(new ParetoDistribution().getName(), new AnnotatedPropertyEditor(new ParetoDistribution()));
-        DISTRIBUTION_MAP.put(new UniformDistribution().getName(), new AnnotatedPropertyEditor(new UniformDistribution()));
-    }
+//    static {
+//        DISTRIBUTION_MAP.put(new ExponentialDistribution().getName(), new AnnotatedPropertyEditor(new ExponentialDistribution()));
+//        DISTRIBUTION_MAP.put(new GammaDistribution().getName(), new AnnotatedPropertyEditor(new GammaDistribution()));
+//        DISTRIBUTION_MAP.put(new LogNormalDistribution().getName(), new AnnotatedPropertyEditor(new LogNormalDistribution()));
+//        DISTRIBUTION_MAP.put(NormalDistribution.create().getName(), new AnnotatedPropertyEditor(NormalDistribution.create()));
+//        DISTRIBUTION_MAP.put(new ParetoDistribution().getName(), new AnnotatedPropertyEditor(new ParetoDistribution()));
+//        DISTRIBUTION_MAP.put(UniformDistribution.create().getName(), new AnnotatedPropertyEditor(UniformDistribution.create()));
+//    }
 
     //TODO: Try to remove these dependencies on parent
 
@@ -275,7 +275,7 @@ public class RandomizerPanel2 extends JPanel {
     static JFrame frame = new JFrame();
 //
 //    public static void main(String[] args) {
-//        Randomizer rd = new Randomizer(new NormalDistribution());
+//        Randomizer rd = new Randomizer(NormalDistribution.create());
 //        RandomizerPanel2 rp = new RandomizerPanel2(rd, frame);
 //        rp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 //        // rp.fillDefaultValues();
@@ -295,14 +295,14 @@ public class RandomizerPanel2 extends JPanel {
     // TODO: Finish
     // Populate the Rule Map. Note! Place items in alphabetical order so they
     // appear that way in the GUI combo box.
-    static {
-        DISTRIBUTION_MAP2.put(new ExponentialDistribution().getName(), ExponentialDistribution.class);
-        DISTRIBUTION_MAP2.put(new GammaDistribution().getName(), GammaDistribution.class);
-        DISTRIBUTION_MAP2.put(new LogNormalDistribution().getName(), LogNormalDistribution.class);
-        DISTRIBUTION_MAP2.put(new NormalDistribution().getName(), NormalDistribution.class);
-        DISTRIBUTION_MAP2.put(new ParetoDistribution().getName(), ParetoDistribution.class);
-        DISTRIBUTION_MAP2.put(new UniformDistribution().getName(), UniformDistribution.class);
-    }
+//    static {
+//        DISTRIBUTION_MAP2.put(new ExponentialDistribution().getName(), ExponentialDistribution.class);
+//        DISTRIBUTION_MAP2.put(new GammaDistribution().getName(), GammaDistribution.class);
+//        DISTRIBUTION_MAP2.put(new LogNormalDistribution().getName(), LogNormalDistribution.class);
+//        DISTRIBUTION_MAP2.put(NormalDistribution.create().getName(), NormalDistribution.class);
+//        DISTRIBUTION_MAP2.put(new ParetoDistribution().getName(), ParetoDistribution.class);
+//        DISTRIBUTION_MAP2.put(UniformDistribution.create().getName(), UniformDistribution.class);
+//    }
 
     public static BiMap<String, Class> getTypeMap() {
         return DISTRIBUTION_MAP2;

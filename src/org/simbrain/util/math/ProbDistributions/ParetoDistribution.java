@@ -51,6 +51,9 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
     private Polarity polarity = Polarity.BOTH;
 
+    private ParetoDistribution() {
+
+    }
 
     @Override
     public double nextRand() {

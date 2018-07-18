@@ -47,7 +47,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * For adding noise to the neuron.

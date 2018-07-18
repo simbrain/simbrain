@@ -75,7 +75,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Noise generator.
      */
-    protected ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    protected ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Adds noise to neuron.

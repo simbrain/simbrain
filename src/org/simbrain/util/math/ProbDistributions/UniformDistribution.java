@@ -33,12 +33,8 @@ public class UniformDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    public UniformDistribution(double floor, double ceil) {
-        setUpperBound(ceil);
-        setLowerBound(floor);
-    }
 
-    public UniformDistribution() {
+    private UniformDistribution() {
 
     }
 

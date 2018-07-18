@@ -418,7 +418,11 @@ public class Radial extends Sparse {
             this.loose = loose;
         }
 
-        UniformDistribution rand = new UniformDistribution(0,1);
+        UniformDistribution rand =
+                UniformDistribution.builder()
+                    .ofLowerBound(0)
+                    .ofUpperBound(1)
+                    .build();
 
         @Override
         public Collection<Synapse> call() throws Exception {

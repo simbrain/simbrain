@@ -565,7 +565,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         upRule.setiBg(0);
         upRule.setAddNoise(true);
         ng.setNeuronType(upRule);
-        ProbabilityDistribution rand = new NormalDistribution();
+        ProbabilityDistribution rand = NormalDistribution.create();
         for (Neuron neuron : ng.getNeuronList()) {
             IzhikevichRule iz = new IzhikevichRule();
             if (Math.random() < 0.2) {

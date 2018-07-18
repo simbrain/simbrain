@@ -55,6 +55,10 @@ public class GammaDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
+    private GammaDistribution() {
+
+    }
+
     @Override
     public double nextRand() {
         return clipping(

@@ -45,7 +45,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * The noise generating randomizer.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Whether or not to add noise to the inputs .

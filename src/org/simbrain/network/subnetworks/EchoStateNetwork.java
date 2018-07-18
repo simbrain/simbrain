@@ -148,7 +148,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * A noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Input data. The sequence of inputs to be fed to the ESN's input layer.

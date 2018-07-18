@@ -46,6 +46,10 @@ public class ExponentialDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
+    private ExponentialDistribution() {
+
+    }
+
     @Override
     public double nextRand() {
         return clipping(

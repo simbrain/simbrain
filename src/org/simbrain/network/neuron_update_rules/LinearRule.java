@@ -65,7 +65,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Add noise to the neuron.

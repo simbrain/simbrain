@@ -73,7 +73,7 @@ public class LMSOffline extends Trainer {
      * The noise generator from which random values are taken if randomizing
      * the input state matrix.
      */
-    private ProbabilityDistribution noiseGen = new UniformDistribution();
+    private ProbabilityDistribution noiseGen = UniformDistribution.create();
 
     /**
      * Construct the LMSOOffline object, with a trainable network the Synapse

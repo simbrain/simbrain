@@ -139,10 +139,12 @@ public class UDF extends JumpAndDecay {
      *          neurons the synapse connects and draw values based on that.
      */
     public void init(Synapse s) {
-        NormalDistribution rand = new NormalDistribution();
-        rand.setClipping(true);
-        rand.setUpperBound(Double.MAX_VALUE);
-        rand.setLowerBound(0.0000001);
+        NormalDistribution rand =
+                NormalDistribution.builder()
+                    .ofUpperBound(Double.MAX_VALUE)
+                    .ofLowerBound(0.0000001)
+                    .ofClipping(true)
+                    .build();
 
         if (s.getSource().getPolarity() == Polarity.EXCITATORY
          && s.getTarget().getPolarity() == Polarity.EXCITATORY) {

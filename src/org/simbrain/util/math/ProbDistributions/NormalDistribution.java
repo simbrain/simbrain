@@ -54,11 +54,8 @@ public class NormalDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    public NormalDistribution() {}
+    private NormalDistribution() {
 
-    public NormalDistribution(double mean, double standardDeviation) {
-        setMean(mean);
-        setStandardDeviation(standardDeviation);
     }
 
     public double nextRand() {

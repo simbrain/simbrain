@@ -16,7 +16,7 @@ public class AlvarezSquire extends CompetitiveGroup {
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Reference to parent simulation.
@@ -32,7 +32,12 @@ public class AlvarezSquire extends CompetitiveGroup {
     public AlvarezSquire(Hippocampus hippo, int numNeurons) {
         super(hippo.network, numNeurons);
         this.hippo = hippo;
-        noiseGenerator = new UniformDistribution(-0.05, 0.05);
+
+        noiseGenerator =
+            UniformDistribution.builder()
+                .ofLowerBound(-0.05)
+                .ofUpperBound(0.05)
+                .build();
     }
 
     @Override

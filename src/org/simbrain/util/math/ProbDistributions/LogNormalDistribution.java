@@ -49,11 +49,8 @@ public class LogNormalDistribution extends ProbabilityDistribution {
 
     private Polarity polarity = Polarity.BOTH;
 
-    public LogNormalDistribution() {}
+    private LogNormalDistribution() {
 
-    public LogNormalDistribution(double location, double scale) {
-        setLocation(location);
-        setScale(scale);
     }
 
     @Override

@@ -14,7 +14,9 @@ import java.util.List;
 
 //TODO: Allow seed to be set
 
-//  This will take the place of probdistribution.  Possibly change its name later
+/**
+ * Base class for all ProbabilityDistribution.
+ */
 public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
@@ -35,8 +37,16 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR113();
 
+    /**
+     * Get a random double number from a probability distribution
+     * @return a random number
+     */
     public abstract double nextRand();
 
+    /**
+     * Get a random integer number from a probability distribution
+     * @return a random number
+     */
     public abstract int nextRandInt();
 
     public abstract ProbabilityDistribution deepCopy();
@@ -58,6 +68,13 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         return deepCopy();
     }
 
+    /**
+     * Static utility method to get a bounded value.
+     * @param value the value to be clipped
+     * @param lowerBound lower bound
+     * @param upperBound upper bound
+     * @return the vlipped value
+     */
     protected static double clipping(double value, double lowerBound, double upperBound) {
         double result = value;
 
@@ -75,14 +92,32 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         return getPolarity().value(nextRand());
     }
 
-    interface Buildable<T> {
-        T build();
-    }
 
-    public static abstract class ProbabilityDistributionBuilder<
+    /**
+     * Base builder for all {@link ProbabilityDistribution} instances.
+     * Create custom instances of the specific implementation of {@link ProbabilityDistribution} by using
+     * the setter methods on this class.
+     * After zero or more of these,
+     * use the build() method to create a specific {@link ProbabilityDistribution} instance.
+     * These can all be chained. For example, create a custom excitatory {@link LogNormalDistribution}
+     * of which has a location of 2.5:
+     * <code>
+     *     ProbabilityDistribution randomizer =
+     *      UniformDistribution.builder()
+     *          .ofPolarity(Polarity.EXCITATORY)
+     *          .ofLocation(2.5)
+     *          .build();
+     * </code>
+     *
+     * If no special set-up is needed, just use LogNormalDistribution.builder().build()
+     * or the short-cut equivalent LogNormalDistribution.create().
+     * @param <B> The type of the builder to return when building
+     * @param <T> The type of the final product to return when finish building.
+     */
+    public abstract static class ProbabilityDistributionBuilder<
             B extends ProbabilityDistributionBuilder,
             T extends ProbabilityDistribution
-            > implements Buildable<T> {
+            > {
 
         /**
          * Uniform access to the product being build. Only used in this abstract class
@@ -91,25 +126,51 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          */
         protected abstract T product();
 
+        /**
+         * Sets the upper bound of the probability distribution when clipped.
+         * @param upperBound the highest value of the interval for clipping
+         * @return the Builder instance (for use in chained initialization)
+         */
         public B ofUpperBound(double upperBound) {
             product().setUpperBound(upperBound);
             return (B) this;
         }
 
+        /**
+         * Sets the lower bound of the probability distribution when clipped.
+         * @param lowerBound the lowest value of the interval for clipping
+         * @return the Builder instance (for use in chained initialization)
+         */
         public B ofLowerBound(double lowerBound) {
             product().setLowerBound(lowerBound);
             return (B) this;
         }
 
+        /**
+         * Sets if the random number generated should be clip or not.
+         * @param clipping if the random number should be clip
+         * @return the Builder instance (for use in chained initialization)
+         */
         public B ofClipping(boolean clipping) {
             product().setClipping(clipping);
             return (B) this;
         }
 
+        /**
+         * Sets if the random number generated should be only positive, negative, or both.
+         * @param polarity the polarity
+         * @return the Builder instance (for use in chained initialization)
+         */
         public B ofPolarity(Polarity polarity) {
             product().setPolarity(polarity);
             return (B) this;
         }
+
+        /**
+         * Builds a instance of specific {@link ProbabilityDistribution} of given states.
+         * @return the final product
+         */
+        public abstract T build();
     }
 
     /**
@@ -120,7 +181,15 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     public static class Randomizer implements EditableObject {
 
         @UserParameter(label = "Randomizer", isObjectType = true)
-        private ProbabilityDistribution probabilityDistribution = new UniformDistribution();
+        private ProbabilityDistribution probabilityDistribution = UniformDistribution.create();
+
+        public ProbabilityDistribution getProbabilityDistribution() {
+            return probabilityDistribution;
+        }
+
+        public void setProbabilityDistribution(ProbabilityDistribution probabilityDistribution) {
+            this.probabilityDistribution = probabilityDistribution;
+        }
 
         /**
          * Returns a random number from the underlying probabiliyt distribution,

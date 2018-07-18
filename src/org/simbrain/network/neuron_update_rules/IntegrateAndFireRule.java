@@ -104,7 +104,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Add noise to neuron.

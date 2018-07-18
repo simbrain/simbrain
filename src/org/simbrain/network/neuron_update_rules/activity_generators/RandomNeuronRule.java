@@ -35,7 +35,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
     /**
      * Noise source.
      */
-    private ProbabilityDistribution randomizer = new UniformDistribution();
+    private ProbabilityDistribution randomizer = UniformDistribution.create();
 
     private double ceiling = 1.0;
 

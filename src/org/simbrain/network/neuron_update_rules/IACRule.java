@@ -65,7 +65,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Add noise to the neuron.

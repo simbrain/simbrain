@@ -98,7 +98,12 @@ public class LogSTDPRule extends STDPRule {
         //        			- (src.getLastSpikeTime());
         //        }
         if (synapse.getStrength() >= 0) {
-            double noise = (1 + new NormalDistribution(0, noiseVar).nextRand());
+            double noise =
+                    (1 + NormalDistribution.builder()
+                            .ofMean(0)
+                            .ofStandardDeviation(noiseVar)
+                            .build().nextRand()
+            );
             if (delta_t < 0) {
                 calcW_plusTerm(synapse);
                 delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t / tau_plus)) * (1 + noise);

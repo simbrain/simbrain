@@ -20,13 +20,10 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     }
 
     /** The noise generating randomizer. */
-    private Randomizer noiseGenerator = new Randomizer();
-
-    {
-        NormalDistribution nd = new NormalDistribution();
-        nd.setStandardDeviation(0.05);
-        noiseGenerator.setPdf(nd);
-    }
+    private ProbabilityDistribution noiseGenerator =
+            NormalDistribution.builder()
+                .ofStandardDeviation(0.05)
+                .build();
 
     /** Whether or not to add noise to the inputs . */
     private boolean addNoise;
@@ -93,13 +90,13 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     }
 
     @Override
-    public Randomizer getNoiseGenerator() {
+    public ProbabilityDistribution getNoiseGenerator() {
         return noiseGenerator;
     }
 
     @Override
-    public void setNoiseGenerator(Randomizer rand) {
-        noiseGenerator = new Randomizer(rand);
+    public void setNoiseGenerator(ProbabilityDistribution rand) {
+        noiseGenerator = rand.deepCopy();
     }
 
     @Override

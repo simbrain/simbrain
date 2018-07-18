@@ -97,7 +97,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
 
     /**
      * Add noise to the neuron.

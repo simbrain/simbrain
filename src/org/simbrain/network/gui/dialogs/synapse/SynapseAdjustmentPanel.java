@@ -28,7 +28,6 @@ import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,7 +78,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Random source for perturbing.
      */
-    private ProbabilityDistribution perturber = new UniformDistribution();
+    private ProbabilityDistribution perturber = UniformDistribution.create();
 
     /**
      * Current Mean label.
@@ -194,16 +193,19 @@ public class SynapseAdjustmentPanel extends JPanel {
      */
     private AnnotatedPropertyEditor randomPanel = new AnnotatedPropertyEditor(allRandomizer);
 
+    private ProbabilityDistribution.Randomizer perturberRandomizer = new ProbabilityDistribution.Randomizer();
+
     /**
      * A random panel for randomizing perturbations to synapse strengths.
      */
-    private RandomizerPanel2 perturberPanel = new RandomizerPanel2(new UniformDistribution(), null);
+    private AnnotatedPropertyEditor perturberPanel = new AnnotatedPropertyEditor(perturberRandomizer);
 
     /**
      * Fills the fields of the random panels to default values.
      */ {
 //        randomPanel.fillFieldValues(allRandomizer);
-        perturberPanel.fillFieldValues(perturber);
+
+        perturberRandomizer.setProbabilityDistribution(perturber);
         inhibitoryRandomizer.setUpperBound(0);
         excitatoryRandomizer.setLowerBound(0);
     }

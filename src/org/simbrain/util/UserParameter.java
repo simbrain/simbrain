@@ -126,5 +126,6 @@ public @interface UserParameter {
      */
     String typeListMethod() default "getTypes";
 
+    boolean editable() default true;
 
 }

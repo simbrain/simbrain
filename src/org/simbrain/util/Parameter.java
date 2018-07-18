@@ -524,6 +524,10 @@ public class Parameter implements Comparable<Parameter> {
         return isFieldAnnotation() ? field.getType() : getter.getReturnType();
     }
 
+    public boolean isEditable() {
+        return annotation.editable();
+    }
+
     public UserParameter getAnnotation() {
         return annotation;
     }

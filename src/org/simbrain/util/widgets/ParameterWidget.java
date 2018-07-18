@@ -22,6 +22,7 @@ import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
@@ -172,6 +173,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return new JNumberSpinnerWithNull(spinnerModel);
         }
 
+        if(!parameter.isEditable()) {
+            return new JLabel();
+        }
+
         return new JTextField();
     }
 
@@ -185,7 +190,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             List<Class> types = (List<Class>) m.invoke(null, null);
             for (Class type : types) {
                 try {
-                    EditableObject inst = (EditableObject) type.newInstance();
+                    EditableObject inst;
+                    if (ProbabilityDistribution.class.isAssignableFrom(type)) {
+                        inst = (ProbabilityDistribution)
+                                type.getMethod("create").invoke(null, null);
+                    } else {
+                        inst = (EditableObject) type.newInstance();
+                    }
                     typeMap.put(inst.getName(), type);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
@@ -248,6 +259,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 ((ChoicesWithNull) component).setSelectedItem(value);
             }
+        } else if(!parameter.isEditable()) {
+            ((JLabel) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         } else {
             ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         }

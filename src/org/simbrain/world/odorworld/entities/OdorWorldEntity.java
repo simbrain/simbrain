@@ -128,16 +128,6 @@ public abstract class OdorWorldEntity {
     private boolean showSensors = true;
 
     /**
-     * Entity Id generator.
-     */
-    private SimpleId sensorIDGenerator = new SimpleId("Sensor", 1);
-
-    /**
-     * Entity Id generator.
-     */
-    private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
-
-    /**
      * Things currently being said by talking entities.
      */
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
@@ -449,7 +439,7 @@ public abstract class OdorWorldEntity {
     public void addEffector(final Effector effector) {
         // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
-        effector.setId(effectorIDGenerator.getId());
+        effector.setId(parentWorld.getEffectorIDGenerator().getId());
         parentWorld.fireEffectorAdded(effector);
     }
 
@@ -474,7 +464,7 @@ public abstract class OdorWorldEntity {
 
         // Assign an id unless it already has one
         if (sensor.getId() == null) {
-            sensor.setId(sensorIDGenerator.getId());
+            sensor.setId(parentWorld.getSensorIDGenerator().getId());
         }
 
         parentWorld.fireSensorAdded(sensor);

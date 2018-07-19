@@ -87,6 +87,16 @@ public class OdorWorld {
     private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
 
     /**
+     * Sensor Id generator.
+     */
+    private SimpleId sensorIDGenerator = new SimpleId("Sensor", 1);
+
+    /**
+     * Effector Id generator.
+     */
+    private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
+
+    /**
      * Agent Name generator.
      */
     private SimpleId agentNameGenerator = new SimpleId("Agent", 1);
@@ -166,7 +176,7 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
 
             // Temp testing
-            entity.addSensor(new ObjectSensor(entity, "Swiss","Swiss.gif"));
+            entity.addSensor(new ObjectSensor(entity, "Swiss", "Swiss.gif"));
 
         }
         addEntity(entity);
@@ -197,6 +207,34 @@ public class OdorWorld {
     }
 
     /**
+     * Return sensor with matching id or null if none found.
+     */
+    public Object getSensor(String id) {
+        for (OdorWorldEntity entity : entityList) {
+            for (Sensor sensor : entity.getSensors()) {
+                if (sensor.getId().equalsIgnoreCase(id)) {
+                    return sensor;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return effector with matching id or null if none found.
+     */
+    public Object getEffector(String id) {
+        for (OdorWorldEntity entity : entityList) {
+            for (Effector effector : entity.getEffectors()) {
+                if (effector.getId().equalsIgnoreCase(id)) {
+                    return effector;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the sensor with the given id, or null if none is found.
      *
      * @param entityId entity id
@@ -223,7 +261,8 @@ public class OdorWorld {
      * @param effectorId sensor id
      * @return effector if found
      */
-    public Effector getEffector(final String entityId, final String effectorId) {
+    public Effector getEffector(final String entityId,
+                                final String effectorId) {
         OdorWorldEntity entity = getEntity(entityId);
         if (entity == null) {
             return null;
@@ -651,6 +690,14 @@ public class OdorWorld {
                 }
             }
         }
+    }
+
+    public SimpleId getSensorIDGenerator() {
+        return sensorIDGenerator;
+    }
+
+    public SimpleId getEffectorIDGenerator() {
+        return effectorIDGenerator;
     }
 
 }

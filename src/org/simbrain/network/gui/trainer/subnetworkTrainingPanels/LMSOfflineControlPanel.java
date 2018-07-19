@@ -24,7 +24,6 @@ import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.randomizer.gui.RandomizerPanel2;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 

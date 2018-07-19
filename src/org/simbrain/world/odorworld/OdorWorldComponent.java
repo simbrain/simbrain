@@ -130,51 +130,16 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof OdorWorldEntity) {
-            return ((OdorWorldEntity) object).getId();
-        } else if (object instanceof Sensor) {
-            String entityName = ((Sensor) object).getParent().getName();
-            String sensorName = ((Sensor) object).getId();
-            return entityName + ":sensor:" + sensorName;
-        } else if (object instanceof Effector) {
-            String entityName = ((Effector) object).getParent().getName();
-            String effectorName = ((Effector) object).getId();
-            return entityName + ":effector:" + effectorName;
-        }
-        return null;
-    }
-
-    @Override
     public Object getObjectFromKey(String objectKey) {
 
         //System.out.println("-->" + objectKey);
-
         if (objectKey.startsWith("Entity")) {
             return getWorld().getEntity(objectKey);
+        } else if (objectKey.startsWith("Sensor")) {
+            return getWorld().getSensor(objectKey);
+        } else if (objectKey.startsWith("Effector")) {
+            return getWorld().getEffector(objectKey);
         }
-        //
-
-        //        String[] parsedKey = objectKey.split(":");
-        //        String entityName = parsedKey[0];
-        //        if (parsedKey.length == 1) {
-        //            return getWorld().getEntity(entityName);
-        //        } else {
-        //            String secondString = parsedKey[1];
-        //            if (secondString.equalsIgnoreCase("sensor")) {
-        //                return getWorld().getSensor(entityName, parsedKey[2]);
-        //            } else if (secondString.equalsIgnoreCase("effector")) {
-        //                return getWorld().getEffector(entityName, parsedKey[2]);
-        //            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
-        //                // Needed to read simulations created before 2/11; remove before
-        //                // beta release
-        //                int index = Integer.parseInt(parsedKey[3]);
-        //                return getWorld().getSensor(entityName, parsedKey[2]);
-        //            } else if (secondString.equalsIgnoreCase("smeller")) {
-        //                int index = Integer.parseInt(parsedKey[3]);
-        //                return getWorld().getSensor(entityName, parsedKey[2]);
-        //            }
-        //        }
         return null;
     }
 

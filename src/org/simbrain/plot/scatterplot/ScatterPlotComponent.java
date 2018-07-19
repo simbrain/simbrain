@@ -159,14 +159,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof ScatterPlotSetter) {
-            return "" + ((ScatterPlotSetter) object).getIndex();
-        }
-        return null;
-    }
-
-    @Override
     public Object getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);

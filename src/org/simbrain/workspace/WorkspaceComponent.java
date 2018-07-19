@@ -28,8 +28,8 @@ import java.util.*;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
- * Extend this class to create your own component type. Gui representations of
- * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
+ * Extend this class to create your own component type. Gui representations of a
+ * workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  */
 public abstract class WorkspaceComponent {
 
@@ -85,8 +85,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * If set to true, serialize this component before others. Possibly replace
-     * with priority system later.
-     * {@see org.simbrain.workspace.Workspace#preSerializationInit()}.
+     * with priority system later. {@see org.simbrain.workspace.Workspace#preSerializationInit()}.
      */
     private int serializePriority = 0;
 
@@ -114,8 +113,8 @@ public abstract class WorkspaceComponent {
     public abstract void save(OutputStream output, String format);
 
     /**
-     * Returns a list of the formats that this component supports.
-     * The default behavior is to return a list containing the default format.
+     * Returns a list of the formats that this component supports. The default
+     * behavior is to return a list containing the default format.
      *
      * @return a list of the formats that this component supports.
      */
@@ -124,8 +123,8 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Fires an event which leads any linked gui components to close,
-     * which calls the haschanged dialog.
+     * Fires an event which leads any linked gui components to close, which
+     * calls the haschanged dialog.
      */
     public void tryClosing() {
         fireComponentClosing();
@@ -152,8 +151,10 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Finds objects based on a key. Used in deserializing attributes. Any class
-     * that produces attributes should override this for serialization.
+     * Finds objects based on a key. Used in deserializing {@link Attribute}'s.
+     * Any class that produces attributes should override this for
+     * serialization.  Each attribute object in a component must be given a
+     * unique id (relative to that component) for deserializing to work.
      *
      * @param objectKey String key
      * @return the corresponding object
@@ -163,20 +164,8 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Returns a unique key associated with an object. Used in serializing
-     * attributes. Any class that produces attributes should override this for
-     * serialization.
-     *
-     * @param object object which should be associated with a key
-     * @return the key
-     */
-    public String getKeyFromObject(Object object) {
-        return null;
-    }
-
-    /**
-     * Return a collection of all model objects currently managed by this component.
-     * Whenever this collection would
+     * Return a collection of all model objects currently managed by this
+     * component. Whenever this collection would
      */
     public List getModels() {
         // TODO: This should be abstract.
@@ -246,7 +235,8 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Notify listeners that a model object has been removed from the component.
+     * Notify listeners that a model object has been removed from the
+     * component.
      */
     public void fireModelRemoved(Object removedModel) {
         for (WorkspaceComponentListener listener : listeners) {
@@ -370,9 +360,11 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Set to true when a component changes, set to false after a component is saved.
+     * Set to true when a component changes, set to false after a component is
+     * saved.
      *
-     * @param changedSinceLastSave whether this component has changed since the last save.
+     * @param changedSinceLastSave whether this component has changed since the
+     *                             last save.
      */
     public void setChangedSinceLastSave(boolean changedSinceLastSave) {
         logger.debug("component changed");

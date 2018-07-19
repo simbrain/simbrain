@@ -72,8 +72,6 @@ public class SmellSource {
         }
     }
 
-    ;
-
     /**
      * Method for calculating decay of stimulus as a function of distance from
      * object.
@@ -104,23 +102,6 @@ public class SmellSource {
      * A value between 0 and 1 which describes how much noise is added.
      */
     private double noiseLevel = initNoise;
-
-    /**
-     * Construct smell source from specified parameters.
-     *
-     * @param distalstim Distal stimulus
-     * @param decay      Decay rate
-     * @param disp       Dispersion
-     * @param addNoise   Add noise
-     * @param noiseLevel Level of noise
-     */
-    public SmellSource(final double[] distalstim, final DecayFunction decay, final double disp, final boolean addNoise, final double noiseLevel) {
-        this.stimulusVector = distalstim;
-        this.decayFunction = decay;
-        this.stimulusDispersion = disp;
-        this.addNoise = addNoise;
-        this.noiseLevel = noiseLevel;
-    }
 
     /**
      * Construct smell source from specified parameters.
@@ -351,55 +332,6 @@ public class SmellSource {
         } else {
             returnVector = stimulusVector;
         }
-    }
-
-    /**
-     * Calculate what impact the object will have on the creature's receptors
-     * (input nodes) based on its distance from this object and its features
-     * (whether it is a "noisy object", and how the stimulus decays). That is,
-     * calculate the proximal stimulus this distal stimulus gives rise to.
-     *
-     * @param dimension
-     * @param distance  distance of creature from object
-     * @return proximal stimulus to creature caused by this object
-     */
-    public double getStimulus(final int dimension, final double distance) {
-        double ret = 0;
-        double val = returnVector[dimension];
-
-        if (distance < stimulusDispersion) {
-            if (decayFunction == DecayFunction.STEP) {
-                if (distance > peak) {
-                    ret = val;
-                }
-            } else if (decayFunction == DecayFunction.LINEAR) {
-                if (distance < peak) {
-                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
-                    if (scalingFactor < 0) {
-                        scalingFactor = 0;
-                    }
-                    ret = val * scalingFactor;
-                } else {
-                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
-                    ret = val * scalingFactor;
-                }
-            } else if (decayFunction == DecayFunction.GAUSSIAN) {
-                double temp = distance;
-                temp -= peak;
-
-                double sigma = .5 * (stimulusDispersion - peak);
-                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
-                ret = val * scalingFactor;
-            } else if (decayFunction == DecayFunction.QUADRATIC) {
-                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
-
-                if (scalingFactor < 0) {
-                    scalingFactor = 0;
-                }
-                ret = val * scalingFactor;
-            }
-        }
-        return ret;
     }
 
     /**

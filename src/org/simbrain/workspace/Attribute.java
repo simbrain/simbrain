@@ -119,11 +119,11 @@ public abstract class Attribute {
      * Return the description associated with this attribute. For use in the
      * GUI. Returns
      *
-     * <ul>
+     * <ol>
      * <li>The results of the {@link #customDescriptionMethod} if set</li>
      * <li>The {@link #description} if it's not empty.
      * <li>A default format ID:methodName(Type).  E.g. Neuron25:getActivation(Double).
-     * </ul>
+     * </ol>
      *
      * @return the description
      */

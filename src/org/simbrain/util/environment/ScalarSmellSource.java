@@ -24,7 +24,7 @@ public class ScalarSmellSource {
      * @return the value, scaled by that distance.
      */
     public double getValue(double distance) {
-        return smellSource.getStimulus(0, distance);
+        return smellSource.getStimulus(distance)[0];
     }
 
     /**

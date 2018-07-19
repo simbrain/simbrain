@@ -95,6 +95,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.getAnnotation().label());
         }
 
+        if(!parameter.isEditable()) {
+            return new JLabel();
+        }
+
         if (parameter.isBoolean()) {
             return new YesNoNull();
         }
@@ -171,10 +175,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return new JNumberSpinnerWithNull(spinnerModel);
         }
 
-        if(!parameter.isEditable()) {
-            return new JLabel();
-        }
-
         return new JTextField();
     }
 
@@ -235,7 +235,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * the widget is displayed.
      */
     public void setWidgetValue(Object value) {
-        if (parameter.isBoolean()) {
+        if(!parameter.isEditable()) {
+            ((JLabel) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
+        } else if (parameter.isBoolean()) {
             if (value == null) {
                 ((YesNoNull) component).setNull();
             } else {
@@ -251,8 +253,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 ((ChoicesWithNull) component).setSelectedItem(value);
             }
-        } else if(!parameter.isEditable()) {
-            ((JLabel) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         } else {
             ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         }

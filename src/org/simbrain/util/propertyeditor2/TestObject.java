@@ -31,20 +31,20 @@ public class TestObject implements EditableObject {
     Integer theIntObject = 1;
     Double theDoubleObject = 1.1;
     Float theFloatObject = .123213f;
-    Long theLongObject = 12321L;
-    Short theShortObject = 20;
+//    Long theLongObject = 12321L;
+//    Short theShortObject = 20;
 
     // Primitive number tests
     @UserParameter(label = "The int", description = "The int", minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
     int theInt = 1;
     double theDouble = .9092342;
     float theFloat = 0;
-    @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
-    long theLong = 20L;
-    short theShort = 20; // TODO: Figure out about shorts...
+//    @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
+//    long theLong = 20L;
+//    short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
-    double[] doubleArray = new double[]{.1, .2, .3, 4};
+    double[] doubleArray = new double[] {.1, .2, .3, 4};
 
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
@@ -70,7 +70,19 @@ public class TestObject implements EditableObject {
 
         return "(Test Object) \n" +
 
-                "The Enum: " + theEnum + "\n" + "The Color: " + theColor + "\n" + "The Boolean Object: " + theBooleanObject + "\n" + "The Boolean: " + theBool + "\n" + "The String: " + theString + "\n" + "The Integer Object: " + theIntObject + "\n" + "The Double Array: " + Arrays.toString(doubleArray) + "\n" + "The Double Object: " + theDoubleObject + "\n" + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + theLongObject + "\n" + "The Short Object: " + theShortObject + "\n" + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n" + "The float: " + theFloat + "\n" + "The long: " + theLong + "\n" + "The short: " + theShort + "\n";
+            "The Enum: " + theEnum + "\n"
+            + "The Color: " + theColor + "\n"
+            + "The Boolean Object: "
+            + theBooleanObject + "\n" + "The Boolean: "
+            + theBool + "\n" + "The String: " + theString
+            + "\n" + "The Integer Object: " + theIntObject
+            + "\n" + "The Double Array: " + Arrays.toString(doubleArray)
+            + "\n" + "The Double Object: " + theDoubleObject + "\n"
+            + "The Float Object: " + theFloatObject + "\n" + "The Long Object: "
+            + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n"
+            + "The float: " + theFloat + "\n";
+
+        //TODO: Longs and shorts
     }
 
     /*
@@ -99,30 +111,6 @@ public class TestObject implements EditableObject {
      */
     public void setEnumeration(ComboBoxWrapper object) {
         theEnum = (TestEnum) object.getCurrentObject();
-    }
-
-    /**
-     * Simple test routine.
-     *
-     * @param args not used.
-     */
-    public static void main(String[] args) {
-
-        TestObject testObject = new TestObject();
-        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(testObject);
-        StandardDialog dialog = editor.getDialog();
-        dialog.pack();
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        // Don't click ok to see output; close the window using it's upper-right 
-        // close button
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent arg) {
-                editor.commitChanges();
-                System.out.println(testObject);
-            }
-        });
-        dialog.setVisible(true);
-
     }
 
     /**
@@ -223,33 +211,33 @@ public class TestObject implements EditableObject {
         this.theFloatObject = theFloatObject;
     }
 
-    /**
-     * @return the theLongObject
-     */
-    public Long getTheLongObject() {
-        return theLongObject;
-    }
-
-    /**
-     * @param theLongObject the theLongObject to set
-     */
-    public void setTheLongObject(Long theLongObject) {
-        this.theLongObject = theLongObject;
-    }
-
-    /**
-     * @return the theShortObject
-     */
-    public Short getTheShortObject() {
-        return theShortObject;
-    }
-
-    /**
-     * @param theShortObject the theShortObject to set
-     */
-    public void setTheShortObject(Short theShortObject) {
-        this.theShortObject = theShortObject;
-    }
+//    /**
+//     * @return the theLongObject
+//     */
+//    public Long getTheLongObject() {
+//        return theLongObject;
+//    }
+//
+//    /**
+//     * @param theLongObject the theLongObject to set
+//     */
+//    public void setTheLongObject(Long theLongObject) {
+//        this.theLongObject = theLongObject;
+//    }
+//
+//    /**
+//     * @return the theShortObject
+//     */
+//    public Short getTheShortObject() {
+//        return theShortObject;
+//    }
+//
+//    /**
+//     * @param theShortObject the theShortObject to set
+//     */
+//    public void setTheShortObject(Short theShortObject) {
+//        this.theShortObject = theShortObject;
+//    }
 
     /**
      * @return the theInt
@@ -293,33 +281,33 @@ public class TestObject implements EditableObject {
         this.theFloat = theFloat;
     }
 
-    /**
-     * @return the theLong
-     */
-    public long getTheLong() {
-        return theLong;
-    }
+//    /**
+//     * @return the theLong
+//     */
+//    public long getTheLong() {
+//        return theLong;
+//    }
+//
+//    /**
+//     * @param theLong the theLong to set
+//     */
+//    public void setTheLong(long theLong) {
+//        this.theLong = theLong;
+//    }
 
-    /**
-     * @param theLong the theLong to set
-     */
-    public void setTheLong(long theLong) {
-        this.theLong = theLong;
-    }
-
-    /**
-     * @return the theShort
-     */
-    public short getTheShort() {
-        return theShort;
-    }
-
-    /**
-     * @param theShort the theShort to set
-     */
-    public void setTheShort(short theShort) {
-        this.theShort = theShort;
-    }
+//    /**
+//     * @return the theShort
+//     */
+//    public short getTheShort() {
+//        return theShort;
+//    }
+//
+//    /**
+//     * @param theShort the theShort to set
+//     */
+//    public void setTheShort(short theShort) {
+//        this.theShort = theShort;
+//    }
 
     /**
      * @return the doubleArray
@@ -334,4 +322,32 @@ public class TestObject implements EditableObject {
     public void setDoubleArray(double[] doubleArray) {
         this.doubleArray = doubleArray;
     }
+
+
+
+    /**
+     * Simple test routine.
+     *
+     * @param args not used.
+     */
+    public static void main(String[] args) {
+
+        TestObject testObject = new TestObject();
+        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(testObject);
+        StandardDialog dialog = editor.getDialog();
+        dialog.pack();
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        // Don't click ok to see output; close the window using it's upper-right
+        // close button
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent arg) {
+                editor.commitChanges();
+                System.out.println(testObject);
+            }
+        });
+        dialog.setVisible(true);
+
+    }
+
+
 }

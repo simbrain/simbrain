@@ -18,25 +18,31 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 /**
  * <b>NeuronGroupCreationDialog</b> is a dialog box for creating a bare neuron
  * group.
  */
-@SuppressWarnings("serial")
 public class NeuronGroupCreationDialog extends StandardDialog {
 
     /**
      * The panel representing the neuron group to be created.
      */
-    private final NeuronGroupPanel neuronGroupPanel;
+    private final AnnotatedPropertyEditor neuronGroupPanel;
 
     /**
      * Network Panel.
      */
     private final NetworkPanel networkPanel;
+
+    /**
+     * "Shell" neuron group that can be used to create the real neuron group.
+     */
+    private final NeuronGroup.NeuronGroupCreator ngCreator;
 
     /**
      * This method is the default constructor.
@@ -45,21 +51,17 @@ public class NeuronGroupCreationDialog extends StandardDialog {
      */
     public NeuronGroupCreationDialog(final NetworkPanel panel) {
         this.networkPanel = panel;
-        neuronGroupPanel = NeuronGroupPanel.createNeuronGroupPanel(panel, this);
+        ngCreator = new NeuronGroup.NeuronGroupCreator(panel.getNetwork());
+        neuronGroupPanel = new AnnotatedPropertyEditor(ngCreator);
         setContentPane(neuronGroupPanel);
         setTitle("New Neuron Group");
     }
 
-    /**
-     * Called when dialog closes.
-     */
     @Override
     protected void closeDialogOk() {
-        boolean success = neuronGroupPanel.commitChanges();
-        if (!success) { // Something went wrong...
-            return; // Do not close the panel or add the group (do not pass go)
-        }
-        networkPanel.getNetwork().addGroup(neuronGroupPanel.getGroup());
+        neuronGroupPanel.commitChanges();
+        networkPanel.getNetwork().addGroup(ngCreator.create());
+
         networkPanel.repaint();
         super.closeDialogOk();
     }

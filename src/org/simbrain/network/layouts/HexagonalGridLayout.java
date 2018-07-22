@@ -19,6 +19,8 @@
 package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -29,6 +31,8 @@ import java.util.List;
  * @author wstclair
  */
 public class HexagonalGridLayout implements Layout {
+
+    //TODO: Extend GridLayout?
 
     /**
      * The default number of columns if manual columns are allowed.
@@ -63,16 +67,19 @@ public class HexagonalGridLayout implements Layout {
     /**
      * Number of columns in the layout.
      */
+    @UserParameter(label = "Number of Columns", description = "Number of columns in the grid")
     private int numColumns = DEFAULT_NUM_COLUMNS;
 
     /**
      * Horizontal spacing between neurons.
      */
+    @UserParameter(label = "Horizontal Spacing", description = "Horizontal spacing between neurons")
     private double hSpacing = DEFAULT_H_SPACING;
 
     /**
      * Vertical spacing between neurons.
      */
+    @UserParameter(label = "Vertical Spacing", description = "Vertical spacing between neurons")
     private double vSpacing = DEFAULT_V_SPACING;
 
     /**
@@ -190,6 +197,11 @@ public class HexagonalGridLayout implements Layout {
      */
     public void setManualColumns(boolean manualColumns) {
         this.manualColumns = manualColumns;
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new HexagonalGridLayout(hSpacing, vSpacing, numColumns);
     }
 
 }

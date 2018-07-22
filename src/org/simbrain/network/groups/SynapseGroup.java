@@ -31,6 +31,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -1977,5 +1978,11 @@ public class SynapseGroup extends Group {
                 }
             }
         }
+    }
+
+    //TODO
+    @Override
+    public EditableObject copy() {
+        return this.copy();
     }
 }

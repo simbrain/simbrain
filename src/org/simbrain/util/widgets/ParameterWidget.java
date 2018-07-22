@@ -262,6 +262,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * Get the value of the widget.
      */
     public Object getWidgetValue() {
+
+        if (!parameter.isEditable()) {
+            // Should not happen
+            return null;
+        }
+
         if (parameter.isBoolean()) {
             return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
         }

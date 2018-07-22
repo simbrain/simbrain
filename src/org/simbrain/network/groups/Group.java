@@ -19,12 +19,14 @@
 package org.simbrain.network.groups;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
  * representation is {@link org.simbrain.network.gui.nodes.GroupNode}.
  */
-public abstract class Group {
+public abstract class Group implements CopyableObject {
 
     /**
      * Reference to the network this group is a part of.
@@ -34,11 +36,13 @@ public abstract class Group {
     /**
      * Name of this group.
      */
+    @UserParameter(label = "ID", description = "Id of this group", order = -1, editable = false)
     private String id;
 
     /**
      * Name of this group. Null strings lead to default labeling conventions.
      */
+    @UserParameter(label = "Label", description = "Group label", order = 10)
     private String label;
 
     /**
@@ -46,10 +50,6 @@ public abstract class Group {
      * GUI.
      */
     private String stateInfo = "";
-
-    /**
-     * Whether this group should be deleted when all its components are deleted.
-     */
 
     /**
      * Flag which prevents infinite loops when deleting composite groups.

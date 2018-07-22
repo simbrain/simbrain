@@ -1475,11 +1475,11 @@ public class Network {
     /**
      * Fire a group update event event.
      *
-     * @param groups reference to group that has been updated.
+     * @param group reference to group that has been updated.
      */
-    public void fireGroupUpdated(final Group groups) {
+    public void fireGroupUpdated(final Group group) {
         for (int i = 0, n = groupListeners.size(); i < n; i++) {
-            groupListeners.get(i).groupUpdated(groups);
+            groupListeners.get(i).groupUpdated(group);
         }
     }
 

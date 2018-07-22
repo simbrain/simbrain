@@ -18,9 +18,15 @@
  */
 package org.simbrain.network.layouts;
 
+import org.jfree.layout.RadialLayout;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +35,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public interface Layout {
+public interface Layout extends CopyableObject {
 
     /**
      * Layout a list of neurons.
@@ -50,4 +56,15 @@ public interface Layout {
      */
     void setInitialLocation(final Point2D initialPoint);
 
+    /**
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return Arrays.asList(LineLayout.class, GridLayout.class, HexagonalGridLayout.class);
+    }
+
+    @Override
+    default String getName() {
+        return getDescription();
+    }
 }

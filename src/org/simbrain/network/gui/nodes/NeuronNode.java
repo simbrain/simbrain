@@ -366,6 +366,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (!currentTextVisibility) {
             return;
         }
+
+        if(neuron.getLabel() == null) {
+            return;
+        }
+
         // Set label text
         if ((!neuron.getLabel().equalsIgnoreCase("")) || (!neuron.getLabel().equalsIgnoreCase(SimbrainConstants.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);

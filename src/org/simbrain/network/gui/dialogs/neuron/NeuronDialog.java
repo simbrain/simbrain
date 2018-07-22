@@ -78,23 +78,14 @@ public final class NeuronDialog extends StandardDialog {
 //            // Create error message and somehow prevent dialog from being created
 //        }
         neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
-        init();
-        addListeners();
-        updateHelp();
-
-    }
-
-    /**
-     * Initializes the components on the panel.
-     */
-    private void init() {
         setTitle("Neuron Dialog");
         JScrollPane scroller = new JScrollPane(neuronPropertiesPanel);
         scroller.setBorder(null);
         setContentPane(scroller);
         this.addButton(helpButton);
+        addListeners();
+        updateHelp();
     }
-
 
     /**
      * Add listeners to the components of the dialog. Specifically alters the

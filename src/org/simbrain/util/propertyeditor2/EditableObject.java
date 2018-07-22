@@ -30,6 +30,8 @@ import java.util.List;
  */
 public interface EditableObject {
 
+    //TODO: Reconsider default.  Make getname a requirement?
+
     /**
      * Returns the name of this object. Useful as a description in dropdowns.
      */

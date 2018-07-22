@@ -96,7 +96,7 @@ public @interface UserParameter {
     /**
      * Used to determine the order of parameters when displayed to a user.
      * Optional. If two parameters have the same order value then they will be
-     * ordered according to the field name.
+     * ordered according to the field name. Lower numbers are higher up in the panel.
      */
     int order() default 0;
 

@@ -26,8 +26,11 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -41,10 +44,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
- * Layers in feed-forward networks are neuron groups. Self-organizing-maps
+ * Layers in feed-forward networks are neuron groups. Self
+ * -organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
+public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
 
     // TODO: If 3.x is developed and neurongroup sticks around:
     //  Add prototype neuron as in synapse group
@@ -86,6 +90,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * The layout for the neurons in this group.
      */
+    @UserParameter(label = "Layout", isObjectType = true, tab = "Layout")
     private Layout layout = DEFAULT_LAYOUT;
 
     /**
@@ -164,13 +169,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
         }
     }
-
-    /**
-     * This used to be how neuron group recordings were labeled. This is now
-     * only here for backwards compatibility.
-     */
-    @Deprecated
-    private int fileNum = 0;
 
     /**
      * Construct a new neuron group from a list of neurons.
@@ -257,6 +255,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             this.addNeuron(new Neuron(network, neuron), false);
         }
         this.setLabel(toCopy.getLabel());
+        this.setLayout(toCopy.getLayout());
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();
     }
@@ -1512,7 +1511,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Number of subsamples to take. This value is also implicitly a threshold.
      * If a neuron group has more than this many neurons, and subsampling is
      * turned on, a vector with this many components is returned by (
-     * {@link getExternalActivations}
+     * {@link #getExternalActivations}
      */
     private static int numSubSamples = 100;
 
@@ -1601,4 +1600,35 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         return false;
     }
 
+    @Override
+    public EditableObject copy() {
+        return this.deepCopy(this.getParentNetwork());
+    }
+
+    /**
+     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
+     */
+    public static class NeuronGroupCreator extends NeuronGroup {
+
+        @UserParameter(label = "Number of neurons", description = "How many neurons this neuron group should have", order = -1)
+        int numNeurons = 20;
+
+        public NeuronGroupCreator(Network network) {
+            super(network);
+        }
+
+        /**
+         * Create a neuron group with {@link #numNeurons} neurons.
+         *
+         * @return the new neuron group
+         */
+        public NeuronGroup create() {
+            NeuronGroup ng = deepCopy(this.getParentNetwork());
+            for(int i = 0; i < numNeurons; i++) {
+                ng.addNeuron(new Neuron(this.getParentNetwork()));
+            }
+            ng.applyLayout();
+            return ng;
+        }
+    }
 }

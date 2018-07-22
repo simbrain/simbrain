@@ -18,6 +18,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.trainers.Trainable;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -516,6 +517,12 @@ public abstract class Subnetwork extends Group {
         for (Group sg : synapseGroupList) {
             sg.recursivelySetIds();
         }
+    }
+
+    //TODO
+    @Override
+    public EditableObject copy() {
+        return this.copy();
     }
 
 }

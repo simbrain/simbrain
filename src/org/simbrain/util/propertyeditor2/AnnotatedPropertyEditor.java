@@ -178,6 +178,7 @@ public class AnnotatedPropertyEditor extends JPanel {
 
     /**
      * Add a ParameterWidget to its corresponding tab panel.
+     *
      * @param pw the ParameterWidget to add
      */
     private void addItemToTabPanel(ParameterWidget pw) {
@@ -188,6 +189,7 @@ public class AnnotatedPropertyEditor extends JPanel {
 
     /**
      * Add a labeled ParameterWidget to its corresponding tab panel.
+     *
      * @param pw the ParameterWidget to add
      */
     private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
@@ -198,6 +200,7 @@ public class AnnotatedPropertyEditor extends JPanel {
 
     /**
      * Creates if not exists a tab panel with a specified name.
+     *
      * @param tabName the name for the tab
      */
     private void addTabPanel(String tabName) {
@@ -335,10 +338,15 @@ public class AnnotatedPropertyEditor extends JPanel {
         // Commit each widgets value to all objects in list
         for (ParameterWidget pw : widgets) {
 
+            if (!pw.getParameter().isEditable()) {
+                continue;
+            }
+
             Object widgetValue = pw.getWidgetValue();
             if (widgetValue == null) {
                 // Don't save widgets in inconsistent state.
                 // System.out.println("null widget, not saving");
+                // Also used
                 break;
             }
 

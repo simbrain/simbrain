@@ -19,6 +19,8 @@
 package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -45,8 +47,6 @@ public class LineLayout implements Layout {
         }
     }
 
-    ;
-
     /**
      * The default orientation of the line.
      */
@@ -60,11 +60,13 @@ public class LineLayout implements Layout {
     /**
      * Current line orientation.
      */
+    @UserParameter(label = "Orientation", description = "Horizontal or Vertical")
     private LineOrientation orientation = DEFAULT_LINE_ORIENTATION;
 
     /**
      * Spacing between neurons.
      */
+    @UserParameter(label = "Spacing", description = "Spacing between neurons")
     private double spacing = DEFAULT_SPACING;
 
     /**
@@ -172,4 +174,10 @@ public class LineLayout implements Layout {
     public String toString() {
         return "Line Layout";
     }
+
+    @Override
+    public EditableObject copy() {
+        return  new LineLayout(spacing, orientation);
+    }
+
 }

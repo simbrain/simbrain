@@ -169,27 +169,50 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
 //        if (specificNeuronGroupPanel != null) {
 //            tabbedPane.addTab("Properties", (JPanel) specificNeuronGroupPanel);
 //        }
-//        tabbedPane.addTab("Neurons", new JPanel()); // Holder
-//        tabbedPane.addTab("Layout", layoutPanel); // Holder
 //
-//            NumericMatrix matrix = new NumericMatrix() {
-//
-//                @Override
-//                public void setData(double[][] data) {
-//                    neuronGroup.setTestData(data);
-//                }
-//
-//                @Override
-//                public double[][] getData() {
-//                    return neuronGroup.getTestData();
-//                }
-//            };
-//            inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
-//
-//            tabbedPane.addTab("Input Data", new JPanel()); // Holder
+        NumericMatrix matrix = new NumericMatrix() {
 
+            @Override
+            public void setData(double[][] data) {
+                neuronGroup.setTestData(data);
+            }
+
+            @Override
+            public double[][] getData() {
+                return neuronGroup.getTestData();
+            }
+        };
+
+        JTabbedPane tabbedPane = ngPanel.getTabbedPane();
+        tabbedPane.setPreferredSize(new Dimension(400, 400));
+        inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
+        tabbedPane.addTab("Input Data", inputDataPanel);
+
+        // Start in default state
+        tabbedPane.setPreferredSize(new Dimension(400, 400));
+        // Handle different tab sizes
+        tabbedPane.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                tabbedPane.setPreferredSize(new Dimension(400, 400));
+                parent.pack();
+                //TODO: Reduce to just what's needed... and not working!  Fix
+                NeuronGroupPanel.this.getTopLevelAncestor().revalidate();
+                NeuronGroupPanel.this.getTopLevelAncestor().repaint();
+                switch (tabbedPane.getSelectedIndex()) {
+                case 2:
+                    tabbedPane.setPreferredSize(new Dimension(600, 400));
+                    parent.pack();
+                    NeuronGroupPanel.this.getTopLevelAncestor().revalidate();
+                    NeuronGroupPanel.this.getTopLevelAncestor().repaint();
+                    break;
+                }
+            }
+        });
+
+        // Set up Help
         if (parent instanceof StandardDialog) {
-            // Set up help button
             Action helpAction;
             if (specificNeuronGroupPanel != null) {
                 helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
@@ -225,6 +248,7 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
     @Override
     public boolean commitChanges() {
         ngPanel.commitChanges();
+        neuronGroup.applyLayout();
         networkPanel.repaint();
         networkPanel.getNetwork().fireGroupUpdated(neuronGroup);
         return true;

@@ -43,7 +43,7 @@ public abstract class Group implements CopyableObject {
      * Name of this group. Null strings lead to default labeling conventions.
      */
     @UserParameter(label = "Label", description = "Group label", order = 10)
-    private String label;
+    private String label = "";
 
     /**
      * Optional information about the current state of the group. For display in
@@ -69,6 +69,11 @@ public abstract class Group implements CopyableObject {
      */
     public Group(final Network net) {
         parentNetwork = net;
+    }
+    public Group(final Network net, String id) {
+        parentNetwork = net;
+        this.id = id;
+        this.label = id;
     }
 
     /**
@@ -234,6 +239,10 @@ public abstract class Group implements CopyableObject {
         // Create a default label based on the id
         if (getLabel() == null) {
             setLabel(id.replaceAll("_", " "));
+        }
+        //TODO: Below should be part of group initalization.
+        if (getLabel().isEmpty()) {
+            setLabel(id);
         }
     }
 

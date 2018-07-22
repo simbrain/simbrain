@@ -85,7 +85,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     /**
      * Default layout for neuron groups.
      */
-    public static final Layout DEFAULT_LAYOUT = new LineLayout(50, LineOrientation.HORIZONTAL);
+    public static final Layout DEFAULT_LAYOUT = new GridLayout();
 
     /**
      * The layout for the neurons in this group.

@@ -26,6 +26,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
+import javax.swing.plaf.TabbedPaneUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -472,6 +473,19 @@ public class AnnotatedPropertyEditor extends JPanel {
             if (w.getLabel().equalsIgnoreCase(label)) {
                 return w;
             }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the tabbed pain or null if there is none.
+     *
+     * @return the tabbed pane
+     */
+    public JTabbedPane getTabbedPane() {
+        if (mainPanel instanceof JTabbedPane) {
+            return (JTabbedPane) mainPanel;
         }
         return null;
     }

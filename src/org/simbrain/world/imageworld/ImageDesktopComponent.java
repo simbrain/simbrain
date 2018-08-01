@@ -191,8 +191,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         clearImageButton.setIcon(ResourceManager.getSmallIcon("Eraser.png"));
         clearImageButton.setToolTipText("Clear Image");
         clearImageButton.addActionListener(evt -> component.getWorld().clearImage());
-        sourceToolbar.add(clearImageButton);
+        // sourceToolbar.add(clearImageButton); // Too destructive.  Don't include on toolbar
 
+        sensorToolbar.add(new JLabel("Sensors:"));
         sensorToolbar.add(sensorMatrixCombo);
         sensorMatrixCombo.setToolTipText("Which Sensor Matrix to View");
         updateComboBox();

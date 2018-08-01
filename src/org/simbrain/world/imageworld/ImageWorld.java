@@ -111,8 +111,8 @@ public class ImageWorld {
         SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
         sensorMatrices.add(threshold10x10);
 
-        SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
-        sensorMatrices.add(offset100x100);
+        //SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
+        //sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
     }

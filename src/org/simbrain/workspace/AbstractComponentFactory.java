@@ -79,10 +79,10 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
         putGuiComponentFactory(ReaderComponent.class, ReaderComponentDesktopGui::new);
 
-        putWorkspaceComponentFactory("Image Display", () -> new ImageWorldComponent(ImageWorld.SourceType.STATIC_SOURCE));
+        putWorkspaceComponentFactory("Image World", () -> new ImageWorldComponent(ImageWorld.SourceType.STATIC_SOURCE));
         putGuiComponentFactory(ImageWorldComponent.class, ImageDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Image Emitter", () -> new ImageWorldComponent(ImageWorld.SourceType.EMITTER_SOURCE));
+        putWorkspaceComponentFactory("Pixel Display", () -> new ImageWorldComponent(ImageWorld.SourceType.EMITTER_SOURCE));
         putGuiComponentFactory(ImageWorldComponent.class, ImageDesktopComponent::new);
 
         putWorkspaceComponentFactory("Device Interaction", () -> new DeviceInteractionComponent(""));

@@ -18,10 +18,17 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.event.PMouseWheelZoomEventHandler;
+import org.piccolo2d.nodes.PImage;
+import org.simbrain.util.SceneGraphBrowser;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity2;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import javax.swing.*;
@@ -35,6 +42,11 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     // TODO: Move most of this input stuff to an input manager...
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The Piccolo PCanvas.
+     */
+    private final PCanvas canvas;
 
     /**
      * Reference to WorkspaceComponent.
@@ -107,16 +119,43 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      * @param world the frame in which this world is rendered
      */
     public OdorWorldPanel(OdorWorldComponent component, OdorWorld world) {
+
+        canvas = new PCanvas();
+        setLayout(new BorderLayout());
+        this.add("Center", canvas);
+
+        canvas.setBackground(backgroundColor);
+        canvas.addMouseListener(mouseListener);
+        canvas.addMouseMotionListener(mouseDraggedListener);
+        canvas.addKeyListener(this);
+        canvas.setFocusable(true);
+
+
+        PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
+        zoomHandler.zoomAboutMouse();
+        canvas.addInputEventListener(zoomHandler);
+
+        PCamera camera = canvas.getCamera();
+
+
+
+//        // TODO: Move to separate method attached to key command
+//        SceneGraphBrowser sgb = new SceneGraphBrowser(
+//            canvas.getRoot());
+//        StandardDialog dialog = new StandardDialog();
+//        dialog.setContentPane(sgb);
+//        dialog.setTitle("Piccolo Scenegraph Browser");
+//        dialog.setModal(false);
+//        dialog.pack();
+//        dialog.setLocationRelativeTo(null);
+//        dialog.setVisible(true);
+
         this.component = component;
         this.world = world;
 
-        renderer = new OdorWorldRenderer();
+//        renderer = new OdorWorldRenderer();
 
-        setBackground(backgroundColor);
-        this.addMouseListener(mouseListener);
-        this.addMouseMotionListener(mouseDraggedListener);
-        this.addKeyListener(this);
-        this.setFocusable(true);
+
 
         menu = new OdorWorldMenu(this);
 
@@ -133,7 +172,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             public void entityAdded(OdorWorldEntity entity) {
-                repaint();
+                OdorWorldEntity2 entity2 = new OdorWorldEntity2("Swiss.gif");
+                canvas.getLayer().addChild(entity2);
+                camera.animateViewToCenterBounds(entity2.getBounds(), true, 5000);
+
             }
 
             public void sensorAdded(Sensor sensor) {
@@ -385,10 +427,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         return temp;
     }
 
-    @Override
-    public void paintComponent(final Graphics g) {
-        renderer.draw((Graphics2D) g, getWorld(), this.getWidth(), this.getHeight());
-    }
+//    @Override
+//    public void paintComponent(final Graphics g) {
+//        renderer.draw((Graphics2D) g, getWorld(), this.getWidth(), this.getHeight());
+//    }
 
     /**
      * @return The selected abstract entity.

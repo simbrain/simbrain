@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.Speech;
@@ -194,14 +195,7 @@ public class EffectorPanel extends JPanel {
 
         StandardDialog dialog = new StandardDialog();
         dialog.setTitle("Edit Effector");
-        AbstractEffectorPanel effectorPanel = null;
-        if (effector instanceof Turning) {
-            effectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
-        } else if (effector instanceof StraightMovement) {
-            effectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
-        } else if (effector instanceof Speech) {
-            effectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
-        }
+        AnnotatedPropertyEditor effectorPanel = new AnnotatedPropertyEditor(effector);
         dialog.setContentPane(effectorPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -63,26 +65,42 @@ public class TileSensor extends Sensor {
     /**
      * Value to return when the tile sensor is activated.
      */
+    @UserParameter(label = "Activation amount",
+            description = "Amount of activation that a neuron coupled with the tile sensor receives "
+                    + "when the tile sensor is activated. ",
+            defaultValue = "" + DEFAULT_ACTIVATION, order = 3)
     private double activationAmount = DEFAULT_ACTIVATION;
 
     /**
      * Upper left corner.
      */
+    @UserParameter(label = "X",
+            description = "x coordinates for the location of the top-left corner of the tile sensor.",
+            order = 4)
     private int x;
+
 
     /**
      * Upper left corner.
      */
+    @UserParameter(label = "Y",
+            description = "y coordinates for the location of the top-left corner of the tile sensor.",
+            order = 5)
     private int y;
-
     /**
      * Width of the sensor.
      */
+    @UserParameter(label = "Width",
+            description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
+            order = 6)
     private int width;
 
     /**
      * Height of the sensor.
      */
+    @UserParameter(label = "Height",
+            description = "Determines the size of the tile. Height specifies the vertical length.",
+            order = 7)
     private int height;
 
     /**
@@ -210,4 +228,13 @@ public class TileSensor extends Sensor {
         return "Tile";
     }
 
+    @Override
+    public EditableObject copy() {
+        return new TileSensor(parent, x, y, width, height);
+    }
+
+    @Override
+    public String getName() {
+        return "Tile";
+    }
 }

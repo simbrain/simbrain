@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
@@ -41,6 +43,9 @@ public class StraightMovement extends Effector {
     /**
      * Effector moves agent ahead by scaling factor times amount.
      */
+    @UserParameter(label = "Base Movement Amount",
+            description = "Effector moves agent ahead by scaling factor times amount.",
+            defaultValue = "" + DEFAULT_SCALING_FACTOR, order = 4)
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
     /**
@@ -56,6 +61,15 @@ public class StraightMovement extends Effector {
      */
     public StraightMovement(RotatingEntity parent, String label) {
         super(parent, label);
+    }
+
+    /**
+     * Construct the straight movement effector with default values.
+     *
+     * @param parent parent entity.
+     */
+    public StraightMovement(RotatingEntity parent) {
+        super(parent, DEFAULT_LABEL);
     }
 
     @Override
@@ -107,5 +121,15 @@ public class StraightMovement extends Effector {
     @Override
     public String getTypeDescription() {
         return "Straight Movement";
+    }
+
+    @Override
+    public String getName() {
+        return "Straight Movement";
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new StraightMovement(((RotatingEntity) parent), getLabel());
     }
 }

@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -41,6 +43,10 @@ public class Hearing extends Sensor {
     /**
      * The thing this hearing sensor listens for.
      */
+    @UserParameter(label = "Utterance",
+            description = "The string or phrase associated with this sensor. Hearing sensors get activated "
+                    + "when it senses a speech effectors of the same utterance.",
+            order = 3)
     private String phrase = "";
 
     /**
@@ -51,6 +57,9 @@ public class Hearing extends Sensor {
     /**
      * If amount to pass out if this sensor is activated.
      */
+    @UserParameter(label = "Output Amount",
+            description = "The amount of activation to be sent to a neuron coupled with this sensor.",
+            defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 4)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
     /**
@@ -64,6 +73,15 @@ public class Hearing extends Sensor {
         super(parent, "Hear: \"" + phrase + "\"");
         this.phrase = phrase;
         this.outputAmount = outputAmount;
+    }
+
+    /**
+     * Construct the hearing sensor.
+     *
+     * @param parent       parent entity
+     */
+    public Hearing(OdorWorldEntity parent) {
+        super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
     //TODO: Clean up / Make this settable
@@ -135,4 +153,8 @@ public class Hearing extends Sensor {
         return "Hearing";
     }
 
+    @Override
+    public EditableObject copy() {
+        return new Hearing(parent, phrase, outputAmount);
+    }
 }

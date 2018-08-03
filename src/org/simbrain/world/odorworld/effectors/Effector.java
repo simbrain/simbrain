@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.util.List;
@@ -25,7 +27,7 @@ import java.util.List;
 /**
  * Abstract class for Odor World effectors.
  */
-public abstract class Effector {
+public abstract class Effector implements CopyableObject {
 
     /**
      * Reference to parent entity.
@@ -35,11 +37,15 @@ public abstract class Effector {
     /**
      * The id of this smell effector.
      */
+    @UserParameter(label = "Effector ID", description = "A unique id for this effector",
+            order = 0, editable = false)
     private String id;
 
     /**
      * Public label of this effector.
      */
+    @UserParameter(label = "Label", description = "Optional string description associated with this effector",
+            defaultValue = "", order = 2)
     private String label;
 
     /**

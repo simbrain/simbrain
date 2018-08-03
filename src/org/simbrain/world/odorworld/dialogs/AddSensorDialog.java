@@ -15,8 +15,10 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -33,7 +35,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
     /**
      * String of Sensor types.
      */
-    private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set", "Hearing"};
+    private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set", "Hearing", "ObjectSensor", "BumpSensor"};
 
     /**
      * Entity to which sensor is being added.
@@ -44,11 +46,6 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
      * Select sensor type.
      */
     private JComboBox sensorType = new JComboBox(sensors);
-
-    /**
-     * Panel that changes to a specific sensor panel.
-     */
-    private AbstractSensorPanel currentSensorPanel;
 
     /**
      * Main dialog box.
@@ -82,7 +79,6 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
-        mainPanel.add(currentSensorPanel);
         setContentPane(mainPanel);
     }
 
@@ -97,37 +93,20 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
      */
     private void initPanel() {
         if (sensorType.getSelectedItem() == "TileSensor") {
-            clearSensorPanel();
             setTitle("Add a tile sensor");
-            currentSensorPanel = new TileSensorPanel(entity);
-            mainPanel.add(currentSensorPanel);
         } else if (sensorType.getSelectedItem() == "SmellSensor") {
-            clearSensorPanel();
             setTitle("Add a smell sensor");
-            currentSensorPanel = new SmellSensorPanel(entity);
-            mainPanel.add(currentSensorPanel);
         } else if (sensorType.getSelectedItem() == "Tile Set") {
-            clearSensorPanel();
             setTitle("Add a grid of tile sensors");
-            currentSensorPanel = new TileSetPanel(entity);
-            mainPanel.add(currentSensorPanel);
         } else if (sensorType.getSelectedItem() == "Hearing") {
-            clearSensorPanel();
             setTitle("Add a hearing sensor");
-            currentSensorPanel = new HearingSensorPanel(entity);
-            mainPanel.add(currentSensorPanel);
+        } else if (sensorType.getSelectedItem().equals("ObjectSensor")) {
+            setTitle("Add a object sensor");
+        } else if (sensorType.getSelectedItem().equals("BumpSensor")) {
+            setTitle("Add a bump sensor");
         }
         pack();
         setLocationRelativeTo(null);
-    }
-
-    /**
-     * Remove current panel, if any.
-     */
-    private void clearSensorPanel() {
-        if (currentSensorPanel != null) {
-            mainPanel.remove(currentSensorPanel);
-        }
     }
 
     /**
@@ -141,6 +120,18 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        currentSensorPanel.commitChanges();
+        if (sensorType.getSelectedItem() == "TileSensor") {
+            entity.addSensor(new TileSensor(entity, 0, 0, 0, 0));
+        } else if (sensorType.getSelectedItem() == "SmellSensor") {
+            entity.addSensor(new SmellSensor(entity));
+        } else if (sensorType.getSelectedItem() == "Tile Set") {
+            entity.addSensor(new TileSensor(entity, 0, 0, 0, 0));
+        } else if (sensorType.getSelectedItem() == "Hearing") {
+            entity.addSensor(new Hearing(entity));
+        } else if (sensorType.getSelectedItem().equals("ObjectSensor")) {
+            entity.addSensor(new ObjectSensor(entity));
+        } else if (sensorType.getSelectedItem().equals("BumpSensor")) {
+            entity.addSensor(new BumpSensor(entity));
+        }
     }
 }

@@ -1,7 +1,9 @@
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.ScalarSmellSource;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -13,12 +15,18 @@ public class ObjectSensor extends Sensor {
     /**
      * Current value of the sensor.
      */
-    private double value;
+    @UserParameter(label = "Output Amount",
+            description = "The amount of activation to be sent to a neuron coupled with this sensor.",
+            defaultValue = "" + 1, order = 4)
+    private double value = 1;
 
     /**
      * The type of the object represented, e.g. Swiss.gif.
      */
-    private String objectType;
+    @UserParameter(label = "Object Type",
+            description = "The type of the object represented, e.g. Swiss.gif.",
+            order = 5)
+    private String objectType = "Swiss.gif";
 
     /**
      * Instantiate an object sensor.
@@ -30,6 +38,15 @@ public class ObjectSensor extends Sensor {
     public ObjectSensor(OdorWorldEntity parent, String label, String objectType) {
         super(parent, label);
         this.objectType = objectType;
+    }
+
+    /**
+     * Instantiate an object sensor.
+     *
+     * @param parent parent entity
+     */
+    public ObjectSensor(OdorWorldEntity parent) {
+        super(parent, "Object Sensor");
     }
 
     @Override
@@ -60,5 +77,15 @@ public class ObjectSensor extends Sensor {
      */
     public String getSensorDescription() {
         return getId() + ":" + getTypeDescription() + " sensor";
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new ObjectSensor(parent, getLabel(), objectType);
+    }
+
+    @Override
+    public String getName() {
+        return "ObjectSensor";
     }
 }

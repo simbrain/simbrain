@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -37,6 +39,9 @@ public class BumpSensor extends Sensor {
     /**
      * Value to produce when bumped.
      */
+    @UserParameter(label = "Output Amount",
+            description = "The amount of activation to be sent to a neuron coupled with this sensor.",
+            defaultValue = "" + 0, order = 4)
     private double bumpValue = 0;
 
     /**
@@ -46,8 +51,17 @@ public class BumpSensor extends Sensor {
      * @param bumpVal value
      */
     public BumpSensor(OdorWorldEntity parent, double bumpVal) {
-        super(parent, "" + bumpVal);
+        super(parent, "Bump Sensor" + bumpVal);
         this.bumpValue = bumpVal;
+    }
+
+    /**
+     * Construct bump sensor with default values.
+     *
+     * @param parent  parent entity
+     */
+    public BumpSensor(OdorWorldEntity parent) {
+        super(parent, "Bump Sensor");
     }
 
     /**
@@ -79,4 +93,13 @@ public class BumpSensor extends Sensor {
         return "Bump";
     }
 
+    @Override
+    public EditableObject copy() {
+        return new BumpSensor(parent, bumpValue);
+    }
+
+    @Override
+    public String getName() {
+        return "Bump";
+    }
 }

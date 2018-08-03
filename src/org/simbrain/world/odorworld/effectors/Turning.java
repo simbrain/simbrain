@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
@@ -47,6 +49,9 @@ public class Turning extends Effector {
      * Turn by amount times direction, which encodes direction: 1 for left, -1
      * for right.
      */
+    @UserParameter(label = "Turning Direction",
+            description = "Turn by amount times direction, which encodes direction: 1 for left, -1 for right.",
+            order = 4)
     private double direction;
 
     /**
@@ -57,6 +62,9 @@ public class Turning extends Effector {
     /**
      * Amount to turn in radians.
      */
+    @UserParameter(label = "Turning Amount",
+            description = "Amount to turn in radians.",
+            order = 5)
     private double amount = 0;
 
     /**
@@ -128,4 +136,13 @@ public class Turning extends Effector {
     }
 
 
+    @Override
+    public String getName() {
+        return "Turning Movement";
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new Turning((RotatingEntity) parent, getLabel(), direction);
+    }
 }

@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
@@ -192,15 +193,7 @@ public class SensorPanel extends JPanel {
 
         StandardDialog dialog = new StandardDialog();
         dialog.setTitle("Edit Sensor");
-        AbstractSensorPanel sensorPanel = null;
-        if (sensor instanceof SmellSensor) {
-            sensorPanel = new SmellSensorPanel(entity, (SmellSensor) sensor);
-        } else if (sensor instanceof TileSensor) {
-            sensorPanel = new TileSensorPanel(entity, (TileSensor) sensor);
-        } else if (sensor instanceof Hearing) {
-            sensorPanel = new HearingSensorPanel(entity, (Hearing) sensor);
-
-        }
+        AnnotatedPropertyEditor sensorPanel = new AnnotatedPropertyEditor(sensor);
         dialog.setContentPane(sensorPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

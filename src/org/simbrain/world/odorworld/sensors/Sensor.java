@@ -18,14 +18,25 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Interface for 2d world sensors.
  */
-public abstract class Sensor {
+public abstract class Sensor implements CopyableObject {
+
+    public static List<Class> SENSOR_LIST =
+            Arrays.asList(SmellSensor.class, Hearing.class, TileSensor.class, ObjectSensor.class);
+
+    public static List<Class> getTypes() {
+        return SENSOR_LIST;
+    }
 
     /**
      * Reference to parent entity.
@@ -35,11 +46,15 @@ public abstract class Sensor {
     /**
      * The id of this smell sensor..
      */
+    @UserParameter(label = "Sensor ID", description = "A unique id for this sensor",
+            order = 0, editable = false)
     private String id;
 
     /**
      * Public label of this sensor.
      */
+    @UserParameter(label = "Label", description = "Optional string description associated with this sensor",
+            defaultValue = "", order = 2)
     private String label;
 
     /**
@@ -108,6 +123,24 @@ public abstract class Sensor {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public static class Editor implements EditableObject {
+
+        @UserParameter(label = "Sensor", isObjectType = true)
+        private Sensor sensor;
+
+        public Editor(Sensor sensor) {
+            this.sensor = sensor;
+        }
+
+        public Sensor getSensor() {
+            return sensor;
+        }
+
+        public void setSensor(Sensor sensor) {
+            this.sensor = sensor;
+        }
     }
 
 }

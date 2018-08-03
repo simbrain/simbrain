@@ -16,6 +16,9 @@ package org.simbrain.world.odorworld.dialogs;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.world.odorworld.effectors.Speech;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
@@ -52,11 +55,6 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
     private JComboBox effectorType = new JComboBox(effectors);
 
     /**
-     * Panel that changes to a specific effector panel.
-     */
-    private AbstractEffectorPanel currentEffectorPanel;
-
-    /**
      * Main dialog box.
      */
     private Box mainPanel = Box.createVerticalBox();
@@ -89,7 +87,6 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
-        mainPanel.add(currentEffectorPanel);
         setContentPane(mainPanel);
     }
 
@@ -105,32 +102,14 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
      */
     private void initPanel() {
         if (effectorType.getSelectedItem() == "StraightMovement") {
-            cleareffectorPanel();
             setTitle("Add a straight movement effector");
-            currentEffectorPanel = new StraightEffectorPanel(rotatingEntity);
-            mainPanel.add(currentEffectorPanel);
         } else if (effectorType.getSelectedItem() == "Turning") {
-            cleareffectorPanel();
             setTitle("Add a turning effector");
-            currentEffectorPanel = new TurningEffectorPanel(rotatingEntity);
-            mainPanel.add(currentEffectorPanel);
         } else if (effectorType.getSelectedItem() == "Speech") {
-            cleareffectorPanel();
             setTitle("Add a speech effector");
-            currentEffectorPanel = new SpeechEffectorPanel(rotatingEntity);
-            mainPanel.add(currentEffectorPanel);
         }
         pack();
         setLocationRelativeTo(null);
-    }
-
-    /**
-     * Remove current panel, if any.
-     */
-    private void cleareffectorPanel() {
-        if (currentEffectorPanel != null) {
-            mainPanel.remove(currentEffectorPanel);
-        }
     }
 
     /**
@@ -144,6 +123,12 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        currentEffectorPanel.commitChanges();
+        if (effectorType.getSelectedItem() == "StraightMovement") {
+            rotatingEntity.addEffector(new StraightMovement(rotatingEntity));
+        } else if (effectorType.getSelectedItem() == "Turning") {
+            rotatingEntity.addEffector(new Turning(rotatingEntity, Turning.DEFAULT_LABEL, 0.0));
+        } else if (effectorType.getSelectedItem() == "Speech") {
+            rotatingEntity.addEffector(new Speech(entity));
+        }
     }
 }

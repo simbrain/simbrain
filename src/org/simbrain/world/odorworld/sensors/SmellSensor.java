@@ -18,8 +18,10 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -53,11 +55,20 @@ public class SmellSensor extends Sensor {
     /**
      * Relative location of the sensor in polar coordinates.
      */
+    @UserParameter(label = "Sensor angle", description = "The angle at which the smell sensor will be added. "
+            + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
+            + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
+            + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
+            defaultValue = "" + (Math.PI / 4), order = 3)
     private double theta = DEFAULT_THETA;
 
     /**
      * Relative location of the sensor in polar coordinates.
      */
+    @UserParameter(label = "Sensor length",
+            description = "The distance from the center of the entity to which the smell sensor is to be added."
+                    + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
+            defaultValue = "" + DEFAULT_RADIUS, order = 4)
     private double radius = DEFAULT_RADIUS;
 
     /**
@@ -80,6 +91,16 @@ public class SmellSensor extends Sensor {
         this.parent = parent;
         this.theta = theta;
         this.radius = radius;
+    }
+
+    /**
+     * Construct a smell sensor.
+     *
+     * @param parent parent
+     */
+    public SmellSensor(final OdorWorldEntity parent) {
+        super(parent, DEFAULT_LABEL);
+        this.parent = parent;
     }
 
     /**
@@ -153,4 +174,13 @@ public class SmellSensor extends Sensor {
         return "Smell";
     }
 
+    @Override
+    public EditableObject copy() {
+        return new SmellSensor(parent, getLabel(), theta, radius);
+    }
+
+    @Override
+    public String getName() {
+        return "Smell";
+    }
 }

@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -39,9 +41,13 @@ public class Speech extends Effector {
      */
     public static final String DEFAULT_PHRASE = "Hi!";
 
+    // TODO: reimplement oversize phrase render problem warning
     /**
      * The thing this speech effector says.
      */
+    @UserParameter(label = "Utterance",
+            description = "The thing this speech effector says.",
+            defaultValue = DEFAULT_PHRASE, order = 3)
     private String phrase = DEFAULT_PHRASE;
 
     /**
@@ -52,6 +58,9 @@ public class Speech extends Effector {
     /**
      * Threshold above which to "the message.
      */
+    @UserParameter(label = "Threshold",
+            description = "Threshold above which to \"the message\".",
+            defaultValue = "" + DEFAULT_THRESHOLD, order = 4)
     private double threshold = DEFAULT_THRESHOLD;
 
     /**
@@ -76,6 +85,15 @@ public class Speech extends Effector {
         super(parent, "Say: \"" + phrase + "\"");
         this.phrase = phrase;
         this.threshold = threshold;
+    }
+
+    /**
+     * Construct the speech effector with default values.
+     *
+     * @param parent    parent entity
+     */
+    public Speech(OdorWorldEntity parent) {
+        super(parent, "Say: \"" + DEFAULT_PHRASE + "\"");
     }
 
     @Override
@@ -157,6 +175,16 @@ public class Speech extends Effector {
 
     @Override
     public String getTypeDescription() {
+        return "Speech";
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new Speech(parent, phrase, threshold);
+    }
+
+    @Override
+    public String getName() {
         return "Speech";
     }
 }

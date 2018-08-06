@@ -97,16 +97,10 @@ public abstract class SpikeResponder implements CopyableObject {
         return srList;
     }
 
-    /**
-     * @return Returns the value.
-     */
     public double getValue() {
         return value;
     }
 
-    /**
-     * @param value The value to set.
-     */
     public void setValue(final double value) {
         this.value = value;
     }

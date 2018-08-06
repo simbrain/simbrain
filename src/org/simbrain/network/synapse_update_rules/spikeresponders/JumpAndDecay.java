@@ -33,7 +33,7 @@ public class JumpAndDecay extends SpikeResponder {
         description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
             + " post-synaptic response to an action potential or spike.",
         defaultValue = "1", order = 1)
-    private double jumpHeight;
+    private double jumpHeight = 1;
 
     /**
      * Base line value.
@@ -42,7 +42,7 @@ public class JumpAndDecay extends SpikeResponder {
         description = "The post-synaptic response value when no spike have occurred. Alternatively, the "
             + "post synaptic response to which decays to over time.",
         defaultValue = "0.0001", order = 2)
-    private double baseLine;
+    private double baseLine = .0001;
 
     /**
      * Rate at which synapse will decay (ms).
@@ -50,11 +50,8 @@ public class JumpAndDecay extends SpikeResponder {
     @UserParameter(label = "Time Constant",
         description = "The time constant of decay and recovery (ms).",
         defaultValue = "3", order = 3)
-    private double timeConstant;
+    private double timeConstant = 3;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JumpAndDecay deepCopy() {
         JumpAndDecay jad = new JumpAndDecay();
@@ -81,39 +78,25 @@ public class JumpAndDecay extends SpikeResponder {
         return "Jump and Decay";
     }
 
-    /**
-     * @return Returns the baseLine.
-     */
+    @Override
+    public String getName() {
+        return "Jump and Decay";
+    }
+
     public double getBaseLine() {
         return baseLine;
     }
 
-    /**
-     * @param baseLine The baseLine to set.
-     */
     public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
     }
 
-    /**
-     * @return Returns the jumpHeight.
-     */
     public double getJumpHeight() {
         return jumpHeight;
     }
 
-    /**
-     * @param jumpHeight The jumpHeight to set.
-     */
     public void setJumpHeight(final double jumpHeight) {
         this.jumpHeight = jumpHeight;
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public String getName() {
-        return "Jump and decay";
     }
 
     /**

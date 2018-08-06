@@ -34,7 +34,7 @@ public class ProbabilisticResponder extends SpikeResponder {
             description = "Probability of producing an output; must be between 0 and 1.",
             minimumValue = 0.0, maximumValue = 1.0,
             defaultValue = "0.5", order = 1)
-    private double activationProbability;
+    private double activationProbability = .5;
 
     /**
      * Amount by which the synapse's strength will be scaled to determine the
@@ -45,11 +45,8 @@ public class ProbabilisticResponder extends SpikeResponder {
             description = "Amount by which the synapse's strength will be scaled to determine the post synaptic "
                     + "response of the synapse in the event that this responder is actually active.",
             defaultValue = "1.0", order = 1)
-    private double responseValue;
+    private double responseValue = 1;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ProbabilisticResponder deepCopy() {
         ProbabilisticResponder pr = new ProbabilisticResponder();
@@ -58,9 +55,7 @@ public class ProbabilisticResponder extends SpikeResponder {
         return pr;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Synapse s) {
         if (s.getSource().isSpike()) {
             if (Math.random() > (1 - activationProbability)) {
@@ -74,38 +69,28 @@ public class ProbabilisticResponder extends SpikeResponder {
         s.setPsr(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
         return "Probabilistic";
     }
 
-    /**
-     * @return the activationProbability
-     */
+    @Override
+    public String getName() {
+        return "Probabilistic";
+    }
+
     public double getActivationProbability() {
         return activationProbability;
     }
 
-    /**
-     * @param activationProbability the activationProbability to set
-     */
     public void setActivationProbability(double activationProbability) {
         this.activationProbability = activationProbability;
     }
 
-    /**
-     * @return the responseVaue
-     */
     public double getResponseValue() {
         return responseValue;
     }
 
-    /**
-     * @param responseVaue the responseVaue to set
-     */
     public void setResponseValue(double responseVaue) {
         this.responseValue = responseVaue;
     }

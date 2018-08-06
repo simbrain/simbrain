@@ -38,17 +38,15 @@ public class Step extends SpikeResponder {
     @UserParameter(label = "Response height", description = "This value is multiplied by"
     		+ " the strength to determine the total instantaneous rise in a post-synaptic"
     		+ " response to an action potential or spike.", defaultValue = "1", order = 1)
-    private double responseHeight;
+    private double responseHeight = 1;
 
     /**
      * Response duration (ms).
      */
     @UserParameter(label = "Response time", description = "Response duration (ms)", defaultValue = "1", order = 1)
-    private double responseDuration;
+    private double responseDuration = 1;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Synapse s) {
         if (s.getSource().isSpike()) {
             timer = responseDuration;
@@ -68,9 +66,6 @@ public class Step extends SpikeResponder {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Step deepCopy() {
         Step st = new Step();
@@ -79,39 +74,29 @@ public class Step extends SpikeResponder {
         return st;
     }
 
-    /**
-     * @return Returns the responseHeight.
-     */
     public double getResponseHeight() {
         return responseHeight;
     }
 
-    /**
-     * @param responseHeight The responseHeight to set.
-     */
     public void setResponseHeight(final double responseHeight) {
         this.responseHeight = responseHeight;
     }
 
-    /**
-     * @return Returns the responseTime.
-     */
     public double getResponseDuration() {
         return responseDuration;
     }
 
-    /**
-     * @param responseDuration The responseTime to set.
-     */
     public void setResponseDuration(final double responseDuration) {
         this.responseDuration = responseDuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
+        return "Step";
+    }
+
+    @Override
+    public String getName() {
         return "Step";
     }
 }

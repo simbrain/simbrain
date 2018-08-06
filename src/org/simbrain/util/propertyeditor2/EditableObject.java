@@ -36,7 +36,7 @@ public interface EditableObject {
      * Returns the name of this object. Useful as a description in dropdowns.
      */
     default String getName() {
-        return "no-name";
+        return "no-name (be sure getName() overridden)";
     }
 
 

@@ -31,23 +31,20 @@ public class RiseAndDecay extends SpikeResponder {
      */
     @UserParameter(label = "Maximum Response", description = "Maximum response value.",
             defaultValue = "1", order = 1)
-    private double maximumResponse;
+    private double maximumResponse = 1;
 
     /**
      * The time constant of decay and recovery (ms).
      */
     @UserParameter(label = "Time constant", description = "Rate at which synapse will decay (ms)",
             defaultValue = "3", order = 1)
-    private double timeConstant;
+    private double timeConstant = 3;
 
     /**
      * Recovery value.
      */
     private double recovery;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public RiseAndDecay deepCopy() {
         RiseAndDecay rad = new RiseAndDecay();
@@ -56,9 +53,7 @@ public class RiseAndDecay extends SpikeResponder {
         return rad;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Synapse s) {
         double timeStep = s.getParentNetwork().getTimeStep();
         if (s.getSource().isSpike()) {
@@ -72,38 +67,28 @@ public class RiseAndDecay extends SpikeResponder {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
         return "Rise and Decay";
     }
 
-    /**
-     * @return Returns the decayRate.
-     */
+    @Override
+    public String getName() {
+        return "Rise and Decay";
+    }
+
     public double getTimeConstant() {
         return timeConstant;
     }
 
-    /**
-     * @param timeConstant The decayRate to set.
-     */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
     }
 
-    /**
-     * @return Returns the maximumResponse.
-     */
     public double getMaximumResponse() {
         return maximumResponse;
     }
 
-    /**
-     * @param maximumResponse The maximumResponse to set.
-     */
     public void setMaximumResponse(final double maximumResponse) {
         this.maximumResponse = maximumResponse;
     }

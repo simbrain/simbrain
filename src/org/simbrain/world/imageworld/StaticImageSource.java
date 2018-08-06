@@ -17,7 +17,9 @@ import java.io.IOException;
  * @author Tim Shea
  */
 public class StaticImageSource extends ImageSourceAdapter {
+    
     private String[] filenames;
+    
     private int fileIndex;
 
     /**

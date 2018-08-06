@@ -20,6 +20,7 @@ import java.util.Set;
  * {@link ThresholdFilterFactory}
  */
 public abstract class ImageFilterFactory {
+    
     private static Map<String, ImageFilterFactory> factories = new HashMap<String, ImageFilterFactory>();
 
     /**

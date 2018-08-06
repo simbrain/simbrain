@@ -15,7 +15,9 @@ import java.awt.image.ColorModel;
  * @author Tim Shea
  */
 public class ThresholdOp implements BufferedImageOp {
+
     private static final int white = 0x00FFFFFF;
+
     private static final int black = 0x00000000;
 
     private double threshold;

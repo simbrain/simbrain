@@ -1,6 +1,7 @@
 package org.simbrain.world.imageworld;
 
 public class CompositeImageSource extends ImageSourceAdapter implements ImageSourceListener {
+
     private ImageSource selectedSource;
 
     public CompositeImageSource(ImageSource selectedSource) {

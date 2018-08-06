@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * for the simbrain 3d environment.
  */
 public class ThreeDWorld implements AppState {
+
     /**
      * Listener receives notifications when a ThreeDWorld is initialized or updated.
      */

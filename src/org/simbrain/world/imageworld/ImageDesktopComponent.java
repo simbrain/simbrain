@@ -43,11 +43,15 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private ImageWorldComponent component;
 
     private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    
     private JToolBar sourceToolbar = new JToolBar();
+    
     private JToolBar sensorToolbar = new JToolBar();
 
     SFileChooser fileChooser;
+    
     private JPopupMenu contextMenu;
+    
     private MultiCouplingMenu multiCouplingMenu;
 
     /**
@@ -72,6 +76,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         component.getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
         this.component.getWorld().addListener(new ImageWorld.Listener() {
+            
             @Override
             public void imageSourceChanged(ImageSource changedSource) {
             }

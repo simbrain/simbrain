@@ -8,9 +8,11 @@ import java.awt.image.BufferedImage;
  * A rectangular matrix of filtered sensors on an ImageSource which
  * can be coupled to.
  *
- * @author Jeff Yoshimi, Tim Shea
+ * @author Jeff Yoshimi
+ * @author Tim Shea
  */
 public class SensorMatrix implements ImageSourceListener {
+
     /**
      * Name of this matrix.
      */
@@ -31,6 +33,7 @@ public class SensorMatrix implements ImageSourceListener {
      */
     private transient int[] colors;
 
+    //TODO: Is this a problem? Elim this constructor and require an imagesource?
     /**
      * Construct a sensor matrix without attaching it to a source.
      *

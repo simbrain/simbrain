@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
-import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
 import javax.imageio.ImageIO;
@@ -16,8 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * ImageWorld contains the contents of this component: the image and a series of sensor matrices
+ * ImageWorld contains an image and a series of sensor matrices
  * that can be used to convert the image into numbers.
+ *
+ * The image is accessed using a {@link ImageSource} object.
  */
 public class ImageWorld {
 
@@ -25,6 +26,7 @@ public class ImageWorld {
      * Listener receives notifications when the image world is changed.
      */
     public interface Listener {
+
         /**
          * Called whenever an image source is changed.
          */
@@ -52,8 +54,9 @@ public class ImageWorld {
 
     private EmitterMatrix emitterMatrix;
 
+    // Todo: Ask Tim if this is the only use of CompositeImageSource.
     /**
-     * Helper so that it's easy to switch between images sources.
+     * Helper so that it's easy to switch between image sources.
      */
     private CompositeImageSource compositeSource;
 
@@ -78,7 +81,7 @@ public class ImageWorld {
     private transient ImageClipboard clipboard;
 
     /**
-     * List of world listener.
+     * List of world listeners.
      */
     private transient List<Listener> listeners;
 
@@ -115,6 +118,7 @@ public class ImageWorld {
         //sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
+
     }
 
     /**

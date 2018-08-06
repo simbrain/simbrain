@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.text.NumberFormat;
 
 public class ThresholdFilterFactory extends ImageFilterFactory {
+
     private static class ThresholdFilterSource extends FilteredImageSource {
+    
         private double threshold;
 
         ThresholdFilterSource(ImageSource source, double threshold, int width, int height) {

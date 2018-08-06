@@ -141,7 +141,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
             @Override
             public void invoke() {
                 double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
-                ts.getTimeSeriesComponent().setValue(activationDiff, 1);
+                ts.getTimeSeriesModel().addData(activationDiff);
             }
         });
     }

@@ -163,16 +163,4 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return TimeSeriesModel.getXStream().toXML(model);
     }
 
-    /**
-     * Convenience method for setting the value of a specified time series in the plot.
-     * Called by external simulations.
-     *
-     * @param value the current "y-axis" value for the time series
-     * @param index which time series curve to set.
-     */
-    public void setValue(double value, Integer index) {
-        // TODO: Throw exception if index out of current bounds
-        model.addData(index, TimeSeriesPlotComponent.this.getWorkspace().getTime(), value);
-    }
-
 }

@@ -64,11 +64,11 @@ public abstract class RegisteredSimulation {
 
     static {
         // TODO: Commented out items are not ready for prime time
-        // REGISTERED_SIMS.add(new EdgeOfChaos());
-        // REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
+        REGISTERED_SIMS.add(new EdgeOfChaos());
+        REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
         // REGISTERED_SIMS.add(new Hippocampus());
-        // REGISTERED_SIMS.add(new RL_Sim_Main());
-        // REGISTERED_SIMS.add(new Cerebellum());
+        REGISTERED_SIMS.add(new RL_Sim_Main());
+        REGISTERED_SIMS.add(new Cerebellum());
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new CortexSimple());

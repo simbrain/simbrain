@@ -102,6 +102,7 @@ public class CortexSimple extends RegisteredSimulation {
 
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
         List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
+        // TODO: This should be setting a prototype rule
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(network);
             IntegrateAndFireRule rule = new IntegrateAndFireRule();

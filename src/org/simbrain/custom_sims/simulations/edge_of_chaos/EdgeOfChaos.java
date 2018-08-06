@@ -109,6 +109,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     private void buildSensorNodes() {
+        
         // Offset in pixels of input nodes to right of reservoir
         int offset = 310;
 

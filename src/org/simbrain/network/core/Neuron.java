@@ -1008,6 +1008,37 @@ public class Neuron {
     }
 
     /**
+     * Convenience method for setting the xyz coordinates from
+     * an array with (at least) 3 values. Elements beyond position
+     * 2 will be ignored.
+     * @param xyz - array of coordinate values {x, y, z}
+     */
+    public void setPosition3D(double[] xyz) {
+        setPosition3D(xyz[0], xyz[1], xyz[2]);
+    }
+
+    /**
+     * Convenience method for setting location in 3D rather than just 2D
+     * space.
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setPosition3D(double x, double y, double z) {
+        setX(x);
+        setY(y);
+        setZ(z);
+    }
+
+    /**
+     * @return an array containing this neuron's position in 3-space
+     * {x, y, z} in that order.
+     */
+    public double [] getPosition3D() {
+        return new double[]{x, y, z};
+    }
+
+    /**
      * If this neuron has a bias field, randomize it within the specified
      * bounds.
      *

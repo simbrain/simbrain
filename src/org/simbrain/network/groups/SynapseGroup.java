@@ -198,9 +198,8 @@ public class SynapseGroup extends Group {
      * flags {@link #inStatic} and {@link #exStatic} should be dominant over the
      * actual values stored in the individual synapses for the purposes of
      * updating and queries made to this group. For instance: If this setting is
-     * <b>true</b>, and some other class calls {@link #isExcitatoryFrozen()},
-     * then instead of iterating over all the synapses in the group to supply an
-     * answer, the method will return the result of {@link #excitatoryPrototype}
+     * <b>true</b>, then instead of iterating over all the synapses in the group to
+     * supply an answer, the method will return the result of {@link #excitatoryPrototype}
      * .isFrozen(). This is useful for cases where synapses within synapse
      * groups are entirely governed by group level attributes and it is known to
      * the user that individual synapse settings will/should not be changed

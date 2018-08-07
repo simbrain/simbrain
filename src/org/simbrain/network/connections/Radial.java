@@ -60,6 +60,9 @@ import org.simbrain.util.math.ProbDistribution;
  *
  * @author Zoë Tosi
  *
+ * TODO: Add a sparsity constraint, such that connections are still chosen stochastically
+ * based on distance, but a specific number of connections are guaranteed to be made.
+ *
  */
 public class Radial extends Sparse {
 

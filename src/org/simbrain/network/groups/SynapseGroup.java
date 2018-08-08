@@ -52,18 +52,18 @@ public class SynapseGroup extends Group {
      * synapse strengths for all synapse groups.
      */
     private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
-            UniformDistribution.builder()
-                    .ofPolarity(Polarity.EXCITATORY)
-                    .build();
+        UniformDistribution.builder()
+            .ofPolarity(Polarity.EXCITATORY)
+            .build();
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory
      * synapse strengths for all synapse groups.
      */
     private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
-            UniformDistribution.builder()
-                    .ofPolarity(Polarity.INHIBITORY)
-                    .build();
+        UniformDistribution.builder()
+            .ofPolarity(Polarity.INHIBITORY)
+            .build();
 
     /**
      * The default ratio (all excitatory) for all synapse groups.
@@ -120,19 +120,19 @@ public class SynapseGroup extends Group {
      * The percent of synapses that are excitatory. This parameter represents
      * the ideal value of {@link #exSynapseSet}.size() / {@link #size()} (the
      * <b>actual</b> excitatory ratio). This value is a mutable parameter the
-     * changing of which will cause the synapse group to attempt to make:
-     * {@link #exSynapseSet}.size() / {@link #size()} as close to the
-     * excitatoryRatio value as possible (see
-     * {@link #setExcitatoryRatio(double)}). This means that this value is an
-     * ideal that (usually) the actual excitatory ratio is near, but seldom
-     * exactly equal to. Because of the way polarity is chosen for new synapses
-     * added to the group this value represents a central limit that the synapse
-     * group would absolutely reach exactly given an infinite number of
-     * synapses. If the source neurons of this group are themselves polarized
-     * the actual excitatory ratio of the synapses in this group will reflect
-     * the excitatory ratio of the source neurons <b>not<b> this variable. The
-     * group will however attempt to get as close to this ratio as possible
-     * without ever assigning a synapse to a source neuron of opposing polarity.
+     * changing of which will cause the synapse group to attempt to make: {@link
+     * #exSynapseSet}.size() / {@link #size()} as close to the excitatoryRatio
+     * value as possible (see {@link #setExcitatoryRatio(double)}). This means
+     * that this value is an ideal that (usually) the actual excitatory ratio is
+     * near, but seldom exactly equal to. Because of the way polarity is chosen
+     * for new synapses added to the group this value represents a central limit
+     * that the synapse group would absolutely reach exactly given an infinite
+     * number of synapses. If the source neurons of this group are themselves
+     * polarized the actual excitatory ratio of the synapses in this group will
+     * reflect the excitatory ratio of the source neurons <b>not<b> this
+     * variable. The group will however attempt to get as close to this ratio as
+     * possible without ever assigning a synapse to a source neuron of opposing
+     * polarity.
      */
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
@@ -177,8 +177,8 @@ public class SynapseGroup extends Group {
      * inhibitory synapses are not static. It is used as an optimization along
      * with {@link #useGroupLevelSettings} to determine whether or not all the
      * inhibitory synapses should be iterated over during update. This flag will
-     * have no effect on panels or update procedure if
-     * {@link #useGroupLevelSettings} is <b>false</b>, however if it is
+     * have no effect on panels or update procedure if {@link
+     * #useGroupLevelSettings} is <b>false</b>, however if it is
      * <b>true</b> this flag will be dominant over the actual state of synapses
      * for the purpose of updating.
      */
@@ -190,26 +190,26 @@ public class SynapseGroup extends Group {
      * excitatory synapses are not static. It is used as an optimization along
      * with {@link #useGroupLevelSettings} to determine whether or not all the
      * excitatory synapses should be iterated over during update. This flag will
-     * have no effect on panels or update procedure if
-     * {@link #useGroupLevelSettings} is <b>false</b>, however if it is
+     * have no effect on panels or update procedure if {@link
+     * #useGroupLevelSettings} is <b>false</b>, however if it is
      * <b>true</b> this flag will be dominant over the actual state of synapses
      * for the purpose of updating.
      */
     private boolean exStatic = false;
 
     /**
-     * Whether or not group level settings i.e. : those stored in
-     * {@link #excitatoryPrototype} and {@link #inhibitoryPrototype} and the
-     * flags {@link #inStatic} and {@link #exStatic} should be dominant over the
+     * Whether or not group level settings i.e. : those stored in {@link
+     * #excitatoryPrototype} and {@link #inhibitoryPrototype} and the flags
+     * {@link #inStatic} and {@link #exStatic} should be dominant over the
      * actual values stored in the individual synapses for the purposes of
-     * updating and queries made to this group. For instance: If this setting is
-     * <b>true</b>, and some other class calls {@link #isExcitatoryFrozen()},
-     * then instead of iterating over all the synapses in the group to supply an
-     * answer, the method will return the result of {@link #excitatoryPrototype}
-     * .isFrozen(). This is useful for cases where synapses within synapse
-     * groups are entirely governed by group level attributes and it is known to
-     * the user that individual synapse settings will/should not be changed
-     * apart from the group.
+     * updating and queries made to this group. For instance: If this setting
+     * is
+     * <b>true</b>, then instead of iterating over all the
+     * synapses in the group to supply an answer, the method will return the
+     * result of {@link #excitatoryPrototype}.isFrozen(). This is useful for
+     * cases where synapses within synapse groups are entirely governed by group
+     * level attributes and it is known to the user that individual synapse
+     * settings will/should not be changed apart from the group.
      * <p>
      * If set to true a compressed representation of the weight matrix is used
      * in saving, see {@link SynapseGroup#compressedMatrixRep}.
@@ -256,7 +256,8 @@ public class SynapseGroup extends Group {
      * the connections (individual synapses) are created along with the group.
      *
      * @param source          the source neuron group.
-     * @param target          the target neuron group. neurons in the group are connected
+     * @param target          the target neuron group. neurons in the group are
+     *                        connected
      * @param excitatoryRatio the ratio of excitatory to inhibitory synapses [0,
      *                        1].
      * @return a synapse group with the above parameters.
@@ -285,8 +286,8 @@ public class SynapseGroup extends Group {
      * @param source            the source neuron group.
      * @param target            the target neuron group.
      * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses [0,
-     *                          1].
+     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses
+     *                          [0, 1].
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectNeurons connectionManager, final double excitatoryRatio) {
@@ -300,21 +301,21 @@ public class SynapseGroup extends Group {
      * @param source            the source neuron group.
      * @param target            the target neuron group.
      * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses [0,
-     *                          1].
-     * @param exciteRand        the randomizer to be used to determine the weights of
-     *                          excitatory synapses.
-     * @param inhibRand         the randomizer to be used to determine the weights of
-     *                          inhibitory synapses.
+     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses
+     *                          [0, 1].
+     * @param exciteRand        the randomizer to be used to determine the
+     *                          weights of excitatory synapses.
+     * @param inhibRand         the randomizer to be used to determine the
+     *                          weights of inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(
-            final NeuronGroup source,
-            final NeuronGroup target,
-            final ConnectNeurons connectionManager,
-            double excitatoryRatio,
-            final ProbabilityDistribution exciteRand,
-            final ProbabilityDistribution inhibRand
+        final NeuronGroup source,
+        final NeuronGroup target,
+        final ConnectNeurons connectionManager,
+        double excitatoryRatio,
+        final ProbabilityDistribution exciteRand,
+        final ProbabilityDistribution inhibRand
     ) {
         SynapseGroup synGroup = new SynapseGroup(source, target, connectionManager);
         synGroup.setExcitatoryRatio(excitatoryRatio);
@@ -380,7 +381,7 @@ public class SynapseGroup extends Group {
         if (size() == 0) {
             String errMessage = "Synapse group creation failed because there are no synapses;";
             errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
-            errMessage +=  "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
+            errMessage += "; target neuron group = " + this.getTargetNeuronGroup().getLabel();
             delete();
             throw new IllegalStateException(errMessage);
         }
@@ -400,10 +401,10 @@ public class SynapseGroup extends Group {
     public void preAllocateSynapses(int expectedNumSynapses) throws IllegalStateException {
         if (!exSynapseSet.isEmpty() || !inSynapseSet.isEmpty()) {
             throw new IllegalArgumentException("Cannot pre-allocate space for"
-               + " some expected number of synapses when the synapse"
-               + " when one or both synapse sets are already populated."
-               + " Pre-allocations can only occur before connections"
-               + " have been initialized.");
+                + " some expected number of synapses when the synapse"
+                + " when one or both synapse sets are already populated."
+                + " Pre-allocations can only occur before connections"
+                + " have been initialized.");
         }
         // Using /0.8 instead of /0.75 because expected number is _expected_
         // but not precisely known.
@@ -665,8 +666,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @param synapse the blank excitatory synapse which will be added to the
-     *                group and have its parameters set based on the parameters of
-     *                this group.
+     *                group and have its parameters set based on the parameters
+     *                of this group.
      */
     public void addNewExcitatorySynapse(final Synapse synapse) {
         getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
@@ -690,8 +691,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @param synapse the blank inhibitory synapse which will be added to the
-     *                group and have its parameters set based on the parameters of
-     *                this group.
+     *                group and have its parameters set based on the parameters
+     *                of this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
         getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
@@ -944,8 +945,7 @@ public class SynapseGroup extends Group {
      * {@link #getRowCompressedMatrixRepresentation()} instead.
      *
      * @return a representation of the synapse strengths in this synapse group
-     * as a weight matrix between two activation vectors (neuron
-     * groups).
+     * as a weight matrix between two activation vectors (neuron groups).
      */
     public double[][] getWeightMatrix() {
         double[][] weightMatrix = new double[getSourceNeurons().size()][getTargetNeurons().size()];
@@ -981,11 +981,10 @@ public class SynapseGroup extends Group {
      * for very sparse synapse groups between very large neuron groups.
      *
      * @return a 2D array with a number of rows equal to the total number of
-     * synapses and a number of columns equal to 3. Each row contains
-     * the the source index number, the target index number, and the
-     * strength in that order. This array is then sorted by source index
-     * then target index. Ex: 1 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0
-     * 3 5.3 1 2 .9
+     * synapses and a number of columns equal to 3. Each row contains the the
+     * source index number, the target index number, and the strength in that
+     * order. This array is then sorted by source index then target index. Ex: 1
+     * 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0 3 5.3 1 2 .9
      */
     public double[][] getNumericIndices() {
         double[][] pairs = new double[size()][3];
@@ -1008,7 +1007,7 @@ public class SynapseGroup extends Group {
         // w is the synapse strength.
         int k = 0;
         for (Synapse s : getAllSynapses()) {
-            pairs[k++] = new double[]{sourceMap.get(s.getSource()), targetMap.get(s.getTarget()), s.getStrength()};
+            pairs[k++] = new double[] {sourceMap.get(s.getSource()), targetMap.get(s.getTarget()), s.getStrength()};
         }
         // Create a comparator to sort synapse table entries by source, then
         // by column.
@@ -1041,11 +1040,10 @@ public class SynapseGroup extends Group {
      * for very sparse synapse groups between very large neuron groups.
      *
      * @return a 2D array with a number of rows equal to the total number of
-     * synapses and a number of columns equal to 3. Each row contains
-     * the the source index number, the target index number, and the
-     * strength in that order. This array is then sorted by source index
-     * then target index. Ex: 1 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0
-     * 3 5.3 1 2 .9
+     * synapses and a number of columns equal to 3. Each row contains the the
+     * source index number, the target index number, and the strength in that
+     * order. This array is then sorted by source index then target index. Ex: 1
+     * 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0 3 5.3 1 2 .9
      */
     public Number[][] getNumericIndices(SynapseParameterGetter<Number> getter) {
         Number[][] pairs = new Number[size()][3];
@@ -1068,7 +1066,7 @@ public class SynapseGroup extends Group {
         // w is the synapse strength.
         int k = 0;
         for (Synapse s : getAllSynapses()) {
-            pairs[k++] = new Number[]{sourceMap.get(s.getSource()), targetMap.get(s.getTarget()), getter.getParameterFromSynapse(s)};
+            pairs[k++] = new Number[] {sourceMap.get(s.getSource()), targetMap.get(s.getTarget()), getter.getParameterFromSynapse(s)};
         }
         // Create a comparator to sort synapse table entries by source, then
         // by column.
@@ -1097,8 +1095,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @return a row compressed representation of the weight matrix derived from
-     * this synapse group. All values are stored as longs, and row
-     * changes are denoted by -1.
+     * this synapse group. All values are stored as longs, and row changes are
+     * denoted by -1.
      */
     public long[] getRowCompressedMatrixRepresentation() {
         double[][] pairs = getNumericIndices();
@@ -1109,8 +1107,9 @@ public class SynapseGroup extends Group {
         int m = 0;
         compRowRep[0] = numSyns;
         for (int l = 1, n = numSyns + numSrc; l < n; l++) {
-            if (m == numSyns)
+            if (m == numSyns) {
                 break;
+            }
             if (pairs[m][0] != currRow) {
                 compRowRep[l] = -1L;
                 currRow++;
@@ -1218,8 +1217,8 @@ public class SynapseGroup extends Group {
 
     /**
      * Randomizes all the synapses according to their corresponding randomizers.
-     * {@link #randomizeExcitatoryConnections()},
-     * {@link #randomizeInhibitoryConnections()}
+     * {@link #randomizeExcitatoryConnections()}, {@link
+     * #randomizeInhibitoryConnections()}
      */
     public void randomizeConnectionWeights() {
         randomizeExcitatoryConnections();
@@ -1230,8 +1229,8 @@ public class SynapseGroup extends Group {
      * Randomizes the weights of the excitatory connections in this group based
      * on the parameters of {@link #exciteRand}. Assumes that all synapses in
      * {@link #exSynapseSet} are--in fact--excitatory. If some action on the
-     * synapses may have corrupted that assumption call
-     * {@link #revalidateSynapseSets()} first.
+     * synapses may have corrupted that assumption call {@link
+     * #revalidateSynapseSets()} first.
      */
     public void randomizeExcitatoryConnections() {
         ConnectionUtilities.randomizeExcitatorySynapsesUnsafe(exSynapseSet, exciteRand);
@@ -1241,8 +1240,8 @@ public class SynapseGroup extends Group {
      * Randomizes the weights of the inhibitory connections in this group based
      * on the parameters of {@link #inhibRand}. Assumes that all synapses in
      * {@link #inSynapseSet} are--in fact--inhibitory. If some action on the
-     * synapses may have corrupted that assumption call
-     * {@link #revalidateSynapseSets()} first.
+     * synapses may have corrupted that assumption call {@link
+     * #revalidateSynapseSets()} first.
      */
     public void randomizeInhibitoryConnections() {
         ConnectionUtilities.randomizeInhibitorySynapsesUnsafe(inSynapseSet, inhibRand);
@@ -1413,8 +1412,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @return whether or not the synapse group is using group-level properties
-     * Homogeneous within synapse type (excitatory/inhibitory) for
-     * faster indexing and optimized updating.
+     * Homogeneous within synapse type (excitatory/inhibitory) for faster
+     * indexing and optimized updating.
      */
     public boolean isUseGroupLevelSettings() {
         return useGroupLevelSettings;
@@ -1559,7 +1558,7 @@ public class SynapseGroup extends Group {
         SynapseParameterSetter<SpikeResponder> setSPR = new SynapseParameterSetter<SpikeResponder>() {
             @Override
             public void setSynapseParameter(Synapse synapse, SpikeResponder sr) {
-                if(sr == null) {
+                if (sr == null) {
                     return;
                 }
                 synapse.setSpikeResponder(sr.deepCopy());

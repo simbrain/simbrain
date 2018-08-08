@@ -71,6 +71,9 @@ public class Radial extends Sparse {
 
     public static final double DEFAULT_LAMBDA = 2.5;
 
+    // TODO: Add a sparsity constraint, such that connections are still chosen stochastically
+    // based on distance, but a specific number of connections are guaranteed to be made.
+
     /**
      * The connection constant for connections between 2 excitatory neurons.
      */
@@ -111,11 +114,16 @@ public class Radial extends Sparse {
     /**
      * @param source      the source neurons.
      * @param target      the target neurons.
-     * @param eeDistConst the connection constant for connections between 2 excitatory neurons.
-     * @param eiDistConst the connection constant for connection from an excitatory to an inhibitory neuron.
-     * @param ieDistConst the connection constant for connection from an inhibitory to an excitatory neuron.
-     * @param iiDistConst the connection constant for connections between 2 inhibitory neurons.
-     * @param distConst   the connection constant for general connections. Used in cases where neurons have no explicit polarity.
+     * @param eeDistConst the connection constant for connections between 2
+     *                    excitatory neurons.
+     * @param eiDistConst the connection constant for connection from an
+     *                    excitatory to an inhibitory neuron.
+     * @param ieDistConst the connection constant for connection from an
+     *                    inhibitory to an excitatory neuron.
+     * @param iiDistConst the connection constant for connections between 2
+     *                    inhibitory neurons.
+     * @param distConst   the connection constant for general connections. Used
+     *                    in cases where neurons have no explicit polarity.
      * @param lambda      average connection distance.
      * @param loose
      * @return synapses
@@ -163,7 +171,8 @@ public class Radial extends Sparse {
     /**
      * @param source    the source neurons
      * @param target    the target neurons
-     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in
+     *                  cases where neurons have no explicit polarity.
      * @param lambda    average connection distance.
      * @param loose
      * @return array of synapses
@@ -205,7 +214,8 @@ public class Radial extends Sparse {
     }
 
     /**
-     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in
+     *                  cases where neurons have no explicit polarity.
      * @param lambda    average connection distance.
      */
     public Radial(double distConst, double lambda) {
@@ -215,10 +225,14 @@ public class Radial extends Sparse {
     }
 
     /**
-     * @param eeDistConst the connection constant for connections between 2 excitatoy neurons
-     * @param eiDistConst the connection constant for connection from an excitatory to an inhibitory neuron.
-     * @param ieDistConst the connectino constant for connection from an inhibitory to an excitatory neuron.
-     * @param iiDistConst the conneciton constant for connections between 2 inhibitory neurons.
+     * @param eeDistConst the connection constant for connections between 2
+     *                    excitatoy neurons
+     * @param eiDistConst the connection constant for connection from an
+     *                    excitatory to an inhibitory neuron.
+     * @param ieDistConst the connectino constant for connection from an
+     *                    inhibitory to an excitatory neuron.
+     * @param iiDistConst the conneciton constant for connections between 2
+     *                    inhibitory neurons.
      * @param lambda      average connection distance.
      */
     public Radial(double eeDistConst, double eiDistConst, double ieDistConst, double iiDistConst, double lambda) {
@@ -322,7 +336,8 @@ public class Radial extends Sparse {
     /**
      * @param src       the source neuron.
      * @param tar       the target neuron.
-     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in
+     *                  cases where neurons have no explicit polarity.
      * @param lambda    average connection distance.
      * @return
      */
@@ -419,10 +434,10 @@ public class Radial extends Sparse {
         }
 
         UniformDistribution rand =
-                UniformDistribution.builder()
-                    .ofLowerBound(0)
-                    .ofUpperBound(1)
-                    .build();
+            UniformDistribution.builder()
+                .ofLowerBound(0)
+                .ofUpperBound(1)
+                .build();
 
         @Override
         public Collection<Synapse> call() throws Exception {
@@ -505,7 +520,7 @@ public class Radial extends Sparse {
                 estimateDensity = (double) count / (synapseGroup.getSourceNeuronGroup().size() * (synapseGroup.getSourceNeuronGroup().size() - 1));
             } else {
                 estimateDensity = (double) count / (synapseGroup.
-                        getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
+                    getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
             }
             synchronized (this) {
                 notify();

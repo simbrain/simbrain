@@ -175,6 +175,14 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
         }
     }
 
+    public void setSlope(final double slope) {
+        this.slope = slope;
+    }
+
+    public double getSlope() {
+        return slope;
+    }
+
     @Override
     public double getBias() {
         return bias;
@@ -183,13 +191,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     @Override
     public void setBias(final double bias) {
         this.bias = bias;
-    }
-
-    /**
-     * @param slope The slope to set.
-     */
-    public void setSlope(final double slope) {
-        this.slope = slope;
     }
 
     @Override
@@ -247,11 +248,5 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
         this.clipping = clipping;
     }
 
-    /**
-     * @return Returns the slope.
-     */
-    public double getSlope() {
-        return slope;
-    }
 
 }

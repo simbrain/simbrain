@@ -34,10 +34,13 @@ import java.text.ParseException;
  * @see SpinnerNumberModelWithNull
  */
 public class JNumberSpinnerWithNull extends JSpinner {
+
+    /** Minimum width of jtext field associated with this spinner. */
+    private static final int MIN_TEXTFIELD_WIDTH = 8;
+
     public JNumberSpinnerWithNull(SpinnerNumberModelWithNull model) {
         super(model);
     }
-
 
     protected JComponent createEditor(SpinnerModel model) {
         if (model instanceof SpinnerNumberModelWithNull) {
@@ -72,21 +75,23 @@ public class JNumberSpinnerWithNull extends JSpinner {
             ftf.setFormatterFactory(factory);
             ftf.setHorizontalAlignment(JTextField.RIGHT);
 
-            /* TBD - initializing the column width of the text field
-             * is imprecise and doing it here is tricky because
-             * the developer may configure the formatter later.
-             */
-            try {
-                String maxString = formatterEditor.valueToString(model.getMinimum());
-                String minString = formatterEditor.valueToString(model.getMaximum());
-                ftf.setColumns(Math.max(maxString.length(), minString.length()));
-            } catch (ParseException e) {
-                // TBD should throw a chained error here
-            }
+            ftf.setColumns(MIN_TEXTFIELD_WIDTH);
+
+//            /* TODO - initializing the column width of the text field
+//             * is imprecise and doing it here is tricky because
+//             * the developer may configure the formatter later.
+//             */
+//            try {
+//                String maxString = formatterEditor.valueToString(model.getMinimum());
+//                String minString = formatterEditor.valueToString(model.getMaximum());
+//                ftf.setColumns(Math.max(maxString.length(), minString.length()));
+//
+//            } catch (ParseException e) {
+//                // TBD should throw a chained error here
+//            }
 
         }
     }
-
 
     public static class NumberEditorFormatter extends NumberFormatter {
         protected final SpinnerNumberModel model;

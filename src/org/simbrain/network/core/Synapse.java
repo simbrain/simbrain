@@ -29,10 +29,7 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
@@ -80,6 +77,7 @@ public class Synapse implements EditableObject {
      */
     private Neuron target;
 
+    //TODO: Rename learningRule to synapseupdaterule
     /**
      * The update method of this synapse, which corresponds to what kind of
      * synapse it is.
@@ -1066,6 +1064,17 @@ public class Synapse implements EditableObject {
             }
         }
 
+    }
+
+    /**
+     * "Clear" the synapse in the sense of setting post synaptic result to 0
+     * and removing all queued activations from the delay manager.
+     */
+    public void clear() {
+        setPsr(0);
+        if(delayManager != null) {
+            Arrays.fill(delayManager, 0);
+        }
     }
 
 }

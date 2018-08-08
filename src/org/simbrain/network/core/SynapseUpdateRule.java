@@ -86,16 +86,6 @@ public abstract class SynapseUpdateRule implements CopyableObject {
     public abstract String getName();
 
     /**
-     * Set activation to 0; override for other "clearing" behavior (e.g. setting
-     * other variables to 0. Called in Gui when "clear" button pressed.
-     *
-     * @param synapse reference to parent synapse
-     */
-    public void clear(final Synapse synapse) {
-        synapse.forceSetStrength(0); // TODO: Used?
-    }
-
-    /**
      * Returns string for tool tip or short description. Override to provide
      * custom information.
      *

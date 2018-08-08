@@ -49,19 +49,17 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     @Override
     public void clear(Neuron neuron) {
         super.clear(neuron);
-        setLastSpikeTime(0);
+        for(Synapse s :neuron.getFanIn()) {
+            s.clear();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public abstract void update(Neuron neuron);
 
     /**

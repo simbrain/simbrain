@@ -8,7 +8,14 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Same as {@link RadialSimple} but you can select a specific in-degree and make sure
+ * all other nodes have that same in-degree.
+ *
+ * @author Zoë Tosi
+ */
 public class RadialSimpleConstrainedKIn extends Sparse {
+
     /**
      * Probability of designating a given synapse excitatory. If not, it's
      * inhibitory.

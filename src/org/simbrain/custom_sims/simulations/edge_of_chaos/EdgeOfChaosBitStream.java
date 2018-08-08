@@ -154,11 +154,9 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         super();
     }
 
-    ;
-
     @Override
     public String getName() {
-        return "Edge of Chaos 2";
+        return "Edge of Chaos (Bit Stream)";
     }
 
     @Override

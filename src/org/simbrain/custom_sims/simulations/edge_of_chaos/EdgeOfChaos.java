@@ -45,7 +45,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     // Since mean is 0, lower variance means lower average weight strength
     //  For 120 neurons: .01,.1, and > .4
     private static double variance = .01;
-    private static int kIn = 4; // in-degree (num connections to each neuron)
+    private static int K = 4; // in-degree (num connections to each neuron)
 
     // References
     Network network;
@@ -109,7 +109,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     private void buildSensorNodes() {
-        
+
         // Offset in pixels of input nodes to right of reservoir
         int offset = 310;
 
@@ -122,9 +122,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
-        cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[]{0, 1, 2}, .8, 1);
+        cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .8, 1);
         network.addGroup(cheeseToRes);
-        flowersToRes = sensorConnections(sensorNodes, reservoir, new int[]{3, 4, 5}, .8, 3);
+        flowersToRes = sensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .8, 3);
         network.addGroup(flowersToRes);
     }
 
@@ -149,22 +149,21 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         ProbabilityDistribution exRand =
             NormalDistribution.builder()
-                    .ofPolarity(Polarity.EXCITATORY)
-                    .ofMean(0)
-                    .ofStandardDeviation(Math.sqrt(variance))
-                    .build();
+                .ofPolarity(Polarity.EXCITATORY)
+                .ofMean(0)
+                .ofStandardDeviation(Math.sqrt(variance))
+                .build();
 
         ProbabilityDistribution inRand =
-                NormalDistribution.builder()
-                        .ofPolarity(Polarity.INHIBITORY)
-                        .ofMean(0)
-                        .ofStandardDeviation(Math.sqrt(variance))
-                        .build();
+            NormalDistribution.builder()
+                .ofPolarity(Polarity.INHIBITORY)
+                .ofMean(0)
+                .ofStandardDeviation(Math.sqrt(variance))
+                .build();
 
-        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(
-                kIn,
-                (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2)
-                );
+        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(K,
+            (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2)
+        );
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con, 0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addGroup(reservoir);
@@ -239,12 +238,12 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Set up world
         double dispersion = 65;
-        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif", new double[]{1, 0, 0, 0, 0, 0});
-        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif", new double[]{0, 1, 0, 0, 0, 0});
-        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif", new double[]{1, 0, 1, 0, 0, 0});
-        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif", new double[]{0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif", new double[]{0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif", new double[]{0, 0, 0, 0, 0, 1});
+        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif", new double[] {1, 0, 0, 0, 0, 0});
+        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif", new double[] {0, 1, 0, 0, 0, 0});
+        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif", new double[] {1, 0, 1, 0, 0, 0});
+        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif", new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif", new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif", new double[] {0, 0, 0, 0, 0, 1});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);
@@ -274,7 +273,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Edge of Chaos";
+        return "Edge of Chaos (Embodied)";
     }
 
     @Override

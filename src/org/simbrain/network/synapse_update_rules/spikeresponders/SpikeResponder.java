@@ -40,7 +40,7 @@ public abstract class SpikeResponder implements CopyableObject {
      */
     public static List<Class> RESPONDER_LIST = Arrays.asList(JumpAndDecay.class,
         ConvolvedJumpAndDecay.class, ProbabilisticResponder.class,
-        RiseAndDecay.class, Step.class);
+        RiseAndDecay.class, Step.class, UDF.class);
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.

@@ -95,6 +95,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
     public static final LinkedHashMap<String, AnnotatedPropertyEditor> RESPONDER_MAP = new LinkedHashMap<>();
 
     static {
+        RESPONDER_MAP.put(new UDF().getDescription(), new AnnotatedPropertyEditor(new UDF()));
         RESPONDER_MAP.put(new JumpAndDecay().getDescription(), new AnnotatedPropertyEditor(new JumpAndDecay()));
         RESPONDER_MAP.put(new ConvolvedJumpAndDecay().getDescription(),
             new AnnotatedPropertyEditor(new ConvolvedJumpAndDecay()));

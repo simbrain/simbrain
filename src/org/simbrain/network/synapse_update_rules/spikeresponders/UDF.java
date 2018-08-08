@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 
 /**
@@ -29,22 +30,35 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
  *
  * @author Zoë Tosi
  */
-public class UDF extends JumpAndDecay {
-
+public class UDF extends SpikeResponder {
+    //TODO: Make this like a real thing... where you can set parameters instead of it doing it automatically, but giving the illusion of control
     /**
      * Use constant.
      */
-    private double U;
+    @UserParameter(label = "Mean Use ", description = "Baseline use and strength of facilitation.",
+             minimumValue = 0, defaultValue = "0.5", order = 1)
+    private double U = 0.5;
 
     /**
      * Depression constant.
      */
-    private double D;
+    @UserParameter(label = "Mean Depression ", description = "Time constant for neurotransmitter depression.",
+            minimumValue = 0, defaultValue = "1100", order = 1)
+    private double D = 1100;
 
     /**
      * Facilitation constant.
      */
-    private double F;
+    @UserParameter(label = "Mean Facilitation ", description = "Time constant for facilitating effects.",
+            defaultValue = "50", order = 1)
+    private double F = 50;
+
+    /**
+     * Psr decay time constant
+     */
+    @UserParameter(label = "PSR Decay Constant", description = "Time constant for facilitating effects.",
+            defaultValue = "50", order = 1)
+    private double tau = 3;
 
     /**
      * The time of the last spike (recorded here since
@@ -93,6 +107,7 @@ public class UDF extends JumpAndDecay {
     public void update(Synapse s) {
         if (firstTime) {
             init(s);
+            spikeDecay.setTimeConstant(tau);
             firstTime = false;
         }
         final double A;
@@ -108,11 +123,15 @@ public class UDF extends JumpAndDecay {
         }
     }
 
-    //    @Override
-    //    public String getDescription() {
-    //        return "Use, Depression, Facilitation (UDF) Short-term Plasticity";
-    //    }
+    @Override
+    public String getDescription() {
+        return "UDF Short-term Plasticity";
+    }
 
+    @Override
+    public String getName() {
+        return "STP (UDF)";
+    }
     /**
      * Sets the time constant for the decay of the PSR which is always
      * governed by a ConvolvedJumpAndDecay spike responder.
@@ -223,5 +242,7 @@ public class UDF extends JumpAndDecay {
         }
         u = U;
     }
+
+
 
 }

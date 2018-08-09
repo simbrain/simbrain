@@ -38,7 +38,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public final class ConnectionPanel2 extends JPanel {
+public final class ConnectionPanel extends JPanel {
 
     /**
      * Parent frame so pack can be called when combo box changed.
@@ -75,7 +75,7 @@ public final class ConnectionPanel2 extends JPanel {
      *
      * @param connection   the underlying connection object
      */
-    public ConnectionPanel2(final Window parent, final ConnectNeurons connection) {
+    public ConnectionPanel(final Window parent, final ConnectNeurons connection) {
         this.parentFrame = parent;
         this.connection = connection;
         init();

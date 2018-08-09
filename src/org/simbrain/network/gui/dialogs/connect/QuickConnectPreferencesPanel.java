@@ -34,7 +34,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
     /**
      * Select connection type.
      */
-    private JComboBox<ConnectionPanel2> cbConnectionType;
+    private JComboBox<ConnectionPanel> cbConnectionType;
 
     /**
      * Main dialog box.
@@ -64,7 +64,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
     /**
      * List of connection panels.
      */
-    private List<ConnectionPanel2> connectorPanels = new ArrayList();
+    private List<ConnectionPanel> connectorPanels = new ArrayList();
 
     /**
      * Connection dialog default constructor.
@@ -81,11 +81,11 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
         // Set up connection holder
         QuickConnectionManager quickConnector = panel.getQuickConnector();
-        connectorPanels.add(new ConnectionPanel2(parentWindow, quickConnector.getAllToAll()));
-        connectorPanels.add(new ConnectionPanel2(parentWindow, quickConnector.getOneToOne()));
-        connectorPanels.add(new ConnectionPanel2(parentWindow, quickConnector.getRadialSimple()));
-        connectorPanels.add(new ConnectionPanel2(parentWindow, quickConnector.getRadial()));
-        connectorPanels.add(new ConnectionPanel2(parentWindow, quickConnector.getSparse()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getAllToAll()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getOneToOne()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getRadialSimple()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getRadial()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getSparse()));
 
         // Set up main panel
         JLabel infoLabel = new JLabel("Set preferences for making \"Quick connections\" using keyboard shortucts");
@@ -98,8 +98,8 @@ public class QuickConnectPreferencesPanel extends JPanel {
         this.add(mainPanel);
 
         // Set up dropdown box
-        ConnectionPanel2 initialSelection = connectorPanels.get(0);
-        for (ConnectionPanel2  cp : connectorPanels) {
+        ConnectionPanel initialSelection = connectorPanels.get(0);
+        for (ConnectionPanel cp : connectorPanels) {
             cbConnectionType.addItem(cp);
             if(cp.getConnection() == networkPanel.getQuickConnector().getCurrentConnector()) {
                 initialSelection = cp;
@@ -111,7 +111,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent arg0) {
                 CardLayout cl = (CardLayout)(connectionPanelHolder.getLayout());
-                ConnectionPanel2 cp =  (ConnectionPanel2)cbConnectionType.getSelectedItem();
+                ConnectionPanel cp =  (ConnectionPanel)cbConnectionType.getSelectedItem();
                 cl.show(connectionPanelHolder, cp.getConnection().getName());
             }
         });
@@ -132,7 +132,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
      */
     public void commitChanges() {
         QuickConnectionManager quickConnector = networkPanel.getQuickConnector();
-        ConnectionPanel2 cp =  (ConnectionPanel2)cbConnectionType.getSelectedItem();
+        ConnectionPanel cp =  (ConnectionPanel)cbConnectionType.getSelectedItem();
         quickConnector.setCurrentConnector(cp.getConnection());
         cp.getConnectionProperties().commitChanges();
         quickConnector.setExcitatoryRatio(cp.getPolarityPanel().getPercentExcitatory());

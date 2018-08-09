@@ -25,7 +25,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
+import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
@@ -55,7 +55,7 @@ import java.util.Set;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class SparseConnectionPanel extends AbstractConnectionPanel {
+public class SparseConnectionPanel extends EditablePanel {
 
     /**
      * A slider for setting the sparsity of the connections.
@@ -157,10 +157,9 @@ public class SparseConnectionPanel extends AbstractConnectionPanel {
      * neurons object, and initializes all appropriate listeners.
      *
      * @param connection the connection object this panel will act on
-     * @param numTargs   the number of target neurons being connected to
      */
     private SparseConnectionPanel(Sparse connection, NetworkPanel networkPanel) {
-        super();
+
         editing = connection.getSynapseGroup() != null;
         this.connection = connection;
         if (editing) {
@@ -458,10 +457,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel {
 
     }
 
-    /**
-     *
-     */
-    @Override
     public void fillFieldValues() {
         double connectivity = connection.getConnectionDensity();
         equalizeEfferentsChkBx.setSelected(connection.isEqualizeEfferents());
@@ -503,11 +498,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel {
         }
         return true;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    
     public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
@@ -597,7 +588,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel {
         this.repaint();
     }
 
-    @Override
     public ConnectNeurons getConnection() {
         return connection;
     }

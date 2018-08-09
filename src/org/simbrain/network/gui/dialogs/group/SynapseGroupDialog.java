@@ -23,7 +23,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
-import org.simbrain.network.gui.dialogs.connect.ConnectionPanel2;
+import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.connect.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
@@ -92,7 +92,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Panel for adjusting the connection object.
      */
-    private ConnectionPanel2 connectionPanel;
+    private ConnectionPanel connectionPanel;
 
     /**
      * Panel for adjusting the synapse group
@@ -252,7 +252,7 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel for creation
         if (isCreationDialog) {
-            connectionPanel = new ConnectionPanel2(parentFrame, synapseGroup.getConnectionManager());
+            connectionPanel = new ConnectionPanel(parentFrame, synapseGroup.getConnectionManager());
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);

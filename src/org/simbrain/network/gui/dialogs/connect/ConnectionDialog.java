@@ -19,20 +19,11 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.widgets.DropDownTriangle;
-import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  * Dialog for using connection objects to create connections between loose neurons.
@@ -50,7 +41,7 @@ public class ConnectionDialog extends StandardDialog {
     /**
      * The main panel.
      */
-    private final ConnectionPanel2 connectionPanel;
+    private final ConnectionPanel connectionPanel;
 
     /**
      * Construct the dialog.
@@ -60,7 +51,7 @@ public class ConnectionDialog extends StandardDialog {
      */
     public ConnectionDialog(final NetworkPanel networkPanel, final ConnectNeurons connection) {
         this.networkPanel = networkPanel;
-        this.connectionPanel = new ConnectionPanel2(this, connection);
+        this.connectionPanel = new ConnectionPanel(this, connection);
         setContentPane(connectionPanel);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));

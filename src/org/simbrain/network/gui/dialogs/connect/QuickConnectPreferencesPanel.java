@@ -100,9 +100,9 @@ public class QuickConnectPreferencesPanel extends JPanel {
         connectorPanels[0] = new AllToAllPanel(manager.getAllToAll(), panel);
         connectorPanels[1] = new OneToOnePanel(manager.getOneToOne());
         connectorPanels[2] = SparseConnectionPanel.createSparsityAdjustmentPanel(manager.getSparse(), panel);
-        connectionPanelHolder.add(connectorPanels[0], AllToAll.getName());
-        connectionPanelHolder.add(connectorPanels[1], OneToOne.getName());
-        connectionPanelHolder.add(connectorPanels[2], Sparse.getName());
+        connectionPanelHolder.add(connectorPanels[0], AllToAll.getNameStatic());
+        connectionPanelHolder.add(connectorPanels[1], OneToOne.getNameStatic());
+        connectionPanelHolder.add(connectorPanels[2], Sparse.getNameStatic());
 
         // Set up main panel
         JLabel infoLabel = new JLabel("Set preferences for making \"Quick connections\" using keyboard shortucts");

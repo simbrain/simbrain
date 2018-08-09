@@ -121,10 +121,10 @@ public final class ConnectionPanel {
         connectorPanels[0] = new AllToAllPanel(allToAll, networkPanel);
         connectorPanels[1] = new OneToOnePanel(oneToOne);
         connectorPanels[2] = SparseConnectionPanel.createSparsityAdjustmentPanel(sparse, networkPanel);
-        connectPanel.add(connectorPanels[0], AllToAll.getName());
-        connectPanel.add(connectorPanels[1], OneToOne.getName());
-        connectPanel.add(connectorPanels[2], Sparse.getName());
-        ((CardLayout) connectPanel.getLayout()).show(connectPanel, AllToAll.getName());
+        connectPanel.add(connectorPanels[0], AllToAll.getNameStatic());
+        connectPanel.add(connectorPanels[1], OneToOne.getNameStatic());
+        connectPanel.add(connectorPanels[2], Sparse.getNameStatic());
+        ((CardLayout) connectPanel.getLayout()).show(connectPanel, AllToAll.getNameStatic());
 
         JPanel cbPanel = new JPanel(new FlowLayout());
         cbPanel.add(new JLabel("Connection Manager: "));

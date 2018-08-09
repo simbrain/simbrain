@@ -17,11 +17,14 @@
  */
 package org.simbrain.network.connections;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +57,7 @@ import java.util.concurrent.*;
  *
  * @author Zoë Tosi
  */
-public class Radial extends Sparse {
+public class Radial implements ConnectNeurons, EditableObject {
 
     /**
      * For neurons with no polarity.
@@ -77,6 +80,7 @@ public class Radial extends Sparse {
     /**
      * The connection constant for connections between 2 excitatory neurons.
      */
+    @UserParameter(label = "eeDistConst Rule", order = 100)
     private double eeDistConst = DEFAULT_EE_CONST;
 
     /**
@@ -202,7 +206,7 @@ public class Radial extends Sparse {
      * Default constructor
      */
     public Radial() {
-        this.setPermitDensityEditing(false);
+        //this.setPermitDensityEditing(false);
     }
 
     /**
@@ -244,11 +248,93 @@ public class Radial extends Sparse {
         this.lambda = lambda;
     }
 
-    /**
-     * {@inheritDoc} Specifically: Connects neurons based on a probability
-     * function related to their distance from one another, which exponentially
-     * decays with distance.
-     */
+    public void connectNeurons(Network network, List source, List target) {
+        System.out.println(source.size() + target.size());
+        List<Synapse> synapses;
+        if (source.size() < 500) {
+            synapses = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
+            for (Synapse s : synapses) {
+                network.addSynapse(s);
+            }
+        } else {
+            List<Callable<Collection<Synapse>>> workers = new ArrayList<Callable<Collection<Synapse>>>();
+            int threads = Runtime.getRuntime().availableProcessors();
+            int idealShare = (int) Math.floor(source.size() / threads);
+            int remaining = source.size();
+            Iterator<Neuron> srcIter = source.iterator();
+            List<Neuron> srcChunk;
+            double runningPercentEx = 0;
+            for (int i = 0; i < threads; i++) {
+                srcChunk = new ArrayList<Neuron>((int) Math.ceil((idealShare * 2) / 0.75));
+                int share;
+                if (remaining < idealShare * 2) {
+                    share = remaining;
+                } else {
+                    share = idealShare;
+                }
+                int j = 0;
+                while (j < share) {
+                    Neuron n = srcIter.next();
+                    srcChunk.add(n);
+                    if (n.isPolarized()) {
+                        if (Polarity.EXCITATORY == n.getPolarity()) {
+                            runningPercentEx++;
+                        }
+                    }
+                    j++;
+                }
+                remaining -= j;
+                workers.add(new ConnectorService(srcChunk, target, false));
+            }
+            runningPercentEx /= source.size();
+            //synGroup.setExcitatoryRatio(runningPercentEx);
+            ExecutorService ex = Executors.newFixedThreadPool(threads);
+            List<Future<Collection<Synapse>>> generatedSyns;
+            try {
+                generatedSyns = ex.invokeAll(workers);
+                ex.shutdown();
+                ex.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+            int numSyns = 0;
+            for (Future<Collection<Synapse>> future : generatedSyns) {
+                try {
+                    numSyns += future.get().size();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+            //synGroup.preAllocateSynapses(numSyns);
+            for (Future<Collection<Synapse>> future : generatedSyns) {
+                try {
+                    for (Synapse s : future.get()) {
+                        network.addSynapse(s);
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+//        if (synGroup.isRecurrent()) {
+//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
+//        } else {
+//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
+//        }
+        source = null;
+        target = null;
+        synapses = null;
+        Runtime.getRuntime().gc();
+    }
+
+
+        /**
+         * Specifically: Connects neurons based on a probability
+         * function related to their distance from one another, which exponentially
+         * decays with distance.
+         */
     @Override
     public void connectNeurons(SynapseGroup synGroup) {
         this.synapseGroup = synGroup;
@@ -322,11 +408,11 @@ public class Radial extends Sparse {
             }
         }
 
-        if (synGroup.isRecurrent()) {
-            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
-        } else {
-            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
-        }
+//        if (synGroup.isRecurrent()) {
+//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
+//        } else {
+//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
+//        }
         source = null;
         target = null;
         synapses = null;

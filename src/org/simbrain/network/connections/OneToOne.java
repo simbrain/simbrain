@@ -12,10 +12,13 @@
  */
 package org.simbrain.network.connections;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.util.OrientationComparator;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,20 +31,20 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class OneToOne implements ConnectNeurons {
-
-    public static boolean DEFAULT_BIDIRECT_PREF;
-
-    public static OrientationComparator DEFAULT_ORIENTATION = OrientationComparator.X_ORDER;
+public class OneToOne implements ConnectNeurons, EditableObject {
 
     /**
      * If true, synapses are added in both directions.
      */
+    @UserParameter(label = "Bi-directional", order = 2)
     private boolean useBidirectionalConnections = false;
+
+    public static OrientationComparator DEFAULT_ORIENTATION = OrientationComparator.X_ORDER;
 
     /**
      * Orientation of how to connect neurons.
      */
+    @UserParameter(label = "Orientation", order = 1)
     private OrientationComparator connectOrientation = DEFAULT_ORIENTATION;
 
     /**
@@ -82,6 +85,11 @@ public class OneToOne implements ConnectNeurons {
         for (Synapse s : syns) {
             synGroup.addNewSynapse(s);
         }
+    }
+
+    @Override
+    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+        connectOneToOne(source, target, useBidirectionalConnections, true);
     }
 
     /**
@@ -201,13 +209,15 @@ public class OneToOne implements ConnectNeurons {
      *
      * @return the name for this connection type
      */
-    public static String getName() {
+    public static String getNameStatic() {
         return "One to one";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public String getName() {
+        return "One to one";
+    }
+
     @Override
     public String toString() {
         return getName();

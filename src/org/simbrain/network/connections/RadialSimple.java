@@ -21,6 +21,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class RadialSimple implements ConnectNeurons {
+public class RadialSimple implements ConnectNeurons, EditableObject {
 
     /**
      * Whether to allow self-connections.
@@ -85,6 +86,11 @@ public class RadialSimple implements ConnectNeurons {
      * of connection.
      */
     private List<Neuron> sourceNeurons;
+
+    //TODO
+    public RadialSimple() {
+
+    }
 
     /**
      * @param network       the network
@@ -296,8 +302,18 @@ public class RadialSimple implements ConnectNeurons {
     }
 
     @Override
-    public String toString() {
-        return "Radial";
+    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+
     }
 
+
+    @Override
+    public String getName() {
+        return "Radial (Simple)";
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

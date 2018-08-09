@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.connections.Radial;
-import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.connections.*;
 import org.simbrain.network.gui.actions.*;
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
@@ -227,7 +224,7 @@ public final class NetworkActionManager {
     /**
      * Connection types.
      */
-    private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf, oneToOne, oneToOneSelf, radial, radialSelf, sparse, sparseSelf;
+    private Action allToAll, oneToOne, radial, radialSimple, radialSelf, sparse;
 
     /**
      * Layout types.
@@ -278,11 +275,6 @@ public final class NetworkActionManager {
      * Shows a trainer dialog.
      */
     private final Action showTrainerAction;
-
-    /**
-     * Shows dialog to edit randomizer properties.
-     */
-//    private final Action setRandomizerPropertiesAction;
 
     /**
      * Shows dialog to adjust group of synapses.
@@ -379,6 +371,7 @@ public final class NetworkActionManager {
         allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(), "All to all");
         oneToOne = new ApplyConnectionAction(networkPanel, new OneToOne(), "One-to-one");
         radial = new ApplyConnectionAction(networkPanel, new Radial(), "Radial");
+        radialSimple = new ApplyConnectionAction(networkPanel, new RadialSimple(), "Radial (Simple)");
         sparse = new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse");
 
         gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
@@ -396,7 +389,6 @@ public final class NetworkActionManager {
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
 
-//        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
         showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
         showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
@@ -428,7 +420,7 @@ public final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List<Action> getNetworkModeActions() {
-        return Arrays.asList(new Action[]{selectionEditModeAction, textEditModeAction, wandEditModeAction});
+        return Arrays.asList(new Action[] {selectionEditModeAction, textEditModeAction, wandEditModeAction});
     }
 
     /**
@@ -437,7 +429,7 @@ public final class NetworkActionManager {
      * @return a list of network control actions
      */
     public List<Action> getNetworkControlActions() {
-        return Arrays.asList(new Action[]{runNetworkAction, stopNetworkAction});
+        return Arrays.asList(new Action[] {runNetworkAction, stopNetworkAction});
     }
 
     /**
@@ -446,7 +438,7 @@ public final class NetworkActionManager {
      * @return a list of clipboard actions
      */
     public List<Action> getClipboardActions() {
-        return Arrays.asList(new Action[]{copyAction, cutAction, pasteAction});
+        return Arrays.asList(new Action[] {copyAction, cutAction, pasteAction});
     }
 
     /**
@@ -455,14 +447,14 @@ public final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List<Action> getNetworkEditingActions() {
-        return Arrays.asList(new Action[]{newNeuronAction, deleteAction});
+        return Arrays.asList(new Action[] {newNeuronAction, deleteAction});
     }
 
     /**
      * @return a list of layout actions
      */
     public List<Action> getLayoutActions() {
-        return Arrays.asList(new Action[]{gridLayout, hexagonalLayout, lineLayout});
+        return Arrays.asList(new Action[] {gridLayout, hexagonalLayout, lineLayout});
     }
 
     /**
@@ -494,16 +486,7 @@ public final class NetworkActionManager {
      * @return connection actions
      */
     public List<Action> getConnectionActions() {
-        return Arrays.asList(new Action[]{allToAll, oneToOne, sparse});
-    }
-
-    /**
-     * (Not current used).
-     *
-     * @return self connect actions
-     */
-    public List<Action> getSelfConnectionActions() {
-        return Arrays.asList(new Action[]{allToAllSelf, fixedFanoutSelf, oneToOneSelf, sparseSelf});
+        return Arrays.asList(new Action[] {allToAll, oneToOne, radial, radialSimple, sparse});
     }
 
     /**
@@ -524,14 +507,14 @@ public final class NetworkActionManager {
      * @return a list of new networks that can be inserted
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[]{new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, ESNCreationDialog.class, "Echo State Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
+        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, ESNCreationDialog.class, "Echo State Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
     }
 
     /**
      * @return a list of the new neuron groups that can be inserted
      */
     public List<Action> getNewGroupActions() {
-        return Arrays.asList(new Action[]{new AddGroupAction(networkPanel, NeuronGroupCreationDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
+        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, NeuronGroupCreationDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
     }
 
     /**
@@ -884,13 +867,6 @@ public final class NetworkActionManager {
     public Action getSelectionEditModeAction() {
         return selectionEditModeAction;
     }
-
-//    /**
-//     * @return the getSetRandomPropsAction
-//     */
-//    public Action getSetRandomizerPropsAction() {
-//        return setRandomizerPropertiesAction;
-//    }
 
     /**
      * @return the showAdjustSynapsesDialog

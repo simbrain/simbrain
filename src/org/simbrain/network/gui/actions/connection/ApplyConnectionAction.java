@@ -22,15 +22,16 @@ import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.RadialPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
- * Apply specified connection either from selected neurons to themselves
- * ("self connect") or from source to target.
+ * Apply specified connection from source to target neurons.
  */
-@SuppressWarnings("serial")
 public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     /**
@@ -41,7 +42,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
     /**
      * Connection panel for dialog.
      */
-    private AbstractConnectionPanel optionsPanel = null;
+    private AnnotatedPropertyEditor connectionPanel = null;
 
     /**
      * Construct the action.
@@ -53,9 +54,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
     public ApplyConnectionAction(final NetworkPanel networkPanel, ConnectNeurons connection, String name) {
 
         super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGET_NEURONS);
-
         putValue(SHORT_DESCRIPTION, "Use " + name + " method to connect source to target neurons");
-
         this.connection = connection;
 
     }
@@ -66,22 +65,26 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
      */
     public void actionPerformed(final ActionEvent event) {
 
-        String title = "Connect ";
+        String title = "Connect " + connection.toString();
 
-        if (connection instanceof AllToAll) {
-            optionsPanel = new AllToAllPanel((AllToAll) connection, networkPanel);
-            title += "All to All";
+        if (connection instanceof Radial) {
+            connectionPanel = new AnnotatedPropertyEditor((Radial) connection);
         } else if (connection instanceof OneToOne) {
-            optionsPanel = new OneToOnePanel((OneToOne) connection);
-            title += "One to One";
-        } else if (connection instanceof Radial) {
-            optionsPanel = new RadialPanel((Radial) connection);
-            title += "Radial";
-        } else if (connection instanceof Sparse) {
-            optionsPanel = SparseConnectionPanel.createSparsityAdjustmentPanel((Sparse) connection, networkPanel);
-            title += "Sparse";
+            connectionPanel = new AnnotatedPropertyEditor((OneToOne) connection);
+        }  else if (connection instanceof Sparse) {
+            connectionPanel = new AnnotatedPropertyEditor((Sparse) connection);
+        }  else if (connection instanceof RadialSimple) {
+            connectionPanel = new AnnotatedPropertyEditor((RadialSimple) connection);
         }
-        ConnectionDialog dialog = ConnectionDialog.createConnectionDialog(optionsPanel, connection, networkPanel);
+        // TODO: Radial Simple Constrained?
+
+        JDialog dialog = connectionPanel.getDialog();
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                connectionPanel.commitChanges();
+                connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+            }
+        });
         dialog.setTitle(title);
         dialog.setLocationRelativeTo(null);
         dialog.pack();

@@ -12,10 +12,12 @@
  */
 package org.simbrain.network.connections;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class AllToAll implements ConnectNeurons {
+public class AllToAll implements ConnectNeurons, EditableObject {
 
     /**
      * The default preference as to whether or not self connections are allowed.
@@ -61,13 +63,23 @@ public class AllToAll implements ConnectNeurons {
      *
      * @return the name for this connection type
      */
-    public static String getName() {
+    /**
+     * Returns a short name for this connection type, used in combo boxes.
+     *
+     * @return the name for this connection type
+     */
+    public static String getNameStatic() {
         return "All to all";
     }
 
     @Override
+    public String getName() {
+        return getNameStatic();
+    }
+
+    @Override
     public String toString() {
-        return getName();
+        return getNameStatic();
     }
 
     /**
@@ -149,6 +161,11 @@ public class AllToAll implements ConnectNeurons {
         for (Synapse s : syns) {
             synGroup.addNewSynapse(s);
         }
+    }
+
+    @Override
+    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+
     }
 
     /**

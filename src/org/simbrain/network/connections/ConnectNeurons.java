@@ -18,11 +18,15 @@
  */
 package org.simbrain.network.connections;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.SynapseGroup;
+
+import java.util.List;
 
 /**
  * Implementing classes create connections (collections of synapses) between
- * groups of neurons.  Acts as a marker interface for TODO.
+ * groups of neurons.
  *
  * @author Zoë Tosi
  */
@@ -35,4 +39,7 @@ public interface ConnectNeurons {
      */
     public abstract void connectNeurons(final SynapseGroup synGroup);
 
-}
+    public abstract void connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
+
+
+    }

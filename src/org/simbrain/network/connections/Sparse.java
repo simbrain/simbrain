@@ -22,6 +22,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import umontreal.iro.lecuyer.randvar.BinomialGen;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.Random;
  *
  * @author Zoë Tosi
  */
-public class Sparse implements ConnectNeurons {
+public class Sparse implements ConnectNeurons, EditableObject {
 
     /**
      * The default preference as to whether or not self connections are allowed.
@@ -268,6 +269,11 @@ public class Sparse implements ConnectNeurons {
                 synapseGroup.addNewSynapse(s);
             }
         }
+
+    }
+
+    @Override
+    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
 
     }
 
@@ -594,13 +600,18 @@ public class Sparse implements ConnectNeurons {
      *
      * @return the name for this connection type
      */
-    public static String getName() {
+    public static String getNameStatic() {
         return "Sparse";
     }
 
     @Override
+    public String getName() {
+        return getNameStatic();
+    }
+
+    @Override
     public String toString() {
-        return getName();
+        return getNameStatic();
     }
 
 }

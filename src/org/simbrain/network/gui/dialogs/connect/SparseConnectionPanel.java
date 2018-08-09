@@ -25,7 +25,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
@@ -54,7 +53,6 @@ import java.util.Set;
  *
  * @author Zoë Tosi
  */
-@SuppressWarnings("serial")
 public class SparseConnectionPanel extends EditablePanel {
 
     /**
@@ -469,9 +467,6 @@ public class SparseConnectionPanel extends EditablePanel {
         allowSelfConnectChkBx.setEnabled(!editing);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean commitChanges() {
         if (equalizeEfferentsChkBx.isEnabled()) {
@@ -498,7 +493,7 @@ public class SparseConnectionPanel extends EditablePanel {
         }
         return true;
     }
-    
+
     public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {

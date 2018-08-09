@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.connect.connector_panels;
+package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -486,9 +486,10 @@ public class SparseConnectionPanel extends AbstractConnectionPanel {
         double connectivity = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(connectivity)) {
             if (!editing)
-                // Just set the density
+            // Just set the density
+            {
                 connection.setConnectionDensity(connectivity);
-            else {
+            } else {
                 // Tell the sparse connection to change its density
                 if (connectivity > connection.getConnectionDensity()) {
                     connection.addToSparsity(connectivity);

@@ -71,7 +71,6 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
         }  else if (connection instanceof RadialSimple) {
             connectionPanel = new AnnotatedPropertyEditor((RadialSimple) connection);
         }
-        // TODO: Radial Simple Constrained?
 
         ConnectionDialog dialog = new ConnectionDialog(networkPanel, connection);
         dialog.setTitle(title);

@@ -23,9 +23,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
-import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.ConnectionPanel2;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
@@ -92,7 +92,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Panel for adjusting the connection object.
      */
-    private ConnectionPanel connectionPanel;
+    private ConnectionPanel2 connectionPanel;
 
     /**
      * Panel for adjusting the synapse group
@@ -121,6 +121,8 @@ public final class SynapseGroupDialog extends StandardDialog {
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
 
     private boolean setUseGroupLevelSettings;
+
+    private Window parentFrame;
 
     /**
      * Creates a synapse group dialog based on a source and target neuron group.
@@ -166,6 +168,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
         sgd.addListeners();
         sgd.tabbedPane.setSelectedIndex(0);
+        sgd.parentFrame = parent;
         return sgd;
     }
 
@@ -249,8 +252,8 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel for creation
         if (isCreationDialog) {
-            connectionPanel = ConnectionPanel.createConnectionPanel(this, networkPanel);
-            JScrollPane connectWrapper = new JScrollPane(connectionPanel.getMainPanel());
+            connectionPanel = new ConnectionPanel2(parentFrame, synapseGroup.getConnectionManager());
+            JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Type", new JPanel());

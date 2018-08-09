@@ -16,11 +16,14 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Connect every source neuron to every target neuron.
@@ -33,14 +36,16 @@ public class AllToAll implements ConnectNeurons, EditableObject {
     /**
      * The default preference as to whether or not self connections are allowed.
      */
-    private static final boolean DEFAULT_SELF_CONNECT_PREF = false;
+    public static boolean STATIC_SELF_CONNECT_PREF = false;
 
     /**
      * Whether or not connections where the source and target are the same
      * neuron are allowed. Only applicable if the source and target neuron sets
      * are the same.
      */
-    private static boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
+    @UserParameter(label = "Self-Connections Allowed ", description = "Can there exist synapses whose source and target are the same?",
+            order = 1)
+    private boolean selfConnectionAllowed = STATIC_SELF_CONNECT_PREF;
 
     /**
      * Construct to all to all connector.
@@ -165,7 +170,14 @@ public class AllToAll implements ConnectNeurons, EditableObject {
 
     @Override
     public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-
+       for(Neuron src : source) {
+           for(Neuron tar : target) {
+               if(src == tar && !selfConnectionAllowed) {
+                   continue;
+               }
+               network.addSynapse(new Synapse(src, tar));
+           }
+       }
     }
 
     /**
@@ -173,7 +185,7 @@ public class AllToAll implements ConnectNeurons, EditableObject {
      * where the source and target neuron are the same neuron is
      * allowed.
      */
-    public static boolean isSelfConnectionAllowed() {
+    public boolean isSelfConnectionAllowed() {
         return selfConnectionAllowed;
     }
 
@@ -182,7 +194,7 @@ public class AllToAll implements ConnectNeurons, EditableObject {
      *
      * @param allowSelfConnect Neurons are allowed to connect to themselves.
      */
-    public static void setSelfConnectionAllowed(boolean allowSelfConnect) {
+    public void setSelfConnectionAllowed(boolean allowSelfConnect) {
         selfConnectionAllowed = allowSelfConnect;
     }
 

@@ -107,7 +107,7 @@ public class DesktopNetworkDialog extends NetworkDialog {
         SimbrainPreferences.putInt("networkZeroWeightColor", SynapseNode.getZeroWeightColor().getRGB());
         SimbrainPreferences.putInt("networkSynapseMinSize", SynapseNode.getMinDiameter());
         SimbrainPreferences.putInt("networkSynapseMaxSize", SynapseNode.getMaxDiameter());
-        SimbrainPreferences.putBoolean("selfConnectionAllowed", AllToAll.isSelfConnectionAllowed());
+        SimbrainPreferences.putBoolean("selfConnectionAllowed", AllToAll.STATIC_SELF_CONNECT_PREF);
     }
 
     /**

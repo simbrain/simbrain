@@ -88,8 +88,8 @@ public class OneToOne implements ConnectNeurons, EditableObject {
     }
 
     @Override
-    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-        connectOneToOne(source, target, useBidirectionalConnections, true);
+    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+        return connectOneToOne(source, target, useBidirectionalConnections, true);
     }
 
     /**

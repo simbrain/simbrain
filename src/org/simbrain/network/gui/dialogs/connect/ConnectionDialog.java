@@ -20,10 +20,10 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -35,12 +35,11 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * Dialog wrapper for all connection panels.
+ * Dialog for using connection objects to create connections between loose neurons.
  *
- * @author jyoshimi
- * @author ztosi
+ * @author Jeff Yoshimi
+ * @author Zoë Tosi
  */
-@SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
 
     /**
@@ -49,19 +48,14 @@ public class ConnectionDialog extends StandardDialog {
     private final NetworkPanel networkPanel;
 
     /**
-     * The connection panel wrapped in this dialog.
-     */
-    private AbstractConnectionPanel connectionPanel;
-
-    /**
      * The main panel.
      */
     private JPanel mainPanel;
 
     /**
-     * The connection properties panel.
+     * Template synapse properties
      */
-    private ConnectionSynapsePropertiesPanel propertiesPanel;
+    private ConnectionSynapsePropertiesPanel synapseProperties;
 
     /**
      * The excitatory ratio and randomizer panel.
@@ -74,29 +68,25 @@ public class ConnectionDialog extends StandardDialog {
     private DropDownTriangle detailTriangle;
 
     /**
-     * Create an instance of a connection dialog.
-     *
-     * @param optionsPanel the connection panel
-     * @param connection   the connection object
-     * @param networkPanel the parent panel
-     * @return the constructed dialog
+     * To edit the properties of the connection object
      */
-    public static ConnectionDialog createConnectionDialog(final AbstractConnectionPanel optionsPanel, final ConnectNeurons connection, final NetworkPanel networkPanel) {
-        ConnectionDialog cd = new ConnectionDialog(optionsPanel, connection, networkPanel);
-        cd.init();
-        return cd;
-    }
+    private AnnotatedPropertyEditor connectionProperties;
+
+    /**
+     * The connection object used to connect source to target neurons.
+     */
+    private ConnectNeurons connection;
 
     /**
      * Construct the dialog.
      *
      * @param networkPanel parent panel
-     * @param optionsPanel the option panel for this connection type
-     * @param connection   the underlyign connection object
+     * @param connection   the underlying connection object
      */
-    private ConnectionDialog(final AbstractConnectionPanel optionsPanel, final ConnectNeurons connection, final NetworkPanel networkPanel) {
+    public ConnectionDialog(final NetworkPanel networkPanel, final ConnectNeurons connection) {
         this.networkPanel = networkPanel;
-        this.connectionPanel = optionsPanel;
+        this.connection = connection;
+        init();
     }
 
     /**
@@ -105,13 +95,14 @@ public class ConnectionDialog extends StandardDialog {
     private void init() {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.add(connectionPanel);
+        connectionProperties = new AnnotatedPropertyEditor(connection);
+        mainPanel.add(connectionProperties);
         detailTriangle = new DropDownTriangle(UpDirection.RIGHT, false, "Synapse Properties", "Synapse Properties", this);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainPanel.add(leftJustify(detailTriangle));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        propertiesPanel = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(this);
-        mainPanel.add(propertiesPanel);
+        synapseProperties = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(this);
+        mainPanel.add(synapseProperties);
         eirPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(this);
         mainPanel.add(eirPanel);
         detailTriangle.addMouseListener(new MouseAdapter() {
@@ -128,15 +119,14 @@ public class ConnectionDialog extends StandardDialog {
      * Update state of detail triangle.
      */
     private void updateDetailTriangle() {
-        propertiesPanel.setVisible(detailTriangle.isDown());
-        propertiesPanel.repaint();
+        synapseProperties.setVisible(detailTriangle.isDown());
+        synapseProperties.repaint();
         pack();
         setLocationRelativeTo(null);
     }
 
     /**
-     * https://stackoverflow.com/questions/8335997/
-     * how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
+     * https://stackoverflow.com/questions/8335997/ how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
      */
     private Component leftJustify(final JPanel panel) {
         Box b = Box.createHorizontalBox();
@@ -158,13 +148,10 @@ public class ConnectionDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        connectionPanel.commitChanges();
-        List<Neuron> source = networkPanel.getSourceModelNeurons();
-        List<Neuron> target = networkPanel.getSelectedModelNeurons();
-        List<Synapse> synapses = connectionPanel.applyConnection(source, target);
+        connectionProperties.commitChanges();
+        List<Synapse> synapses = connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
         ConnectionUtilities.polarizeSynapses(synapses, eirPanel.getPercentExcitatory());
-        propertiesPanel.commitChanges();
-        ConnectionUtilities.conformToTemplates(synapses, propertiesPanel.getTemplateExcitatorySynapse(), propertiesPanel.getTemplateInhibitorySynapse());
+        ConnectionUtilities.conformToTemplates(synapses, synapseProperties.getTemplateExcitatorySynapse(), synapseProperties.getTemplateInhibitorySynapse());
         eirPanel.commitChanges();
         if (eirPanel.exRandomizerEnabled()) {
             ConnectionUtilities.randomizeExcitatorySynapses(synapses, eirPanel.getExRandomizer());

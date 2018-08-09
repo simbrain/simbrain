@@ -273,8 +273,9 @@ public class Sparse implements ConnectNeurons, EditableObject {
     }
 
     @Override
-    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
 
+        return null;
     }
 
     /**

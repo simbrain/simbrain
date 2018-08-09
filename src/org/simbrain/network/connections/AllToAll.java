@@ -21,9 +21,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Connect every source neuron to every target neuron.
@@ -169,15 +167,19 @@ public class AllToAll implements ConnectNeurons, EditableObject {
     }
 
     @Override
-    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-       for(Neuron src : source) {
+    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+       List<Synapse> retList = new ArrayList();
+        for(Neuron src : source) {
            for(Neuron tar : target) {
                if(src == tar && !selfConnectionAllowed) {
                    continue;
                }
-               network.addSynapse(new Synapse(src, tar));
+               Synapse syn = new Synapse(src, tar);
+               retList.add(syn);
+               network.addSynapse(syn);
            }
        }
+        return retList;
     }
 
     /**

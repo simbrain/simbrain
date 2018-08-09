@@ -20,7 +20,9 @@ package org.simbrain.network.connections;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.List;
 
@@ -29,8 +31,9 @@ import java.util.List;
  * groups of neurons.
  *
  * @author Zoë Tosi
+ * @author Jeff Yoshimi
  */
-public interface ConnectNeurons {
+public interface ConnectNeurons extends EditableObject {
 
     /**
      * Apply connection to a synapse group using specified parameters.
@@ -39,7 +42,15 @@ public interface ConnectNeurons {
      */
     public abstract void connectNeurons(final SynapseGroup synGroup);
 
-    public abstract void connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
+    /**
+     * Apply connection to a set of loose neurons.
+     *
+     * @param network parent network loose neuron
+     * @param source  source neurons
+     * @param target  target neurons
+     * @return the resulting list of synapses, which are sometimes needed for
+     * other operations
+     */
+    public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
 
-
-    }
+}

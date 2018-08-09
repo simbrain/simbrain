@@ -16,18 +16,11 @@ package org.simbrain.network.gui.actions.connection;
 import org.simbrain.network.connections.*;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.RadialPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * Apply specified connection from source to target neurons.
@@ -78,15 +71,8 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
         }  else if (connection instanceof RadialSimple) {
             connectionPanel = new AnnotatedPropertyEditor((RadialSimple) connection);
         }
-        // TODO: Radial Simple Constrained?
 
-        JDialog dialog = connectionPanel.getDialog();
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                connectionPanel.commitChanges();
-                connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
-            }
-        });
+        ConnectionDialog dialog = new ConnectionDialog(networkPanel, connection);
         dialog.setTitle(title);
         dialog.setLocationRelativeTo(null);
         dialog.pack();

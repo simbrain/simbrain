@@ -13,18 +13,16 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.*;
+import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>QuickConnectPreferencesPanel</b> is a dialog box for setting the
@@ -36,7 +34,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
     /**
      * Select connection type.
      */
-    private JComboBox<ConnectNeurons> cbConnectionType;
+    private JComboBox<ConnectionPanel> cbConnectionType;
 
     /**
      * Main dialog box.
@@ -51,7 +49,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
     /**
      * Reference to network panel.
      */
-    private NetworkPanel panel;
+    private NetworkPanel networkPanel;
 
     /**
      * Parent dialog.
@@ -59,50 +57,35 @@ public class QuickConnectPreferencesPanel extends JPanel {
     private final Window parentWindow;
 
     /**
-     * Panel for setting the inhibitory / excitatory ratio.
-     */
-    private SynapsePolarityAndRandomizerPanel ratioPanel;
-
-    /**
      * Panel which holds the connection panels (for use in resizing).
      */
     private JPanel connectionPanelHolder = new JPanel(new CardLayout());
 
     /**
-     * List of connection panels (for use in resizing).
+     * List of connection panels.
      */
-    private AbstractConnectionPanel[] connectorPanels = new AbstractConnectionPanel[3];
+    private List<ConnectionPanel> connectorPanels = new ArrayList();
 
     /**
      * Connection dialog default constructor.
      *
-     * @param panel
-     * @param parentWindow
+     * @param panel parent network panel
+     * @param parentWindow parent window
      */
     public QuickConnectPreferencesPanel(NetworkPanel panel, final Window parentWindow) {
-        this.panel = panel;
+        this.networkPanel = panel;
         this.parentWindow = parentWindow;
 
-        // Set up combo box
-        cbConnectionType = new JComboBox<ConnectNeurons>(panel.getQuickConnector().getConnectors());
-        cbConnectionType.setSelectedItem(panel.getQuickConnector().getCurrentConnector());
-        cbConnectionType.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent arg0) {
-                initCardPanel();
-            }
-        });
-
+        cbConnectionType = new JComboBox();
         typePanel.addItem("Quick Connection Type", cbConnectionType);
 
         // Set up connection holder
-        QuickConnectionManager manager = panel.getQuickConnector();
-        connectorPanels[0] = new AllToAllPanel(manager.getAllToAll(), panel);
-        connectorPanels[1] = new OneToOnePanel(manager.getOneToOne());
-        connectorPanels[2] = SparseConnectionPanel.createSparsityAdjustmentPanel(manager.getSparse(), panel);
-        connectionPanelHolder.add(connectorPanels[0], AllToAll.getNameStatic());
-        connectionPanelHolder.add(connectorPanels[1], OneToOne.getNameStatic());
-        connectionPanelHolder.add(connectorPanels[2], Sparse.getNameStatic());
+        QuickConnectionManager quickConnector = panel.getQuickConnector();
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getAllToAll()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getOneToOne()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getRadialSimple()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getRadial()));
+        connectorPanels.add(new ConnectionPanel(parentWindow, quickConnector.getSparse()));
 
         // Set up main panel
         JLabel infoLabel = new JLabel("Set preferences for making \"Quick connections\" using keyboard shortucts");
@@ -112,13 +95,26 @@ public class QuickConnectPreferencesPanel extends JPanel {
         mainPanel.add(typePanel);
         mainPanel.add(connectionPanelHolder);
         mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        QuickConnectionManager connector = panel.getQuickConnector();
-        ratioPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parentWindow, connector.getExRandomizer(), connector.getInRandomizer(), connector.isUseExcitatoryRandomization(), connector.isUseInhibitoryRandomization());
-        ratioPanel.setExcitatoryRatio(panel.getQuickConnector().getExcitatoryRatio());
-        mainPanel.add(ratioPanel);
         this.add(mainPanel);
 
-        initCardPanel();
+        // Set up dropdown box
+        ConnectionPanel initialSelection = connectorPanels.get(0);
+        for (ConnectionPanel cp : connectorPanels) {
+            cbConnectionType.addItem(cp);
+            if(cp.getConnection() == networkPanel.getQuickConnector().getCurrentConnector()) {
+                initialSelection = cp;
+            }
+            connectionPanelHolder.add(cp, cp.getConnection().getName());
+        }
+        cbConnectionType.setSelectedItem(initialSelection);
+        cbConnectionType.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent arg0) {
+                CardLayout cl = (CardLayout)(connectionPanelHolder.getLayout());
+                ConnectionPanel cp =  (ConnectionPanel)cbConnectionType.getSelectedItem();
+                cl.show(connectionPanelHolder, cp.getConnection().getName());
+            }
+        });
 
     }
 
@@ -127,83 +123,23 @@ public class QuickConnectPreferencesPanel extends JPanel {
      * properly displays changed values).
      */
     public void fillFieldValues() {
-        connectorPanels[0].fillFieldValues();
-        connectorPanels[1].fillFieldValues();
-        connectorPanels[2].fillFieldValues();
-        // ratioPanel
-        // Others here?
-    }
-
-    /**
-     * Set the current "card".
-     */
-    private void initCardPanel() {
-        CardLayout cl = (CardLayout) connectionPanelHolder.getLayout();
-        cl.show(connectionPanelHolder, cbConnectionType.getSelectedItem().toString());
-        connectionPanelHolder.setPreferredSize(getSelectedPanel().getPreferredSize());
-        mainPanel.revalidate();
-        mainPanel.repaint();
-        parentWindow.pack();
-    }
-
-    /**
-     * Helper method to get the current card panel.
-     *
-     * @return the currently visible panel
-     */
-    private AbstractConnectionPanel getSelectedPanel() {
-        for (AbstractConnectionPanel p : connectorPanels) {
-            if (p.isVisible()) {
-                return p;
-            }
-        }
-        return null;
+        //TODO
+        // connectorPanels[0].fillFieldValues();
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        QuickConnectionManager connector = panel.getQuickConnector();
-        connector.setCurrentConnector((ConnectNeurons) cbConnectionType.getSelectedItem());
-        connectorPanels[0].commitChanges();
-        connectorPanels[1].commitChanges();
-        connectorPanels[2].commitChanges();
-        ratioPanel.commitChanges();
-        connector.setExcitatoryRatio(ratioPanel.getPercentExcitatory());
-        connector.setExRandomizer(ratioPanel.getExRandomizer());
-        connector.setInRandomizer(ratioPanel.getInRandomizer());
-        connector.setUseExcitatoryRandomization(ratioPanel.exRandomizerEnabled());
-        connector.setUseInhibitoryRandomization(ratioPanel.inRandomizerEnabled());
-    }
-
-    /**
-     * Helper class for embedding this panel in a dialog.
-     */
-    public class QuickConnectDialog extends StandardDialog {
-
-        /**
-         * Reference to the preferences panel.
-         */
-        private QuickConnectPreferencesPanel panel;
-
-        /**
-         * Construct the dialog.
-         *
-         * @param panel the embedded panel
-         */
-        public QuickConnectDialog(QuickConnectPreferencesPanel panel) {
-            this.panel = panel;
-            setTitle("Quick Connect Propeties");
-
-        }
-
-        @Override
-        protected void closeDialogOk() {
-            super.closeDialogOk();
-            panel.commitChanges();
-        }
-
+        QuickConnectionManager quickConnector = networkPanel.getQuickConnector();
+        ConnectionPanel cp =  (ConnectionPanel)cbConnectionType.getSelectedItem();
+        quickConnector.setCurrentConnector(cp.getConnection());
+        cp.getConnectionProperties().commitChanges();
+        quickConnector.setExcitatoryRatio(cp.getPolarityPanel().getPercentExcitatory());
+        quickConnector.setExRandomizer(cp.getPolarityPanel().getExRandomizer());
+        quickConnector.setInRandomizer(cp.getPolarityPanel().getInRandomizer());
+        quickConnector.setUseExcitatoryRandomization(cp.getPolarityPanel().exRandomizerEnabled());
+        quickConnector.setUseInhibitoryRandomization(cp.getPolarityPanel().inRandomizerEnabled());
     }
 
 }

@@ -23,7 +23,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel.RandBehavior;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 
 import javax.swing.*;
 import java.awt.*;

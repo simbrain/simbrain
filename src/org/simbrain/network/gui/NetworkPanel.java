@@ -2711,8 +2711,7 @@ public class NetworkPanel extends JPanel {
     public void setWeightsVisible(final boolean weightsVisible) {
         this.looseWeightsVisible = weightsVisible;
         actionManager.getShowWeightsAction().setState(looseWeightsVisible);
-        for (Synapse synapse : network.getSynapseList()) {
-            SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
+        for(SynapseNode node : getSynapseNodes()) {
             if (node != null) {
                 node.setVisible(weightsVisible);
             }

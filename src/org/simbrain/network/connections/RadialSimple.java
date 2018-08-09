@@ -335,7 +335,7 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     }
 
     @Override
-    public void connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
         this.network = network;
         excNeurons = target.stream().filter(neuron -> neuron.getPolarity()
                 == SimbrainConstants.Polarity.EXCITATORY).collect(Collectors.toList());
@@ -348,7 +348,7 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
             makeExcitatory(src, null, true);
             makeInhibitory(src, null, true);
         }
-
+        return null;
     }
 
     /**

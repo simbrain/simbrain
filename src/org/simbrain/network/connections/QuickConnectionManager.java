@@ -18,8 +18,10 @@
  */
 package org.simbrain.network.connections;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -55,6 +57,16 @@ public class QuickConnectionManager {
     private final OneToOne oneToOne = new OneToOne();
 
     /**
+     * The Gaussian connector.
+     */
+    private final Radial radial = new Radial();
+
+    /**
+     * The Radial connector.
+     */
+    private final RadialSimple radialSimple = new RadialSimple();
+
+    /**
      * The sparse connector.
      */
     private final Sparse sparse = new Sparse();
@@ -70,7 +82,7 @@ public class QuickConnectionManager {
     private boolean useExcitatoryRandomization = false;
 
     /**
-     * Whether excitatory connection should be randomized.
+     * Whether inhibitory connection should be randomized.
      */
     private boolean useInhibitoryRandomization = false;
 
@@ -106,147 +118,99 @@ public class QuickConnectionManager {
      * @return the connection objects
      */
     public ConnectNeurons[] getConnectors() {
-        return new ConnectNeurons[]{allToAll, oneToOne, sparse};
+        return new ConnectNeurons[]{allToAll, oneToOne, radial, radialSimple, sparse};
     }
 
     /**
      * Apply the current connection object to indicated source and target
      * neurons.
      *
+     * @param net network containing neurons to connect
      * @param source source neurons
      * @param target target neurons
      */
-    public void applyCurrentConnection(List<Neuron> source, List<Neuron> target) {
-        List<Synapse> retList = null;
-        if (currentConnector == allToAll) {
-            retList = ((AllToAll) currentConnector).connectAllToAll(source, target);
-        } else if (currentConnector == oneToOne) {
-            retList = ((OneToOne) currentConnector).connectOneToOne(source, target);
-        } else if (currentConnector == sparse) {
-            retList = ((Sparse) currentConnector).connectSparse(source, target);
-        }
+    public void applyCurrentConnection(Network net, List<Neuron> source, List<Neuron> target) {
+        List<Synapse> retList = currentConnector.connectNeurons(net, source, target);
         if (retList != null) {
             ConnectionUtilities.polarizeSynapses(retList, excitatoryRatio);
-            if (this.isUseExcitatoryRandomization()) {
+            if (this.useExcitatoryRandomization) {
                 ConnectionUtilities.randomizeExcitatorySynapses(retList, exRandomizer);
             }
-            if (this.isUseInhibitoryRandomization()) {
+            if (this.useInhibitoryRandomization) {
                 ConnectionUtilities.randomizeInhibitorySynapses(retList, exRandomizer);
             }
         }
-
     }
 
-    /**
-     * @return the currentConnector
-     */
     public ConnectNeurons getCurrentConnector() {
         return currentConnector;
     }
 
-    /**
-     * @param currentConnector the currentConnector to set
-     */
     public void setCurrentConnector(ConnectNeurons currentConnector) {
         this.currentConnector = currentConnector;
     }
 
-    /**
-     * @return the useExcitatoryRandomization
-     */
     public boolean isUseExcitatoryRandomization() {
         return useExcitatoryRandomization;
     }
 
-    /**
-     * @param useExcitatoryRandomization the useExcitatoryRandomization to set
-     */
     public void setUseExcitatoryRandomization(boolean useExcitatoryRandomization) {
         this.useExcitatoryRandomization = useExcitatoryRandomization;
     }
 
-    /**
-     * @return the useInhibitoryRandomization
-     */
     public boolean isUseInhibitoryRandomization() {
         return useInhibitoryRandomization;
     }
 
-    /**
-     * @param useInhibitoryRandomization the useInhibitoryRandomization to set
-     */
     public void setUseInhibitoryRandomization(boolean useInhibitoryRandomization) {
         this.useInhibitoryRandomization = useInhibitoryRandomization;
     }
 
-    /**
-     * @return the excitatoryRatio
-     */
     public double getExcitatoryRatio() {
         return excitatoryRatio;
     }
 
-    /**
-     * @param excitatoryRatio the excitatoryRatio to set
-     */
     public void setExcitatoryRatio(double excitatoryRatio) {
         this.excitatoryRatio = excitatoryRatio;
     }
 
-    /**
-     * @return the exRandomizer
-     */
     public ProbabilityDistribution getExRandomizer() {
         return exRandomizer;
     }
 
-    /**
-     * @param exRandomizer the exRandomizer to set
-     */
     public void setExRandomizer(ProbabilityDistribution exRandomizer) {
         this.exRandomizer = exRandomizer;
     }
 
-    /**
-     * @return the inRandomizer
-     */
     public ProbabilityDistribution getInRandomizer() {
         return inRandomizer;
     }
 
-    /**
-     * @param inRandomizer the inRandomizer to set
-     */
     public void setInRandomizer(ProbabilityDistribution inRandomizer) {
         this.inRandomizer = inRandomizer;
     }
 
-    /**
-     * @return the defaultPercentExcitatory
-     */
     public static double getDefaultPercentExcitatory() {
         return DEFAULT_PERCENT_EXCITATORY;
     }
 
-    /**
-     * @return the allToAll
-     */
     public AllToAll getAllToAll() {
         return allToAll;
     }
 
-    /**
-     * @return the oneToOne
-     */
     public OneToOne getOneToOne() {
         return oneToOne;
     }
 
-    /**
-     * @return the sparse
-     */
     public Sparse getSparse() {
         return sparse;
     }
 
+    public Radial getRadial() {
+        return radial;
+    }
+
+    public RadialSimple getRadialSimple() {
+        return radialSimple;
+    }
 }

@@ -18,29 +18,27 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
+import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.widgets.DropDownTriangle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
 /**
  * Panel for editing connection objects when creating new synapse groups.
- * <p>
- * Very similar to {@link QuickConnectPreferencesPanel} (with some repeated
- * code). Perhaps factor out common code later.
+ *
+ * @author Jeff Yoshimi
+ * @author Zoë Tosi
  */
-public final class ConnectionPanel {
+public final class ConnectionPanel extends JPanel {
 
     /**
      * Parent frame so pack can be called when combo box changed.
@@ -48,179 +46,134 @@ public final class ConnectionPanel {
     private final Window parentFrame;
 
     /**
-     * Parent network panel.
+     * Template synapse properties
      */
-    private final NetworkPanel networkPanel;
+    private ConnectionSynapsePropertiesPanel synapseProperties;
 
     /**
-     * The main panel holding the connection panels.
+     * The excitatory ratio and randomizer panel.
      */
-    private final JPanel mainPanel;
+    private SynapsePolarityAndRandomizerPanel polarityPanel;
 
     /**
-     * The all to all connector.
+     * Drop down triangle for synapse properties.
      */
-    private final AllToAll allToAll = new AllToAll();
+    private DropDownTriangle detailTriangle;
 
     /**
-     * The one to one connector.
+     * To edit the properties of the connection object
      */
-    private final OneToOne oneToOne = new OneToOne();
+    private AnnotatedPropertyEditor connectionProperties;
 
     /**
-     * The sparse connector.
+     * The connection object used to connect source to target neurons.
      */
-    private final Sparse sparse = new Sparse();
+    private ConnectNeurons connection;
 
     /**
-     * Select the connection type.
-     */
-    private JComboBox<ConnectNeurons> cbConnectionType = new JComboBox<ConnectNeurons>(new ConnectNeurons[]{allToAll, oneToOne, sparse});
-
-    /**
-     * Panel with card layout showing the different connection panels.
-     */
-    private JPanel connectPanel = new JPanel();
-
-    /**
-     * List of connection panels used to separately set their preferred sizes.
-     */
-    private AbstractConnectionPanel[] connectorPanels = new AbstractConnectionPanel[3];
-
-    /**
-     * Construct a connection panel.
+     * Construct the dialog.
      *
-     * @param parent       parent window
-     * @param networkPanel parent network panel
-     * @return constructed connection panel
+     * @param connection   the underlying connection object
      */
-    public static ConnectionPanel createConnectionPanel(final Window parent, final NetworkPanel networkPanel) {
-        ConnectionPanel cp = new ConnectionPanel(parent, networkPanel);
-        cp.addListeners();
-        return cp;
-    }
-
-    /**
-     * Private constructor for the factory method.
-     *
-     * @param parent       parent window
-     * @param networkPanel parent network panel
-     */
-    private ConnectionPanel(final Window parent, final NetworkPanel networkPanel) {
+    public ConnectionPanel(final Window parent, final ConnectNeurons connection) {
         this.parentFrame = parent;
-        this.networkPanel = networkPanel;
-        mainPanel = new JPanel();
+        this.connection = connection;
         init();
     }
 
     /**
-     * Initialize the panel.
+     * Initialize the connection panel.
      */
     private void init() {
-        connectPanel.setLayout(new CardLayout());
-        connectorPanels[0] = new AllToAllPanel(allToAll, networkPanel);
-        connectorPanels[1] = new OneToOnePanel(oneToOne);
-        connectorPanels[2] = SparseConnectionPanel.createSparsityAdjustmentPanel(sparse, networkPanel);
-        connectPanel.add(connectorPanels[0], AllToAll.getNameStatic());
-        connectPanel.add(connectorPanels[1], OneToOne.getNameStatic());
-        connectPanel.add(connectorPanels[2], Sparse.getNameStatic());
-        ((CardLayout) connectPanel.getLayout()).show(connectPanel, AllToAll.getNameStatic());
-
-        JPanel cbPanel = new JPanel(new FlowLayout());
-        cbPanel.add(new JLabel("Connection Manager: "));
-        cbPanel.add(cbConnectionType);
-        // Sparse by default
-        cbConnectionType.setSelectedIndex(2);
-        updateComboBox();
-
-        mainPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        mainPanel.add(cbPanel, gbc);
-
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridy = 1;
-        gbc.gridwidth = 4;
-        mainPanel.add(connectPanel, gbc);
-
-    }
-
-    /**
-     * Respond to changes in the combo box.
-     */
-    private void addListeners() {
-        cbConnectionType.addItemListener(new ItemListener() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        connectionProperties = new AnnotatedPropertyEditor(connection);
+        add(connectionProperties);
+        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Synapse Properties", "Synapse Properties", parentFrame);
+        add(Box.createRigidArea(new Dimension(0, 10)));
+        add(leftJustify(detailTriangle));
+        add(Box.createRigidArea(new Dimension(0, 15)));
+        synapseProperties = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(parentFrame);
+        add(synapseProperties);
+        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parentFrame);
+        add(polarityPanel);
+        detailTriangle.addMouseListener(new MouseAdapter() {
             @Override
-            public void itemStateChanged(ItemEvent arg0) {
-                updateComboBox();
+            public void mouseClicked(MouseEvent e) {
+                updateDetailTriangle();
             }
         });
+        updateDetailTriangle();
     }
 
     /**
-     * Update state of combo box.
+     * Update state of detail triangle.
      */
-    private void updateComboBox() {
-        CardLayout cl = (CardLayout) connectPanel.getLayout();
-        cl.show(connectPanel, cbConnectionType.getSelectedItem().toString());
-        connectPanel.setPreferredSize(getSelectedPanel().getPreferredSize());
-        mainPanel.revalidate();
-        mainPanel.repaint();
+    private void updateDetailTriangle() {
+        synapseProperties.setVisible(detailTriangle.isDown());
+        synapseProperties.repaint();
         parentFrame.pack();
     }
-
     /**
-     * Helper method to get the current card panel.
-     *
-     * @return the currently visible panel
+     * https://stackoverflow.com/questions/8335997/ how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
      */
-    private AbstractConnectionPanel getSelectedPanel() {
-        for (AbstractConnectionPanel p : connectorPanels) {
-            if (p.isVisible()) {
-                return p;
-            }
-        }
-        return null;
+    private Component leftJustify(final JPanel panel) {
+        Box b = Box.createHorizontalBox();
+        b.add(Box.createHorizontalStrut(10));
+        b.add(panel);
+        b.add(Box.createHorizontalGlue());
+        return b;
     }
 
     /**
-     * Use the state of the gui to set the connection object of the synapse
-     * group being created.
+     * Commit changes made in this panel to a loose network.
      *
-     * @param synapseGroup the synapse group whose connection object is to be
-     *                     set
+     * @param networkPanel
+     */
+    public void commitChanges(NetworkPanel networkPanel) {
+        connectionProperties.commitChanges();
+        List<Synapse> synapses = connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+        ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
+        ConnectionUtilities.conformToTemplates(synapses, synapseProperties.getTemplateExcitatorySynapse(), synapseProperties.getTemplateInhibitorySynapse());
+        polarityPanel.commitChanges();
+        if (polarityPanel.exRandomizerEnabled()) {
+            ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
+        }
+        if (polarityPanel.inRandomizerEnabled()) {
+            ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
+        }
+        networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+    }
+
+    /**
+     * Commit changes made to a synapse group's connectivity.
+     *
+     * @param synapseGroup the group to change
      */
     public void commitChanges(SynapseGroup synapseGroup) {
-        AbstractConnectionPanel acp = getSelectedPanel();
-        acp.commitChanges();
-        synapseGroup.setConnectionManager(acp.getConnection());
+        connectionProperties.commitChanges();
+        connection.connectNeurons(synapseGroup);
+        // TODO: Polarity, etc.
     }
 
-    /**
-     * @return the mainPanel
-     */
-    public JPanel getMainPanel() {
-        return mainPanel;
+    public ConnectionSynapsePropertiesPanel getSynapseProperties() {
+        return synapseProperties;
     }
 
-    /**
-     * Test the connection panel.
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        NetworkPanel np = new NetworkPanel(new Network());
-        JFrame frame = new JFrame();
-        ConnectionPanel cp = createConnectionPanel(frame, np);
-        frame.setContentPane(cp.mainPanel);
-        cp.mainPanel.setVisible(true);
-        frame.setVisible(true);
-        frame.pack();
+    public SynapsePolarityAndRandomizerPanel getPolarityPanel() {
+        return polarityPanel;
+    }
+
+    public AnnotatedPropertyEditor getConnectionProperties() {
+        return connectionProperties;
+    }
+
+    public ConnectNeurons getConnection() {
+        return connection;
+    }
+
+    @Override
+    public String toString() {
+        return connection.getName();
     }
 
 }

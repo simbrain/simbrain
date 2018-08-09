@@ -245,7 +245,7 @@ public class KeyBindings {
                         .sourceAndTargetNeuronGroupsSelected(panel)) {
                     AddSynapseGroupAction.displaySynapseGroupDialog(panel);
                 } else {
-                    panel.getQuickConnector().applyCurrentConnection(
+                    panel.getQuickConnector().applyCurrentConnection(panel.getNetwork(),
                             panel.getSourceModelNeurons(),
                             panel.getSelectedModelNeurons());
                     panel.getNetwork().fireSynapsesUpdated();

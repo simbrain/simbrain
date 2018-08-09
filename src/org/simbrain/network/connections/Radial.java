@@ -26,10 +26,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -248,9 +245,9 @@ public class Radial implements ConnectNeurons, EditableObject {
         this.lambda = lambda;
     }
 
-    public void connectNeurons(Network network, List source, List target) {
+    public List<Synapse> connectNeurons(Network network, List source, List target) {
         System.out.println(source.size() + target.size());
-        List<Synapse> synapses;
+        List<Synapse> synapses = Collections.EMPTY_LIST;
         if (source.size() < 500) {
             synapses = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
             for (Synapse s : synapses) {
@@ -296,7 +293,7 @@ public class Radial implements ConnectNeurons, EditableObject {
                 ex.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return;
+                return synapses;
             }
             int numSyns = 0;
             for (Future<Collection<Synapse>> future : generatedSyns) {
@@ -327,6 +324,7 @@ public class Radial implements ConnectNeurons, EditableObject {
         target = null;
         synapses = null;
         Runtime.getRuntime().gc();
+        return synapses;
     }
 
 

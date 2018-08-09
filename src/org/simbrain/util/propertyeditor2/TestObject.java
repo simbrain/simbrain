@@ -337,10 +337,8 @@ public class TestObject implements EditableObject {
         StandardDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        // Don't click ok to see output; close the window using it's upper-right
-        // close button
         dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent arg) {
+            public void windowClosed(WindowEvent arg) {
                 editor.commitChanges();
                 System.out.println(testObject);
             }

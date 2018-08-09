@@ -69,6 +69,8 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
         if (connection instanceof Radial) {
             connectionPanel = new AnnotatedPropertyEditor((Radial) connection);
+        } else if (connection instanceof AllToAll) {
+            connectionPanel = new AnnotatedPropertyEditor((AllToAll) connection);
         } else if (connection instanceof OneToOne) {
             connectionPanel = new AnnotatedPropertyEditor((OneToOne) connection);
         }  else if (connection instanceof Sparse) {

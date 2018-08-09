@@ -62,6 +62,8 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     /**
      * The input type and also thing that computes an input value. TODO: rename
      */
+    @UserParameter(label = "Input Type ", description = "Weighted Sum or Post-synaptic responses from spikes",
+             order = 5)
     protected InputType inputType = InputType.WEIGHTED;
 
     /**

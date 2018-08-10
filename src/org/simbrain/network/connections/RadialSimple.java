@@ -21,10 +21,14 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
@@ -38,9 +42,29 @@ import java.util.List;
  */
 public class RadialSimple implements ConnectNeurons, EditableObject {
 
+    public enum ConnectStyle {
+        PROBABILISTIC, DETERMINISTIC
+    }
+
+    public enum SelectionStyle {
+        OUT, IN
+    }
+
+    /**
+     * Should connections be selected randomly from a given neighborhood or in a prescribed way
+     * based on the in-degree?
+     */
+    @UserParameter(label = "Connection Method", description = "Make local connections based on a specified in degree or randomly?",order = 2)
+    private ConnectStyle conMethod = ConnectStyle.PROBABILISTIC;
+
+    @UserParameter(label = "Selection Method", description = "Are excNeurons in radius sending to or recieving from the neuron in question.",order = 1)
+    private SelectionStyle selectMethod = SelectionStyle.IN;
+
     /**
      * Whether to allow self-connections.
      */
+    @UserParameter(label = "Self-Connections Allowed ", description = "Can there exist synapses whose source and target are the same?",
+            order = 9)
     private boolean allowSelfConnections = false;
 
     /**
@@ -49,14 +73,27 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     private Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
 
     /**
-     * Probability of designating a given synapse excitatory. If not, it's
-     * inhibitory.
+     * Probability of making connections to neighboring excitatory neurons. Also used for
+     * neurons with no polarity.
      */
+    @UserParameter(label = "Exc. Probability", description = "Probability connections will be made to neighbor excitatory (or non-polar) neurons ",
+            minimumValue = 0, defaultValue = "0.8", order = 5)
     private double excitatoryProbability = .8;
 
     /**
-     * Radius within which to connect excitatory neurons.
+     * The number of connections allowed with excitatory (or non-polar) neurons. If there
+     * are sufficient excitatory (or non-polar) neurons in a given neuron's neighborhood this
+     * will be how many connections are made.
      */
+    @UserParameter(label = "Num. Exc. Connections", description = "Maximum # of connections with exc. neurons",
+            minimumValue = 0, defaultValue = "5", order = 7)
+    private int excCons = 5;
+
+    /**
+     * Radius within which to connect excitatory excNeurons.
+     */
+    @UserParameter(label = "Exc. Radius", description = "Distance to search for excitatory neurons to connect to",
+            minimumValue = 0, defaultValue = "100", order = 3)
     private double excitatoryRadius = 100;
 
     /**
@@ -65,15 +102,28 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     private Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     /**
-     * Radius within which to connect inhibitory neurons.
+     * Radius within which to connect inhibitory excNeurons.
      */
+    @UserParameter(label = "Inh. Radius", description = "Distance to search for inhibitory neurons to connect to",
+            minimumValue = 0, defaultValue = "80", order = 4)
     private double inhibitoryRadius = 80;
 
     /**
      * Probability of designating a given synapse excitatory. If not, it's
      * inhibitory.
      */
+    @UserParameter(label = "Inh. Probability", description = "Probability connections will be made to neighbor inhibitory neurons ",
+            minimumValue = 0, defaultValue = "0.8", order = 6)
     private double inhibitoryProbability = .8;
+
+    /**
+     * The number of connections allowed with inhibitory neurons. If there
+     * are sufficient inhibitory neurons in a given neuron's neighborhood this
+     * will be how many connections are made.
+     */
+    @UserParameter(label = "Num. Inh. Connections", description = "Maximum # of connections with inh. neurons",
+            minimumValue = 0, defaultValue = "5", order = 8)
+    private int inhCons = 5;
 
     /**
      * Reference to network in which radial connections will be made on loose
@@ -82,10 +132,13 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     private Network network;
 
     /**
-     * Reference to source neurons (target neurons are not provided to this type
-     * of connection.
+     * Reference to excNeurons from or to which to make connections
      */
-    private List<Neuron> sourceNeurons;
+    private List<Neuron> excNeurons;
+
+    private List<Neuron> inhNeurons;
+
+    private List<Neuron> nonPolarNeurons;
 
     //TODO
     public RadialSimple() {
@@ -94,12 +147,17 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
 
     /**
      * @param network       the network
-     * @param sourceNeurons the source neurons
+     * @param neurons the neurons that radial connections are to be made between
      */
-    public RadialSimple(Network network, List<Neuron> sourceNeurons) {
+    public RadialSimple(Network network, List<Neuron> neurons) {
         super();
         this.network = network;
-        this.sourceNeurons = sourceNeurons;
+        excNeurons = neurons.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.EXCITATORY ||
+                neuron.getPolarity()
+                        == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
+        inhNeurons = neurons.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.INHIBITORY).collect(Collectors.toList());
     }
 
 
@@ -111,7 +169,11 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
      */
     public List<Synapse> connectNeurons(final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
-        for (Neuron source : sourceNeurons) {
+        for (Neuron source : excNeurons) {
+            makeExcitatory(source, syns, looseSynapses);
+            makeInhibitory(source, syns, looseSynapses);
+        }
+        for (Neuron source : inhNeurons) {
             makeExcitatory(source, syns, looseSynapses);
             makeInhibitory(source, syns, looseSynapses);
         }
@@ -120,82 +182,190 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
 
     /**
      * Make an inhibitory neuron, in the sense of connecting this neuron with
-     * surrounding neurons via excitatory connections.
+     * surrounding excNeurons via excitatory connections.
      *
-     * @param source source neuron
+     * @param neuron
      */
-    private void makeInhibitory(final Neuron source, List<Synapse> syns, boolean looseSynapses) {
-        for (Neuron target : getNeuronsInRadius(source, inhibitoryRadius)) {
-            if (!sourceNeurons.contains(target)) {
-                continue;
-            }
+    private void makeInhibitory(final Neuron neuron, List<Synapse> syns, boolean looseSynapses) {
+        int degreeCounter = 0;
+        List<Neuron> neusInRadius = getNeuronsInRadius(neuron, inhNeurons, inhibitoryRadius);
+        neusInRadius.addAll(getNeuronsInRadius(neuron, nonPolarNeurons, inhibitoryRadius));
+        if (conMethod == ConnectStyle.DETERMINISTIC) {
+            Collections.shuffle(neusInRadius);
+        }
+        for (Neuron otherNeu : neusInRadius) {
             // Don't add a connection if there is already one present
-            if (Network.getSynapse(source, target) != null) {
+            if (Network.getSynapse(neuron, otherNeu) != null) {
                 continue;
             }
             if (!allowSelfConnections) {
-                if (source == target) {
+                if (neuron == otherNeu) {
                     continue;
                 }
             }
-            if (Math.random() < inhibitoryProbability) {
-                Synapse synapse = new Synapse(source, target);
-                synapse.setStrength(-1);
+            if (conMethod == ConnectStyle.PROBABILISTIC) {
+                if (Math.random() < inhibitoryProbability) {
+                    Synapse synapse;
+                    if (selectMethod == SelectionStyle.IN)
+                        synapse = new Synapse(otherNeu, neuron);
+                    else {
+                        synapse = new Synapse(neuron, otherNeu);
+                    }
+                    synapse.setStrength(-Math.random());
+                    if (looseSynapses) {
+                        network.addSynapse(synapse);
+                    } else {
+                        if (syns != null)
+                            syns.add(synapse);
+                    }
+                }
+            } else {
+                Synapse synapse;
+                if (selectMethod == SelectionStyle.IN)
+                    synapse = new Synapse(otherNeu, neuron);
+                else {
+                    synapse = new Synapse(neuron, otherNeu);
+                }
+                synapse.setStrength(-Math.random());
                 if (looseSynapses) {
                     network.addSynapse(synapse);
+                } else {
+                    if (syns != null)
+                        syns.add(synapse);
                 }
-                syns.add(synapse);
+                degreeCounter++;
+                if(degreeCounter >= inhCons) {
+                    network.fireSynapsesUpdated();
+                    break;
+                }
             }
+            network.fireSynapsesUpdated();
         }
     }
 
     /**
-     * Return a list of neurons in a specific radius of a specified neuron.
+     * Make an excitatory neuron, in the sense of connecting this neuron with
+     * surrounding excNeurons via excitatory connections.
+     *
+     * @param neuron neuron neuron
+     */
+    private void makeExcitatory(final Neuron neuron, List<Synapse> syns, boolean looseSynapses) {
+        int degreeCounter = 0;
+        List<Neuron> neusInRadius = getNeuronsInRadius(neuron, excNeurons, excitatoryRadius);
+        neusInRadius.addAll(getNeuronsInRadius(neuron, nonPolarNeurons, excitatoryRadius));
+        if (conMethod == ConnectStyle.DETERMINISTIC) {
+            Collections.shuffle(neusInRadius);
+        }
+        for (Neuron otherNeu : neusInRadius) {
+            // Don't add a connection if there is already one present
+            if (Network.getSynapse(neuron, otherNeu) != null) {
+                continue;
+            }
+            if (!allowSelfConnections) {
+                if (neuron == otherNeu) {
+                    continue;
+                }
+            }
+            if (conMethod == ConnectStyle.PROBABILISTIC) {
+                if (Math.random() < excitatoryProbability) {
+                    Synapse synapse;
+                    if (selectMethod == SelectionStyle.IN)
+                        synapse = new Synapse(otherNeu, neuron);
+                    else {
+                        synapse = new Synapse(neuron, otherNeu);
+                    }
+                    synapse.setStrength(Math.random());
+                    if (looseSynapses) {
+                        network.addSynapse(synapse);
+                    } else {
+                        if (syns != null)
+                            syns.add(synapse);
+                    }
+                }
+            } else {
+                Synapse synapse;
+                if (selectMethod == SelectionStyle.IN)
+                    synapse = new Synapse(otherNeu, neuron);
+                else {
+                    synapse = new Synapse(neuron, otherNeu);
+                }
+                synapse.setStrength(Math.random());
+                if (looseSynapses) {
+                    network.addSynapse(synapse);
+                } else {
+                    if (syns != null)
+                        syns.add(synapse);
+                }
+                degreeCounter++;
+                if(degreeCounter >= excCons) {
+                    network.fireSynapsesUpdated();
+                    break;
+                }
+            }
+            network.fireSynapsesUpdated();
+        }
+    }
+
+
+    @Override
+    public void connectNeurons(SynapseGroup synGroup) {
+        // No implementation yet.
+        List<Neuron> target = synGroup.getTargetNeurons();
+        List<Neuron> source = synGroup.getSourceNeurons();
+        List<Synapse> exSyns = new ArrayList<>();
+        List<Synapse> inSyns = new ArrayList<>();
+        excNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.EXCITATORY).collect(Collectors.toList());
+        inhNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.INHIBITORY).collect(Collectors.toList());
+        nonPolarNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
+        for (Neuron src : source) {
+            makeExcitatory(src, exSyns, false);
+            makeInhibitory(src, inSyns, false);
+        }
+
+        for(Synapse s : exSyns) {
+            synGroup.addNewExcitatorySynapse(s);
+        }
+
+        for(Synapse s : inSyns) {
+            synGroup.addNewInhibitorySynapse(s);
+        }
+    }
+
+    @Override
+    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
+        this.network = network;
+        excNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.EXCITATORY).collect(Collectors.toList());
+        inhNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.INHIBITORY).collect(Collectors.toList());
+        nonPolarNeurons = target.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
+
+        for (Neuron src : source) {
+            makeExcitatory(src, null, true);
+            makeInhibitory(src, null, true);
+        }
+        return null;
+    }
+
+    /**
+     * Return a list of excNeurons in a specific radius of a specified neuron.
      *
      * @param source the source neuron.
      * @param radius the radius to search within.
-     * @return list of neurons in the given radius.
+     * @return list of excNeurons in the given radius.
      */
-    private List<Neuron> getNeuronsInRadius(Neuron source, double radius) {
+    private List<Neuron> getNeuronsInRadius(Neuron source, List<Neuron> neighbors, double radius) {
         ArrayList<Neuron> ret = new ArrayList<Neuron>();
-        for (Neuron neuron : sourceNeurons) {
+        for (Neuron neuron : neighbors) {
             if (network.getEuclideanDist(source, neuron) < radius) {
                 ret.add(neuron);
             }
         }
         return ret;
-    }
-
-    /**
-     * Make an excitatory neuron, in the sense of connecting this neuron with
-     * surrounding neurons via excitatory connections.
-     *
-     * @param source source neuron
-     */
-    private void makeExcitatory(final Neuron source, List<Synapse> syns, boolean looseSynapses) {
-        for (Neuron target : getNeuronsInRadius(source, excitatoryRadius)) {
-            if (!sourceNeurons.contains(target)) {
-                continue;
-            }
-            // Don't add a connection if there is already one present
-            if (Network.getSynapse(source, target) != null) {
-                continue;
-            }
-            if (!allowSelfConnections) {
-                if (source == target) {
-                    continue;
-                }
-            }
-            if (Math.random() < excitatoryProbability) {
-                Synapse synapse = new Synapse(source, target);
-                synapse.setStrength(1);
-                if (looseSynapses) {
-                    network.addSynapse(synapse);
-                }
-                syns.add(synapse);
-            }
-            network.fireSynapsesUpdated();
-        }
     }
 
     /**
@@ -296,17 +466,21 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
         this.baseInhibitorySynapse = baseInhibitorySynapse;
     }
 
-    @Override
-    public void connectNeurons(SynapseGroup synGroup) {
-        // No implementation yet.
+    public int getExcCons() {
+        return excCons;
     }
 
-    @Override
-    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-
-        return null;
+    public int getInhCons() {
+        return inhCons;
     }
 
+    public void setExcCons(int excCons) {
+        this.excCons = excCons;
+    }
+
+    public void setInhCons(int inhCons) {
+        this.inhCons = inhCons;
+    }
 
     @Override
     public String getName() {

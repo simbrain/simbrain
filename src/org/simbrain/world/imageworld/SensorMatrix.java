@@ -33,9 +33,9 @@ public class SensorMatrix implements ImageSourceListener {
      */
     private transient int[] colors;
 
-    //TODO: Is this a problem? Elim this constructor and require an imagesource?
     /**
      * Construct a sensor matrix without attaching it to a source.
+     * Currently used by 3d component.
      *
      * @param name The name of the sensor matrix.
      */
@@ -159,12 +159,18 @@ public class SensorMatrix implements ImageSourceListener {
         if (image.getHeight() != getHeight() || image.getWidth() != getWidth()) {
             throw new AssertionError();
         }
+
         for (int y = 0; y < image.getHeight(); ++y) {
             for (int x = 0; x < image.getWidth(); ++x) {
                 int color = image.getRGB(x, y);
+                // Get red, green and blue as values between 0 and 1
+                // For my (jky) benefit, an overview of the bit twiddling here:
+                //    https://stackoverflow.com/questions/2534116/how-to-convert-get-rgbx-y-integer-pixel-to-colorr-g-b-a-in-java
                 double red = ((color >>> 16) & 0xFF) / 255.0;
                 double green = ((color >>> 8) & 0xFF) / 255.0;
                 double blue = (color & 0xFF) / 255.0;
+                // I (JKY) believe the brightness channel is based on this:
+                // https://en.wikipedia.org/wiki/Luma_(video)
                 channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
                 channels[1][y * getWidth() + x] = red;
                 channels[2][y * getWidth() + x] = green;

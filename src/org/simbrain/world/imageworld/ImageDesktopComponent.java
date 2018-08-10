@@ -30,8 +30,6 @@ import java.io.IOException;
  */
 public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
-    private static final long serialVersionUID = 9019927108869839191L;
-
     /**
      * Combo box for selecting which sensor matrix to view.
      */
@@ -97,6 +95,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void setupMenuBar(GenericFrame frame) {
+
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File  ");
         menuBar.add(fileMenu);
@@ -109,6 +108,10 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenuItem saveImage = new JMenuItem("Save Image...");
         saveImage.addActionListener(this::saveImage);
         fileMenu.add(saveImage);
+
+        fileMenu.addSeparator();
+        fileMenu.add(copyAction);
+        fileMenu.add(pasteAction);
 
         fileMenu.addSeparator();
         fileMenu.add(new OpenAction(this));
@@ -130,19 +133,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
 
     private void setupContextMenu(ImageWorldComponent component) {
         contextMenu = new JPopupMenu();
-        Action copyAction = new AbstractAction("Copy") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                component.getWorld().getClipboard().copyImage();
-            }
-        };
         contextMenu.add(copyAction);
-        Action pasteAction = new AbstractAction("Paste") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                component.getWorld().getClipboard().pasteImage();
-            }
-        };
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
         multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 5);
@@ -228,14 +219,28 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         sensorToolbar.add(deleteSensorMatrix);
     }
 
+    Action copyAction = new AbstractAction("Copy") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            component.getWorld().getClipboard().copyImage();
+        }
+    };
+
+    Action pasteAction = new AbstractAction("Paste") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            component.getWorld().getClipboard().pasteImage();
+        }
+    };
+
     private void setupFileChooser() {
         fileChooser = new SFileChooser(SimbrainPreferences.getString("imagesDirectory"), "");
         fileChooser.setUseImagePreview(true);
         String[] exts = ImageIO.getReaderFileSuffixes();
-        String[] descriptions = ImageIO.getReaderFormatNames();
-        for (int i = 0; i < exts.length; ++i) {
-            fileChooser.addExtension(descriptions[i], "." + exts[i]);
-        }
+        //String[] descriptions = ImageIO.getReaderFormatNames();
+        //for (int i = 0; i < exts.length; ++i) {
+        //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
+        //}
     }
 
     private void loadImage(ActionEvent evt) {

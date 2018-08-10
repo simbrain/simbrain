@@ -44,7 +44,7 @@ public class SFileChooser {
 
     /**
      * The map of extensions and their descriptions in the order of their
-     * addition.
+     * addition. NOTE: uneven results with this.  TODO: Test and review.
      */
     private final LinkedHashMap<String, String> exts = new LinkedHashMap<String, String>();
 

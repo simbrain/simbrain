@@ -14,7 +14,6 @@ import javax.swing.*;
  * A dialog to create a new SensorMatrix.
  */
 public class SensorMatrixDialog extends StandardDialog {
-    private static final long serialVersionUID = 1L;
 
     private ImageWorld world;
     private Box mainPanel = Box.createVerticalBox();
@@ -52,6 +51,8 @@ public class SensorMatrixDialog extends StandardDialog {
         });
         filterTypeCombo.setSelectedIndex(0);
         sensorMatrixPanel.addItem("Name", nameField);
+        // Fill the name field with something.... TODO: But improve what that is!
+        nameField.setText("Filter " + (world.getSensorMatrices().size() + 1));
         sensorMatrixPanel.addItem("Filter", filterTypeCombo);
         mainPanel.add(filterPanel);
         setContentPane(mainPanel);

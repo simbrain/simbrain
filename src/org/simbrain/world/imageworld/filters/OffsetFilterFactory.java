@@ -9,29 +9,14 @@ import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 
 /**
- * OffsetFilterFactory constructs offset filters for use in ImageWorld. An offset filter applies a translation along
- * the x and y axes of the image after scaling is applied. The translation is specified in pixels.
+ * OffsetFilterFactory constructs offset filters for use in ImageWorld. An
+ * offset filter applies a translation along the x and y axes of the image after
+ * scaling is applied. The translation is specified in pixels.
  */
 public class OffsetFilterFactory extends ImageFilterFactory {
-    private static class OffsetFilterSource extends FilteredImageSource {
-        private int xOffset;
-        private int yOffset;
 
-        OffsetFilterSource(ImageSource source, int xOffset, int yOffset, int width, int height) {
-            super(source, "Offset Filter", ImageFilterFactory.createIdentityOp(), width, height);
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-            onImageUpdate(source);
-        }
-
-        @Override
-        protected void setCurrentImage(BufferedImage image) {
-            BufferedImage offsetImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-            Graphics graphics = offsetImage.getGraphics();
-            graphics.drawImage(image, xOffset, yOffset, null);
-            super.setCurrentImage(offsetImage);
-        }
-    }
+    private int xOffset;
+    private int yOffset;
 
     static {
         ImageFilterFactory.putFactory("Offset Filter", new OffsetFilterFactory());
@@ -40,9 +25,6 @@ public class OffsetFilterFactory extends ImageFilterFactory {
     public static FilteredImageSource createOffsetFilter(ImageSource source, int xOffset, int yOffset, int width, int height) {
         return new OffsetFilterSource(source, xOffset, yOffset, width, height);
     }
-
-    private int xOffset;
-    private int yOffset;
 
     @Override
     public void setDefaultValues() {
@@ -76,5 +58,25 @@ public class OffsetFilterFactory extends ImageFilterFactory {
     @Override
     public FilteredImageSource create(ImageSource source) {
         return createOffsetFilter(source, xOffset, yOffset, getWidth(), getHeight());
+    }
+
+    private static class OffsetFilterSource extends FilteredImageSource {
+        private int xOffset;
+        private int yOffset;
+
+        OffsetFilterSource(ImageSource source, int xOffset, int yOffset, int width, int height) {
+            super(source, "Offset Filter", ImageFilterFactory.createIdentityOp(), width, height);
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+            onImageUpdate(source);
+        }
+
+        @Override
+        protected void setCurrentImage(BufferedImage image) {
+            BufferedImage offsetImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics graphics = offsetImage.getGraphics();
+            graphics.drawImage(image, xOffset, yOffset, null);
+            super.setCurrentImage(offsetImage);
+        }
     }
 }

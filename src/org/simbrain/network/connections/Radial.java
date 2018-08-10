@@ -61,15 +61,15 @@ public class Radial implements ConnectNeurons, EditableObject {
      */
     public static final double DEFAULT_DIST_CONST = 0.25;
 
-    public static final double DEFAULT_EE_CONST = 0.3;
+    public static final double DEFAULT_EE_CONST = 0.2;
 
-    public static final double DEFAULT_EI_CONST = 0.2;
+    public static final double DEFAULT_EI_CONST = 0.3;
 
     public static final double DEFAULT_IE_CONST = 0.4;
 
     public static final double DEFAULT_II_CONST = 0.1;
 
-    public static final double DEFAULT_LAMBDA = 2.5;
+    public static final double DEFAULT_LAMBDA = 20;
 
     // TODO: Add a sparsity constraint, such that connections are still chosen stochastically
     // based on distance, but a specific number of connections are guaranteed to be made.
@@ -77,30 +77,39 @@ public class Radial implements ConnectNeurons, EditableObject {
     /**
      * The connection constant for connections between 2 excitatory neurons.
      */
-    @UserParameter(label = "eeDistConst Rule", order = 100)
+    @UserParameter(label = "Exc. \u2192 Exc. Constant", defaultValue = "0.2",
+            minimumValue = 0, maximumValue = 1, order = 2 )
     private double eeDistConst = DEFAULT_EE_CONST;
 
     /**
      * The connection constant for connection from an excitatory to an
      * inhibitory neuron.
      */
+    @UserParameter(label = "Exc. \u2192 Inh. Constant", defaultValue = "0.3",
+            minimumValue = 0, maximumValue = 1, order = 3 )
     private double eiDistConst = DEFAULT_EI_CONST;
 
     /**
      * The connection constant for connection from an inhibitory to an
      * excitatory neuron.
      */
+    @UserParameter(label = "Inh. \u2192 Exc. Constant", defaultValue = "0.4",
+            minimumValue = 0, maximumValue = 1, order = 4 )
     private double ieDistConst = DEFAULT_IE_CONST;
 
     /**
      * The connection constant for connections between 2 inhibitory neurons.
      */
+    @UserParameter(label = "Inh. \u2192 Inh. Constant", defaultValue = "0.1",
+            minimumValue = 0, maximumValue = 1, order = 5 )
     private double iiDistConst = DEFAULT_II_CONST;
 
     /**
      * The connection constant for general connections. Used in cases where
      * neurons have no explicit polarity.
      */
+    @UserParameter(label = "No Polarity Constant", defaultValue = "0.25",
+            minimumValue = 0, maximumValue = 1, order = 6 )
     private double distConst = DEFAULT_DIST_CONST;
 
     /**
@@ -108,6 +117,8 @@ public class Radial implements ConnectNeurons, EditableObject {
      * create denser connections. Lambda can be thought of as the average
      * connection distance.
      */
+    @UserParameter(label = "Distance Drop-off", defaultValue = "20",
+            minimumValue = 0.01, order = 1 )
     private double lambda = DEFAULT_LAMBDA;
 
     private SynapseGroup synapseGroup;
@@ -159,6 +170,11 @@ public class Radial implements ConnectNeurons, EditableObject {
                 }
                 if (randVal < probability) {
                     Synapse s = new Synapse(src, tar);
+                    if(src.getPolarity() == Polarity.INHIBITORY) {
+                        s.forceSetStrength(-1);
+                    } else {
+                        s.forceSetStrength(1);
+                    }
                     synapses.add(s);
                     if (loose) {
                         src.getNetwork().addSynapse(s);
@@ -246,85 +262,12 @@ public class Radial implements ConnectNeurons, EditableObject {
     }
 
     public List<Synapse> connectNeurons(Network network, List source, List target) {
-        System.out.println(source.size() + target.size());
-        List<Synapse> synapses = Collections.EMPTY_LIST;
-        if (source.size() < 500) {
-            synapses = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
-            for (Synapse s : synapses) {
-                network.addSynapse(s);
-            }
-        } else {
-            List<Callable<Collection<Synapse>>> workers = new ArrayList<Callable<Collection<Synapse>>>();
-            int threads = Runtime.getRuntime().availableProcessors();
-            int idealShare = (int) Math.floor(source.size() / threads);
-            int remaining = source.size();
-            Iterator<Neuron> srcIter = source.iterator();
-            List<Neuron> srcChunk;
-            double runningPercentEx = 0;
-            for (int i = 0; i < threads; i++) {
-                srcChunk = new ArrayList<Neuron>((int) Math.ceil((idealShare * 2) / 0.75));
-                int share;
-                if (remaining < idealShare * 2) {
-                    share = remaining;
-                } else {
-                    share = idealShare;
-                }
-                int j = 0;
-                while (j < share) {
-                    Neuron n = srcIter.next();
-                    srcChunk.add(n);
-                    if (n.isPolarized()) {
-                        if (Polarity.EXCITATORY == n.getPolarity()) {
-                            runningPercentEx++;
-                        }
-                    }
-                    j++;
-                }
-                remaining -= j;
-                workers.add(new ConnectorService(srcChunk, target, false));
-            }
-            runningPercentEx /= source.size();
-            //synGroup.setExcitatoryRatio(runningPercentEx);
-            ExecutorService ex = Executors.newFixedThreadPool(threads);
-            List<Future<Collection<Synapse>>> generatedSyns;
-            try {
-                generatedSyns = ex.invokeAll(workers);
-                ex.shutdown();
-                ex.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return synapses;
-            }
-            int numSyns = 0;
-            for (Future<Collection<Synapse>> future : generatedSyns) {
-                try {
-                    numSyns += future.get().size();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-            //synGroup.preAllocateSynapses(numSyns);
-            for (Future<Collection<Synapse>> future : generatedSyns) {
-                try {
-                    for (Synapse s : future.get()) {
-                        network.addSynapse(s);
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
+        List<Synapse> syns = connectRadialPolarized(source, target, eeDistConst,
+                eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
+        for(Synapse s : syns) {
+            network.addSynapse(s);
         }
-
-//        if (synGroup.isRecurrent()) {
-//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
-//        } else {
-//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
-//        }
-        source = null;
-        target = null;
-        synapses = null;
-        Runtime.getRuntime().gc();
-        return synapses;
+        return syns;
     }
 
 

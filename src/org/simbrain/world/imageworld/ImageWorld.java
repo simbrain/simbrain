@@ -3,10 +3,13 @@ package org.simbrain.world.imageworld;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
+import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,43 +25,9 @@ import java.util.List;
  */
 public class ImageWorld {
 
-    /**
-     * Listener receives notifications when the image world is changed.
-     */
-    public interface Listener {
-
-        /**
-         * Called whenever an image source is changed.
-         */
-        void imageSourceChanged(ImageSource changedSource);
-
-        /**
-         * Called whenever a sensor matrix is added.
-         */
-        void sensorMatrixAdded(SensorMatrix addedMatrix);
-
-        /**
-         * Called whenever a sensor matrix is removed.
-         */
-        void sensorMatrixRemoved(SensorMatrix removedMatrix);
-    }
-
-    public enum SourceType {
-        STATIC_SOURCE,
-        EMITTER_SOURCE
-    }
-
-    private final SourceType sourceType;
-
     private StaticImageSource staticSource;
 
     private EmitterMatrix emitterMatrix;
-
-    // Todo: Ask Tim if this is the only use of CompositeImageSource.
-    /**
-     * Helper so that it's easy to switch between image sources.
-     */
-    private CompositeImageSource compositeSource;
 
     /**
      * List of sensor matrices associated with this world.
@@ -69,6 +38,19 @@ public class ImageWorld {
      * Currently selected sensor matrix.
      */
     private SensorMatrix currentSensorMatrix;
+
+    // Todo: Ask Tim if this is the only use of CompositeImageSource.
+    /**
+     * Helper so that it's easy to switch between image sources.
+     */
+    private CompositeImageSource compositeSource;
+
+    public enum SourceType {
+        STATIC_SOURCE,
+        EMITTER_SOURCE
+    }
+
+    private final SourceType sourceType;
 
     /**
      * Container for the current image or sensor view.
@@ -104,18 +86,42 @@ public class ImageWorld {
         sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
 
+
+        imagePanel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                // For testing ImageAlbum
+                //staticSource.step();
+                //staticSource.notifyImageUpdate();
+
+                // For testing image editing
+                //emitterMatrix.setBrightness(e.getLocationOnScreen(), 4);
+                // emitterMatrix.emitImage();
+
+            }
+        });
+
         // Load default sensor matrices
         SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
         sensorMatrices.add(unfiltered);
 
-        SensorMatrix color25x25 = new SensorMatrix("Color 25x25", ImageFilterFactory.createColorFilter(compositeSource, 25, 25));
-        sensorMatrices.add(color25x25);
+        SensorMatrix gray100x100 = new SensorMatrix("Gray 150x150", ImageFilterFactory.createGrayFilter(compositeSource, 150, 150));
+        sensorMatrices.add(gray100x100);
+
+        SensorMatrix color100x100 = new SensorMatrix("Color 100x100", ImageFilterFactory.createColorFilter(compositeSource, 100, 100));
+        sensorMatrices.add(color100x100);
 
         SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
         sensorMatrices.add(threshold10x10);
 
-        //SensorMatrix offset100x100 = new SensorMatrix("Offset 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
-        //sensorMatrices.add(offset100x100);
+        SensorMatrix threshold250x250 = new SensorMatrix("Threshold 250x250", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 250, 250));
+        sensorMatrices.add(threshold250x250);
+
+        SensorMatrix offset100x100 = new SensorMatrix("Offset-25 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
+        sensorMatrices.add(offset100x100);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
 
@@ -161,6 +167,16 @@ public class ImageWorld {
         ImageIO.write(image, ext, file);
     }
 
+    /**
+     * Update the current tooltip on the jpanel.
+     */
+    private void updateToolTipText() {
+        if(currentSensorMatrix == null) {
+            imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
+        } else {
+            imagePanel.setToolTipText(currentSensorMatrix.getWidth() + " by " +  currentSensorMatrix.getHeight());
+        }
+    }
     /**
      * Set an existing buffered image as the current image.
      */
@@ -336,6 +352,7 @@ public class ImageWorld {
         }
         sensorMatrix.getSource().addListener(imagePanel);
         currentSensorMatrix = sensorMatrix;
+        updateToolTipText();
     }
 
     /**
@@ -343,6 +360,27 @@ public class ImageWorld {
      */
     public List<SensorMatrix> getSensorMatrices() {
         return sensorMatrices;
+    }
+
+    /**
+     * Listener receives notifications when the image world is changed.
+     */
+    public interface Listener {
+
+        /**
+         * Called whenever an image source is changed.
+         */
+        void imageSourceChanged(ImageSource changedSource);
+
+        /**
+         * Called whenever a sensor matrix is added.
+         */
+        void sensorMatrixAdded(SensorMatrix addedMatrix);
+
+        /**
+         * Called whenever a sensor matrix is removed.
+         */
+        void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
     /**

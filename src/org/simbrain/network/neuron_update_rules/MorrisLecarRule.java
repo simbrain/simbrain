@@ -249,6 +249,11 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         this.noiseGenerator = noise;
     }
 
+    /**
+     * Convenience method for simulations. Sets the stdev of the randomizer.
+     *
+     * @param amp amplitude of the noise
+     */
     public void setNoiseAmplitude(double amp) {
         ((NormalDistribution) noiseGenerator).setStandardDeviation(amp);
     }

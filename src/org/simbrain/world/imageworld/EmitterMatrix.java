@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -113,7 +114,14 @@ public class EmitterMatrix extends ImageSourceAdapter {
                 }
             }
         }
+
         notifyImageUpdate();
+    }
+
+    // Testing image editing. obviously not done!
+    public void setBrightness(Point loc, int value) {
+        // TODO: Downsample location
+        channels[1][14] = value;
     }
 
     public void clear() {
@@ -127,4 +135,5 @@ public class EmitterMatrix extends ImageSourceAdapter {
     public String toString() {
         return "EmitterMatrix";
     }
+
 }

@@ -18,10 +18,10 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import org.simbrain.util.SimpleId;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.ScalarSmellSource;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.propertyeditor.DisplayOrder;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -31,25 +31,37 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
-import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parent class for all Odor World objects. Adapted and extended from From
- * Developing Games in Java, by David Brackeen.
+ * Parent class for all Odor World objects.
  */
-public abstract class OdorWorldEntity {
+public abstract class OdorWorldEntity implements EditableObject {
 
-    /**
-     * Animation used to depict this object. If the animation has one frame this
-     * is equivalent to just using a single image to represent it.
-     */
-    private Animation animation;
+    // TODO:
+    // Merge BasicEntity into OdorWorldEntity
+    //
+    // Make “Agent” a subclass with sensors, effectors, and an ability to turn and move?
+
+    /** Support for property change events. */
+    private PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+
+    //TODO: This is a first pass
+    /** Type of this object.  These are mapped to images, etc. */
+    public enum EntityType {
+        SWISS, FLOWER
+    }
+
+    @UserParameter(label = "Type", order = 2)
+    public EntityType entityType = EntityType.SWISS;
 
     /**
      * Name of this entity.
      */
+    @UserParameter(label = "Name", order = 1)
     private String name;
 
     /**
@@ -60,22 +72,22 @@ public abstract class OdorWorldEntity {
     /**
      * X Position.
      */
-    protected float x;
+    protected double x;
 
     /**
      * Y Position.
      */
-    protected float y;
+    protected double y;
 
     /**
      * X Velocity.
      */
-    protected float dx;
+    protected double dx;
 
     /**
      * Y Velocity.
      */
-    protected float dy;
+    protected double dy;
 
     /**
      * Back reference to parent parentWorld.
@@ -107,6 +119,7 @@ public abstract class OdorWorldEntity {
      */
     private ScalarSmellSource scalarSmell = new ScalarSmellSource(1);
 
+    //TODO: Remove or at least re-implement.
     /**
      * True if a collision occurred in the last time step.
      */
@@ -115,11 +128,13 @@ public abstract class OdorWorldEntity {
     /**
      * Enable sensors. If not the agent is "blind."
      */
+    @UserParameter(label = "Enable Sensors", order = 5)
     private boolean sensorsEnabled = true;
 
     /**
      * Enable effectors. If not the agent is "paralyzed.
      */
+    @UserParameter(label = "Enable Effectors", order = 6)
     private boolean effectorsEnabled = true;
 
     /**
@@ -132,29 +147,6 @@ public abstract class OdorWorldEntity {
      */
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
 
-    /**
-     * Construct an entity from an animation.
-     *
-     * @param anim  animation to use.
-     * @param world parent world
-     */
-    public OdorWorldEntity(final Animation anim, OdorWorld world) {
-        this.animation = anim;
-        this.parentWorld = world;
-        anim.start();
-    }
-
-    /**
-     * Construct an odor world entity from a single image location.
-     *
-     * @param imageLocation the image location
-     * @param world
-     */
-    public OdorWorldEntity(final String imageLocation, OdorWorld world) {
-        this.animation = new Animation(imageLocation);
-        this.parentWorld = world;
-        animation.start();
-    }
 
     /**
      * Construct an entity.
@@ -170,7 +162,6 @@ public abstract class OdorWorldEntity {
      * velocity.
      */
     public void update() {
-        // System.out.println(Arrays.asList(currentlyHeardPhrases));
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
@@ -180,50 +171,14 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Called before update() if the creature collided with a tile horizontally.
-     */
-    public void collideHorizontal() {
-        behavior.collisionX();
-        collision = true;
-    }
-
-    /**
-     * Called before update() if the creature collided with a tile vertically.
-     */
-    public void collideVertical() {
-        behavior.collissionY();
-        collision = true;
-    }
-
-    // TODO: Say in docs if this is upper right or not (but not center).
-
-    /**
-     * Gets this OdorWorldEntity's current x position.
-     *
-     * @return
-     */
-    @DisplayOrder(val = 50)
-    public float getX() {
-        return x;
-    }
-
-    /**
-     * Gets this OdorWorldEntity's current y position.
-     *
-     * @return
-     */
-    @DisplayOrder(val = 60)
-    public float getY() {
-        return y;
-    }
-
-    /**
      * Sets this OdorWorldEntity's current x position.
      *
      * @param newx
      */
     @Consumable(idMethod = "getId")
-    public void setX(final float newx) {
+    public void setX(final double newx) {
+        //TODO: Review
+        x = newx;
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
@@ -233,11 +188,10 @@ public abstract class OdorWorldEntity {
             } else {
                 this.x = newx;
             }
-        } else {
-            if (isInBoundsX(newx)) {
-                this.x = newx;
-            }
         }
+
+        // TODO: Reimplmenet isInBoundsX (see in 3.03) if needed.
+
     }
 
     /**
@@ -246,8 +200,9 @@ public abstract class OdorWorldEntity {
      * @param newy
      */
     @Consumable(idMethod = "getId")
-    public void setY(final float newy) {
+    public void setY(final double newy) {
         // System.out.println("y:" + newy);
+        y = newy;
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
                 this.y = parentWorld.getHeight() - (Math.abs(newy) % parentWorld.getHeight());
@@ -256,65 +211,7 @@ public abstract class OdorWorldEntity {
             } else {
                 this.y = newy;
             }
-        } else {
-            if (isInBoundsY(newy)) {
-                this.y = newy;
-            }
         }
-    }
-
-    /**
-     * Check whether, if the provided point is used to set the x (upper left)
-     * coordinate of the entity, the bounds of the object will be in bounds.
-     *
-     * @param x the point to check
-     * @return whether the point is in bounds or not.
-     */
-    public boolean isInBoundsX(float x) {
-        if ((x < 0) || ((x + getWidth()) > getParentWorld().getWidth())) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check whether, if the provided point is used to set the y (upper left)
-     * coordinate of the entity, the bounds of the object will be in bounds.
-     *
-     * @param y the point to check
-     * @return whether the point is in bounds or not.
-     */
-    public boolean isInBoundsY(float y) {
-        if ((y < 0) || ((y + getHeight()) > getParentWorld().getHeight())) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Gets this OdorWorldEntity's width, based on the size of the current
-     * image.
-     *
-     * @return
-     */
-    public int getWidth() {
-        while (getImage().getWidth(null) < 0) {
-            ;
-        }
-        return animation.getImage().getWidth(null);
-    }
-
-    /**
-     * Gets this OdorWorldEntity's height, based on the size of the current
-     * image.
-     *
-     * @return
-     */
-    public int getHeight() {
-        while (getImage().getHeight(null) < 0) {
-            ;
-        }
-        return animation.getImage().getHeight(null);
     }
 
     /**
@@ -323,9 +220,8 @@ public abstract class OdorWorldEntity {
      *
      * @return
      */
-    @DisplayOrder(val = 80)
     @Producible(idMethod = "getId")
-    public float getVelocityX() {
+    public double getVelocityX() {
         return dx;
     }
 
@@ -335,9 +231,8 @@ public abstract class OdorWorldEntity {
      *
      * @return
      */
-    @DisplayOrder(val = 90)
     @Producible(idMethod = "getId")
-    public float getVelocityY() {
+    public double getVelocityY() {
         return dy;
     }
 
@@ -348,7 +243,7 @@ public abstract class OdorWorldEntity {
      * @param dx
      */
     @Consumable(idMethod = "getId")
-    public void setVelocityX(final float dx) {
+    public void setVelocityX(final double dx) {
         this.dx = dx;
     }
 
@@ -359,7 +254,7 @@ public abstract class OdorWorldEntity {
      * @param dy
      */
     @Consumable(idMethod = "getId")
-    public void setVelocityY(final float dy) {
+    public void setVelocityY(final double dy) {
         this.dy = dy;
     }
 
@@ -368,7 +263,6 @@ public abstract class OdorWorldEntity {
      *
      * @return entity's name.
      */
-    @DisplayOrder(val = 10)
     public String getName() {
         if (name == null) {
             return id;
@@ -401,37 +295,6 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Gets this OdorWorldEntity's current image.
-     *
-     * @return
-     */
-    public Image getImage() {
-        return animation.getImage();
-    }
-
-    /**
-     * Get bounds, based on current image.
-     *
-     * @return bounds of this entity.
-     */
-    public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, getWidth(), getHeight());
-    }
-
-    /**
-     * Reduced bounds used for some entities, to improve the look of collisions
-     * and blocking. TODO: This may not work well when shapes (not pixel images)
-     * are used.
-     *
-     * @return reduced bounds.
-     */
-    public Rectangle getReducedBounds() {
-        Rectangle ret = getBounds();
-        ret.grow(-getHeight() / 5, -getWidth() / 5);
-        return ret;
-    }
-
-    /**
      * Add an effector.
      *
      * @param effector effector to add
@@ -440,7 +303,7 @@ public abstract class OdorWorldEntity {
         // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(parentWorld.getEffectorIDGenerator().getId());
-        parentWorld.fireEffectorAdded(effector);
+//        parentWorld.fireEffectorAdded(effector);
     }
 
     /**
@@ -450,7 +313,7 @@ public abstract class OdorWorldEntity {
      */
     public void removeEffector(final Effector effector) {
         effectors.remove(effector);
-        parentWorld.fireEffectorRemoved(effector);
+//        parentWorld.fireEffectorRemoved(effector);
     }
 
     /**
@@ -467,7 +330,7 @@ public abstract class OdorWorldEntity {
             sensor.setId(parentWorld.getSensorIDGenerator().getId());
         }
 
-        parentWorld.fireSensorAdded(sensor);
+//        parentWorld.fireSensorAdded(sensor);
     }
 
     /**
@@ -509,7 +372,7 @@ public abstract class OdorWorldEntity {
      */
     public void removeSensor(final Sensor sensor) {
         sensors.remove(sensor);
-        parentWorld.fireSensorRemoved(sensor);
+//        parentWorld.fireSensorRemoved(sensor);
     }
 
     /**
@@ -590,7 +453,7 @@ public abstract class OdorWorldEntity {
      */
     @Producible(idMethod = "getId")
     public double[] getCenterLocation() {
-        return new double[]{getCenterX(), getCenterY()};
+        return new double[] {getCenterX(), getCenterY()};
     }
 
     /**
@@ -600,14 +463,15 @@ public abstract class OdorWorldEntity {
         setCenterLocation(value[0], value[1]);
     }
 
+    //TODO: Remove
     /**
      * Returns the center x position of this entity.
      *
      * @return center x coordinate.
      */
     @Producible(idMethod = "getId")
-    public float getCenterX() {
-        return x + (getWidth() / 2);
+    public double getCenterX() {
+        return x;
     }
 
     /**
@@ -616,8 +480,8 @@ public abstract class OdorWorldEntity {
      * @return center y coordinate.
      */
     @Producible(idMethod = "getId")
-    public float getCenterY() {
-        return y + (getHeight() / 2);
+    public double getCenterY() {
+        return y;
     }
 
     /**
@@ -627,8 +491,8 @@ public abstract class OdorWorldEntity {
      * @param y y coordinate
      */
     public void setCenterLocation(double x, double y) {
-        setX(x - (getWidth() / 2));
-        setY(y - (getHeight() / 2));
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -638,7 +502,7 @@ public abstract class OdorWorldEntity {
      */
     @Producible(idMethod = "getId")
     public double[] getLocation() {
-        return new double[]{x, y};
+        return new double[] {x, y};
     }
 
     /**
@@ -653,25 +517,9 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * @return the animation associated with this entity
-     */
-    public Animation getAnimation() {
-        return animation;
-    }
-
-    /**
-     * @param animation the animation to set
-     */
-    public void setAnimation(final Animation animation) {
-        this.animation = animation;
-        parentWorld.fireEntityChanged(this);
-    }
-
-    /**
      * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
-        getAnimation().initializeImages();
         currentlyHeardPhrases = new ArrayList<String>();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
@@ -726,7 +574,6 @@ public abstract class OdorWorldEntity {
     /**
      * @return the sensorsEnabled
      */
-    @DisplayOrder(val = 130)
     public boolean isSensorsEnabled() {
         return sensorsEnabled;
     }
@@ -741,7 +588,6 @@ public abstract class OdorWorldEntity {
     /**
      * @return the effectorsEnabled
      */
-    @DisplayOrder(val = 150)
     public boolean isEffectorsEnabled() {
         return effectorsEnabled;
     }
@@ -756,23 +602,14 @@ public abstract class OdorWorldEntity {
     /**
      * @return the showSensors
      */
-    @DisplayOrder(val = 100)
     public boolean isShowSensors() {
         return showSensors;
     }
 
-    /**
-     * @param showSensors the showSensors to set
-     */
     public void setShowSensors(boolean showSensors) {
         this.showSensors = showSensors;
     }
 
-    /**
-     * Returns true if the entity is blocked from moving.
-     *
-     * @return true if blocked, false otherwise.
-     */
     public boolean isBlocked() {
         if (getParentWorld().isObjectsBlockMovement()) {
             if (hasCollided()) {
@@ -782,55 +619,9 @@ public abstract class OdorWorldEntity {
         return false;
     }
 
-    /**
-     * Return the current behavior.
-     *
-     * @return behavior object.
-     */
     public Behavior getBehavior() {
         return behavior;
     }
-
-    // /**
-    // * Return the object's current behavior.
-    // *
-    // * @return the current behavior
-    // */
-    // public ComboBoxWrapper getObjectBehavior() {
-    // return new ComboBoxWrapper() {
-    // public Object getCurrentObject() {
-    // if (behavior instanceof StationaryBehavior) {
-    // return "Stationary";
-    // } else if (behavior instanceof NewtonianBouncer) {
-    // return "Bouncer";
-    // }
-    // return behavior;
-    // }
-    //
-    // public Object[] getObjects() {
-    // return new Object[] { "Stationary", "Bouncer"};
-    // }
-    // };
-    // }
-    //
-    // /**
-    // * Set the object's current behavior.
-    // *
-    // * @param behaviorData the behavior selected in a gui combo box
-    // */
-    // public void setObjectBehavior(ComboBoxWrapper behaviorData) {
-    // String behaviorString = ((String) behaviorData.getCurrentObject());
-    // if (behaviorString.equalsIgnoreCase("Stationary")) {
-    // behavior = new StationaryBehavior();
-    // } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
-    // behavior = new NewtonianBouncer(this);
-    // }
-    // }
-
-    // TODO: the methods below need not be double, but are double to accommodate
-    // the
-    // coupling framework, which does not currently handle casts between data
-    // types.
 
     /**
      * Move the object north by the specified amount in pixels.
@@ -843,7 +634,7 @@ public abstract class OdorWorldEntity {
             if (this instanceof RotatingEntity) {
                 ((RotatingEntity) this).setHeading(90);
             }
-            setY(getY() - (float) amount);
+            setY(y - amount);
         }
     }
 
@@ -858,7 +649,7 @@ public abstract class OdorWorldEntity {
             if (this instanceof RotatingEntity) {
                 ((RotatingEntity) this).setHeading(270);
             }
-            setY(getY() + (float) amount);
+            setY(y + amount);
         }
     }
 
@@ -873,7 +664,7 @@ public abstract class OdorWorldEntity {
             if (this instanceof RotatingEntity) {
                 ((RotatingEntity) this).setHeading(0);
             }
-            setX(getX() + (float) amount);
+            setX(x +  amount);
         }
     }
 
@@ -888,40 +679,8 @@ public abstract class OdorWorldEntity {
             if (this instanceof RotatingEntity) {
                 ((RotatingEntity) this).setHeading(180);
             }
-            setX(getX() - (float) amount);
+            setX(x -  amount);
         }
-    }
-
-    /**
-     * Get the X position as a double.
-     *
-     * @return the x position as a double.
-     */
-    public double getDoubleX() {
-        return x;
-    }
-
-    /**
-     * Get the Y position as a double.
-     *
-     * @return the y position as a double.
-     */
-    public double getDoubleY() {
-        return y;
-    }
-
-    /**
-     * @param x the x to set
-     */
-    public void setX(double x) {
-        setX((float) x);
-    }
-
-    /**
-     * @param y the y to set
-     */
-    public void setY(double y) {
-        setY((float) y);
     }
 
     /**
@@ -950,19 +709,36 @@ public abstract class OdorWorldEntity {
         return currentlyHeardPhrases;
     }
 
-    /**
-     * Returns the "type" of the object in the sense of the image name associated with it.
-     *
-     * @return the object's type
-     */
-    public String getObjectType() {
-        String imageName = getAnimation().getImageLocations()[0];
-        String[] truncatedName = imageName.split("/");
-        return truncatedName[truncatedName.length - 1];
-    }
-
     public ScalarSmellSource getScalarSmell() {
         return scalarSmell;
     }
 
+    public void setEntityType(EntityType entityType) {
+        this.entityType = entityType;
+    }
+
+    public EntityType getEntityType() {
+        return entityType;
+    }
+
+    // TODO: Make finer grained
+    public void commitEditorChanges() {
+        mPcs.firePropertyChange("propertiesChanged", null, this);
+    };
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.removePropertyChangeListener(listener);
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }

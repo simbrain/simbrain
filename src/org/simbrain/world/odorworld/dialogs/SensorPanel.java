@@ -165,17 +165,7 @@ public class SensorPanel extends JPanel {
                 editSensor(selectedSensor);
             }
         });
-        entity.getParentWorld().addListener(new WorldListenerAdapter() {
-            @Override
-            public void sensorRemoved(Sensor sensor) {
-                model.removeSensor(sensor);
-            }
 
-            @Override
-            public void sensorAdded(Sensor sensor) {
-                model.addRow(sensor);
-            }
-        });
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);

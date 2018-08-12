@@ -29,19 +29,23 @@ import java.net.URL;
 public class OdorWorldResourceManager {
 
     /**
-     * Retrieve an ImageIcon based on its file name.
+     * Return an image for a "rotating" entity.
      *
-     * @param name name of the image file to retrieve
-     * @return the ImageIcon which can be used with Swing components, etc
+     * @param name name of the image
+     * @return the image
      */
-    public static ImageIcon getImageIcon(final String name) {
-        ImageIcon imageIcon;
-        URL url;
+    public static Image getRotatingImage(final String name) {
+        return getImage("rotating/" + name);
+    }
 
-        url = OdorWorldResourceManager.class.getResource(name);
-        imageIcon = new ImageIcon(url);
-
-        return imageIcon;
+    /**
+     * Return an image for an unmoving "static entity.
+     *
+     * @param name name of the image
+     * @return the image
+     */
+    public static Image getStaticImage(final String name) {
+        return getImage("static/" + name);
     }
 
     /**
@@ -50,13 +54,10 @@ public class OdorWorldResourceManager {
      * @param name name of the image file to retrieve
      * @return the Image which can be used with Swing components, etc
      */
-    public static Image getImage(final String name) {
+    private static Image getImage(final String name) {
         URL url;
-
         url = OdorWorldResourceManager.class.getResource(name);
-
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
-
         return toolKit.getImage(url);
     }
 }

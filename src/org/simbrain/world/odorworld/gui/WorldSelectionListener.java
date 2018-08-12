@@ -16,38 +16,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld.entities;
+package org.simbrain.world.odorworld.gui;
 
-import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+
+import java.util.EventListener;
 
 /**
- * <b>BasicEntity</b> represents a static entity in the Odor World environment,
- * with a static image file. (TODO: Improve doc)
+ * A listener that receives notification of changes in the selection for world
+ * panel.
  */
-public class BasicEntity extends OdorWorldEntity {
+public interface WorldSelectionListener extends EventListener {
 
     /**
-     * Construct a default entity.
+     * Notify this listener that the selection has changed.
      *
-     * @param world
+     * @param e world selection event
      */
-    public BasicEntity(final OdorWorld world) {
-        super(world);
-    }
-
-    /**
-     * Construct a basic entity with a single image location.
-     *
-     * @param type image location
-     * @param world
-     */
-    public BasicEntity(final EntityType type, final OdorWorld world) {
-        super(world);
-        setEntityType(type);
-    }
-
-    @Override
-    public void update() {
-    }
-
+    void selectionChanged(WorldSelectionEvent e);
 }

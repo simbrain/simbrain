@@ -18,10 +18,9 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,7 +42,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @return
      */
     public static OdorWorldComponent open(InputStream input, String name, String format) {
-        OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
+        OdorWorld newWorld = (OdorWorld) Utils.getSimbrainXStream().fromXML(input);
         return new OdorWorldComponent(name, newWorld);
     }
 
@@ -60,7 +59,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     public OdorWorldComponent(String name) {
         super(name);
         world = new OdorWorld();
-        addListener();
+//        addListener();
     }
 
     /**
@@ -72,61 +71,16 @@ public class OdorWorldComponent extends WorkspaceComponent {
     public OdorWorldComponent(String name, OdorWorld world) {
         super(name);
         this.world = world;
-        addListener();
-    }
-
-    /**
-     * Initialize this component.
-     */
-    private void addListener() {
-        world.addListener(new WorldListener() {
-
-            public void updated() {
-                fireUpdateEvent();
-            }
-
-            public void effectorAdded(Effector effector) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void effectorRemoved(Effector effector) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void entityAdded(OdorWorldEntity entity) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void entityRemoved(OdorWorldEntity entity) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void sensorAdded(Sensor sensor) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void sensorRemoved(Sensor sensor) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void entityChanged(OdorWorldEntity entity) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void propertyChanged() {
-                setChangedSinceLastSave(true);
-            }
-        });
     }
 
     @Override
     public String getXML() {
-        return OdorWorld.getXStream().toXML(world);
+        return Utils.getSimbrainXStream().toXML(world);
     }
 
     @Override
     public void save(OutputStream output, String format) {
-        OdorWorld.getXStream().toXML(world, output);
+        Utils.getSimbrainXStream().toXML(world, output);
     }
 
     @Override

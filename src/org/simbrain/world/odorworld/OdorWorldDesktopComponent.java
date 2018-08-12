@@ -62,60 +62,8 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu.setUpMenus();
         setGuiSizeToWorldSize();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
-        // class?
+
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
-        // //TODO: Think then Remove
-
-        this.getParentFrame().pack();
-
-        this.addComponentListener(new ComponentListener() {
-
-            public void componentHidden(ComponentEvent arg0) {
-            }
-
-            public void componentMoved(ComponentEvent arg0) {
-            }
-
-            public void componentResized(ComponentEvent arg0) {
-                worldPanel.getWorld().setWidth(worldPanel.getWidth(), false);
-                worldPanel.getWorld().setHeight(worldPanel.getHeight(), false);
-            }
-
-            public void componentShown(ComponentEvent arg0) {
-            }
-        });
-
-        worldPanel.getWorld().addListener(new WorldListener() {
-
-            public void updated() {
-            }
-
-            public void entityAdded(OdorWorldEntity entity) {
-            }
-
-            public void entityChanged(OdorWorldEntity entity) {
-            }
-
-            public void entityRemoved(OdorWorldEntity entity) {
-            }
-
-            public void sensorAdded(Sensor sensor) {
-            }
-
-            public void sensorRemoved(Sensor sensor) {
-            }
-
-            public void effectorRemoved(Effector effector) {
-            }
-
-            public void effectorAdded(Effector effector) {
-            }
-
-            public void propertyChanged() {
-                setGuiSizeToWorldSize();
-            }
-
-        });
 
     }
 

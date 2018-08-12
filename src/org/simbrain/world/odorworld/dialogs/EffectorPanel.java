@@ -166,17 +166,6 @@ public class EffectorPanel extends JPanel {
                 editEffector(selectedEffector);
             }
         });
-        entity.getParentWorld().addListener(new WorldListenerAdapter() {
-            @Override
-            public void effectorRemoved(Effector effector) {
-                model.removeEffector(effector);
-            }
-
-            @Override
-            public void effectorAdded(Effector effector) {
-                model.addRow(effector);
-            }
-        });
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);

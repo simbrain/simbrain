@@ -50,12 +50,11 @@ public final class AddEntityAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
+    //TODO: This is redundant.  See other class to getLastCLicked
     public void actionPerformed(final ActionEvent event) {
         BasicEntity entity = new BasicEntity(worldPanel.getWorld());
-        entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
+        entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
         entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), SmellSource.DecayFunction.GAUSSIAN, entity.getLocation()));
         worldPanel.getWorld().addEntity(entity);
     }

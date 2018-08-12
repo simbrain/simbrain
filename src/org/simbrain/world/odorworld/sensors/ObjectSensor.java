@@ -54,10 +54,11 @@ public class ObjectSensor extends Sensor {
         value = 0;
         for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
             ScalarSmellSource smell = entity.getScalarSmell();
-            if(entity.getObjectType().equals(objectType)) {
-                double distance = SimbrainMath.distance(parent.getCenterLocation(), entity.getCenterLocation());
-                value += smell.getValue(distance);
-            }
+            //TODO
+//            if(entity.getObjectType().equals(objectType)) {
+//                double distance = SimbrainMath.distance(parent.getCenterLocation(), entity.getCenterLocation());
+//                value += smell.getValue(distance);
+//            }
         }
     }
 

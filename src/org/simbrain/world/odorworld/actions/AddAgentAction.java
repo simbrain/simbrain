@@ -48,12 +48,10 @@ public final class AddAgentAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
-        entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
+        entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
         worldPanel.getWorld().addAgent(entity);
     }
 }

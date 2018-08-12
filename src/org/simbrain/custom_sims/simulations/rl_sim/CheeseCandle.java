@@ -38,7 +38,7 @@ public class CheeseCandle extends RL_Sim {
         sim.world.deleteEntity(sim.flower);
 
         // Update the world
-        sim.world.fireUpdateEvent();
+        // sim.world.fireUpdateEvent();
 
         // Set goal states
         goalEntities.clear();

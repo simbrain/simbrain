@@ -18,30 +18,36 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
-import org.piccolo2d.nodes.PImage;
+import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.util.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
-import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity2;
-import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.gui.DragEventHandler2;
+import org.simbrain.world.odorworld.gui.EntityNode;
+import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
+import org.simbrain.world.odorworld.gui.WorldSelectionModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <b>OdorWorldPanel</b> represent the OdorWorld.
  */
 public class OdorWorldPanel extends JPanel implements KeyListener {
-
-    // TODO: Move most of this input stuff to an input manager...
-    private static final long serialVersionUID = 1L;
 
     /**
      * The Piccolo PCanvas.
@@ -49,7 +55,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     private final PCanvas canvas;
 
     /**
-     * Reference to WorkspaceComponent.
+     * Reference to WorkspaceComponent. // TODO: Needed?
      */
     private OdorWorldComponent component;
 
@@ -57,6 +63,11 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      * Reference to model world.
      */
     private OdorWorld world;
+
+    /**
+     * Selection model.
+     */
+    private final WorldSelectionModel selectionModel;
 
     /**
      * Color of the world background.
@@ -68,40 +79,40 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      */
     private boolean drawingWalls = false;
 
-    /**
-     * Point being dragged.
-     */
-    private Point draggingPoint;
-
-    /**
-     * Entity currently selected.
-     */
-    private OdorWorldEntity selectedEntity;
-
-    /**
-     * Selected point.
-     */
-    private Point selectedPoint;
-
-    /**
-     * First point for wall.
-     */
-    private Point wallPoint1;
-
-    /**
-     * Second point for wall.
-     */
-    private Point wallPoint2;
-
-    /**
-     * Distance in x direction.
-     */
-    private int distanceX;
-
-    /**
-     * Distance in y direction.
-     */
-    private int distanceY;
+//    /**
+//     * Point being dragged.
+//     */
+//    private Point draggingPoint;
+//
+//    /**
+//     * Entity currently selected.
+//     */
+//    private OdorWorldEntity selectedEntity;
+//
+//    /**
+//     * Selected point.
+//     */
+//    private Point selectedPoint;
+//
+//    /**
+//     * First point for wall.
+//     */
+//    private Point wallPoint1;
+//
+//    /**
+//     * Second point for wall.
+//     */
+//    private Point wallPoint2;
+//
+//    /**
+//     * Distance in x direction.
+//     */
+//    private int distanceX;
+//
+//    /**
+//     * Distance in y direction.
+//     */
+//    private int distanceY;
 
     /**
      * World menu.
@@ -111,7 +122,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /**
      * Renderer for this world.
      */
-    private OdorWorldRenderer renderer;
+    // private OdorWorldRenderer renderer;
 
     /**
      * Construct a world, set its background color.
@@ -125,82 +136,78 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         this.add("Center", canvas);
 
         canvas.setBackground(backgroundColor);
-        canvas.addMouseListener(mouseListener);
-        canvas.addMouseMotionListener(mouseDraggedListener);
         canvas.addKeyListener(this);
         canvas.setFocusable(true);
 
+        // Remove default event handlers
+        PInputEventListener panEventHandler = canvas.getPanEventHandler();
+        PInputEventListener zoomEventHandler = canvas.getZoomEventHandler();
+        canvas.removeInputEventListener(panEventHandler);
+        canvas.removeInputEventListener(zoomEventHandler);
 
         PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
         zoomHandler.zoomAboutMouse();
         canvas.addInputEventListener(zoomHandler);
 
-        PCamera camera = canvas.getCamera();
+        selectionModel = new WorldSelectionModel(this);
+        selectionModel.addSelectionListener((e) -> {
+            updateSelectionHandles(e);
+        });
 
+        // Key events
+        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK), "debug");
+        canvas.getActionMap().put("debug", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                showPNodeDebugger();
+            }
+        });
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("UP"), "straight");
+        canvas.getActionMap().put("straight", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveSelectedItem();
+            }
+        });
 
+        canvas.addInputEventListener(new DragEventHandler2(this));
 
-//        // TODO: Move to separate method attached to key command
-//        SceneGraphBrowser sgb = new SceneGraphBrowser(
-//            canvas.getRoot());
-//        StandardDialog dialog = new StandardDialog();
-//        dialog.setContentPane(sgb);
-//        dialog.setTitle("Piccolo Scenegraph Browser");
-//        dialog.setModal(false);
-//        dialog.pack();
-//        dialog.setLocationRelativeTo(null);
-//        dialog.setVisible(true);
+        // PCamera camera = canvas.getCamera();
+
+        world.addPropertyChangeListener(evt -> {
+            if ("entityAdded".equals(evt.getPropertyName())) {
+                EntityNode node = new EntityNode(world, (OdorWorldEntity) evt.getNewValue());
+                canvas.getLayer().addChild(node);
+                selectionModel.setSelection(Collections.singleton(node)); // not working
+            }
+        });
 
         this.component = component;
         this.world = world;
-
-//        renderer = new OdorWorldRenderer();
-
-
 
         menu = new OdorWorldMenu(this);
 
         menu.initMenu();
 
-        world.addListener(new WorldListener() {
+    }
 
-            public void updated() {
-                repaint();
-            }
+    private void moveSelectedItem() {
+        if(this.getSelectedEntity() != null) {
+            PNode selected = getSelectedEntity();
+            selected.offset(5,0);
+            // canvas.getCamera(). TODO: Do something to follow the selected agent
+        }
+    }
 
-            public void effectorAdded(Effector effector) {
-                repaint();
-            }
-
-            public void entityAdded(OdorWorldEntity entity) {
-                OdorWorldEntity2 entity2 = new OdorWorldEntity2("Swiss.gif");
-                canvas.getLayer().addChild(entity2);
-                camera.animateViewToCenterBounds(entity2.getBounds(), true, 5000);
-
-            }
-
-            public void sensorAdded(Sensor sensor) {
-                repaint();
-            }
-
-            public void entityRemoved(OdorWorldEntity entity) {
-                repaint();
-            }
-
-            public void sensorRemoved(Sensor sensor) {
-                repaint();
-            }
-
-            public void effectorRemoved(Effector effector) {
-                repaint();
-            }
-
-            public void entityChanged(OdorWorldEntity entity) {
-                repaint();
-            }
-
-            public void propertyChanged() {
-            }
-        });
+    private void showPNodeDebugger() {
+        // TODO: Move to separate method attached to key command
+        SceneGraphBrowser sgb = new SceneGraphBrowser(
+            canvas.getRoot());
+        StandardDialog dialog = new StandardDialog();
+        dialog.setContentPane(sgb);
+        dialog.setTitle("Piccolo Scenegraph Browser");
+        dialog.setModal(false);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
     // final ActionListener copyListener = new ActionListener() {
@@ -252,107 +259,107 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     // }
     // };
 
-    /**
-     * Handle button clicks on Odor World main panel.
-     */
-    private final MouseListener mouseListener = new MouseAdapter() {
+//    /**
+//     * Handle button clicks on Odor World main panel.
+//     */
+//    private final MouseListener mouseListener = new MouseAdapter() {
+//
+//        /**
+//         * Task to perform when mouse button is pressed.
+//         *
+//         * @param mouseEvent Mouse event
+//         */
+//        public void mousePressed(final MouseEvent mouseEvent) {
+//
+//            // Select Entity
+//            selectedEntity = null;
+//            selectedPoint = mouseEvent.getPoint();
+//            for (OdorWorldEntity sprite : world.getObjectList()) {
+//                if (sprite.getBounds().contains(selectedPoint)) {
+//                    selectedEntity = sprite;
+//                }
+//            }
+//            if (selectedEntity != null) {
+//                distanceX = (int) selectedEntity.getX() - mouseEvent.getPoint().x;
+//                distanceY = (int) selectedEntity.getY() - mouseEvent.getPoint().y;
+//            }
+//
+//            // Submits point for wall drawing
+//            if (drawingWalls) {
+//                mouseEvent.getPoint();
+//                setWallPoint1(selectedPoint);
+//            }
+//
+//            // Show context menu for right click
+//            if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+//                JPopupMenu menu = getContextMenu(selectedEntity);
+//                if (menu != null) {
+//                    menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+//                }
+//            }
+//
+//            // Handle Double clicks
+//            else if (mouseEvent.getClickCount() == 2) {
+//                if (selectedEntity != null) {
+//                    ShowEntityDialogAction action = new ShowEntityDialogAction(selectedEntity);
+//                    action.actionPerformed(null);
+//                }
+//            }
+//
+//        }
+//
+//        /**
+//         * Task to perform when mouse button is released.
+//         *
+//         * @param mouseEvent Mouse event
+//         */
+//        public void mouseReleased(final MouseEvent mouseEvent) {
+//            if (drawingWalls) {
+//                setWallPoint2(mouseEvent.getPoint());
+//                draggingPoint = null;
+//            }
+//        }
+//    };
 
-        /**
-         * Task to perform when mouse button is pressed.
-         *
-         * @param mouseEvent Mouse event
-         */
-        public void mousePressed(final MouseEvent mouseEvent) {
-
-            // Select Entity
-            selectedEntity = null;
-            selectedPoint = mouseEvent.getPoint();
-            for (OdorWorldEntity sprite : world.getObjectList()) {
-                if (sprite.getBounds().contains(selectedPoint)) {
-                    selectedEntity = sprite;
-                }
-            }
-            if (selectedEntity != null) {
-                distanceX = (int) selectedEntity.getX() - mouseEvent.getPoint().x;
-                distanceY = (int) selectedEntity.getY() - mouseEvent.getPoint().y;
-            }
-
-            // Submits point for wall drawing
-            if (drawingWalls) {
-                mouseEvent.getPoint();
-                setWallPoint1(selectedPoint);
-            }
-
-            // Show context menu for right click
-            if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-                JPopupMenu menu = getContextMenu(selectedEntity);
-                if (menu != null) {
-                    menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
-                }
-            }
-
-            // Handle Double clicks
-            else if (mouseEvent.getClickCount() == 2) {
-                if (selectedEntity != null) {
-                    ShowEntityDialogAction action = new ShowEntityDialogAction(selectedEntity);
-                    action.actionPerformed(null);
-                }
-            }
-
-        }
-
-        /**
-         * Task to perform when mouse button is released.
-         *
-         * @param mouseEvent Mouse event
-         */
-        public void mouseReleased(final MouseEvent mouseEvent) {
-            if (drawingWalls) {
-                setWallPoint2(mouseEvent.getPoint());
-                draggingPoint = null;
-            }
-        }
-    };
-
-    /**
-     * Handle mouse drags in the odor world panel.
-     */
-    private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
-        /**
-         * Task to perform when mouse button is held and mouse moved.
-         *
-         * @param e Mouse event
-         */
-        public void mouseDragged(final MouseEvent e) {
-
-            if (drawingWalls) {
-                draggingPoint = e.getPoint();
-                repaint();
-            }
-
-            // Drag selected entity
-            if (selectedEntity != null) {
-
-                // Build a rectangle that corresponds to the bounds where the
-                // agent will be in the next moment. Then shrink it a bit to
-                // control the way
-                // agents "bump" into
-                // the edge of the world when dragged.
-                final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
-                final Rectangle testRect = new Rectangle((int) test.getX(), (int) test.getY(), selectedEntity.getWidth(), selectedEntity.getHeight());
-                testRect.grow(-5, -5); // TODO: Do this shrinking in a more
-                // principled way
-
-                // Only draw change the entity location if it's in the world
-                // bounds.
-                if (getBounds().contains((testRect.getBounds()))) {
-                    selectedEntity.setX(test.x);
-                    selectedEntity.setY(test.y);
-                    repaint();
-                }
-            }
-        }
-    };
+//    /**
+//     * Handle mouse drags in the odor world panel.
+//     */
+//    private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
+//        /**
+//         * Task to perform when mouse button is held and mouse moved.
+//         *
+//         * @param e Mouse event
+//         */
+//        public void mouseDragged(final MouseEvent e) {
+//
+//            if (drawingWalls) {
+//                draggingPoint = e.getPoint();
+//                repaint();
+//            }
+//
+//            // Drag selected entity
+//            if (selectedEntity != null) {
+//
+//                // Build a rectangle that corresponds to the bounds where the
+//                // agent will be in the next moment. Then shrink it a bit to
+//                // control the way
+//                // agents "bump" into
+//                // the edge of the world when dragged.
+//                final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
+//                final Rectangle testRect = new Rectangle((int) test.getX(), (int) test.getY(), (int) selectedEntity.getWidth(), (int) selectedEntity.getHeight());
+//                testRect.grow(-5, -5); // TODO: Do this shrinking in a more
+//                // principled way
+//
+//                // Only draw change the entity location if it's in the world
+//                // bounds.
+//                if (getBounds().contains((testRect.getBounds()))) {
+//                    selectedEntity.setX(test.x);
+//                    selectedEntity.setY(test.y);
+//                    repaint();
+//                }
+//            }
+//        }
+//    };
 
     /**
      * Task to perform when keyboard button is released.
@@ -435,8 +442,19 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /**
      * @return The selected abstract entity.
      */
-    public OdorWorldEntity getSelectedEntity() {
-        return selectedEntity;
+    public PNode getSelectedEntity() {
+        List<PNode> selectedEntities = getSelectedEntities();
+        if (!selectedEntities.isEmpty()) {
+            return selectedEntities.get(0);
+        }
+        return null;
+    }
+
+    public List<PNode> getSelectedEntities() {
+        return getSelection().stream()
+            .filter(p -> p instanceof Sprite)
+            .map(p -> p.getParent())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -496,34 +514,34 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     public void setBackgroundColor(final int backgroundColor) {
         this.backgroundColor = new Color(backgroundColor);
     }
-
-    /**
-     * @param wallPoint1 The wallPoint1 to set.
-     */
-    private void setWallPoint1(final Point wallPoint1) {
-        this.wallPoint1 = wallPoint1;
-    }
-
-    /**
-     * @return Returns the wallPoint1.
-     */
-    private Point getWallPoint1() {
-        return wallPoint1;
-    }
-
-    /**
-     * @param wallPoint2 The wallPoint2 to set.
-     */
-    private void setWallPoint2(final Point wallPoint2) {
-        this.wallPoint2 = wallPoint2;
-    }
-
-    /**
-     * @return Returns the wallPoint2.
-     */
-    private Point getWallPoint2() {
-        return wallPoint2;
-    }
+//
+//    /**
+//     * @param wallPoint1 The wallPoint1 to set.
+//     */
+//    private void setWallPoint1(final Point wallPoint1) {
+//        this.wallPoint1 = wallPoint1;
+//    }
+//
+//    /**
+//     * @return Returns the wallPoint1.
+//     */
+//    private Point getWallPoint1() {
+//        return wallPoint1;
+//    }
+//
+//    /**
+//     * @param wallPoint2 The wallPoint2 to set.
+//     */
+//    private void setWallPoint2(final Point wallPoint2) {
+//        this.wallPoint2 = wallPoint2;
+//    }
+//
+//    /**
+//     * @return Returns the wallPoint2.
+//     */
+//    private Point getWallPoint2() {
+//        return wallPoint2;
+//    }
 
     /**
      * @return the world
@@ -539,13 +557,84 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         this.world = world;
     }
 
-    /**
-     * Returns the last point clicked on.
-     *
-     * @return the last selected point
-     */
-    public Point getSelectedPoint() {
-        return selectedPoint;
+    public void setBeginPosition(Point2D position) {
     }
 
+    public void clearSelection() {
+        selectionModel.clear();
+    }
+
+    public Collection<PNode> getSelection() {
+        return selectionModel.getSelection();
+    }
+
+    public PCanvas getCanvas() {
+        return canvas;
+    }
+
+    public void setSelection(Collection elements) {
+        selectionModel.setSelection(elements);
+    }
+
+    /**
+     * Last clicked position.
+     */
+    private Point2D lastClickedPosition;
+
+    public Point2D getLastClickedPosition() {
+        return lastClickedPosition;
+    }
+
+    public void setLastClickedPosition(Point2D position) {
+        lastClickedPosition = position;
+    }
+
+    /**
+     * Update selection handles.
+     *
+     * @param event the NetworkSelectionEvent
+     */
+    private void updateSelectionHandles(final WorldSelectionEvent event) {
+
+        Set<PNode> selection = event.getSelection();
+        Set<PNode> oldSelection = event.getOldSelection();
+
+        Set<PNode> difference = new HashSet<PNode>(oldSelection);
+        difference.removeAll(selection);
+
+        for (PNode node : difference) {
+            SelectionHandle.removeSelectionHandleFrom(node);
+        }
+        for (PNode node : selection) {
+            // TODO: Move that to util class!
+            SelectionHandle.addSelectionHandleTo(node);
+
+        }
+    }
+
+    /**
+     * Return true if the specified element is selected.
+     *
+     * @param element element
+     * @return true if the specified element is selected
+     */
+    public boolean isSelected(final Object element) {
+        return selectionModel.isSelected(element);
+    }
+
+
+    /**
+     * Toggle the selected state of the specified element; if it is selected,
+     * remove it from the selection, if it is not selected, add it to the
+     * selection.
+     *
+     * @param element element
+     */
+    public void toggleSelection(final Object element) {
+        if (isSelected(element)) {
+            selectionModel.remove(element);
+        } else {
+            selectionModel.add(element);
+        }
+    }
 }

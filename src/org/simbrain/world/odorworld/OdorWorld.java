@@ -18,23 +18,19 @@
  */
 package org.simbrain.world.odorworld;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.util.SimpleId;
-import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
-import org.simbrain.world.odorworld.entities.Animation;
-import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.util.ArrayList;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -50,10 +46,10 @@ public class OdorWorld {
      */
     private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
 
-    /**
-     * Listeners on this odor world.
-     */
-    private List<WorldListener> listenerList = new ArrayList<WorldListener>();
+//    /**
+//     * Listeners on this odor world.
+//     */
+//    private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
@@ -102,6 +98,11 @@ public class OdorWorld {
     private SimpleId agentNameGenerator = new SimpleId("Agent", 1);
 
     /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+
+    /**
      * Default constructor.
      */
     OdorWorld() {
@@ -115,11 +116,11 @@ public class OdorWorld {
     public void update(int time) {
         for (OdorWorldEntity object : entityList) {
             object.updateSmellSource();
-            object.updateSensors();
-            object.applyEffectors();
+//            object.updateSensors();
+//            object.applyEffectors();
             updateEntity(object, time);
         }
-        fireUpdateEvent();
+//        fireUpdateEvent();
     }
 
     /**
@@ -137,7 +138,9 @@ public class OdorWorld {
         entityList.add(entity);
 
         // Fire entity added event
-        fireEntityAdded(entity);
+        // fireEntityAdded(entity);
+
+        mPcs.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
         recomputeMaxStimulusLength();
@@ -286,13 +289,13 @@ public class OdorWorld {
         if (entityList.contains(entity)) {
             entityList.remove(entity);
             for (Sensor sensor : entity.getSensors()) {
-                fireSensorRemoved(sensor);
+//                fireSensorRemoved(sensor);
             }
             for (Effector effector : entity.getEffectors()) {
-                fireEffectorRemoved(effector);
+//                fireEffectorRemoved(effector);
             }
             recomputeMaxStimulusLength();
-            fireEntityRemoved(entity);
+//            fireEntityRemoved(entity);
         }
     }
 
@@ -301,7 +304,7 @@ public class OdorWorld {
      */
     public void deleteAllEntities() {
         for (OdorWorldEntity entity : entityList) {
-            deleteEntity(entity);
+            //deleteEntity(entity);
         }
     }
 
@@ -319,23 +322,6 @@ public class OdorWorld {
     }
 
     /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object TODO: There is more to remove!
-     */
-    static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.omitField(OdorWorld.class, "listenerList");
-        xstream.omitField(Animation.class, "frames");
-        xstream.omitField(Animation.class, "currFrameIndex");
-        xstream.omitField(BasicEntity.class, "images");
-        xstream.omitField(OdorWorldEntity.class, "images");
-        xstream.omitField(RotatingEntity.class, "imageMap");
-        xstream.omitField(SmellSensor.class, "DEFAULT_RADIUS");
-        return xstream;
-    }
-
-    /**
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
@@ -343,7 +329,7 @@ public class OdorWorld {
      * @return Initialized object.
      */
     private Object readResolve() {
-        listenerList = new ArrayList<WorldListener>();
+        // listenerList = new ArrayList<WorldListener>();
         if (agentNameGenerator == null) {
             agentNameGenerator = new SimpleId("Agent", 1);
         }
@@ -361,12 +347,12 @@ public class OdorWorld {
     private void updateEntity(final OdorWorldEntity entity, final int time) {
 
         // Collision detection
-        float dx = entity.getVelocityX();
-        float oldX = entity.getX();
-        float newX = oldX + dx * time;
-        float dy = entity.getVelocityY();
-        float oldY = entity.getY();
-        float newY = oldY + dy * time;
+        double dx = entity.getVelocityX();
+        double oldX = entity.getX();
+        double newX = oldX + dx * time;
+        double dy = entity.getVelocityY();
+        double oldY = entity.getY();
+        double newY = oldY + dy * time;
         // TODO: Fire event
 
         // Very simple motion
@@ -381,15 +367,15 @@ public class OdorWorld {
         entity.getBehavior().apply(time);
 
         // Handle sprite collisions
-        entity.setHasCollided(false);
-        for (OdorWorldEntity otherEntity : entityList) {
-            if (entity == otherEntity) {
-                continue;
-            }
-            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
-                otherEntity.setHasCollided(true);
-            }
-        }
+        //        entity.setHasCollided(false);
+        //        for (OdorWorldEntity otherEntity : entityList) {
+        //            if (entity == otherEntity) {
+        //                continue;
+        //            }
+        //            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
+        //                otherEntity.setHasCollided(true);
+        //            }
+        //        }
         //
         // // Handle sprite collisions
         // if (xCollission(entity, newX)) {
@@ -430,9 +416,9 @@ public class OdorWorld {
             if (entity == entityToCheck) {
                 continue;
             }
-            if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
-                return true;
-            }
+//            if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
+//                return true;
+//            }
         }
         return false;
     }
@@ -458,20 +444,11 @@ public class OdorWorld {
                 continue;
             }
 
-            if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
-                return true;
-            }
+//            if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
+//                return true;
+//            }
         }
         return false;
-    }
-
-    /**
-     * Add a world listener.
-     *
-     * @param listener listener to add.
-     */
-    public void addListener(WorldListener listener) {
-        listenerList.add(listener);
     }
 
     /**
@@ -483,99 +460,13 @@ public class OdorWorld {
         return entityList;
     }
 
-    /**
-     * Fire entity added event.
-     *
-     * @param entity entity that was added
-     */
-    public void fireEntityAdded(final OdorWorldEntity entity) {
-        for (WorldListener listener : listenerList) {
-            listener.entityAdded(entity);
-        }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.addPropertyChangeListener(listener);
     }
 
-    /**
-     * Fire entity removed event.
-     *
-     * @param entity entity that was removed
-     */
-    public void fireEntityRemoved(final OdorWorldEntity entity) {
-        for (WorldListener listener : listenerList) {
-            listener.entityRemoved(entity);
-        }
-    }
-
-    /**
-     * Fire entity changed event.
-     *
-     * @param entity entity that was changed
-     */
-    public void fireEntityChanged(final OdorWorldEntity entity) {
-        for (WorldListener listener : listenerList) {
-            listener.entityChanged(entity);
-        }
-    }
-
-    /***
-     * Fire sensor added event.
-     *
-     * @param sensor sensor that was added
-     */
-    public void fireSensorAdded(final Sensor sensor) {
-        for (WorldListener listener : listenerList) {
-            listener.sensorAdded(sensor);
-        }
-    }
-
-    /**
-     * Fire sensor removed event.
-     *
-     * @param sensor sensor that was removed
-     */
-    public void fireSensorRemoved(final Sensor sensor) {
-        for (WorldListener listener : listenerList) {
-            listener.sensorRemoved(sensor);
-        }
-    }
-
-    /**
-     * Fire effector added event.
-     *
-     * @param effector effector that was added
-     */
-    public void fireEffectorAdded(final Effector effector) {
-        for (WorldListener listener : listenerList) {
-            listener.effectorAdded(effector);
-        }
-    }
-
-    /**
-     * Fire effector removed event.
-     *
-     * @param effector effector that was removed
-     */
-    public void fireEffectorRemoved(final Effector effector) {
-        for (WorldListener listener : listenerList) {
-            listener.effectorRemoved(effector);
-        }
-    }
-
-    /**
-     * Fire an update event.
-     */
-    public void fireUpdateEvent() {
-        for (WorldListener listener : listenerList) {
-            listener.updated();
-        }
-    }
-
-    /**
-     * Fire a property changed event.
-     */
-    public void firePropertyChangedEvent() {
-        for (WorldListener listener : listenerList) {
-            listener.propertyChanged();
-        }
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.removePropertyChangeListener(listener);
     }
 
     /**
@@ -593,43 +484,17 @@ public class OdorWorld {
     }
 
     /**
-     * Set width.
-     *
-     * @param newWidth  new width
-     * @param fireEvent whether to fire a property changed event
-     */
-    public void setWidth(int newWidth, boolean fireEvent) {
-        this.width = newWidth;
-        if (fireEvent) {
-            firePropertyChangedEvent();
-        }
-    }
-
-    /**
-     * Set height.
-     *
-     * @param newHeight new height
-     * @param fireEvent whether to fire a property changed event
-     */
-    public void setHeight(int newHeight, boolean fireEvent) {
-        this.height = newHeight;
-        if (fireEvent) {
-            firePropertyChangedEvent();
-        }
-    }
-
-    /**
      * @param height the height to set
      */
     public void setHeight(int height) {
-        setHeight(height, true);
+        // TODO;
     }
 
     /**
      * @param width the width to set
      */
     public void setWidth(int width) {
-        setWidth(width, true);
+        // TODO;
     }
 
     /**

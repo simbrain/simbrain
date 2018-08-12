@@ -20,6 +20,7 @@ import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
@@ -233,7 +234,7 @@ public class ActorCritic extends RegisteredSimulation {
         world.addAgent(mouse);
         resetMouse();
 
-        cheese = new BasicEntity("Swiss.gif", world);
+        cheese = new BasicEntity(OdorWorldEntity.EntityType.SWISS, world);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
         cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion, cheese.getCenterLocation()));

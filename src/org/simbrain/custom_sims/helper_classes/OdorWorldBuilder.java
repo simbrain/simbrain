@@ -57,7 +57,8 @@ public class OdorWorldBuilder {
      * @return reference to the entity
      */
     public OdorWorldEntity addEntity(int x, int y, String imageName) {
-        BasicEntity entity = new BasicEntity(imageName, world);
+        // TODO: Reimplement using EntityType
+        BasicEntity entity = new BasicEntity(null, world);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
         world.addEntity(entity);

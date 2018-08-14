@@ -21,7 +21,7 @@ package org.simbrain.world.odorworld.actions;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.OdorWorldPanel;
-import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -53,7 +53,7 @@ public final class AddEntityAction extends AbstractAction {
 
     //TODO: This is redundant.  See other class to getLastCLicked
     public void actionPerformed(final ActionEvent event) {
-        BasicEntity entity = new BasicEntity(worldPanel.getWorld());
+        OdorWorldEntity entity = new OdorWorldEntity(worldPanel.getWorld());
         entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
         entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), SmellSource.DecayFunction.GAUSSIAN, entity.getLocation()));
         worldPanel.getWorld().addEntity(entity);

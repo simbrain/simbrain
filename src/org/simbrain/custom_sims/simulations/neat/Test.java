@@ -15,7 +15,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
-import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -82,7 +82,7 @@ public class Test {
         }
     }
 
-    public static void worldTestingIteration(Agent agent, BasicEntity cheese, RotatingEntity newEntity) {
+    public static void worldTestingIteration(Agent agent, OdorWorldEntity cheese, RotatingEntity newEntity) {
         Network n = agent.getNet();
         OdorWorld w = agent.getWorld();
 
@@ -165,7 +165,7 @@ public class Test {
     }
 
     // same as the previous one but with 2 mice
-    public static void worldTestingIteration2(Agent agent, BasicEntity cheese, RotatingEntity newEntity, RotatingEntity pinnedMouse) {
+    public static void worldTestingIteration2(Agent agent, OdorWorldEntity cheese, RotatingEntity newEntity, RotatingEntity pinnedMouse) {
         Network n = agent.getNet();
 //        Network n2 = n.copy();
         Network n2 = agent.getGenome().buildNetwork();  // ask genome to build another identical network...
@@ -285,7 +285,7 @@ public class Test {
         OdorWorld w = agent.getWorld();
 
         // create cheese with smell
-        BasicEntity cheese = new BasicEntity(w);
+        OdorWorldEntity cheese = new OdorWorldEntity(w);
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);
         smell.setDispersion(240);
@@ -321,7 +321,7 @@ public class Test {
 
         Network n = agent.getNet();
         OdorWorld w = agent.getWorld();
-        BasicEntity cheese = new BasicEntity(w);
+        OdorWorldEntity cheese = new OdorWorldEntity(w);
         NEATRandomizer rand = agent.getRandomizer();
 
         double[] smellVector = {1, 0.2};

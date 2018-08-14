@@ -161,10 +161,26 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                 showPNodeDebugger();
             }
         });
+        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
+        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
+        canvas.getActionMap().put("deleteSelection", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                world.deleteAllEntities(); // TODO Just delete selected entities
+                // world.deleteEntities(List);
+            }
+        });
         canvas.getInputMap().put(KeyStroke.getKeyStroke("UP"), "straight");
         canvas.getActionMap().put("straight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 moveSelectedItem();
+            }
+        });
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("W"), "north");
+        canvas.getActionMap().put("north", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if(getSelectedEntity() != null) {
+                    ((EntityNode)getSelectedEntity()).getEntity().moveNorth(5);
+                }
             }
         });
 
@@ -402,7 +418,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         // }
 
         if (k.getKeyCode() != KeyEvent.VK_SPACE) {
-            // this.fireWorldChanged();
+            // this.WorldChanged();
         }
 
         repaint();
@@ -451,8 +467,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     }
 
     public List<PNode> getSelectedEntities() {
+        // Assumes selected pnodes parents are entitynodes
         return getSelection().stream()
-            .filter(p -> p instanceof Sprite)
+            .filter(p -> p.getParent() instanceof EntityNode)
             .map(p -> p.getParent())
             .collect(Collectors.toList());
     }

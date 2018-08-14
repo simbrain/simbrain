@@ -573,7 +573,8 @@ public class Creature {
 
     // Was not here before last pull
     public void setAgentSkin(String type) {
-        agent.setEntityType(type);
+        // TODO: Set entity type
+//        agent.setEntityType(type);
     }
 
     // Was not here before last pull

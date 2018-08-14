@@ -120,7 +120,6 @@ public class OdorWorld {
 //            object.applyEffectors();
             updateEntity(object, time);
         }
-//        fireUpdateEvent();
     }
 
     /**
@@ -132,6 +131,7 @@ public class OdorWorld {
 
         // Set the entity's id
         entity.setId(entityIDGenerator.getId());
+        entity.setName(entity.getId());
 
         // Add entity to the map
         // map.addSprite(entity);
@@ -288,6 +288,7 @@ public class OdorWorld {
         // map.removeSprite(entity);
         if (entityList.contains(entity)) {
             entityList.remove(entity);
+            entity.delete();
             for (Sensor sensor : entity.getSensors()) {
 //                fireSensorRemoved(sensor);
             }
@@ -304,7 +305,7 @@ public class OdorWorld {
      */
     public void deleteAllEntities() {
         for (OdorWorldEntity entity : entityList) {
-            //deleteEntity(entity);
+            deleteEntity(entity);
         }
     }
 
@@ -329,12 +330,14 @@ public class OdorWorld {
      * @return Initialized object.
      */
     private Object readResolve() {
-        // listenerList = new ArrayList<WorldListener>();
         if (agentNameGenerator == null) {
             agentNameGenerator = new SimpleId("Agent", 1);
         }
 
+        mPcs = new PropertyChangeSupport(this);
+
         for (OdorWorldEntity entity : entityList) {
+            mPcs.firePropertyChange("entityAdded", null, entity);
             entity.postSerializationInit();
         }
         recomputeMaxStimulusLength();

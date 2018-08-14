@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.awt.*;
@@ -103,7 +102,7 @@ public final class WorldClipboard {
      *
      * @param entity Entity to copy
      */
-    public static void copyEntity(final BasicEntity entity) {
+    public static void copyEntity(final OdorWorldEntity entity) {
         // OdorWorldEntity temp = new OdorWorldEntity();
         // temp.setImageName(entity.getImageName());
         // temp.setName("Copy of " + entity.getName());

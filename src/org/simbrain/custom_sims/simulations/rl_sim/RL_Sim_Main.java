@@ -15,7 +15,6 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -101,9 +100,9 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * Entities that a simulation can refer to.
      */
     RotatingEntity mouse;
-    BasicEntity flower;
-    BasicEntity cheese_1;
-    BasicEntity candle_1;
+    OdorWorldEntity flower;
+    OdorWorldEntity cheese_1;
+    OdorWorldEntity candle_1;
 
     /**
      * Neural net variables.
@@ -217,12 +216,12 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse = ob.addAgent(43, 110, "Mouse");
         mouse.setHeading(0);
 
-        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif", new double[] {1, 0, 0, 0, 0, 1});
+        cheese_1 = (OdorWorldEntity) ob.addEntity(350, 29, "Swiss.gif", new double[] {1, 0, 0, 0, 0, 1});
         cheese_1.getSmellSource().setDispersion(350);
-        candle_1 = (BasicEntity) ob.addEntity(350, 29, "Candle.png",
+        candle_1 = (OdorWorldEntity) ob.addEntity(350, 29, "Candle.png",
                 new double[] { 0, 1, 0, 0, 0, 1 });
         candle_1.getSmellSource().setDispersion(350);
-        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif", new double[] {0, 0, 1, 0, 0, 1});
+        flower = (OdorWorldEntity) ob.addEntity(350, 212, "Pansy.gif", new double[] {0, 0, 1, 0, 0, 1});
         flower.getSmellSource().setDispersion(350);
     }
 

@@ -18,14 +18,7 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import org.simbrain.util.piccolo.LoopedFramesAnimation;
-import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
-
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents an entity that can rotate.
@@ -36,12 +29,6 @@ import java.util.List;
  * sensors, for example.
  */
 public class RotatingEntity extends OdorWorldEntity {
-
-    // TODO: Move this all to new GUI class
-    public Sprite sprite;
-    public final LoopedFramesAnimation animation2;
-
-    // private TreeMap<Double, Animation> imageMap;
 
     /**
      * Current heading / orientation.
@@ -69,16 +56,6 @@ public class RotatingEntity extends OdorWorldEntity {
     private final double manualStraightMovementIncrement = 4;
 
     /**
-     * Default type.
-     */
-    private static final String DEFAULT_TYPE = "Mouse";
-
-    /**
-     * Type; used to load images.
-     */
-    private String entityType = DEFAULT_TYPE;
-
-    /**
      * Obvious...
      */
     private final static double DEGREES_IN_A_CIRCLE = 360;
@@ -90,57 +67,6 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     public RotatingEntity(final OdorWorld world) {
         super(world);
-
-        Image image1 = OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif");
-        Image image2 = OdorWorldResourceManager.getRotatingImage("mouse/Mouse_15.gif");
-        List<Image> images = Arrays.asList(image1,image2);
-
-        animation2 = new LoopedFramesAnimation(images);
-        sprite = new Sprite(animation2);
-
-        // TODO: get actual image bounds?
-        sprite.setBounds(x,y,40,40);
-//        this.setPaint(Color.green);
-//        this.addChild(sprite);
-
-
-//        initTreeMap();
-//        this.setAnimation(imageMap.get(imageMap.firstKey()));
-    }
-
-    /**
-     * Initialize the tree map, which associates angles with images /
-     * animations.
-     */
-    private void initTreeMap() {
-        if (entityType == null) {
-            entityType = "Mouse";
-        }
-//        if (entityType.equalsIgnoreCase("Circle")) {
-//            imageMap = RotatingEntityManager.getCircle();
-//        }
-//        if (entityType.equalsIgnoreCase("Mouse")) {
-//            imageMap = RotatingEntityManager.getMouse();
-//        } else if (entityType.equalsIgnoreCase("Amy")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("amy", 20);
-//        } else if (entityType.equalsIgnoreCase("Arnold")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("arno", 20);
-//        } else if (entityType.equalsIgnoreCase("Boy")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("boy", 20);
-//        } else if (entityType.equalsIgnoreCase("Cow")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("cow", 25);
-//        } else if (entityType.equalsIgnoreCase("Girl")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("girl", 20);
-//        } else if (entityType.equalsIgnoreCase("Lion")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("lion", 15);
-//        } else if (entityType.equalsIgnoreCase("Susi")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("susi", 20);
-//        } else if (entityType.equalsIgnoreCase("Jake")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("jake", 20);
-//        } else if (entityType.equalsIgnoreCase("Steve")) {
-//            imageMap = RotatingEntityManager.getRotatingTileset("steve", 20);
-//        }
-        update();
     }
 
     /**
@@ -160,7 +86,7 @@ public class RotatingEntity extends OdorWorldEntity {
     public void setHeading(final double d) {
         //System.out.println("setHeading:" + d);
         heading = d;
-        updateImageBasedOnHeading();
+//        updateImageBasedOnHeading();
 //        getParentWorld().fireEntityChanged(this);
     }
 
@@ -195,30 +121,9 @@ public class RotatingEntity extends OdorWorldEntity {
     @Override
     public void update() {
         super.update();
-
-        sprite.advance();
-//
-//        if (!isBlocked()) {
-//            heading = computeAngle(heading);
-//            // System.out.println("heading:" + heading);
-//            // TODO: only do this if heading has changed
-//            updateImageBasedOnHeading();
-//            getAnimation().update();
-//        }
     }
 
-    /**
-     * The method name says it all...
-     */
-    private void updateImageBasedOnHeading() {
-//        for (Entry<Double, Animation> entry : imageMap.entrySet()) {
-//            // System.out.println("" + heading + "-" + entry.getKey());
-//            if (heading < entry.getKey()) {
-////                setAnimation(entry.getValue());
-//                break;
-//            }
-//        }
-    }
+
 
     /**
      * Initialize map animations using image location information.
@@ -233,13 +138,13 @@ public class RotatingEntity extends OdorWorldEntity {
 //        }
     }
 
-    /**
-     * @param type the type to set
-     */
-    public void setEntityType(String type) {
-        this.entityType = type;
-        initTreeMap();
-    }
+//    /**
+//     * @param type the type to set
+//     */
+//    public void setEntityType(String type) {
+//        this.entityType = type;
+//        initTreeMap();
+//    }
 
     // "Amy", "Arnold", "Boy", "Circle", "Cow", "Girl", "Jake", "Lion", "Mouse", "Susi", "Steve"};
 

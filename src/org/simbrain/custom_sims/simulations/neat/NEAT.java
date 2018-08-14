@@ -18,7 +18,7 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.environment.SmellSource.DecayFunction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -27,7 +27,7 @@ public class NEAT extends RegisteredSimulation {
     ControlPanel cp;
     Network n;
     OdorWorld w;
-    BasicEntity cheese;
+    OdorWorldEntity cheese;
     RotatingEntity newEntity;
     RotatingEntity pinnedMouse;
 
@@ -98,7 +98,7 @@ public class NEAT extends RegisteredSimulation {
         sim.addNetwork(65, 15, 500, 500, new NetworkComponent("NEAT", n));
         sim.addNetwork(65, 520, 500, 500, new NetworkComponent("NEAT2", n2));
 
-        cheese = new BasicEntity(w);
+        cheese = new OdorWorldEntity(w);
 
         SmellSource mouse1Smell = new SmellSource();
         mouse1Smell.setDispersion(450);

@@ -115,11 +115,9 @@ public final class DragEventHandler2 extends PDragSequenceEventHandler {
 
         super.mousePressed(mouseEvent);
 
-//        // Set last clicked position, used in many areas for "placement" of
-//        // objects in the last clicked position on screen.
+        // Set last clicked position, used in many areas for "placement" of
+        // objects in the last clicked position on screen.
         odorWorldPanel.setLastClickedPosition(mouseEvent.getCanvasPosition());
-//
-//        odorWorldPanel.getWhereToAdd().setLocation(event.getPosition());
 
         // Set picked node
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
@@ -302,7 +300,7 @@ public final class DragEventHandler2 extends PDragSequenceEventHandler {
         for (PNode node  : odorWorldPanel.getSelection()) {
             // TODO: networkpanel has a draggable flag here
             // TODO: Only update model at end of drag.
-            //TODO: This getparent business...
+            // TODO: This getparent business...
             node.getParent().localToParent(delta);
             node.getParent().offset(delta.getWidth(), delta.getHeight());
         }
@@ -321,6 +319,12 @@ public final class DragEventHandler2 extends PDragSequenceEventHandler {
             marquee = null;
             marqueeStartPosition = null;
             return;
+        } else {
+            for(PNode node : odorWorldPanel.getSelectedEntities()) {
+                if(node instanceof EntityNode) {
+                    ((EntityNode) node).pushViewPositionToModel();
+                }
+            }
         }
 
 //        // Reset the beginning of a sequence of pastes, but keep the old

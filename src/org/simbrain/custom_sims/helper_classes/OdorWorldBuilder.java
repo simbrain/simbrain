@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
@@ -42,7 +41,7 @@ public class OdorWorldBuilder {
     public RotatingEntity addAgent(int x, int y, String type) {
         RotatingEntity agent = new RotatingEntity(world);
         world.addAgent(agent);
-        agent.setEntityType(type);
+//        agent.setEntityType(type); //TODO: EntityType
         agent.setLocation(x, y);
         // TODO: Note that setCenterLocation fails here. Problem in OdorWorld
         return agent;
@@ -53,12 +52,12 @@ public class OdorWorldBuilder {
      *
      * @param x         x location
      * @param y         y location
-     * @param imageName image for this object. See BasicEntity around line 85.
+     * @param imageName image for this object. See OdorWorldEntity around line 85.
      * @return reference to the entity
      */
     public OdorWorldEntity addEntity(int x, int y, String imageName) {
         // TODO: Reimplement using EntityType
-        BasicEntity entity = new BasicEntity(null, world);
+        OdorWorldEntity entity = new OdorWorldEntity(null, world);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
         world.addEntity(entity);
@@ -72,7 +71,7 @@ public class OdorWorldBuilder {
      * @return the entity
      */
     public OdorWorldEntity addEntity(int x, int y, String imageName, double[] stimulus) {
-        BasicEntity entity = (BasicEntity) addEntity(x, y, imageName);
+        OdorWorldEntity entity = (OdorWorldEntity) addEntity(x, y, imageName);
         entity.setSmellSource(new SmellSource(stimulus));
         return entity;
     }

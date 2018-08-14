@@ -64,6 +64,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      * Initialize attribute types and listeners.
      */
     private void init() {
+        // TODO: This is seeming fishy...
         network.addNeuronListener(new NeuronListener() {
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);

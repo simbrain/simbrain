@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Parent class for all Odor World objects.
  */
-public abstract class OdorWorldEntity implements EditableObject {
+public class OdorWorldEntity implements EditableObject {
 
     // TODO:
     // Merge BasicEntity into OdorWorldEntity
@@ -47,7 +47,7 @@ public abstract class OdorWorldEntity implements EditableObject {
     // Make “Agent” a subclass with sensors, effectors, and an ability to turn and move?
 
     /** Support for property change events. */
-    private PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
 
     //TODO: This is a first pass
     /** Type of this object.  These are mapped to images, etc. */
@@ -82,11 +82,13 @@ public abstract class OdorWorldEntity implements EditableObject {
     /**
      * X Velocity.
      */
+    @UserParameter(label = "dx", description = "amount to move in x-direction each update", order = 5)
     protected double dx;
 
     /**
      * Y Velocity.
      */
+    @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 5)
     protected double dy;
 
     /**
@@ -158,10 +160,22 @@ public abstract class OdorWorldEntity implements EditableObject {
     }
 
     /**
+     * Construct a basic entity with a single image location.
+     *
+     * @param type  image location
+     * @param world
+     */
+    public OdorWorldEntity(final EntityType type, final OdorWorld world) {
+        setEntityType(type);
+    }
+
+    /**
      * Updates this OdorWorldEntity's Animation and its position based on the
      * velocity.
      */
     public void update() {
+
+        mPcs.firePropertyChange("updated", null, this);
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
@@ -177,8 +191,6 @@ public abstract class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void setX(final double newx) {
-        //TODO: Review
-        x = newx;
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
@@ -189,8 +201,7 @@ public abstract class OdorWorldEntity implements EditableObject {
                 this.x = newx;
             }
         }
-
-        // TODO: Reimplmenet isInBoundsX (see in 3.03) if needed.
+        mPcs.firePropertyChange("moved", null, null);
 
     }
 
@@ -202,7 +213,6 @@ public abstract class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void setY(final double newy) {
         // System.out.println("y:" + newy);
-        y = newy;
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
                 this.y = parentWorld.getHeight() - (Math.abs(newy) % parentWorld.getHeight());
@@ -212,6 +222,7 @@ public abstract class OdorWorldEntity implements EditableObject {
                 this.y = newy;
             }
         }
+        mPcs.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -456,12 +467,6 @@ public abstract class OdorWorldEntity implements EditableObject {
         return new double[] {getCenterX(), getCenterY()};
     }
 
-    /**
-     * Assigns the location of the center of this entity from a double array.
-     */
-    public void setCenterLocation(double[] value) {
-        setCenterLocation(value[0], value[1]);
-    }
 
     //TODO: Remove
     /**
@@ -520,6 +525,7 @@ public abstract class OdorWorldEntity implements EditableObject {
      * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
+        mPcs = new PropertyChangeSupport(this);
         currentlyHeardPhrases = new ArrayList<String>();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
@@ -609,6 +615,8 @@ public abstract class OdorWorldEntity implements EditableObject {
     public void setShowSensors(boolean showSensors) {
         this.showSensors = showSensors;
     }
+
+    // Todo: move collisions, blocks etc. to piccolo
 
     public boolean isBlocked() {
         if (getParentWorld().isObjectsBlockMovement()) {
@@ -721,7 +729,7 @@ public abstract class OdorWorldEntity implements EditableObject {
         return entityType;
     }
 
-    // TODO: Make finer grained
+    // TODO: Make finer grained. entityTypeChange?
     public void commitEditorChanges() {
         mPcs.firePropertyChange("propertiesChanged", null, this);
     };
@@ -741,4 +749,13 @@ public abstract class OdorWorldEntity implements EditableObject {
     public double getY() {
         return y;
     }
+
+    /**
+     * Remove this entity. Assumes it's been removed from parent world already.
+     */
+    public void delete() {
+
+        mPcs.firePropertyChange("deleted", null, this);
+    }
+
 }

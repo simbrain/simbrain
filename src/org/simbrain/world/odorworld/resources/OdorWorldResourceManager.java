@@ -55,8 +55,7 @@ public class OdorWorldResourceManager {
      * @return the Image which can be used with Swing components, etc
      */
     private static Image getImage(final String name) {
-        URL url;
-        url = OdorWorldResourceManager.class.getResource(name);
+        URL url = OdorWorldResourceManager.class.getResource(name);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
     }

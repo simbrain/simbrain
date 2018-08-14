@@ -63,11 +63,10 @@ import java.util.Iterator;
  * @author Michael Heuer
  * @author Jeff Yoshimi
  */
-public final class DragEventHandler2 extends PDragSequenceEventHandler {
+public final class WorldMouseHandler extends PDragSequenceEventHandler {
 
-    //TODO: Clean up. Rename when done
     //TODO: Factor out common features and move to piccolo utility
-    // TODO: Rename to mouse or something? Since it handles that stuff to?
+
     /**
      * Selection marquee.
      */
@@ -103,7 +102,7 @@ public final class DragEventHandler2 extends PDragSequenceEventHandler {
      *
      * @param odorWorldPanel parent panel
      */
-    public DragEventHandler2(OdorWorldPanel odorWorldPanel) {
+    public WorldMouseHandler(OdorWorldPanel odorWorldPanel) {
         super();
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
@@ -285,16 +284,6 @@ public final class DragEventHandler2 extends PDragSequenceEventHandler {
         PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
         //System.out.println("Drag:" + pickedNode);
-
-        // Handle interaction box dragging
-//        if (pickedNode instanceof InteractionBox) {
-//            delta = event.getDeltaRelativeTo(pickedNode.getParent());
-//            if (pickedNode.getParent() instanceof NeuronGroupNode) {
-//                pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
-//            } else if (pickedNode.getParent() instanceof SubnetworkNode) {
-//                pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
-//            }
-//        }
 
         // Continue to drag nodes that have already been selected
         for (PNode node  : odorWorldPanel.getSelection()) {

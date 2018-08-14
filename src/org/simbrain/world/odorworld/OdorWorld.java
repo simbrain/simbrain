@@ -100,7 +100,7 @@ public class OdorWorld {
     /**
      * Support for property change events.
      */
-    private transient PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * Default constructor.
@@ -140,7 +140,7 @@ public class OdorWorld {
         // Fire entity added event
         // fireEntityAdded(entity);
 
-        mPcs.firePropertyChange("entityAdded", null, entity);
+        changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
         recomputeMaxStimulusLength();
@@ -164,6 +164,7 @@ public class OdorWorld {
      */
     public void addAgent(final OdorWorldEntity entity) {
 
+        entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
         entity.setName(agentNameGenerator.getId());
 
         if (entity instanceof RotatingEntity) {
@@ -334,10 +335,10 @@ public class OdorWorld {
             agentNameGenerator = new SimpleId("Agent", 1);
         }
 
-        mPcs = new PropertyChangeSupport(this);
+        changeSupport = new PropertyChangeSupport(this);
 
         for (OdorWorldEntity entity : entityList) {
-            mPcs.firePropertyChange("entityAdded", null, entity);
+            changeSupport.firePropertyChange("entityAdded", null, entity);
             entity.postSerializationInit();
         }
         recomputeMaxStimulusLength();
@@ -465,11 +466,11 @@ public class OdorWorld {
 
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        mPcs.addPropertyChangeListener(listener);
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        mPcs.removePropertyChangeListener(listener);
+        changeSupport.removePropertyChangeListener(listener);
     }
 
     /**

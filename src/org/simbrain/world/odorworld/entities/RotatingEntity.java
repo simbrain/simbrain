@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.odorworld.entities;
 
+import org.simbrain.util.UserParameter;
 import org.simbrain.world.odorworld.OdorWorld;
 
 /**
@@ -48,17 +49,8 @@ public class RotatingEntity extends OdorWorldEntity {
     /**
      * Amount to manually rotate.
      */
-    private final double manualMotionTurnIncrement = 4;
-
-    /**
-     * Amount to manually rotate.
-     */
-    private final double manualStraightMovementIncrement = 4;
-
-    /**
-     * Obvious...
-     */
-    private final static double DEGREES_IN_A_CIRCLE = 360;
+    @UserParameter(label = "Turn amount", order = 10)
+    private double manualMotionTurnIncrement = 14;
 
     /**
      * Create a rotating entity using default map.
@@ -84,10 +76,16 @@ public class RotatingEntity extends OdorWorldEntity {
      * @param d the orientation, in degrees
      */
     public void setHeading(final double d) {
-        //System.out.println("setHeading:" + d);
-        heading = d;
-//        updateImageBasedOnHeading();
-//        getParentWorld().fireEntityChanged(this);
+
+        double newHeading = d;
+        if (newHeading >= 360) {
+            newHeading -= 360;
+        }
+        if (newHeading < 0) {
+            newHeading += 360;
+        }
+        heading = newHeading;
+        changeSupport.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -99,30 +97,10 @@ public class RotatingEntity extends OdorWorldEntity {
         return heading;
     }
 
-    /**
-     * Ensures that angle lies between 0 and 360.
-     *
-     * @param val the absolute angle
-     * @return value's "absolute angle"
-     */
-    private double computeAngle(final double val) {
-
-        // TODO: This will not work for vals greater or less than 360
-        double retVal = val;
-        if (val >= DEGREES_IN_A_CIRCLE) {
-            retVal -= DEGREES_IN_A_CIRCLE;
-        }
-        if (val < 0) {
-            retVal += DEGREES_IN_A_CIRCLE;
-        }
-        return retVal;
-    }
-
     @Override
     public void update() {
         super.update();
     }
-
 
 
     /**
@@ -137,16 +115,6 @@ public class RotatingEntity extends OdorWorldEntity {
 //            imageMap.get(key).initializeImages();
 //        }
     }
-
-//    /**
-//     * @param type the type to set
-//     */
-//    public void setEntityType(String type) {
-//        this.entityType = type;
-//        initTreeMap();
-//    }
-
-    // "Amy", "Arnold", "Boy", "Circle", "Cow", "Girl", "Jake", "Lion", "Mouse", "Susi", "Steve"};
 
 
     /**
@@ -170,8 +138,9 @@ public class RotatingEntity extends OdorWorldEntity {
             return;
         }
         if (!isBlocked()) {
-            heading += amount;
+            setHeading(heading + amount);
         }
+        changeSupport.firePropertyChange("moved", null, null);
 
     }
 
@@ -182,12 +151,7 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     //@Consumible(customDescriptionMethod="getId")
     public void turnRight(double amount) {
-        if (amount == 0) {
-            return;
-        }
-        if (!isBlocked()) {
-            heading -= amount;
-        }
+        turn(-amount);
     }
 
     /**
@@ -205,6 +169,17 @@ public class RotatingEntity extends OdorWorldEntity {
             setX(getX() + (float) (amount * Math.cos(radians)));
             setY(getY() - (float) (amount * Math.sin(radians)));
         }
+        changeSupport.firePropertyChange("moved", null, null);
     }
 
+    public void goStraight() {
+        goStraight(manualStraightMovementIncrement);
+    }
+
+    public void turnLeft() {
+        turnLeft(manualMotionTurnIncrement);
+    }
+    public void turnRight() {
+        turnRight(manualMotionTurnIncrement);
+    }
 }

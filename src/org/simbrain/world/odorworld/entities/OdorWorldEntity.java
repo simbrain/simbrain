@@ -47,12 +47,12 @@ public class OdorWorldEntity implements EditableObject {
     // Make “Agent” a subclass with sensors, effectors, and an ability to turn and move?
 
     /** Support for property change events. */
-    private transient PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     //TODO: This is a first pass
     /** Type of this object.  These are mapped to images, etc. */
     public enum EntityType {
-        SWISS, FLOWER
+        SWISS, FLOWER, MOUSE
     }
 
     @UserParameter(label = "Type", order = 2)
@@ -90,6 +90,14 @@ public class OdorWorldEntity implements EditableObject {
      */
     @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 5)
     protected double dy;
+
+
+    /**
+     * Amount to manually move forward or in cardinal directions.
+     */
+    @UserParameter(label = "Straigh movement", order = 10)
+    protected double manualStraightMovementIncrement = 7;
+
 
     /**
      * Back reference to parent parentWorld.
@@ -175,7 +183,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void update() {
 
-        mPcs.firePropertyChange("updated", null, this);
+        changeSupport.firePropertyChange("updated", null, this);
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
@@ -201,7 +209,7 @@ public class OdorWorldEntity implements EditableObject {
                 this.x = newx;
             }
         }
-        mPcs.firePropertyChange("moved", null, null);
+        changeSupport.firePropertyChange("moved", null, null);
 
     }
 
@@ -222,7 +230,7 @@ public class OdorWorldEntity implements EditableObject {
                 this.y = newy;
             }
         }
-        mPcs.firePropertyChange("moved", null, null);
+        changeSupport.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -525,7 +533,7 @@ public class OdorWorldEntity implements EditableObject {
      * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
-        mPcs = new PropertyChangeSupport(this);
+        changeSupport = new PropertyChangeSupport(this);
         currentlyHeardPhrases = new ArrayList<String>();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
@@ -676,6 +684,22 @@ public class OdorWorldEntity implements EditableObject {
         }
     }
 
+    public void moveNorth() {
+        moveNorth(manualStraightMovementIncrement);
+    }
+    public void moveSouth() {
+        moveSouth(manualStraightMovementIncrement);
+    }
+    public void moveEast() {
+        moveEast(manualStraightMovementIncrement);
+    }
+    public void moveWest() {
+        moveWest(manualStraightMovementIncrement);
+    }
+
+
+
+
     /**
      * Move the object west by the specified amount in pixels.
      *
@@ -731,15 +755,15 @@ public class OdorWorldEntity implements EditableObject {
 
     // TODO: Make finer grained. entityTypeChange?
     public void commitEditorChanges() {
-        mPcs.firePropertyChange("propertiesChanged", null, this);
+        changeSupport.firePropertyChange("propertiesChanged", null, this);
     };
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        mPcs.addPropertyChangeListener(listener);
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        mPcs.removePropertyChangeListener(listener);
+        changeSupport.removePropertyChangeListener(listener);
     }
 
     public double getX() {
@@ -755,7 +779,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void delete() {
 
-        mPcs.firePropertyChange("deleted", null, this);
+        changeSupport.firePropertyChange("deleted", null, this);
     }
 
 }

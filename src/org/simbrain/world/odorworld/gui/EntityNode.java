@@ -24,12 +24,13 @@ import org.simbrain.util.piccolo.LoopedFramesAnimation;
 import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -62,15 +63,12 @@ public class EntityNode extends PNode {
      */
     private boolean updateFlag;
 
-
+    // TODO: Use?
     public Sprite sprite;
-
     public final LoopedFramesAnimation animation2 = null;
-
-    private TreeMap<Double, LoopedFramesAnimation> imageMap = null;
-
-
-    // TODO: Replace image with imagesource.
+    // Old solution. Not sure whether to keep it..
+    private TreeMap<Double, Image> imageMap = null;
+    // TODO: Replace image with image source type of design?
 
     /**
      * Construct an entity node with a back-ref to parent.
@@ -84,13 +82,13 @@ public class EntityNode extends PNode {
 
         // this.setPickable(true); //Needed?
 
-        setImage();
+        updateImage();
 
         this.centerFullBoundsOnPoint(entity.getX(), entity.getY());
 
         entity.addPropertyChangeListener(evt -> {
             if ("propertiesChanged".equals(evt.getPropertyName())) {
-                setImage();
+                updateImage();
             } else if ("deleted".equals(evt.getPropertyName())) {
                 this.removeFromParent();
             } else if ("moved".equals(evt.getPropertyName())) {
@@ -111,7 +109,10 @@ public class EntityNode extends PNode {
         entity.setY(p.getY());
     }
 
-    private void setImage() {
+    /**
+     * Initialize the image associated with the object.
+     */
+    private void updateImage() {
 
         this.removeChild(image);
 
@@ -122,52 +123,35 @@ public class EntityNode extends PNode {
         case FLOWER:
             this.image = new PImage(OdorWorldResourceManager.getStaticImage("pansy.gif"));
             break;
+        case MOUSE:
+            this.image = new PImage(OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif"));
+            break;
         default:
             break;
+        }
+
+        // Good enough for now (?), while the world is just 2d
+        // things that can sometimes rotate
+        if(entity instanceof RotatingEntity) {
+            initTreeMap();
         }
 
         this.addChild(image);
 
     }
 
-    public OdorWorldEntity getEntity() {
-        return entity;
-    }
-
-    public void initRotating() {
-
-        Image image1 = OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif");
-        Image image2 = OdorWorldResourceManager.getRotatingImage("mouse/Mouse_15.gif");
-        List<Image> images = Arrays.asList(image1, image2);
-
-//        animation = new LoopedFramesAnimation(images);
-//        sprite = new Sprite(animation2);
-
-        // TODO: get actual image bounds?
-//        sprite.setBounds(x, y, 40, 40);
-//        this.setPaint(Color.green);
-//        this.addChild(sprite);
-
-
-//        initTreeMap();
-//        this.setAnimation(imageMap.get(imageMap.firstKey()));
-    }
-
-
     /**
      * Initialize the tree map, which associates angles with images /
      * animations.
      */
     private void initTreeMap() {
-//        if (entityType == null) {
-//            entityType = "Mouse";
-//        }
 //        if (entityType.equalsIgnoreCase("Circle")) {
 //            imageMap = RotatingEntityManager.getCircle();
 //        }
-//        if (entityType.equalsIgnoreCase("Mouse")) {
-//            imageMap = RotatingEntityManager.getMouse();
-//        } else if (entityType.equalsIgnoreCase("Amy")) {
+        if (entity.getEntityType() == OdorWorldEntity.EntityType.MOUSE) {
+            imageMap = RotatingEntityManager.getMouse();
+        }
+//        else if (entityType.equalsIgnoreCase("Amy")) {
 //            imageMap = RotatingEntityManager.getRotatingTileset("amy", 20);
 //        } else if (entityType.equalsIgnoreCase("Arnold")) {
 //            imageMap = RotatingEntityManager.getRotatingTileset("arno", 20);
@@ -194,9 +178,13 @@ public class EntityNode extends PNode {
         //sprite.advance();
 
         if (updateFlag) {
+            if(entity instanceof RotatingEntity) {
+                updateImageBasedOnHeading();
+            }
             centerFullBoundsOnPoint(entity.getX(), entity.getY());
             updateFlag = false;
         }
+
 //
 //        if (!isBlocked()) {
 //            heading = computeAngle(heading);
@@ -211,13 +199,39 @@ public class EntityNode extends PNode {
      * The method name says it all...
      */
     private void updateImageBasedOnHeading() {
-//        for (Entry<Double, Animation> entry : imageMap.entrySet()) {
-//            // System.out.println("" + heading + "-" + entry.getKey());
-//            if (heading < entry.getKey()) {
-////                setAnimation(entry.getValue());
-//                break;
-//            }
-//        }
+
+        if(imageMap == null) {
+            //TODO: Smelly!
+            return;
+        }
+
+        // TODO: Also smelly
+        // Exception if entity is not rotating?
+        for (Map.Entry<Double, Image> entry : imageMap.entrySet()) {
+            // System.out.println("" + ((RotatingEntity)entity).getHeading() + "-" + entry.getKey());
+            if ( ((RotatingEntity)entity).getHeading() < entry.getKey()) {
+
+                // TODO: For these events use the changeSupport old / new value thing so it only happens
+                // on changes
+                if (entry.getValue() != null) {
+                    image.setImage(entry.getValue());
+                }
+                break;
+            }
+        }
     }
+
+    public OdorWorldEntity getEntity() {
+        return entity;
+    }
+
+    // PImage image1 = new PImage(OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif"));
+    // PImage image2 = new PImage(OdorWorldResourceManager.getRotatingImage("mouse/Mouse_15.gif"));
+    // List<Image> images = Arrays.asList(image1, image2);
+    // image = image1;
+    // animation = new LoopedFramesAnimation(images);
+    // sprite = new Sprite(animation2);
+    // this.addChild(sprite);
+
 
 }

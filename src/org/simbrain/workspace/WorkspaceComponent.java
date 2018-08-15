@@ -23,13 +23,18 @@ import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
 /**
- * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
- * Extend this class to create your own component type. Gui representations of a
- * workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
+ * Represents a component in a Simbrain {@link Workspace}. Extend this class to
+ * create your own component type. See {@link Workspace} for more info.
+ * <p>
+ * Note that for deserialization sublclasses must have a static "open" method,
+ * that is called using reflection by {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}.
+ * See {@link org.simbrain.network.NetworkComponent#open(InputStream, String,
+ * String)} for an example.
  */
 public abstract class WorkspaceComponent {
 
@@ -85,7 +90,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * If set to true, serialize this component before others. Possibly replace
-     * with priority system later. {@see org.simbrain.workspace.Workspace#preSerializationInit()}.
+     * with priority system later.
      */
     private int serializePriority = 0;
 

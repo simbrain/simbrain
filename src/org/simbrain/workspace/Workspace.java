@@ -20,26 +20,46 @@ package org.simbrain.workspace;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
- * data-tables, gauges, and scripts are examples of components in a Simbrain
- * workspace. Essentially, an instance of a workspace corresponds to a single
- * simulation (though at some point it will be possible to link multiple
- * workspaces on different machines together). A workspace can be visualized via
- * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
+ * simulated environments, data-tables, plots and gauges are examples of
+ * components in a Simbrain workspace. Essentially, an instance of a workspace
+ * corresponds to a single simulation, that can be run with or without a
+ * graphical view of it. The main visualization of a workspace is {@link
+ * org.simbrain.workspace.gui.SimbrainDesktop}.
+ * <p>
+ * To create a new type of workspace component, extend {@link
+ * WorkspaceComponent}, and {@link org.simbrain.workspace.gui.GuiComponent}. The
+ * latter is a gui representation of the former. Follow the pattern in {@link
+ * AbstractComponentFactory} to register this mapping.  The workspace component
+ * holds all the model objects, and manages couplings. Usually there is some
+ * central model object, like {@link org.simbrain.world.odorworld.OdorWorld} or
+ * {@link org.simbrain.network.core.Network} that the workspace component
+ * creates and wraps.  The gui component is a {@link javax.swing.JPanel}  and
+ * can either manage the graphics or (more typically) hold custom panels etc.
+ * that do. De-serialization has a lot of steps, but the main things to be aware
+ * of are to handle custom model deserializing in a readresolve method in the
+ * main model object (e.g. Network or OdorWorld) and that if any special
+ * graphical syncing is needed that it can be done the guicomponent constructor
+ * by overriding {@link GuiComponent#postAddInit()}. Other init can happen in
+ * overrides of {@link WorkspaceComponent#save(OutputStream, String)} and in a
+ * static open method that must also be created. An example is {@link
+ * org.simbrain.world.odorworld.OdorWorldComponent#open(InputStream, String,
+ * String)}
  *
- * @see Coupling
+ * @author Jeff Yoshimi
+ * @author Matt Watson
+ * @author Tim Shea
  */
 public class Workspace {
 
@@ -54,7 +74,8 @@ public class Workspace {
     private transient List<WorkspaceComponent> componentList = Collections.synchronizedList(new ArrayList<WorkspaceComponent>());
 
     /**
-     * Component factory should be used to create new workspace and gui components.
+     * Component factory should be used to create new workspace and gui
+     * components.
      */
     private transient AbstractComponentFactory componentFactory = new AbstractComponentFactory(this);
 
@@ -272,7 +293,8 @@ public class Workspace {
      * scripts when making a series of events occur, e.g. set some neurons, run
      * for 50 iterations, set some other neurons, run 20 iterations, etc.
      *
-     * @param numIterations the number of iteration to run while waiting on the latch.
+     * @param numIterations the number of iteration to run while waiting on the
+     *                      latch.
      */
     public void iterate(int numIterations) {
         synchronized (updaterLock) {
@@ -311,7 +333,8 @@ public class Workspace {
     }
 
     /**
-     * Check whether there have been changes in the workspace or its components.
+     * Check whether there have been changes in the workspace or its
+     * components.
      *
      * @return true if changes exist, false otherwise
      */
@@ -334,7 +357,7 @@ public class Workspace {
     }
 
     public AbstractComponentFactory getComponentFactory() {
-         return componentFactory;
+        return componentFactory;
     }
 
     /**
@@ -424,7 +447,8 @@ public class Workspace {
      * Returns all components of the specified type, e.g. all
      * WorkspaceComponents of type NetworkComponent.class.
      *
-     * @param componentType the type of the component, in the sense of its class
+     * @param componentType the type of the component, in the sense of its
+     *                      class
      * @return list of components
      */
     public Collection<? extends WorkspaceComponent> getComponentList(Class<?> componentType) {

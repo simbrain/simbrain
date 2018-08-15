@@ -44,7 +44,8 @@ import java.util.zip.ZipOutputStream;
  * couplings from a legible xml form / zipped directory structure. Mainly this
  * means recreating components, couplings, and update actions. Also some effort
  * has been made to allow reuse between individual component save / reopen and
- * workspace level save / reopen.
+ * workspace level save / reopen.  Some additional information is in
+ * {@link Workspace}.
  *
  * @author Matt Watson
  * @author Zoë Tosi

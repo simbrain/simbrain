@@ -26,10 +26,6 @@ import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
  *
@@ -119,7 +115,7 @@ public class SmellSensor extends Sensor {
     @Override
     public void update() {
         double[] temp = new double[currentValue.length];
-        for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
+        for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
 
             // Don't smell yourself
             if (entity != parent) {

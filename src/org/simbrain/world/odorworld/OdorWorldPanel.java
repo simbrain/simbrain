@@ -29,8 +29,8 @@ import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.gui.WorldMouseHandler;
 import org.simbrain.world.odorworld.gui.EntityNode;
+import org.simbrain.world.odorworld.gui.WorldMouseHandler;
 import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
 import org.simbrain.world.odorworld.gui.WorldSelectionModel;
 
@@ -133,21 +133,26 @@ public class OdorWorldPanel extends JPanel {
         this.world = world;
 
         menu = new OdorWorldMenu(this);
-
         menu.initMenu();
 
     }
 
-    private void moveSelectedItem() {
-        if (this.getSelectedEntity() != null) {
-            PNode selected = getSelectedEntity();
-            selected.offset(5, 0);
-            // canvas.getCamera(). TODO: Do something to follow the selected agent
+    /**
+     * Add gui reps of all model entities to the panel.  Called
+     * when de-serializing saved worlds.
+     */
+    public void syncToModel() {
+        for(OdorWorldEntity oe : world.getEntityList()) {
+            EntityNode node = new EntityNode(world, oe);
+            canvas.getLayer().addChild(node);
         }
     }
 
+
+    /**
+     * Show the PNode debugging tool.
+     */
     private void showPNodeDebugger() {
-        // TODO: Move to separate method attached to key command
         SceneGraphBrowser sgb = new SceneGraphBrowser(
             canvas.getRoot());
         StandardDialog dialog = new StandardDialog();
@@ -159,17 +164,10 @@ public class OdorWorldPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * @return The selected abstract entity.
-     */
-    public PNode getSelectedEntity() {
-        List<PNode> selectedEntities = getSelectedEntities();
-        if (!selectedEntities.isEmpty()) {
-            return selectedEntities.get(0);
-        }
-        return null;
-    }
 
+    /**
+     * Get selected pnodes
+     */
     public List<PNode> getSelectedEntities() {
         // Assumes selected pnodes parents are entitynodes
         return getSelection().stream()
@@ -178,6 +176,9 @@ public class OdorWorldPanel extends JPanel {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Get selected odor world entities
+     */
     public List<OdorWorldEntity> getSelectedModelEntities() {
         return getSelection().stream()
             .filter(p -> p.getParent() instanceof EntityNode)
@@ -386,7 +387,7 @@ public class OdorWorldPanel extends JPanel {
                     if (entity instanceof RotatingEntity) {
                         ((RotatingEntity) entity).goStraight();
                     } else {
-                        entity.moveNorth();
+                        entity.goNorth();
                     }
                     entity.update();
                 }
@@ -400,7 +401,7 @@ public class OdorWorldPanel extends JPanel {
                     if (entity instanceof RotatingEntity) {
                         ((RotatingEntity) entity).turnLeft();
                     } else {
-                        entity.moveWest();
+                        entity.goWest();
                     }
                     entity.update();
                 }
@@ -414,7 +415,7 @@ public class OdorWorldPanel extends JPanel {
                     if (entity instanceof RotatingEntity) {
                         ((RotatingEntity) entity).turnRight();
                     } else {
-                        entity.moveEast();
+                        entity.goEast();
                     }
                     entity.update();
                 }
@@ -426,11 +427,11 @@ public class OdorWorldPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 for (OdorWorldEntity entity : getSelectedModelEntities()) {
                     if (entity instanceof RotatingEntity) {
-                        ((RotatingEntity) entity).goStraight();
+                        ((RotatingEntity) entity).goBackwards();
                     } else {
-                        entity.moveSouth();
-                        entity.update();
+                        entity.goSouth();
                     }
+                    entity.update();
                 }
             }
         });

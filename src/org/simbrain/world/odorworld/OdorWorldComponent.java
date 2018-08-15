@@ -118,7 +118,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     @Override
     public List getModels() {
         List<Object> models = new ArrayList<Object>();
-        for (OdorWorldEntity entity : world.getObjectList()) {
+        for (OdorWorldEntity entity : world.getEntityList()) {
             models.add(entity);
             models.addAll(entity.getSensors());
             models.addAll(entity.getEffectors());

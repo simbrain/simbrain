@@ -175,11 +175,14 @@ public class RotatingEntity extends OdorWorldEntity {
     public void goStraight() {
         goStraight(manualStraightMovementIncrement);
     }
-
+    public void goBackwards() { goStraight(-manualMotionTurnIncrement);
+    }
     public void turnLeft() {
         turnLeft(manualMotionTurnIncrement);
     }
     public void turnRight() {
         turnRight(manualMotionTurnIncrement);
     }
+
+
 }

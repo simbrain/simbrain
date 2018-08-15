@@ -236,9 +236,6 @@ public class SimbrainDesktop {
             moveLastFocusedComponentToFront();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void newWorkspaceOpened() {
             frame.setTitle(workspace.getCurrentFile().getName());

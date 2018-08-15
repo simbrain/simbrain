@@ -338,26 +338,26 @@ public class OdorWorld {
         changeSupport = new PropertyChangeSupport(this);
 
         for (OdorWorldEntity entity : entityList) {
-            changeSupport.firePropertyChange("entityAdded", null, entity);
             entity.postSerializationInit();
         }
         recomputeMaxStimulusLength();
         return this;
     }
 
+    //TODO: Collision detection should probably be handled by piccolo for now.
+    // It does make this a weird "model" with incomplete information about the virtual
+    // physics, etc...
+
     /**
-     * Updates all entities. TODO: Should this be in OdorWorldEntity?
+     * Updates all entities.
      */
     private void updateEntity(final OdorWorldEntity entity, final int time) {
 
         // Collision detection
         double dx = entity.getVelocityX();
         double oldX = entity.getX();
-        double newX = oldX + dx * time;
         double dy = entity.getVelocityY();
         double oldY = entity.getY();
-        double newY = oldY + dy * time;
-        // TODO: Fire event
 
         // Very simple motion
         if (dx != 0) {
@@ -460,7 +460,7 @@ public class OdorWorld {
      *
      * @return the entity list
      */
-    public List<OdorWorldEntity> getObjectList() {
+    public List<OdorWorldEntity> getEntityList() {
         return entityList;
     }
 
@@ -549,7 +549,7 @@ public class OdorWorld {
      * @param stimulusVecs the 2d matrix of stimulus vectors
      */
     public void loadStimulusVectors(double[][] stimulusVecs) {
-        Iterator<OdorWorldEntity> entityIterator = getObjectList().iterator();
+        Iterator<OdorWorldEntity> entityIterator = getEntityList().iterator();
         for (int i = 0; i < stimulusVecs.length; i++) {
             if (entityIterator.hasNext()) {
                 OdorWorldEntity entity = entityIterator.next();

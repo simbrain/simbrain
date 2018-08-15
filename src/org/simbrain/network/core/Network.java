@@ -963,6 +963,7 @@ public class Network {
         return (Network) Network.getXStream().fromXML(xml_rep);
     }
 
+    // TODO: Use transient instead. Most if not all of this not needed.
     /**
      * Returns a properly initialized xstream object.
      *

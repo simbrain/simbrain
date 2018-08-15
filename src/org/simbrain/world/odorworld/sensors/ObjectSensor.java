@@ -2,7 +2,6 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.ScalarSmellSource;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -52,7 +51,7 @@ public class ObjectSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
+        for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
             ScalarSmellSource smell = entity.getScalarSmell();
             //TODO
 //            if(entity.getObjectType().equals(objectType)) {

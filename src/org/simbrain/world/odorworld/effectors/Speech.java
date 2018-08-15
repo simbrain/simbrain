@@ -105,7 +105,7 @@ public class Speech extends Effector {
             activated = false;
         }
         if (activated) {
-            for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
+            for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
 
                 // TODO: Can add radius check here later
 

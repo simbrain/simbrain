@@ -129,12 +129,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     private ScalarSmellSource scalarSmell = new ScalarSmellSource(1);
 
-    //TODO: Remove or at least re-implement.
-    /**
-     * True if a collision occurred in the last time step.
-     */
-    private boolean collision;
-
     /**
      * Enable sensors. If not the agent is "blind."
      */
@@ -535,9 +529,6 @@ public class OdorWorldEntity implements EditableObject {
     public void postSerializationInit() {
         changeSupport = new PropertyChangeSupport(this);
         currentlyHeardPhrases = new ArrayList<String>();
-        // Temporary hack because collision is turned off and some entities are
-        // saved in a collided state
-        this.collision = false;
     }
 
     /**
@@ -566,23 +557,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void setEffectors(List<Effector> effectors) {
         this.effectors = effectors;
-    }
-
-    /**
-     * @return true if a collision occurred
-     */
-    public boolean hasCollided() {
-        return collision;
-    }
-
-    /**
-     * @param collission the collision to set
-     */
-    public void setHasCollided(boolean collission) {
-        // if (collission) {
-        // cycle.bite();
-        // }
-        this.collision = collission;
     }
 
     /**
@@ -628,9 +602,9 @@ public class OdorWorldEntity implements EditableObject {
 
     public boolean isBlocked() {
         if (getParentWorld().isObjectsBlockMovement()) {
-            if (hasCollided()) {
-                return true;
-            }
+//            if (hasCollided()) {
+//                return true;
+//            }
         }
         return false;
     }
@@ -684,20 +658,18 @@ public class OdorWorldEntity implements EditableObject {
         }
     }
 
-    public void moveNorth() {
+    public void goNorth() {
         moveNorth(manualStraightMovementIncrement);
     }
-    public void moveSouth() {
+    public void goSouth() {
         moveSouth(manualStraightMovementIncrement);
     }
-    public void moveEast() {
+    public void goEast() {
         moveEast(manualStraightMovementIncrement);
     }
-    public void moveWest() {
+    public void goWest() {
         moveWest(manualStraightMovementIncrement);
     }
-
-
 
 
     /**

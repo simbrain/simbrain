@@ -23,7 +23,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.simbrain.network.gui.nodes.SelectionHandle;
-import org.simbrain.util.SceneGraphBrowser;
+import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;

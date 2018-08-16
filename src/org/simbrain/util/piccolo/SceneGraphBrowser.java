@@ -1,4 +1,4 @@
-package org.simbrain.util;
+package org.simbrain.util.piccolo;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.PRoot;

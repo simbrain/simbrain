@@ -29,7 +29,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
-import org.simbrain.util.SceneGraphBrowser;
+import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
 
 /**

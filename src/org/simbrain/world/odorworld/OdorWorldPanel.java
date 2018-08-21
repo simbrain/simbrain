@@ -126,6 +126,8 @@ public class OdorWorldPanel extends JPanel {
                 EntityNode node = new EntityNode(world, (OdorWorldEntity) evt.getNewValue());
                 canvas.getLayer().addChild(node);
                 selectionModel.setSelection(Collections.singleton(node)); // not working
+            } else if ("worldUpdated".equals(evt.getPropertyName())) {
+                // No implementation yet.  Camera moves may go here.
             }
         });
 

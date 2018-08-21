@@ -177,12 +177,24 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void update() {
 
-        changeSupport.firePropertyChange("updated", null, this);
+        // Very simple motion
+        if (dx != 0) {
+            setX(x + dx);
+        }
+        if (dy != 0) {
+            setY(y + dy);
+        }
+
+        //updateSensors();
+        //updateEffectors();
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
             currentlyHeardPhrases.clear();
         }
+
+        changeSupport.firePropertyChange("updated", null, this);
+
 
     }
 

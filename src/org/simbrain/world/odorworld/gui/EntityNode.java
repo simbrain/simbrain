@@ -175,6 +175,8 @@ public class EntityNode extends PNode {
 
     private void update() {
 
+        //TODO: Make sure this is only called once per workspace update
+
         //sprite.advance();
 
         if (updateFlag) {
@@ -182,6 +184,7 @@ public class EntityNode extends PNode {
                 updateImageBasedOnHeading();
             }
             setOffset(entity.getX(), entity.getY());
+            repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
             updateFlag = false;
         }
 

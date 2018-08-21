@@ -114,12 +114,11 @@ public class OdorWorld {
      * @param time an integer representation of time.
      */
     public void update(int time) {
-        for (OdorWorldEntity object : entityList) {
-            object.updateSmellSource();
-//            object.updateSensors();
-//            object.applyEffectors();
-            updateEntity(object, time);
+        for (OdorWorldEntity entity : entityList) {
+            entity.updateSmellSource();
+            entity.update();
         }
+        changeSupport.firePropertyChange("worldUpdated", null, null);
     }
 
     /**
@@ -348,57 +347,57 @@ public class OdorWorld {
     // It does make this a weird "model" with incomplete information about the virtual
     // physics, etc...
 
-    /**
-     * Updates all entities.
-     */
-    private void updateEntity(final OdorWorldEntity entity, final int time) {
-
-        // Collision detection
-        double dx = entity.getVelocityX();
-        double oldX = entity.getX();
-        double dy = entity.getVelocityY();
-        double oldY = entity.getY();
-
-        // Very simple motion
-        if (dx != 0) {
-            entity.setX(entity.getX() + dx);
-        }
-        if (dy != 0) {
-            entity.setY(entity.getY() + dy);
-        }
-
-        // Behavior
-        entity.getBehavior().apply(time);
-
-        // Handle sprite collisions
-        //        entity.setHasCollided(false);
-        //        for (OdorWorldEntity otherEntity : entityList) {
-        //            if (entity == otherEntity) {
-        //                continue;
-        //            }
-        //            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
-        //                otherEntity.setHasCollided(true);
-        //            }
-        //        }
-        //
-        // // Handle sprite collisions
-        // if (xCollission(entity, newX)) {
-        // entity.collideHorizontal();
-        // } else {
-        // // sprite.setX(newX);
-        // }
-        // if (yCollission(entity, newY)) {
-        // entity.collideVertical();
-        // } else {
-        // // sprite.setY(newY);
-        // }
-
-        // Update creature
-        entity.update();
-
-        // System.out.println(sprite.getId() + " new - x: " + sprite.getX() +
-        // " y:" + sprite.getY());
-    }
+//    /**
+//     * Updates all entities.
+//     */
+//    private void updateEntity(final OdorWorldEntity entity, final int time) {
+//
+//        // Collision detection
+//        double dx = entity.getVelocityX();
+//        double oldX = entity.getX();
+//        double dy = entity.getVelocityY();
+//        double oldY = entity.getY();
+//
+//        // Very simple motion
+//        if (dx != 0) {
+//            entity.setX(entity.getX() + dx);
+//        }
+//        if (dy != 0) {
+//            entity.setY(entity.getY() + dy);
+//        }
+//
+//        // Behavior
+//        // entity.getBehavior().apply(time);
+//
+//        // Handle sprite collisions
+//        //        entity.setHasCollided(false);
+//        //        for (OdorWorldEntity otherEntity : entityList) {
+//        //            if (entity == otherEntity) {
+//        //                continue;
+//        //            }
+//        //            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
+//        //                otherEntity.setHasCollided(true);
+//        //            }
+//        //        }
+//        //
+//        // // Handle sprite collisions
+//        // if (xCollission(entity, newX)) {
+//        // entity.collideHorizontal();
+//        // } else {
+//        // // sprite.setX(newX);
+//        // }
+//        // if (yCollission(entity, newY)) {
+//        // entity.collideVertical();
+//        // } else {
+//        // // sprite.setY(newY);
+//        // }
+//
+//        // Update creature
+//        entity.update();
+//
+//        // System.out.println(sprite.getId() + " new - x: " + sprite.getX() +
+//        // " y:" + sprite.getY());
+//    }
 
     /**
      * Handle collisions in x directions.

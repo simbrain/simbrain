@@ -181,7 +181,7 @@ public class EntityNode extends PNode {
             if(entity instanceof RotatingEntity) {
                 updateImageBasedOnHeading();
             }
-            centerFullBoundsOnPoint(entity.getX(), entity.getY());
+            setOffset(entity.getX(), entity.getY());
             updateFlag = false;
         }
 

@@ -72,11 +72,13 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * X Position.
      */
+    @UserParameter(label = "X", description = "X Position", order = 3)
     protected double x;
 
     /**
      * Y Position.
      */
+    @UserParameter(label = "Y", description = "Y Position", order = 4)
     protected double y;
 
     /**
@@ -88,7 +90,7 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * Y Velocity.
      */
-    @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 5)
+    @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 6)
     protected double dy;
 
 

@@ -18,10 +18,12 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
@@ -29,16 +31,14 @@ import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.gui.EntityNode;
-import org.simbrain.world.odorworld.gui.WorldMouseHandler;
-import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
-import org.simbrain.world.odorworld.gui.WorldSelectionModel;
+import org.simbrain.world.odorworld.gui.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,6 +97,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.setBackground(backgroundColor);
         canvas.setFocusable(true);
 
+        canvas.getLayer().addChild(new WorldMapNode());
+
         // Remove default event handlers
         PInputEventListener panEventHandler = canvas.getPanEventHandler();
         PInputEventListener zoomEventHandler = canvas.getZoomEventHandler();
@@ -127,7 +129,27 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().addChild(node);
                 selectionModel.setSelection(Collections.singleton(node)); // not working
             } else if ("worldUpdated".equals(evt.getPropertyName())) {
-                // No implementation yet.  Camera moves may go here.
+                double worldHeight = world.getHeight();
+                double worldWidth = world.getWidth();
+                PCamera camera = canvas.getCamera();
+                PBounds cameraBounds = camera.getFullBounds();
+
+                PNode firstNode = canvas.getLayer().getChild(canvas.getLayer().getChildrenCount() - 1);
+                PBounds firstNodeBounds = firstNode.getFullBounds();
+
+                double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
+                double cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2;
+
+                // stop centering the entity if the view is going out of bound of the bound of the world.
+                if (cameraNewX < 0 || cameraNewX + cameraBounds.width > worldWidth) {
+                    cameraNewX = worldWidth - cameraBounds.width;
+                }
+                if (cameraNewY < 0 || cameraNewY + cameraBounds.height > worldHeight) {
+                    cameraNewY = worldHeight - cameraBounds.height;
+                }
+
+                camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
+                repaint();
             }
         });
 

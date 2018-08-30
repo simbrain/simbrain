@@ -19,7 +19,7 @@ public class WorldMapNode extends PNode {
             for (int j = 0; j < 20; j++) {
                 PImage testimg = new PImage(OdorWorldResourceManager.getStaticImage("PlaceHolderTile.png"));
                 testimg.setPickable(false);
-                testimg.offset(i * testimg.getBounds().x, j * testimg.getBounds().y);
+                testimg.offset(i * 32, j * 32);
                 test.add(testimg);
                 this.addChild(testimg);
             }

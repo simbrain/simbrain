@@ -129,33 +129,35 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().addChild(node);
                 selectionModel.setSelection(Collections.singleton(node)); // not working
             } else if ("worldUpdated".equals(evt.getPropertyName())) {
-                double worldHeight = world.getHeight();
-                double worldWidth = world.getWidth();
-                PCamera camera = canvas.getCamera();
-                PBounds cameraBounds = camera.getFullBounds();
+                if(!getSelectedModelEntities().isEmpty()) {
+                    double worldHeight = world.getHeight();
+                    double worldWidth = world.getWidth();
+                    PCamera camera = canvas.getCamera();
+                    PBounds cameraBounds = camera.getFullBounds();
 
-                PNode firstNode = canvas.getLayer().getChild(canvas.getLayer().getChildrenCount() - 1);
-                PBounds firstNodeBounds = firstNode.getFullBounds();
+                    PNode firstNode = getSelectedEntities().get(0);
+                    PBounds firstNodeBounds = firstNode.getFullBounds();
 
-                double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
-                double cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2;
+                    double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
+                    double cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2;
 
-//                // stop centering the entity if the view is going out of bound of the bound of the world.
-//                if (cameraNewX < 0) {
-//                    cameraNewX = 0;
-//                }
-//                if (cameraNewY < 0) {
-//                    cameraNewY = 0;
-//                }
-//                if (cameraNewX + cameraBounds.width > worldWidth) {
-//                    cameraNewX = worldWidth - cameraBounds.width;
-//                }
-//                if (cameraNewY + cameraBounds.height > worldHeight) {
-//                    cameraNewY = worldHeight - cameraBounds.height;
-//                }
+//                    // stop centering the entity if the view is going out of bound of the bound of the world.
+//                    if (cameraNewX < 0) {
+//                        cameraNewX = 0;
+//                    }
+//                    if (cameraNewY < 0) {
+//                        cameraNewY = 0;
+//                    }
+//                    if (cameraNewX + cameraBounds.width > worldWidth) {
+//                        cameraNewX = worldWidth - cameraBounds.width;
+//                    }
+//                    if (cameraNewY + cameraBounds.height > worldHeight) {
+//                        cameraNewY = worldHeight - cameraBounds.height;
+//                    }
 
-                camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
-                repaint();
+                    camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
+                    repaint();
+                }
             }
         });
 

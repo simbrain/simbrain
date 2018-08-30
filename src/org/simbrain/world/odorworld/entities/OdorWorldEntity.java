@@ -208,14 +208,15 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void setX(final double newx) {
         // System.out.println("x:" + newx);
+        this.x = newx;
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
                 this.x = parentWorld.getWidth() - (Math.abs(newx) % parentWorld.getWidth());
             } else if (newx > parentWorld.getWidth()) {
                 this.x = newx % parentWorld.getWidth();
-            } else {
-                this.x = newx;
             }
+        } else {
+            this.x = newx;
         }
         changeSupport.firePropertyChange("moved", null, null);
 
@@ -234,9 +235,9 @@ public class OdorWorldEntity implements EditableObject {
                 this.y = parentWorld.getHeight() - (Math.abs(newy) % parentWorld.getHeight());
             } else if (newy > parentWorld.getHeight()) {
                 this.y = newy % parentWorld.getHeight();
-            } else {
-                this.y = newy;
             }
+        } else {
+            this.y = newy;
         }
         changeSupport.firePropertyChange("moved", null, null);
     }

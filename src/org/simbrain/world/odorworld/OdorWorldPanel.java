@@ -140,19 +140,19 @@ public class OdorWorldPanel extends JPanel {
                 double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
                 double cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2;
 
-                // stop centering the entity if the view is going out of bound of the bound of the world.
-                if (cameraNewX < 0) {
-                    cameraNewX = 0;
-                }
-                if (cameraNewY < 0) {
-                    cameraNewY = 0;
-                }
-                if (cameraNewX + cameraBounds.width > worldWidth) {
-                    cameraNewX = worldWidth - cameraBounds.width;
-                }
-                if (cameraNewY + cameraBounds.height > worldHeight) {
-                    cameraNewY = worldHeight - cameraBounds.height;
-                }
+//                // stop centering the entity if the view is going out of bound of the bound of the world.
+//                if (cameraNewX < 0) {
+//                    cameraNewX = 0;
+//                }
+//                if (cameraNewY < 0) {
+//                    cameraNewY = 0;
+//                }
+//                if (cameraNewX + cameraBounds.width > worldWidth) {
+//                    cameraNewX = worldWidth - cameraBounds.width;
+//                }
+//                if (cameraNewY + cameraBounds.height > worldHeight) {
+//                    cameraNewY = worldHeight - cameraBounds.height;
+//                }
 
                 camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
                 repaint();

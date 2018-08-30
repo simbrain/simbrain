@@ -14,10 +14,12 @@ public class WorldMapNode extends PNode {
     ArrayList<PImage> test = new ArrayList<>();
 
     {
+
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
                 PImage testimg = new PImage(OdorWorldResourceManager.getStaticImage("PlaceHolderTile.png"));
-                testimg.offset(i * 32, j * 32);
+                testimg.setPickable(false);
+                testimg.offset(i * testimg.getBounds().x, j * testimg.getBounds().y);
                 test.add(testimg);
                 this.addChild(testimg);
             }

@@ -33,19 +33,35 @@ import java.util.stream.Collectors;
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them according to
- * some probability.
+ * some probability. Inhibitory and excitatory synapses are created separately
+ * and use separate parameters. Therefore the total number of connections that will
+ * be made depends upon both sets of parameters. 
  * <p>
  * Currently this is not accessible in the GUI, and is only used by some
  * scripts.
  *
- * @author Jeff Yoshimi
+ * @author Zoe Tosi, Jeff Yoshimi
  */
 public class RadialSimple implements ConnectNeurons, EditableObject {
 
+
+    /**
+     * When connecting neurons within a radius of a given neuron they can be chosen
+     * stochastically, based on some probability parameter ({@link #PROBABILISTIC} or
+     * deterministically based upon a predefined number of requested connections
+     * ({@link #DETERMINISTIC}.
+     */
     public enum ConnectStyle {
         PROBABILISTIC, DETERMINISTIC
     }
 
+    /**
+     * Are neurons within a given radius being connected <emp>to</emp> the neuron in
+     * question ({@link #IN} or are they being connected <emp>from</emp> the neuron in
+     * question ({@link #OUT})? Equivalently is the neuron for which are checking for
+     * other neurons within a given distance the target of the connections that will
+     * made or the source?
+     */
     public enum SelectionStyle {
         OUT, IN
     }
@@ -132,12 +148,21 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     private Network network;
 
     /**
-     * Reference to excNeurons from or to which to make connections
+     * List containing neurons with excitatory polarity among the neurons selected
+     * to form connections between
      */
     private List<Neuron> excNeurons;
 
+    /**
+     * List containing neurons with inhibitory polarity among the neurons selected
+     * to form connections between
+     */
     private List<Neuron> inhNeurons;
 
+    /**
+     * A list containing all non polar neurons among the neurons selected to form connections
+     * between
+     */
     private List<Neuron> nonPolarNeurons;
 
     //TODO
@@ -481,6 +506,16 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     public void setInhCons(int inhCons) {
         this.inhCons = inhCons;
     }
+
+
+    public SelectionStyle getSelectMethod() {
+        return selectMethod;
+    }
+
+    public void setSelectMethod(SelectionStyle selectMethod) {
+        this.selectMethod = selectMethod;
+    }
+
 
     @Override
     public String getName() {

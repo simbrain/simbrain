@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
+import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule.InputType;
@@ -160,12 +161,15 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 .ofStandardDeviation(Math.sqrt(variance))
                 .build();
 
-//        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(K,
-//            (int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2)
-//        );
+        RadialSimple con = new RadialSimple(parentNet, res.getNeuronList());
+        con.setExcCons(K/2);
+        con.setExcitatoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
+        con.setInhCons(K/2);
+        con.setInhibitoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
+        con.setSelectMethod(RadialSimple.SelectionStyle.IN);
 
-        // TODO: Redo null for connection manager Zoë!
-        SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, null, 0.5, exRand, inRand);
+        SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
+                0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addGroup(reservoir);
 

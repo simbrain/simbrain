@@ -39,13 +39,16 @@ import java.util.concurrent.*;
  * <li>Inhibitory to Excitatory (IE)</li>
  * </ol>
  * <p>
- * In each case, the probability of a connection is more likely the closer two
- * neurons of the relevant type are to each other. Probabilities of connection
- * are given by an exponential probability distribution e^-( D(a, b) / (λ^2) )
- * where D is distance in pixels.
- * <p>
- * Lambda controls the number of pixels over which to expect connections to be
- * made.
+ * The probability of making a connection drops off according to a gaussian centered
+ * on each neuron, which is scaled differently according to the polarity of the source
+ * and target neuron. Specifically the probability of forming a connection between
+ * a neuron <emp>a</emp> with polarity <emp>x</emp> and another neuron <emp>b</emp>
+ * with polarity <emp>y</emp> is given by P(a, b) = min( C_xy * exp( -(D(a, b) / λ)^2 ), 1).
+ * Where D(a, b) gives the Euclidean distance in pixels, C_xy is a scalar constant
+ * unique to the polarity of x and y (e.g. exc to exc may have a C_ee of 0.2 while
+ * inh to inh may have a C_ii of 0.1, meaning as a baseline exc/exc synapses are
+ * twice as likely as inh/inh synapses). Lambda <emp>roughly</emp> represents the standard
+ * deviation in with respect to distance for the gaussian drop off.
  * <p>
  * Any of the 4 constants for the 4 cases can be set to a value between 0 and 1.
  * Set to 0, if you want no connections of that type to be made. Set to 1 to
@@ -69,7 +72,7 @@ public class RadialGaussian implements ConnectNeurons, EditableObject {
 
     public static final double DEFAULT_II_CONST = 0.1;
 
-    public static final double DEFAULT_LAMBDA = 20;
+    public static final double DEFAULT_LAMBDA = 200;
 
     // TODO: Add a sparsity constraint, such that connections are still chosen stochastically
     // based on distance, but a specific number of connections are guaranteed to be made.
@@ -117,7 +120,7 @@ public class RadialGaussian implements ConnectNeurons, EditableObject {
      * create denser connections. Lambda can be thought of as the average
      * connection distance.
      */
-    @UserParameter(label = "Distance Drop-off", defaultValue = "20",
+    @UserParameter(label = "Distance Drop-off", defaultValue = "200",
             minimumValue = 0.01, order = 1 )
     private double lambda = DEFAULT_LAMBDA;
 

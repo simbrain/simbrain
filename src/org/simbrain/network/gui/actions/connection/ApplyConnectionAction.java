@@ -60,8 +60,8 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
         String title = "Connect " + connection.toString();
 
-        if (connection instanceof Radial) {
-            connectionPanel = new AnnotatedPropertyEditor((Radial) connection);
+        if (connection instanceof RadialGaussian) {
+            connectionPanel = new AnnotatedPropertyEditor((RadialGaussian) connection);
         } else if (connection instanceof AllToAll) {
             connectionPanel = new AnnotatedPropertyEditor((AllToAll) connection);
         } else if (connection instanceof OneToOne) {

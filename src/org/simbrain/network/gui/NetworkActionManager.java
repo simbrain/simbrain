@@ -370,7 +370,7 @@ public final class NetworkActionManager {
 
         allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(), "All to all");
         oneToOne = new ApplyConnectionAction(networkPanel, new OneToOne(), "One-to-one");
-        radial = new ApplyConnectionAction(networkPanel, new Radial(), "Radial");
+        radial = new ApplyConnectionAction(networkPanel, new RadialGaussian(), "Radial (Gaussian)");
         radialSimple = new ApplyConnectionAction(networkPanel, new RadialSimple(), "Radial (Simple)");
         sparse = new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse");
 

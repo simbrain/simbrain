@@ -21,7 +21,6 @@ package org.simbrain.network.connections;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -59,7 +58,7 @@ public class QuickConnectionManager {
     /**
      * The Gaussian connector.
      */
-    private final Radial radial = new Radial();
+    private final RadialGaussian radial = new RadialGaussian();
 
     /**
      * The Radial connector.
@@ -206,7 +205,7 @@ public class QuickConnectionManager {
         return sparse;
     }
 
-    public Radial getRadial() {
+    public RadialGaussian getRadial() {
         return radial;
     }
 

@@ -54,7 +54,7 @@ import java.util.concurrent.*;
  *
  * @author Zoë Tosi
  */
-public class Radial implements ConnectNeurons, EditableObject {
+public class RadialGaussian implements ConnectNeurons, EditableObject {
 
     /**
      * For neurons with no polarity.
@@ -218,14 +218,14 @@ public class Radial implements ConnectNeurons, EditableObject {
     /**
      * Default constructor
      */
-    public Radial() {
+    public RadialGaussian() {
         //this.setPermitDensityEditing(false);
     }
 
     /**
      * @param lambda average connection distance.
      */
-    public Radial(double lambda) {
+    public RadialGaussian(double lambda) {
         this();
         this.lambda = lambda;
     }
@@ -235,7 +235,7 @@ public class Radial implements ConnectNeurons, EditableObject {
      *                  cases where neurons have no explicit polarity.
      * @param lambda    average connection distance.
      */
-    public Radial(double distConst, double lambda) {
+    public RadialGaussian(double distConst, double lambda) {
         this();
         this.distConst = distConst;
         this.lambda = lambda;
@@ -252,7 +252,7 @@ public class Radial implements ConnectNeurons, EditableObject {
      *                    inhibitory neurons.
      * @param lambda      average connection distance.
      */
-    public Radial(double eeDistConst, double eiDistConst, double ieDistConst, double iiDistConst, double lambda) {
+    public RadialGaussian(double eeDistConst, double eiDistConst, double ieDistConst, double iiDistConst, double lambda) {
         this();
         this.eeDistConst = eeDistConst;
         this.eiDistConst = eiDistConst;

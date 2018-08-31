@@ -134,7 +134,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
         QuickConnectionManager quickConnector = networkPanel.getQuickConnector();
         ConnectionPanel cp =  (ConnectionPanel)cbConnectionType.getSelectedItem();
         quickConnector.setCurrentConnector(cp.getConnection());
-        cp.getConnectionProperties().commitChanges();
+        cp.commitChanges(networkPanel);
         quickConnector.setExcitatoryRatio(cp.getPolarityPanel().getPercentExcitatory());
         quickConnector.setExRandomizer(cp.getPolarityPanel().getExRandomizer());
         quickConnector.setInRandomizer(cp.getPolarityPanel().getInRandomizer());

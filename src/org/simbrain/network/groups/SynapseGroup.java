@@ -28,6 +28,7 @@ import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -114,7 +115,7 @@ public class SynapseGroup extends Group {
     /**
      * The connect neurons object associated with this group.
      */
-    private ConnectNeurons connectionManager;
+    private ConnectNeurons connectionManager = DEFAULT_CONNECTION_MANAGER;
 
     /**
      * The percent of synapses that are excitatory. This parameter represents

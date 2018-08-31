@@ -596,23 +596,14 @@ public class Sparse implements ConnectNeurons, EditableObject {
         return synapseGroup;
     }
 
-    /**
-     * Returns a short name for this connection type, used in combo boxes.
-     *
-     * @return the name for this connection type
-     */
-    public static String getNameStatic() {
+    @Override
+    public String getName() {
         return "Sparse";
     }
 
     @Override
-    public String getName() {
-        return getNameStatic();
-    }
-
-    @Override
     public String toString() {
-        return getNameStatic();
+        return getName();
     }
 
 }

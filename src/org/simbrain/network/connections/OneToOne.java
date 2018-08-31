@@ -39,6 +39,9 @@ public class OneToOne implements ConnectNeurons, EditableObject {
     @UserParameter(label = "Bi-directional", order = 2)
     private boolean useBidirectionalConnections = false;
 
+    /**
+     * Default orientation used to make the connections.
+     */
     public static OrientationComparator DEFAULT_ORIENTATION = OrientationComparator.X_ORDER;
 
     /**
@@ -73,7 +76,6 @@ public class OneToOne implements ConnectNeurons, EditableObject {
     }
 
     /**
-     * {@inheritDoc}
      * Source and target neuron groups must have the same number of neurons.
      * A synapse is created such that every source neuron is connected to
      * exactly one target neuron (and vice versa if connections are
@@ -165,52 +167,6 @@ public class OneToOne implements ConnectNeurons, EditableObject {
         }
         return syns;
 
-    }
-
-    /**
-     * @return the useBidirectionalConnections
-     */
-    public boolean isUseBidirectionalConnections() {
-        return useBidirectionalConnections;
-    }
-
-    /**
-     * @param useBidirectionalConnections the useBidirectionalConnections to set
-     */
-    public void setUseBidirectionalConnections(final boolean useBidirectionalConnections) {
-        this.useBidirectionalConnections = useBidirectionalConnections;
-    }
-
-    /**
-     * @return the connectOrientation
-     */
-    public OrientationComparator getConnectOrientation() {
-        return connectOrientation;
-    }
-
-    /**
-     * @param connectOrientation the connectOrientation to set
-     */
-    public void setConnectOrientation(final OrientationComparator connectOrientation) {
-        this.connectOrientation = connectOrientation;
-    }
-
-    /**
-     * Used for populating combo box with orientation types.
-     *
-     * @return Array of connection types.
-     */
-    public static OrientationComparator[] getOrientationTypes() {
-        return OrientationComparator.values();
-    }
-
-    /**
-     * Returns a short name for this connection type, used in combo boxes.
-     *
-     * @return the name for this connection type
-     */
-    public static String getNameStatic() {
-        return "One to one";
     }
 
     @Override

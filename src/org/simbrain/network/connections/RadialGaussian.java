@@ -562,4 +562,8 @@ public class RadialGaussian implements ConnectNeurons, EditableObject {
         }
     }
 
+    @Override
+    public String getName() {
+        return "Radial (Gaussian)";
+    }
 }

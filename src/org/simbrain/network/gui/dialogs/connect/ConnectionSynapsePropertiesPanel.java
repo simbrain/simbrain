@@ -112,19 +112,6 @@ public class ConnectionSynapsePropertiesPanel extends EditablePanel {
 
     /**
      * @param parent
-     * @param synapses
-     * @return
-     */
-    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(final Window parent, final Collection<Synapse> synapses) {
-        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent, synapses);
-        if (!spp.creationPanel) {
-            spp.initApplyListeners();
-        }
-        return spp;
-    }
-
-    /**
-     * @param parent
      * @return
      */
     public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(final Window parent) {

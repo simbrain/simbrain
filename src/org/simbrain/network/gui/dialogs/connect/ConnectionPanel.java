@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -63,7 +64,7 @@ public final class ConnectionPanel extends JPanel {
     /**
      * To edit the properties of the connection object
      */
-    private AnnotatedPropertyEditor connectionProperties;
+    private JPanel connectionProperties;
 
     /**
      * The connection object used to connect source to target neurons.
@@ -86,7 +87,11 @@ public final class ConnectionPanel extends JPanel {
      */
     private void init() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        connectionProperties = new AnnotatedPropertyEditor(connection);
+        if (connection instanceof Sparse) {
+            connectionProperties =  SparseConnectionPanel.createSparsityAdjustmentPanel((Sparse) connection, null);
+        } else  {
+            connectionProperties = new AnnotatedPropertyEditor(connection);
+        }
         add(connectionProperties);
         detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Synapse Properties", "Synapse Properties", parentFrame);
         add(Box.createRigidArea(new Dimension(0, 10)));
@@ -111,7 +116,9 @@ public final class ConnectionPanel extends JPanel {
     private void updateDetailTriangle() {
         synapseProperties.setVisible(detailTriangle.isDown());
         synapseProperties.repaint();
-        parentFrame.pack();
+        if (parentFrame != null) {
+            parentFrame.pack();
+        }
     }
     /**
      * https://stackoverflow.com/questions/8335997/ how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
@@ -130,7 +137,11 @@ public final class ConnectionPanel extends JPanel {
      * @param networkPanel
      */
     public void commitChanges(NetworkPanel networkPanel) {
-        connectionProperties.commitChanges();
+        if(connection instanceof Sparse) {
+            ((SparseConnectionPanel)connectionProperties).commitChanges();
+        } else {
+            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
+        }
         List<Synapse> synapses = connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
         ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
         ConnectionUtilities.conformToTemplates(synapses, synapseProperties.getTemplateExcitatorySynapse(), synapseProperties.getTemplateInhibitorySynapse());
@@ -150,7 +161,11 @@ public final class ConnectionPanel extends JPanel {
      * @param synapseGroup the group to change
      */
     public void commitChanges(SynapseGroup synapseGroup) {
-        connectionProperties.commitChanges();
+        if(connection instanceof Sparse) {
+            ((SparseConnectionPanel)connectionProperties).commitChanges();
+        } else {
+            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
+        }
         connection.connectNeurons(synapseGroup);
         // TODO: Polarity, etc.
     }
@@ -161,10 +176,6 @@ public final class ConnectionPanel extends JPanel {
 
     public SynapsePolarityAndRandomizerPanel getPolarityPanel() {
         return polarityPanel;
-    }
-
-    public AnnotatedPropertyEditor getConnectionProperties() {
-        return connectionProperties;
     }
 
     public ConnectNeurons getConnection() {

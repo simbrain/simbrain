@@ -603,7 +603,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * The PolaraizedRandomizer this panel will either use to fill field
          * values and edit, or which this panel will create and then edit.
          */
-        private ProbabilityDistribution randomizer;
+        private ProbabilityDistribution.Randomizer randomizer = new ProbabilityDistribution.Randomizer();
 
         /**
          * The randomizer panel used as a basis for this panel.
@@ -623,14 +623,16 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         private final JButton applyButton = new JButton("Apply");
 
         /**
+         * Construct the synapse randomizer panel.
+         *
          * @param parent     for resizing
-         * @param randomizer to fill field values
+         * @param dist  initial probabiliity distrubtion
          * @param enabled    start out enabled (w/ {@link #randomizerPanel}
          *                   visible)
          */
-        public EditableRandomizerPanel(Window parent, ProbabilityDistribution randomizer, boolean enabled) {
-            this.randomizer = randomizer;
-            polarity = randomizer.getPolarity();
+        public EditableRandomizerPanel(Window parent, ProbabilityDistribution dist, boolean enabled) {
+            this.randomizer.setProbabilityDistribution(dist);
+            polarity = randomizer.getProbabilityDistribution().getPolarity();
             enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, enabled, "Disabled", "Enabled", parent);
             enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
             enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
@@ -638,34 +640,34 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         }
 
         /**
-         * @param parent
-         * @param randomizer
+         * Construct the synapse randomizer panel.
+         *
+         * @param parent     for resizing
+         * @param dist  initial probabiliity distrubtion
          */
-        public EditableRandomizerPanel(Window parent, ProbabilityDistribution randomizer) {
-            this.randomizer = randomizer;
-            polarity = randomizer.getPolarity();
-            enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, true, "Disabled", "Enabled", parent);
-            enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
-            enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
-            init();
+        public EditableRandomizerPanel(Window parent, ProbabilityDistribution dist) {
+            this(parent, dist, true);
         }
 
         /**
-         * @param parent
-         * @param polarity
+         * Initialize with a polarity
+         *
+         * @param parent parent window
+         * @param polarity initial polarity
          */
         public EditableRandomizerPanel(Window parent, Polarity polarity) {
-            this.polarity = polarity;
 
-            randomizer =
-                    UniformDistribution.builder()
-                            .ofPolarity(polarity)
-                            .build();
+                this.polarity = polarity;
 
-            enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);
-            enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
-            enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
-            init();
+                randomizer.setProbabilityDistribution(
+                        UniformDistribution.builder()
+                                .ofPolarity(polarity)
+                                .build());
+
+                enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);
+                enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
+                enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
+                init();
         }
 
         /**
@@ -728,17 +730,17 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                     if (enableStatusTriangle.isDown()) {
                         randomizerPanel.commitChanges();
                         if (Polarity.EXCITATORY.equals(polarity)) {
-                            exRandomizer = randomizer;
+                            exRandomizer = randomizer.getProbabilityDistribution();
                             if (synapseGroup != null) {
-                                synapseGroup.setExcitatoryRandomizer(randomizer);
+                                synapseGroup.setExcitatoryRandomizer(randomizer.getProbabilityDistribution());
                                 if (!creationPanel) {
                                     synapseGroup.randomizeExcitatoryConnections();
                                 }
                             }
                         } else {
-                            inRandomizer = randomizer;
+                            inRandomizer = randomizer.getProbabilityDistribution();
                             if (synapseGroup != null) {
-                                synapseGroup.setInhibitoryRandomizer(randomizer);
+                                synapseGroup.setInhibitoryRandomizer(randomizer.getProbabilityDistribution());
                                 if (!creationPanel) {
                                     synapseGroup.randomizeInhibitoryConnections();
                                 }
@@ -794,9 +796,9 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             if (enableStatusTriangle.isDown() || randomizerState == RandBehavior.FORCE_ON) {
                 randomizerPanel.commitChanges();
                 if (Polarity.EXCITATORY.equals(polarity)) {
-                    exRandomizer = randomizer;
+                    exRandomizer = randomizer.getProbabilityDistribution();
                 } else {
-                    inRandomizer = randomizer;
+                    inRandomizer = randomizer.getProbabilityDistribution();
                 }
             }
         }

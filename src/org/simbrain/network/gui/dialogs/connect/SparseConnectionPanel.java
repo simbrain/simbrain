@@ -168,8 +168,12 @@ public class SparseConnectionPanel extends EditablePanel {
             // Assumes only one source and one target group are selected if any
             // are
             try {
-                if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
+                // TODO: Temp.  For loose neuron case
+                if(networkPanel == null) {
+                    return;
+                }
 
+                if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
                     NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
                     NeuronGroup target = networkPanel.getSelectedModelNeuronGroups().get(0);
                     numTargs = target.size();

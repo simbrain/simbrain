@@ -22,8 +22,11 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,7 +36,22 @@ import java.util.List;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public interface ConnectNeurons extends EditableObject {
+public interface ConnectNeurons extends CopyableObject {
+
+    /**
+     * Connectors for drop-down list used by
+     * {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * to set a type of probability distribution.
+     */
+    public static List<Class> CONNECTION_LIST = Arrays.asList(AllToAll.class,
+        RadialSimple.class, RadialGaussian.class, OneToOne.class, Sparse.class);
+
+    /**
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return CONNECTION_LIST;
+    }
 
     /**
      * Apply connection to a synapse group using specified parameters.
@@ -53,4 +71,28 @@ public interface ConnectNeurons extends EditableObject {
      */
     public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
 
+    //TODO: Reconsider this
+    @Override
+    default EditableObject copy() {
+        return this;
+    }
+
+    /**
+     * Utility class that encapsulates a connection type so that it
+     * can be used in an {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
+     * so that it's easy to create a property editor to edit a probability distribution.
+     */
+    public static class ConnectionType implements EditableObject {
+
+        @UserParameter(label = "Connection Type", isObjectType = true)
+        private ConnectNeurons connectionType = new AllToAll();
+
+        public ConnectNeurons getConnectionType() {
+            return connectionType;
+        }
+
+        public void setConnectionType(ConnectNeurons type) {
+            this.connectionType = type;
+        }
+    }
 }

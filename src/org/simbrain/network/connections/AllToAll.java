@@ -61,28 +61,14 @@ public class AllToAll implements ConnectNeurons, EditableObject {
         this.selfConnectionAllowed = allowSelfConnect;
     }
 
-    /**
-     * Returns a short name for this connection type, used in combo boxes.
-     *
-     * @return the name for this connection type
-     */
-    /**
-     * Returns a short name for this connection type, used in combo boxes.
-     *
-     * @return the name for this connection type
-     */
-    public static String getNameStatic() {
-        return "All to all";
-    }
-
     @Override
     public String getName() {
-        return getNameStatic();
+        return "All to All";
     }
 
     @Override
     public String toString() {
-        return getNameStatic();
+        return getName();
     }
 
     /**

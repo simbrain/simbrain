@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -28,6 +29,7 @@ import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel
 import org.simbrain.network.gui.dialogs.connect.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -92,7 +94,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Panel for adjusting the connection object.
      */
-    private ConnectionPanel connectionPanel;
+    private AnnotatedPropertyEditor connectionPanel;
 
     /**
      * Panel for adjusting the synapse group
@@ -158,12 +160,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         return sgd;
     }
 
-    /**
-     * @param parent
-     * @param np
-     * @param sg
-     * @return
-     */
+    //TODO
     public static SynapseGroupDialog createSynapseGroupDialog(final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
         SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
         sgd.addListeners();
@@ -252,7 +249,7 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel for creation
         if (isCreationDialog) {
-            connectionPanel = new ConnectionPanel(parentFrame, synapseGroup.getConnectionManager());
+            connectionPanel = new AnnotatedPropertyEditor(new ConnectNeurons.ConnectionType());
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
@@ -393,7 +390,8 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     public void commitChanges() {
         if (isCreationDialog) {
-            connectionPanel.commitChanges(synapseGroup);
+
+            connectionPanel.commitChanges();
 
             ((EditablePanel) tabSummaryInfo).commitChanges();
             ((EditablePanel) editSynapsesPanel).commitChanges();

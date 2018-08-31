@@ -40,19 +40,32 @@ import java.util.stream.Collectors;
  * Currently this is not accessible in the GUI, and is only used by some
  * scripts.
  *
- * @author Zoe Tosi, Jeff Yoshimi
+ * @author Zoë Tosi
+ * @author Jeff Yoshimi
  */
 public class RadialSimple implements ConnectNeurons, EditableObject {
 
-
     /**
      * When connecting neurons within a radius of a given neuron they can be chosen
-     * stochastically, based on some probability parameter ({@link #PROBABILISTIC} or
+     * stochastically, based on some probability parameter ({@link #PROBABILISTIC}) or
      * deterministically based upon a predefined number of requested connections
-     * ({@link #DETERMINISTIC}.
+     * ({@link #DETERMINISTIC}).
      */
     public enum ConnectStyle {
-        PROBABILISTIC, DETERMINISTIC
+
+        PROBABILISTIC ("Probabilistic"),
+        DETERMINISTIC("Deterministic");
+
+        private final String description;
+
+        ConnectStyle(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 
     /**
@@ -63,17 +76,29 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
      * made or the source?
      */
     public enum SelectionStyle {
-        OUT, IN
+
+        OUT ("Outward"),
+        IN ("Inward");
+        private final String description;
+
+        SelectionStyle(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 
     /**
      * Should connections be selected randomly from a given neighborhood or in a prescribed way
      * based on the in-degree?
      */
-    @UserParameter(label = "Connection Method", description = "Make local connections based on a specified in degree or randomly?",order = 2)
+    @UserParameter(label = "Connection Method", description = "Make local connections based on a specified in-degree (determnistic) or randomly (probabilistic)",order = 1)
     private ConnectStyle conMethod = ConnectStyle.PROBABILISTIC;
 
-    @UserParameter(label = "Selection Method", description = "Are excNeurons in radius sending to or recieving from the neuron in question.",order = 1)
+    @UserParameter(label = "Inward / Outward", description = "Are the connections to be made 'inward' (connections sent in to each neuron) or 'outward' (connections radiating out from each neuron).",order = 2)
     private SelectionStyle selectMethod = SelectionStyle.IN;
 
     /**
@@ -515,7 +540,6 @@ public class RadialSimple implements ConnectNeurons, EditableObject {
     public void setSelectMethod(SelectionStyle selectMethod) {
         this.selectMethod = selectMethod;
     }
-
 
     @Override
     public String getName() {

@@ -18,8 +18,11 @@
  */
 package org.simbrain.world.odorworld.resources;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -35,7 +38,7 @@ public class OdorWorldResourceManager {
      * @return the image
      */
     public static Image getRotatingImage(final String name) {
-        return getImage("rotating/" + name);
+        return getBufferedImage("rotating/" + name);
     }
 
     /**
@@ -45,7 +48,7 @@ public class OdorWorldResourceManager {
      * @return the image
      */
     public static Image getStaticImage(final String name) {
-        return getImage("static/" + name);
+        return getBufferedImage("static/" + name);
     }
 
     /**
@@ -58,5 +61,33 @@ public class OdorWorldResourceManager {
         URL url = OdorWorldResourceManager.class.getResource(name);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
+    }
+
+    /**
+     * Retrieve and load an Image into buffer based on its file name.
+     *
+     * @param name name of the image file to retrieve
+     * @return the Image which can be used with Swing components, etc
+     */
+    private static BufferedImage getBufferedImage(final String name) {
+        /*
+         * There is currently some performance issue with this method,
+         * but this the image retrieve from the other getImage() method
+         * does not seem to allow immediate retrieval of the image size
+         * so this method is needed to correctly set the bound for the PNodes.
+         */
+        URL url = OdorWorldResourceManager.class.getResource(name);
+        BufferedImage image = null;
+        try {
+            // source: https://stackoverflow.com/a/44170254
+            // with disk caching ImageIO.read() is really slow...
+            // even when disabled, the performance is still bad
+            // TODO: improve performance on image loading?
+            ImageIO.setUseCache(false);
+            image = ImageIO.read(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
     }
 }

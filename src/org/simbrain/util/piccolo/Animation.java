@@ -48,4 +48,9 @@ public interface Animation
      * @return the current frame for this animation
      */
     Image getCurrentFrame();
+
+    /**
+     * Reset the frame counter to 0.
+     */
+    void resetToStaticFrame();
 }

@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -50,6 +52,11 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * Reference to model world.
      */
     private OdorWorld world;
+
+    /**
+     * Timer to update entity animations.
+     */
+    private Timer animationTimer;
 
     /**
      * Default constructor.
@@ -124,5 +131,22 @@ public class OdorWorldComponent extends WorkspaceComponent {
             models.addAll(entity.getEffectors());
         }
         return models;
+    }
+
+    @Override
+    public void start() {
+        animationTimer = new Timer();
+        animationTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                world.advance();
+            }
+        },50, 50);
+    }
+
+    @Override
+    public void stop() {
+        animationTimer.cancel();
+        world.stopAnimation();
     }
 }

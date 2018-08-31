@@ -122,6 +122,20 @@ public class OdorWorld {
     }
 
     /**
+     * Advance animation.
+     */
+    public void advance() {
+        changeSupport.firePropertyChange("advance", null, null);
+    }
+
+    /**
+     * Stop animation.
+     */
+    public void stopAnimation() {
+        changeSupport.firePropertyChange("stopAnimation", null, null);
+    }
+
+    /**
      * Add an Odor World Entity.
      *
      * @param entity the entity to add

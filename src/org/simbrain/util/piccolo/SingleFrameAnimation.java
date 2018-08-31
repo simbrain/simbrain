@@ -65,4 +65,8 @@ public final class SingleFrameAnimation
     {
         return currentFrame;
     }
+
+    @Override
+    public void resetToStaticFrame() {
+    }
 }

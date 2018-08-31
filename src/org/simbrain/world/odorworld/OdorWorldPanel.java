@@ -32,6 +32,7 @@ import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.gui.*;
+import org.simbrain.world.threedworld.entities.Entity;
 
 import javax.swing.*;
 import java.awt.*;
@@ -158,6 +159,16 @@ public class OdorWorldPanel extends JPanel {
                     camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
                     repaint();
                 }
+            } else if ("advance".equals(evt.getPropertyName())) {
+                canvas.getLayer().getChildrenReference().stream()
+                        .filter(i -> i instanceof EntityNode)
+                        .forEach(i -> ((EntityNode) i).advance());
+                repaint();
+            } else if ("stopAnimation".equals(evt.getPropertyName())) {
+                canvas.getLayer().getChildrenReference().stream()
+                        .filter(i -> i instanceof EntityNode)
+                        .forEach(i -> ((EntityNode) i).resetToStaticFrame());
+                repaint();
             }
         });
 

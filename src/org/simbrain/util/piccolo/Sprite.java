@@ -129,6 +129,8 @@ public class Sprite
         this.animations = new HashSet<Animation>(animations);
         this.frameSkip = frameSkip;
         setCurrentAnimation(currentAnimation);
+        Image currentFrame = currentAnimation.getCurrentFrame();
+        setBounds(0, 0, currentFrame.getWidth(null), currentFrame.getHeight(null));
     }
 
 

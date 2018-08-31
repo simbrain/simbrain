@@ -18,10 +18,12 @@
  */
 package org.simbrain.world.odorworld.entities;
 
+import org.simbrain.util.piccolo.Animation;
+import org.simbrain.util.piccolo.Animations;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.*;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 /**
  * Manages the creation of treemaps for rotating entities.
@@ -29,8 +31,6 @@ import java.util.TreeMap;
  * @author jyoshimi
  */
 public class RotatingEntityManager {
-
-    //TODO: Use LoopedFramesAnimation?
 
     /**
      * Rotating image base directory.
@@ -42,33 +42,44 @@ public class RotatingEntityManager {
      *
      * @return mouse tree map
      */
-    public static TreeMap<Double, Image> getMouse() {
-        TreeMap<Double, Image> mouseMap = new TreeMap<Double, Image>();
-        mouseMap.put(7.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif"));
-        mouseMap.put(22.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_15.gif"));
-        mouseMap.put(37.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_30.gif"));
-        mouseMap.put(52.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_45.gif"));
-        mouseMap.put(67.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_60.gif"));
-        mouseMap.put(82.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_75.gif"));
-        mouseMap.put(97.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_90.gif"));
-        mouseMap.put(112.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_105.gif"));
-        mouseMap.put(127.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_120.gif"));
-        mouseMap.put(142.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_135.gif"));
-        mouseMap.put(157.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_150.gif"));
-        mouseMap.put(172.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_165.gif"));
-        mouseMap.put(187.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_180.gif"));
-        mouseMap.put(202.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_195.gif"));
-        mouseMap.put(217.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_210.gif"));
-        mouseMap.put(232.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_225.gif"));
-        mouseMap.put(247.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_240.gif"));
-        mouseMap.put(262.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_255.gif"));
-        mouseMap.put(277.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_270.gif"));
-        mouseMap.put(292.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_285.gif"));
-        mouseMap.put(307.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_300.gif"));
-        mouseMap.put(322.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_315.gif"));
-        mouseMap.put(337.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_330.gif"));
-        mouseMap.put(352.5, OdorWorldResourceManager.getRotatingImage("mouse/Mouse_345.gif"));
+    public static ArrayList<Animation> getMouse() {
+
+        ArrayList<Animation> mouseMap = new ArrayList<>();
+        int degree = 15;
+        int count = 360 / degree; // each image is 15 degree apart
+        for (int i = 0; i < count; i++) {
+            mouseMap.add(
+                    Animations.createAnimation(
+                            OdorWorldResourceManager.getRotatingImage(
+                                    "mouse/Mouse_" + i * degree + ".gif"
+                            )
+                    )
+            );
+        }
+
         return mouseMap;
+    }
+
+    public static Animation getMouseByDegree(double degree) {
+        return getAnimationByHeading("mouse", degree);
+    }
+
+    public static Animation getAnimationByHeading(String animationName, double degree) {
+        ArrayList<Animation> animation;
+        if (animationName.equals("mouse")) {
+            animation = getMouse();
+        } else {
+            animation = getRotatingTileset(animationName);
+        }
+
+        return getAnimationByHeading(animation, degree);
+    }
+
+    public static Animation getAnimationByHeading(ArrayList<Animation> animations, double degree) {
+        int degreeApart = 360 / animations.size();
+        degree = (degree + degreeApart / 2) % 360;
+        int index = (int)(degree / degreeApart);
+        return animations.get(index);
     }
 
     /**
@@ -91,37 +102,22 @@ public class RotatingEntityManager {
      *
      * @param tileBaseName base name used to access the relevant set of image,
      *                     which are named in a standard way
-     * @param duration
      * @return horse tree map
      */
-    public static TreeMap<Double, Image> getRotatingTileset(String tileBaseName, int duration) {
-        TreeMap<Double, Image> cowMap = new TreeMap<Double, Image>();
+    public static ArrayList<Animation> getRotatingTileset(String tileBaseName) {
 
-//        double angle = 7.5;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/e0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/e0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/ne0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/ne0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/n0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/n0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/nw0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/nw0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/w0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/w0007.png"}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/sw0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/sw0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/s0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/s0007.png",}, duration));
-//
-//        angle += 45.0;
-//        cowMap.put(angle, new Image(new String[]{ROTATING_IMAGE_DIR + tileBaseName + "/se0000.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0001.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0002.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0003.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0004.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0005.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0006.png", ROTATING_IMAGE_DIR + tileBaseName + "/se0007.png",}, duration));
+        ArrayList<Animation> rotatingTileset = new ArrayList<>();
 
-        return cowMap;
+        String[] fileNameInitials = {"e000", "ne000", "n000", "nw000", "w000", "sw000", "s000", "se000"};
+        for (String fni : fileNameInitials) {
+            ArrayList<Image> frames = new ArrayList<>();
+            for (int i = 0; i < 8; i++) {
+                frames.add(OdorWorldResourceManager.getRotatingImage(tileBaseName + "/" + fni + i + ".png"));
+            }
+            rotatingTileset.add(Animations.createLoopedAnimation(frames));
+        }
+
+        return rotatingTileset;
     }
 
 }

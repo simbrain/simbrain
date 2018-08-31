@@ -92,4 +92,10 @@ public final class MultipleFramesAnimation
     {
         return frames.get(index);
     }
+
+
+    @Override
+    public void resetToStaticFrame() {
+        index = 0;
+    }
 }

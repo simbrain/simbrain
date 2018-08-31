@@ -88,4 +88,9 @@ public final class LoopedFramesAnimation
     {
         return frames.get(index);
     }
+
+    @Override
+    public void resetToStaticFrame() {
+        index = 0;
+    }
 }

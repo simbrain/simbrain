@@ -52,7 +52,7 @@ public class OdorWorldEntity implements EditableObject {
     //TODO: This is a first pass
     /** Type of this object.  These are mapped to images, etc. */
     public enum EntityType {
-        SWISS, FLOWER, MOUSE
+        SWISS, FLOWER, MOUSE, COW
     }
 
     @UserParameter(label = "Type", order = 2)

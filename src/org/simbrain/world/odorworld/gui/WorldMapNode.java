@@ -17,7 +17,7 @@ public class WorldMapNode extends PNode {
 
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
-                PImage testimg = new PImage(OdorWorldResourceManager.getStaticImage("PlaceHolderTile.png"));
+                PImage testimg = new PImage(OdorWorldResourceManager.getStaticImage("grass_tile.png"));
                 testimg.setPickable(false);
                 testimg.offset(i * 32, j * 32);
                 test.add(testimg);

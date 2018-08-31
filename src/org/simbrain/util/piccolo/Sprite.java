@@ -57,6 +57,10 @@ public class Sprite
     private final Set<Animation> animations;
 
 
+    public Sprite(final Image image) {
+        this(Animations.createAnimation(image));
+    }
+
     /**
      * Create a new piccolo sprite node with the specified animation.
      *
@@ -126,7 +130,7 @@ public class Sprite
         {
             throw new IllegalArgumentException("animations must contain at least one animation");
         }
-        this.animations = new HashSet<Animation>(animations);
+        this.animations = animations;
         this.frameSkip = frameSkip;
         setCurrentAnimation(currentAnimation);
         Image currentFrame = currentAnimation.getCurrentFrame();
@@ -153,6 +157,10 @@ public class Sprite
             }
             skipped = 0;
         }
+    }
+
+    public void resetToStaticFrame() {
+        currentAnimation.resetToStaticFrame();
     }
 
     /**

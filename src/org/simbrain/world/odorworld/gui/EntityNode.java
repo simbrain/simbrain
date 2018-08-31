@@ -20,10 +20,7 @@ package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PImage;
-import org.simbrain.util.piccolo.Animation;
-import org.simbrain.util.piccolo.LoopedFramesAnimation;
-import org.simbrain.util.piccolo.SingleFrameAnimation;
-import org.simbrain.util.piccolo.Sprite;
+import org.simbrain.util.piccolo.*;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -54,24 +51,14 @@ public class EntityNode extends PNode {
     private static final String DEFAULT_IMAGE = "Swiss.gif";
 
     /**
-     * Image representing this entity.
-     */
-    private transient PImage image;
-
-    /**
      * Flag to indicate this node's location has changed and should be updated at the next update
      */
     private boolean updateFlag;
 
-    // TODO: Use?
+    /**
+     * Sprite representing this entity
+     */
     public Sprite sprite;
-
-    public ArrayList<Animation> animations;
-    public Animation currentAnimation;
-    public final LoopedFramesAnimation animation2 = null;
-    // Old solution. Not sure whether to keep it..
-//    private TreeMap<Double, Image> imageMap = null;
-    // TODO: Replace image with image source type of design?
 
     /**
      * Construct an entity node with a back-ref to parent.
@@ -121,30 +108,30 @@ public class EntityNode extends PNode {
 
         switch (entity.getEntityType()) {
         case SWISS:
-            this.currentAnimation = new SingleFrameAnimation(OdorWorldResourceManager.getStaticImage(DEFAULT_IMAGE));
-            sprite = new Sprite(currentAnimation);
+            sprite = new Sprite(OdorWorldResourceManager.getStaticImage(DEFAULT_IMAGE));
             break;
         case FLOWER:
-            this.currentAnimation = new SingleFrameAnimation(OdorWorldResourceManager.getStaticImage("pansy.gif"));
-            sprite = new Sprite(currentAnimation);
+            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("pansy.gif"));
             break;
         case MOUSE:
-            this.animations = RotatingEntityManager.getMouse();
-            updateImageBasedOnHeading();
-            sprite = new Sprite(currentAnimation);
+            sprite = new RotatingSprite(RotatingEntityManager.getMouse());
             break;
+        case AMY:
+        case ARNO:
+        case BOY:
         case COW:
-            this.animations = RotatingEntityManager.getRotatingTileset("cow");
-            updateImageBasedOnHeading();
-            sprite = new Sprite(currentAnimation);
+        case GIRL:
+        case JAKE:
+        case LION:
+        case STEVE:
+        case SUSI:
+            sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset(entity.getEntityType().name()));
             break;
         default:
             break;
         }
 
-
         addChild(sprite);
-
 
     }
 
@@ -157,7 +144,7 @@ public class EntityNode extends PNode {
 
         if (updateFlag) {
             if(entity instanceof RotatingEntity) {
-                updateImageBasedOnHeading();
+                ((RotatingSprite) sprite).updateHeading(((RotatingEntity)entity).getHeading());
             }
             setOffset(entity.getX(), entity.getY());
             repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
@@ -174,41 +161,16 @@ public class EntityNode extends PNode {
 //        }
     }
 
-    /**
-     * The method name says it all...
-     */
-    private void updateImageBasedOnHeading() {
-
-        if(animations == null) {
-            //TODO: Smelly!
-            return;
-        }
-
-        currentAnimation = RotatingEntityManager.getAnimationByHeading(
-                animations,
-                ((RotatingEntity)entity).getHeading()
-        );
-    }
-
     public void advance() {
-        currentAnimation.advance();
+        sprite.advance();
     }
 
     public void resetToStaticFrame() {
-        currentAnimation.resetToStaticFrame();
+        sprite.resetToStaticFrame();
     }
 
     public OdorWorldEntity getEntity() {
         return entity;
     }
-
-    // PImage image1 = new PImage(OdorWorldResourceManager.getRotatingImage("mouse/Mouse_0.gif"));
-    // PImage image2 = new PImage(OdorWorldResourceManager.getRotatingImage("mouse/Mouse_15.gif"));
-    // List<Image> images = Arrays.asList(image1, image2);
-    // image = image1;
-    // animation = new LoopedFramesAnimation(images);
-    // sprite = new Sprite(animation2);
-    // this.addChild(sprite);
-
 
 }

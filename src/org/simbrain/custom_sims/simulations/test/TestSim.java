@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.network.connections.RadialSimpleConstrainedKIn;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule.InputType;
@@ -152,8 +151,8 @@ public class TestSim extends RegisteredSimulation {
                         .ofUpperBound(3)
                         .build();
 
-        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0, exRand, inRand);
+//        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, null, 1.0, exRand, inRand);
         sg.setLabel("Recurrent Synapses");
         network.addGroup(sg);
         for (Neuron n : ng1.getNeuronList()) {

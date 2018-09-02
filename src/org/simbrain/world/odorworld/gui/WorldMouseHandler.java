@@ -36,6 +36,7 @@ import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
+import org.simbrain.world.odorworld.dialogs.EntityDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
@@ -124,9 +125,10 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         // Show context menu for right click
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
             if (pickedNode.getParent() instanceof EntityNode) {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode)pickedNode.getParent()).getEntity());
+                JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode) pickedNode.getParent()).getEntity());
+                menu.show(odorWorldPanel, (int) odorWorldPanel.getLastClickedPosition().getX(), (int) odorWorldPanel.getLastClickedPosition().getY());
             } else {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(null); //TODO. Don't use null in this way
+                JPopupMenu menu = odorWorldPanel.getContextMenu(null);
                 menu.show(odorWorldPanel, (int) odorWorldPanel.getLastClickedPosition().getX(), (int) odorWorldPanel.getLastClickedPosition().getY());
             }
         }
@@ -153,18 +155,15 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             if (node.getParent() instanceof EntityNode) {
                 EntityNode entityNode = (EntityNode) node.getParent();
                 // Edit odor world entity properties
-                AnnotatedPropertyEditor editor =
-                    new AnnotatedPropertyEditor(entityNode.getEntity());
-                StandardDialog dialog = editor.getDialog();
+                EntityDialog dialog = new EntityDialog(entityNode.getEntity());
                 dialog.setModal(true);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 dialog.addWindowListener(new WindowAdapter() {
                     public void windowClosed(WindowEvent arg) {
-                        editor.commitChanges();
-                entityNode.getEntity().commitEditorChanges();
-
+                        dialog.commitChanges();
+                        entityNode.getEntity().commitEditorChanges();
                     }
                 });
             }
@@ -286,7 +285,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         //System.out.println("Drag:" + pickedNode);
 
         // Continue to drag nodes that have already been selected
-        for (PNode node  : odorWorldPanel.getSelection()) {
+        for (PNode node : odorWorldPanel.getSelection()) {
             // TODO: networkpanel has a draggable flag here
             // TODO: Only update model at end of drag.
             // TODO: This getparent business...
@@ -309,8 +308,8 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             marqueeStartPosition = null;
             return;
         } else {
-            for(PNode node : odorWorldPanel.getSelectedEntities()) {
-                if(node instanceof EntityNode) {
+            for (PNode node : odorWorldPanel.getSelectedEntities()) {
+                if (node instanceof EntityNode) {
                     ((EntityNode) node).pushViewPositionToModel();
                 }
             }

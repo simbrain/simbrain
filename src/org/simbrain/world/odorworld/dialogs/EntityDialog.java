@@ -23,6 +23,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -36,29 +37,12 @@ import java.awt.event.ActionListener;
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
  * creatures and entities within a world environment.
  */
-public class EntityDialog extends StandardDialog implements ActionListener {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The dimension for the combobox renderer.
-     */
-    private final int cbRendererDimension = 35;
+public class EntityDialog extends StandardDialog {
 
     /**
      * The entity for which this dialog is called.
      */
     private OdorWorldEntity entityRef;
-
-    /**
-     * The text field containing the name of the entity.
-     */
-    private JTextField tfEntityName = new JTextField();
-
-    /**
-     * The Combobox from which to choose the entity image.
-     */
-    private JComboBox cbImageName = new JComboBox();
 
     /**
      * The renderer to display the combobox.
@@ -73,23 +57,7 @@ public class EntityDialog extends StandardDialog implements ActionListener {
     /**
      * Property editor for main entity properties.
      */
-    private ReflectivePropertyEditor mainEditor;
-
-    /**
-     * The text field containing the number of bites until the item dies
-     * (absolute, not remaining).
-     */
-    private JTextField bitesToDie = new JTextField();
-
-    /**
-     * The checkbox identifying whether or not the item is edible.
-     */
-    private JCheckBox edible = new JCheckBox();
-
-    /**
-     * The probability of a resurrection each turn.
-     */
-    private JTextField resurrectionProb = new JTextField();
+    private AnnotatedPropertyEditor mainEditor;
 
     /**
      * Tabbed pane.
@@ -99,7 +67,7 @@ public class EntityDialog extends StandardDialog implements ActionListener {
     /**
      * Editor panel for smell source.
      */
-    SmellSourcePanel smellPanel;
+    private SmellSourcePanel smellPanel;
 
     /**
      * Create and show the world entity dialog box.
@@ -119,19 +87,10 @@ public class EntityDialog extends StandardDialog implements ActionListener {
      */
     private void init() {
 
-        this.fillFieldValues();
+        mainEditor = new AnnotatedPropertyEditor(entityRef);
 
-        // Main tab
-        // tabbedPane.addTab("Main", mainPanel);
-        mainEditor = new ReflectivePropertyEditor();
-        // TODO: For now rotating entities are the only agents. As noted
-        // elsewhere the concept of an agent needs to be made explicit.
-        if (entityRef instanceof RotatingEntity) {
-            mainEditor.setExcludeList(new String[]{"entityType", "id"});
-        } else {
-            mainEditor.setExcludeList(new String[]{"entityType", "id", "showSensors", "sensorsEnabled", "effectorsEnabled"});
-        }
-        mainEditor.setObjectToEdit(entityRef);
+        fillFieldValues();
+
         tabbedPane.addTab("Main", mainEditor);
 
         // Smell tabs
@@ -142,31 +101,14 @@ public class EntityDialog extends StandardDialog implements ActionListener {
         }
 
         // Sensor / effector display
-        if (entityRef instanceof RotatingEntity) {
+        if (entityRef.isSensorsEnabled()) {
             tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
+        }
+        if (entityRef.isEffectorsEnabled()) {
             tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
         }
 
-        // [Below not currently used]
-        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension, cbRendererDimension));
-        cbImageName.setRenderer(cbRenderer);
-        // mainPanel.addItem("Image", cbImageName);
-
-        // Misc. Tabs
-        bitesToDie.setColumns(2);
-        edible.addActionListener(this);
-        miscPanel.addItem("Edible", edible);
-        miscPanel.addItem("Bites to die", bitesToDie);
-        miscPanel.addItem("Resurrection Probability", resurrectionProb);
-        // lifeCycleEditor = new
-        // ReflectivePropertyEditor(entityRef.getLifeCycle());
-        // tabbedPane.addTab("LifeCycle", lifeCycleEditor);
-        ShowHelpAction helpAction;
-        if (entityRef instanceof RotatingEntity) {
-            helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/agents.html");
-        } else {
-            helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
-        }
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
         addButton(new JButton(helpAction));
         setContentPane(tabbedPane);
     }
@@ -186,65 +128,20 @@ public class EntityDialog extends StandardDialog implements ActionListener {
      * Fills the values within the fields of the dialog.
      */
     private void fillFieldValues() {
-        if (entityRef != null) {
-            tfEntityName.setText(entityRef.getName());
+        if (mainEditor != null) {
+            mainEditor.fillFieldValues();
         }
-        //
-        // cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.));
-        // edible.setSelected(entityRef`);
-        // bitesToDie.setText((new
-        // Integer(entityRef.getBitesToDie())).toString());
-        // bitesToDie.setEnabled(entityRef.getEdible());
-        // resurrectionProb.setText("" + entityRef.getResurrectionProb());
     }
 
     /**
      * Commits changes to the entity that are shown in the dialog.
      */
     public void commitChanges() {
-        mainEditor.commit();
+        mainEditor.commitChanges();
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }
-        // lifeCycleEditor.commit();
-        // entityRef.setEdible(edible.isSelected());
-        //
-        // if (!edible.isSelected()) {
-        // entityRef.setBites(0);
-        // }
-        //
-        // entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
-        // entityRef.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
 
-        // if (!entityRef.getName().equals(tfEntityName.getText())) {
-        // if (!Utils.containsName(entityRef.getParent().getEntityNames(),
-        // tfEntityName.getText())) {
-        // entityRef.setName(tfEntityName.getText());
-        // ArrayList a = new ArrayList();
-        // a.add(entityRef);
-        // entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
-        // entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
-        // } else {
-        // JOptionPane.showMessageDialog(
-        // null, "The name \"" + tfEntityName.getText() + "\" already exists.",
-        // "Warning", JOptionPane.ERROR_MESSAGE);
-        // }
-        // }
-
-        // entityRef.setImageName(cbImageName.getSelectedItem().toString());
-    }
-
-    /**
-     * Respond to button pressing events.
-     *
-     * @param e the ActionEvent triggering this method
-     */
-    public void actionPerformed(final ActionEvent e) {
-        Object o = e.getSource();
-
-        if (o == edible) {
-            bitesToDie.setEnabled(edible.isSelected());
-        }
     }
 
 }

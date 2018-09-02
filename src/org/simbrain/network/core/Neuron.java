@@ -94,7 +94,7 @@ public class Neuron implements EditableObject {
      */
     @UserParameter(
         label = "Increment",
-        description = "Amount that a neuron is incremented / decemented when it is manually adjusted.",
+        description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
         defaultValue = "1" + DEFAULT_INCREMENT, order = 6)
     protected double increment = DEFAULT_INCREMENT;
 
@@ -169,6 +169,7 @@ public class Neuron implements EditableObject {
      * The polarity of this neuron (excitatory, inhibitory, or none, which is
      * null).
      */
+    @UserParameter(label = "Polarity", order = 10)
     private Polarity polarity = Polarity.BOTH;
 
     /**

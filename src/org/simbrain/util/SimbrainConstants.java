@@ -115,6 +115,11 @@ public class SimbrainConstants {
          * @return the  name of enum member.
          */
         public abstract String title();
+        
+        @Override
+        public String toString() {
+            return title();
+        }
     }
 
 }

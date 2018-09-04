@@ -22,7 +22,10 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
@@ -30,28 +33,55 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implementing classes create connections (collections of synapses) between
- * groups of neurons.
+ * Maintains a specific strategy for connecting two groups
+ * of neurons together.  Subclasses correspond to specific types of
+ * connection strategy. Applied using static methods for loose
+ * neurons and synapse groups.
+ *
+ * Maintains all information needed to apply the connection method
+ * either to a pair of lists of neurons (for connecting loose neurons)
+ * or to a synapse group (for creating a synapse group).
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public interface ConnectNeurons extends CopyableObject {
+public abstract class ConnectNeurons implements EditableObject {
 
     /**
-     * Connectors for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
-     * to set a type of probability distribution.
+     * Default percent of excitatory neurons.
      */
-    public static List<Class> CONNECTION_LIST = Arrays.asList(AllToAll.class,
-        RadialSimple.class, RadialGaussian.class, OneToOne.class, Sparse.class);
+    private static final double DEFAULT_PERCENT_EXCITATORY = 1.0;
 
     /**
-     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     * Whether excitatory connection should be randomized.
      */
-    public static List<Class> getTypes() {
-        return CONNECTION_LIST;
-    }
+    private boolean useExcitatoryRandomization = false;
+
+    /**
+     * Whether inhibitory connection should be randomized.
+     */
+    private boolean useInhibitoryRandomization = false;
+
+    /**
+     * The current ratio of excitatory to inhibitory neurons.
+     */
+    private double excitatoryRatio = DEFAULT_PERCENT_EXCITATORY;
+
+    /**
+     * The randomizer for excitatory synapses.
+     */
+    private ProbabilityDistribution exRandomizer =
+        UniformDistribution.builder()
+            .ofPolarity(SimbrainConstants.Polarity.EXCITATORY)
+            .build();
+
+    /**
+     * The randomizer for inhibitory synapses.
+     */
+    private ProbabilityDistribution inRandomizer =
+        UniformDistribution.builder()
+            .ofPolarity(SimbrainConstants.Polarity.INHIBITORY)
+            .build();
 
     /**
      * Apply connection to a synapse group using specified parameters.
@@ -71,28 +101,37 @@ public interface ConnectNeurons extends CopyableObject {
      */
     public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
 
-    //TODO: Reconsider this
-    @Override
-    default EditableObject copy() {
-        return this;
+
+    public boolean isUseExcitatoryRandomization() {
+        return useExcitatoryRandomization;
     }
 
-    /**
-     * Utility class that encapsulates a connection type so that it
-     * can be used in an {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
-     * so that it's easy to create a property editor to edit a probability distribution.
-     */
-    public static class ConnectionType implements EditableObject {
-
-        @UserParameter(label = "Connection Type", isObjectType = true)
-        private ConnectNeurons connectionType = new AllToAll();
-
-        public ConnectNeurons getConnectionType() {
-            return connectionType;
-        }
-
-        public void setConnectionType(ConnectNeurons type) {
-            this.connectionType = type;
-        }
+    public void setUseExcitatoryRandomization(boolean useExcitatoryRandomization) {
+        this.useExcitatoryRandomization = useExcitatoryRandomization;
     }
+
+    public boolean isUseInhibitoryRandomization() {
+        return useInhibitoryRandomization;
+    }
+
+    public void setUseInhibitoryRandomization(boolean useInhibitoryRandomization) {
+        this.useInhibitoryRandomization = useInhibitoryRandomization;
+    }
+
+    public double getExcitatoryRatio() {
+        return excitatoryRatio;
+    }
+
+    public void setExcitatoryRatio(double excitatoryRatio) {
+        this.excitatoryRatio = excitatoryRatio;
+    }
+
+    public ProbabilityDistribution getExRandomizer() {
+        return exRandomizer;
+    }
+
+    public ProbabilityDistribution getInRandomizer() {
+        return inRandomizer;
+    }
+
 }

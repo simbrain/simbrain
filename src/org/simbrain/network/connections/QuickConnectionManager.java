@@ -21,9 +21,6 @@ package org.simbrain.network.connections;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 
 import java.util.List;
 
@@ -39,11 +36,6 @@ import java.util.List;
  * @author Jeff Yoshimi
  */
 public class QuickConnectionManager {
-
-    /**
-     * Default percent of excitatory neurons.
-     */
-    private static final double DEFAULT_PERCENT_EXCITATORY = 1.0;
 
     /**
      * The all to all connector.
@@ -76,37 +68,6 @@ public class QuickConnectionManager {
     private ConnectNeurons currentConnector;
 
     /**
-     * Whether excitatory connection should be randomized.
-     */
-    private boolean useExcitatoryRandomization = false;
-
-    /**
-     * Whether inhibitory connection should be randomized.
-     */
-    private boolean useInhibitoryRandomization = false;
-
-    /**
-     * The current ratio of excitatory to inhibitory neurons.
-     */
-    private double excitatoryRatio = DEFAULT_PERCENT_EXCITATORY;
-
-    /**
-     * The randomizer for excitatory synapses.
-     */
-    private ProbabilityDistribution exRandomizer =
-            UniformDistribution.builder()
-                    .ofPolarity(Polarity.EXCITATORY)
-                    .build();
-
-    /**
-     * The randomizer for inhibitory synapses.
-     */
-    private ProbabilityDistribution inRandomizer =
-            UniformDistribution.builder()
-                    .ofPolarity(Polarity.INHIBITORY)
-                    .build();
-
-    /**
      * Construct the quick connection manager.
      */
     public QuickConnectionManager() {
@@ -131,12 +92,12 @@ public class QuickConnectionManager {
     public void applyCurrentConnection(Network net, List<Neuron> source, List<Neuron> target) {
         List<Synapse> retList = currentConnector.connectNeurons(net, source, target);
         if (retList != null) {
-            ConnectionUtilities.polarizeSynapses(retList, excitatoryRatio);
-            if (this.useExcitatoryRandomization) {
-                ConnectionUtilities.randomizeExcitatorySynapses(retList, exRandomizer);
+            ConnectionUtilities.polarizeSynapses(retList, currentConnector.getExcitatoryRatio());
+            if (currentConnector.isUseExcitatoryRandomization()) {
+                ConnectionUtilities.randomizeExcitatorySynapses(retList, currentConnector.getExRandomizer());
             }
-            if (this.useInhibitoryRandomization) {
-                ConnectionUtilities.randomizeInhibitorySynapses(retList, exRandomizer);
+            if (currentConnector.isUseInhibitoryRandomization()) {
+                ConnectionUtilities.randomizeInhibitorySynapses(retList, currentConnector.getInRandomizer());
             }
         }
     }
@@ -147,50 +108,6 @@ public class QuickConnectionManager {
 
     public void setCurrentConnector(ConnectNeurons currentConnector) {
         this.currentConnector = currentConnector;
-    }
-
-    public boolean isUseExcitatoryRandomization() {
-        return useExcitatoryRandomization;
-    }
-
-    public void setUseExcitatoryRandomization(boolean useExcitatoryRandomization) {
-        this.useExcitatoryRandomization = useExcitatoryRandomization;
-    }
-
-    public boolean isUseInhibitoryRandomization() {
-        return useInhibitoryRandomization;
-    }
-
-    public void setUseInhibitoryRandomization(boolean useInhibitoryRandomization) {
-        this.useInhibitoryRandomization = useInhibitoryRandomization;
-    }
-
-    public double getExcitatoryRatio() {
-        return excitatoryRatio;
-    }
-
-    public void setExcitatoryRatio(double excitatoryRatio) {
-        this.excitatoryRatio = excitatoryRatio;
-    }
-
-    public ProbabilityDistribution getExRandomizer() {
-        return exRandomizer;
-    }
-
-    public void setExRandomizer(ProbabilityDistribution exRandomizer) {
-        this.exRandomizer = exRandomizer;
-    }
-
-    public ProbabilityDistribution getInRandomizer() {
-        return inRandomizer;
-    }
-
-    public void setInRandomizer(ProbabilityDistribution inRandomizer) {
-        this.inRandomizer = inRandomizer;
-    }
-
-    public static double getDefaultPercentExcitatory() {
-        return DEFAULT_PERCENT_EXCITATORY;
     }
 
     public AllToAll getAllToAll() {

@@ -5,8 +5,9 @@ import org.simbrain.util.BiMap;
 import java.util.HashMap;
 
 /**
- * Objects that implement this interface can be edited using an
- * {@link ObjectTypeEditor}.
+ * Indicates that an object can be copied. Used by the {@link ObjectTypeEditor}.
+ * When an object's type is changed using the editor, a prototype object is created
+ * and then copies of that object are made and applied to all the edited objects.
  *
  * @author Jeff Yoshimi
  */

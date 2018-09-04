@@ -31,12 +31,15 @@ import java.awt.event.MouseListener;
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
  * <p>
- * Good example of use: GeneralNeuronPropertiesPanel around line 243
+ * An example usage is in {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
  *
  * @author Zoë Tosi
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
+    /**
+     * Direction the triangle faces when it is "up".
+     */
     public enum UpDirection {
         LEFT, RIGHT;
     }

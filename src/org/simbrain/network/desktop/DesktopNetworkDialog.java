@@ -84,7 +84,6 @@ public class DesktopNetworkDialog extends NetworkDialog {
         ((NetworkPanelDesktop) networkPanel).applyUserPrefsToNetwork();
         networkPropertiesPanel.fillFieldValues();
         networkPropertiesPanel.setIndicatorColor();
-        quickConnectPanel.fillFieldValues();
         networkPanel.resetColors();
 
     }

@@ -29,7 +29,7 @@ import java.util.List;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class AllToAll implements ConnectNeurons, EditableObject {
+public class AllToAll extends ConnectNeurons implements EditableObject {
 
     /**
      * The default preference as to whether or not self connections are allowed.

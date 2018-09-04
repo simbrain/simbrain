@@ -24,17 +24,20 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.DropDownTriangle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * Panel for editing connection objects when creating new synapse groups.
+ * Panel for editing connection managers.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
@@ -52,7 +55,7 @@ public final class ConnectionPanel extends JPanel {
     private ConnectionSynapsePropertiesPanel synapseProperties;
 
     /**
-     * The excitatory ratio and randomizer panel.
+     * The excitatory-inhibitory ratio and randomizer panel.
      */
     private SynapsePolarityAndRandomizerPanel polarityPanel;
 
@@ -86,36 +89,72 @@ public final class ConnectionPanel extends JPanel {
      * Initialize the connection panel.
      */
     private void init() {
+
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        // Connection Properties
+        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Show", "Hide", parentFrame);
+        JPanel connectionContainer = new JPanel(new GridBagLayout());
+        connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
         if (connection instanceof Sparse) {
             connectionProperties =  SparseConnectionPanel.createSparsityAdjustmentPanel((Sparse) connection, null);
         } else  {
             connectionProperties = new AnnotatedPropertyEditor(connection);
         }
-        add(connectionProperties);
-        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Synapse Properties", "Synapse Properties", parentFrame);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        connectionContainer.add(detailTriangle, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 3;
+        gbc.weighty = 3;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.anchor = GridBagConstraints.CENTER;
+        connectionContainer.add(connectionProperties, gbc);
+        add(connectionContainer);
+
+        // Synapse Properties
+        JPanel synapseContainer = new JPanel();
+        synapseContainer.setBorder(BorderFactory.createTitledBorder("Synapse Type"));
         add(Box.createRigidArea(new Dimension(0, 10)));
-        add(leftJustify(detailTriangle));
+        add(leftJustify(synapseContainer));
         add(Box.createRigidArea(new Dimension(0, 15)));
-        synapseProperties = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(parentFrame);
-        add(synapseProperties);
-        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parentFrame);
+        JButton synProperties = new JButton("Set");
+        synProperties.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StandardDialog dialog =  new StandardDialog();
+                dialog.setContentPane(ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(dialog));
+                dialog.setVisible(true);
+            }
+            //TODO: Display some text info about which synapse types are being used
+        });
+        synapseContainer.add(synProperties);
+        add(synapseContainer);
+
+        // E/I Ratio and Randomizers
+        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connection, parentFrame);
         add(polarityPanel);
         detailTriangle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                updateDetailTriangle();
+                updateExcitatoryRatioTriangle();
             }
         });
-        updateDetailTriangle();
+        updateExcitatoryRatioTriangle();
     }
 
     /**
      * Update state of detail triangle.
      */
-    private void updateDetailTriangle() {
-        synapseProperties.setVisible(detailTriangle.isDown());
-        synapseProperties.repaint();
+    private void updateExcitatoryRatioTriangle() {
+        connectionProperties.setVisible(detailTriangle.isDown());
+        connectionProperties.repaint();
         if (parentFrame != null) {
             parentFrame.pack();
         }
@@ -130,6 +169,18 @@ public final class ConnectionPanel extends JPanel {
         b.add(Box.createHorizontalGlue());
         return b;
     }
+
+    //TODO!
+    public void commitSettings() {
+        if(connection instanceof Sparse) {
+            ((SparseConnectionPanel)connectionProperties).commitChanges();
+        } else {
+            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
+        }
+        polarityPanel.commitChanges(connection);
+    }
+
+    //TODO: The logic below should be in model objects
 
     /**
      * Commit changes made in this panel to a loose network.

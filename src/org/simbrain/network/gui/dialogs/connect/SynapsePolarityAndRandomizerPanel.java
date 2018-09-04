@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -51,6 +52,7 @@ import java.util.Hashtable;
  */
 @SuppressWarnings("serial")
 public class SynapsePolarityAndRandomizerPanel extends JPanel {
+
 
     public enum RandBehavior {
         FORCE_ON, DEFAULT, FORCE_OFF;
@@ -147,6 +149,24 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     private static final double ERROR_TOLERANCE = 0.05;
+
+    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(ConnectNeurons connection, Window parentFrame) {
+        SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parentFrame, RandBehavior.DEFAULT);
+        prPanel.fillDefaultValues();
+        System.out.println(connection.getExcitatoryRatio());
+        prPanel.exRandomizer =  connection.getExRandomizer();
+        prPanel.inRandomizer = connection.getInRandomizer();
+        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame, prPanel.exRandomizer, connection.isUseExcitatoryRandomization());
+        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame, prPanel.inRandomizer, connection.isUseInhibitoryRandomization());
+        prPanel.excitatoryRandomizerPanel.initListeners();
+        prPanel.inhibitoryRandomizerPanel.initListeners();
+        prPanel.initializeContent();
+        prPanel.initializeLayout();
+        prPanel.setExcitatoryRatio(connection.getExcitatoryRatio()/100); //TODO!!
+        return prPanel;
+
+    }
+
 
     /**
      * @param parent
@@ -803,6 +823,11 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             }
         }
 
+    }
+
+    public void commitChanges(ConnectNeurons connection) {
+        connection.setExcitatoryRatio(ratioSlider.getValue());
+        //TODO
     }
 
 }

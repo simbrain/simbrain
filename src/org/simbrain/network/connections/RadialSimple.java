@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class RadialSimple implements ConnectNeurons, EditableObject {
+public class RadialSimple extends ConnectNeurons implements EditableObject {
 
     /**
      * When connecting neurons within a radius of a given neuron they can be chosen

@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
@@ -54,7 +55,7 @@ public class NetworkDialog extends StandardDialog {
     /**
      * Connection preferences panel.
      */
-    protected QuickConnectPreferencesPanel quickConnectPanel;
+    protected ConnectionSelectorPanel quickConnectPanel;
 
     /**
      * Random panel.
@@ -84,7 +85,8 @@ public class NetworkDialog extends StandardDialog {
         tabbedPane.addTab("Main", networkPropertiesPanel);
 
         // Quick-connect properties
-        quickConnectPanel = new QuickConnectPreferencesPanel(networkPanel, this);
+        quickConnectPanel = new ConnectionSelectorPanel(networkPanel.getQuickConnector().getConnectors(),
+            networkPanel.getQuickConnector().getCurrentConnector());
         tabbedPane.addTab("Connections", quickConnectPanel);
 
         // Randomizer properties. Not currently used but being left in case
@@ -110,6 +112,7 @@ public class NetworkDialog extends StandardDialog {
     private void commitChanges() {
         networkPropertiesPanel.commitChanges();
         quickConnectPanel.commitChanges();
+        networkPanel.getQuickConnector().setCurrentConnector(quickConnectPanel.getSelectedConnector());
     }
 
     @Override

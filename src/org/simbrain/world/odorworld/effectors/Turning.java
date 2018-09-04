@@ -21,7 +21,7 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Effector for turning.
@@ -79,14 +79,14 @@ public class Turning extends Effector {
      * @param label     descriptive label
      * @param direction amount turn in radians.
      */
-    public Turning(RotatingEntity parent, String label, double direction) {
+    public Turning(OdorWorldEntity parent, String label, double direction) {
         super(parent, label);
         this.direction = direction;
     }
 
     @Override
     public void update() {
-        ((RotatingEntity) parent).turn(direction * amount);
+        parent.turn(direction * amount);
         this.amount = 0;
     }
 
@@ -143,6 +143,6 @@ public class Turning extends Effector {
 
     @Override
     public EditableObject copy() {
-        return new Turning((RotatingEntity) parent, getLabel(), direction);
+        return new Turning(parent, getLabel(), direction);
     }
 }

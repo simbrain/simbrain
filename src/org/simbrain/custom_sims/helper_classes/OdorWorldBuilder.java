@@ -4,7 +4,6 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * Utility for building odor worlds in simulation files.
@@ -38,13 +37,12 @@ public class OdorWorldBuilder {
      *             RotatingEntity around line 250).
      * @return reference to the agent
      */
-    public RotatingEntity addAgent(int x, int y, String type) {
-        RotatingEntity agent = new RotatingEntity(world);
-        world.addAgent(agent);
-//        agent.setEntityType(type); //TODO: EntityType
-        agent.setLocation(x, y);
-        // TODO: Note that setCenterLocation fails here. Problem in OdorWorld
-        return agent;
+    public OdorWorldEntity addAgent(int x, int y, String type) {
+        OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
+        world.addEntity(entity);
+        //TODO: Set type!
+        entity.setLocation(x, y);
+        return entity;
     }
 
     /**
@@ -57,7 +55,7 @@ public class OdorWorldBuilder {
      */
     public OdorWorldEntity addEntity(int x, int y, String imageName) {
         // TODO: Reimplement using EntityType
-        OdorWorldEntity entity = new OdorWorldEntity(null, world);
+        OdorWorldEntity entity = new OdorWorldEntity(world);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
         world.addEntity(entity);

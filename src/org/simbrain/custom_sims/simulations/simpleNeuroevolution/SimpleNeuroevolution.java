@@ -8,7 +8,6 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
@@ -34,7 +33,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 
 
     List<OdorWorldBuilder> world = new ArrayList<>();
-    List<RotatingEntity> mouse = new ArrayList<>();
+    List<OdorWorldEntity> mouse = new ArrayList<>();
     List<OdorWorldEntity> cheese = new ArrayList<>();
     List<OdorWorldEntity> poison = new ArrayList<>();
     List<NetWorldPairAttribute> attribute = new ArrayList<>();

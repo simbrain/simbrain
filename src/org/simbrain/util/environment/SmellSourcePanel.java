@@ -46,12 +46,12 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
     /**
      * Random number generator upper limit.
      */
-    private double randomUpper;
+    private double randomUpper = 10;
 
     /**
      * Random number generator lower limit.
      */
-    private double randomLower;
+    private double randomLower = 0;
 
     /**
      * Tabbed pane.
@@ -265,8 +265,8 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
 
         // Sets initial upper and lower randomizer bounds to current rounded max
         // and min values in the stimulus vector
-        randomUpper = Double.parseDouble(stimulusVals[0].getText());
-        randomLower = Double.parseDouble(stimulusVals[0].getText());
+        //randomUpper = Double.parseDouble(stimulusVals[0].getText());
+        // randomLower = Double.parseDouble(stimulusVals[0].getText());
 
         for (int i = 0; i < valArray.length; i++) {
             if ((Double.parseDouble(stimulusVals[i].getText())) > randomUpper) {
@@ -277,9 +277,6 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
                 randomLower = Double.parseDouble(stimulusVals[i].getText());
             }
         }
-
-        randomUpper = Math.rint(randomUpper);
-        randomLower = Math.rint(randomLower);
 
         tfStimulusNum.setText(Integer.toString(valArray.length));
         tfRandomUpper.setText(Double.toString(randomUpper));

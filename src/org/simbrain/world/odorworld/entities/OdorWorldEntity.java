@@ -41,22 +41,54 @@ import java.util.List;
  */
 public class OdorWorldEntity implements EditableObject {
 
-    // TODO:
-    // Merge BasicEntity into OdorWorldEntity
-    //
-    // Make “Agent” a subclass with sensors, effectors, and an ability to turn and move?
-
     /** Support for property change events. */
     protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    //TODO: This is a first pass
+    // TODO: Put in all static objects
+    // TODO: Move to separate class?
     /** Type of this object.  These are mapped to images, etc. */
     public enum EntityType {
-        SWISS, FLOWER, MOUSE, AMY, ARNO, BOY, COW, GIRL, JAKE, LION, STEVE, SUSI
+        SWISS ("Swiss", false),
+        FLOWER ("Flower", false),
+        MOUSE ("Mouse", true),
+        AMY ("Amy", true),
+        ARNO ("Arno", true),
+        BOY ("Boy", true),
+        COW ("Cow", true),
+        GIRL ("Girl", true),
+        JAKE ("Jake", true),
+        LION ("Lion", true),
+        STEVE ("Steve", true),
+        SUSI ("Susi", true);
+
+        /**
+         * String description that shows up in dialog boxes.
+         */
+        private final String description;
+
+        /**
+         * Whether the sprite representing this entity is based on heading.
+         */
+        private boolean isRotating;
+
+        /**
+         *
+         * Create the entity
+         */
+        EntityType(String description, boolean isRotating) {
+            this.description = description;
+            this.isRotating = isRotating;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+
     }
 
     @UserParameter(label = "Type", order = 2)
-    public EntityType entityType = EntityType.SWISS;
+    private EntityType entityType = EntityType.SWISS;
 
     /**
      * Name of this entity.
@@ -100,6 +132,26 @@ public class OdorWorldEntity implements EditableObject {
     @UserParameter(label = "Straigh movement", order = 10)
     protected double manualStraightMovementIncrement = 7;
 
+    /**
+     * Current heading / orientation.
+     */
+    private double heading = DEFAULT_HEADING;
+
+    /**
+     * Initial heading of agent.
+     */
+    private final static double DEFAULT_HEADING = 0;
+
+    /**
+     * Default location for sensors relative to agent.
+     */
+    private static double WHISKER_ANGLE = Math.PI / 4;
+
+    /**
+     * Amount to manually rotate.
+     */
+    @UserParameter(label = "Turn amount", order = 10)
+    private double manualMotionTurnIncrement = 14;
 
     /**
      * Back reference to parent parentWorld.
@@ -135,13 +187,13 @@ public class OdorWorldEntity implements EditableObject {
      * Enable sensors. If not the agent is "blind."
      */
     @UserParameter(label = "Enable Sensors", order = 5)
-    private boolean sensorsEnabled = true;
+    private boolean sensorsEnabled = false;
 
     /**
      * Enable effectors. If not the agent is "paralyzed.
      */
     @UserParameter(label = "Enable Effectors", order = 6)
-    private boolean effectorsEnabled = true;
+    private boolean effectorsEnabled = false;
 
     /**
      * If true, show sensors.
@@ -152,7 +204,6 @@ public class OdorWorldEntity implements EditableObject {
      * Things currently being said by talking entities.
      */
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
-
 
     /**
      * Construct an entity.
@@ -167,9 +218,10 @@ public class OdorWorldEntity implements EditableObject {
      * Construct a basic entity with a single image location.
      *
      * @param type  image location
-     * @param world
+     * @param world parent world
      */
-    public OdorWorldEntity(final EntityType type, final OdorWorld world) {
+    public OdorWorldEntity(final OdorWorld world, final EntityType type) {
+        this.parentWorld = world;
         setEntityType(type);
     }
 
@@ -639,8 +691,8 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void moveNorth(double amount) {
         if (!isBlocked() && (amount != 0)) {
-            if (this instanceof RotatingEntity) {
-                ((RotatingEntity) this).setHeading(90);
+            if (this.isRotating()) {
+                setHeading(90);
             }
             setY(y - amount);
         }
@@ -654,8 +706,8 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void moveSouth(double amount) {
         if (!isBlocked() && (amount != 0)) {
-            if (this instanceof RotatingEntity) {
-                ((RotatingEntity) this).setHeading(270);
+            if (this.isRotating()) {
+                setHeading(270);
             }
             setY(y + amount);
         }
@@ -669,8 +721,8 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void moveEast(double amount) {
         if (!isBlocked() && (amount != 0)) {
-            if (this instanceof RotatingEntity) {
-                ((RotatingEntity) this).setHeading(0);
+            if (this.isRotating()) {
+                this.setHeading(0);
             }
             setX(x +  amount);
         }
@@ -698,8 +750,8 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void moveWest(double amount) {
         if (!isBlocked() && (amount != 0)) {
-            if (this instanceof RotatingEntity) {
-                ((RotatingEntity) this).setHeading(180);
+            if (this.isRotating()) {
+                setHeading(180);
             }
             setX(x -  amount);
         }
@@ -771,5 +823,115 @@ public class OdorWorldEntity implements EditableObject {
 
         changeSupport.firePropertyChange("deleted", null, this);
     }
+
+    /**
+     * Returns the heading in radians.
+     *
+     * @return orientation in degrees
+     */
+    public double getHeadingRadians() {
+        return (heading * Math.PI) / 180;
+    }
+
+    /**
+     * Set the orientation of the creature.
+     *
+     * @param d the orientation, in degrees
+     */
+    public void setHeading(final double d) {
+
+        // TOOD: Exception if isRotating is false
+
+        double newHeading = d;
+        if (newHeading >= 360) {
+            newHeading -= 360;
+        }
+        if (newHeading < 0) {
+            newHeading += 360;
+        }
+        heading = newHeading;
+        changeSupport.firePropertyChange("moved", null, null);
+    }
+
+    /**
+     * Returns the current heading, in degrees.
+     *
+     * @return current heading.
+     */
+    public double getHeading() {
+        return heading;
+    }
+
+    /**
+     * Rotate left by the specified amount.
+     *
+     * @param amount amount to turn left. Assumes a positive number.
+     */
+    //@Consumible(customDescriptionMethod="getId")
+    public void turnLeft(double amount) {
+        turn(amount);
+    }
+
+    /**
+     * Turn by the specified amount, positive or negative.
+     *
+     * @param amount
+     */
+    //@Consumible(customDescriptionMethod="getId")
+    public void turn(double amount) {
+        if (amount == 0) {
+            return;
+        }
+        if (!isBlocked()) {
+            setHeading(heading + amount);
+        }
+        changeSupport.firePropertyChange("moved", null, null);
+
+    }
+
+    /**
+     * Rotate right by the specified amount.
+     *
+     * @param amount amount to turn right. Assumes a positive number.
+     */
+    //@Consumible(customDescriptionMethod="getId")
+    public void turnRight(double amount) {
+        turn(-amount);
+    }
+
+    /**
+     * Move the entity in a straight line relative to its current heading.
+     *
+     * @param amount
+     */
+    //@Consumible(customDescriptionMethod="getId")
+    public void goStraight(double amount) {
+        if (amount == 0) {
+            return;
+        }
+        if (!isBlocked()) {
+            double radians = getHeadingRadians();
+            setX(getX() + (float) (amount * Math.cos(radians)));
+            setY(getY() - (float) (amount * Math.sin(radians)));
+        }
+        changeSupport.firePropertyChange("moved", null, null);
+    }
+
+    public void goStraight() {
+        goStraight(manualStraightMovementIncrement);
+    }
+    public void goBackwards() { goStraight(-manualMotionTurnIncrement);
+    }
+    public void turnLeft() {
+        turnLeft(manualMotionTurnIncrement);
+    }
+    public void turnRight() {
+        turnRight(manualMotionTurnIncrement);
+    }
+
+    public boolean isRotating() {
+        return entityType.isRotating;
+    }
+
 
 }

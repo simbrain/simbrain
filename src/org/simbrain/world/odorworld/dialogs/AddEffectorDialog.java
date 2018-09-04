@@ -20,7 +20,6 @@ import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -47,7 +46,7 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
     /**
      * Instantiated entity to which effector is being added.
      */
-    private RotatingEntity rotatingEntity;
+    private OdorWorldEntity parentEntity;
 
     /**
      * Select effector type.
@@ -71,7 +70,7 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
      */
     public AddEffectorDialog(OdorWorldEntity entity) {
         this.entity = entity;
-        this.rotatingEntity = (RotatingEntity) entity;
+        this.parentEntity = entity;
         init("Add effector");
     }
 
@@ -124,11 +123,11 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
      */
     public void commitChanges() {
         if (effectorType.getSelectedItem() == "StraightMovement") {
-            rotatingEntity.addEffector(new StraightMovement(rotatingEntity));
+            parentEntity.addEffector(new StraightMovement(parentEntity));
         } else if (effectorType.getSelectedItem() == "Turning") {
-            rotatingEntity.addEffector(new Turning(rotatingEntity, Turning.DEFAULT_LABEL, 0.0));
+            parentEntity.addEffector(new Turning(parentEntity, Turning.DEFAULT_LABEL, 0.0));
         } else if (effectorType.getSelectedItem() == "Speech") {
-            rotatingEntity.addEffector(new Speech(entity));
+            parentEntity.addEffector(new Speech(entity));
         }
     }
 }

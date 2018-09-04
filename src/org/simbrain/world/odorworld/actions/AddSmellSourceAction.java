@@ -64,7 +64,7 @@ public final class AddSmellSourceAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(final ActionEvent event) {
-        String dimension = JOptionPane.showInputDialog("How many dimensions will the smell vector have?");
+        String dimension = JOptionPane.showInputDialog("How many dimensions will the smell vector have?", 10);
         if (dimension != null) {
             int dims = Integer.parseInt(dimension);
             entity.setSmellSource(new SmellSource(new double[dims]));

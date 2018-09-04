@@ -25,14 +25,12 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionHandle;
-import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.gui.*;
-import org.simbrain.world.threedworld.entities.Entity;
 
 import javax.swing.*;
 import java.awt.*;
@@ -397,7 +395,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("addAgent", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: Making a "mouse" should be enough...
-                RotatingEntity entity = new RotatingEntity(world);
+                OdorWorldEntity entity = new OdorWorldEntity(world);
                 entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
                 entity.setLocation(getLastClickedPosition().getX(), getLastClickedPosition().getY());
                 world.addEntity(entity);
@@ -427,8 +425,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("north", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity instanceof RotatingEntity) {
-                        ((RotatingEntity) entity).goStraight();
+                    if (entity.isRotating()) {
+                        entity.goStraight();
                     } else {
                         entity.goNorth();
                     }
@@ -441,8 +439,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("west", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 for (OdorWorldEntity entity : OdorWorldPanel.this.getSelectedModelEntities()) {
-                    if (entity instanceof RotatingEntity) {
-                        ((RotatingEntity) entity).turnLeft();
+                    if (entity.isRotating()) {
+                        entity.turnLeft();
                     } else {
                         entity.goWest();
                     }
@@ -455,8 +453,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("east", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity instanceof RotatingEntity) {
-                        ((RotatingEntity) entity).turnRight();
+                    if (entity.isRotating()) {
+                        entity.turnRight();
                     } else {
                         entity.goEast();
                     }
@@ -469,8 +467,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("south", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity instanceof RotatingEntity) {
-                        ((RotatingEntity) entity).goBackwards();
+                    if (entity.isRotating()) {
+                        entity.goBackwards();
                     } else {
                         entity.goSouth();
                     }

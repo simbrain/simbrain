@@ -10,7 +10,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import java.util.List;
 public class AgentTrails extends RegisteredSimulation {
 
     NetBuilder net;
-    RotatingEntity mouse;
+    OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
     NeuronGroup sensoryNet, actionNet, predictionNet;

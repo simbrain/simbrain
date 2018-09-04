@@ -20,7 +20,6 @@ import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import javax.swing.*;
@@ -97,7 +96,7 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Entities that a simulation can refer to.
      */
-    RotatingEntity mouse;
+    OdorWorldEntity mouse;
     OdorWorldEntity cheese; // TODO: Change to goal or generify like RL_Sim?
 
     /**
@@ -229,11 +228,11 @@ public class ActorCritic extends RegisteredSimulation {
         world.setObjectsBlockMovement(true);
         world.setWrapAround(false);
 
-        mouse = new RotatingEntity(world);
+        mouse = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
         world.addAgent(mouse);
         resetMouse();
 
-        cheese = new OdorWorldEntity(OdorWorldEntity.EntityType.SWISS, world);
+        cheese = new OdorWorldEntity(world, OdorWorldEntity.EntityType.SWISS);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
         cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion, cheese.getCenterLocation()));

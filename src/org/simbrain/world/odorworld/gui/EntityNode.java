@@ -19,16 +19,14 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PImage;
-import org.simbrain.util.piccolo.*;
+import org.simbrain.util.piccolo.RotatingSprite;
+import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.geom.Point2D;
-import java.util.*;
 
 /**
  * Piccolo representation of an {@link OdorWorldEntity}.
@@ -56,7 +54,7 @@ public class EntityNode extends PNode {
     private boolean updateFlag;
 
     /**
-     * Sprite representing this entity
+     * Sprite representing this entity.
      */
     public Sprite sprite;
 
@@ -143,8 +141,8 @@ public class EntityNode extends PNode {
         //sprite.advance();
 
         if (updateFlag) {
-            if(entity instanceof RotatingEntity) {
-                ((RotatingSprite) sprite).updateHeading(((RotatingEntity)entity).getHeading());
+            if(entity.isRotating()) {
+                ((RotatingSprite) sprite).updateHeading(entity.getHeading());
             }
             setOffset(entity.getX(), entity.getY());
             repaint(); // TODO: Not clear why this is needed. setOffset fires an event.

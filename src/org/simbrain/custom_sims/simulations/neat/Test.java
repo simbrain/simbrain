@@ -16,7 +16,6 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
@@ -82,7 +81,7 @@ public class Test {
         }
     }
 
-    public static void worldTestingIteration(Agent agent, OdorWorldEntity cheese, RotatingEntity newEntity) {
+    public static void worldTestingIteration(Agent agent, OdorWorldEntity cheese, OdorWorldEntity newEntity) {
         Network n = agent.getNet();
         OdorWorld w = agent.getWorld();
 
@@ -165,7 +164,7 @@ public class Test {
     }
 
     // same as the previous one but with 2 mice
-    public static void worldTestingIteration2(Agent agent, OdorWorldEntity cheese, RotatingEntity newEntity, RotatingEntity pinnedMouse) {
+    public static void worldTestingIteration2(Agent agent, OdorWorldEntity cheese, OdorWorldEntity newEntity, OdorWorldEntity pinnedMouse) {
         Network n = agent.getNet();
 //        Network n2 = n.copy();
         Network n2 = agent.getGenome().buildNetwork();  // ask genome to build another identical network...
@@ -297,7 +296,7 @@ public class Test {
         mouse1Smell.setDispersion(450);
         mouse1Smell.setDecayFunction(DecayFunction.GAUSSIAN);
         mouse1Smell.setStimulusVector(new double[8]);
-        RotatingEntity newEntity = new RotatingEntity(w);
+        OdorWorldEntity newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
 
         w.addAgent(newEntity);
@@ -334,14 +333,14 @@ public class Test {
         mouse1Smell.setDispersion(450);
         mouse1Smell.setDecayFunction(DecayFunction.GAUSSIAN);
         mouse1Smell.setStimulusVector(new double[8]);
-        RotatingEntity newEntity = new RotatingEntity(w);
+        OdorWorldEntity newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
 
         SmellSource mouse2Smell = new SmellSource();
         mouse2Smell.setDispersion(450);
         mouse2Smell.setDecayFunction(DecayFunction.GAUSSIAN);
         mouse2Smell.setStimulusVector(new double[8]);
-        RotatingEntity pinnedMouse = new RotatingEntity(w);
+        OdorWorldEntity pinnedMouse = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         pinnedMouse.setSmellSource(mouse2Smell);
 
         w.addAgent(newEntity);

@@ -16,7 +16,6 @@ import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
@@ -99,7 +98,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Entities that a simulation can refer to.
      */
-    RotatingEntity mouse;
+    OdorWorldEntity mouse;
     OdorWorldEntity flower;
     OdorWorldEntity cheese_1;
     OdorWorldEntity candle_1;

@@ -9,7 +9,6 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +44,7 @@ public class CreaturesSim extends RegisteredSimulation {
     List<String> talkList = Arrays.asList("Wait", "Left", "Right", "Forward", "Backward", "Sleep", "Approach", "Ingest", "Look", "Smell", "Attack", "Play", "Mate", "Speak");
     float talkProb = .05f;
     Random talkRandomizer = new Random();
-    RotatingEntity npc;
+    OdorWorldEntity npc;
 
     @Override
     public void run() {
@@ -192,7 +191,7 @@ public class CreaturesSim extends RegisteredSimulation {
         // net.getNetworkPanel().setAutoZoomMode(false);
         // net.getNetworkPanel().zoomToFitPage(true);
 
-        RotatingEntity agent = world.addAgent(250, 250, "Mouse");
+        OdorWorldEntity agent = world.addAgent(250, 250, "Mouse");
         Creature creature = new Creature(this, name, net, agent);
         creatureList.add(creature);
 

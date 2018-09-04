@@ -60,11 +60,6 @@ public class SensorPanel extends JPanel {
     private SensorModel model;
 
     /**
-     * The parent entity.
-     */
-    private OdorWorldEntity entity;
-
-    /**
      * The selected sensor to edit. If more than one sensor is selected in the
      * table, this is the first selected row.
      */

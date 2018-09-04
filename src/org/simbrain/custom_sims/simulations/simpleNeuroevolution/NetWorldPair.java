@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class NetWorldPair {
     List<Neuron> sourceNeuron = new ArrayList<>();
     List<Neuron> targetNeuron = new ArrayList<>();
     OdorWorldBuilder world;
-    RotatingEntity mouse;
+    OdorWorldEntity mouse;
     OdorWorldEntity cheese;
     OdorWorldEntity poison;
     NetWorldPairAttribute attriubte;

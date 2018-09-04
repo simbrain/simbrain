@@ -22,16 +22,11 @@ import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
@@ -43,16 +38,6 @@ public class EntityDialog extends StandardDialog {
      * The entity for which this dialog is called.
      */
     private OdorWorldEntity entityRef;
-
-    /**
-     * The renderer to display the combobox.
-     */
-    private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
-
-    /**
-     * The panel containing item-specific information not in other panels.
-     */
-    private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
     /**
      * Property editor for main entity properties.
@@ -108,9 +93,10 @@ public class EntityDialog extends StandardDialog {
             tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
         }
 
+        setContentPane(tabbedPane);
+
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
         addButton(new JButton(helpAction));
-        setContentPane(tabbedPane);
     }
 
     @Override

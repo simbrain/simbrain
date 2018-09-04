@@ -9,7 +9,6 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -40,7 +39,7 @@ public class Creature {
     /**
      * The odor world agent belonging to this creature.
      */
-    private RotatingEntity agent;
+    private OdorWorldEntity agent;
 
     /**
      * The creature's biochemistry.
@@ -100,7 +99,7 @@ public class Creature {
 
     //TODO: Add gender
 
-    public Creature(CreaturesSim sim, String name, NetworkWrapper net, RotatingEntity agent) {
+    public Creature(CreaturesSim sim, String name, NetworkWrapper net, OdorWorldEntity agent) {
         this.parentSim = sim;
         this.name = name;
 
@@ -562,7 +561,7 @@ public class Creature {
         return (brain);
     }
 
-    public RotatingEntity getAgent() {
+    public OdorWorldEntity getAgent() {
         return (agent);
     }
 

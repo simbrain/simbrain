@@ -21,7 +21,7 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Effector for straight ahead movement.
@@ -59,7 +59,7 @@ public class StraightMovement extends Effector {
      * @param parent parent entity.
      * @param label  descriptive label
      */
-    public StraightMovement(RotatingEntity parent, String label) {
+    public StraightMovement(OdorWorldEntity parent, String label) {
         super(parent, label);
     }
 
@@ -68,13 +68,13 @@ public class StraightMovement extends Effector {
      *
      * @param parent parent entity.
      */
-    public StraightMovement(RotatingEntity parent) {
+    public StraightMovement(OdorWorldEntity parent) {
         super(parent, DEFAULT_LABEL);
     }
 
     @Override
     public void update() {
-        ((RotatingEntity) parent).goStraight(amount * scalingFactor);
+        parent.goStraight(amount * scalingFactor);
         this.amount = 0;
     }
 
@@ -130,6 +130,6 @@ public class StraightMovement extends Effector {
 
     @Override
     public EditableObject copy() {
-        return new StraightMovement(((RotatingEntity) parent), getLabel());
+        return new StraightMovement(parent, getLabel());
     }
 }

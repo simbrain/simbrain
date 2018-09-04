@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 // TODO: Rename this?  VehicleBuilder?  VehicleHelper?
@@ -79,7 +79,7 @@ public class Vehicle {
      * @return the resulting neuron group, which will have been added to the
      * simulation
      */
-    public NeuronGroup addVehicle(int x, int y, RotatingEntity agent, VehicleType type, int stimulusDimension) {
+    public NeuronGroup addVehicle(int x, int y, OdorWorldEntity agent, VehicleType type, int stimulusDimension) {
 
         // Create the network
         NeuronGroup vehicle = new NeuronGroup(net.getNetwork());
@@ -130,14 +130,14 @@ public class Vehicle {
     /**
      * Add a pursuer.
      */
-    public NeuronGroup addPursuer(int x, int y, RotatingEntity agent, int stimulusDimension) {
+    public NeuronGroup addPursuer(int x, int y, OdorWorldEntity agent, int stimulusDimension) {
         return addVehicle(x, y, agent, VehicleType.PURSUER, stimulusDimension);
     }
 
     /**
      * Add an avoider.
      */
-    public NeuronGroup addAvoider(int x, int y, RotatingEntity agent, int stimulusDimension) {
+    public NeuronGroup addAvoider(int x, int y, OdorWorldEntity agent, int stimulusDimension) {
         return addVehicle(x, y, agent, VehicleType.AVOIDER, stimulusDimension);
     }
 

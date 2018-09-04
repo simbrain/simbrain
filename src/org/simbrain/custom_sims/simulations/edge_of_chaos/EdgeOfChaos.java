@@ -21,7 +21,6 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
@@ -52,7 +51,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
     NeuronGroup reservoir, sensorNodes;
     OdorWorldBuilder world;
-    RotatingEntity mouse;
+    OdorWorldEntity mouse;
 
     @Override
     public void run() {

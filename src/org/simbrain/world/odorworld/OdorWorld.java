@@ -24,7 +24,6 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -179,24 +178,25 @@ public class OdorWorld {
 
         entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
         entity.setName(agentNameGenerator.getId());
+        entity.setSensorsEnabled(true);
+        entity.setEffectorsEnabled(true);
 
-        if (entity instanceof RotatingEntity) {
+        // Add default effectors
+        entity.addEffector(new StraightMovement(entity, "Go-straight"));
+        entity.addEffector(new Turning(entity, "Go-left", Turning.LEFT));
+        entity.addEffector(new Turning(entity, "Go-right", Turning.RIGHT));
 
-            // Add default effectors
-            entity.addEffector(new StraightMovement((RotatingEntity) entity, "Go-straight"));
-            entity.addEffector(new Turning((RotatingEntity) entity, "Go-left", Turning.LEFT));
-            entity.addEffector(new Turning((RotatingEntity) entity, "Go-right", Turning.RIGHT));
+        // Add default sensors
+        entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
+        entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
+        entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
 
-            // Add default sensors
-            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
-            entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
-            entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
+        // Temp testing
+        entity.addSensor(new ObjectSensor(entity, "Swiss", "Swiss.gif"));
 
-            // Temp testing
-            entity.addSensor(new ObjectSensor(entity, "Swiss", "Swiss.gif"));
+        entityList.add(entity);
 
-        }
-        addEntity(entity);
+        changeSupport.firePropertyChange("entityAdded", null, entity);
     }
 
     /**

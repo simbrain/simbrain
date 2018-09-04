@@ -19,7 +19,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.world.odorworld.OdorWorldPanel;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,7 @@ public final class AddAgentAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
+        OdorWorldEntity entity = new OdorWorldEntity(worldPanel.getWorld(), OdorWorldEntity.EntityType.MOUSE);
         entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
         worldPanel.getWorld().addAgent(entity);
     }

@@ -333,7 +333,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
         // only ever be one Simbrain Desktop?
         SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
-        SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(current.getFrame(), this, sgib.getSynapseGroup());
+        SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(this, sgib.getSynapseGroup());
         sgd.setModalityType(Dialog.ModalityType.MODELESS);
         return sgd;
     }

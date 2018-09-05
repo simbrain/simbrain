@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -67,21 +66,21 @@ public final class ConnectionPanel extends JPanel {
     /**
      * To edit the properties of the connection object
      */
-    private JPanel connectionProperties;
+    private AnnotatedPropertyEditor connectionManagerProperties;
 
     /**
      * The connection object used to connect source to target neurons.
      */
-    private ConnectNeurons connection;
+    private ConnectNeurons connectionManager;
 
     /**
      * Construct the dialog.
      *
-     * @param connection   the underlying connection object
+     * @param connectionManager   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectNeurons connection) {
+    public ConnectionPanel(final Window parent, final ConnectNeurons connectionManager) {
         this.parentFrame = parent;
-        this.connection = connection;
+        this.connectionManager = connectionManager;
         init();
     }
 
@@ -96,11 +95,7 @@ public final class ConnectionPanel extends JPanel {
         detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Show", "Hide", parentFrame);
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
-        if (connection instanceof Sparse) {
-            connectionProperties =  SparseConnectionPanel.createSparsityAdjustmentPanel((Sparse) connection, null);
-        } else  {
-            connectionProperties = new AnnotatedPropertyEditor(connection);
-        }
+        connectionManagerProperties = new AnnotatedPropertyEditor(connectionManager);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -115,7 +110,7 @@ public final class ConnectionPanel extends JPanel {
         gbc.weighty = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        connectionContainer.add(connectionProperties, gbc);
+        connectionContainer.add(connectionManagerProperties, gbc);
         add(connectionContainer);
 
         // Synapse Properties
@@ -138,7 +133,7 @@ public final class ConnectionPanel extends JPanel {
         add(synapseContainer);
 
         // E/I Ratio and Randomizers
-        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connection, parentFrame);
+        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionManager, parentFrame);
         add(polarityPanel);
         detailTriangle.addMouseListener(new MouseAdapter() {
             @Override
@@ -153,8 +148,8 @@ public final class ConnectionPanel extends JPanel {
      * Update state of detail triangle.
      */
     private void updateExcitatoryRatioTriangle() {
-        connectionProperties.setVisible(detailTriangle.isDown());
-        connectionProperties.repaint();
+        connectionManagerProperties.setVisible(detailTriangle.isDown());
+        connectionManagerProperties.repaint();
         if (parentFrame != null) {
             parentFrame.pack();
         }
@@ -170,17 +165,14 @@ public final class ConnectionPanel extends JPanel {
         return b;
     }
 
-    //TODO!
+    /**
+     * Update the {@link ConnectNeurons} object associated with this panel.
+     */
     public void commitSettings() {
-        if(connection instanceof Sparse) {
-            ((SparseConnectionPanel)connectionProperties).commitChanges();
-        } else {
-            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
-        }
-        polarityPanel.commitChanges(connection);
+        connectionManagerProperties.commitChanges();
+        polarityPanel.commitChanges(connectionManager);
     }
 
-    //TODO: The logic below should be in model objects
 
     /**
      * Commit changes made in this panel to a loose network.
@@ -188,12 +180,11 @@ public final class ConnectionPanel extends JPanel {
      * @param networkPanel
      */
     public void commitChanges(NetworkPanel networkPanel) {
-        if(connection instanceof Sparse) {
-            ((SparseConnectionPanel)connectionProperties).commitChanges();
-        } else {
-            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
-        }
-        List<Synapse> synapses = connection.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+
+        connectionManagerProperties.commitChanges();
+        List<Synapse> synapses = connectionManager.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+
+        //TODO: Consider moving the below to connection manager
         ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
         ConnectionUtilities.conformToTemplates(synapses, synapseProperties.getTemplateExcitatorySynapse(), synapseProperties.getTemplateInhibitorySynapse());
         polarityPanel.commitChanges();
@@ -212,13 +203,8 @@ public final class ConnectionPanel extends JPanel {
      * @param synapseGroup the group to change
      */
     public void commitChanges(SynapseGroup synapseGroup) {
-        if(connection instanceof Sparse) {
-            ((SparseConnectionPanel)connectionProperties).commitChanges();
-        } else {
-            ((AnnotatedPropertyEditor)connectionProperties).commitChanges();
-        }
-        connection.connectNeurons(synapseGroup);
-        // TODO: Polarity, etc.
+        connectionManagerProperties.commitChanges();
+        connectionManager.connectNeurons(synapseGroup);
     }
 
     public ConnectionSynapsePropertiesPanel getSynapseProperties() {
@@ -230,12 +216,12 @@ public final class ConnectionPanel extends JPanel {
     }
 
     public ConnectNeurons getConnection() {
-        return connection;
+        return connectionManager;
     }
 
     @Override
     public String toString() {
-        return connection.getName();
+        return connectionManager.getName();
     }
 
 }

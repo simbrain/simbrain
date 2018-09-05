@@ -102,13 +102,13 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
 
-    //TODO
-
+    //TODO.
     private boolean setUseGroupLevelSettings;
-    private Window parentFrame;
+
+    /**
+     * Summary information panel
+     */
     private SummaryPanel sumPanel;
-
-
 
     /**
      * Creates a synapse group dialog based on a source and target neuron group.
@@ -142,14 +142,6 @@ public final class SynapseGroupDialog extends StandardDialog {
         return sgd;
     }
 
-    //TODO
-    public static SynapseGroupDialog createSynapseGroupDialog(final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
-        SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
-        sgd.tabbedPane.setSelectedIndex(0);
-        sgd.parentFrame = parent;
-        return sgd;
-    }
-
     /**
      * Create a new synapse group connecting the indicated neuron groups.
      *
@@ -162,17 +154,6 @@ public final class SynapseGroupDialog extends StandardDialog {
         this.sourceNeuronGroup = src;
         this.targetNeuronGroup = tar;
         isCreationDialog = true;
-        init();
-    }
-
-    /**
-     * @param parent
-     * @param np
-     */
-    private SynapseGroupDialog(final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
-        super(parent, "Synapse Group Dialog");
-        networkPanel = np;
-        synapseGroup = sg;
         init();
     }
 

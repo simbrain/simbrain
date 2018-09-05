@@ -144,16 +144,15 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     private final JLabel warning = new JLabel(ResourceManager.getImageIcon("WarningGray.png"));
 
+    private static final double ERROR_TOLERANCE = 0.05;
+
     {
         warning.setToolTipText("Failed to apply ratio within error tolerance." + " Source neurons might be polarized.");
     }
 
-    private static final double ERROR_TOLERANCE = 0.05;
-
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(ConnectNeurons connection, Window parentFrame) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parentFrame, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
-        System.out.println(connection.getExcitatoryRatio());
         prPanel.exRandomizer =  connection.getExRandomizer();
         prPanel.inRandomizer = connection.getInRandomizer();
         prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame, prPanel.exRandomizer, connection.isUseExcitatoryRandomization());
@@ -162,7 +161,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         prPanel.inhibitoryRandomizerPanel.initListeners();
         prPanel.initializeContent();
         prPanel.initializeLayout();
-        prPanel.setExcitatoryRatio(connection.getExcitatoryRatio()/100); //TODO!!
+        prPanel.setExcitatoryRatio(connection.getExcitatoryRatio());
         return prPanel;
 
     }
@@ -826,8 +825,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     public void commitChanges(ConnectNeurons connection) {
-        connection.setExcitatoryRatio(ratioSlider.getValue());
-        //TODO
+        connection.setExcitatoryRatio((double) ratioSlider.getValue()/100);
     }
 
 }

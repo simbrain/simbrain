@@ -289,7 +289,9 @@ public class RadialSimple extends ConnectNeurons implements EditableObject {
                     break;
                 }
             }
-            network.fireSynapsesUpdated();
+            if (network != null) {
+                network.fireSynapsesUpdated();
+            }
         }
     }
 
@@ -352,7 +354,9 @@ public class RadialSimple extends ConnectNeurons implements EditableObject {
                     break;
                 }
             }
-            network.fireSynapsesUpdated();
+            if (network != null) {
+                network.fireSynapsesUpdated();
+            }
         }
     }
 

@@ -115,7 +115,7 @@ public class SynapseGroup extends Group {
     /**
      * The connect neurons object associated with this group.
      */
-    private ConnectNeurons connectionManager = DEFAULT_CONNECTION_MANAGER;
+    private ConnectNeurons connectionManager;
 
     /**
      * The percent of synapses that are excitatory. This parameter represents

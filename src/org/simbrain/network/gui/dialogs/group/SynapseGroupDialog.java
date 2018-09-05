@@ -227,8 +227,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(summaryScrollWrapper);
         tabbedPane.addTab("Properties", summaryScrollWrapper);
 
-
-        // Connectivity panel for creation
+        // Connectivity panel
         if (isCreationDialog) {
             connectionPanel = new ConnectionSelectorPanel();
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
@@ -357,6 +356,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         if (isCreationDialog) {
 
             connectionPanel.commitChanges();
+            synapseGroup.setConnectionManager(connectionPanel.getSelectedConnector());
 
             sumPanel.commitChanges();
             editSynapsesPanel.commitChanges();

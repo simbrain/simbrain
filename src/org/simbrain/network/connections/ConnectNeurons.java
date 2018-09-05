@@ -23,13 +23,10 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,9 +45,9 @@ import java.util.List;
 public abstract class ConnectNeurons implements EditableObject {
 
     /**
-     * Default percent of excitatory neurons.
+     * Default ratio of excitatory neurons (from 0 to 1).
      */
-    private static final double DEFAULT_PERCENT_EXCITATORY = 1.0;
+    private static final double DEFAULT_EXCITATORY_RATIO = 1.0;
 
     /**
      * Whether excitatory connection should be randomized.
@@ -63,9 +60,10 @@ public abstract class ConnectNeurons implements EditableObject {
     private boolean useInhibitoryRandomization = false;
 
     /**
-     * The current ratio of excitatory to inhibitory neurons.
+     * The normalized ratio of excitatory to inhibitory neurons.
+     * A value between 0 (all inhibitory) and 1 (all excitatory).
      */
-    private double excitatoryRatio = DEFAULT_PERCENT_EXCITATORY;
+    private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
     /**
      * The randomizer for excitatory synapses.

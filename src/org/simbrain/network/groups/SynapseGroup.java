@@ -12,7 +12,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterGetter;
 import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterSetter;
@@ -28,7 +28,6 @@ import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -74,7 +73,7 @@ public class SynapseGroup extends Group {
     /**
      * All to All.
      */
-    public static final ConnectNeurons DEFAULT_CONNECTION_MANAGER = new Sparse(.1, false, false);
+    public static final ConnectionStrategy DEFAULT_CONNECTION_MANAGER = new Sparse(.1, false, false);
 
     /**
      * A set containing all the excitatory (wt > 0) synapses in the group.
@@ -115,7 +114,7 @@ public class SynapseGroup extends Group {
     /**
      * The connect neurons object associated with this group.
      */
-    private ConnectNeurons connectionManager;
+    private ConnectionStrategy connectionManager;
 
     /**
      * The percent of synapses that are excitatory. This parameter represents
@@ -276,7 +275,7 @@ public class SynapseGroup extends Group {
      * @param connectionManager the connection manager used to establish which
      * @return a synapse group with the above parameters.
      */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectNeurons connectionManager) {
+    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
         return createSynapseGroup(source, target, connectionManager, DEFAULT_EXCITATORY_RATIO, null, null);
     }
 
@@ -291,7 +290,7 @@ public class SynapseGroup extends Group {
      *                          [0, 1].
      * @return a synapse group with the above parameters.
      */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectNeurons connectionManager, final double excitatoryRatio) {
+    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager, final double excitatoryRatio) {
         return createSynapseGroup(source, target, connectionManager, excitatoryRatio, DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
     }
 
@@ -313,7 +312,7 @@ public class SynapseGroup extends Group {
     public static SynapseGroup createSynapseGroup(
         final NeuronGroup source,
         final NeuronGroup target,
-        final ConnectNeurons connectionManager,
+        final ConnectionStrategy connectionManager,
         double excitatoryRatio,
         final ProbabilityDistribution exciteRand,
         final ProbabilityDistribution inhibRand
@@ -356,7 +355,7 @@ public class SynapseGroup extends Group {
      * @param target            target neuron group
      * @param connectionManager a connection object which builds this group
      */
-    public SynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectNeurons connectionManager) {
+    public SynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
         super(source.getParentNetwork());
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
@@ -1257,7 +1256,7 @@ public class SynapseGroup extends Group {
      * @param connection the connection manager to be used by this synapse group
      *                   for making synaptic connections.
      */
-    public void setConnectionManager(ConnectNeurons connection) {
+    public void setConnectionManager(ConnectionStrategy connection) {
         if (this.connectionManager == null) {
             this.connectionManager = connection;
         } else {
@@ -1268,7 +1267,7 @@ public class SynapseGroup extends Group {
     /**
      * @return the connection manager for this synapse group.
      */
-    public ConnectNeurons getConnectionManager() {
+    public ConnectionStrategy getConnectionManager() {
         return connectionManager;
     }
 

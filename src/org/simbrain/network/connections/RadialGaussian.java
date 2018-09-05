@@ -57,7 +57,7 @@ import java.util.concurrent.*;
  *
  * @author Zoë Tosi
  */
-public class RadialGaussian extends ConnectNeurons implements EditableObject {
+public class RadialGaussian extends ConnectionStrategy implements EditableObject {
 
     /**
      * For neurons with no polarity.

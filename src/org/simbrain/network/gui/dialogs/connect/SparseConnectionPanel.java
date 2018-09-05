@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -587,7 +587,7 @@ public class SparseConnectionPanel extends EditablePanel {
         this.repaint();
     }
 
-    public ConnectNeurons getConnection() {
+    public ConnectionStrategy getConnection() {
         return connection;
     }
 

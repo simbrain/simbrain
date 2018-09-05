@@ -30,7 +30,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
     /**
      * The connection to apply.
      */
-    private ConnectNeurons connection;
+    private ConnectionStrategy connection;
 
     /**
      * Connection panel for dialog.
@@ -44,7 +44,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
      * @param connection   the connection to apply
      * @param name         the name of this action
      */
-    public ApplyConnectionAction(final NetworkPanel networkPanel, ConnectNeurons connection, String name) {
+    public ApplyConnectionAction(final NetworkPanel networkPanel, ConnectionStrategy connection, String name) {
 
         super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGET_NEURONS);
         putValue(SHORT_DESCRIPTION, "Use " + name + " method to connect source to target neurons");

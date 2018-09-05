@@ -30,19 +30,15 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import java.util.List;
 
 /**
- * Maintains a specific strategy for connecting two groups
- * of neurons together.  Subclasses correspond to specific types of
+ * Maintains a specific strategy for creating connections between two groups
+ * of neurons.  Subclasses correspond to specific types of
  * connection strategy. Applied using static methods for loose
  * neurons and synapse groups.
- *
- * Maintains all information needed to apply the connection method
- * either to a pair of lists of neurons (for connecting loose neurons)
- * or to a synapse group (for creating a synapse group).
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public abstract class ConnectNeurons implements EditableObject {
+public abstract class ConnectionStrategy implements EditableObject {
 
     /**
      * Default ratio of excitatory neurons (from 0 to 1).

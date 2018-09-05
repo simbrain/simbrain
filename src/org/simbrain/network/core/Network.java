@@ -19,9 +19,8 @@
 package org.simbrain.network.core;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
@@ -1735,7 +1734,7 @@ public class Network {
      * @param tng        target neuron group
      * @param connection conection object
      */
-    public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectNeurons connection) {
+    public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
 
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
         addGroup(group);

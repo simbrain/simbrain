@@ -37,7 +37,7 @@ import java.util.Random;
  *
  * @author Zoë Tosi
  */
-public class Sparse extends ConnectNeurons implements EditableObject {
+public class Sparse extends ConnectionStrategy implements EditableObject {
 
     /**
      * The default preference as to whether or not self connections are allowed.

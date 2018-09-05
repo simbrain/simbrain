@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -49,7 +49,7 @@ public class ConnectionDialog extends StandardDialog {
      * @param networkPanel parent panel
      * @param connection   the underlying connection object
      */
-    public ConnectionDialog(final NetworkPanel networkPanel, final ConnectNeurons connection) {
+    public ConnectionDialog(final NetworkPanel networkPanel, final ConnectionStrategy connection) {
         this.networkPanel = networkPanel;
         this.connectionPanel = new ConnectionPanel(this, connection);
         setContentPane(connectionPanel);

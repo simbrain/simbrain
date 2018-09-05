@@ -65,7 +65,7 @@ public class QuickConnectionManager {
     /**
      * The current connection object.
      */
-    private ConnectNeurons currentConnector;
+    private ConnectionStrategy currentConnector;
 
     /**
      * Construct the quick connection manager.
@@ -77,8 +77,8 @@ public class QuickConnectionManager {
     /**
      * @return the connection objects
      */
-    public ConnectNeurons[] getConnectors() {
-        return new ConnectNeurons[]{allToAll, oneToOne, radial, radialSimple, sparse};
+    public ConnectionStrategy[] getConnectors() {
+        return new ConnectionStrategy[]{allToAll, oneToOne, radial, radialSimple, sparse};
     }
 
     /**
@@ -102,11 +102,11 @@ public class QuickConnectionManager {
         }
     }
 
-    public ConnectNeurons getCurrentConnector() {
+    public ConnectionStrategy getCurrentConnector() {
         return currentConnector;
     }
 
-    public void setCurrentConnector(ConnectNeurons currentConnector) {
+    public void setCurrentConnector(ConnectionStrategy currentConnector) {
         this.currentConnector = currentConnector;
     }
 

@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -66,21 +66,21 @@ public final class ConnectionPanel extends JPanel {
     /**
      * To edit the properties of the connection object
      */
-    private AnnotatedPropertyEditor connectionManagerProperties;
+    private AnnotatedPropertyEditor connectionStrategyProperties;
 
     /**
      * The connection object used to connect source to target neurons.
      */
-    private ConnectNeurons connectionManager;
+    private ConnectionStrategy connectionStrategy;
 
     /**
      * Construct the dialog.
      *
      * @param connectionManager   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectNeurons connectionManager) {
+    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager) {
         this.parentFrame = parent;
-        this.connectionManager = connectionManager;
+        this.connectionStrategy = connectionManager;
         init();
     }
 
@@ -95,7 +95,7 @@ public final class ConnectionPanel extends JPanel {
         detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Show", "Hide", parentFrame);
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
-        connectionManagerProperties = new AnnotatedPropertyEditor(connectionManager);
+        connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -110,7 +110,7 @@ public final class ConnectionPanel extends JPanel {
         gbc.weighty = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        connectionContainer.add(connectionManagerProperties, gbc);
+        connectionContainer.add(connectionStrategyProperties, gbc);
         add(connectionContainer);
 
         // Synapse Properties
@@ -133,7 +133,7 @@ public final class ConnectionPanel extends JPanel {
         add(synapseContainer);
 
         // E/I Ratio and Randomizers
-        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionManager, parentFrame);
+        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
         add(polarityPanel);
         detailTriangle.addMouseListener(new MouseAdapter() {
             @Override
@@ -148,8 +148,8 @@ public final class ConnectionPanel extends JPanel {
      * Update state of detail triangle.
      */
     private void updateExcitatoryRatioTriangle() {
-        connectionManagerProperties.setVisible(detailTriangle.isDown());
-        connectionManagerProperties.repaint();
+        connectionStrategyProperties.setVisible(detailTriangle.isDown());
+        connectionStrategyProperties.repaint();
         if (parentFrame != null) {
             parentFrame.pack();
         }
@@ -166,11 +166,11 @@ public final class ConnectionPanel extends JPanel {
     }
 
     /**
-     * Update the {@link ConnectNeurons} object associated with this panel.
+     * Update the {@link ConnectionStrategy} object associated with this panel.
      */
     public void commitSettings() {
-        connectionManagerProperties.commitChanges();
-        polarityPanel.commitChanges(connectionManager);
+        connectionStrategyProperties.commitChanges();
+        polarityPanel.commitChanges(connectionStrategy);
     }
 
 
@@ -181,8 +181,8 @@ public final class ConnectionPanel extends JPanel {
      */
     public void commitChanges(NetworkPanel networkPanel) {
 
-        connectionManagerProperties.commitChanges();
-        List<Synapse> synapses = connectionManager.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+        connectionStrategyProperties.commitChanges();
+        List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
 
         //TODO: Consider moving the below to connection manager
         ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
@@ -203,8 +203,8 @@ public final class ConnectionPanel extends JPanel {
      * @param synapseGroup the group to change
      */
     public void commitChanges(SynapseGroup synapseGroup) {
-        connectionManagerProperties.commitChanges();
-        connectionManager.connectNeurons(synapseGroup);
+        connectionStrategyProperties.commitChanges();
+        connectionStrategy.connectNeurons(synapseGroup);
     }
 
     public ConnectionSynapsePropertiesPanel getSynapseProperties() {
@@ -215,13 +215,13 @@ public final class ConnectionPanel extends JPanel {
         return polarityPanel;
     }
 
-    public ConnectNeurons getConnection() {
-        return connectionManager;
+    public ConnectionStrategy getConnectionStrategy() {
+        return connectionStrategy;
     }
 
     @Override
     public String toString() {
-        return connectionManager.getName();
+        return connectionStrategy.getName();
     }
 
 }

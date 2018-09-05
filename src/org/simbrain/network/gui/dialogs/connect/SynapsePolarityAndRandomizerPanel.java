@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -40,7 +40,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
-import java.util.Arrays;
 import java.util.Hashtable;
 
 /**
@@ -150,7 +149,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         warning.setToolTipText("Failed to apply ratio within error tolerance." + " Source neurons might be polarized.");
     }
 
-    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(ConnectNeurons connection, Window parentFrame) {
+    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(ConnectionStrategy connection, Window parentFrame) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parentFrame, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
         prPanel.exRandomizer =  connection.getExRandomizer();
@@ -824,7 +823,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     }
 
-    public void commitChanges(ConnectNeurons connection) {
+    public void commitChanges(ConnectionStrategy connection) {
         connection.setExcitatoryRatio((double) ratioSlider.getValue()/100);
     }
 

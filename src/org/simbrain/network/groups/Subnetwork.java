@@ -13,7 +13,7 @@
 package org.simbrain.network.groups;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -142,7 +142,7 @@ public abstract class Subnetwork extends Group {
      * @param connection the type of connection desired between the two groups
      * @return the new group
      */
-    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target, ConnectNeurons connection) {
+    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target, ConnectionStrategy connection) {
         SynapseGroup newGroup = connectNeuronGroups(source, target, "" + (getIndexOfNeuronGroup(source) + 1), "" + (getIndexOfNeuronGroup(target) + 1), connection);
         return newGroup;
     }
@@ -158,7 +158,7 @@ public abstract class Subnetwork extends Group {
      * @param connection  the type of connection desired between the two groups
      * @return the new group
      */
-    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target, String sourceLabel, String targetLabel, ConnectNeurons connection) {
+    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target, String sourceLabel, String targetLabel, ConnectionStrategy connection) {
         SynapseGroup newGroup = SynapseGroup.createSynapseGroup(source, target, connection);
         addSynapseGroup(newGroup);
         setSynapseGroupLabel(source, target, newGroup, sourceLabel, targetLabel);

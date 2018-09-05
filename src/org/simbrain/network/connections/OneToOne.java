@@ -31,7 +31,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class OneToOne extends ConnectNeurons implements EditableObject {
+public class OneToOne extends ConnectionStrategy implements EditableObject {
 
     /**
      * If true, synapses are added in both directions.

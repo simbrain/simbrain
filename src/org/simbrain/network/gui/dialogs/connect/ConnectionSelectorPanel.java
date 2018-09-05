@@ -14,20 +14,11 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.*;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Panel for selecting a type of connection.
@@ -41,13 +32,13 @@ public class ConnectionSelectorPanel extends JPanel {
     /**
      * Temporary list of connection panels managed by combo box.
      */
-    private final ConnectNeurons[] CONNECTORS = {new AllToAll(), new OneToOne(),
+    private final ConnectionStrategy[] CONNECTORS = {new AllToAll(), new OneToOne(),
         new RadialSimple(), new RadialGaussian()};
 
     /**
      * Select connection type.
      */
-    private JComboBox<ConnectNeurons> cbConnectionType;
+    private JComboBox<ConnectionStrategy> cbConnectionType;
 
     /**
      * The current seelcted connection panel
@@ -72,9 +63,9 @@ public class ConnectionSelectorPanel extends JPanel {
      *
      * @param initConnection initial connection manager
      */
-    public ConnectionSelectorPanel(ConnectNeurons initConnection) {
+    public ConnectionSelectorPanel(ConnectionStrategy initConnection) {
         cbConnectionType = new JComboBox(CONNECTORS);
-        for(ConnectNeurons cn : CONNECTORS) {
+        for(ConnectionStrategy cn : CONNECTORS) {
             if(cn.getClass() == initConnection.getClass()) {
                 cbConnectionType.removeItem(cn);
                 cbConnectionType.addItem(initConnection);
@@ -92,7 +83,7 @@ public class ConnectionSelectorPanel extends JPanel {
      * @param connectionManagers list of connection managers for drop down
      * @param initConnection initial connection manager
      */
-    public ConnectionSelectorPanel(ConnectNeurons[] connectionManagers, ConnectNeurons initConnection) {
+    public ConnectionSelectorPanel(ConnectionStrategy[] connectionManagers, ConnectionStrategy initConnection) {
         cbConnectionType = new JComboBox(connectionManagers);
         cbConnectionType.setSelectedItem(initConnection);
         init();
@@ -142,15 +133,15 @@ public class ConnectionSelectorPanel extends JPanel {
             remove(currentConnectionPanel);
         }
         currentConnectionPanel = new ConnectionPanel(null,
-            (ConnectNeurons) cbConnectionType.getSelectedItem());
+            (ConnectionStrategy) cbConnectionType.getSelectedItem());
         add(currentConnectionPanel, gbc);
     }
 
     /**
      * Get the current selected connection manager.
      */
-    public ConnectNeurons getSelectedConnector() {
-        return currentConnectionPanel.getConnection();
+    public ConnectionStrategy getSelectedConnector() {
+        return currentConnectionPanel.getConnectionStrategy();
     }
 
     /**

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
-import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;

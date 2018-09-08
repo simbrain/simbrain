@@ -63,7 +63,7 @@ public class CondensedConnectionPanel {
      *                     the number of efferents should the user chose to equalize them.
      */
     public CondensedConnectionPanel(final NetworkPanel networkPanel, final Window parent, final int numTargs) {
-        connectorPanel = SparseConnectionPanel.createSparsityAdjustmentPanel(new Sparse(), networkPanel);
+        connectorPanel = SparseConnectionPanel.createSparsityAdjustmentPanel(new Sparse(), numTargs, false);
         connectorPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5)));
         connectorPanel.setNumTargs(numTargs);
         connectorPanel.setDensity(0.25);

@@ -29,11 +29,13 @@ import java.awt.event.ItemListener;
  */
 public class ConnectionSelectorPanel extends JPanel {
 
+    private final Window parentFrame;
+
     /**
      * Temporary list of connection panels managed by combo box.
      */
     private final ConnectionStrategy[] CONNECTORS = {new AllToAll(), new OneToOne(),
-        new RadialSimple(), new RadialGaussian()};
+        new RadialSimple(), new RadialGaussian(), new Sparse()};
 
     /**
      * Select connection type.
@@ -41,7 +43,7 @@ public class ConnectionSelectorPanel extends JPanel {
     private JComboBox<ConnectionStrategy> cbConnectionType;
 
     /**
-     * The current seelcted connection panel
+     * The current selected connection panel
      */
     private ConnectionPanel currentConnectionPanel;
 
@@ -51,10 +53,18 @@ public class ConnectionSelectorPanel extends JPanel {
     private GridBagConstraints gbc;
 
     /**
+     * Whether or not the connections that are/will be made are
+     * recurrent.
+     */
+    private boolean recurrent;
+
+    /**
      * Connection dialog default constructor.
      */
-    public ConnectionSelectorPanel() {
+    public ConnectionSelectorPanel(boolean recurrent, Window parentFrame) {
+        this.parentFrame=parentFrame;
         cbConnectionType = new JComboBox(CONNECTORS);
+        this.recurrent = recurrent;
         init();
     }
 
@@ -63,13 +73,13 @@ public class ConnectionSelectorPanel extends JPanel {
      *
      * @param initConnection initial connection manager
      */
-    public ConnectionSelectorPanel(ConnectionStrategy initConnection) {
+    public ConnectionSelectorPanel(ConnectionStrategy initConnection, Window parentFrame) {
+        this.parentFrame=parentFrame;
         cbConnectionType = new JComboBox(CONNECTORS);
         for(ConnectionStrategy cn : CONNECTORS) {
             if(cn.getClass() == initConnection.getClass()) {
                 cbConnectionType.removeItem(cn);
                 cbConnectionType.addItem(initConnection);
-                // TODO: alphebatize
                 break;
             }
         }
@@ -83,7 +93,9 @@ public class ConnectionSelectorPanel extends JPanel {
      * @param connectionManagers list of connection managers for drop down
      * @param initConnection initial connection manager
      */
-    public ConnectionSelectorPanel(ConnectionStrategy[] connectionManagers, ConnectionStrategy initConnection) {
+    public ConnectionSelectorPanel(ConnectionStrategy[] connectionManagers,
+                                   ConnectionStrategy initConnection, Window parentFrame) {
+        this.parentFrame = parentFrame;
         cbConnectionType = new JComboBox(connectionManagers);
         cbConnectionType.setSelectedItem(initConnection);
         init();
@@ -93,6 +105,7 @@ public class ConnectionSelectorPanel extends JPanel {
      * Initialize the panel.
      */
     private void init() {
+
 
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -113,7 +126,7 @@ public class ConnectionSelectorPanel extends JPanel {
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(0, 5, 0, 5);
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         updatePanel();
 
@@ -132,9 +145,20 @@ public class ConnectionSelectorPanel extends JPanel {
         if (currentConnectionPanel != null) {
             remove(currentConnectionPanel);
         }
-        currentConnectionPanel = new ConnectionPanel(null,
-            (ConnectionStrategy) cbConnectionType.getSelectedItem());
+        int noTar = 0;
+        if(cbConnectionType.getSelectedItem().getClass() == Sparse.class) {
+            if(((Sparse) cbConnectionType.getSelectedItem()).getSynapseGroup() != null) {
+                noTar = ((Sparse) cbConnectionType.getSelectedItem())
+                        .getSynapseGroup().getTargetNeuronGroup()
+                        .size();
+            }
+        }
+        currentConnectionPanel = new ConnectionPanel(parentFrame,
+            (ConnectionStrategy) cbConnectionType.getSelectedItem(),
+                noTar, recurrent);
         add(currentConnectionPanel, gbc);
+        repaint();
+        parentFrame.pack();
     }
 
     /**

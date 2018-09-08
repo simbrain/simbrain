@@ -25,6 +25,7 @@ import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -85,8 +86,9 @@ public class NetworkDialog extends StandardDialog {
 
         // Quick-connect properties
         quickConnectPanel = new ConnectionSelectorPanel(networkPanel.getQuickConnector().getConnectors(),
-            networkPanel.getQuickConnector().getCurrentConnector());
-        tabbedPane.addTab("Connections", quickConnectPanel);
+            networkPanel.getQuickConnector().getCurrentConnector(), this);
+        JScrollPane wrapper = new JScrollPane(quickConnectPanel);
+        tabbedPane.addTab("Connections", wrapper);
 
         // Randomizer properties. Not currently used but being left in case
         //   it is reinstated.

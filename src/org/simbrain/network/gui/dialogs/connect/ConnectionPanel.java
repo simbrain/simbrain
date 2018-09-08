@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -58,10 +59,10 @@ public final class ConnectionPanel extends JPanel {
      */
     private SynapsePolarityAndRandomizerPanel polarityPanel;
 
-    /**
-     * Drop down triangle for synapse properties.
-     */
-    private DropDownTriangle detailTriangle;
+//    /**
+//     * Drop down triangle for synapse properties.
+//     */
+//    private DropDownTriangle detailTriangle;
 
     /**
      * To edit the properties of the connection object
@@ -73,12 +74,24 @@ public final class ConnectionPanel extends JPanel {
      */
     private ConnectionStrategy connectionStrategy;
 
+    private SparseConnectionPanel spPanel;
+
+    /**
+     * Number of target neurons, can be 0
+     */
+    private int noTar;
+
+    /**
+     * Whether or not the the connections would be recurrent.
+     */
+    private boolean rec;
+
     /**
      * Construct the dialog.
      *
      * @param connectionManager   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager) {
+    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager, int noTar, boolean rec) {
         this.parentFrame = parent;
         this.connectionStrategy = connectionManager;
         init();
@@ -90,70 +103,52 @@ public final class ConnectionPanel extends JPanel {
     private void init() {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        // Connection Properties
-        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.RIGHT, false, "Show", "Hide", parentFrame);
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
-        connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        connectionContainer.add(detailTriangle, gbc);
-        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 3;
         gbc.weighty = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        connectionContainer.add(connectionStrategyProperties, gbc);
-        add(connectionContainer);
-
-        // Synapse Properties
-        JPanel synapseContainer = new JPanel();
-        synapseContainer.setBorder(BorderFactory.createTitledBorder("Synapse Type"));
-        add(Box.createRigidArea(new Dimension(0, 10)));
-        add(leftJustify(synapseContainer));
-        add(Box.createRigidArea(new Dimension(0, 15)));
-        JButton synProperties = new JButton("Set");
-        synProperties.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                StandardDialog dialog =  new StandardDialog();
-                dialog.setContentPane(ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(dialog));
-                dialog.setVisible(true);
+        if(connectionStrategy.getClass() != Sparse.class) {
+            connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
+            connectionContainer.add(connectionStrategyProperties, gbc);
+            spPanel = null;
+        } else {
+            if(((Sparse) connectionStrategy).getSynapseGroup() != null) {
+                spPanel = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
+            } else {
+                spPanel = SparseConnectionPanel.createSparsityAdjustmentPanel(
+                        (Sparse) connectionStrategy, noTar, rec);
             }
-            //TODO: Display some text info about which synapse types are being used
-        });
-        synapseContainer.add(synProperties);
-        add(synapseContainer);
+            connectionContainer.add(spPanel, gbc);
+        }
+        add(connectionContainer);
 
         // E/I Ratio and Randomizers
         polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
         add(polarityPanel);
-        detailTriangle.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                updateExcitatoryRatioTriangle();
-            }
-        });
-        updateExcitatoryRatioTriangle();
+//        detailTriangle.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                updateExcitatoryRatioTriangle();
+//            }
+//        });
+//        updateExcitatoryRatioTriangle();
     }
 
-    /**
-     * Update state of detail triangle.
-     */
-    private void updateExcitatoryRatioTriangle() {
-        connectionStrategyProperties.setVisible(detailTriangle.isDown());
-        connectionStrategyProperties.repaint();
-        if (parentFrame != null) {
-            parentFrame.pack();
-        }
-    }
+//    /**
+//     * Update state of detail triangle.
+//     */
+//    private void updateExcitatoryRatioTriangle() {
+//        connectionStrategyProperties.setVisible(detailTriangle.isDown());
+//        connectionStrategyProperties.repaint();
+//        if (parentFrame != null) {
+//            parentFrame.pack();
+//        }
+//    }
     /**
      * https://stackoverflow.com/questions/8335997/ how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
      */
@@ -169,7 +164,12 @@ public final class ConnectionPanel extends JPanel {
      * Update the {@link ConnectionStrategy} object associated with this panel.
      */
     public void commitSettings() {
-        connectionStrategyProperties.commitChanges();
+        if(connectionStrategyProperties != null) {
+            connectionStrategyProperties.commitChanges();
+        }
+        if(spPanel != null) {
+            spPanel.commitChanges();
+        }
         polarityPanel.commitChanges(connectionStrategy);
     }
 

@@ -137,11 +137,11 @@ public class SparseConnectionPanel extends EditablePanel {
      * Create the sparsity based connection panel.
      *
      * @param connection   the connection object to adjust
-     * @param networkPanel the parent panel
      * @return the constructed panel
      */
-    public static SparseConnectionPanel createSparsityAdjustmentPanel(Sparse connection, NetworkPanel networkPanel) {
-        SparseConnectionPanel sap = new SparseConnectionPanel(connection, networkPanel);
+    public static SparseConnectionPanel createSparsityAdjustmentPanel(Sparse connection,
+                                                                      int noTar, boolean rec) {
+        SparseConnectionPanel sap = new SparseConnectionPanel(connection, noTar,rec);
         sap.fillFieldValues();
         sap.initializeSparseSlider();
         sap.addChangeListeners();
@@ -151,12 +151,30 @@ public class SparseConnectionPanel extends EditablePanel {
     }
 
     /**
+     * Create the sparsity based connection panel.
+     *
+     * @param connection   the connection object to adjust
+     * @return the constructed panel
+     */
+    public static SparseConnectionPanel createSparsityAdjustmentEditor(Sparse connection) {
+        if(connection.getSynapseGroup() == null) {
+            throw new IllegalStateException("Cannot edit a sparse connection strategy object, when its" +
+                    " parent synapse group is null.");
+        }
+        int noSrc = connection.getSynapseGroup().getSourceNeuronGroup().size();
+        int noTar = connection.getSynapseGroup().getTargetNeuronGroup().size();
+        SparseConnectionPanel sap = createSparsityAdjustmentPanel(connection, noTar,
+                connection.getSynapseGroup().isRecurrent());
+        return sap;
+    }
+
+    /**
      * Constructs a gui panel for adjusting the sparsity of a sparse connect
      * neurons object, and initializes all appropriate listeners.
      *
      * @param connection the connection object this panel will act on
      */
-    private SparseConnectionPanel(Sparse connection, NetworkPanel networkPanel) {
+    private SparseConnectionPanel(Sparse connection, int noTar, boolean recurrent) {
 
         editing = connection.getSynapseGroup() != null;
         this.connection = connection;
@@ -165,39 +183,41 @@ public class SparseConnectionPanel extends EditablePanel {
             setRecurrent(connection.getSynapseGroup().isRecurrent());
             allowSelfConnect = connection.isSelfConnectionAllowed();
         } else {
+            numTargs = noTar;
+            setRecurrent(recurrent);
             // Assumes only one source and one target group are selected if any
             // are
-            try {
-                // TODO: Temp.  For loose neuron case
-                if(networkPanel == null) {
-                    return;
-                }
-
-                if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
-                    NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
-                    NeuronGroup target = networkPanel.getSelectedModelNeuronGroups().get(0);
-                    numTargs = target.size();
-                    setRecurrent(source.equals(target));
-
-                } else {
-                    // Called when Quick Properties (see QuickConnectDialog) is used
-                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModelNeurons());
-                    List<Neuron> targets = networkPanel.getSelectedModelNeurons();
-                    numTargs = targets.size();
-                    int sourcesSize = sources.size();
-                    sources.retainAll(targets);
-                    int newSize = sources.size();
-                    // Counts as recurrent iff all the source neurons are the
-                    // same
-                    // as all the target neurons.
-                    setRecurrent(sourcesSize == newSize);
-                }
-                synsPerSource.setVisible(numTargs != 0);
-            } catch (IndexOutOfBoundsException e) {
-                setRecurrent(true);
-                numTargs = (int) 1E4;
-                synsPerSource.setVisible(false);
-            }
+//            try {
+////                // TODO: Temp.  For loose neuron case
+////                if(networkPanel == null) {
+////                    return;
+////                }
+//
+//                if (noSrc > 0 || noTar > 0) {
+//                    NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
+//                    NeuronGroup target = networkPanel.getSelectedModelNeuronGroups().get(0);
+//                    numTargs = target.size();
+//                    setRecurrent(source.equals(target));
+//
+//                } else {
+//                    // Called when Quick Properties (see QuickConnectDialog) is used
+//                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModelNeurons());
+//                    List<Neuron> targets = networkPanel.getSelectedModelNeurons();
+//                    numTargs = targets.size();
+//                    int sourcesSize = sources.size();
+//                    sources.retainAll(targets);
+//                    int newSize = sources.size();
+//                    // Counts as recurrent iff all the source neurons are the
+//                    // same
+//                    // as all the target neurons.
+//                    setRecurrent(sourcesSize == newSize);
+//                }
+//                synsPerSource.setVisible(numTargs != 0);
+//            } catch (IndexOutOfBoundsException e) {
+//                setRecurrent(true);
+//                numTargs = (int) 1E4;
+//                synsPerSource.setVisible(false);
+//            }
         }
 
 
@@ -228,6 +248,7 @@ public class SparseConnectionPanel extends EditablePanel {
         sSize.width = 80;
         synsPerSource.setPreferredSize(sSize);
         equalizerPanel.add(synsPerSource);
+        synsPerSource.setVisible(numTargs > 0);
 
         allowSelfConnectPanel = new JPanel(new FlowLayout());
         allowSelfConnectPanel.add(new JLabel("Self Connections: "));
@@ -290,8 +311,8 @@ public class SparseConnectionPanel extends EditablePanel {
         connectionDensitySlider.setPaintTicks(true);
 
         Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
-        labelTable2.put(new Integer(0), new JLabel("0%"));
-        labelTable2.put(new Integer(100), new JLabel("100%"));
+        labelTable2.put(0, new JLabel("0%"));
+        labelTable2.put(100, new JLabel("100%"));
         connectionDensitySlider.setLabelTable(labelTable2);
         connectionDensitySlider.setPaintLabels(true);
 
@@ -322,9 +343,13 @@ public class SparseConnectionPanel extends EditablePanel {
                     synsPerSourceListener.disable();
                     int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
                     double val = (double) (connectionDensitySlider.getValue()) / 100;
-                    densityTf.setValue(new Double(val));
-                    int sps = (int) (val * nt);
-                    synsPerSource.setValue(new Integer(sps));
+                    densityTf.setValue(val);
+                    if (numTargs > 0) {
+                        int sps = (int) (val * nt);
+                        synsPerSource.setValue(sps);
+                    } else {
+                        synsPerSource.setText("N/A");
+                    }
                 }
             }
         };
@@ -356,9 +381,13 @@ public class SparseConnectionPanel extends EditablePanel {
                     int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
                     Integer sps = Utils.parseInteger(synsPerSource);
                     if (sps != null) {
-                        densityTf.setValue(new Double((double) sps / nt));
+                        if(numTargs > 0) {
+                            densityTf.setValue((double) sps / nt);
+                        } else {
+                            densityTf.setText("N/A");
+                        }
                         int sVal = (int) (((Number) densityTf.getValue()).doubleValue() * 100);
-                        connectionDensitySlider.setValue(new Integer(sVal));
+                        connectionDensitySlider.setValue(sVal);
                     }
                 }
             }
@@ -393,10 +422,14 @@ public class SparseConnectionPanel extends EditablePanel {
                     int sps;
                     int nt = allowSelfConnect ? numTargs : numTargs - 1;
                     if (densityTf.getValue() != null) {
-                        sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
-                        synsPerSource.setValue(new Integer(sps));
+                        if(numTargs > 0) {
+                            sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
+                            synsPerSource.setValue(sps);
+                        } else {
+                            synsPerSource.setText("N/A");
+                        }
                         int sVal = (int) (((Number) densityTf.getValue()).doubleValue() * 100);
-                        connectionDensitySlider.setValue(new Integer(sVal));
+                        connectionDensitySlider.setValue(sVal);
                     }
                 }
             }
@@ -452,7 +485,7 @@ public class SparseConnectionPanel extends EditablePanel {
 
                 int nt = allowSelfConnect || !recurrentConnection ? numTargs : numTargs - 1;
                 double sparsity = Double.parseDouble(densityTf.getText());
-                synsPerSource.setValue(new Integer((int) (sparsity * nt)));
+                synsPerSource.setValue((int) (sparsity * nt));
 
             }
         });
@@ -475,7 +508,7 @@ public class SparseConnectionPanel extends EditablePanel {
     public boolean commitChanges() {
         if (equalizeEfferentsChkBx.isEnabled()) {
             // Should always be disabled if the connection is AllToAll
-            ((Sparse) connection).setEqualizeEfferents(equalizeEfferentsChkBx.isSelected());
+            connection.setEqualizeEfferents(equalizeEfferentsChkBx.isSelected());
         }
         double connectivity = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(connectivity)) {
@@ -524,7 +557,7 @@ public class SparseConnectionPanel extends EditablePanel {
         this.allowSelfConnect = allowSelfConnect;
         int nt = allowSelfConnect ? numTargs : numTargs - 1;
         int sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
-        synsPerSource.setValue(new Integer(sps));
+        synsPerSource.setValue(sps);
     }
 
     public boolean isRecurrentConnection() {
@@ -552,7 +585,7 @@ public class SparseConnectionPanel extends EditablePanel {
         this.numTargs = numTargs;
         int nt = allowSelfConnect ? numTargs : numTargs - 1;
         int sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
-        synsPerSource.setValue(new Integer(sps));
+        synsPerSource.setValue(sps);
     }
 
     public void setEnabled(boolean enabled) {

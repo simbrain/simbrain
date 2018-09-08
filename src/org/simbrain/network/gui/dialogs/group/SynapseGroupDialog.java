@@ -166,6 +166,8 @@ public final class SynapseGroupDialog extends StandardDialog {
     private SynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
         networkPanel = np;
         synapseGroup = sg;
+        this.sourceNeuronGroup = sg.getSourceNeuronGroup();
+        this.targetNeuronGroup = sg.getTargetNeuronGroup();
         init();
     }
 
@@ -210,13 +212,13 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel
         if (isCreationDialog) {
-            connectionPanel = new ConnectionSelectorPanel();
+            connectionPanel = new ConnectionSelectorPanel(sourceNeuronGroup.equals(targetNeuronGroup), this);
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Type", connectWrapper);
         } else {
-            connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager());
+            connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this);
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);

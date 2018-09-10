@@ -21,13 +21,11 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.gui.EntityNode;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -66,7 +64,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     public OdorWorldComponent(String name) {
         super(name);
         world = new OdorWorld();
-//        addListener();
+        init();
     }
 
     /**
@@ -78,6 +76,18 @@ public class OdorWorldComponent extends WorkspaceComponent {
     public OdorWorldComponent(String name, OdorWorld world) {
         super(name);
         this.world = world;
+        init();
+    }
+
+    private void init() {
+        world.addPropertyChangeListener(evt -> {
+            if ("entityAdded".equals(evt.getPropertyName())) {
+                fireModelAdded(evt.getNewValue());
+            }
+            if ("entityDeleted".equals(evt.getPropertyName())) {
+                fireModelRemoved(evt.getNewValue());
+            }
+        });
     }
 
     @Override

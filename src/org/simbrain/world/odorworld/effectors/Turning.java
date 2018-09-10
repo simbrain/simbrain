@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -102,19 +103,27 @@ public class Turning extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod = "getMixedId")
+    @Consumable(idMethod = "getMixedId", customDescriptionMethod = "getEffectorDescription")
     public void addAmount(double amount) {
         this.amount += amount;
     }
 
-
     /**
-     * @param amount the amount to set
+     * Called by reflection to return a custom description for couplings.
      */
-    @Consumable(idMethod = "getMixedId")
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public String getEffectorDescription() {
+        String dirString = (direction == 1) ? "Left" : "Right";
+        return getParent().getName() + ":" + "Turn " + dirString;
     }
+
+    // TODO: Is a straight set needed?
+//    /**
+//     * @param amount the amount to set
+//     */
+//    @Consumable(idMethod = "getMixedId", customDescriptionMethod = "getEffectorDescription")
+//    public void setAmount(double amount) {
+//        this.amount = amount;
+//    }
 
     /**
      * @return the direction

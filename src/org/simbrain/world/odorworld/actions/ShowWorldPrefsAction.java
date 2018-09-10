@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 import javax.swing.*;
@@ -38,7 +39,7 @@ public final class ShowWorldPrefsAction extends AbstractAction {
     private final OdorWorldPanel component;
 
     /**
-     * Construct a show prefs action
+     * Construct a show prefs action.
      *
      * @param component parent component
      */
@@ -53,11 +54,9 @@ public final class ShowWorldPrefsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Odor world preferences...");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(component.getWorld());
+        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(component.getWorld());
         JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);

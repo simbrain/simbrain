@@ -56,10 +56,8 @@ public final class DeleteEntityAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Delete entity");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-//        worldPanel.getWorld().deleteEntity(entity);
+        worldPanel.getWorld().deleteEntity(entity);
     }
 }

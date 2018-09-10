@@ -239,8 +239,8 @@ public class OdorWorldEntity implements EditableObject {
             setY(y + dy);
         }
 
-        //updateSensors();
-        //updateEffectors();
+        updateSensors();
+        updateEffectors();
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
@@ -375,6 +375,9 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void setId(String id) {
         this.id = id;
+        if(name == null) {
+            name = id;
+        }
     }
 
     /**
@@ -461,7 +464,7 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * Apply impact of all effectors.
      */
-    public void applyEffectors() {
+    public void updateEffectors() {
         if (effectorsEnabled) {
             for (Effector effector : effectors) {
                 effector.update();
@@ -820,7 +823,7 @@ public class OdorWorldEntity implements EditableObject {
      * Remove this entity. Assumes it's been removed from parent world already.
      */
     public void delete() {
-
+        parentWorld.deleteEntity(this);
         changeSupport.firePropertyChange("deleted", null, this);
     }
 
@@ -852,6 +855,7 @@ public class OdorWorldEntity implements EditableObject {
         heading = newHeading;
         changeSupport.firePropertyChange("moved", null, null);
     }
+
 
     /**
      * Returns the current heading, in degrees.

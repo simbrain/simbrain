@@ -19,7 +19,9 @@
 package org.simbrain.world.odorworld;
 
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -38,17 +40,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Core model class of Odor World, which contains a list of entities in the
  * world. Some code from Developing Games in Java, by David Brackeen.
  */
-public class OdorWorld {
+public class OdorWorld implements EditableObject {
 
     /**
      * List of odor world entities.
      */
     private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
-
-//    /**
-//     * Listeners on this odor world.
-//     */
-//    private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
@@ -58,22 +55,26 @@ public class OdorWorld {
     /**
      * Whether or not sprites wrap around or are halted at the borders
      */
+    @UserParameter(label = "Wrap around", description = "Whether or not sprites wrap around or are halted at the borders", order = 6)
     private boolean wrapAround = true;
 
     /**
      * If true, then objects block movements; otherwise agents can walk through
      * objects.
      */
+    @UserParameter(label = "Wrap around", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
 
     /**
      * Height of world.
      */
+    @UserParameter(label = "Height", description = "Height of world", order = 1)
     private int height = 450;
 
     /**
      * Width of world.
      */
+    @UserParameter(label = "Width", description = "Width of world", order = 2)
     private int width = 450;
 
     /**
@@ -94,7 +95,7 @@ public class OdorWorld {
     /**
      * Agent Name generator.
      */
-    private SimpleId agentNameGenerator = new SimpleId("Agent", 1);
+    private SimpleId agentIdGenerator = new SimpleId("Agent", 1);
 
     /**
      * Support for property change events.
@@ -149,9 +150,6 @@ public class OdorWorld {
         // map.addSprite(entity);
         entityList.add(entity);
 
-        // Fire entity added event
-        // fireEntityAdded(entity);
-
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
@@ -177,7 +175,7 @@ public class OdorWorld {
     public void addAgent(final OdorWorldEntity entity) {
 
         entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
-        entity.setName(agentNameGenerator.getId());
+        entity.setId(agentIdGenerator.getId());
         entity.setSensorsEnabled(true);
         entity.setEffectorsEnabled(true);
 
@@ -191,8 +189,8 @@ public class OdorWorld {
         entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
         entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
 
-        // Temp testing
-        entity.addSensor(new ObjectSensor(entity, "Swiss", "Swiss.gif"));
+        // TODO: Temp testing. Mabye add sensors for every object type?
+        entity.addSensor(new ObjectSensor(entity, OdorWorldEntity.EntityType.COW));
 
         entityList.add(entity);
 
@@ -310,8 +308,11 @@ public class OdorWorld {
 //                fireEffectorRemoved(effector);
             }
             recomputeMaxStimulusLength();
-//            fireEntityRemoved(entity);
+            changeSupport.firePropertyChange("entityDeleted", null, entity);
         }
+
+
+
     }
 
     /**
@@ -322,6 +323,7 @@ public class OdorWorld {
             deleteEntity(entity);
         }
     }
+
 
     /**
      * Computes maximum stimulus length. This is used for scaling the color in
@@ -344,8 +346,8 @@ public class OdorWorld {
      * @return Initialized object.
      */
     private Object readResolve() {
-        if (agentNameGenerator == null) {
-            agentNameGenerator = new SimpleId("Agent", 1);
+        if (agentIdGenerator == null) {
+            agentIdGenerator = new SimpleId("Agent", 1);
         }
 
         changeSupport = new PropertyChangeSupport(this);
@@ -581,5 +583,6 @@ public class OdorWorld {
     public SimpleId getEffectorIDGenerator() {
         return effectorIDGenerator;
     }
+
 
 }

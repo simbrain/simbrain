@@ -218,7 +218,7 @@ public class OdorWorldPanel extends JPanel {
     }
 
     /**
-     * Get selected odor world entities
+     * Get selected odor world entities.
      */
     public List<OdorWorldEntity> getSelectedModelEntities() {
         return getSelection().stream()
@@ -226,6 +226,16 @@ public class OdorWorldPanel extends JPanel {
             .map(p -> ((EntityNode) p.getParent()).getEntity())
             .collect(Collectors.toList());
     }
+
+    /**
+     * Delete all current selected entities.
+     */
+    private void deleteSelectedEntities() {
+        for(OdorWorldEntity e : getSelectedModelEntities()) {
+            e.delete();
+        }
+    }
+
 
     /**
      * Create a popup menu based on location of mouse click.
@@ -395,10 +405,10 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("addAgent", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: Making a "mouse" should be enough...
-                OdorWorldEntity entity = new OdorWorldEntity(world);
+                OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
                 entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
                 entity.setLocation(getLastClickedPosition().getX(), getLastClickedPosition().getY());
-                world.addEntity(entity);
+                world.addAgent(entity);
             }
         });
 
@@ -406,16 +416,14 @@ public class OdorWorldPanel extends JPanel {
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
         canvas.getActionMap().put("deleteSelection", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                world.deleteAllEntities(); // TODO Just delete selected entities
-                // world.deleteEntities(List);
+                deleteSelectedEntities();
             }
         });
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
         canvas.getActionMap().put("deleteSelection", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                world.deleteAllEntities(); // TODO Just delete selected entities
-                // world.deleteEntities(List);
+                deleteSelectedEntities();
             }
         });
 

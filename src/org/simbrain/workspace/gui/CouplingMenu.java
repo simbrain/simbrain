@@ -79,8 +79,7 @@ public class CouplingMenu extends JMenu {
             List<Producer<?>> producers = workspace.getCouplingFactory().getAllProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getId()
-                        + ":" + producer.getDescription(), producer, consumer));
+                    couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getDescription(), producer, consumer));
                 }
             }
             if (!couplings.isEmpty()) {

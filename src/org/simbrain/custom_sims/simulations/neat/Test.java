@@ -129,8 +129,8 @@ public class Test {
 
         // coupling output node 0 - 2 to move straight, turn left (maybe, not sure, check later), and turn right effector
         ((StraightMovement) newEntity.getEffectors().get(0)).setAmount(n.getNeuronGroups().get(1).getNeuron(0).getActivation());
-        ((Turning) newEntity.getEffectors().get(1)).setAmount(n.getNeuronGroups().get(1).getNeuron(1).getActivation());
-        ((Turning) newEntity.getEffectors().get(2)).setAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
+        ((Turning) newEntity.getEffectors().get(1)).addAmount(n.getNeuronGroups().get(1).getNeuron(1).getActivation());
+        ((Turning) newEntity.getEffectors().get(2)).addAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
         // update world
         w.update(1);
@@ -227,8 +227,8 @@ public class Test {
         n2.bufferedUpdateAllNeurons();
         n2.update();
         ((StraightMovement) newEntity.getEffectors().get(0)).setAmount(n.getNeuronGroups().get(1).getNeuron(0).getActivation());
-        ((Turning) newEntity.getEffectors().get(1)).setAmount(n.getNeuronGroups().get(1).getNeuron(1).getActivation());
-        ((Turning) newEntity.getEffectors().get(2)).setAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
+        ((Turning) newEntity.getEffectors().get(1)).addAmount(n.getNeuronGroups().get(1).getNeuron(1).getActivation());
+        ((Turning) newEntity.getEffectors().get(2)).addAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
         double[] newStim = new double[8];
         for (int i = 3; i < 9; i++) {
@@ -243,8 +243,8 @@ public class Test {
         pinnedMouse.getSmellSource().setStimulusVector(newStim);
 
         // pinned mouse cant move
-        ((Turning) pinnedMouse.getEffectors().get(1)).setAmount(n2.getNeuronGroups().get(1).getNeuron(1).getActivation());
-        ((Turning) pinnedMouse.getEffectors().get(2)).setAmount(n2.getNeuronGroups().get(1).getNeuron(2).getActivation());
+        ((Turning) pinnedMouse.getEffectors().get(1)).addAmount(n2.getNeuronGroups().get(1).getNeuron(1).getActivation());
+        ((Turning) pinnedMouse.getEffectors().get(2)).addAmount(n2.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
         w.update(1);
 

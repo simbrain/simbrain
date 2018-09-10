@@ -88,9 +88,16 @@ public class StraightMovement extends Effector {
     /**
      * @param amount the amount to set
      */
-    @Consumable(idMethod = "getMixedId")
+    @Consumable(idMethod = "getMixedId",customDescriptionMethod = "getEffectorDescription")
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    /**
+     * Called by reflection to return a custom description for couplings.
+     */
+    public String getEffectorDescription() {
+        return getParent().getName() + ":" + "Go Straight";
     }
 
     /**

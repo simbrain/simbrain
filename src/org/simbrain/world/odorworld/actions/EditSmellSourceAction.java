@@ -61,9 +61,7 @@ public final class EditSmellSourceAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "View / Edit smell stimulus...");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(entity.getSmellSource()));
         JDialog dialog = editor.getDialog();

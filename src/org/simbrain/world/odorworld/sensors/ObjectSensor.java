@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.ScalarSmellSource;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -23,19 +24,18 @@ public class ObjectSensor extends Sensor {
      * The type of the object represented, e.g. Swiss.gif.
      */
     @UserParameter(label = "Object Type",
-            description = "The type of the object represented, e.g. Swiss.gif.",
+            description = "What type of object this sensor responds to",
             order = 5)
-    private String objectType = "Swiss.gif";
+    private OdorWorldEntity.EntityType objectType;
 
     /**
      * Instantiate an object sensor.
      *
      * @param parent parent entity
-     * @param label label for the sensor
      * @param objectType the type (e.g. Swiss.gif)
      */
-    public ObjectSensor(OdorWorldEntity parent, String label, String objectType) {
-        super(parent, label);
+    public ObjectSensor(OdorWorldEntity parent, OdorWorldEntity.EntityType objectType) {
+        super(parent, objectType.toString());
         this.objectType = objectType;
     }
 
@@ -53,11 +53,10 @@ public class ObjectSensor extends Sensor {
         value = 0;
         for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
             ScalarSmellSource smell = entity.getScalarSmell();
-            //TODO
-//            if(entity.getObjectType().equals(objectType)) {
-//                double distance = SimbrainMath.distance(parent.getCenterLocation(), entity.getCenterLocation());
-//                value += smell.getValue(distance);
-//            }
+            if(entity.getEntityType() == objectType) {
+                double distance = SimbrainMath.distance(parent.getCenterLocation(), entity.getCenterLocation());
+                value += smell.getValue(distance);
+            }
         }
     }
 
@@ -68,7 +67,7 @@ public class ObjectSensor extends Sensor {
 
     @Override
     public String getTypeDescription() {
-        return objectType.substring(0, objectType.lastIndexOf('.'));
+        return objectType.toString();
     }
 
     /**
@@ -76,12 +75,12 @@ public class ObjectSensor extends Sensor {
      * corresponding to object sensors.
      */
     public String getSensorDescription() {
-        return getId() + ":" + getTypeDescription() + " sensor";
+        return getParent().getName() + ":" + getTypeDescription() + " sensor";
     }
 
     @Override
     public EditableObject copy() {
-        return new ObjectSensor(parent, getLabel(), objectType);
+        return new ObjectSensor(parent, objectType);
     }
 
     @Override

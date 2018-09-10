@@ -131,7 +131,7 @@ public class SmellSensor extends Sensor {
     /**
      * @return the currentValue
      */
-    @Producible(idMethod = "getId")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
     public double[] getCurrentValues() {
         return currentValue;
     }
@@ -167,6 +167,15 @@ public class SmellSensor extends Sensor {
     @Override
     public String getTypeDescription() {
         return "Smell";
+    }
+
+    /**
+     * Called by reflection to return a custom description for couplings.
+     */
+    public String getSensorDescription() {
+        return getParent().getName() + ":" + "Smell sensor (" +
+            SimbrainMath.roundDouble(theta,2)+ "," +
+            SimbrainMath.roundDouble(radius ,2) + ")";
     }
 
     @Override

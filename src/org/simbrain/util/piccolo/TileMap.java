@@ -9,6 +9,19 @@ import org.w3c.dom.NodeList;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Java representation of a .tmx tilemap produced by the Tiled app
+ * (https://doc.mapeditor.org/en/stable/)
+ *
+ * A tilemap contains a list of {@link TileMapLayer} objects and a {@link TileSet}
+ * object. Each layer is basically a grid of tiles, each of which points to a
+ * member of a tileset, which is like a sprite sheet. To get a sense of
+ * this see a sample tmx file like <code>sample.tmx</code>.
+ *
+ * The map returns a list of PImages, one per layer, which can be rendered in a
+ * Piccolo canvas.
+ *
+ */
 public class TileMap {
 
     public enum Orientation {
@@ -77,6 +90,12 @@ public class TileMap {
      */
     private Color backgroundcolor;
 
+    /**
+     * Create a tilemap by parsing a tmx file, which is an xml representation
+     * of a tilemap.
+     *
+     * @param filename file to parse
+     */
     public TileMap(String filename) {
         Document doc = OdorWorldResourceManager.getTileMap(filename);
 
@@ -103,11 +122,20 @@ public class TileMap {
      * Get a list of images of each layer of this map.
      * @return the list of layer images
      */
-    public ArrayList<PImage> render() {
+    public ArrayList<PImage> createImageList() {
         ArrayList<PImage> renderedLayers = new ArrayList<>();
         for (TileMapLayer l : layers) {
-            renderedLayers.add(l.render(tileset));
+            renderedLayers.add(l.renderImage(tileset));
         }
         return renderedLayers;
     }
+
+    public int getMapHeight() {
+        return height * tileheight;
+    }
+
+    public int getMapWidth() {
+        return width * tilewidth;
+    }
+
 }

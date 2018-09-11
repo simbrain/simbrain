@@ -23,6 +23,7 @@ import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
+import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.util.StandardDialog;
@@ -96,7 +97,10 @@ public class OdorWorldPanel extends JPanel {
         canvas.setBackground(backgroundColor);
         canvas.setFocusable(true);
 
-        canvas.getLayer().addChild(new WorldMapNode());
+        // Add tile map
+        for(PImage layer : world.getTileMap().createImageList()) {
+            canvas.getLayer().addChild(layer);
+        }
 
         // Remove default event handlers
         PInputEventListener panEventHandler = canvas.getPanEventHandler();
@@ -140,19 +144,19 @@ public class OdorWorldPanel extends JPanel {
                     double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
                     double cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2;
 
-//                    // stop centering the entity if the view is going out of bound of the bound of the world.
-//                    if (cameraNewX < 0) {
-//                        cameraNewX = 0;
-//                    }
-//                    if (cameraNewY < 0) {
-//                        cameraNewY = 0;
-//                    }
-//                    if (cameraNewX + cameraBounds.width > worldWidth) {
-//                        cameraNewX = worldWidth - cameraBounds.width;
-//                    }
-//                    if (cameraNewY + cameraBounds.height > worldHeight) {
-//                        cameraNewY = worldHeight - cameraBounds.height;
-//                    }
+                    // Stop centering the entity if the view is going out of bound of the bound of the world.
+                    if (cameraNewX < 0) {
+                        cameraNewX = 0;
+                    }
+                    if (cameraNewY < 0) {
+                        cameraNewY = 0;
+                    }
+                    if (cameraNewX + cameraBounds.width > worldWidth) {
+                        cameraNewX = worldWidth - cameraBounds.width;
+                    }
+                    if (cameraNewY + cameraBounds.height > worldHeight) {
+                        cameraNewY = worldHeight - cameraBounds.height;
+                    }
 
                     camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
                     repaint();

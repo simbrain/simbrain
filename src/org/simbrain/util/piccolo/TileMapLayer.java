@@ -62,11 +62,12 @@ public class TileMapLayer {
     }
 
     /**
-     * Get a full image of the layer.
+     * Render one layer of a tileset.
+     *
      * @param tileSet the tileset to use on this layer
      * @return the image of this layer
      */
-    public PImage render(TileSet tileSet) {
+    public PImage renderImage(TileSet tileSet) {
         BufferedImage layer =
                 new BufferedImage(
                         tileSet.getTilewidth() * width,

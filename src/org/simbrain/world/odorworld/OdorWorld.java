@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
@@ -48,6 +49,11 @@ public class OdorWorld implements EditableObject {
     private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
 
     /**
+     * Basic tilemap that determines the size and basic features of the world.
+     */
+    private TileMap tileMap = new TileMap("largeWorld.tmx");
+
+    /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
      */
     private double totalSmellVectorLength;
@@ -64,18 +70,6 @@ public class OdorWorld implements EditableObject {
      */
     @UserParameter(label = "Wrap around", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
-
-    /**
-     * Height of world.
-     */
-    @UserParameter(label = "Height", description = "Height of world", order = 1)
-    private int height = 450;
-
-    /**
-     * Width of world.
-     */
-    @UserParameter(label = "Width", description = "Width of world", order = 2)
-    private int width = 450;
 
     /**
      * Entity Id generator.
@@ -503,26 +497,12 @@ public class OdorWorld implements EditableObject {
     }
 
     /**
-     * @param height the height to set
-     */
-    public void setHeight(int height) {
-        // TODO;
-    }
-
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(int width) {
-        // TODO;
-    }
-
-    /**
      * Returns width of world in pixels.
      *
      * @return width in pixels.
      */
     public int getWidth() {
-        return width;
+        return tileMap.getMapWidth();
     }
 
     /**
@@ -531,7 +511,7 @@ public class OdorWorld implements EditableObject {
      * @return height of world
      */
     public int getHeight() {
-        return height;
+        return tileMap.getMapHeight();
     }
 
     /**
@@ -584,5 +564,13 @@ public class OdorWorld implements EditableObject {
         return effectorIDGenerator;
     }
 
+    public TileMap getTileMap() {
+        return tileMap;
+    }
 
+    //TODO: Get rid of these. Here now to prevent compile errors I don't feel like fixing.
+    public void setHeight(int i) {
+    }
+    public void setWidth(int i) {
+    }
 }

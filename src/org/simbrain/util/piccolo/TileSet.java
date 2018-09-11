@@ -72,6 +72,11 @@ public class TileSet {
 
     private BufferedImage transparentTexture = null;
 
+    /**
+     * Create a tileset from one element of a Tilemap.
+     *
+     * @param xmlElement xmlelement to parse
+     */
     public TileSet(Element xmlElement) {
         firstgid = Integer.parseInt(xmlElement.getAttribute("firstgid"));
         // TODO: handle external .tsx source

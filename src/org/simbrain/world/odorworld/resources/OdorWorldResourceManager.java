@@ -18,10 +18,17 @@
  */
 package org.simbrain.world.odorworld.resources;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -69,7 +76,7 @@ public class OdorWorldResourceManager {
      * @param name name of the image file to retrieve
      * @return the Image which can be used with Swing components, etc
      */
-    private static BufferedImage getBufferedImage(final String name) {
+    public static BufferedImage getBufferedImage(final String name) {
         /*
          * There is currently some performance issue with this method,
          * but this the image retrieve from the other getImage() method
@@ -89,5 +96,32 @@ public class OdorWorldResourceManager {
             e.printStackTrace();
         }
         return image;
+    }
+
+    public static Document getDocument(final String name) {
+        URL url = OdorWorldResourceManager.class.getResource(name);
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        Document doc = null;
+        try {
+            doc = db.parse(url.openStream());
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        doc.getDocumentElement().normalize();
+        return doc;
+    }
+
+    public static Document getTileMap(final String name) {
+        return getDocument("tilemap/" + name);
     }
 }

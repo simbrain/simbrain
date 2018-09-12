@@ -50,14 +50,13 @@ public final class ShowEntityDialogAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Edit entity...");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         EntityDialog dialog = new EntityDialog(entity);
         dialog.setTitle("Edit " + entity.getName() + " (" + entity.getId() + ")");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+
     }
 }

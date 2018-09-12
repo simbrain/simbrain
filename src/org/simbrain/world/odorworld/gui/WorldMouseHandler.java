@@ -149,8 +149,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         PNode node = event.getPath().getPickedNode();
         // System.out.println("Mouse clicked / Picked node: " + node);
 
-
-        // Double click on text objects to edit them
+        // Double click on entities to edit them
         if (event.getClickCount() != 1) {
             if (node.getParent() instanceof EntityNode) {
                 EntityNode entityNode = (EntityNode) node.getParent();

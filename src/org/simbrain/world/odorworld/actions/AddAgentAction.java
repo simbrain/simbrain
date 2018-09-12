@@ -52,6 +52,6 @@ public final class AddAgentAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         OdorWorldEntity entity = new OdorWorldEntity(worldPanel.getWorld(), OdorWorldEntity.EntityType.MOUSE);
         entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
-        worldPanel.getWorld().addAgent(entity);
+        worldPanel.getWorld().addEntity(entity);
     }
 }

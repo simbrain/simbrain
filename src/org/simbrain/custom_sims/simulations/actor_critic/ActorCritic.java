@@ -229,7 +229,7 @@ public class ActorCritic extends RegisteredSimulation {
         world.setWrapAround(false);
 
         mouse = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
-        world.addAgent(mouse);
+        world.addEntity(mouse);
         resetMouse();
 
         cheese = new OdorWorldEntity(world, OdorWorldEntity.EntityType.SWISS);

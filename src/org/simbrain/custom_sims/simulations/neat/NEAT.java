@@ -113,8 +113,8 @@ public class NEAT extends RegisteredSimulation {
         pinnedMouse = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         pinnedMouse.setSmellSource(mouse2Smell);
 
-        w.addAgent(newEntity);
-        w.addAgent(pinnedMouse);
+        w.addEntity(newEntity);
+        w.addEntity(pinnedMouse);
         w.addEntity(cheese);
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);

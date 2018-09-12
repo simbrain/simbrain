@@ -101,7 +101,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         } else if (sensorType.getSelectedItem() == "Hearing") {
             setTitle("Add a hearing sensor");
         } else if (sensorType.getSelectedItem().equals("ObjectSensor")) {
-            setTitle("Add a object sensor");
+            setTitle("Add an object sensor");
         } else if (sensorType.getSelectedItem().equals("BumpSensor")) {
             setTitle("Add a bump sensor");
         }

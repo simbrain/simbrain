@@ -299,7 +299,7 @@ public class Test {
         OdorWorldEntity newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
 
-        w.addAgent(newEntity);
+        w.addEntity(newEntity);
         w.addEntity(cheese);
 
         // set location of entities
@@ -343,8 +343,8 @@ public class Test {
         OdorWorldEntity pinnedMouse = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         pinnedMouse.setSmellSource(mouse2Smell);
 
-        w.addAgent(newEntity);
-        w.addAgent(pinnedMouse);
+        w.addEntity(newEntity);
+        w.addEntity(pinnedMouse);
         w.addEntity(cheese);
 
         newEntity.setLocation(450 / 2, 450 / 8 * 7);

@@ -24,12 +24,8 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.StraightMovement;
-import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -51,7 +47,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Basic tilemap that determines the size and basic features of the world.
      */
-    private TileMap tileMap = new TileMap("largeWorld.tmx");
+    private TileMap tileMap = new TileMap("sample.tmx");
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
@@ -144,6 +140,8 @@ public class OdorWorld implements EditableObject {
         // map.addSprite(entity);
         entityList.add(entity);
 
+        entity.addDefaultSensorsEffectors();
+
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
@@ -159,36 +157,6 @@ public class OdorWorld implements EditableObject {
      */
     public boolean containsEntity(final OdorWorldEntity entity) {
         return entityList.contains(entity);
-    }
-
-    /**
-     * Adds an agent and by default adds several sensors and effectors to it.
-     *
-     * @param entity the entity corresponding to the agent
-     */
-    public void addAgent(final OdorWorldEntity entity) {
-
-        entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
-        entity.setId(agentIdGenerator.getId());
-        entity.setSensorsEnabled(true);
-        entity.setEffectorsEnabled(true);
-
-        // Add default effectors
-        entity.addEffector(new StraightMovement(entity, "Go-straight"));
-        entity.addEffector(new Turning(entity, "Go-left", Turning.LEFT));
-        entity.addEffector(new Turning(entity, "Go-right", Turning.RIGHT));
-
-        // Add default sensors
-        entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
-        entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
-        entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
-
-        // TODO: Temp testing. Mabye add sensors for every object type?
-        entity.addSensor(new ObjectSensor(entity, OdorWorldEntity.EntityType.COW));
-
-        entityList.add(entity);
-
-        changeSupport.firePropertyChange("entityAdded", null, entity);
     }
 
     /**

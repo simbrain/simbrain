@@ -28,7 +28,11 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import java.beans.PropertyChangeListener;
@@ -43,49 +47,6 @@ public class OdorWorldEntity implements EditableObject {
 
     /** Support for property change events. */
     protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    // TODO: Put in all static objects
-    // TODO: Move to separate class?
-    /** Type of this object.  These are mapped to images, etc. */
-    public enum EntityType {
-        SWISS ("Swiss", false),
-        FLOWER ("Flower", false),
-        MOUSE ("Mouse", true),
-        AMY ("Amy", true),
-        ARNO ("Arno", true),
-        BOY ("Boy", true),
-        COW ("Cow", true),
-        GIRL ("Girl", true),
-        JAKE ("Jake", true),
-        LION ("Lion", true),
-        STEVE ("Steve", true),
-        SUSI ("Susi", true);
-
-        /**
-         * String description that shows up in dialog boxes.
-         */
-        private final String description;
-
-        /**
-         * Whether the sprite representing this entity is based on heading.
-         */
-        private boolean isRotating;
-
-        /**
-         *
-         * Create the entity
-         */
-        EntityType(String description, boolean isRotating) {
-            this.description = description;
-            this.isRotating = isRotating;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-
-    }
 
     @UserParameter(label = "Type", order = 2)
     private EntityType entityType = EntityType.SWISS;
@@ -223,6 +184,8 @@ public class OdorWorldEntity implements EditableObject {
     public OdorWorldEntity(final OdorWorld world, final EntityType type) {
         this.parentWorld = world;
         setEntityType(type);
+        sensorsEnabled = type.useSensors;
+        effectorsEnabled = type.useEffectors;
     }
 
     /**
@@ -248,7 +211,6 @@ public class OdorWorldEntity implements EditableObject {
         }
 
         changeSupport.firePropertyChange("updated", null, this);
-
 
     }
 
@@ -416,7 +378,7 @@ public class OdorWorldEntity implements EditableObject {
             sensor.setId(parentWorld.getSensorIDGenerator().getId());
         }
 
-//        parentWorld.fireSensorAdded(sensor);
+//       parentWorld.fireSensorAdded(sensor);
     }
 
     /**
@@ -935,6 +897,69 @@ public class OdorWorldEntity implements EditableObject {
 
     public boolean isRotating() {
         return entityType.isRotating;
+    }
+
+    /**
+     * Add some default sensors and effectors to "agent" objects.
+     */
+    public void addDefaultSensorsEffectors() {
+
+
+
+    }
+
+    // TODO: Put in all missing static objects
+    // TODO: Move to separate class?
+    /** Type of this object.  These are mapped to images, etc. */
+    public enum EntityType {
+        SWISS ("Swiss", false, false, false),
+        FLOWER ("Flower", false, false, false),
+        MOUSE ("Mouse", true, true, true),
+        AMY ("Amy", true, true, true),
+        ARNO ("Arno", true, true, true),
+        BOY ("Boy", true, true, true),
+        COW ("Cow", true, true, true),
+        GIRL ("Girl", true, true, true),
+        JAKE ("Jake", true, true, true),
+        LION ("Lion", true, true, true),
+        STEVE ("Steve", true, true, true),
+        SUSI ("Susi", true, true, true);
+
+        /**
+         * String description that shows up in dialog boxes.
+         */
+        private final String description;
+
+        /**
+         * Whether the sprite representing this entity is based on heading.
+         */
+        private boolean isRotating;
+
+        /**
+         * Whether this entity type uses sensors by default.
+         */
+        private boolean useSensors;
+
+        /**
+         * Whether this entity type uses effectors by default.
+         */
+        private boolean useEffectors;
+
+        /**
+         * Create the entity
+         */
+        EntityType(String description, boolean isRotating, boolean sensors, boolean effectors) {
+            this.description = description;
+            this.isRotating = isRotating;
+            this.useSensors = sensors;
+            this.useEffectors = effectors;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+
     }
 
 

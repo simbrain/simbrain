@@ -408,11 +408,10 @@ public class OdorWorldPanel extends JPanel {
         canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.SHIFT_MASK), "addAgent");
         canvas.getActionMap().put("addAgent", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: Making a "mouse" should be enough...
                 OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
                 entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
                 entity.setLocation(getLastClickedPosition().getX(), getLastClickedPosition().getY());
-                world.addAgent(entity);
+                world.addEntity(entity);
             }
         });
 

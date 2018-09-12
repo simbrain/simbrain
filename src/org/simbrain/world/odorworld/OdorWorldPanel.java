@@ -430,6 +430,21 @@ public class OdorWorldPanel extends JPanel {
             }
         });
 
+        // Example of getting press and release events
+        // See https://docs.oracle.com/javase/8/docs/api/javax/swing/KeyStroke.html#getKeyStroke-java.lang.String-
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed O"), "test press o");
+        canvas.getActionMap().put("test press o", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Pressed o");
+            }
+        });
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("released O"), "released o");
+        canvas.getActionMap().put("released o", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Released o");
+            }
+        });
+
         // Move. arrows. wasd
         canvas.getInputMap().put(KeyStroke.getKeyStroke("UP"), "north");
         canvas.getInputMap().put(KeyStroke.getKeyStroke("W"), "north");

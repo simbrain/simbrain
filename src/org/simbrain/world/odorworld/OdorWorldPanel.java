@@ -79,11 +79,6 @@ public class OdorWorldPanel extends JPanel {
     private boolean drawingWalls = false;
 
     /**
-     * World menu.
-     */
-    private OdorWorldMenu menu;
-
-    /**
      * Construct a world, set its background color.
      *
      * @param world the frame in which this world is rendered
@@ -177,9 +172,6 @@ public class OdorWorldPanel extends JPanel {
         this.component = component;
         this.world = world;
 
-        menu = new OdorWorldMenu(this);
-        menu.initMenu();
-
     }
 
     /**
@@ -255,13 +247,6 @@ public class OdorWorldPanel extends JPanel {
             contextMenu.add(new JMenuItem(new AddAgentAction(this)));
             contextMenu.addSeparator();
         } else {
-            contextMenu.add(menu.getCopyItem());
-            contextMenu.add(menu.getCutItem());
-            JMenuItem pasteItem = menu.getPasteItem();
-            if (WorldClipboard.getClipboardEntity() == null) {
-                pasteItem.setEnabled(false);
-            }
-            contextMenu.add(pasteItem);
             contextMenu.add(new JMenuItem(new ShowEntityDialogAction(entity)));
             contextMenu.add(new JMenuItem(new DeleteEntityAction(this, entity)));
             contextMenu.addSeparator();

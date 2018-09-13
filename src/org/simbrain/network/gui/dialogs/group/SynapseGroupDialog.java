@@ -23,7 +23,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
-import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
+import org.simbrain.network.gui.dialogs.connect.SynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
@@ -69,7 +69,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Panel for editing synapses in the group.
      */
-    private ConnectionSynapsePropertiesPanel editSynapsesPanel;
+    private SynapsePropertiesPanel editSynapsesPanel;
 
     /**
      * Panel for adjusting the connection object.
@@ -236,7 +236,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         }
 
         // Tab for editing synapses
-        editSynapsesPanel = ConnectionSynapsePropertiesPanel.createSynapsePropertiesPanel(this, synapseGroup);
+        editSynapsesPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(this, synapseGroup);
         if (!isCreationDialog) {
             ActionListener al = new ActionListener() {
                 @Override

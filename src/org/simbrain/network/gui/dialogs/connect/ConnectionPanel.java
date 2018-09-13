@@ -24,16 +24,10 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.widgets.DropDownTriangle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -52,7 +46,7 @@ public final class ConnectionPanel extends JPanel {
     /**
      * Template synapse properties
      */
-    private ConnectionSynapsePropertiesPanel synapseProperties;
+    private SynapsePropertiesPanel synapseProperties;
 
     /**
      * The excitatory-inhibitory ratio and randomizer panel.
@@ -207,7 +201,7 @@ public final class ConnectionPanel extends JPanel {
         connectionStrategy.connectNeurons(synapseGroup);
     }
 
-    public ConnectionSynapsePropertiesPanel getSynapseProperties() {
+    public SynapsePropertiesPanel getSynapseProperties() {
         return synapseProperties;
     }
 

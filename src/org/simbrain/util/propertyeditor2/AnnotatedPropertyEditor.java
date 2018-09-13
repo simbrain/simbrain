@@ -23,6 +23,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
@@ -59,7 +60,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Oliver Coleman
  */
-public class AnnotatedPropertyEditor extends JPanel {
+public class AnnotatedPropertyEditor extends EditablePanel {
 
     // TODO: Deal explicitly with empty list case using "null window"
     // TODO: Use a collection instead of a list of editable objects?
@@ -319,8 +320,9 @@ public class AnnotatedPropertyEditor extends JPanel {
     /**
      * Commit changes on the internal object or list of objects.
      */
-    public void commitChanges() {
+    public boolean commitChanges() {
         commitChanges(editedObjects);
+        return true;
     }
 
     /**

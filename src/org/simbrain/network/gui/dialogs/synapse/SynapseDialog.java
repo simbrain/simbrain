@@ -24,6 +24,7 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -82,7 +83,6 @@ public final class SynapseDialog extends StandardDialog {
      */
     public static SynapseDialog createSynapseDialog(final Collection<SynapseNode> selectedSynapses, final Frame parent) {
         SynapseDialog sd = new SynapseDialog(getSynapses(selectedSynapses), parent);
-        sd.addListeners();
         return sd;
     }
 
@@ -94,7 +94,6 @@ public final class SynapseDialog extends StandardDialog {
      */
     public static SynapseDialog createSynapseDialog(final List<Synapse> selectedSynapses) {
         SynapseDialog sd = new SynapseDialog(selectedSynapses);
-        sd.addListeners();
         return sd;
     }
 
@@ -139,15 +138,6 @@ public final class SynapseDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-    }
-
-    /**
-     * Add listeners to the components of the dialog. Specifically alters the
-     * destination of the help button to reflect the currently selected synapse
-     * update rule.
-     */
-    private void addListeners() {
-//        synapseEditingPanel.getSynapseRulePanel().getCbSynapseType().addActionListener(e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     /**

@@ -76,6 +76,7 @@ public class ConnectionSelectorPanel extends JPanel {
     public ConnectionSelectorPanel(ConnectionStrategy initConnection, Window parentFrame) {
         this.parentFrame=parentFrame;
         cbConnectionType = new JComboBox(CONNECTORS);
+        cbConnectionType.setPreferredSize(new Dimension(200,100));
         for(ConnectionStrategy cn : CONNECTORS) {
             if(cn.getClass() == initConnection.getClass()) {
                 cbConnectionType.removeItem(cn);

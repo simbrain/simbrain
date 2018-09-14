@@ -111,6 +111,11 @@ public final class SynapseGroupDialog extends StandardDialog {
     private SummaryPanel sumPanel;
 
     /**
+     * When editing the connection strategy must be explicitly applied with a button press.
+     */
+    private ApplyPanel connectionApplyPanel;
+
+    /**
      * Creates a synapse group dialog based on a source and target neuron group.
      * This should be used when the synapse group being "edited" doesn't exist
      * yet, i.e. it's being created from the parameters in this panel.
@@ -219,12 +224,15 @@ public final class SynapseGroupDialog extends StandardDialog {
             tabbedPane.addTab("Connection Type", connectWrapper);
         } else {
             connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this);
+            connectionApplyPanel  =  ApplyPanel.createApplyPanel(connectionPanel);
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Manager", connectWrapper);
+        }
 
-            // Weight matrix
+        // Weight matrix
+        if (!isCreationDialog) {
             if (synapseGroup.size() < 10000) {
                 JPanel weightMatrix = new JPanel();
                 final JScrollPane matrixScrollPane = new JScrollPane(weightMatrix);
@@ -344,16 +352,16 @@ public final class SynapseGroupDialog extends StandardDialog {
             sumPanel.commitChanges();
             editSynapsesPanel.commitChanges();
             adjustmentPanel.commitChanges();
-            // Create the synapse group.
+
             synapseGroup.makeConnections();
 
-            // TODO: Spike responders at creation time?
             networkPanel.getNetwork().addGroup(synapseGroup);
             networkPanel.repaint();
         } else {
             // Must be set ONLY after dialog is closed otherwise changes won't
             // take effect
             synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
+            // When editing a synpase group most edits are handled by apply buttons
         }
     }
 

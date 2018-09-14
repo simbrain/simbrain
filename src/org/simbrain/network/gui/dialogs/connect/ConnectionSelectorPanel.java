@@ -14,6 +14,7 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.*;
+import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,8 +28,11 @@ import java.awt.event.ItemListener;
  * the current conection manager,  which can then be used to
  * create connections or store connection settings.
  */
-public class ConnectionSelectorPanel extends JPanel {
+public class ConnectionSelectorPanel extends EditablePanel {
 
+    /**
+     * So that it can be resized on updates with pack().
+     */
     private final Window parentFrame;
 
     /**
@@ -169,11 +173,14 @@ public class ConnectionSelectorPanel extends JPanel {
         return currentConnectionPanel.getConnectionStrategy();
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
+    @Override
+    public void fillFieldValues() {
+    }
+
+    @Override
+    public boolean commitChanges() {
         currentConnectionPanel.commitSettings();
+        return true;
     }
 
 }

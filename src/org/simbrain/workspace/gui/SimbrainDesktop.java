@@ -345,7 +345,8 @@ public class SimbrainDesktop {
 
 
         // Set the "dock" image.
-        if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
+
+        if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
             Taskbar.getTaskbar().setIconImage((ResourceManager.getImage("simbrain-icon.png")));
         }
 

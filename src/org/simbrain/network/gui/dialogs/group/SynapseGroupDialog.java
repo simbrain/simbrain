@@ -225,7 +225,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         } else {
             connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this);
             connectionApplyPanel  =  ApplyPanel.createApplyPanel(connectionPanel);
-            JScrollPane connectWrapper = new JScrollPane(connectionPanel);
+            JScrollPane connectWrapper = new JScrollPane(connectionApplyPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Manager", connectWrapper);

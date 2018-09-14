@@ -128,4 +128,11 @@ public abstract class ConnectionStrategy implements EditableObject {
         return inRandomizer;
     }
 
+    public void setExRandomizer(ProbabilityDistribution exRandomizer) {
+        this.exRandomizer = exRandomizer;
+    }
+
+    public void setInRandomizer(ProbabilityDistribution inRandomizer) {
+        this.inRandomizer = inRandomizer;
+    }
 }

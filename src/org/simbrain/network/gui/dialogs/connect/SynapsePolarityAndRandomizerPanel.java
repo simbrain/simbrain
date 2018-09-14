@@ -668,7 +668,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         }
 
         /**
-         * Initialize with a polarity
+         * Initialize with a polarity.
          *
          * @param parent parent window
          * @param polarity initial polarity
@@ -825,6 +825,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     public void commitChanges(ConnectionStrategy connection) {
         connection.setExcitatoryRatio((double) ratioSlider.getValue()/100);
+        connection.setUseExcitatoryRandomization(this.exRandomizerEnabled());
+        connection.setUseInhibitoryRandomization(this.inRandomizerEnabled());
+        connection.setExRandomizer(exRandomizer);
+        connection.setInRandomizer(inRandomizer);
     }
 
 }

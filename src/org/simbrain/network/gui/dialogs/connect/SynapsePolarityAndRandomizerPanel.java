@@ -119,10 +119,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      */
     private SwitchableChangeListener sliderListener;
 
-    private ProbabilityDistribution exRandomizer;
-
-    private ProbabilityDistribution inRandomizer;
-
     /**
      * Whether or not this panel is being used to create or edit synapses.
      */
@@ -152,10 +148,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(ConnectionStrategy connection, Window parentFrame) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parentFrame, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
-        prPanel.exRandomizer =  connection.getExRandomizer();
-        prPanel.inRandomizer = connection.getInRandomizer();
-        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame, prPanel.exRandomizer, connection.isUseExcitatoryRandomization());
-        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame, prPanel.inRandomizer, connection.isUseInhibitoryRandomization());
+        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame,
+                connection.getExRandomizer(), connection.isUseExcitatoryRandomization());
+        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame,
+                connection.getInRandomizer(), connection.isUseInhibitoryRandomization());
         prPanel.excitatoryRandomizerPanel.initListeners();
         prPanel.inhibitoryRandomizerPanel.initListeners();
         prPanel.initializeContent();
@@ -197,19 +193,20 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.EXCITATORY);
             prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.INHIBITORY);
         } else {
-            prPanel.fillFieldValues(synGrp);
             prPanel.creationPanel = false;
             if (synGrp.getExcitatoryRandomizer() == null) {
                 prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.EXCITATORY);
+                synGrp.setExcitatoryRandomizer(prPanel.getExcitatoryRandomizerPanel().getProbDist());
             } else {
                 prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, synGrp.getExcitatoryRandomizer());
             }
             if (synGrp.getInhibitoryRandomizer() == null) {
                 prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.INHIBITORY);
+                synGrp.setInhibitoryRandomizer(prPanel.getInhibitoryRandomizerPanel().getProbDist());
             } else {
                 prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, synGrp.getInhibitoryRandomizer());
             }
-
+            prPanel.fillFieldValues(synGrp);
         }
         prPanel.excitatoryRandomizerPanel.initListeners();
         prPanel.inhibitoryRandomizerPanel.initListeners();
@@ -227,8 +224,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     ) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
-        prPanel.exRandomizer = exRandomizer2;
-        prPanel.inRandomizer = inRandomizer2;
         prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, exRandomizer2, useExcitatoryRandomization);
         prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, inRandomizer2, useInhibitoryRandomization);
         prPanel.excitatoryRandomizerPanel.initListeners();
@@ -392,11 +387,11 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         ratioSlider.setPaintTicks(true);
 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-        labelTable.put(new Integer(0), new JLabel("0/100"));
-        labelTable.put(new Integer(25), new JLabel("25/75"));
-        labelTable.put(new Integer(50), new JLabel("50/50"));
-        labelTable.put(new Integer(75), new JLabel("75/25"));
-        labelTable.put(new Integer(100), new JLabel("100/0"));
+        labelTable.put(0, new JLabel("0/100"));
+        labelTable.put(25, new JLabel("25/75"));
+        labelTable.put(50,  new JLabel("50/50"));
+        labelTable.put(75, new JLabel("75/25"));
+        labelTable.put(100, new JLabel("100/0"));
         ratioSlider.setLabelTable(labelTable);
         ratioSlider.setPaintLabels(true);
     }
@@ -415,8 +410,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                 if (source == ratioSlider && isEnabled()) {
                     exTfListener.disable();
                     inTfListener.disable();
-                    eRatio.setValue(new Integer(ratioSlider.getValue()));
-                    iRatio.setValue(RATIO_MAX - new Integer(ratioSlider.getValue()));
+                    eRatio.setValue(ratioSlider.getValue());
+                    iRatio.setValue(RATIO_MAX - ratioSlider.getValue());
                     exTfListener.enable();
                     inTfListener.enable();
                 }
@@ -493,6 +488,12 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     public void fillFieldValues(SynapseGroup synGrp) {
         double exRatio = synGrp.getExcitatoryRatioParameter();
         setExcitatoryRatio(exRatio);
+        excitatoryRandomizerPanel.randomizer.setProbabilityDistribution(
+                synGrp.getExcitatoryRandomizer());
+        excitatoryRandomizerPanel.randomizerPanel.fillFieldValues();
+        inhibitoryRandomizerPanel.randomizer.setProbabilityDistribution(
+                synGrp.getInhibitoryRandomizer());
+        inhibitoryRandomizerPanel.randomizerPanel.fillFieldValues();
     }
 
     /**
@@ -527,8 +528,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             synapseGroup.setExcitatoryRatio(percentExcitatory);
         excitatoryRandomizerPanel.commitChanges();
         inhibitoryRandomizerPanel.commitChanges();
-        synapseGroup.setExcitatoryRandomizer(exRandomizer);
-        synapseGroup.setInhibitoryRandomizer(inRandomizer);
+        synapseGroup.setInhibitoryRandomizer(inhibitoryRandomizerPanel.getProbDist());
+        synapseGroup.setExcitatoryRandomizer(excitatoryRandomizerPanel.getProbDist());
     }
 
     /**
@@ -573,6 +574,13 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return inhibitoryRandomizerPanel;
     }
 
+    public ProbabilityDistribution getExRandomizer() {
+        return excitatoryRandomizerPanel.getProbDist();
+    }
+
+    public ProbabilityDistribution getInRandomizer() {
+        return inhibitoryRandomizerPanel.getProbDist();
+    }
     /**
      * @return whether or not excitatory randomization is enabled.
      */
@@ -597,14 +605,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         sliderApply.addActionListener(al);
     }
 
-    public ProbabilityDistribution getExRandomizer() {
-        return exRandomizer;
-    }
-
-    public ProbabilityDistribution getInRandomizer() {
-        return inRandomizer;
-    }
-
     /**
      * @author Zoë Tosi
      */
@@ -621,7 +621,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * The PolaraizedRandomizer this panel will either use to fill field
          * values and edit, or which this panel will create and then edit.
          */
-        private ProbabilityDistribution.Randomizer randomizer = new ProbabilityDistribution.Randomizer();
+        private final ProbabilityDistribution.Randomizer randomizer = new ProbabilityDistribution.Randomizer();
 
         /**
          * The randomizer panel used as a basis for this panel.
@@ -735,6 +735,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
         }
 
+        public ProbabilityDistribution getProbDist() {
+            return randomizer.getProbabilityDistribution();
+        }
+
         /**
          * Initializes the listener on the apply button, allowing the values in
          * the randomizer to be committed, and if editing, immediately causing
@@ -748,7 +752,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                     if (enableStatusTriangle.isDown()) {
                         randomizerPanel.commitChanges();
                         if (Polarity.EXCITATORY.equals(polarity)) {
-                            exRandomizer = randomizer.getProbabilityDistribution();
                             if (synapseGroup != null) {
                                 synapseGroup.setExcitatoryRandomizer(randomizer.getProbabilityDistribution());
                                 if (!creationPanel) {
@@ -756,7 +759,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                                 }
                             }
                         } else {
-                            inRandomizer = randomizer.getProbabilityDistribution();
                             if (synapseGroup != null) {
                                 synapseGroup.setInhibitoryRandomizer(randomizer.getProbabilityDistribution());
                                 if (!creationPanel) {
@@ -813,11 +815,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         public void commitChanges() {
             if (enableStatusTriangle.isDown() || randomizerState == RandBehavior.FORCE_ON) {
                 randomizerPanel.commitChanges();
-                if (Polarity.EXCITATORY.equals(polarity)) {
-                    exRandomizer = randomizer.getProbabilityDistribution();
-                } else {
-                    inRandomizer = randomizer.getProbabilityDistribution();
-                }
+
             }
         }
 
@@ -827,8 +825,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         connection.setExcitatoryRatio((double) ratioSlider.getValue()/100);
         connection.setUseExcitatoryRandomization(this.exRandomizerEnabled());
         connection.setUseInhibitoryRandomization(this.inRandomizerEnabled());
-        connection.setExRandomizer(exRandomizer);
-        connection.setInRandomizer(inRandomizer);
+        connection.setExRandomizer(getExRandomizer());
+        connection.setInRandomizer(getInRandomizer());
     }
 
 }

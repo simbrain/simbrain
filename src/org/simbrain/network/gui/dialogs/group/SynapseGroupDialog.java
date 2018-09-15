@@ -188,7 +188,6 @@ public final class SynapseGroupDialog extends StandardDialog {
         }
 
         setMinimumSize(new Dimension(500, 300));
-
         fillFieldValues();
         setContentPane(tabbedPane);
 
@@ -224,7 +223,12 @@ public final class SynapseGroupDialog extends StandardDialog {
             tabbedPane.addTab("Connection Type", connectWrapper);
         } else {
             connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this);
-            connectionApplyPanel  =  ApplyPanel.createApplyPanel(connectionPanel);
+            connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
+                    (ActionEvent e) -> {
+                connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
+                sumPanel.fillFieldValues(synapseGroup);
+                adjustmentPanel.fullUpdate();
+            });
             JScrollPane connectWrapper = new JScrollPane(connectionApplyPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
@@ -269,12 +273,14 @@ public final class SynapseGroupDialog extends StandardDialog {
         tabbedPane.addTab("Synapse Type", editSynapseScrollPane);
 
         // Synapse Adjustment Panel
-        adjustmentPanel = SynapseGroupAdjustmentPanel.createSynapseGroupAdjustmentPanel(this, synapseGroup, isCreationDialog);
-        adjustmentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JScrollPane adjustSynScrollPane = new JScrollPane(adjustmentPanel);
-        adjustSynScrollPane.setBorder(null);
-        storedComponents.add(adjustSynScrollPane);
-        tabbedPane.addTab("Synapse Values", adjustSynScrollPane);
+        if(!isCreationDialog) {
+            adjustmentPanel = SynapseGroupAdjustmentPanel.createSynapseGroupAdjustmentPanel(this, synapseGroup, isCreationDialog);
+            adjustmentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            JScrollPane adjustSynScrollPane = new JScrollPane(adjustmentPanel);
+            adjustSynScrollPane.setBorder(null);
+            storedComponents.add(adjustSynScrollPane);
+            tabbedPane.addTab("Synapse Values", adjustSynScrollPane);
+        }
 
         // Set up help button
         Action helpAction;
@@ -345,15 +351,11 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     public void commitChanges() {
         if (isCreationDialog) {
-
-            connectionPanel.commitChanges();
+            connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
             synapseGroup.setConnectionManager(connectionPanel.getSelectedConnector());
 
             sumPanel.commitChanges();
             editSynapsesPanel.commitChanges();
-            adjustmentPanel.commitChanges();
-
-            synapseGroup.makeConnections();
 
             networkPanel.getNetwork().addGroup(synapseGroup);
             networkPanel.repaint();

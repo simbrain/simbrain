@@ -183,4 +183,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
         return true;
     }
 
+    public ConnectionPanel getCurrentConnectionPanel() {
+        return currentConnectionPanel;
+    }
 }

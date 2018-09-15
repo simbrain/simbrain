@@ -25,10 +25,7 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import umontreal.iro.lecuyer.randvar.BinomialGen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A superclass for all connectors whose primary parameter is related to base
@@ -274,8 +271,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
 
     @Override
     public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-
-        return null;
+        return connectSparse(source, target);
     }
 
     /**

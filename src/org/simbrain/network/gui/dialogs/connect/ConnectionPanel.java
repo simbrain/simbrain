@@ -25,6 +25,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,14 +62,14 @@ public final class ConnectionPanel extends JPanel {
     /**
      * To edit the properties of the connection object
      */
-    private AnnotatedPropertyEditor connectionStrategyProperties;
+    private EditablePanel connectionStrategyProperties;
 
     /**
      * The connection object used to connect source to target neurons.
      */
     private ConnectionStrategy connectionStrategy;
 
-    private SparseConnectionPanel spPanel;
+//    private SparseConnectionPanel spPanel;
 
     /**
      * Number of target neurons, can be 0
@@ -106,43 +107,25 @@ public final class ConnectionPanel extends JPanel {
         gbc.weighty = 3;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        if(connectionStrategy.getClass() != Sparse.class) {
+        if (connectionStrategy.getClass() != Sparse.class) {
             connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
-            connectionContainer.add(connectionStrategyProperties, gbc);
-            spPanel = null;
+
         } else {
-            if(((Sparse) connectionStrategy).getSynapseGroup() != null) {
-                spPanel = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
+            if (((Sparse) connectionStrategy).getSynapseGroup() != null) {
+                connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
             } else {
-                spPanel = SparseConnectionPanel.createSparsityAdjustmentPanel(
+                connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentPanel(
                         (Sparse) connectionStrategy, noTar, rec);
             }
-            connectionContainer.add(spPanel, gbc);
         }
+        connectionContainer.add(connectionStrategyProperties, gbc);
         add(connectionContainer);
 
         // E/I Ratio and Randomizers
         polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
         add(polarityPanel);
-//        detailTriangle.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                updateExcitatoryRatioTriangle();
-//            }
-//        });
-//        updateExcitatoryRatioTriangle();
     }
 
-//    /**
-//     * Update state of detail triangle.
-//     */
-//    private void updateExcitatoryRatioTriangle() {
-//        connectionStrategyProperties.setVisible(detailTriangle.isDown());
-//        connectionStrategyProperties.repaint();
-//        if (parentFrame != null) {
-//            parentFrame.pack();
-//        }
-//    }
     /**
      * https://stackoverflow.com/questions/8335997/ how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
      */
@@ -158,12 +141,7 @@ public final class ConnectionPanel extends JPanel {
      * Update the {@link ConnectionStrategy} object associated with this panel.
      */
     public void commitSettings() {
-        if(connectionStrategyProperties != null) {
-            connectionStrategyProperties.commitChanges();
-        }
-        if(spPanel != null) {
-            spPanel.commitChanges();
-        }
+        connectionStrategyProperties.commitChanges();
         polarityPanel.commitChanges(connectionStrategy);
     }
 
@@ -175,13 +153,11 @@ public final class ConnectionPanel extends JPanel {
      */
     public void commitChanges(NetworkPanel networkPanel) {
 
-        connectionStrategyProperties.commitChanges();
+        commitSettings();
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
 
         //TODO: Consider moving the below to connection manager
         ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
-        ConnectionUtilities.conformToTemplates(synapses, synapseProperties.getTemplateExcitatorySynapse(), synapseProperties.getTemplateInhibitorySynapse());
-        polarityPanel.commitChanges();
         if (polarityPanel.exRandomizerEnabled()) {
             ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
         }
@@ -197,8 +173,24 @@ public final class ConnectionPanel extends JPanel {
      * @param synapseGroup the group to change
      */
     public void commitChanges(SynapseGroup synapseGroup) {
+        synapseGroup.clear();
         connectionStrategyProperties.commitChanges();
         connectionStrategy.connectNeurons(synapseGroup);
+        polarityPanel.commitChanges();
+        if (polarityPanel.exRandomizerEnabled()) {
+            ConnectionUtilities.randomizeExcitatorySynapses(
+                    synapseGroup.getExcitatorySynapses(),
+                    polarityPanel.getExRandomizer());
+            synapseGroup.setExcitatoryRandomizer(polarityPanel
+                    .getExRandomizer());
+        }
+        if (polarityPanel.inRandomizerEnabled()) {
+            ConnectionUtilities.randomizeInhibitorySynapses(
+                    synapseGroup.getInhibitorySynapses(),
+                    polarityPanel.getInRandomizer());
+            synapseGroup.setInhibitoryRandomizer(polarityPanel
+                    .getInRandomizer());
+        }
     }
 
     public SynapsePropertiesPanel getSynapseProperties() {

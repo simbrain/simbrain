@@ -276,6 +276,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         if (!creationPanel) {
             updateHistogram();
             statPanel.update();
+            excitatoryPercentPanel.fillFieldValues(synapseGroup);
         }
         revalidate();
         repaint();

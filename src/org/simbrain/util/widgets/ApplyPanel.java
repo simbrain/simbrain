@@ -17,6 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A widget that contains an apply button, for cases when it should be possible
@@ -27,13 +28,13 @@ import java.awt.event.ActionListener;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class ApplyPanel extends EditablePanel {
+public class ApplyPanel extends JPanel {
 
     /**
      * The committable panel which is being wrapped around, and to which changes
      * will be committed when the apply button is pressed.
      */
-    private final EditablePanel mainPanel;
+    private final JPanel mainPanel;
 
     /**
      * The button used to apply changes.
@@ -54,6 +55,8 @@ public class ApplyPanel extends EditablePanel {
         setLayout(layoutManager);
     }
 
+    private AtomicBoolean applyPressed = new AtomicBoolean(false);
+
     /**
      * A factory method to create an apply panel.
      *
@@ -65,9 +68,22 @@ public class ApplyPanel extends EditablePanel {
         ap.applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                ap.commitChanges();
+                mainPanel.commitChanges();
             }
         });
+        return ap;
+    }
+
+    /**
+     * A factory method to create an apply panel attached to an artbitrary panel
+     * with a custom action associated with pressing apply.
+     * @param mainPanel the panel to wrap
+     * @param al a listener that is triggered and performs an action when apply is pressed
+     * @return
+     */
+    public static ApplyPanel createCustomApplyPanel(JPanel mainPanel, ActionListener al) {
+        final ApplyPanel ap = new ApplyPanel(mainPanel);
+        ap.applyButton.addActionListener(al);
         return ap;
     }
 
@@ -76,8 +92,11 @@ public class ApplyPanel extends EditablePanel {
      *
      * @param mainPanel the editable panel to which changes may be applied
      */
-    private ApplyPanel(EditablePanel mainPanel) {
+    private ApplyPanel(JPanel mainPanel) {
         this.mainPanel = mainPanel;
+        applyButton.addActionListener((ActionEvent e) -> {
+            applyPressed.set(true);
+        });
         masterLayout();
     }
 
@@ -122,11 +141,6 @@ public class ApplyPanel extends EditablePanel {
         this.add(applyButton, gbc);
     }
 
-    @Override
-    public boolean commitChanges() {
-        return mainPanel.commitChanges();
-    }
-
     /**
      * Allows outside parties to add other listeners to the apply panel's apply
      * button.
@@ -135,10 +149,7 @@ public class ApplyPanel extends EditablePanel {
      */
     public void addActionListener(ActionListener l) {
         applyButton.addActionListener(l);
-    }
 
-    @Override
-    public void fillFieldValues() {
     }
 
     public void setEnabled(boolean enabled) {

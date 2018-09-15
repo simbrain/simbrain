@@ -79,6 +79,7 @@ public final class NeuronDialog extends StandardDialog {
 //        }
         neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
         setTitle("Neuron Dialog");
+
         JScrollPane scroller = new JScrollPane(neuronPropertiesPanel);
         scroller.setBorder(null);
         setContentPane(scroller);

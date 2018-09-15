@@ -55,6 +55,7 @@ public class NeuronGroupCreationDialog extends StandardDialog {
         neuronGroupPanel = new AnnotatedPropertyEditor(ngCreator);
         setContentPane(neuronGroupPanel);
         setTitle("New Neuron Group");
+        setAlwaysOnTop(true);
     }
 
     @Override

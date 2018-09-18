@@ -90,7 +90,7 @@ public class OdorWorldEntity implements EditableObject {
      * Amount to manually move forward or in cardinal directions.
      */
     @UserParameter(label = "Straigh movement", order = 10)
-    protected double manualStraightMovementIncrement = 7;
+    protected double manualStraightMovementIncrement = 1;
 
     /**
      * Current heading / orientation.
@@ -101,11 +101,6 @@ public class OdorWorldEntity implements EditableObject {
      * Change in current heading.
      */
     private double dtheta;
-
-    /**
-     * Velocity magnitude.
-     */
-    private double velocity;
 
     /**
      * Initial heading of agent.
@@ -121,7 +116,7 @@ public class OdorWorldEntity implements EditableObject {
      * Amount to manually rotate.
      */
     @UserParameter(label = "Turn amount", order = 10)
-    private double manualMotionTurnIncrement = 5;
+    private double manualMotionTurnIncrement = 1;
 
     /**
      * Back reference to parent parentWorld.

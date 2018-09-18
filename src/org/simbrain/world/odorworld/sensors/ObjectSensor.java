@@ -15,10 +15,7 @@ public class ObjectSensor extends Sensor {
     /**
      * Current value of the sensor.
      */
-    @UserParameter(label = "Output Amount",
-            description = "The amount of activation to be sent to a neuron coupled with this sensor.",
-            defaultValue = "" + 1, order = 4)
-    private double value = 1;
+    private double value = 0;
 
     /**
      * The type of the object represented, e.g. Swiss.gif.
@@ -26,7 +23,7 @@ public class ObjectSensor extends Sensor {
     @UserParameter(label = "Object Type",
             description = "What type of object this sensor responds to",
             order = 5)
-    private OdorWorldEntity.EntityType objectType;
+    private OdorWorldEntity.EntityType objectType = OdorWorldEntity.EntityType.SWISS;
 
     /**
      * Instantiate an object sensor.

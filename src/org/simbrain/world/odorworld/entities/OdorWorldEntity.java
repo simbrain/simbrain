@@ -86,7 +86,6 @@ public class OdorWorldEntity implements EditableObject {
     @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 6)
     protected double dy;
 
-
     /**
      * Amount to manually move forward or in cardinal directions.
      */
@@ -97,6 +96,16 @@ public class OdorWorldEntity implements EditableObject {
      * Current heading / orientation.
      */
     private double heading = DEFAULT_HEADING;
+
+    /**
+     * Change in current heading.
+     */
+    private double dtheta;
+
+    /**
+     * Velocity magnitude.
+     */
+    private double velocity;
 
     /**
      * Initial heading of agent.
@@ -112,7 +121,7 @@ public class OdorWorldEntity implements EditableObject {
      * Amount to manually rotate.
      */
     @UserParameter(label = "Turn amount", order = 10)
-    private double manualMotionTurnIncrement = 14;
+    private double manualMotionTurnIncrement = 5;
 
     /**
      * Back reference to parent parentWorld.
@@ -200,6 +209,14 @@ public class OdorWorldEntity implements EditableObject {
         }
         if (dy != 0) {
             setY(y + dy);
+        }
+        if (dtheta != 0) {
+            setHeading(heading + dtheta);
+            double dthetaRad = Math.toRadians(-dtheta);
+            double dx2 = Math.cos(dthetaRad) * dx - Math.sin(dthetaRad) * dy;
+            double dy2 = Math.sin(dthetaRad) * dx + Math.cos(dthetaRad) * dy;
+            dx = dx2;
+            dy = dy2;
         }
 
         updateSensors();
@@ -828,6 +845,15 @@ public class OdorWorldEntity implements EditableObject {
         return heading;
     }
 
+
+    public double getManualStraightMovementIncrement() {
+        return manualStraightMovementIncrement;
+    }
+
+    public double getManualMotionTurnIncrement() {
+        return manualMotionTurnIncrement;
+    }
+
     /**
      * Rotate left by the specified amount.
      *
@@ -884,15 +910,24 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     public void goStraight() {
-        goStraight(manualStraightMovementIncrement);
+        double radians = getHeadingRadians();
+        dx = manualStraightMovementIncrement * Math.cos(radians);
+        dy = - manualStraightMovementIncrement * Math.sin(radians);
     }
-    public void goBackwards() { goStraight(-manualMotionTurnIncrement);
+    public void goBackwards() {
+        double radians = getHeadingRadians();
+        dx = - manualStraightMovementIncrement * Math.cos(radians);
+        dy = manualStraightMovementIncrement * Math.sin(radians);
+
     }
     public void turnLeft() {
-        turnLeft(manualMotionTurnIncrement);
+        dtheta = manualMotionTurnIncrement;
     }
     public void turnRight() {
-        turnRight(manualMotionTurnIncrement);
+        dtheta = - manualMotionTurnIncrement;
+    }
+    public void stopTurning() {
+        dtheta = 0;
     }
 
     public boolean isRotating() {

@@ -41,6 +41,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
 import java.util.stream.Collectors;
 
 /**
@@ -74,9 +75,21 @@ public class OdorWorldPanel extends JPanel {
     private Color backgroundColor = Color.white;
 
     /**
+     * Default panel width
+     */
+    private int preferredWidth = 450;
+
+    /**
+     * Default panel height
+     */
+    private int preferredHeight = 450;
+
+    /**
      * The boolean that turns on and off wall drawing behavior for the mouse.
      */
     private boolean drawingWalls = false;
+
+    private Timer movementTimer;
 
     /**
      * Construct a world, set its background color.
@@ -362,6 +375,15 @@ public class OdorWorldPanel extends JPanel {
         return selectionModel.isSelected(element);
     }
 
+
+    public int getPreferredWidth() {
+        return preferredWidth;
+    }
+
+    public int getPreferredHeight() {
+        return preferredHeight;
+    }
+
     /**
      * Toggle the selected state of the specified element; if it is selected,
      * remove it from the selection, if it is not selected, add it to the
@@ -417,76 +439,114 @@ public class OdorWorldPanel extends JPanel {
 
         // Example of getting press and release events
         // See https://docs.oracle.com/javase/8/docs/api/javax/swing/KeyStroke.html#getKeyStroke-java.lang.String-
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed O"), "test press o");
-        canvas.getActionMap().put("test press o", new AbstractAction() {
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed W"), "test press w");
+        canvas.getActionMap().put("test press w", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Pressed o");
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.goStraight();
             }
         });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released O"), "released o");
-        canvas.getActionMap().put("released o", new AbstractAction() {
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("released W"), "stop moving");
+
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed S"), "test press s");
+        canvas.getActionMap().put("test press s", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Released o");
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.goBackwards();
+            }
+        });
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("released S"), "stop moving");
+        canvas.getActionMap().put("stop moving", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.setVelocityX(0);
+                entity.setVelocityY(0);
             }
         });
 
-        // Move. arrows. wasd
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("UP"), "north");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("W"), "north");
-        canvas.getActionMap().put("north", new AbstractAction() {
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed A"), "test press a");
+        canvas.getActionMap().put("test press a", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity.isRotating()) {
-                        entity.goStraight();
-                    } else {
-                        entity.goNorth();
-                    }
-                    entity.update();
-                }
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.turnLeft();
             }
         });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "west");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("A"), "west");
-        canvas.getActionMap().put("west", new AbstractAction() {
+
+
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed D"), "test press d");
+        canvas.getActionMap().put("test press d", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                for (OdorWorldEntity entity : OdorWorldPanel.this.getSelectedModelEntities()) {
-                    if (entity.isRotating()) {
-                        entity.turnLeft();
-                    } else {
-                        entity.goWest();
-                    }
-                    entity.update();
-                }
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.turnRight();
             }
         });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "east");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("D"), "east");
-        canvas.getActionMap().put("east", new AbstractAction() {
+
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("released A"), "stopTurning");
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("released D"), "stopTurning");
+        canvas.getActionMap().put("stopTurning", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity.isRotating()) {
-                        entity.turnRight();
-                    } else {
-                        entity.goEast();
-                    }
-                    entity.update();
-                }
+                OdorWorldEntity entity = ((EntityNode) getSelectedEntities().get(0)).getEntity();
+                entity.stopTurning();
             }
         });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "south");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("S"), "south");
-        canvas.getActionMap().put("south", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                for (OdorWorldEntity entity : getSelectedModelEntities()) {
-                    if (entity.isRotating()) {
-                        entity.goBackwards();
-                    } else {
-                        entity.goSouth();
-                    }
-                    entity.update();
-                }
-            }
-        });
+
+//        // Move. arrows. wasd
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("UP"), "north");
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("W"), "north");
+//        canvas.getActionMap().put("north", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                for (OdorWorldEntity entity : getSelectedModelEntities()) {
+//                    if (entity.isRotating()) {
+//                        entity.goStraight();
+//                    } else {
+//                        entity.goNorth();
+//                    }
+//                    entity.update();
+//                }
+//            }
+//        });
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "west");
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("A"), "west");
+//        canvas.getActionMap().put("west", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                for (OdorWorldEntity entity : OdorWorldPanel.this.getSelectedModelEntities()) {
+//                    if (entity.isRotating()) {
+//                        entity.turnLeft();
+//                    } else {
+//                        entity.goWest();
+//                    }
+//                    entity.update();
+//                }
+//            }
+//        });
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "east");
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("D"), "east");
+//        canvas.getActionMap().put("east", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                for (OdorWorldEntity entity : getSelectedModelEntities()) {
+//                    if (entity.isRotating()) {
+//                        entity.turnRight();
+//                    } else {
+//                        entity.goEast();
+//                    }
+//                    entity.update();
+//                }
+//            }
+//        });
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), "south");
+//        canvas.getInputMap().put(KeyStroke.getKeyStroke("S"), "south");
+//        canvas.getActionMap().put("south", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                for (OdorWorldEntity entity : getSelectedModelEntities()) {
+//                    if (entity.isRotating()) {
+//                        entity.goBackwards();
+//                    } else {
+//                        entity.goSouth();
+//                    }
+//                    entity.update();
+//                }
+//            }
+//        });
 
         // Debug Piccolo
         canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK), "debug");

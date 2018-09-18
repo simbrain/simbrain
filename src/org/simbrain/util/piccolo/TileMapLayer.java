@@ -32,6 +32,11 @@ public class TileMapLayer {
      */
     private ArrayList<ArrayList<Integer>> gid = new ArrayList<>();
 
+    /**
+     * The rendered image of the layer
+     */
+    private PImage layer = null;
+
 
     public TileMapLayer(Element layer) {
 
@@ -68,24 +73,28 @@ public class TileMapLayer {
      * @return the image of this layer
      */
     public PImage renderImage(TileSet tileSet) {
-        BufferedImage layer =
-                new BufferedImage(
-                        tileSet.getTilewidth() * width,
-                        tileSet.getTileheight() * height,
-                        BufferedImage.TYPE_INT_ARGB
-                );
-        Graphics2D graphics = layer.createGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Image image = tileSet.getTileImage(gid.get(i).get(j));
-                graphics.drawImage(image, j * tileSet.getTilewidth(), i * tileSet.getTileheight(), null);
+        if (layer == null) {
+            BufferedImage layerImage =
+                    new BufferedImage(
+                            tileSet.getTilewidth() * width,
+                            tileSet.getTileheight() * height,
+                            BufferedImage.TYPE_INT_ARGB
+                    );
+            Graphics2D graphics = layerImage.createGraphics();
+            graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    Image image = tileSet.getTileImage(gid.get(i).get(j));
+                    graphics.drawImage(image, j * tileSet.getTilewidth(), i * tileSet.getTileheight(), null);
+                }
             }
+            graphics.dispose();
+            PImage ret = new PImage(layerImage);
+            ret.setPickable(false);
+            layer = ret;
+            return ret;
         }
-        graphics.dispose();
-        PImage ret = new PImage(layer);
-        ret.setPickable(false);
-        return ret;
+        return layer;
     }
 
 }

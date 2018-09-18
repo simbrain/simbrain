@@ -72,8 +72,8 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      * object.
      */
     private void setGuiSizeToWorldSize() {
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
-        worldPanel.setSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getPreferredWidth(), worldPanel.getPreferredHeight()));
+        worldPanel.setSize(new Dimension(worldPanel.getPreferredWidth(), worldPanel.getPreferredHeight()));
         getParentFrame().pack();
     }
 

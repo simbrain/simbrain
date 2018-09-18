@@ -59,6 +59,11 @@ public class EntityNode extends PNode {
     public Sprite sprite;
 
     /**
+     * For advancing animation proportional to velocity.
+     */
+    private double frameCounter = 0;
+
+    /**
      * Construct an entity node with a back-ref to parent.
      *
      * @param world  parent world
@@ -160,7 +165,14 @@ public class EntityNode extends PNode {
     }
 
     public void advance() {
-        sprite.advance();
+        double dx = entity.getVelocityX();
+        double dy = entity.getVelocityY();
+        frameCounter += Math.sqrt(dx * dx + dy * dy);
+        int i = 0;
+        for (; i < frameCounter; i++) {
+            sprite.advance();
+        }
+        frameCounter -= i;
     }
 
     public void resetToStaticFrame() {

@@ -77,12 +77,12 @@ public class OdorWorldPanel extends JPanel {
     /**
      * Default panel width
      */
-    private int preferredWidth = 450;
+    private int defaultWidth = 250;
 
     /**
      * Default panel height
      */
-    private int preferredHeight = 450;
+    private int defaultHeight = 250;
 
     /**
      * The boolean that turns on and off wall drawing behavior for the mouse.
@@ -376,12 +376,12 @@ public class OdorWorldPanel extends JPanel {
     }
 
 
-    public int getPreferredWidth() {
-        return preferredWidth;
+    public int getDefaultWidth() {
+        return defaultWidth;
     }
 
-    public int getPreferredHeight() {
-        return preferredHeight;
+    public int getDefaultHeight() {
+        return defaultHeight;
     }
 
     /**

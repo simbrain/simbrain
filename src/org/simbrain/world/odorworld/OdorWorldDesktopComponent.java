@@ -20,13 +20,8 @@ package org.simbrain.world.odorworld;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -68,12 +63,13 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     }
 
     /**
-     * Sets the size of the gui panel based on the "logical" size of the world
-     * object.
+     * Sets the max size of the window based on the size of the underlying world / tilemap;
+     * set the default size base don the panel preferences.
      */
     private void setGuiSizeToWorldSize() {
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getPreferredWidth(), worldPanel.getPreferredHeight()));
-        worldPanel.setSize(new Dimension(worldPanel.getPreferredWidth(), worldPanel.getPreferredHeight()));
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getDefaultWidth(), worldPanel.getDefaultHeight()));
+        // The world's height and width are based on the underlying tilemap
+        getParentFrame().setMaximumSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
         getParentFrame().pack();
     }
 

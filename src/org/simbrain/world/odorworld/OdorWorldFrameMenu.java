@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -127,7 +128,38 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.add(new SaveAction(parent));
         fileMenu.add(new SaveAsAction(parent));
         fileMenu.addSeparator();
-        fileMenu.add(new LoadTileMapAction(parent.getWorldPanel()));
+
+        JMenuItem loadTileMapItem = new JMenuItem(new LoadTileMapAction(parent.getWorldPanel()));
+
+        JMenuItem loadEmptyMapItem = new JMenuItem(new AbstractAction("Load Empty Map") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.getWorldPanel().getWorld().setTileMap(new TileMap("empty.tmx"));
+            }
+        });
+
+        JMenuItem loadSampleMapItem = new JMenuItem(new AbstractAction("Load Sample Map") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.getWorldPanel().getWorld().setTileMap(new TileMap("sample.tmx"));
+            }
+        });
+
+        JMenuItem loadLargeMapItem = new JMenuItem(new AbstractAction("Load Large Map") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.getWorldPanel().getWorld().setTileMap(new TileMap("largeWorld.tmx"));
+            }
+        });
+
+        JMenu loadTileMapMenu = new JMenu("Load Tile Map");
+        loadTileMapMenu.add(loadTileMapItem);
+        loadTileMapMenu.addSeparator();
+        loadTileMapMenu.add(loadSampleMapItem);
+        loadTileMapMenu.add(loadLargeMapItem);
+        loadTileMapMenu.add(loadEmptyMapItem);
+        
+        fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));
         fileMenu.add(new CloseAction(parent.getWorkspaceComponent()));

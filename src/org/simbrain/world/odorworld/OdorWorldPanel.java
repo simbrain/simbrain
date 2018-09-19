@@ -129,7 +129,6 @@ public class OdorWorldPanel extends JPanel {
         // Add key bindings
         addKeyBindings(world);
 
-
         // Mouse events
         canvas.addInputEventListener(new WorldMouseHandler(this));
 

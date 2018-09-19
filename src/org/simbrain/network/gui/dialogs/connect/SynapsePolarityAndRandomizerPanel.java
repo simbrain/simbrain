@@ -822,6 +822,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     public void commitChanges(ConnectionStrategy connection) {
+        excitatoryRandomizerPanel.commitChanges();
+        inhibitoryRandomizerPanel.commitChanges();
         connection.setExcitatoryRatio((double) ratioSlider.getValue()/100);
         connection.setUseExcitatoryRandomization(this.exRandomizerEnabled());
         connection.setUseInhibitoryRandomization(this.inRandomizerEnabled());

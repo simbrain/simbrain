@@ -114,7 +114,7 @@ public class EntityNode extends PNode {
             sprite = new Sprite(OdorWorldResourceManager.getStaticImage(DEFAULT_IMAGE));
             break;
         case FLOWER:
-            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("pansy.gif"));
+            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
             break;
         case MOUSE:
             sprite = new RotatingSprite(RotatingEntityManager.getMouse());

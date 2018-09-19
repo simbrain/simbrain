@@ -106,6 +106,9 @@ public class RotatingEntityManager {
      */
     public static ArrayList<Animation> getRotatingTileset(String tileBaseName) {
 
+        // The folders are lower cased
+        tileBaseName = tileBaseName.toLowerCase();
+
         ArrayList<Animation> rotatingTileset = new ArrayList<>();
 
         String[] fileNameInitials = {"e000", "ne000", "n000", "nw000", "w000", "sw000", "s000", "se000"};

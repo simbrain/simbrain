@@ -28,6 +28,25 @@ public class OdorWorldBuilder {
         world = odorWorldComponent.getWorld();
     }
 
+
+    /// NEW STUFF ///
+
+    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type) {
+        OdorWorldEntity entity = new OdorWorldEntity(world, type);
+        entity.setLocation(x, y);
+        entity.setSmellSource(new SmellSource(6));
+        world.addEntity(entity);
+        return entity;
+    }
+
+    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
+        OdorWorldEntity entity = (OdorWorldEntity) addEntity(x, y, type);
+        entity.setSmellSource(new SmellSource(stimulus));
+        return entity;
+    }
+
+    /// OLD STUFF ///
+
     /**
      * Add an agent to the odor world.
      *
@@ -40,7 +59,6 @@ public class OdorWorldBuilder {
     public OdorWorldEntity addAgent(int x, int y, String type) {
         OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
         world.addEntity(entity);
-        //TODO: Set type!
         entity.setLocation(x, y);
         return entity;
     }

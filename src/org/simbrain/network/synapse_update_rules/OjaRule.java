@@ -39,7 +39,7 @@ public class OjaRule extends SynapseUpdateRule {
      * Normalization factor.
      */
     @UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", defaultValue = "1", order = 1)
-    private double normalizationFactor;
+    private double normalizationFactor = 1;
 
     @Override
     public void init(Synapse synapse) {

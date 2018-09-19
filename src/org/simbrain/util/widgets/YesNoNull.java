@@ -50,8 +50,8 @@ public class YesNoNull extends ChoicesWithNull {
         super();
         addItem("Yes");
         addItem("No");
-        setPreferredSize(new Dimension(60, getPreferredSize().height));
-        setMaximumSize(new Dimension(60, getPreferredSize().height));
+        setPreferredSize(new Dimension(80, getPreferredSize().height));
+        setMaximumSize(new Dimension(80, getPreferredSize().height));
     }
 
     /**

@@ -54,11 +54,6 @@ public final class ConnectionPanel extends JPanel {
      */
     private SynapsePolarityAndRandomizerPanel polarityPanel;
 
-//    /**
-//     * Drop down triangle for synapse properties.
-//     */
-//    private DropDownTriangle detailTriangle;
-
     /**
      * To edit the properties of the connection object
      */
@@ -68,8 +63,6 @@ public final class ConnectionPanel extends JPanel {
      * The connection object used to connect source to target neurons.
      */
     private ConnectionStrategy connectionStrategy;
-
-//    private SparseConnectionPanel spPanel;
 
     /**
      * Number of target neurons, can be 0
@@ -144,7 +137,6 @@ public final class ConnectionPanel extends JPanel {
         connectionStrategyProperties.commitChanges();
         polarityPanel.commitChanges(connectionStrategy);
     }
-
 
     /**
      * Commit changes made in this panel to a loose network.

@@ -11,7 +11,7 @@ public class TileSet {
     /**
      * The first global tile ID of this tileset (this global ID maps to the first tile in this tileset).
      */
-    private int firstgid;
+    private int firstgid = 1;
 
     /**
      * The name of this tileset.
@@ -21,17 +21,17 @@ public class TileSet {
     /**
      * The (maximum) width of the tiles in this tileset.
      */
-    private int tilewidth;
+    private int tilewidth = 32;
 
     /**
      * The (maximum) height of the tiles in this tileset.
      */
-    private int tileheight;
+    private int tileheight = 32;
 
     /**
      * The spacing in pixels between the tiles in this tileset (applies to the tileset image).
      */
-    private int spacing;
+    private int spacing = 0;
 
     /**
      * The margin around the tiles in this tileset (applies to the tileset image).
@@ -46,7 +46,7 @@ public class TileSet {
     /**
      * The number of tile columns in the tileset. For image collection tilesets it is editable and is used when displaying the tileset. (since 0.15)
      */
-    private int columns;
+    private int columns = 1;
 
     /**
      * Horizontal offset in pixels
@@ -66,7 +66,7 @@ public class TileSet {
     /**
      * The path to the image.
      */
-    private String imagePath;
+    private String imagePath = "";
 
     private BufferedImage missingTexture = null;
 
@@ -78,17 +78,19 @@ public class TileSet {
      * @param xmlElement xmlelement to parse
      */
     public TileSet(Element xmlElement) {
-        firstgid = Integer.parseInt(xmlElement.getAttribute("firstgid"));
-        // TODO: handle external .tsx source
-        name = xmlElement.getAttribute("name");
-        tilewidth = Integer.parseInt(xmlElement.getAttribute("tilewidth"));
-        tileheight = Integer.parseInt(xmlElement.getAttribute("tileheight"));
-        spacing = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("spacing"), 0);
-        // some more optional stuff to handle
-        tilecount = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("tilecount"), -1);
-        columns = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("columns"), -1);
-        imagePath = "tilemap/" + ((Element)(xmlElement.getElementsByTagName("image").item(0)))
-                        .getAttribute("source");
+        if (xmlElement != null) {
+            firstgid = Integer.parseInt(xmlElement.getAttribute("firstgid"));
+            // TODO: handle external .tsx source
+            name = xmlElement.getAttribute("name");
+            tilewidth = Integer.parseInt(xmlElement.getAttribute("tilewidth"));
+            tileheight = Integer.parseInt(xmlElement.getAttribute("tileheight"));
+            spacing = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("spacing"), 0);
+            // some more optional stuff to handle
+            tilecount = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("tilecount"), -1);
+            columns = TMXUtils.parseIntWithDefaultValue(xmlElement.getAttribute("columns"), -1);
+            imagePath = "tilemap/" + ((Element)(xmlElement.getElementsByTagName("image").item(0)))
+                    .getAttribute("source");
+        }
     }
 
     /**
@@ -98,8 +100,10 @@ public class TileSet {
      */
     public Image getTileImage(int index) {
 
-        if (image == null) {
-            image = OdorWorldResourceManager.getBufferedImage(imagePath);
+        if (missingTexture == null) {
+            if (!imagePath.isEmpty()) {
+                image = OdorWorldResourceManager.getBufferedImage(imagePath);
+            }
             missingTexture = OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png");
             // TODO: find better transparent texture solution
             transparentTexture = OdorWorldResourceManager.getBufferedImage("tilemap/transparent32x32.png");

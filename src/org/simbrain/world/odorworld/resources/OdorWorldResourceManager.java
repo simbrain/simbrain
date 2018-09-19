@@ -124,4 +124,26 @@ public class OdorWorldResourceManager {
     public static Document getTileMap(final String name) {
         return getDocument("tilemap/" + name);
     }
+
+    public static Document getTileMap(final File file) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        Document doc = null;
+        try {
+            doc = db.parse(file);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        doc.getDocumentElement().normalize();
+        return doc;
+
+    }
 }

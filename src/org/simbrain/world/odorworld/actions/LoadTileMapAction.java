@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 import javax.swing.*;
@@ -28,10 +29,10 @@ public class LoadTileMapAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser chooser = new SFileChooser(".", "Load vectors");
+        SFileChooser chooser = new SFileChooser(".", "Load TMX tilemap");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            //component.getWorld().setTileMap(new TileMap(theFile));
+            component.getWorld().setTileMap(new TileMap(theFile));
         }
     }
 

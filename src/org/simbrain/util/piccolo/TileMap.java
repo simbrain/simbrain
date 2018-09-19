@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -98,6 +99,15 @@ public class TileMap {
      */
     public TileMap(String filename) {
         Document doc = OdorWorldResourceManager.getTileMap(filename);
+        readDocument(doc);
+    }
+
+    public TileMap(File file) {
+        Document doc = OdorWorldResourceManager.getTileMap(file);
+        readDocument(doc);
+    }
+
+    private void readDocument(Document doc) {
 
         Element root = doc.getDocumentElement();
 

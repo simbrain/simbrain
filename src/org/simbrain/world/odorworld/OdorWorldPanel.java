@@ -91,6 +91,8 @@ public class OdorWorldPanel extends JPanel {
 
     private Timer movementTimer;
 
+    private List<PImage> layerImageList;
+
     /**
      * Construct a world, set its background color.
      *
@@ -106,9 +108,8 @@ public class OdorWorldPanel extends JPanel {
         canvas.setFocusable(true);
 
         // Add tile map
-        for(PImage layer : world.getTileMap().createImageList()) {
-            canvas.getLayer().addChild(layer);
-        }
+        layerImageList = world.getTileMap().createImageList();
+        canvas.getLayer().addChildren(layerImageList);
 
         // Remove default event handlers
         PInputEventListener panEventHandler = canvas.getPanEventHandler();
@@ -178,6 +179,12 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().getChildrenReference().stream()
                         .filter(i -> i instanceof EntityNode)
                         .forEach(i -> ((EntityNode) i).resetToStaticFrame());
+                repaint();
+            } else if ("tileMapChanged".equals(evt.getPropertyName())) {
+                canvas.getLayer().removeChildren(layerImageList);
+                layerImageList = world.getTileMap().createImageList();
+                canvas.getLayer().addChildren(layerImageList);
+
                 repaint();
             }
         });
@@ -382,6 +389,11 @@ public class OdorWorldPanel extends JPanel {
 
     public int getDefaultHeight() {
         return defaultHeight;
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(defaultWidth < getWorld().getWidth() ? defaultWidth : getWorld().getWidth(),
+                defaultHeight < getWorld().getHeight() ? defaultHeight : getWorld().getHeight());
     }
 
     /**

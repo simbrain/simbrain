@@ -57,7 +57,11 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu.setUpMenus();
         setGuiSizeToWorldSize();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
-
+        worldPanel.getWorld().addPropertyChangeListener(evt -> {
+            if ("tileMapChanged".equals(evt.getPropertyName())) {
+                setGuiSizeToWorldSize();
+            }
+        });
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
     }
@@ -67,10 +71,14 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      * set the default size base don the panel preferences.
      */
     private void setGuiSizeToWorldSize() {
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getDefaultWidth(), worldPanel.getDefaultHeight()));
+        worldPanel.setPreferredSize(worldPanel.getPreferredSize());
         // The world's height and width are based on the underlying tilemap
-        getParentFrame().setMaximumSize(new Dimension(worldPanel.getWorld().getWidth(), worldPanel.getWorld().getHeight()));
         getParentFrame().pack();
+        int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
+//        int widthOffset = 0;
+        int heightOffet = getParentFrame().getSize().height - worldPanel.getHeight();
+        getParentFrame().setMaximumSize(new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
+                worldPanel.getWorld().getHeight() + heightOffet));
     }
 
     /**

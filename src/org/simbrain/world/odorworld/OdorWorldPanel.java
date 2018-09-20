@@ -180,10 +180,10 @@ public class OdorWorldPanel extends JPanel {
                         .forEach(i -> ((EntityNode) i).resetToStaticFrame());
                 repaint();
             } else if ("tileMapChanged".equals(evt.getPropertyName())) {
-                canvas.getLayer().removeChildren(layerImageList);
+                canvas.getLayer().removeAllChildren();
                 layerImageList = world.getTileMap().createImageList();
                 canvas.getLayer().addChildren(layerImageList);
-
+                syncToModel();
                 repaint();
             }
         });

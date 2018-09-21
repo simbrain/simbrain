@@ -92,6 +92,7 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
      */
     private EditablePanel specificNeuronGroupPanel;
 
+
     /**
      * Creates a neuron group panel meant for editing an existing neuron group.
      *
@@ -102,7 +103,6 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
      */
     public static NeuronGroupPanel createNeuronGroupPanel(final NetworkPanel np, final NeuronGroup ng, final Window parent) {
         NeuronGroupPanel ngp = new NeuronGroupPanel(np, ng, parent);
-        System.out.println("NeuronGroupPanel.createNeuronGroupPanel");
         ngp.initializeLayout();
         return ngp;
     }
@@ -130,7 +130,7 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
         }
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(400, 400));
+        tabbedPane.setPreferredSize(new Dimension(500, 400));
         this.add(tabbedPane);
 
         // Summary Panel

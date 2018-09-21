@@ -62,7 +62,6 @@ public class NeuronGroupCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         neuronGroupPanel.commitChanges();
         networkPanel.getNetwork().addGroup(ngCreator.create());
-
         networkPanel.repaint();
         super.closeDialogOk();
     }

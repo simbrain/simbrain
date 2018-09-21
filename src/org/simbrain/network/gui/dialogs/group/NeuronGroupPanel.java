@@ -46,11 +46,16 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
- * Main tabbed panel for editing neuron groups.
+ * Main tabbed panel for editing neuron groups. Creation handled via
+ * {@link NeuronGroupCreationDialog}.
  *
  * @author Jeff Yoshimi
  */
 public class NeuronGroupPanel extends GroupPropertiesPanel {
+
+    // TODO: Implement tab resizing as in synapsegroupdialogs
+    // TODO: Get apply panels properly set up
+    // TODO: Evaluate spiking group stuff at bottom
 
     /**
      * Parent network panel.
@@ -63,6 +68,11 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
     private final Window parent;
 
     /**
+     * Neuron group summary.
+     */
+    private ApplyPanel summaryPanel;
+
+    /**
      * Neuron Group.
      */
     private NeuronGroup neuronGroup;
@@ -70,7 +80,7 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
     /**
      * Layout panel.
      */
-    private AnnotatedPropertyEditor ngPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Panel for editing test input data for this group.
@@ -92,6 +102,7 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
      */
     public static NeuronGroupPanel createNeuronGroupPanel(final NetworkPanel np, final NeuronGroup ng, final Window parent) {
         NeuronGroupPanel ngp = new NeuronGroupPanel(np, ng, parent);
+        System.out.println("NeuronGroupPanel.createNeuronGroupPanel");
         ngp.initializeLayout();
         return ngp;
     }
@@ -107,43 +118,6 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
         networkPanel = np;
         neuronGroup = ng;
         this.parent = parent;
-        ngPanel = new AnnotatedPropertyEditor(ng);
-    }
-
-    /**
-     * Wraps the components in apply panels if we are editing rather than
-     * creating a neuron group.
-     */
-    private void editWrapComponents() {
-
-//        summaryPanel = ApplyPanel.createApplyPanel(new SummaryPanel(neuronGroup, false));
-//
-//        specificNeuronGroupPanel = getSpecificGroupPanel();
-//        if (specificNeuronGroupPanel != null) {
-//            specificNeuronGroupPanel = ApplyPanel.createApplyPanel(specificNeuronGroupPanel);
-//        }
-//
-//        combinedNeuronInfoPanel = new AnnotatedPropertyEditor(neuronGroup.getNeuronList());
-        // TODO: Re-implement?  If all nodes spiking, making it a spiking neuron group
-//        ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        boolean spiking = true;
-//                        for (Neuron n : neuronGroup.getNeuronList()) {
-//                            if (!n.getUpdateRule().isSpikingNeuron()) {
-//                                spiking = false;
-//                                break;
-//                            }
-//                        }
-//                        neuronGroup.setSpikingNeuronGroup(spiking);
-//                    }
-//                });
-//            }
-//        });
-
     }
 
     /**
@@ -151,25 +125,38 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
      */
     private void initializeLayout() {
 
+        if (parent instanceof StandardDialog) {
+            ((StandardDialog) parent).setTitle("Edit " + neuronGroup.getLabel());
+        }
 
-//        setLayout(new BorderLayout());
-//        this.setMinimumSize(new Dimension(200, 300));
-        add(ngPanel);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setPreferredSize(new Dimension(400, 400));
+        this.add(tabbedPane);
 
-//        specificNeuronGroupPanel = getSpecificGroupPanel();
-//
-//            //TODO Get rid of this?
-//            if (parent instanceof StandardDialog) {
-//                ((StandardDialog) parent).setTitle("Edit " + neuronGroup.getLabel());
-//            }
-//            editWrapComponents();
-//
-//
-//        tabbedPane.addTab(SummaryPanel.DEFAULT_PANEL_NAME, (JPanel) summaryPanel);
-//        if (specificNeuronGroupPanel != null) {
-//            tabbedPane.addTab("Properties", (JPanel) specificNeuronGroupPanel);
-//        }
-//
+        // Summary Panel
+        summaryPanel = ApplyPanel.createApplyPanel(new SummaryPanel(neuronGroup, false));
+        tabbedPane.addTab(SummaryPanel.DEFAULT_PANEL_NAME, (JPanel) summaryPanel);
+
+        // Specific neuron group properties
+        // TODO: Test when specific groups implemented
+        specificNeuronGroupPanel = getSpecificGroupPanel();
+        ApplyPanel sngp = null;
+        if (specificNeuronGroupPanel != null) {
+            sngp = ApplyPanel.createApplyPanel(specificNeuronGroupPanel);
+        }
+        if (sngp != null) {
+            tabbedPane.addTab("Properties", (JPanel) specificNeuronGroupPanel);
+        }
+
+        // Layout
+        layoutPanel = new AnnotatedPropertyEditor(neuronGroup.getLayout());
+        ApplyPanel lp = ApplyPanel.createApplyPanel(layoutPanel);
+        tabbedPane.addTab("Layout", lp);
+        // TODO: Select layout type
+        // TODO: Apply.
+
+
+        // Input panel
         NumericMatrix matrix = new NumericMatrix() {
 
             @Override
@@ -182,34 +169,8 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
                 return neuronGroup.getTestData();
             }
         };
-
-        JTabbedPane tabbedPane = ngPanel.getTabbedPane();
-        tabbedPane.setPreferredSize(new Dimension(400, 400));
         inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
         tabbedPane.addTab("Input Data", inputDataPanel);
-
-        // Start in default state
-        tabbedPane.setPreferredSize(new Dimension(400, 400));
-        // Handle different tab sizes
-        tabbedPane.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                tabbedPane.setPreferredSize(new Dimension(400, 400));
-                parent.pack();
-                //TODO: Reduce to just what's needed... and not working!  Fix
-                NeuronGroupPanel.this.getTopLevelAncestor().revalidate();
-                NeuronGroupPanel.this.getTopLevelAncestor().repaint();
-                switch (tabbedPane.getSelectedIndex()) {
-                case 2:
-                    tabbedPane.setPreferredSize(new Dimension(600, 400));
-                    parent.pack();
-                    NeuronGroupPanel.this.getTopLevelAncestor().revalidate();
-                    NeuronGroupPanel.this.getTopLevelAncestor().repaint();
-                    break;
-                }
-            }
-        });
 
         // Set up Help
         if (parent instanceof StandardDialog) {
@@ -247,13 +208,13 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
 
     @Override
     public boolean commitChanges() {
-        ngPanel.commitChanges();
-        neuronGroup.applyLayout();
-        networkPanel.repaint();
-        networkPanel.getNetwork().fireGroupUpdated(neuronGroup);
+        // Everything handled via apply panels for panel editing
+//        layoutPanel.commitChanges();
+//        neuronGroup.applyLayout();
+//        networkPanel.repaint();
+//        networkPanel.getNetwork().fireGroupUpdated(neuronGroup);
         return true;
     }
-
 
     @Override
     public String getHelpPath() {
@@ -264,5 +225,26 @@ public class NeuronGroupPanel extends GroupPropertiesPanel {
     public Group getGroup() {
         return neuronGroup;
     }
+
+    //        combinedNeuronInfoPanel = new AnnotatedPropertyEditor(neuronGroup.getNeuronList());
+    // TODO: Re-implement?  If all nodes spiking, making it a spiking neuron group
+//        ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        boolean spiking = true;
+//                        for (Neuron n : neuronGroup.getNeuronList()) {
+//                            if (!n.getUpdateRule().isSpikingNeuron()) {
+//                                spiking = false;
+//                                break;
+//                            }
+//                        }
+//                        neuronGroup.setSpikingNeuronGroup(spiking);
+//                    }
+//                });
+//            }
+//        });
 
 }

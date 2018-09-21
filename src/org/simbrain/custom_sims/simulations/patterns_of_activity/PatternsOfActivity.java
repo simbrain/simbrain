@@ -77,9 +77,9 @@ public class PatternsOfActivity extends RegisteredSimulation {
         mouse.addSensor(new SmellSensor(mouse, "Smell", 0,0));
 
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(120, 180, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0});
+        OdorWorldEntity cheese = world.addEntity(120, 180, OdorWorldEntity.EntityType.SWISS, new double[] {1, .5, .2});
         cheese.getSmellSource().setDispersion(65);
-        OdorWorldEntity flower = world.addEntity(320, 180, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 1, 0});
+        OdorWorldEntity flower = world.addEntity(320, 180, OdorWorldEntity.EntityType.FLOWER, new double[] {.2, 1, .3});
         flower.getSmellSource().setDispersion(65);
 
         // Make couplings

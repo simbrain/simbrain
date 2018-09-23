@@ -65,7 +65,7 @@ public class OdorWorldResourceManager {
      * @return the Image which can be used with Swing components, etc
      */
     private static Image getImage(final String name) {
-        URL url = OdorWorldResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
     }
@@ -83,7 +83,7 @@ public class OdorWorldResourceManager {
          * does not seem to allow immediate retrieval of the image size
          * so this method is needed to correctly set the bound for the PNodes.
          */
-        URL url = OdorWorldResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
         BufferedImage image = null;
         try {
             // source: https://stackoverflow.com/a/44170254
@@ -99,7 +99,7 @@ public class OdorWorldResourceManager {
     }
 
     public static Document getDocument(final String name) {
-        URL url = OdorWorldResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;

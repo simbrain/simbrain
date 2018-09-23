@@ -1,12 +1,13 @@
 package org.simbrain.world.threedworld.engine;
 
-import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioContext;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
+import com.jme3.system.JmeContext;
 import org.simbrain.world.threedworld.ThreeDImagePanel;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ import java.util.concurrent.Future;
  * ThreeDEngine is a modification of jme3 SimpleApplication to provide
  * greater control over the update cycle, input mapping, and root node.
  */
-public class ThreeDEngine extends Application {
+public class ThreeDEngine extends SimpleApplication {
     /**
      * ThreeDEngine.State is an enumeration to control the update cycle
      * of ThreeDEngine.
@@ -67,16 +68,18 @@ public class ThreeDEngine extends Application {
         settings.setWidth(600);
         settings.setHeight(400);
         setSettings(settings);
-        start();
 
-        context = (ThreeDContext) getContext();
+        context = new ThreeDContext(super.getContext());
         panel = context.createPanel();
         panel.setPreferredSize(new Dimension(settings.getWidth(), settings.getHeight()));
         setPauseOnLostFocus(false);
 
         bulletAppState = new BulletAppState();
         bulletAppState.setEnabled(false);
-        getStateManager().attach(bulletAppState);
+
+        // TODO: Reinstate. Currently produces
+        // java.lang.UnsatisfiedLinkError: com.jme3.bullet.PhysicsSpace.createPhysicsSpace(FFFFFFIZ)
+        //getStateManager().attach(bulletAppState);
     }
 
     /**
@@ -305,6 +308,11 @@ public class ThreeDEngine extends Application {
         if (updateSync) {
             paused = true;
         }
+    }
+
+    @Override
+    public void simpleInitApp() {
+
     }
 
     /**

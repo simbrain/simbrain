@@ -52,7 +52,7 @@ public class ResourceManager {
     public static ImageIcon getImageIcon(final String name) {
         // TODO: Replace usage of this method with get<SIZE>Icon and create a user
         // preference for changing the sizes.
-        URL url = ResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
         return new ImageIcon(url);
     }
 
@@ -63,7 +63,7 @@ public class ResourceManager {
      * @return Returns a scaled ImageIcon.
      */
     public static ImageIcon getSmallIcon(final String name) {
-        URL url = ResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
         ImageIcon imageIcon = new ImageIcon(url);
         Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
         imageIcon.setImage(image);
@@ -77,7 +77,7 @@ public class ResourceManager {
      * @return the Image which can be used with Swing components, etc
      */
     public static Image getImage(final String name) {
-        URL url = ResourceManager.class.getResource(name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
     }

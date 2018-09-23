@@ -36,6 +36,8 @@ import org.simbrain.util.SimpleId;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -97,6 +99,12 @@ public class Network {
      * Text objects.
      */
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
+
+    /**
+     * Array list of neurons.
+     */
+    private final List<NeuronArray> naList = new ArrayList();
+
 
     /**
      * The update manager for this network.
@@ -207,6 +215,12 @@ public class Network {
      * A special flag for if the network is being run for a one-time single iteration.
      */
     private boolean oneOffRun = false;
+
+    /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -489,6 +503,13 @@ public class Network {
         neuron.setId(getNeuronIdGenerator().getId());
         updatePriorityList();
         fireNeuronAdded(neuron);
+    }
+
+
+    public void addNeuronArray(NeuronArray na) {
+        // Set id
+        naList.add(na);
+        changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
     /**
@@ -1851,4 +1872,14 @@ public class Network {
     public boolean isOneOffRun() {
         return oneOffRun;
     }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
 }

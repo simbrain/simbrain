@@ -1,0 +1,127 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+apply plugin: 'checkstyle'
+
+mainClassName = 'org.simbrain.workspace.gui.SimbrainDesktop'
+
+compileJava {
+    options.compilerArgs += '-proc:none'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDirs 'src/org/simbrain/resource', 
+                'src/org/simbrain/world/odorworld/resources',
+                'src/org/simbrain/world/threedworld/threedassets/'
+            exclude '**/*.java'
+        }
+    }
+}
+
+def jmonkeyengine_version = '[3.2,)'
+def log4jVer = '2.5'
+def dl4j_version = "1.0.0-beta"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+
+    //compile fileTree(dir: 'lib/jME3_2014-06-12/lib/',include: ['*.jar'])
+
+    compile files(
+        'lib/ojalgo-35.0.jar', 
+        'lib/utils.jar', 
+        'lib/ssj.jar')
+
+    compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-jogl:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-plugins:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-effects:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-networking:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-blender:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-bullet-native:$jmonkeyengine_version"
+    // compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
+    // compile "org.jmonkeyengine:jme3-niftygui:$jmonkeyengine_version"
+    // compile "com.badlogicgames.gdx:gdx-ai:1.8.0"
+    compile "javax.vecmath:vecmath:1.5.2"
+    // compile "com.simsilica:zay-es:1.2.1"
+    // compile "com.simsilica:zay-es-net:1.2.1"
+
+
+    // https://mvnrepository.com/artifact/junit/junit
+    compile 'junit:junit:4.12'
+
+    // Logger
+    compile("org.apache.logging.log4j:log4j-core:${log4jVer}")
+
+    // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
+    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.0'
+
+    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
+    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '2.5.3'
+
+    // https://mvnrepository.com/artifact/org.beanshell/bsh
+    compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
+    
+    // https://mvnrepository.com/artifact/gov.nist.math/jama
+    compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
+
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+
+    // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
+    compile group: 'org.piccolo2d', name: 'piccolo2d-extras', version: '3.0'
+    compile group: 'org.piccolo2d', name: 'piccolo2d-core', version: '3.0'
+
+    // https://mvnrepository.com/artifact/jfree/jfreechart
+    compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
+
+    // https://mvnrepository.com/artifact/org.jblas/jblas
+    compile group: 'org.jblas', name: 'jblas', version: '1.2.4'
+
+    // https://mvnrepository.com/artifact/log4j/log4j
+    compile group: 'log4j', name: 'log4j', version: '1.2.16'
+
+    // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
+    compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
+
+    // Dl4j, ND4j
+    compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
+    compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
+
+
+}
+
+jar {
+    // TODO: Why can't below re-use mainclassname?
+    // TODO: Figure out how to get the "uber jar" or "fat jar" working
+    manifest {
+        attributes 'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
+    }
+    baseName = 'simbrain'
+    version =  '3.1'
+}
+
+
+task hello {
+    doLast {
+        println 'Hello world!'
+    }
+}
+
+
+task getHomeDir {
+    doLast {
+        println gradle.gradleHomeDir
+    }
+}

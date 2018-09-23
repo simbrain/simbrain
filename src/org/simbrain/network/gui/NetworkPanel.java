@@ -512,6 +512,15 @@ public class NetworkPanel extends JPanel {
      */
     private void addNetworkListeners() {
 
+        network.addPropertyChangeListener(
+            evt -> {
+                if ("neuronArrayAdded".equals(evt.getPropertyName())) {
+                    NeuronArrayNode nad = new NeuronArrayNode(this, (NeuronArray) evt.getNewValue());
+                    canvas.getLayer().addChild(nad);
+                }
+            }
+        );
+
         // Handle general network events
         network.addNetworkListener(new NetworkListener() {
 

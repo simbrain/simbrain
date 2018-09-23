@@ -27,6 +27,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
@@ -226,7 +227,18 @@ public class KeyBindings {
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
         panel.getActionMap().put("wandMode",
-                panel.getActionManager().getWandEditModeAction());
+            panel.getActionManager().getWandEditModeAction());
+
+        // TODO: (Temporary) Add neuron array
+        inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
+        panel.getActionMap().put("neuronArray", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                NeuronArray na = new NeuronArray(panel.getNetwork());
+                na.setX(panel.getLastClickedPosition().getX());
+                na.setY(panel.getLastClickedPosition().getY());
+                panel.getNetwork().addNeuronArray(na);
+            }
+        });
 
         // Number keys
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");

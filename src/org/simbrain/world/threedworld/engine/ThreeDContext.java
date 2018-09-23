@@ -6,6 +6,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.TouchInput;
 import com.jme3.input.awt.AwtKeyInput;
 import com.jme3.input.awt.AwtMouseInput;
+import com.jme3.opencl.Context;
 import com.jme3.renderer.Renderer;
 import com.jme3.system.*;
 import org.simbrain.world.threedworld.ThreeDImagePanel;
@@ -13,47 +14,6 @@ import org.simbrain.world.threedworld.ThreeDImagePanel;
 import java.awt.event.MouseEvent;
 
 public class ThreeDContext implements JmeContext {
-    private class Listener implements SystemListener {
-        @Override
-        public void initialize() {
-            initInThread();
-        }
-
-        @Override
-        public void reshape(int width, int height) {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public void update() {
-            updateInThread();
-        }
-
-        @Override
-        public void requestClose(boolean escapeIsPressed) {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public void gainFocus() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public void loseFocus() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public void handleError(String message, Throwable throwable) {
-            listener.handleError(message, throwable);
-        }
-
-        @Override
-        public void destroy() {
-            destroyInThread();
-        }
-    }
 
     private JmeContext actualContext;
     private AppSettings settings = new AppSettings(true);
@@ -81,7 +41,8 @@ public class ThreeDContext implements JmeContext {
     private AwtKeyInput keyInput = new AwtKeyInput();
     private boolean lastThrottleState = false;
 
-    public ThreeDContext() {
+    public ThreeDContext(JmeContext context) {
+        actualContext = context;
     }
 
     @Override
@@ -102,6 +63,11 @@ public class ThreeDContext implements JmeContext {
     @Override
     public Renderer getRenderer() {
         return actualContext.getRenderer();
+    }
+
+    @Override
+    public Context getOpenCLContext() {
+        return (Context) actualContext;
     }
 
     @Override
@@ -205,4 +171,47 @@ public class ThreeDContext implements JmeContext {
     @Override
     public void restart() {
     }
+
+    private class Listener implements SystemListener {
+        @Override
+        public void initialize() {
+            initInThread();
+        }
+
+        @Override
+        public void reshape(int width, int height) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void update() {
+            updateInThread();
+        }
+
+        @Override
+        public void requestClose(boolean escapeIsPressed) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void gainFocus() {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void loseFocus() {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void handleError(String message, Throwable throwable) {
+            listener.handleError(message, throwable);
+        }
+
+        @Override
+        public void destroy() {
+            destroyInThread();
+        }
+    }
+
 }

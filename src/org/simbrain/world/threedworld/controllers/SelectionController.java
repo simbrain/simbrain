@@ -146,7 +146,7 @@ public class SelectionController implements ActionListener, AnalogListener {
     private void attachSelectionBox(Node node) {
         BoundingBox bounds = (BoundingBox) node.getWorldBound();
         WireBox selectionWire = new WireBox();
-        selectionWire.fromBoundingBox(bounds);
+        selectionWire.setBound(bounds); // was fromBoundingBox
         selectionWire.setLineWidth(2);
         Geometry selectionBox = new Geometry("SelectionBox", selectionWire);
         Vector3f boundsOffset = bounds.getCenter().subtract(node.getLocalTranslation());

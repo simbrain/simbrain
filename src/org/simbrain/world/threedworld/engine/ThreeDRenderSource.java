@@ -1,6 +1,7 @@
 package org.simbrain.world.threedworld.engine;
 
 import com.jme3.post.SceneProcessor;
+import com.jme3.profile.AppProfiler;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
@@ -127,5 +128,10 @@ public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProce
             viewPort.setOutputFrameBuffer(null);
         }
         viewPort.getProcessors().remove(this);
+    }
+
+    @Override
+    public void setProfiler(AppProfiler profiler) {
+
     }
 }

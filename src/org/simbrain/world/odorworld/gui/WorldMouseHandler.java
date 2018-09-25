@@ -206,26 +206,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        //System.out.println("start:" + pickedNode);
-        //System.out.println("start-parent:" + pickedNode.getParent());
-
-//        // Set picked node to parent node in some cases
-//        if (pickedNode.getParent() instanceof TextNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof NeuronNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof SynapseNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof InteractionBox) {
-//            pickedNode = pickedNode.getParent();
-//        }
-
-//        if (pickedNode instanceof NeuronNode) {
-//            odorWorldPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
-//            // NeuronNode's moving flag no longer used. See NeuronNode comments.
-//            //((NeuronNode) pickedNode).setMoving(true);
-//        }
-//
         // Either start dragging selected node(s) or toggle selection (if shift
         // is pressed).
         if (odorWorldPanel.isSelected(pickedNode)) {

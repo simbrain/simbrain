@@ -86,7 +86,8 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     private void init() {
 
-        //square.setStroke();
+
+        square.setPickable(true);
         addChild(square);
         PBounds bounds = square.getBounds();
         setBounds(bounds);
@@ -94,10 +95,8 @@ public class NeuronArrayNode extends ScreenElement  {
         infoText = new PText("rows: " + neuronArray.getRows() + "\n cols:"
             + neuronArray.getCols());
         infoText.setFont(INFO_FONT);
-        square.addChild(infoText);
-        infoText.offset(2,2);
-
-        setPickable(true);
+        addChild(infoText);
+        infoText.offset(4,4);
 
         //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 

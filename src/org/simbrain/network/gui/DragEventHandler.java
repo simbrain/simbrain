@@ -34,6 +34,7 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
 import java.awt.event.InputEvent;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -346,8 +347,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
             // Allow selection of synapses via the line associated with it
             if (node instanceof SynapseNode) {
-                PPath.Float line = ((SynapseNode) node).getLine();
-                if (bounds.intersects(line.getGlobalBounds())) {
+                Line2D.Float line = ((SynapseNode) node).getLineBound();
+                if (bounds.intersectsLine(line)) {
                     boundsIntersects = true;
                 }
 

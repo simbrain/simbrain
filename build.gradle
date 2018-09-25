@@ -18,21 +18,21 @@ sourceSets {
             srcDir 'src'
         }
         resources {
-            srcDirs 'src/org/simbrain/resource', 
-                'src/org/simbrain/world/odorworld/resources',
-                'src/org/simbrain/world/threedworld/threedassets/'
+            srcDirs 'src/org/simbrain/resource',
+                    'src/org/simbrain/world/odorworld/resources',
+                    'src/org/simbrain/world/threedworld/threedassets/'
             exclude '**/*.java'
         }
     }
 }
 
-distributions{
+distributions {
     main {
         baseName = 'Simbrain3.1Beta'
         contents {
             // ${executableDir} doesn't work...
             into('bin') {
-                from {'.'} {
+                from { '.' } {
                     include 'scripts/**'
                     include 'etc/Readme.txt'
                     include 'etc/ReleaseNotes.txt'
@@ -41,7 +41,7 @@ distributions{
                     include 'simulations/**'
                     include 'utils/**'
                     include 'docs/**'
-                }             
+                }
             }
         }
     }
@@ -50,6 +50,7 @@ distributions{
 def jmonkeyengine_version = '[3.2,)'
 def log4jVer = '2.5'
 def dl4j_version = "1.0.0-beta"
+def versionName = "Simbrain3.1Beta"
 
 repositories {
     mavenCentral()
@@ -59,9 +60,9 @@ repositories {
 dependencies {
 
     compile files(
-        'lib/ojalgo-35.0.jar', 
-        'lib/utils.jar', 
-        'lib/ssj.jar')
+            'lib/ojalgo-35.0.jar',
+            'lib/utils.jar',
+            'lib/ssj.jar')
 
     compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
@@ -70,9 +71,9 @@ dependencies {
     compile "org.jmonkeyengine:jme3-effects:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-networking:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-blender:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
+    // compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-bullet-native:$jmonkeyengine_version"
-    // compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
     // compile "org.jmonkeyengine:jme3-niftygui:$jmonkeyengine_version"
     // compile "com.badlogicgames.gdx:gdx-ai:1.8.0"
     compile "javax.vecmath:vecmath:1.5.2"
@@ -91,7 +92,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
-    
+
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
 
@@ -124,16 +125,17 @@ dependencies {
 // TODO: Create a custom distribution that loads up this together with other stuff
 task uberJar(type: Jar) {
 
-      manifest {
+    archivesBaseName = versionName
+    manifest {
         attributes(
-          'Main-Class': mainClassName
+                'Main-Class': mainClassName
         )
-      }
+    }
 
     from sourceSets.main.output
     from configurations.runtimeClasspath.
-                                         findAll { it.name.endsWith('jar') }.
-                                         collect { zipTree(it) }
+            findAll { it.name.endsWith('jar') }.
+            collect { zipTree(it) }
 }
 
 // For printing variable bindings / learning gradle

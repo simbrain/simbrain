@@ -185,10 +185,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         BiMap<String, Class> typeMap = new BiMap<>();
         try {
             Method m = c.getDeclaredMethod(methodName);
-            List<Class> types = (List<Class>) m.invoke(null, null);
+            List<Class> types = (List<Class>) m.invoke(null);
             for (Class type : types) {
                 try {
-                    EditableObject inst = (EditableObject) type.newInstance();
+                    EditableObject inst = (EditableObject) type.getDeclaredConstructor().newInstance();
                     typeMap.put(inst.getName(), type);
                 } catch (InstantiationException e) {
                     e.printStackTrace();

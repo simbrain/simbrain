@@ -222,7 +222,7 @@ public class OdorWorldPanel extends JPanel {
 
 
     /**
-     * Get selected pnodes
+     * Get selected pnodes.
      */
     public List<PNode> getSelectedEntities() {
         // Assumes selected pnodes parents are entitynodes

@@ -3,8 +3,11 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'checkstyle'
 
-mainClassName = 'org.simbrain.workspace.gui.SimbrainDesktop'
+mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
+sourceCompatibility = 1.9
+
+// https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
 compileJava {
     options.compilerArgs += '-proc:none'
 }
@@ -23,6 +26,27 @@ sourceSets {
     }
 }
 
+distributions{
+    main {
+        baseName = 'Simbrain3.1Beta'
+        contents {
+            // ${executableDir} doesn't work...
+            into('bin') {
+                from {'.'} {
+                    include 'scripts/**'
+                    include 'etc/Readme.txt'
+                    include 'etc/ReleaseNotes.txt'
+                    include 'etc/License.txt'
+                    include 'etc/config.properties'
+                    include 'simulations/**'
+                    include 'utils/**'
+                    include 'docs/**'
+                }             
+            }
+        }
+    }
+}
+
 def jmonkeyengine_version = '[3.2,)'
 def log4jVer = '2.5'
 def dl4j_version = "1.0.0-beta"
@@ -33,8 +57,6 @@ repositories {
 }
 
 dependencies {
-
-    //compile fileTree(dir: 'lib/jME3_2014-06-12/lib/',include: ['*.jar'])
 
     compile files(
         'lib/ojalgo-35.0.jar', 
@@ -54,14 +76,11 @@ dependencies {
     // compile "org.jmonkeyengine:jme3-niftygui:$jmonkeyengine_version"
     // compile "com.badlogicgames.gdx:gdx-ai:1.8.0"
     compile "javax.vecmath:vecmath:1.5.2"
-    // compile "com.simsilica:zay-es:1.2.1"
-    // compile "com.simsilica:zay-es-net:1.2.1"
-
 
     // https://mvnrepository.com/artifact/junit/junit
-    compile 'junit:junit:4.12'
+    compile "junit:junit:4.12"
 
-    // Logger
+    // log4j
     compile("org.apache.logging.log4j:log4j-core:${log4jVer}")
 
     // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
@@ -95,33 +114,34 @@ dependencies {
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
     compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
 
-    // Dl4j, ND4j
-    compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
+    // Dl4j, ND4j.
+    // compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
     compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
-
 }
 
-jar {
-    // TODO: Why can't below re-use mainclassname?
-    // TODO: Figure out how to get the "uber jar" or "fat jar" working
-    manifest {
-        attributes 'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
-    }
-    baseName = 'simbrain'
-    version =  '3.1'
+// This creates a fat jar that executes properly if it's in the correct directory.
+// TODO: Create a custom distribution that loads up this together with other stuff
+task uberJar(type: Jar) {
+
+      manifest {
+        attributes(
+          'Main-Class': mainClassName
+        )
+      }
+
+    from sourceSets.main.output
+    from configurations.runtimeClasspath.
+                                         findAll { it.name.endsWith('jar') }.
+                                         collect { zipTree(it) }
 }
 
-
-task hello {
-    doLast {
-        println 'Hello world!'
-    }
-}
-
-
-task getHomeDir {
+// For printing variable bindings / learning gradle
+task printStuff {
     doLast {
         println gradle.gradleHomeDir
+        println mainClassName
+        println project.buildDir
+        println "" + project.buildDir + "/" + project.executableDir
     }
 }

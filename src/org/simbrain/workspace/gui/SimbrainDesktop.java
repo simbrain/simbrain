@@ -565,9 +565,14 @@ public class SimbrainDesktop {
             });
             scriptMenu.add(item);
         }
-        scriptMenu.addSeparator();
-        for (Action action : actionManager.getScriptActions(this)) {
-            scriptMenu.add(action);
+        if(actionManager.getScriptActions(this) == null) {
+            JOptionPane.showOptionDialog(null, "To use scripts place Simbrain.jar in the same directory as the scripts directory and restart.", "Warning", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, null, null);
+        } else {
+            scriptMenu.addSeparator();
+            for (Action action : actionManager.getScriptActions(this)) {
+                scriptMenu.add(action);
+            }
         }
         return scriptMenu;
     }

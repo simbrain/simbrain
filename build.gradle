@@ -23,21 +23,24 @@ sourceSets {
     }
 }
 
+// Define a custom simbrain distribution task. Invoke with <code>gradle sb_distZip</code>
 distributions {
-    main {
+    sb_ {
+        description 
         baseName = versionName
         contents {
-            into(project.executableDir) {
-                from { '.' } {
-                    include 'scripts/**'
-                    include 'etc/Readme.txt'
-                    include 'etc/ReleaseNotes.txt'
-                    include 'etc/License.txt'
-                    include 'etc/config.properties'
-                    include 'simulations/**'
-                    include 'utils/**'
-                    include 'docs/**'
-                }
+            from {
+                uberJar
+            }
+            from {projectDir} {
+                include 'scripts/**'
+                include 'etc/Readme.txt'
+                include 'etc/ReleaseNotes.txt'
+                include 'etc/License.txt'
+                include 'etc/config.properties'
+                include 'simulations/**'
+                include 'utils/**'
+                include 'docs/**'
             }
         }
     }
@@ -137,12 +140,15 @@ compileJava {
     options.compilerArgs += '-proc:none'
 }
 
-// For printing variable bindings / learning gradle
 task printStuff {
+    group 'Misc'
+    description 'For printing variable bindings / learning gradle'
     doLast {
         println gradle.gradleHomeDir
         println mainClassName
         println project.buildDir
         println "" + project.buildDir + "/" + project.executableDir
+        println rootProject
+        println projectDir
     }
 }

@@ -30,8 +30,7 @@ distributions {
     main {
         baseName = 'Simbrain3.1Beta'
         contents {
-            // ${executableDir} doesn't work...
-            into('bin') {
+            into(project.executableDir) {
                 from { '.' } {
                     include 'scripts/**'
                     include 'etc/Readme.txt'
@@ -45,6 +44,7 @@ distributions {
             }
         }
     }
+
 }
 
 def jmonkeyengine_version = '[3.2,)'
@@ -121,7 +121,6 @@ dependencies {
 
 }
 
-// This creates a fat jar that executes properly if it's in the correct directory.
 // TODO: Create a custom distribution that loads up this together with other stuff
 task uberJar(type: Jar) {
 

@@ -7,10 +7,7 @@ mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
 sourceCompatibility = 1.9
 
-// https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
-compileJava {
-    options.compilerArgs += '-proc:none'
-}
+def versionName = "Simbrain3.1Beta"
 
 sourceSets {
     main {
@@ -28,7 +25,7 @@ sourceSets {
 
 distributions {
     main {
-        baseName = 'Simbrain3.1Beta'
+        baseName = versionName
         contents {
             into(project.executableDir) {
                 from { '.' } {
@@ -47,23 +44,62 @@ distributions {
 
 }
 
-def jmonkeyengine_version = '[3.2,)'
-def log4jVer = '2.5'
-def dl4j_version = "1.0.0-beta"
-def versionName = "Simbrain3.1Beta"
-
 repositories {
     mavenCentral()
     jcenter()
 }
 
+def log4jVer = '2.5'
+def dl4j_version = "1.0.0-beta"
+def jmonkeyengine_version = '[3.2,)'
+
 dependencies {
 
+    // TODO: Remove these dependencies
     compile files(
             'lib/ojalgo-35.0.jar',
             'lib/utils.jar',
             'lib/ssj.jar')
 
+    // https://mvnrepository.com/artifact/log4j/log4j
+    compile group: 'log4j', name: 'log4j', version: '1.2.16'
+
+    // https://mvnrepository.com/artifact/junit/junit
+    compile "junit:junit:4.12"
+
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+
+    // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
+    compile group: 'org.piccolo2d', name: 'piccolo2d-extras', version: '3.0'
+    compile group: 'org.piccolo2d', name: 'piccolo2d-core', version: '3.0'
+
+    // https://mvnrepository.com/artifact/jfree/jfreechart
+    compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
+
+    // TODO: Migrate to nd4j
+    // https://mvnrepository.com/artifact/org.jblas/jblas
+    compile group: 'org.jblas', name: 'jblas', version: '1.2.4'
+    // https://mvnrepository.com/artifact/gov.nist.math/jama
+    compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
+
+    // Dl4j, ND4j.
+    // compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
+    compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
+
+    // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
+    compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
+
+    // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
+    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.0'
+
+    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
+    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '2.5.3'
+
+    // https://mvnrepository.com/artifact/org.beanshell/bsh
+    compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
+
+    // JME. Only one of bullet or bullet-native should be uncommented
     compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-jogl:$jmonkeyengine_version"
@@ -77,47 +113,6 @@ dependencies {
     // compile "org.jmonkeyengine:jme3-niftygui:$jmonkeyengine_version"
     // compile "com.badlogicgames.gdx:gdx-ai:1.8.0"
     compile "javax.vecmath:vecmath:1.5.2"
-
-    // https://mvnrepository.com/artifact/junit/junit
-    compile "junit:junit:4.12"
-
-    // log4j
-    compile("org.apache.logging.log4j:log4j-core:${log4jVer}")
-
-    // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
-    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.0'
-
-    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '2.5.3'
-
-    // https://mvnrepository.com/artifact/org.beanshell/bsh
-    compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
-
-    // https://mvnrepository.com/artifact/gov.nist.math/jama
-    compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
-
-    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
-
-    // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
-    compile group: 'org.piccolo2d', name: 'piccolo2d-extras', version: '3.0'
-    compile group: 'org.piccolo2d', name: 'piccolo2d-core', version: '3.0'
-
-    // https://mvnrepository.com/artifact/jfree/jfreechart
-    compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
-
-    // https://mvnrepository.com/artifact/org.jblas/jblas
-    compile group: 'org.jblas', name: 'jblas', version: '1.2.4'
-
-    // https://mvnrepository.com/artifact/log4j/log4j
-    compile group: 'log4j', name: 'log4j', version: '1.2.16'
-
-    // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
-    compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
-
-    // Dl4j, ND4j.
-    // compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
-    compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
 }
 
@@ -135,6 +130,11 @@ task uberJar(type: Jar) {
     from configurations.runtimeClasspath.
             findAll { it.name.endsWith('jar') }.
             collect { zipTree(it) }
+}
+
+// https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
+compileJava {
+    options.compilerArgs += '-proc:none'
 }
 
 // For printing variable bindings / learning gradle

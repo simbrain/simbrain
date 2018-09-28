@@ -282,6 +282,14 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         menu.add(editGroup);
         menu.add(renameAction);
         menu.add(removeAction);
+//        // TODO: Not yet working
+//        Action removeGroupOnly = new AbstractAction("Remove group but not neurons") {
+//            @Override
+//            public void actionPerformed(final ActionEvent event) {
+//                networkPanel.getNetwork().detachNeuronsFromGroup(neuronGroup);
+//            }
+//        };
+//        menu.add(removeGroupOnly);
 
         // Selection submenu
         menu.addSeparator();

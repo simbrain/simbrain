@@ -42,7 +42,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * <b>Network</b> provides core neural network functionality and is the the main
+ * <b>Network</b> provides core neural network functionality and is the the
+ * main
  * API for external calls. Network objects are sets of neurons and weights
  * connecting them. Most update and learning logic occurs in the neurons and
  * weights themselves, as well as in special groups.
@@ -162,7 +163,8 @@ public class Network {
     private AtomicBoolean updateCompleted = new AtomicBoolean(false);
 
     /**
-     * List of neurons sorted by their update priority. Used in priority based update.
+     * List of neurons sorted by their update priority. Used in priority based
+     * update.
      */
     private List<Neuron> prioritySortedNeuronList;
 
@@ -187,12 +189,14 @@ public class Network {
     private SimpleId groupIdGenerator = new SimpleId("Group", 1);
 
     /**
-     * A variable telling the network not to fire events to any listeners during update.
+     * A variable telling the network not to fire events to any listeners during
+     * update.
      */
     private volatile boolean fireUpdates = true;
 
     /**
-     * An internal id giving networks unique numbers within the same simbrain session.
+     * An internal id giving networks unique numbers within the same simbrain
+     * session.
      */
     private static int current_id = 0;
 
@@ -212,7 +216,8 @@ public class Network {
     private int updateFreq = 1;
 
     /**
-     * A special flag for if the network is being run for a one-time single iteration.
+     * A special flag for if the network is being run for a one-time single
+     * iteration.
      */
     private boolean oneOffRun = false;
 
@@ -234,7 +239,8 @@ public class Network {
 
     /**
      * The core update function of the neural network. Calls the current update
-     * function on each neuron, decays all the neurons, and checks their bounds.
+     * function on each neuron, decays all the neurons, and checks their
+     * bounds.
      */
     public void update() {
         networkListeners.forEach(l -> l.setUpdateComplete(false));
@@ -354,7 +360,8 @@ public class Network {
     }
 
     /**
-     * Calculates the Euclidean distance between two neurons' positions in coordinate space.
+     * Calculates the Euclidean distance between two neurons' positions in
+     * coordinate space.
      *
      * @param n1 The first neuron.
      * @param n2 The second neuron.
@@ -465,14 +472,16 @@ public class Network {
      *
      * @param source the source neuron group
      * @param target the target neuron group
-     * @return the synapse group between source and target, null if there is none
+     * @return the synapse group between source and target, null if there is
+     * none
      */
     public SynapseGroup getSynapseGroup(NeuronGroup source, NeuronGroup target) {
         for (Group group : groupList) {
             if (group instanceof SynapseGroup) {
                 SynapseGroup synapseGroup = (SynapseGroup) group;
-                if (source == synapseGroup.getSourceNeuronGroup() && target == synapseGroup.getTargetNeuronGroup())
+                if (source == synapseGroup.getSourceNeuronGroup() && target == synapseGroup.getTargetNeuronGroup()) {
                     return synapseGroup;
+                }
             }
         }
         return null;
@@ -604,8 +613,8 @@ public class Network {
      * and must be transferred in to a group. This is what happens in converting
      * loose neurons to a neuron group. It also happens to be the way the add
      * neurons dialog does things (it defaults to adding neurons, but if a user
-     * wants they can be put in a group). This is not part of the standard neuron
-     * group creation process.
+     * wants they can be put in a group). This is not part of the standard
+     * neuron group creation process.
      * <p>
      * TODO: Confusing; if possible refactor so that this method is not needed.
      *
@@ -617,6 +626,17 @@ public class Network {
             neuronList.remove(neuron);
             group.addNeuron(neuron, false);
         }
+    }
+
+    /**
+     * Remove a neuron group, but not the neurons inside it: they can stay as
+     * loose neurons. NOT YET WORKING.
+     *
+     * @param group the group to remove
+     */
+    public void detachNeuronsFromGroup(NeuronGroup group) {
+        group.releaseNeurons();
+        removeGroup(group);
     }
 
     /**
@@ -890,8 +910,8 @@ public class Network {
     }
 
     /**
-     * Create a "flat" list of groups, which only includes sub-groups of subnetworks
-     * and unbound groups.
+     * Create a "flat" list of groups, which only includes sub-groups of
+     * subnetworks and unbound groups.
      *
      * @return the flat list
      */
@@ -984,6 +1004,7 @@ public class Network {
     }
 
     // TODO: Use transient instead. Most if not all of this not needed.
+
     /**
      * Returns a properly initialized xstream object.
      *
@@ -1473,7 +1494,8 @@ public class Network {
     }
 
     /**
-     * @param group             reference to the group whose parameters are being changed
+     * @param group             reference to the group whose parameters are
+     *                          being changed
      * @param changeDescription A change of description for the group
      */
     public void fireGroupChanged(final Group group, final String changeDescription) {

@@ -1606,7 +1606,21 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
-     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
+     * Remove a neuron group, but not the neurons inside it.
+     * Release the neurons as loose neurons.
+     */
+    public void releaseNeurons() {
+        for(Neuron neuron : neuronList) {
+            getParentNetwork().addNeuron(neuron);
+        }
+        neuronList.clear();
+        stopRecording();
+        // NOT YET WORKING.
+        //TODO: Fire special event which results in new pnodes being created in the canvas.
+    }
+
+    /**
+     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      */
     public static class NeuronGroupCreator extends NeuronGroup {
 

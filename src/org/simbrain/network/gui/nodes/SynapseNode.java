@@ -57,6 +57,11 @@ public final class SynapseNode extends ScreenElement {
     private PPath.Float line;
 
     /**
+     * The line for bound checking.
+     */
+    private Line2D.Float lineBound = new Line2D.Float();
+
+    /**
      * Reference to source neuron.
      */
     private NeuronNode source;
@@ -173,8 +178,7 @@ public final class SynapseNode extends ScreenElement {
         if (!isSelfConnection()) {
             line.reset();
             line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
-            // publicLine
-            // .setLine(source.getCenter(), localToGlobal(synapseCenter));
+            lineBound.setLine(source.getCenter(), localToGlobal(synapseCenter));
         }
     }
 
@@ -561,4 +565,8 @@ public final class SynapseNode extends ScreenElement {
         return line;
     }
 
+
+    public Line2D.Float getLineBound() {
+        return lineBound;
+    }
 }

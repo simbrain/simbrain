@@ -206,26 +206,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        //System.out.println("start:" + pickedNode);
-        //System.out.println("start-parent:" + pickedNode.getParent());
-
-//        // Set picked node to parent node in some cases
-//        if (pickedNode.getParent() instanceof TextNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof NeuronNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof SynapseNode) {
-//            pickedNode = pickedNode.getParent();
-//        } else if (pickedNode.getParent() instanceof InteractionBox) {
-//            pickedNode = pickedNode.getParent();
-//        }
-
-//        if (pickedNode instanceof NeuronNode) {
-//            odorWorldPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
-//            // NeuronNode's moving flag no longer used. See NeuronNode comments.
-//            //((NeuronNode) pickedNode).setMoving(true);
-//        }
-//
         // Either start dragging selected node(s) or toggle selection (if shift
         // is pressed).
         if (odorWorldPanel.isSelected(pickedNode)) {
@@ -284,12 +264,16 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         //System.out.println("Drag:" + pickedNode);
 
         // Continue to drag nodes that have already been selected
-        for (PNode node : odorWorldPanel.getSelection()) {
+        for (PNode node : odorWorldPanel.getSelectedEntities()) {
             // TODO: networkpanel has a draggable flag here
             // TODO: Only update model at end of drag.
             // TODO: This getparent business...
-            node.getParent().localToParent(delta);
-            node.getParent().offset(delta.getWidth(), delta.getHeight());
+            node.localToParent(delta);
+            node.offset(delta.getWidth(), delta.getHeight());
+            // Below needed for proper continuous updating of couplings
+            if (node instanceof EntityNode) {
+                ((EntityNode) node).pushViewPositionToModel();
+            }
         }
 
     }
@@ -306,27 +290,10 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             marquee = null;
             marqueeStartPosition = null;
             return;
-        } else {
-            for (PNode node : odorWorldPanel.getSelectedEntities()) {
-                if (node instanceof EntityNode) {
-                    ((EntityNode) node).pushViewPositionToModel();
-                }
-            }
         }
-
-//        // Reset the beginning of a sequence of pastes, but keep the old
-//        // paste-offset. This occurs when pasting a sequence, and moving one set
-//        // of objects to a new location
-//        if (odorWorldPanel.getNumberOfPastes() != 1) {
-//            odorWorldPanel.setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) odorWorldPanel.getSelectedModelElements()));
-//        }
 
         // End drag selected node(s)
         pickedNode = null;
-//        odorWorldPanel.setEndPosition(SimnetUtils.getUpperLeft((ArrayList) odorWorldPanel.getSelectedModelElements()));
-
-        // Reset the place new neurons and groups should be added
-//        odorWorldPanel.getWhereToAdd().setLocation(event.getPosition().getX() + NetworkPanel.DEFAULT_SPACING, event.getPosition().getY());
 
         priorSelection = Collections.EMPTY_LIST;
         odorWorldPanel.repaint();

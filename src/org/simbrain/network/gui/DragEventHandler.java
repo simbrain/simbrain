@@ -29,11 +29,13 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
 import java.awt.event.InputEvent;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -171,13 +173,16 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        //System.out.println("start:" + pickedNode);
-        //System.out.println("start-parent:" + pickedNode.getParent());
+        // System.out.println("start:" + pickedNode);
+        // System.out.println("start-parent:" + pickedNode.getParent());
 
-        // Set picked node to parent node in some cases
+        // Must be careful no to add too much hierarchy in pnodes because then it's hard to pick them
+        // Currently most pnodes have just a single layer of children.
         if (pickedNode.getParent() instanceof TextNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof NeuronNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof NeuronArrayNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof SynapseNode) {
             pickedNode = pickedNode.getParent();
@@ -259,8 +264,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         // Continue to drag nodes that have already been selected
-        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
-            PNode node = (PNode) i.next();
+        for (PNode node : networkPanel.getSelection() ) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.isDraggable()) {
@@ -346,8 +350,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
             // Allow selection of synapses via the line associated with it
             if (node instanceof SynapseNode) {
-                PPath.Float line = ((SynapseNode) node).getLine();
-                if (bounds.intersects(line.getGlobalBounds())) {
+                Line2D.Float line = ((SynapseNode) node).getLineBound();
+                if (bounds.intersectsLine(line)) {
                     boundsIntersects = true;
                 }
 

@@ -181,19 +181,19 @@ public class OdorWorldFrameMenu extends JMenuBar {
             }
         });
         editMenu.add(clearAllItems);
-        editMenu.addSeparator();
-        JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
-        loadVectors.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SFileChooser chooser = new SFileChooser(".", "Load vectors");
-                File theFile = chooser.showOpenDialog();
-                if (theFile != null) {
-                    double[][] vecs = Utils.getDoubleMatrix(theFile);
-                    world.loadStimulusVectors(vecs);
-                }
-            }
-        });
-        editMenu.add(loadVectors);
+        // editMenu.addSeparator();
+        // JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
+        // loadVectors.addActionListener(new ActionListener() {
+        //     public void actionPerformed(ActionEvent e) {
+        //         SFileChooser chooser = new SFileChooser(".", "Load vectors");
+        //         File theFile = chooser.showOpenDialog();
+        //         if (theFile != null) {
+        //             double[][] vecs = Utils.getDoubleMatrix(theFile);
+        //             world.loadStimulusVectors(vecs);
+        //         }
+        //     }
+        // });
+        // editMenu.add(loadVectors);
 
     }
 

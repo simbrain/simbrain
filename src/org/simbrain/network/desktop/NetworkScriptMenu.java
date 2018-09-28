@@ -51,9 +51,11 @@ public class NetworkScriptMenu {
     public static JMenu getNetworkScriptMenu(NetworkPanel panel) {
         JMenu scriptMenu = new JMenu("Scripts");
         scriptMenu.add(new RunScriptAction(panel));
-        scriptMenu.addSeparator();
-        for (Action action : getScriptActions(panel)) {
-            scriptMenu.add(action);
+        if(getScriptActions(panel) != null) {
+            scriptMenu.addSeparator();
+            for (Action action : getScriptActions(panel)) {
+                scriptMenu.add(action);
+            }
         }
         return scriptMenu;
     }

@@ -75,13 +75,22 @@ public final class ConnectionPanel extends JPanel {
     private boolean rec;
 
     /**
+     * Whether or not this is a creation panel or an edit panel.
+     */
+    private boolean isCreation = true;
+
+    /**
      * Construct the dialog.
      *
      * @param connectionManager   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager, int noTar, boolean rec) {
+    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager, int noTar, boolean rec,
+                           boolean isCreation) {
         this.parentFrame = parent;
         this.connectionStrategy = connectionManager;
+        this.noTar = noTar;
+        this.rec = rec;
+        this.isCreation = isCreation;
         init();
     }
 
@@ -115,8 +124,10 @@ public final class ConnectionPanel extends JPanel {
         add(connectionContainer);
 
         // E/I Ratio and Randomizers
-        polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
-        add(polarityPanel);
+        if (isCreation) {
+            polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
+            add(polarityPanel);
+        }
     }
 
     /**
@@ -135,7 +146,9 @@ public final class ConnectionPanel extends JPanel {
      */
     public void commitSettings() {
         connectionStrategyProperties.commitChanges();
-        polarityPanel.commitChanges(connectionStrategy);
+        if (isCreation) {
+            polarityPanel.commitChanges(connectionStrategy);
+        }
     }
 
     /**
@@ -149,12 +162,14 @@ public final class ConnectionPanel extends JPanel {
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
 
         //TODO: Consider moving the below to connection manager
-        ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
-        if (polarityPanel.exRandomizerEnabled()) {
-            ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
-        }
-        if (polarityPanel.inRandomizerEnabled()) {
-            ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
+        if (isCreation) {
+            ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
+            if (polarityPanel.exRandomizerEnabled()) {
+                ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
+            }
+            if (polarityPanel.inRandomizerEnabled()) {
+                ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
+            }
         }
         networkPanel.getNetwork().fireSynapsesUpdated(synapses);
     }
@@ -168,21 +183,25 @@ public final class ConnectionPanel extends JPanel {
         synapseGroup.clear();
         connectionStrategyProperties.commitChanges();
         connectionStrategy.connectNeurons(synapseGroup);
-        polarityPanel.commitChanges();
-        if (polarityPanel.exRandomizerEnabled()) {
-            ConnectionUtilities.randomizeExcitatorySynapses(
-                    synapseGroup.getExcitatorySynapses(),
-                    polarityPanel.getExRandomizer());
-            synapseGroup.setExcitatoryRandomizer(polarityPanel
-                    .getExRandomizer());
+        if (isCreation) {
+            polarityPanel.commitChanges();
+            if (polarityPanel.exRandomizerEnabled()) {
+                ConnectionUtilities.randomizeExcitatorySynapses(
+                        synapseGroup.getExcitatorySynapses(),
+                        polarityPanel.getExRandomizer());
+                synapseGroup.setExcitatoryRandomizer(polarityPanel
+                        .getExRandomizer());
+            }
+            if (polarityPanel.inRandomizerEnabled()) {
+                ConnectionUtilities.randomizeInhibitorySynapses(
+                        synapseGroup.getInhibitorySynapses(),
+                        polarityPanel.getInRandomizer());
+                synapseGroup.setInhibitoryRandomizer(polarityPanel
+                        .getInRandomizer());
+            }
+            synapseGroup.setExcitatoryRatio(polarityPanel.getPercentExcitatory());
         }
-        if (polarityPanel.inRandomizerEnabled()) {
-            ConnectionUtilities.randomizeInhibitorySynapses(
-                    synapseGroup.getInhibitorySynapses(),
-                    polarityPanel.getInRandomizer());
-            synapseGroup.setInhibitoryRandomizer(polarityPanel
-                    .getInRandomizer());
-        }
+        synapseGroup.setConnectionManager(connectionStrategy);
     }
 
     public SynapsePropertiesPanel getSynapseProperties() {

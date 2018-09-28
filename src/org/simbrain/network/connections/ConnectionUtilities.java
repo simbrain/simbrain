@@ -106,7 +106,7 @@ public class ConnectionUtilities {
 
     /**
      * Randomize and polarize synapses using default excitatory and inhibitory
-     * polarizers (uniform 0 to 1).  See {@link #randomizeAndPolarizeSynapses(Collection, PolarizedRandomizer, * PolarizedRandomizer, double)}
+     * polarizers (uniform 0 to 1).
      *
      * @param synapses        the synapses to modify
      * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
@@ -344,10 +344,10 @@ public class ConnectionUtilities {
             return;
 
         // TODO: I'm commenting this out for now just to test code, but
-        //  it's being thrown a lot and testing is needed.
-//        if (!expectedPolarity.equals(inQuestion.getPolarity())) {
-//            throw new IllegalArgumentException("Randomizer's polarity does" + " not match its implied polarity");
-//        }
+     //     it's being thrown a lot and testing is needed.
+        if (!expectedPolarity.equals(inQuestion.getPolarity())) {
+            throw new IllegalArgumentException("Randomizer's polarity does" + " not match its implied polarity");
+        }
     }
 
     /**

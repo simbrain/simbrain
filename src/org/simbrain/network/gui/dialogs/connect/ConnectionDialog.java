@@ -55,7 +55,7 @@ public class ConnectionDialog extends StandardDialog {
         this.connectionPanel = new ConnectionPanel(this, connection,
                 networkPanel.getSelectedModelNeurons().size(), ConnectionUtilities.
                 testRecurrence(networkPanel.getSelectedModelNeurons(),
-                        networkPanel.getSourceModelNeurons()));
+                        networkPanel.getSourceModelNeurons()), true);
         setContentPane(connectionPanel);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));

@@ -216,13 +216,13 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel
         if (isCreationDialog) {
-            connectionPanel = new ConnectionSelectorPanel(sourceNeuronGroup.equals(targetNeuronGroup), this);
+            connectionPanel = new ConnectionSelectorPanel(sourceNeuronGroup.equals(targetNeuronGroup), this, isCreationDialog);
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Type", connectWrapper);
         } else {
-            connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this);
+            connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this, isCreationDialog);
             connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
                     (ActionEvent e) -> {
                 connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
@@ -372,6 +372,16 @@ public final class SynapseGroupDialog extends StandardDialog {
         super.closeDialogOk();
         if (isCreationDialog) {
             commitChanges();
+        }
+    }
+
+    @Override
+    public void pack() {
+        super.pack();
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int height = gd.getDisplayMode().getHeight();
+        if(this.getLocation().y + this.getBounds().height > height) {
+            this.setBounds(getLocation().x, getLocation().y, getWidth(), height - getLocation().y);
         }
     }
 

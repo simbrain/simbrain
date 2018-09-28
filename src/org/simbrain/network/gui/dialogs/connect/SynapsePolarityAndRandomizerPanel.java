@@ -698,9 +698,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));
 
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.anchor = GridBagConstraints.NORTH;
-            gbc.fill = GridBagConstraints.NONE;
-            gbc.weighty = 0.0;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weighty = 1.0;
+            gbc.weightx = 1.0;
             gbc.gridx = 0;
             gbc.gridy = 0;
 
@@ -723,6 +724,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             gbc.weighty = 1.0;
             this.add(new JPanel(), gbc);
 
+            gbc.anchor = GridBagConstraints.SOUTHEAST;
             gbc.fill = GridBagConstraints.NONE;
             gbc.weighty = 0.0;
             gbc.gridy += 1;
@@ -815,7 +817,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         public void commitChanges() {
             if (enableStatusTriangle.isDown() || randomizerState == RandBehavior.FORCE_ON) {
                 randomizerPanel.commitChanges();
-
+                randomizer.getProbabilityDistribution().setPolarity(polarity);
             }
         }
 

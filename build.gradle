@@ -5,6 +5,27 @@ apply plugin: 'checkstyle'
 
 mainClassName = 'org.simbrain.workspace.gui.SimbrainDesktop'
 
+checkstyle{
+    configFile rootProject.file('etc/checkstyle.xml')
+}
+
+task pathingJar(type: Jar) {
+    dependsOn configurations.runtime
+    appendix = 'pathing'
+
+    doFirst {
+        manifest {
+            attributes "Class-Path": configurations.runtime.files.collect {
+                it.toURL().toString().replaceFirst(/file:\/+/ , '/' )
+            }.join(' ')
+            attributes (
+                'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
+            )
+        }
+
+    }
+}
+
 compileJava {
     options.compilerArgs += '-proc:none'
 }
@@ -15,11 +36,18 @@ sourceSets {
             srcDir 'src'
         }
         resources {
-            srcDirs 'src/org/simbrain/resource', 
-                'src/org/simbrain/world/odorworld/resources',
-                'src/org/simbrain/world/threedworld/threedassets/'
+            srcDirs 'src/org/simbrain/resource',
+                    'src/org/simbrain/world/odorworld/resources',
+                    'src/org/simbrain/world/threedworld/threedassets/'
             exclude '**/*.java'
         }
+    }
+}
+
+run {
+    dependsOn pathingJar
+    doFirst {
+        classpath = files(sourceSets.main.output.files, pathingJar.archivePath)
     }
 }
 

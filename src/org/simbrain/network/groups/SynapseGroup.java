@@ -1248,20 +1248,13 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Sets the connection manager for this synapse group once and only once.
-     * Subsequent attempts to modify the connection manager will fail, as
-     * changing the connection manager amounts to (and should be implemented as)
-     * creating an entirely new synapse group.
+     * Sets the connection manager for this synapse group.
      *
      * @param connection the connection manager to be used by this synapse group
      *                   for making synaptic connections.
      */
     public void setConnectionManager(ConnectionStrategy connection) {
-        if (this.connectionManager == null) {
             this.connectionManager = connection;
-        } else {
-            throw new UnsupportedOperationException("The connection object" + " of a synapse group can be set only once. If a new" + " connection scheme is desired a new synapse group must" + " be constructed.");
-        }
     }
 
     /**

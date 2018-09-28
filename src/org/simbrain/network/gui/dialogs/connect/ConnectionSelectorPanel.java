@@ -39,7 +39,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
      * Temporary list of connection panels managed by combo box.
      */
     private final ConnectionStrategy[] CONNECTORS = {new AllToAll(), new OneToOne(),
-        new RadialSimple(), new RadialGaussian(), new Sparse()};
+            new RadialSimple(), new RadialGaussian(), new Sparse()};
 
     /**
      * Select connection type.
@@ -63,12 +63,18 @@ public class ConnectionSelectorPanel extends EditablePanel {
     private boolean recurrent;
 
     /**
+     * Whether or not this is a panel that is a part of creating a new synapse group or editing an extant one.
+     */
+    private boolean isCreation;
+
+    /**
      * Connection dialog default constructor.
      */
-    public ConnectionSelectorPanel(boolean recurrent, Window parentFrame) {
-        this.parentFrame=parentFrame;
+    public ConnectionSelectorPanel(boolean recurrent, Window parentFrame, boolean isCreation) {
+        this.parentFrame = parentFrame;
         cbConnectionType = new JComboBox(CONNECTORS);
         this.recurrent = recurrent;
+        this.isCreation = isCreation;
         init();
     }
 
@@ -77,12 +83,13 @@ public class ConnectionSelectorPanel extends EditablePanel {
      *
      * @param initConnection initial connection manager
      */
-    public ConnectionSelectorPanel(ConnectionStrategy initConnection, Window parentFrame) {
-        this.parentFrame=parentFrame;
+    public ConnectionSelectorPanel(ConnectionStrategy initConnection, Window parentFrame, boolean isCreation) {
+        this.parentFrame = parentFrame;
         cbConnectionType = new JComboBox(CONNECTORS);
-        cbConnectionType.setPreferredSize(new Dimension(200,100));
-        for(ConnectionStrategy cn : CONNECTORS) {
-            if(cn.getClass() == initConnection.getClass()) {
+        cbConnectionType.setPreferredSize(new Dimension(200, 20));
+        this.isCreation = isCreation;
+        for (ConnectionStrategy cn : CONNECTORS) {
+            if (cn.getClass() == initConnection.getClass()) {
                 cbConnectionType.removeItem(cn);
                 cbConnectionType.addItem(initConnection);
                 break;
@@ -96,11 +103,12 @@ public class ConnectionSelectorPanel extends EditablePanel {
      * Construct the panel from a specified set of connection manager objects.
      *
      * @param connectionManagers list of connection managers for drop down
-     * @param initConnection initial connection manager
+     * @param initConnection     initial connection manager
      */
     public ConnectionSelectorPanel(ConnectionStrategy[] connectionManagers,
-                                   ConnectionStrategy initConnection, Window parentFrame) {
+                                   ConnectionStrategy initConnection, Window parentFrame, boolean isCreation) {
         this.parentFrame = parentFrame;
+        this.isCreation = isCreation;
         cbConnectionType = new JComboBox(connectionManagers);
         cbConnectionType.setSelectedItem(initConnection);
         init();
@@ -117,13 +125,12 @@ public class ConnectionSelectorPanel extends EditablePanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 15, 30, 5);
+        gbc.insets = new Insets(20, 15, 20, 5);
         gbc.fill = GridBagConstraints.NONE;
         add(new JLabel("Connection Manager:"), gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 5, 30, 5);
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(20, 5, 20, 5);
         add(cbConnectionType, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
@@ -151,16 +158,16 @@ public class ConnectionSelectorPanel extends EditablePanel {
             remove(currentConnectionPanel);
         }
         int noTar = 0;
-        if(cbConnectionType.getSelectedItem().getClass() == Sparse.class) {
-            if(((Sparse) cbConnectionType.getSelectedItem()).getSynapseGroup() != null) {
+        if (cbConnectionType.getSelectedItem().getClass() == Sparse.class) {
+            if (((Sparse) cbConnectionType.getSelectedItem()).getSynapseGroup() != null) {
                 noTar = ((Sparse) cbConnectionType.getSelectedItem())
                         .getSynapseGroup().getTargetNeuronGroup()
                         .size();
             }
         }
         currentConnectionPanel = new ConnectionPanel(parentFrame,
-            (ConnectionStrategy) cbConnectionType.getSelectedItem(),
-                noTar, recurrent);
+                (ConnectionStrategy) cbConnectionType.getSelectedItem(),
+                noTar, recurrent, isCreation);
         add(currentConnectionPanel, gbc);
         repaint();
         parentFrame.pack();

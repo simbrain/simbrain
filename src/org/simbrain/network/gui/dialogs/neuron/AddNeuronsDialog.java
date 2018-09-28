@@ -278,6 +278,7 @@ public class AddNeuronsDialog extends StandardDialog {
         public NeuronGroupPanelLite(NetworkPanel np) {
             addListeners();
             setLayout(new BorderLayout());
+            addToGroup.setSelected(true);
 
             JPanel subPanel = new JPanel();
             subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.X_AXIS));
@@ -285,6 +286,8 @@ public class AddNeuronsDialog extends StandardDialog {
             subPanel.add(Box.createHorizontalStrut(20));
             subPanel.add(tfNameLabel);
             tfGroupName.setEnabled(addToGroup.isSelected());
+            String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
+            tfGroupName.setText(dName);
             subPanel.add(tfGroupName);
             subPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             this.add(subPanel, BorderLayout.CENTER);

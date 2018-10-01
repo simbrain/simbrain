@@ -19,9 +19,10 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -53,10 +54,12 @@ public class HopfieldCreationDialog extends StandardDialog {
      */
     private HopfieldPropertiesPanel hopPropertiesPanel;
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network Panel.
@@ -70,7 +73,7 @@ public class HopfieldCreationDialog extends StandardDialog {
      */
     public HopfieldCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 
@@ -89,7 +92,7 @@ public class HopfieldCreationDialog extends StandardDialog {
 
         // Layout panel
         tabLayout.add(layoutPanel);
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
 
         // Set it all up
         tabbedPane.addTab("Logic", tabLogic);
@@ -110,8 +113,8 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = (Hopfield) hopPropertiesPanel.getGroup();
         layoutPanel.commitChanges();
-        layoutPanel.getCurrentLayout().setInitialLocation(networkPanel.getWhereToAdd());
-        hopfield.getNeuronGroup().setLayout(layoutPanel.getCurrentLayout());
+        layoutObject.getLayout().setInitialLocation(networkPanel.getWhereToAdd());
+        hopfield.getNeuronGroup().setLayout(layoutObject.getLayout());
         hopfield.getNeuronGroup().applyLayout();
         networkPanel.getNetwork().addGroup(hopfield);
         networkPanel.repaint();

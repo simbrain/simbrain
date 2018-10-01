@@ -17,6 +17,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
@@ -34,9 +35,14 @@ public class LayoutDialog extends StandardDialog {
     private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
     /**
+     * Layout to set.
+     */
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
+    /**
      * Main panel.
      */
-    private MainLayoutPanel mainPanel;
+    private AnnotatedPropertyEditor mainPanel;
 
     /**
      * The network panel where layout will occur.
@@ -60,7 +66,7 @@ public class LayoutDialog extends StandardDialog {
      */
     public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        mainPanel = new MainLayoutPanel(layout, false, this);
+        mainPanel = new AnnotatedPropertyEditor(layoutObject);
         setContentPane(mainPanel);
     }
 
@@ -70,13 +76,13 @@ public class LayoutDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-        mainPanel.getCurrentLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
-        mainPanel.getCurrentLayout().layoutNeurons(networkPanel.getSelectedModelNeurons());
+        layoutObject.getLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
+        layoutObject.getLayout().layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
     }
 
     /**
-     * @see AbstractLayoutPanel
+     * @see AnnotatedPropertyEditor
      */
     public void commitChanges() {
         mainPanel.commitChanges();

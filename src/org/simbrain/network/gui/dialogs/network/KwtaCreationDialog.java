@@ -19,11 +19,11 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 
@@ -54,10 +54,12 @@ public class KwtaCreationDialog extends StandardDialog {
      */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     // TODO: Separate this from number of neurons! Add a second field.
     /**
@@ -77,7 +79,7 @@ public class KwtaCreationDialog extends StandardDialog {
      */
     public KwtaCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 
@@ -87,7 +89,7 @@ public class KwtaCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()));
         layoutPanel.commitChanges();
-        Layout layout = layoutPanel.getCurrentLayout();
+        Layout layout = layoutObject.getLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         layout.layoutNeurons(kWTA.getNeuronList());
         networkPanel.getNetwork().addGroup(kWTA);

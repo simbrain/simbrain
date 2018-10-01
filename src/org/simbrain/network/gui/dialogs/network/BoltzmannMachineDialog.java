@@ -19,10 +19,11 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.BoltzmannMachine;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -33,10 +34,13 @@ import java.text.NumberFormat;
  */
 public class BoltzmannMachineDialog extends StandardDialog {
 
+    
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network Panel.
@@ -54,7 +58,7 @@ public class BoltzmannMachineDialog extends StandardDialog {
      */
     public BoltzmannMachineDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 

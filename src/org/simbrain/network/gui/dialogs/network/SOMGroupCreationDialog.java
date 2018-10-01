@@ -19,10 +19,11 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -52,10 +53,12 @@ public class SOMGroupCreationDialog extends StandardDialog {
      */
     private SOMPropertiesPanel somPanel;
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network Panel.
@@ -69,7 +72,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
      */
     public SOMGroupCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 
@@ -83,8 +86,8 @@ public class SOMGroupCreationDialog extends StandardDialog {
 
         // Set up tab panels
         tabLogic.add(somPanel);
-        layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(SOMGroup.DEFAULT_LAYOUT);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
+        layoutObject.setLayout(SOMGroup.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -104,7 +107,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
         somPanel.commitChanges();
         SOMGroup som = (SOMGroup) somPanel.getGroup();
         layoutPanel.commitChanges();
-        som.setLayout(layoutPanel.getCurrentLayout());
+        som.setLayout(layoutObject.getLayout());
         som.applyLayout();
         som.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(som);

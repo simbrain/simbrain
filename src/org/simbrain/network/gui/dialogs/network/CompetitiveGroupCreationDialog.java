@@ -19,10 +19,11 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel.CompetitivePropsPanelType;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -52,10 +53,13 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
      */
     private CompetitivePropertiesPanel compPropertiesPanel;
 
+
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network Panel.
@@ -82,8 +86,8 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
 
         // Set up tab panels
         tabLogic.add(compPropertiesPanel);
-        layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(CompetitiveGroup.DEFAULT_LAYOUT);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
+        layoutObject.setLayout(CompetitiveGroup.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -101,8 +105,9 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         compPropertiesPanel.commitChanges();
+        layoutPanel.commitChanges();
         CompetitiveGroup competitive = (CompetitiveGroup) compPropertiesPanel.getGroup();
-        competitive.setLayout(layoutPanel.getCurrentLayout());
+        competitive.setLayout(layoutObject.getLayout());
         competitive.applyLayout();
         competitive.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(competitive);

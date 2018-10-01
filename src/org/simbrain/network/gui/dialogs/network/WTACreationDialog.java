@@ -19,9 +19,10 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -52,10 +53,12 @@ public class WTACreationDialog extends StandardDialog {
      */
     private WTAPropertiesPanel wtaPanel;
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network panel.
@@ -69,7 +72,7 @@ public class WTACreationDialog extends StandardDialog {
      */
     public WTACreationDialog(final NetworkPanel np) {
         networkPanel = np;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 
@@ -83,8 +86,8 @@ public class WTACreationDialog extends StandardDialog {
         // Set up tab panels
         wtaPanel = new WTAPropertiesPanel(networkPanel);
         tabLogic.add(wtaPanel);
-        layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(WinnerTakeAll.DEFAULT_LAYOUT);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
+        layoutObject.setLayout(WinnerTakeAll.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", tabLayout);
@@ -103,7 +106,7 @@ public class WTACreationDialog extends StandardDialog {
         wtaPanel.commitChanges();
         WinnerTakeAll wta = (WinnerTakeAll) wtaPanel.getGroup();
         layoutPanel.commitChanges();
-        wta.setLayout(layoutPanel.getCurrentLayout());
+        wta.setLayout(layoutObject.getLayout());
         wta.applyLayout();
         wta.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(wta);

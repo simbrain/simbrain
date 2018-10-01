@@ -22,6 +22,7 @@ import org.jfree.layout.RadialLayout;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 
@@ -66,5 +67,26 @@ public interface Layout extends CopyableObject {
     @Override
     default String getName() {
         return getDescription();
+    }
+
+    /**
+     * Layout wrapped for {@link AnnotatedPropertyEditor} to edit.
+     */
+    class LayoutObject implements EditableObject {
+
+        /**
+         * The layout to edit. Default to {@link LineLayout}.
+         */
+        @UserParameter(label = "Layout", isObjectType = true)
+        private Layout layout = new LineLayout();
+
+        public Layout getLayout() {
+            return layout;
+        }
+
+        public void setLayout(Layout layout) {
+            this.layout = layout;
+        }
+
     }
 }

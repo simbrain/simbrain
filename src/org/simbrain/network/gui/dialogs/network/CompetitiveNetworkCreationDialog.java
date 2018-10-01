@@ -19,12 +19,12 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel.CompetitivePropsPanelType;
-import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -55,10 +55,12 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
      */
     private CompetitivePropertiesPanel competitivePanel;
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * Layout panel.
      */
-    private MainLayoutPanel layoutPanel;
+    private AnnotatedPropertyEditor layoutPanel;
 
     /**
      * Network Panel.
@@ -72,7 +74,7 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
      */
     public CompetitiveNetworkCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         init();
     }
 
@@ -86,8 +88,7 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
 
         // Set up tab panels
         tabLogic.add(competitivePanel);
-        layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(new LineLayout());
+        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -108,7 +109,7 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
         CompetitiveNetwork competitiveNet = (CompetitiveNetwork) competitivePanel.getGroup();
         CompetitiveGroup competitive = competitiveNet.getCompetitive();
         layoutPanel.commitChanges();
-        competitive.setLayout(layoutPanel.getCurrentLayout());
+        competitive.setLayout(layoutObject.getLayout());
         competitive.applyLayout();
         competitiveNet.layoutNetwork(); // Must layout competitive net first
         networkPanel.getNetwork().addGroup(competitiveNet);

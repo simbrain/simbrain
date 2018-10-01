@@ -18,11 +18,9 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
@@ -106,10 +104,12 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private AnnotatedPropertyEditor combinedNeuronInfoPanel;
 
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+
     /**
      * A panel where layout settings can be edited.
      */
-    private MainLayoutPanel selectLayout;
+    private AnnotatedPropertyEditor selectLayout;
 
     /**
      * A panel for editing whether or not the neurons will be added as a group.
@@ -179,7 +179,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         addNeuronsPanel.add(Box.createVerticalStrut(10));
 
-        selectLayout = new MainLayoutPanel(DEFAULT_LAYOUT, true, this);
+        selectLayout = new AnnotatedPropertyEditor(layoutObject);
         selectLayout.setAlignmentX(CENTER_ALIGNMENT);
         addNeuronsPanel.add(selectLayout);
 
@@ -203,7 +203,7 @@ public class AddNeuronsDialog extends StandardDialog {
             for (int i = 0; i < number; i++) {
                 addedNeurons.add(new Neuron(net, baseNeuron));
             }
-            networkPanel.addNeuronsToPanel(addedNeurons, selectLayout.getCurrentLayout());
+            networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
         }
     }
 
@@ -216,7 +216,7 @@ public class AddNeuronsDialog extends StandardDialog {
         if (ng != null) {
             networkPanel.getNetwork().transferNeuronsToGroup(addedNeurons, ng);
             networkPanel.getNetwork().addGroup(ng);
-            ng.setLayout(selectLayout.getCurrentLayout());
+            ng.setLayout(layoutObject.getLayout());
             networkPanel.repaint();
         }
     }

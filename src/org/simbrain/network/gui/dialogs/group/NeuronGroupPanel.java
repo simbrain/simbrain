@@ -23,7 +23,6 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;

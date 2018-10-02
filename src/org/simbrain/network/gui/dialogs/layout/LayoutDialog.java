@@ -30,11 +30,6 @@ public class LayoutDialog extends StandardDialog {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The default initial layout.
-     */
-    private static final Layout DEFAULT_LAYOUT = new GridLayout();
-
-    /**
      * Layout to set.
      */
     private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
@@ -50,29 +45,17 @@ public class LayoutDialog extends StandardDialog {
     private final NetworkPanel networkPanel;
 
     /**
-     * Constructor for creating dialog.
+     * Constructor for creating independent dialog.
      *
      * @param networkPanel the networkPanel where layout will occur
      */
     public LayoutDialog(final NetworkPanel networkPanel) {
-        this(DEFAULT_LAYOUT, networkPanel);
-    }
-
-    /**
-     * Constructor for creating independent dialog.
-     *
-     * @param layout       the layout to show
-     * @param networkPanel the networkPanel where layout will occur
-     */
-    public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         mainPanel = new AnnotatedPropertyEditor(layoutObject);
         setContentPane(mainPanel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();

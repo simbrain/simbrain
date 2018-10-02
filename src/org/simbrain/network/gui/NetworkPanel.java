@@ -3178,7 +3178,7 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
         contextMenu.add(actionManager.getConnectionMenu());
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getLayoutMenu());
+        contextMenu.add(actionManager.getLayoutNeuronsAction());
         contextMenu.add(actionManager.getGroupMenu());
         contextMenu.addSeparator();
         // Add align and space menus if objects are selected

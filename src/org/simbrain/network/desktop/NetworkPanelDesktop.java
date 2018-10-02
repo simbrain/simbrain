@@ -135,7 +135,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getRandomizeObjectsAction());
         editMenu.add(actionManager.getShowAdjustSynapsesDialog());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getLayoutMenu());
+        editMenu.add(actionManager.getLayoutNeuronsAction());
         editMenu.add(actionManager.getGroupMenu());
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());

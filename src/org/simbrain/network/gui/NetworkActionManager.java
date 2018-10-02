@@ -229,7 +229,7 @@ public final class NetworkActionManager {
     /**
      * Layout types.
      */
-    private Action gridLayout, hexagonalLayout, lineLayout;
+    private Action layoutNeurons;
 
     /**
      * Whether weights should be shown or not.
@@ -374,9 +374,7 @@ public final class NetworkActionManager {
         radialSimple = new ApplyConnectionAction(networkPanel, new RadialSimple(), "Radial (Simple)");
         sparse = new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse");
 
-        gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
-        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(), networkPanel);
-        lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
+        layoutNeurons = new ShowLayoutDialogAction(networkPanel);
 
         setSourceNeuronsAction = new SetSourceNeurons(networkPanel);
         clearSourceNeuronsAction = new ClearSourceNeurons(networkPanel);
@@ -451,13 +449,6 @@ public final class NetworkActionManager {
     }
 
     /**
-     * @return a list of layout actions
-     */
-    public List<Action> getLayoutActions() {
-        return Arrays.asList(new Action[] {gridLayout, hexagonalLayout, lineLayout});
-    }
-
-    /**
      * Returns a menu of model group actions.
      *
      * @return the group menu
@@ -467,19 +458,6 @@ public final class NetworkActionManager {
         JMenu groupMenu = new JMenu("Group");
         groupMenu.add(neuronGroupAction);
         return groupMenu;
-    }
-
-    /**
-     * Returns a menu for setting neuron connections.
-     *
-     * @return the connection menu
-     */
-    public JMenu getLayoutMenu() {
-        JMenu layoutMenu = new JMenu("Layout");
-        for (Action action : getLayoutActions()) {
-            layoutMenu.add(action);
-        }
-        return layoutMenu;
     }
 
     /**
@@ -909,4 +887,10 @@ public final class NetworkActionManager {
     public Action getZoomToFitPageAction() {
         return zoomToFitPageAction;
     }
+
+    public Action getLayoutNeuronsAction() {
+        return layoutNeurons;
+    }
+
+
 }

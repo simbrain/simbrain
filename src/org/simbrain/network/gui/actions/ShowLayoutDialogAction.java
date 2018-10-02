@@ -25,20 +25,13 @@ import java.awt.event.ActionEvent;
 public class ShowLayoutDialogAction extends ConditionallyEnabledAction {
 
     /**
-     * The layout.
-     */
-    private Layout layout;
-
-    /**
      * Show layout dialog action.
      *
-     * @param layout       the layout type
      * @param networkPanel parent panel
      */
-    public ShowLayoutDialogAction(Layout layout, NetworkPanel networkPanel) {
-        super(networkPanel, layout.getDescription(), EnablingCondition.NEURONS);
-        this.layout = layout;
-        putValue(SHORT_DESCRIPTION, "Apply the " + layout.getDescription() + " layout to selected neurons");
+    public ShowLayoutDialogAction(NetworkPanel networkPanel) {
+        super(networkPanel, "Layout Neurons...",  EnablingCondition.NEURONS);
+        putValue(SHORT_DESCRIPTION, "Lay out the selected neurons");
     }
 
     /**
@@ -47,7 +40,7 @@ public class ShowLayoutDialogAction extends ConditionallyEnabledAction {
      */
     public void actionPerformed(ActionEvent e) {
         LayoutDialog dialog;
-        dialog = new LayoutDialog(layout, networkPanel);
+        dialog = new LayoutDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

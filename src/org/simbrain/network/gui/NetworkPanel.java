@@ -40,7 +40,7 @@ import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -2948,24 +2948,12 @@ public class NetworkPanel extends JPanel {
      * @return the dialog representing the neuron group node.
      */
     public StandardDialog getNeuronGroupDialog(final NeuronGroupNode node) {
-        @SuppressWarnings("serial") StandardDialog dialog = new StandardDialog() {
-            private final NeuronGroupPanel panel;
 
-            {
-                panel = NeuronGroupPanel.createNeuronGroupPanel(node.getNetworkPanel(), node.getNeuronGroup(), this);
-                setContentPane(panel);
-            }
-
-            @Override
-            protected void closeDialogOk() {
-                super.closeDialogOk();
-                panel.commitChanges();
-            }
-        };
-        dialog.setTitle("Neuron Group Dialog");
-        dialog.setAsDoneDialog();
-        dialog.setModalityType(Dialog.ModalityType.MODELESS);
-        return dialog;
+        NeuronGroupDialog ng = new NeuronGroupDialog(this, node.getNeuronGroup());
+        ng.setTitle("Neuron Group Dialog");
+        ng.setAsDoneDialog();
+        ng.setModalityType(Dialog.ModalityType.MODELESS);
+        return ng;
     }
 
     /**

@@ -69,6 +69,7 @@ public interface Layout extends CopyableObject {
         return getDescription();
     }
 
+    //TODO: A better name would be nice but we can't come up with one...
     /**
      * Layout wrapped for {@link AnnotatedPropertyEditor} to edit.
      */
@@ -79,6 +80,21 @@ public interface Layout extends CopyableObject {
          */
         @UserParameter(label = "Layout", isObjectType = true)
         private Layout layout = new LineLayout();
+
+        /**
+         * Construct with default line layout.
+         */
+        public LayoutObject() {
+        }
+
+        /**
+         * Contstruct with a specified layout.
+         *
+         * @param layout layout to use
+         */
+        public LayoutObject(Layout layout) {
+            this.layout = layout;
+        }
 
         public Layout getLayout() {
             return layout;

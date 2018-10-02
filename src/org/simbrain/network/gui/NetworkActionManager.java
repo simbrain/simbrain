@@ -36,11 +36,8 @@ import org.simbrain.network.gui.actions.synapse.*;
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.dialogs.network.*;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.LineLayout;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -492,7 +489,7 @@ public final class NetworkActionManager {
      * @return a list of the new neuron groups that can be inserted
      */
     public List<Action> getNewGroupActions() {
-        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, NeuronGroupCreationDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
+        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, NeuronGroupDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
     }
 
     /**

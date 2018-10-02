@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.actions.modelgroups;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
@@ -60,7 +60,7 @@ public final class AddGroupAction extends AbstractAction {
         }
 
         putValue(SHORT_DESCRIPTION, "Add " + name + " group to network");
-        if (dialogClass == NeuronGroupCreationDialog.class) {
+        if (dialogClass == NeuronGroupDialog.class) {
             networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('g'), this);
             networkPanel.getActionMap().put(this, this);
         }

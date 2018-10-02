@@ -90,8 +90,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     /**
      * The layout for the neurons in this group.
      */
-    @UserParameter(label = "Layout", isObjectType = true, tab = "Layout")
-    private Layout layout = DEFAULT_LAYOUT;
+    private Layout.LayoutObject layout = new Layout.LayoutObject();
 
     /**
      * Set of incoming synapse groups.
@@ -213,8 +212,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         }
         // Very slow to add to a copy on write array list so do it this way
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
-        layout.setInitialLocation(initialPosition);
-        layout.layoutNeurons(this.getNeuronList());
+        layout.getLayout().setInitialLocation(initialPosition);
+        layout.getLayout().layoutNeurons(this.getNeuronList());
         updateRule = getNeuronType();
         resetSubsamplingIndices();
     }
@@ -229,7 +228,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      */
     public NeuronGroup(final Network network, Point2D initialPosition) {
         super(network);
-        layout.setInitialLocation(initialPosition);
+        layout.getLayout().setInitialLocation(initialPosition);
         resetSubsamplingIndices();
     }
 
@@ -407,7 +406,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
 
     /**
      * Writes the activations of the network to a file. When
-     * {@link #startRecording()} is called, the group checks whether or not the
+     * startRecording is called, the group checks whether or not the
      * group is entirely populated by spiking neurons. If it is then this
      * methods writes the activations to a file as spike trains in [neuron
      * id][spk time] couplets. Otherwise it writes the neurons' activation
@@ -1137,20 +1136,20 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         }
     }
 
-    /**
-     * @return the layout
-     */
     public Layout getLayout() {
+        return layout.getLayout();
+    }
+
+    public Layout.LayoutObject getLayoutObject() {
         return layout;
     }
 
-    /**
-     * Set the layout. Does not apply it. Call apply layout for that.
-     *
-     * @param layout the layout to set
-     */
+    public void setLayoutObject(Layout.LayoutObject layoutObject) {
+        this.layout = layoutObject;
+    }
+
     public void setLayout(Layout layout) {
-        this.layout = layout;
+        this.layout.setLayout(layout);
     }
 
     /**
@@ -1203,8 +1202,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.setInitialLocation(getPosition());
-        layout.layoutNeurons(getNeuronList());
+        layout.getLayout().setInitialLocation(getPosition());
+        layout.getLayout().layoutNeurons(getNeuronList());
     }
 
     /**
@@ -1214,8 +1213,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * @param initialPosition the position from which to begin the layout.
      */
     public void applyLayout(Point2D initialPosition) {
-        layout.setInitialLocation(initialPosition);
-        layout.layoutNeurons(getNeuronList());
+        layout.getLayout().setInitialLocation(initialPosition);
+        layout.getLayout().layoutNeurons(getNeuronList());
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {

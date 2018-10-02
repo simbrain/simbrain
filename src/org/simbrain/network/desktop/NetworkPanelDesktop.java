@@ -32,7 +32,7 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -47,7 +47,6 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.CouplingMenu;
-import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -305,20 +304,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
         // only ever be one Simbrain Desktop?
         SimbrainDesktop current = SimbrainDesktop.getInstances().values().iterator().next();
-        @SuppressWarnings("serial") StandardDialog dialog = new StandardDialog(current.getFrame(), "Neuron Group Dialog") {
-            private final NeuronGroupPanel panel;
-
-            {
-                panel = NeuronGroupPanel.createNeuronGroupPanel(node.getNetworkPanel(), node.getNeuronGroup(), this);
-                setContentPane(panel);
-            }
-
-            @Override
-            protected void closeDialogOk() {
-                super.closeDialogOk();
-                panel.commitChanges();
-            }
-        };
+        NeuronGroupDialog dialog = new NeuronGroupDialog(this, node.getNeuronGroup());
         dialog.setAsDoneDialog();
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;

@@ -482,7 +482,7 @@ public final class NetworkActionManager {
      * @return a list of new networks that can be inserted
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, ESNCreationDialog.class, "Echo State Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
+        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
     }
 
     /**

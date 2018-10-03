@@ -160,7 +160,13 @@ public final class ConnectionPanel extends JPanel {
 
         commitSettings();
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
-
+        if (synapses.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Chosen connection" +
+                            " parameters resulted in no synapses being created." +
+                            "\nTry using different connection parameters.",
+                    "Warning: No Connections Created", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         //TODO: Consider moving the below to connection manager
         if (isCreation) {
             ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());

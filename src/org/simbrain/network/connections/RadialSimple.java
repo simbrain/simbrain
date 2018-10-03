@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.connections;
 
+
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -391,6 +392,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
     @Override
     public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
         this.network = network;
+        List<Synapse> createdSyns = new ArrayList<>();
         excNeurons = target.stream().filter(neuron -> neuron.getPolarity()
                 == SimbrainConstants.Polarity.EXCITATORY).collect(Collectors.toList());
         inhNeurons = target.stream().filter(neuron -> neuron.getPolarity()
@@ -399,10 +401,10 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                 == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
 
         for (Neuron src : source) {
-            makeExcitatory(src, null, true);
-            makeInhibitory(src, null, true);
+            makeExcitatory(src, createdSyns, true);
+            makeInhibitory(src, createdSyns, true);
         }
-        return null;
+        return createdSyns;
     }
 
     /**

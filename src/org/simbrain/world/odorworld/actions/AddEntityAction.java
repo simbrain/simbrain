@@ -55,7 +55,7 @@ public final class AddEntityAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         OdorWorldEntity entity = new OdorWorldEntity(worldPanel.getWorld());
         entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
-        entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), SmellSource.DecayFunction.GAUSSIAN, entity.getLocation()));
+        entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), SmellSource.DecayFunction.GAUSSIAN));
         worldPanel.getWorld().addEntity(entity);
     }
 }

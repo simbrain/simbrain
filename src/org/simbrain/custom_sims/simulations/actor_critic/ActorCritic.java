@@ -235,7 +235,7 @@ public class ActorCritic extends RegisteredSimulation {
         cheese = new OdorWorldEntity(world, OdorWorldEntity.EntityType.SWISS);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
-        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion, cheese.getCenterLocation()));
+        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion));
         world.addEntity(cheese);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();

@@ -22,6 +22,7 @@ import javafx.util.Pair;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.ScalarSmellSource;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -643,7 +644,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void setSmellSource(final SmellSource smellSource) {
         this.smellSource = smellSource;
-        smellSource.setLocation(this.getLocation());
     }
 
     /**
@@ -1137,9 +1137,25 @@ public class OdorWorldEntity implements EditableObject {
      * Add some default sensors and effectors to "agent" objects.
      */
     public void addDefaultSensorsEffectors() {
+        // TODO
+    }
 
-
-
+    /**
+     * Returns the smell, if any, associated with this object.
+     *
+     * @param sensorLocation location of the sensor detecting the smell of this object
+     * @return the smell vector, or null if the object is out of range or has no smell
+     */
+    public double[] getSmellVector(double[] sensorLocation) {
+        if (smellSource == null) {
+            return null;
+        }
+        double distanceToSensor = SimbrainMath.distance(getCenterLocation(), sensorLocation);
+        if(distanceToSensor < smellSource.getDispersion()) {
+            return smellSource.getStimulus(distanceToSensor);
+        } else {
+            return null;
+        }
     }
 
     // TODO: Put in all missing static objects

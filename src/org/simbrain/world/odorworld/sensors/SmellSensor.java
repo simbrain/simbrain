@@ -113,19 +113,16 @@ public class SmellSensor extends Sensor {
 
     @Override
     public void update() {
-        double[] temp = new double[currentValue.length];
+        currentValue = new double[currentValue.length];
         for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
-
             // Don't smell yourself
             if (entity != parent) {
-                SmellSource smell = entity.getSmellSource();
-                if (smell != null) {
-                    temp = SimbrainMath.addVector(temp, smell.getStimulus(SimbrainMath.distance(getLocation(),
-                        entity.getCenterLocation())));
+                double[] smell = entity.getSmellVector(getLocation());
+                if(smell != null) {
+                    currentValue = SimbrainMath.addVector(currentValue, smell);
                 }
             }
         }
-        currentValue = temp;
     }
 
     /**

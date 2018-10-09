@@ -363,7 +363,7 @@ public class OdorWorldEntity implements EditableObject {
         // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(parentWorld.getEffectorIDGenerator().getId());
-//        parentWorld.fireEffectorAdded(effector);
+        changeSupport.firePropertyChange("effectorAdded", null, effector);
     }
 
     /**
@@ -373,7 +373,8 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void removeEffector(final Effector effector) {
         effectors.remove(effector);
-//        parentWorld.fireEffectorRemoved(effector);
+        changeSupport.firePropertyChange("effectorRemoved", null, effector);
+
     }
 
     /**
@@ -390,7 +391,7 @@ public class OdorWorldEntity implements EditableObject {
             sensor.setId(parentWorld.getSensorIDGenerator().getId());
         }
 
-//       parentWorld.fireSensorAdded(sensor);
+        changeSupport.firePropertyChange("sensorAdded", null, sensor);
     }
 
     /**
@@ -432,7 +433,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void removeSensor(final Sensor sensor) {
         sensors.remove(sensor);
-//        parentWorld.fireSensorRemoved(sensor);
+        changeSupport.firePropertyChange("sensorRemoved", null, sensor);
     }
 
     /**

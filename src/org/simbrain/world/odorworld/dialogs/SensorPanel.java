@@ -21,12 +21,8 @@ package org.simbrain.world.odorworld.dialogs;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -118,10 +114,11 @@ public class SensorPanel extends JPanel {
             }
         });
         for (Sensor sensor : entity.getSensors()) {
-            model.addRow(sensor);
+            model.addSensor(sensor);
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
+
         JPanel buttonBar = new JPanel();
         JButton addSensor = new JButton("Add", ResourceManager.getImageIcon("plus.png"));
         addSensor.setToolTipText("Add sensor...");
@@ -164,6 +161,15 @@ public class SensorPanel extends JPanel {
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);
+
+        entity.addPropertyChangeListener(evt -> {
+            if ("sensorAdded".equals(evt.getPropertyName())) {
+                model.addSensor((Sensor) evt.getNewValue());
+            } else if ("sensorRemoved".equals(evt.getPropertyName())) {
+                model.removeSensor((Sensor) evt.getNewValue());
+            }
+        });
+
     }
 
     /**
@@ -232,7 +238,7 @@ public class SensorPanel extends JPanel {
          *
          * @param sensor
          */
-        public void addRow(Sensor sensor) {
+        public void addSensor(Sensor sensor) {
             data.add(sensor);
         }
 
@@ -245,30 +251,22 @@ public class SensorPanel extends JPanel {
             data.remove(row);
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public int getRowCount() {
             return data.size();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public Object getValueAt(int row, int col) {
             switch (col) {
                 case 0:
@@ -282,9 +280,7 @@ public class SensorPanel extends JPanel {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
                 case 0:
@@ -298,9 +294,7 @@ public class SensorPanel extends JPanel {
             this.fireTableDataChanged();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public boolean isCellEditable(int row, int col) {
             switch (col) {
                 case 0:
@@ -314,9 +308,7 @@ public class SensorPanel extends JPanel {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public Class getColumnClass(int col) {
             switch (col) {
                 case 0:

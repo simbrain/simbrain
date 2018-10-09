@@ -21,12 +21,9 @@ package org.simbrain.world.odorworld.dialogs;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.Speech;
-import org.simbrain.world.odorworld.effectors.StraightMovement;
-import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -124,7 +121,7 @@ public class EffectorPanel extends JPanel {
             }
         });
         for (Effector effector : entity.getEffectors()) {
-            model.addRow(effector);
+            model.addEffector(effector);
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -169,6 +166,14 @@ public class EffectorPanel extends JPanel {
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);
+
+        entity.addPropertyChangeListener(evt -> {
+            if ("effectorAdded".equals(evt.getPropertyName())) {
+                model.addEffector((Effector) evt.getNewValue());
+            } else if ("effectorRemoved".equals(evt.getPropertyName())) {
+                model.removeEffector((Effector) evt.getNewValue());
+            }
+        });
     }
 
     /**
@@ -238,7 +243,7 @@ public class EffectorPanel extends JPanel {
          *
          * @param effector
          */
-        public void addRow(Effector effector) {
+        public void addEffector(Effector effector) {
             data.add(effector);
         }
 
@@ -251,30 +256,22 @@ public class EffectorPanel extends JPanel {
             data.remove(row);
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public int getRowCount() {
             return data.size();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public Object getValueAt(int row, int col) {
             switch (col) {
                 case 0:
@@ -288,9 +285,7 @@ public class EffectorPanel extends JPanel {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
                 case 0:
@@ -304,9 +299,7 @@ public class EffectorPanel extends JPanel {
             this.fireTableDataChanged();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public boolean isCellEditable(int row, int col) {
             switch (col) {
                 case 0:
@@ -320,9 +313,7 @@ public class EffectorPanel extends JPanel {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public Class getColumnClass(int col) {
             switch (col) {
                 case 0:

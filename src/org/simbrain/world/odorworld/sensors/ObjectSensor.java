@@ -1,14 +1,16 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.environment.ScalarSmellSource;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Sensor that reacts when an object of a given type is near it.
+ * <br>
+ * While the smell framework involves objects emitting smells, object type
+ * sensors have a sensitivity, and are more "sensor" or "subject" based than
+ * object based.
  */
 public class ObjectSensor extends Sensor {
 
@@ -18,17 +20,28 @@ public class ObjectSensor extends Sensor {
     private double value = 0;
 
     /**
+     * "Sensitivity" of this sensor.  Detects objects of a given type in a
+     * radius of this many pixels.
+     */
+    @UserParameter(label = "Sensor Radius",
+        description = "Sensor detects objects of a given type in a radius of this many pixels",
+        order = 10)
+    double sensorRadius = 100;
+
+    // TODO: Add decay function
+
+    /**
      * The type of the object represented, e.g. Swiss.gif.
      */
     @UserParameter(label = "Object Type",
-            description = "What type of object this sensor responds to",
-            order = 5)
+        description = "What type of object this sensor responds to",
+        order = 5)
     private OdorWorldEntity.EntityType objectType = OdorWorldEntity.EntityType.SWISS;
 
     /**
      * Instantiate an object sensor.
      *
-     * @param parent parent entity
+     * @param parent     parent entity
      * @param objectType the type (e.g. Swiss.gif)
      */
     public ObjectSensor(OdorWorldEntity parent, OdorWorldEntity.EntityType objectType) {
@@ -48,11 +61,10 @@ public class ObjectSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
-            ScalarSmellSource smell = entity.getScalarSmell();
-            if(entity.getEntityType() == objectType) {
-                double distance = SimbrainMath.distance(parent.getCenterLocation(), entity.getCenterLocation());
-                value += smell.getValue(distance);
+        for (OdorWorldEntity entity : parent.getEntitiesInRadius(sensorRadius)) {
+            if (entity.getEntityType() == objectType) {
+                value = 1;
+                break;
             }
         }
     }
@@ -68,7 +80,8 @@ public class ObjectSensor extends Sensor {
     }
 
     /**
-     * Called by reflection to return a custom description for the {@link org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
+     * Called by reflection to return a custom description for the {@link
+     * org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
      * corresponding to object sensors.
      */
     public String getSensorDescription() {

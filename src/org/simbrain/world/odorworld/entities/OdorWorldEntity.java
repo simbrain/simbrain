@@ -20,7 +20,6 @@ package org.simbrain.world.odorworld.entities;
 
 import javafx.util.Pair;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.environment.ScalarSmellSource;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -30,7 +29,11 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import java.awt.geom.Line2D;
@@ -44,7 +47,9 @@ import java.util.stream.Collectors;
  */
 public class OdorWorldEntity implements EditableObject {
 
-    /** Support for property change events. */
+    /**
+     * Support for property change events.
+     */
     protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     @UserParameter(label = "Type", order = 2)
@@ -86,47 +91,7 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * Collision bound handling conditions
      */
-    private HashMap<String, List<Pair<String, String>>> collisionConditions = new HashMap<>(); {
-        // When checking collision on the right of this entity
-        collisionConditions.put("right",
-                List.of(
-                        // if the up bound of this entity is collided with the left of other entity,
-                        // it is a right collision
-                        new Pair<>("up", "left"),
-                        // if down bound of this and left bound of other
-                        new Pair<>("down", "left"),
-                        // if right bound of this and up bound of other
-                        new Pair<>("right", "up"),
-                        // etc.
-                        new Pair<>("right", "down")
-                )
-        );
-        collisionConditions.put("left",
-                List.of(
-                        new Pair<>("up", "right"),
-                        new Pair<>("down", "right"),
-                        new Pair<>("left", "up"),
-                        new Pair<>("left", "up")
-                )
-        );
-        collisionConditions.put("down",
-                List.of(
-                        new Pair<>("left", "up"),
-                        new Pair<>("right", "up"),
-                        new Pair<>("down", "left"),
-                        new Pair<>("down", "right")
-                )
-        );
-        collisionConditions.put("up",
-                List.of(
-                        new Pair<>("left", "down"),
-                        new Pair<>("right", "down"),
-                        new Pair<>("up", "left"),
-                        new Pair<>("up", "right")
-                )
-        );
-
-    }
+    private HashMap<String, List<Pair<String, String>>> collisionConditions = new HashMap<>();
 
     /**
      * X Velocity.
@@ -156,6 +121,9 @@ public class OdorWorldEntity implements EditableObject {
      */
     private double dtheta;
 
+    //TODO
+    private boolean manualControl;
+
     /**
      * Initial heading of agent.
      */
@@ -171,9 +139,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     @UserParameter(label = "Turn amount", order = 10)
     private double manualMotionTurnIncrement = 1;
-
-
-    private boolean manualControl;
 
     /**
      * Back reference to parent parentWorld.
@@ -201,11 +166,6 @@ public class OdorWorldEntity implements EditableObject {
     private SmellSource smellSource;
 
     /**
-     * "Scalar" smell source, associated with the type of this object.
-     */
-    private ScalarSmellSource scalarSmell = new ScalarSmellSource(1);
-
-    /**
      * Enable sensors. If not the agent is "blind."
      */
     @UserParameter(label = "Enable Sensors", order = 5)
@@ -220,6 +180,7 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * If true, show sensors.
      */
+    @UserParameter(label = "Show sensors", order = 30)
     private boolean showSensors = true;
 
     /**
@@ -252,111 +213,13 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     /**
-     * Check if this entity is colliding with other entity in a given direction
-     * @param direction direction can be "up", "down", "left", "right.
-     * @param other the other entity
-     * @return true if collided
-     */
-    public boolean collideOn(String direction, OdorWorldEntity other) {
-        for (Pair p : collisionConditions.get(direction)) {
-            if (collisionBounds.get(p.getKey()).intersectsLine(other.collisionBounds.get(p.getValue()))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if this entity is colliding with any entity in the world.
-     * @param direction direction can be "up", "down", "left", "right.
-     * @return true if collided
-     */
-    public boolean collideOn(String direction) {
-        for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
-            if (i != this) {
-                if (collideOn(direction, i)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gett all entities that are in the collision bound of this entity
-     * @return a list of entities in the collision bound.
-     */
-    public List<OdorWorldEntity> getEntitiesInCollisionRadius() {
-        return parentWorld.getEntityList().stream()
-                .filter(i -> isInRadius(i, collisionRadius + i.collisionRadius))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get all entities that are in the given radius
-     * @param radius the radius bound
-     * @return a list of entities in the given radius
-     */
-    public List<OdorWorldEntity> getEntitiesInRadius(double radius) {
-        return parentWorld.getEntityList().stream()
-                .filter(i -> isInRadius(i, radius))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Check if a given entity is in a radius of this entity.
-     * @param other the entity to check
-     * @param radius the radius
-     * @return true if the given entity is in radius
-     */
-    public boolean isInRadius(OdorWorldEntity other, double radius) {
-        if (other == this) {
-            return false;
-        }
-        double dx = x - other.x;
-        double dy = y - other.y;
-        return radius * radius > dx * dx + dy * dy;
-    }
-
-    /**
      * Updates this OdorWorldEntity's Animation and its position based on the
      * velocity.
      */
     public void update() {
         updateCollisionBound();
         if (!manualControl) {
-            // Very simple motion
-            if (dx != 0) {
-                boolean collided = false;
-                if (dx > 0) {
-                    collided = collideOn("right");
-                } else {
-                    collided = collideOn("left");
-                }
-
-                if (!collided) {
-                    setX(x + dx);
-                }
-            }
-            if (dy != 0) {
-                boolean collided = false;
-                if (dy > 0) {
-                    collided = collideOn("down");
-                } else {
-                    collided = collideOn("up");
-                }
-                if (!collided) {
-                    setY(y + dy);
-                }
-            }
-            if (dtheta != 0) {
-                setHeading(heading + dtheta);
-                double dthetaRad = Math.toRadians(-dtheta);
-                double dx2 = Math.cos(dthetaRad) * dx - Math.sin(dthetaRad) * dy;
-                double dy2 = Math.sin(dthetaRad) * dx + Math.cos(dthetaRad) * dy;
-                dx = dx2;
-                dy = dy2;
-            }
+            simpleMotion();
         }
 
         updateSensors();
@@ -369,6 +232,43 @@ public class OdorWorldEntity implements EditableObject {
 
         changeSupport.firePropertyChange("updated", null, this);
 
+    }
+
+    /**
+     * Simple motion control.
+     */
+    private void simpleMotion() {
+        if (dx != 0) {
+            boolean collided = false;
+            if (dx > 0) {
+                collided = collideOn("right");
+            } else {
+                collided = collideOn("left");
+            }
+
+            if (!collided) {
+                setX(x + dx);
+            }
+        }
+        if (dy != 0) {
+            boolean collided = false;
+            if (dy > 0) {
+                collided = collideOn("down");
+            } else {
+                collided = collideOn("up");
+            }
+            if (!collided) {
+                setY(y + dy);
+            }
+        }
+        if (dtheta != 0) {
+            setHeading(heading + dtheta);
+            double dthetaRad = Math.toRadians(-dtheta);
+            double dx2 = Math.cos(dthetaRad) * dx - Math.sin(dthetaRad) * dy;
+            double dy2 = Math.sin(dthetaRad) * dx + Math.cos(dthetaRad) * dy;
+            dx = dx2;
+            dy = dy2;
+        }
     }
 
     /**
@@ -496,7 +396,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void setId(String id) {
         this.id = id;
-        if(name == null) {
+        if (name == null) {
             name = id;
         }
     }
@@ -663,8 +563,6 @@ public class OdorWorldEntity implements EditableObject {
         return new double[] {getCenterX(), getCenterY()};
     }
 
-
-    //TODO: Remove
     /**
      * Returns the center x position of this entity.
      *
@@ -696,19 +594,12 @@ public class OdorWorldEntity implements EditableObject {
         this.y = y;
     }
 
-    public boolean isManualControl() {
-        return manualControl;
-    }
-
-    public void setManualControl(boolean manualControl) {
-        this.manualControl = manualControl;
-    }
-
     /**
      * Returns the location of the entity as a double array.
      *
      * @return location of the entity.
      */
+    //TODO: Remove
     @Producible(idMethod = "getId")
     public double[] getLocation() {
         return new double[] {x, y};
@@ -720,6 +611,7 @@ public class OdorWorldEntity implements EditableObject {
      * @param x x coordinate
      * @param y y coordinate
      */
+    //TODO: Remove
     public void setLocation(double x, double y) {
         setX(x);
         setY(y);
@@ -856,23 +748,25 @@ public class OdorWorldEntity implements EditableObject {
             if (this.isRotating()) {
                 this.setHeading(0);
             }
-            setX(x +  amount);
+            setX(x + amount);
         }
     }
 
     public void goNorth() {
         moveNorth(manualStraightMovementIncrement);
     }
+
     public void goSouth() {
         moveSouth(manualStraightMovementIncrement);
     }
+
     public void goEast() {
         moveEast(manualStraightMovementIncrement);
     }
+
     public void goWest() {
         moveWest(manualStraightMovementIncrement);
     }
-
 
     /**
      * Move the object west by the specified amount in pixels.
@@ -885,7 +779,7 @@ public class OdorWorldEntity implements EditableObject {
             if (this.isRotating()) {
                 setHeading(180);
             }
-            setX(x -  amount);
+            setX(x - amount);
         }
     }
 
@@ -896,7 +790,6 @@ public class OdorWorldEntity implements EditableObject {
         if (smellSource != null) {
             smellSource.update();
         }
-        scalarSmell.update();
     }
 
     /**
@@ -915,12 +808,9 @@ public class OdorWorldEntity implements EditableObject {
         return currentlyHeardPhrases;
     }
 
-    public ScalarSmellSource getScalarSmell() {
-        return scalarSmell;
-    }
-
     /**
      * Update the entity type of this entity.
+     *
      * @param entityType the entity type
      */
     public void setEntityType(EntityType entityType) {
@@ -951,35 +841,37 @@ public class OdorWorldEntity implements EditableObject {
             collisionBounds.put("right", new Line2D.Double());
         }
         collisionBounds.get("up").setLine(
-                x + dx,
-                y,
-                x + entityType.imageWidth + dx,
-                y
+            x + dx,
+            y,
+            x + entityType.imageWidth + dx,
+            y
         );
         collisionBounds.get("down").setLine(
-                x + dx,
-                y + entityType.imageHeight,
-                x + entityType.imageWidth + dx,
-                y + entityType.imageHeight
+            x + dx,
+            y + entityType.imageHeight,
+            x + entityType.imageWidth + dx,
+            y + entityType.imageHeight
         );
         collisionBounds.get("left").setLine(
-                x,
-                y + dy,
-                x,
-                y + entityType.imageHeight + dy
+            x,
+            y + dy,
+            x,
+            y + entityType.imageHeight + dy
         );
         collisionBounds.get("right").setLine(
-                x + entityType.imageWidth,
-                y + dy,
-                x + entityType.imageWidth,
-                y + entityType.imageHeight + dy
+            x + entityType.imageWidth,
+            y + dy,
+            x + entityType.imageWidth,
+            y + entityType.imageHeight + dy
         );
     }
 
     // TODO: Make finer grained. entityTypeChange?
     public void commitEditorChanges() {
         changeSupport.firePropertyChange("propertiesChanged", null, this);
-    };
+    }
+
+    ;
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
@@ -1111,20 +1003,24 @@ public class OdorWorldEntity implements EditableObject {
     public void goStraight() {
         double radians = getHeadingRadians();
         dx = manualStraightMovementIncrement * Math.cos(radians);
-        dy = - manualStraightMovementIncrement * Math.sin(radians);
+        dy = -manualStraightMovementIncrement * Math.sin(radians);
     }
+
     public void goBackwards() {
         double radians = getHeadingRadians();
-        dx = - manualStraightMovementIncrement * Math.cos(radians);
+        dx = -manualStraightMovementIncrement * Math.cos(radians);
         dy = manualStraightMovementIncrement * Math.sin(radians);
 
     }
+
     public void turnLeft() {
         dtheta = manualMotionTurnIncrement;
     }
+
     public void turnRight() {
-        dtheta = - manualMotionTurnIncrement;
+        dtheta = -manualMotionTurnIncrement;
     }
+
     public void stopTurning() {
         dtheta = 0;
     }
@@ -1134,46 +1030,144 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     /**
-     * Add some default sensors and effectors to "agent" objects.
+     * Add some default sensors and effectors.
      */
     public void addDefaultSensorsEffectors() {
-        // TODO
+
+        // Rotating entities are currently a proxy for "agents", though any object
+        // can have sensors and effectors
+        if (entityType.isRotating) {
+            // Add default effectors
+            addEffector(new StraightMovement(this,
+                "Go-straight"));
+            addEffector(new Turning(this, "Go-left",
+                Turning.LEFT));
+            addEffector(new Turning(this, "Go-right",
+                Turning.RIGHT));
+
+            // Add default sensors
+            addSensor(new SmellSensor(this, "Smell-Left", Math.PI / 8,
+                50));
+            addSensor(new SmellSensor(this, "Smell-Center", 0, 0));
+            addSensor(new SmellSensor(this, "Smell-Right",
+                -Math.PI / 8, 50));
+
+            // Add an object sensor
+            addSensor(new ObjectSensor(this, EntityType.SWISS));
+        }
     }
 
     /**
      * Returns the smell, if any, associated with this object.
      *
-     * @param sensorLocation location of the sensor detecting the smell of this object
-     * @return the smell vector, or null if the object is out of range or has no smell
+     * @param sensorLocation location of the sensor detecting the smell of this
+     *                       object
+     * @return the smell vector, or null if the object is out of range or has no
+     * smell
      */
     public double[] getSmellVector(double[] sensorLocation) {
         if (smellSource == null) {
             return null;
         }
         double distanceToSensor = SimbrainMath.distance(getCenterLocation(), sensorLocation);
-        if(distanceToSensor < smellSource.getDispersion()) {
+        if (distanceToSensor < smellSource.getDispersion()) {
             return smellSource.getStimulus(distanceToSensor);
         } else {
             return null;
         }
     }
 
+    /**
+     * Check if this entity is colliding with other entity in a given direction.
+     *
+     * @param direction direction can be "up", "down", "left", "right.
+     * @param other     the other entity
+     * @return true if collided
+     */
+    public boolean collideOn(String direction, OdorWorldEntity other) {
+        for (Pair p : collisionConditions.get(direction)) {
+            if (collisionBounds.get(p.getKey()).intersectsLine(other.collisionBounds.get(p.getValue()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if this entity is colliding with any entity in the world.
+     *
+     * @param direction direction can be "up", "down", "left", "right.
+     * @return true if collided
+     */
+    public boolean collideOn(String direction) {
+        for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
+            if (i != this) {
+                if (collideOn(direction, i)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all entities that are in the collision bound of this entity.
+     *
+     * @return a list of entities in the collision bound.
+     */
+    public List<OdorWorldEntity> getEntitiesInCollisionRadius() {
+        return parentWorld.getEntityList().stream()
+            .filter(i -> isInRadius(i, collisionRadius + i.collisionRadius))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all entities that are in the given radius.
+     *
+     * @param radius the radius bound
+     * @return a list of entities in the given radius
+     */
+    public List<OdorWorldEntity> getEntitiesInRadius(double radius) {
+        return parentWorld.getEntityList().stream()
+            .filter(i -> isInRadius(i, radius))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Check if a given entity is in a radius of this entity.
+     *
+     * @param other  the entity to check
+     * @param radius the radius
+     * @return true if the given entity is in radius
+     */
+    public boolean isInRadius(OdorWorldEntity other, double radius) {
+        if (other == this) {
+            return false;
+        }
+        double dx = x - other.x;
+        double dy = y - other.y;
+        return radius * radius > dx * dx + dy * dy;
+    }
+
+
     // TODO: Put in all missing static objects
     // TODO: Move to separate class?
-    /** Type of this object.  These are mapped to images, etc. */
+    /**
+     * Type of this object.  These are mapped to images, etc.
+     */
     public enum EntityType {
-        SWISS  ("Swiss",  false, false, false, 32, 32),
-        FLOWER ("Flower", false, false, false, 32, 32),
-        MOUSE  ("Mouse",   true,  true,  true, 40, 40),
-        AMY    ("Amy",     true,  true,  true, 96, 96),
-        ARNO   ("Arno",    true,  true,  true, 96, 96),
-        BOY    ("Boy",     true,  true,  true, 96, 96),
-        COW    ("Cow",     true,  true,  true, 96, 96),
-        GIRL   ("Girl",    true,  true,  true, 96, 96),
-        JAKE   ("Jake",    true,  true,  true, 96, 96),
-        LION   ("Lion",    true,  true,  true, 96, 96),
-        STEVE  ("Steve",   true,  true,  true, 96, 96),
-        SUSI   ("Susi",    true,  true,  true, 96, 96);
+        SWISS("Swiss", false, false, false, 32, 32),
+        FLOWER("Flower", false, false, false, 32, 32),
+        MOUSE("Mouse", true, true, true, 40, 40),
+        AMY("Amy", true, true, true, 96, 96),
+        ARNO("Arno", true, true, true, 96, 96),
+        BOY("Boy", true, true, true, 96, 96),
+        COW("Cow", true, true, true, 96, 96),
+        GIRL("Girl", true, true, true, 96, 96),
+        JAKE("Jake", true, true, true, 96, 96),
+        LION("Lion", true, true, true, 96, 96),
+        STEVE("Steve", true, true, true, 96, 96),
+        SUSI("Susi", true, true, true, 96, 96);
 
         /**
          * String description that shows up in dialog boxes.
@@ -1203,12 +1197,12 @@ public class OdorWorldEntity implements EditableObject {
          * Create the entity
          */
         EntityType(
-                String description,
-                boolean isRotating,
-                boolean sensors,
-                boolean effectors,
-                int imageWidth,
-                int imageHeight
+            String description,
+            boolean isRotating,
+            boolean sensors,
+            boolean effectors,
+            int imageWidth,
+            int imageHeight
         ) {
             this.description = description;
             this.isRotating = isRotating;
@@ -1226,4 +1220,47 @@ public class OdorWorldEntity implements EditableObject {
     }
 
 
+    // Intializer
+    {
+        // When checking collision on the right of this entity
+        collisionConditions.put("right",
+            List.of(
+                // if the up bound of this entity is collided with the left of other entity,
+                // it is a right collision
+                new Pair<>("up", "left"),
+                // if down bound of this and left bound of other
+                new Pair<>("down", "left"),
+                // if right bound of this and up bound of other
+                new Pair<>("right", "up"),
+                // etc.
+                new Pair<>("right", "down")
+            )
+        );
+        collisionConditions.put("left",
+            List.of(
+                new Pair<>("up", "right"),
+                new Pair<>("down", "right"),
+                new Pair<>("left", "up"),
+                new Pair<>("left", "up")
+            )
+        );
+        collisionConditions.put("down",
+            List.of(
+                new Pair<>("left", "up"),
+                new Pair<>("right", "up"),
+                new Pair<>("down", "left"),
+                new Pair<>("down", "right")
+            )
+        );
+        collisionConditions.put("up",
+            List.of(
+                new Pair<>("left", "down"),
+                new Pair<>("right", "down"),
+                new Pair<>("up", "left"),
+                new Pair<>("up", "right")
+            )
+        );
+
+    }
+    
 }

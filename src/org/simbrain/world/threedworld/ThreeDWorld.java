@@ -64,7 +64,7 @@ public class ThreeDWorld implements AppState {
     public ThreeDWorld() {
         initialized = false;
         engine = new ThreeDEngine();
-        engine.initialize();
+        engine.initialize(); // TODO: This was added to force a call. Not sure the correct way to make sure this called.
         engine.getStateManager().attach(this);
         cameraController = new CameraController(this);
         selectionController = new SelectionController(this);

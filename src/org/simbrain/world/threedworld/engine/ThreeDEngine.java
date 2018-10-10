@@ -230,10 +230,10 @@ public class ThreeDEngine extends LegacyApplication {
     @Override
     public void initialize() {
         try {
-            System.out.println("initalizestart-->" + Thread.currentThread().getContextClassLoader() );
+
+            System.out.println("initialize(begin):" + Thread.currentThread().getContextClassLoader() );
 
             super.initialize();
-
 
             String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
             getAssetManager().registerLocator(rootDirectory, FileLocator.class);
@@ -257,9 +257,8 @@ public class ThreeDEngine extends LegacyApplication {
             updateSync = false;
             setState(State.RunAll);
             update();
-            System.out.println("initalizeend-->" + Thread.currentThread().getContextClassLoader() );
+            System.out.println("initialize(End): " + Thread.currentThread().getContextClassLoader() );
 
-            // TODO: Reinstate. Currently produces
             // java.lang.UnsatisfiedLinkError: com.jme3.bullet.PhysicsSpace.createPhysicsSpace(FFFFFFIZ)
             getStateManager().attach(bulletAppState);
 

@@ -19,6 +19,7 @@
 package org.simbrain.workspace.actions;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -49,33 +50,14 @@ public final class OpenCouplingListAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Open coupling list");
     }
 
-    /**
-     * @param event Action event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Coupling List");
-        //JComponent cl = new CouplingListPanel(desktop, new Vector(
-        //        desktop.getWorkspace().getCouplingManager().getCouplings()));
-        // JComponent cl = new AttributePanel(desktop);
-        MyGlassPane pane = new MyGlassPane();
-        //frame.setContentPane(cl);
-        frame.setGlassPane(pane);
+        CouplingListPanel cpl = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
+        frame.setContentPane(cpl);
         frame.pack();
-        pane.repaint();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
     }
 
-    /**
-     * Class for creating a glass pane. Used for when no data is available.
-     */
-    class MyGlassPane extends JComponent {
-        public void paint(Graphics g) {
-            g.setColor(Color.red);
-            g.fillRect(0, 0, 100, 100);
-            System.out.println("Inside Paint Method");
-        }
-    }
 }

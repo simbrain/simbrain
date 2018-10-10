@@ -70,9 +70,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             CouplingListPanel.this.getActionMap().put(this, this);
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             desktop.getWorkspace().removeCouplings(getSelectedCouplings());
         }
@@ -87,6 +85,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      */
     public CouplingListPanel(SimbrainDesktop desktop, List<Coupling<?>> couplingList) {
         super(new BorderLayout());
+        System.out.println("CouplingListPanel.CouplingListPanel");
 
         // Reference to the simbrain desktop
         this.desktop = desktop;

@@ -23,6 +23,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.gui.EntityNode;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -81,8 +83,28 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     private void init() {
         world.addPropertyChangeListener(evt -> {
+            // Add / remove entities
             if ("entityAdded".equals(evt.getPropertyName())) {
-                fireModelAdded(evt.getNewValue());
+                OdorWorldEntity entity = (OdorWorldEntity) evt.getNewValue();
+                fireModelAdded(entity);
+
+                // Add / remove sensors to an entity
+                entity.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent entityEvent) {
+                        if ("sensorAdded".equals(entityEvent.getPropertyName())
+                            || "effectorAdded".equals(entityEvent.getPropertyName())
+                        )
+                        {
+                            fireModelAdded(entityEvent.getNewValue());
+                        } else if ("sensorRemoved".equals(entityEvent.getPropertyName())
+                            || "effectorRemoved".equals(entityEvent.getPropertyName())
+                        )
+                        {
+                            fireModelRemoved(entityEvent.getNewValue());
+                        }
+                    }
+                });
             }
             if ("entityDeleted".equals(evt.getPropertyName())) {
                 fireModelRemoved(evt.getNewValue());
@@ -151,7 +173,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             public void run() {
                 world.advance();
             }
-        },50, 50);
+        }, 50, 50);
     }
 
     @Override

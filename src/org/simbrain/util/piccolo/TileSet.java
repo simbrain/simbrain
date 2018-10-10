@@ -61,16 +61,16 @@ public class TileSet {
     /**
      * The tileset image
      */
-    private BufferedImage image = null;
+    private transient BufferedImage image = null;
 
     /**
      * The path to the image.
      */
     private String imagePath = "";
 
-    private BufferedImage missingTexture = null;
+    private transient BufferedImage missingTexture = null;
 
-    private BufferedImage transparentTexture = null;
+    private transient BufferedImage transparentTexture = null;
 
     /**
      * Create a tileset from one element of a Tilemap.

@@ -1060,6 +1060,8 @@ public class Network {
 
         fireUpdates = true;
 
+        changeSupport = new PropertyChangeSupport(this);
+
         // Initialize listener lists
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();

@@ -35,7 +35,7 @@ public class TileMapLayer {
     /**
      * The rendered image of the layer
      */
-    private PImage layer = null;
+    private transient PImage layer = null;
 
 
     public TileMapLayer(Element layer) {

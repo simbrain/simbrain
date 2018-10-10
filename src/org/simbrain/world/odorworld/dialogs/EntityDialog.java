@@ -63,8 +63,6 @@ public class EntityDialog extends StandardDialog {
     public EntityDialog(final OdorWorldEntity we) {
         entityRef = we;
         init();
-        this.pack();
-        this.setLocationRelativeTo(null);
     }
 
     /**

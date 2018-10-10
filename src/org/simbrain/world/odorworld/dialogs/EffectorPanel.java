@@ -57,11 +57,6 @@ public class EffectorPanel extends JPanel {
     private EffectorModel model;
 
     /**
-     * The parent entity.
-     */
-    private OdorWorldEntity entity;
-
-    /**
      * The selected effector to edit. If more than one effector is selected in
      * the table, this is the first selected row.
      */
@@ -155,7 +150,6 @@ public class EffectorPanel extends JPanel {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                model.fireTableDataChanged();
             }
         });
         editEffector.addActionListener(new ActionListener() {
@@ -187,16 +181,12 @@ public class EffectorPanel extends JPanel {
             return;
         }
 
-        StandardDialog dialog = new StandardDialog();
-        dialog.setTitle("Edit Effector");
         AnnotatedPropertyEditor effectorPanel = new AnnotatedPropertyEditor(effector);
-        dialog.setContentPane(effectorPanel);
+        StandardDialog dialog = effectorPanel.getDialog();
+        dialog.setTitle("Edit Effector");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            effectorPanel.commitChanges();
-        }
     }
 
     /**
@@ -245,15 +235,7 @@ public class EffectorPanel extends JPanel {
          */
         public void addEffector(Effector effector) {
             data.add(effector);
-        }
-
-        /**
-         * Remove a row
-         *
-         * @param row
-         */
-        public void removeRow(int row) {
-            data.remove(row);
+            model.fireTableDataChanged();
         }
 
         @Override

@@ -1262,5 +1262,5 @@ public class OdorWorldEntity implements EditableObject {
         );
 
     }
-    
+
 }

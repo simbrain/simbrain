@@ -57,6 +57,5 @@ public final class ShowEntityDialogAction extends AbstractAction {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
     }
 }

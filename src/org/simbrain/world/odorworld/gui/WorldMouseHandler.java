@@ -155,7 +155,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 EntityNode entityNode = (EntityNode) node.getParent();
                 // Edit odor world entity properties
                 EntityDialog dialog = new EntityDialog(entityNode.getEntity());
-                dialog.setModal(true);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);

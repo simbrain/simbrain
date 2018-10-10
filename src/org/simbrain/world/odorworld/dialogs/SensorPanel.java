@@ -23,6 +23,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.threedworld.entities.EditorDialog;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -149,7 +150,6 @@ public class SensorPanel extends JPanel {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                model.fireTableDataChanged();
             }
         });
         editSensor.addActionListener(new ActionListener() {
@@ -182,16 +182,12 @@ public class SensorPanel extends JPanel {
             return;
         }
 
-        StandardDialog dialog = new StandardDialog();
-        dialog.setTitle("Edit Sensor");
         AnnotatedPropertyEditor sensorPanel = new AnnotatedPropertyEditor(sensor);
-        dialog.setContentPane(sensorPanel);
+        StandardDialog dialog = sensorPanel.getDialog();
+        dialog.setTitle("Edit Sensor");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            sensorPanel.commitChanges();
-        }
     }
 
     /**
@@ -240,15 +236,7 @@ public class SensorPanel extends JPanel {
          */
         public void addSensor(Sensor sensor) {
             data.add(sensor);
-        }
-
-        /**
-         * Remove a row.
-         *
-         * @param row
-         */
-        public void removeRow(int row) {
-            data.remove(row);
+            model.fireTableDataChanged();
         }
 
         @Override

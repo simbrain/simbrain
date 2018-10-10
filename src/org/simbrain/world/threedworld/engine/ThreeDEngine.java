@@ -1,5 +1,6 @@
 package org.simbrain.world.threedworld.engine;
 
+import com.jme3.app.LegacyApplication;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioContext;
@@ -21,7 +22,7 @@ import java.util.concurrent.Future;
  * ThreeDEngine is a modification of jme3 SimpleApplication to provide
  * greater control over the update cycle, input mapping, and root node.
  */
-public class ThreeDEngine extends SimpleApplication {
+public class ThreeDEngine extends LegacyApplication {
     /**
      * ThreeDEngine.State is an enumeration to control the update cycle
      * of ThreeDEngine.
@@ -77,9 +78,8 @@ public class ThreeDEngine extends SimpleApplication {
         bulletAppState = new BulletAppState();
         bulletAppState.setEnabled(false);
 
-        // TODO: Reinstate. Currently produces
-        // java.lang.UnsatisfiedLinkError: com.jme3.bullet.PhysicsSpace.createPhysicsSpace(FFFFFFIZ)
-        //getStateManager().attach(bulletAppState);
+        System.out.println(Thread.currentThread().getContextClassLoader() );
+
     }
 
     /**
@@ -118,6 +118,7 @@ public class ThreeDEngine extends SimpleApplication {
      *              the state change is asynchronous.
      */
     public void queueState(State value, boolean wait) {
+
         enqueue(() -> {
             setState(value);
         }, wait);
@@ -229,7 +230,10 @@ public class ThreeDEngine extends SimpleApplication {
     @Override
     public void initialize() {
         try {
+            System.out.println("initalizestart-->" + Thread.currentThread().getContextClassLoader() );
+
             super.initialize();
+
 
             String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
             getAssetManager().registerLocator(rootDirectory, FileLocator.class);
@@ -253,14 +257,25 @@ public class ThreeDEngine extends SimpleApplication {
             updateSync = false;
             setState(State.RunAll);
             update();
+            System.out.println("initalizeend-->" + Thread.currentThread().getContextClassLoader() );
+
+            // TODO: Reinstate. Currently produces
+            // java.lang.UnsatisfiedLinkError: com.jme3.bullet.PhysicsSpace.createPhysicsSpace(FFFFFFIZ)
+            getStateManager().attach(bulletAppState);
+
+
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Failed to initialize 3D World.");
             setState(State.SystemPause);
         }
+
     }
 
     @Override
     public void update() {
+        System.out.println("update-->" + Thread.currentThread().getContextClassLoader() );
+
         try {
             runQueuedTasks();
         } catch (RuntimeException ex) {
@@ -310,10 +325,6 @@ public class ThreeDEngine extends SimpleApplication {
         }
     }
 
-    @Override
-    public void simpleInitApp() {
-
-    }
 
     /**
      * Synchronize the engine update to an external update cycle. This should

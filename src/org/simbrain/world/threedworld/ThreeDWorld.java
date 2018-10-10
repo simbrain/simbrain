@@ -64,6 +64,7 @@ public class ThreeDWorld implements AppState {
     public ThreeDWorld() {
         initialized = false;
         engine = new ThreeDEngine();
+        engine.initialize();
         engine.getStateManager().attach(this);
         cameraController = new CameraController(this);
         selectionController = new SelectionController(this);
@@ -75,6 +76,7 @@ public class ThreeDWorld implements AppState {
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         idCounter = new AtomicInteger();
+
     }
 
     /**

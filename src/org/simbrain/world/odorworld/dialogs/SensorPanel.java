@@ -282,19 +282,19 @@ public class SensorPanel extends JPanel {
             this.fireTableDataChanged();
         }
 
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            switch (col) {
-                case 0:
-                    return false;
-                case 1:
-                    return true;
-                case 2:
-                    return false;
-                default:
-                    return false;
-            }
-        }
+//        @Override
+//        public boolean isCellEditable(int row, int col) {
+//            switch (col) {
+//                case 0:
+//                    return false;
+//                case 1:
+//                    return true;
+//                case 2:
+//                    return false;
+//                default:
+//                    return false;
+//            }
+//        }
 
         @Override
         public Class getColumnClass(int col) {

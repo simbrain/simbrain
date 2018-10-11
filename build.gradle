@@ -26,9 +26,10 @@ sourceSets {
     }
 }
 
-// https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
 compileJava {
+    // https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
     options.compilerArgs += '-proc:none'
+    options.encoding = 'UTF-8'
 }
 
 task pathingJar(type: Jar) {

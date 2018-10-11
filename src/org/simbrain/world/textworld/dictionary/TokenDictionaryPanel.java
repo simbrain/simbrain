@@ -44,7 +44,7 @@ import java.util.Set;
  *
  * @author Jeff Yoshimi
  */
-public class TokenDictionaryPanel extends JPanel {
+public class TokenDictionaryPanel extends EditablePanel {
 
     /**
      * The display or reader world.
@@ -178,11 +178,13 @@ public class TokenDictionaryPanel extends JPanel {
         }
     }
 
-    public void commitChanges() {
+    @Override
+    public boolean commitChanges() {
         if (world instanceof DisplayWorld) {
             ((DisplayWorld) world).setDisplayThreshold(Double.parseDouble(thresholdField.getText()));
         }
         world.loadTokenDictionary(table.getData().asStringArray());
+        return true;
     }
 
     /**

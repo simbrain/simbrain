@@ -23,6 +23,9 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <b>DisplayComponent</b> is a component which wraps a display world with
@@ -132,21 +135,13 @@ public class DisplayComponent extends WorkspaceComponent {
     //    }
 
     /**
-     * {@inheritDoc}
-     *
-     * @param input
-     * @param name
-     * @param format
-     * @return
+     * {@inheritDoc}.
      */
     public static DisplayComponent open(InputStream input, String name, String format) {
         DisplayWorld newWorld = (DisplayWorld) DisplayWorld.getXStream().fromXML(input);
         return new DisplayComponent(name, newWorld);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         world.preSaveInit();
@@ -155,7 +150,6 @@ public class DisplayComponent extends WorkspaceComponent {
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -173,6 +167,15 @@ public class DisplayComponent extends WorkspaceComponent {
     @Override
     public Object getObjectFromKey(String objectKey) {
         return world;
+    }
+
+    @Override
+    public List<Object> getModels() {
+        List<Object> retList = new ArrayList<Object>();
+        retList.add(world);
+        //retList.addAll(world.get);
+        return retList;
+
     }
 
     /**

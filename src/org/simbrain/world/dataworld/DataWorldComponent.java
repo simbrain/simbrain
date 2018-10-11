@@ -70,57 +70,6 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     /**
-     * TableColumn writes to a specific column of the outer DataWorld.
-     */
-    public class TableColumn {
-
-        /**
-         * The index of the column.
-         */
-        private int index;
-
-        /**
-         * Construct a TableColumn.
-         *
-         * @param index index of the column to set.
-         */
-        public TableColumn(int index) {
-            this.index = index;
-        }
-
-        /**
-         * Return the id of the column.
-         */
-        public String getId() {
-            return "Column" + index;
-        }
-
-        /**
-         * Return the index of the column.
-         */
-        public int getIndex() {
-            return index;
-        }
-
-        /**
-         * Return the value of the current cell of the column.
-         */
-        @Producible(idMethod = "getId")
-        public double getValue() {
-            return dataTable.getValueCurrentRow(index);
-        }
-
-        /**
-         * Set the value of the current cell of the column.
-         */
-        @Consumable(idMethod = "getId")
-        public void setValue(double value) {
-            dataTable.setValueCurrentRow(index, value);
-        }
-
-    }
-
-    /**
      * Table model.
      */
     private NumericTable dataTable;
@@ -128,7 +77,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     /**
      * List of columns in the table.
      */
-    private List<TableColumn> columns;
+    private List<TableColumn> columns = new ArrayList<>();
 
     /**
      * Construct data world from a model. Used (for example) in deserializing.
@@ -233,4 +182,54 @@ public class DataWorldComponent extends WorkspaceComponent {
         return dataTable.getVectorCurrentRow();
     }
 
+    /**
+     * TableColumn writes to a specific column of the outer DataWorld.
+     */
+    public class TableColumn {
+
+        /**
+         * The index of the column.
+         */
+        private int index;
+
+        /**
+         * Construct a TableColumn.
+         *
+         * @param index index of the column to set.
+         */
+        public TableColumn(int index) {
+            this.index = index;
+        }
+
+        /**
+         * Return the id of the column.
+         */
+        public String getId() {
+            return "Column" + index;
+        }
+
+        /**
+         * Return the index of the column.
+         */
+        public int getIndex() {
+            return index;
+        }
+
+        /**
+         * Return the value of the current cell of the column.
+         */
+        @Producible(idMethod = "getId")
+        public double getValue() {
+            return dataTable.getValueCurrentRow(index);
+        }
+
+        /**
+         * Set the value of the current cell of the column.
+         */
+        @Consumable(idMethod = "getId")
+        public void setValue(double value) {
+            dataTable.setValueCurrentRow(index, value);
+        }
+
+    }
 }

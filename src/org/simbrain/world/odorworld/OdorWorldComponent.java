@@ -35,6 +35,7 @@ import java.util.*;
  * {@link OdorWorldPanel}.
  */
 public class OdorWorldComponent extends WorkspaceComponent {
+
     /**
      * Recreates an instance of this class from a saved component.
      *

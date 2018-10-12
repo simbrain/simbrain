@@ -65,11 +65,34 @@ public class TextWorldActions {
                 //putValue(ACCELERATOR_KEY, keyStroke);
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 for (String word : extractTextItems()) {
+                    world.addWordToTokenDictionary(word);
+                }
+                world.fireDictionaryChangedEvent();
+            }
+        };
+    }
+
+    public static Action getExtractDictionaryFromTextAction(final TextWorld world) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
+                putValue(NAME, "Extract dictionary...");
+                putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
+                //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
+                //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                //putValue(ACCELERATOR_KEY, keyStroke);
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                Scanner scanner = new Scanner(world.getText());
+                List<String> words = parseText(scanner);
+                for (String word : words) {
                     world.addWordToTokenDictionary(word);
                 }
                 world.fireDictionaryChangedEvent();
@@ -89,35 +112,44 @@ public class TextWorldActions {
         // rich text)
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            // Adapted from
-            // http://www.javapractices.com/topic/TopicAction.do?Id=87
-            Scanner scanner;
             try {
-                scanner = new Scanner(new FileReader(theFile));
-                try {
-                    // first use a Scanner to get each line
-                    while (scanner.hasNextLine()) {
-                        Scanner lineScan = new Scanner(scanner.nextLine());
-                        while (lineScan.hasNext()) {
-                            String word = lineScan.next();
-                            retList.add(word);
-                            // System.out.println("Entry is : " + word);
-                        }
-                    }
-                } finally {
-                    // Ensure the underlying stream is always closed
-                    // this only has any effect if the item passed to
-                    // the Scanner constructor implements Closeable
-                    // (which it does
-                    // in this case).
-                    scanner.close();
-                    setDictionaryDirectory(chooser.getCurrentLocation());
-                }
+                Scanner scanner = new Scanner(theFile);
+                parseText(scanner);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
         return retList;
+    }
+
+    private static List<String> parseText(Scanner scanner) {
+        List<String> retList = new ArrayList<String>();
+        // Adapted from
+        // http://www.javapractices.com/topic/TopicAction.do?Id=87
+        try {
+            try {
+                // first use a Scanner to get each line
+                while (scanner.hasNextLine()) {
+                    Scanner lineScan = new Scanner(scanner.nextLine());
+                    while (lineScan.hasNext()) {
+                        String word = lineScan.next();
+                        retList.add(word);
+                        // System.out.println("Entry is : " + word);
+                    }
+                }
+            } finally {
+                // Ensure the underlying stream is always closed
+                // this only has any effect if the item passed to
+                // the Scanner constructor implements Closeable
+                // (which it does
+                // in this case).
+                scanner.close();
+                return retList;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -138,9 +170,7 @@ public class TextWorldActions {
                 putValue(SHORT_DESCRIPTION, "Edit dictionary...");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 TokenDictionaryPanel scalarPanel = new TokenDictionaryPanel(world);
                 DictionarySelector dialog;

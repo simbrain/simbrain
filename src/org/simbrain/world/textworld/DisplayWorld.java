@@ -183,23 +183,14 @@ public class DisplayWorld extends TextWorld {
         }
     }
 
-    /**
-     * @return the displayThreshold
-     */
     public double getDisplayThreshold() {
         return displayThreshold;
     }
 
-    /**
-     * @param displayThreshold the displayThreshold to set
-     */
     public void setDisplayThreshold(double displayThreshold) {
         this.displayThreshold = displayThreshold;
     }
 
-    /**
-     * @return the vectorToTokenDict
-     */
     public NTree getVectorToTokenDict() {
         return vectorToTokenDict;
     }

@@ -984,16 +984,12 @@ public class Neuron implements EditableObject {
         this.getNetwork().fireNeuronChanged(this);
     }
 
-    /**
-     * @return the label
-     */
+    @Producible(idMethod = "getId", defaultVisibility = false)
     public String getLabel() {
         return label;
     }
 
-    /**
-     * @param label the label to set
-     */
+    @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(final String label) {
         this.label = label;
         this.getNetwork().fireNeuronLabelChanged(this);

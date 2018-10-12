@@ -125,6 +125,7 @@ public class ReaderPanel extends JPanel {
         }
         JToolBar dictionaryToolBar = new JToolBar();
         dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
+        dictionaryToolBar.add(TextWorldActions.getExtractDictionaryFromTextAction(world));
         topToolbarPanel.add(dictionaryToolBar);
 
         add(topToolbarPanel, BorderLayout.NORTH);

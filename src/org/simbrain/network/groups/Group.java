@@ -21,6 +21,8 @@ package org.simbrain.network.groups;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
@@ -139,16 +141,12 @@ public abstract class Group implements CopyableObject {
         this.id = id;
     }
 
-    /**
-     * @return the label
-     */
+    @Producible(idMethod = "getId", defaultVisibility = false)
     public String getLabel() {
         return label;
     }
 
-    /**
-     * @param label the label to set
-     */
+    @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(String label) {
         this.label = label;
         if (parentNetwork != null) {

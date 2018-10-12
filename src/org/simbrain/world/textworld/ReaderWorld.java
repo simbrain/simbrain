@@ -193,7 +193,7 @@ public final class ReaderWorld extends TextWorld {
      * @return the current string
      */
     @Producible
-    public String getCurrentString() {
+    public String getCurrentToken() {
         if (getCurrentItem() == null) {
             return "";
         } else {

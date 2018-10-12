@@ -86,7 +86,7 @@ public class DictionarySelector extends StandardDialog {
                 initCardPanel();
             }
         });
-        dictionaryType.setSelectedIndex(1);
+        dictionaryType.setSelectedIndex(0);
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Select Dictionary Type:"));
         topPanel.add(dictionaryType);

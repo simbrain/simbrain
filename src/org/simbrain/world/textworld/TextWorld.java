@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Consumable;
 
 /**
  * <b>TextWorld</b> is an environment for modeling speech and reading and other
@@ -102,6 +103,7 @@ public abstract class TextWorld {
      *
      * @param newText the text to add
      */
+    @Consumable
     public void addText(String newText) {
         if (getText() != null) {
             setPosition(getText().length());
@@ -250,23 +252,10 @@ public abstract class TextWorld {
         }
     }
 
-    /**
-     * @return the lastPosition
-     */
-    public int getLastPosition() {
-        return lastPosition;
-    }
-
-    /**
-     * @return the currentItem
-     */
     public TextItem getCurrentItem() {
         return currentItem;
     }
 
-    /**
-     * @param currentItem the currentItem to set
-     */
     public void setCurrentItem(TextItem currentItem) {
         this.currentItem = currentItem;
         fireCurrentItemChanged(currentItem);

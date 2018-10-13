@@ -64,7 +64,7 @@ public class OdorWorld implements EditableObject {
      * If true, then objects block movements; otherwise agents can walk through
      * objects.
      */
-    @UserParameter(label = "Wrap around", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
+    @UserParameter(label = "Blocking", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
 
     /**
@@ -123,6 +123,7 @@ public class OdorWorld implements EditableObject {
      */
     public void stopAnimation() {
         changeSupport.firePropertyChange("stopAnimation", null, null);
+        changeSupport.firePropertyChange("worldStopped", null, null);
     }
 
     /**
@@ -548,4 +549,7 @@ public class OdorWorld implements EditableObject {
     }
 
 
+    public void start() {
+        changeSupport.firePropertyChange("worldStarted", null, null);
+    }
 }

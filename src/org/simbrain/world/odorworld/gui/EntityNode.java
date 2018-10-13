@@ -77,8 +77,7 @@ public class EntityNode extends PNode {
 
         updateImage();
 
-        this.centerFullBoundsOnPoint(entity.getX(), entity.getY());
-
+        setOffset(entity.getX(), entity.getY());
         entity.addPropertyChangeListener(evt -> {
             if ("propertiesChanged".equals(evt.getPropertyName())) {
                 updateImage();
@@ -143,8 +142,6 @@ public class EntityNode extends PNode {
 
         //TODO: Make sure this is only called once per workspace update
 
-        //sprite.advance();
-
         if (updateFlag) {
             if(entity.isRotating()) {
                 ((RotatingSprite) sprite).updateHeading(entity.getHeading());
@@ -153,15 +150,6 @@ public class EntityNode extends PNode {
             repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
             updateFlag = false;
         }
-
-//
-//        if (!isBlocked()) {
-//            heading = computeAngle(heading);
-//            // System.out.println("heading:" + heading);
-//            // TODO: only do this if heading has changed
-//            updateImageBasedOnHeading();
-//            getAnimation().update();
-//        }
     }
 
     public void advance() {

@@ -121,9 +121,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     private double dtheta;
 
-    //TODO
-    private boolean manualControl;
-
     /**
      * Initial heading of agent.
      */
@@ -218,9 +215,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void update() {
         updateCollisionBound();
-        if (!manualControl) {
-            simpleMotion();
-        }
+        simpleMotion();
 
         updateSensors();
         updateEffectors();
@@ -232,6 +227,13 @@ public class OdorWorldEntity implements EditableObject {
 
         changeSupport.firePropertyChange("updated", null, this);
 
+    }
+
+    public void manualMovementUpdate() {
+        updateCollisionBound();
+        simpleMotion();
+        changeSupport.firePropertyChange("updated", null, this);
+        changeSupport.firePropertyChange("manuallyUpdated", null, this);
     }
 
     /**
@@ -692,16 +694,6 @@ public class OdorWorldEntity implements EditableObject {
         this.showSensors = showSensors;
     }
 
-    // Todo: move collisions, blocks etc. to piccolo
-
-    public boolean isBlocked() {
-        if (getParentWorld().isObjectsBlockMovement()) {
-//            if (hasCollided()) {
-//                return true;
-//            }
-        }
-        return false;
-    }
 
     public Behavior getBehavior() {
         return behavior;
@@ -714,7 +706,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveNorth(double amount) {
-        if (!isBlocked() && (amount != 0)) {
+        if (!collideOn("up") && (amount > 0)) {
             if (this.isRotating()) {
                 setHeading(90);
             }
@@ -729,7 +721,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveSouth(double amount) {
-        if (!isBlocked() && (amount != 0)) {
+        if (!collideOn("down") && (amount > 0)) {
             if (this.isRotating()) {
                 setHeading(270);
             }
@@ -744,7 +736,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveEast(double amount) {
-        if (!isBlocked() && (amount != 0)) {
+        if (!collideOn("right") && (amount > 0)) {
             if (this.isRotating()) {
                 this.setHeading(0);
             }
@@ -775,7 +767,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveWest(double amount) {
-        if (!isBlocked() && (amount != 0)) {
+        if (!collideOn("left") && (amount > 0)) {
             if (this.isRotating()) {
                 setHeading(180);
             }
@@ -965,9 +957,7 @@ public class OdorWorldEntity implements EditableObject {
         if (amount == 0) {
             return;
         }
-        if (!isBlocked()) {
-            setHeading(heading + amount);
-        }
+        setHeading(heading + amount);
         changeSupport.firePropertyChange("moved", null, null);
 
     }
@@ -992,11 +982,9 @@ public class OdorWorldEntity implements EditableObject {
         if (amount == 0) {
             return;
         }
-        if (!isBlocked()) {
-            double radians = getHeadingRadians();
-            setX(getX() + (float) (amount * Math.cos(radians)));
-            setY(getY() - (float) (amount * Math.sin(radians)));
-        }
+        double radians = getHeadingRadians();
+        dx = amount * Math.cos(radians);
+        dy = -amount * Math.sin(radians);
         changeSupport.firePropertyChange("moved", null, null);
     }
 
@@ -1100,6 +1088,9 @@ public class OdorWorldEntity implements EditableObject {
      * @return true if collided
      */
     public boolean collideOn(String direction) {
+        if (!getParentWorld().isObjectsBlockMovement()) {
+            return false;
+        }
         for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
             if (i != this) {
                 if (collideOn(direction, i)) {

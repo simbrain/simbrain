@@ -175,6 +175,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 world.advance();
             }
         }, 50, 50);
+        world.start();
     }
 
     @Override

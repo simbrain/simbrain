@@ -54,7 +54,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      * Public label of this sensor.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this sensor",
-            defaultValue = "", order = 2)
+            defaultValue = "", order = 1)
     private String label;
 
     /**

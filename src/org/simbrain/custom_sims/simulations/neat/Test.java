@@ -10,8 +10,8 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.*;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.environment.SmellSource.DecayFunction;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -288,13 +288,13 @@ public class Test {
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);
         smell.setDispersion(240);
-        smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        smell.setDecayFunction(GaussianDecayFunction.create());
         cheese.setSmellSource(smell);
 
         // create mouse with smell vector
         SmellSource mouse1Smell = new SmellSource();
         mouse1Smell.setDispersion(450);
-        mouse1Smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        mouse1Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse1Smell.setStimulusVector(new double[8]);
         OdorWorldEntity newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
@@ -326,19 +326,19 @@ public class Test {
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);
         smell.setDispersion(240);
-        smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        smell.setDecayFunction(GaussianDecayFunction.create());
         cheese.setSmellSource(smell);
 
         SmellSource mouse1Smell = new SmellSource();
         mouse1Smell.setDispersion(450);
-        mouse1Smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        mouse1Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse1Smell.setStimulusVector(new double[8]);
         OdorWorldEntity newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
 
         SmellSource mouse2Smell = new SmellSource();
         mouse2Smell.setDispersion(450);
-        mouse2Smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        mouse2Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse2Smell.setStimulusVector(new double[8]);
         OdorWorldEntity pinnedMouse = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         pinnedMouse.setSmellSource(mouse2Smell);

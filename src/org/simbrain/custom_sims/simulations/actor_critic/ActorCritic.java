@@ -11,6 +11,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
@@ -235,7 +236,7 @@ public class ActorCritic extends RegisteredSimulation {
         cheese = new OdorWorldEntity(world, OdorWorldEntity.EntityType.SWISS);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
-        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, SmellSource.DecayFunction.STEP, dispersion));
+        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, StepDecayFunction.create(), dispersion));
         world.addEntity(cheese);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();

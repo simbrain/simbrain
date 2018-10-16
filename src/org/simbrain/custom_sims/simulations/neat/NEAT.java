@@ -15,7 +15,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.environment.SmellSource.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -101,14 +101,14 @@ public class NEAT extends RegisteredSimulation {
 
         SmellSource mouse1Smell = new SmellSource();
         mouse1Smell.setDispersion(450);
-        mouse1Smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        mouse1Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse1Smell.setStimulusVector(new double[8]);
         newEntity = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         newEntity.setSmellSource(mouse1Smell);
 
         SmellSource mouse2Smell = new SmellSource();
         mouse2Smell.setDispersion(450);
-        mouse2Smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        mouse2Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse2Smell.setStimulusVector(new double[8]);
         pinnedMouse = new OdorWorldEntity(w, OdorWorldEntity.EntityType.MOUSE);
         pinnedMouse.setSmellSource(mouse2Smell);
@@ -119,7 +119,7 @@ public class NEAT extends RegisteredSimulation {
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);
         smell.setDispersion(240);
-        smell.setDecayFunction(DecayFunction.GAUSSIAN);
+        smell.setDecayFunction(GaussianDecayFunction.create());
         cheese.setSmellSource(smell);
         newEntity.setLocation(450 / 2, 450 / 8 * 7);
         cheese.setLocation(450 / 4 + (rand.nextBoolean() ? 450 / 2 : 0), 450 / 8);

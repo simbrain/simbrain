@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -55,7 +56,7 @@ public final class AddEntityAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         OdorWorldEntity entity = new OdorWorldEntity(worldPanel.getWorld());
         entity.setLocation(worldPanel.getLastClickedPosition().getX(), worldPanel.getLastClickedPosition().getY());
-        entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), SmellSource.DecayFunction.GAUSSIAN));
+        entity.setSmellSource(new SmellSource(SimbrainMath.multVector(new double[]{0.0, 0.0, 0.3, 0.7, 0.0, 0.0}, 100), GaussianDecayFunction.create()));
         worldPanel.getWorld().addEntity(entity);
     }
 }

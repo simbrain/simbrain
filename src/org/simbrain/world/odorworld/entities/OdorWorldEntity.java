@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import javafx.util.Pair;
+import org.simbrain.util.Pair;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
@@ -1196,6 +1196,14 @@ public class OdorWorldEntity implements EditableObject {
             return description;
         }
 
+        public double getImageWidth() {
+            return imageWidth;
+        }
+
+        public double getImageHeight() {
+            return imageHeight;
+        }
+
     }
 
 
@@ -1220,7 +1228,7 @@ public class OdorWorldEntity implements EditableObject {
                 new Pair<>("up", "right"),
                 new Pair<>("down", "right"),
                 new Pair<>("left", "up"),
-                new Pair<>("left", "up")
+                new Pair<>("left", "down")
             )
         );
         collisionConditions.put("down",

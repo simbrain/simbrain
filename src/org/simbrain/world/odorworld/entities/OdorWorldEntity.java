@@ -158,9 +158,9 @@ public class OdorWorldEntity implements EditableObject {
     protected Behavior behavior = new StationaryBehavior();
 
     /**
-     * Smell Source (if any).
+     * Smell Source (if any). Initialize to random smell source with 10 components.
      */
-    private SmellSource smellSource;
+    private SmellSource smellSource = new SmellSource(10);
 
     /**
      * Enable sensors. If not the agent is "blind."

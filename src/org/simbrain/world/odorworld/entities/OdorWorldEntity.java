@@ -26,8 +26,6 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.behaviors.Behavior;
-import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -151,11 +149,6 @@ public class OdorWorldEntity implements EditableObject {
      * Effectors.
      */
     private List<Effector> effectors = new ArrayList<Effector>();
-
-    /**
-     * Behavior.
-     */
-    protected Behavior behavior = new StationaryBehavior();
 
     /**
      * Smell Source (if any). Initialize to random smell source with 10 components.
@@ -692,11 +685,6 @@ public class OdorWorldEntity implements EditableObject {
 
     public void setShowSensors(boolean showSensors) {
         this.showSensors = showSensors;
-    }
-
-
-    public Behavior getBehavior() {
-        return behavior;
     }
 
     /**

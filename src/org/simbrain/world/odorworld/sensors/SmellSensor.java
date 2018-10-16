@@ -68,7 +68,7 @@ public class SmellSensor extends Sensor {
     /**
      * Current value of this sensor, as an array of doubles.
      */
-    private double[] currentValue;
+    private double[] currentValue = new double[0];
 
     /**
      * Construct a smell sensor.

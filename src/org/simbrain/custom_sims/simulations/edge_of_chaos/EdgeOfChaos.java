@@ -16,7 +16,7 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.environment.SmellSource.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -254,12 +254,12 @@ public class EdgeOfChaos extends RegisteredSimulation {
         flower1.getSmellSource().setDispersion(dispersion);
         flower2.getSmellSource().setDispersion(dispersion);
         flower3.getSmellSource().setDispersion(dispersion);
-        cheese1.getSmellSource().setDecayFunction(DecayFunction.STEP);
-        cheese2.getSmellSource().setDecayFunction(DecayFunction.STEP);
-        cheese3.getSmellSource().setDecayFunction(DecayFunction.STEP);
-        flower1.getSmellSource().setDecayFunction(DecayFunction.STEP);
-        flower2.getSmellSource().setDecayFunction(DecayFunction.STEP);
-        flower3.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        cheese1.getSmellSource().setDecayFunction(StepDecayFunction.create());
+        cheese2.getSmellSource().setDecayFunction(StepDecayFunction.create());
+        cheese3.getSmellSource().setDecayFunction(StepDecayFunction.create());
+        flower1.getSmellSource().setDecayFunction(StepDecayFunction.create());
+        flower2.getSmellSource().setDecayFunction(StepDecayFunction.create());
+        flower3.getSmellSource().setDecayFunction(StepDecayFunction.create());
 
         // Couple agent to cheese and flower nodes
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), sensorNodes);

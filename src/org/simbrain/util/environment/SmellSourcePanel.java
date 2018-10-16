@@ -19,7 +19,6 @@
 package org.simbrain.util.environment;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.environment.SmellSource.DecayFunction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -151,7 +150,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
     /**
      * Decay function combo box.
      */
-    private JComboBox cbDecayFunction = new JComboBox(SmellSource.DecayFunction.values());
+    // private JComboBox cbDecayFunction = new JComboBox(SmellSource.DecayFunction.values());
 
     /**
      * Dispersion field.
@@ -231,7 +230,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
         fillFieldValues();
 
         this.add(tabbedPane);
-        dispersionPanel.addItem("Decay function", cbDecayFunction);
+        // dispersionPanel.addItem("Decay function", cbDecayFunction);
         dispersionPanel.addItem("Dispersion", tfDispersion);
         tfPeak.setToolTipText("How far (in pixels) the smell disperses.");
         dispersionPanel.addItem("Peak distance", tfPeak);
@@ -249,14 +248,14 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        cbDecayFunction.setSelectedItem(smellSource.getDecayFunction());
+        // cbDecayFunction.setSelectedItem(smellSource.getDecayFunction());
         tfDispersion.setText(Double.toString(smellSource.getDispersion()));
         tfPeak.setText(Double.toString(smellSource.getPeak()));
 
         updateStimulusPanel();
 
         rbAddNoise.setSelected(smellSource.isAddNoise());
-        jsNoiseLevel.setValue((int) (smellSource.getNoiseLevel() * 100));
+        // jsNoiseLevel.setValue((int) (smellSource.getNoiseLevel() * 100));
         if (smellSource.isAddNoise()) {
             jsNoiseLevel.setEnabled(true);
         } else {
@@ -294,13 +293,13 @@ public class SmellSourcePanel extends LabelledItemPanel implements ActionListene
 
         smellSource.setStimulusVector(valArray);
         smellSource.setDispersion(Double.parseDouble(tfDispersion.getText()));
-        smellSource.setDecayFunction((DecayFunction) cbDecayFunction.getSelectedItem());
-        smellSource.setPeak(Double.parseDouble(tfPeak.getText()));
+        // smellSource.setDecayFunction((DecayFunction) cbDecayFunction.getSelectedItem());
+        // smellSource.setPeak(Double.parseDouble(tfPeak.getText()));
 
         smellSource.setAddNoise(rbAddNoise.isSelected());
 
         if (rbAddNoise.isSelected()) {
-            smellSource.setNoiseLevel((double) jsNoiseLevel.getValue() / 100);
+            // smellSource.setNoiseLevel((double) jsNoiseLevel.getValue() / 100);
         }
     }
 

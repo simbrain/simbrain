@@ -19,8 +19,17 @@
 package org.simbrain.util.environment;
 
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.math.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
+import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -49,59 +58,7 @@ public class SmellSource {
      * Method for calculating decay of stimulus as a function of distance from
      * object.
      */
-    private DecayFunction decayFunction = DecayFunction.LINEAR;
-
-    /**
-     * If outside of this radius the object has no affect on the network.
-     */
-    private double stimulusDispersion = 70;
-
-    /**
-     * Peak value.
-     */
-    private double peak = 0;
-
-    /**
-     * If true, add noise to object's stimulus vector.
-     */
-    private boolean addNoise = false;
-
-    /**
-     * Initial noise.
-     */
-    private final double initNoise = .3;
-
-    /**
-     * A value between 0 and 1 which describes how much noise is added.
-     */
-    private double noiseLevel = initNoise;
-
-    /**
-     * Decay Functions.
-     */
-    public enum DecayFunction {
-
-        STEP("Step"), LINEAR("Linear"), GAUSSIAN("Gaussian"), QUADRATIC("Quadratic");
-
-        /**
-         * Name of decay function.
-         */
-        private String name;
-
-        /**
-         * Constructor.
-         *
-         * @param name name.
-         */
-        DecayFunction(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
+    private DecayFunction decayFunction = LinearDecayFunction.create();
 
     /**
      * Construct smell source from specified parameters.
@@ -113,7 +70,7 @@ public class SmellSource {
      */
     public SmellSource(double[] distalstim, DecayFunction decay, double dispersion) {
         this(distalstim, decay);
-        this.stimulusDispersion = dispersion;
+        decayFunction.setDispersion(dispersion);
     }
 
     /**
@@ -144,7 +101,11 @@ public class SmellSource {
      * @param numDimensions number of dimensions of the stimulus vector.
      */
     public SmellSource(final int numDimensions) {
-        this.stimulusVector = SimbrainMath.randomVector(numDimensions);
+        UniformDistribution randomizer = UniformDistribution.create();
+        this.stimulusVector = new double[numDimensions];
+        for (int i = 0; i < numDimensions; i++) {
+            stimulusVector[i] = randomizer.nextRand();
+        }
     }
 
     /**
@@ -163,42 +124,11 @@ public class SmellSource {
      * @return proximal stimulus to creature caused by this object
      */
     public double[] getStimulus(final double distance) {
-        double[] ret = new double[getStimulusDimension()];
+        double[] ret;
         if (returnVector == null) {
             returnVector = stimulusVector;
         }
-        if (distance < stimulusDispersion) {
-            if (decayFunction == DecayFunction.STEP) {
-                if (distance >= peak) {
-                    ret = (returnVector.clone());
-                }
-            } else if (decayFunction == DecayFunction.LINEAR) {
-                if (distance < peak) {
-                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
-
-                    if (scalingFactor < 0) {
-                        scalingFactor = 0;
-                    }
-
-                    ret = SimbrainMath.multVector(returnVector, scalingFactor);
-                } else {
-                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
-                    ret = SimbrainMath.multVector(returnVector, scalingFactor);
-                }
-            } else if (decayFunction == DecayFunction.GAUSSIAN) {
-                double temp = distance;
-                temp -= peak;
-                double sigma = .5 * (stimulusDispersion - peak);
-                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
-                ret = SimbrainMath.multVector(returnVector, scalingFactor);
-            } else if (decayFunction == DecayFunction.QUADRATIC) {
-                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
-                if (scalingFactor < 0) {
-                    scalingFactor = 0;
-                }
-                ret = SimbrainMath.multVector(returnVector, scalingFactor);
-            }
-        }
+        ret = decayFunction.apply(distance, returnVector);
 
         return ret;
     }
@@ -207,23 +137,21 @@ public class SmellSource {
      * Update the source.
      */
     public void update() {
-        // Add noise to object vector
-        if (addNoise) {
-            returnVector = SimbrainMath.getNoisyVector(stimulusVector, noiseLevel);
-        } else {
-            returnVector = stimulusVector;
-        }
+        returnVector = stimulusVector;
     }
 
     /**
      * Randomize values.
      */
     public void randomize() {
-        java.util.Random theRandNum = new java.util.Random();
-        final int ten = 10;
+        UniformDistribution randomizer =
+                UniformDistribution.builder()
+                .ofLowerBound(0)
+                .ofUpperBound(10)
+                .build();
 
         for (int i = 0; i < getStimulusDimension(); i++) {
-            stimulusVector[i] = (theRandNum.nextInt(ten));
+            stimulusVector[i] = randomizer.nextRand();
         }
     }
 
@@ -264,7 +192,7 @@ public class SmellSource {
      * @return add noise
      */
     public boolean isAddNoise() {
-        return addNoise;
+        return decayFunction.getAddNoise();
     }
 
     /**
@@ -286,30 +214,12 @@ public class SmellSource {
     }
 
     /**
-     * Return the noise level.
-     *
-     * @return the noise level
-     */
-    public double getNoiseLevel() {
-        return noiseLevel;
-    }
-
-    /**
      * Sets the add noise.
      *
-     * @param b the add noise
+     * @param addNoise the add noise
      */
-    public void setAddNoise(final boolean b) {
-        addNoise = b;
-    }
-
-    /**
-     * Sets the noise level.
-     *
-     * @param d Noise level
-     */
-    public void setNoiseLevel(final double d) {
-        noiseLevel = d;
+    public void setAddNoise(final boolean addNoise) {
+        decayFunction.setAddNoise(addNoise);
     }
 
     /**
@@ -318,7 +228,7 @@ public class SmellSource {
      * @param d Dispersion
      */
     public void setDispersion(final double d) {
-        stimulusDispersion = d;
+        decayFunction.setDispersion(d);
     }
 
     /**
@@ -327,21 +237,21 @@ public class SmellSource {
      * @return the dispersion
      */
     public double getDispersion() {
-        return stimulusDispersion;
+        return decayFunction.getDispersion();
     }
 
     /**
      * @return Returns the peak.
      */
     public double getPeak() {
-        return peak;
+        return decayFunction.getPeakDistance();
     }
 
     /**
      * @param peak The peak to set.
      */
     public void setPeak(final double peak) {
-        this.peak = peak;
+        decayFunction.setPeakDistance(peak);
     }
 
     /**
@@ -358,20 +268,20 @@ public class SmellSource {
         this.decayFunction = decayFunction;
     }
 
-    /**
-     * @return the imageBox
-     */
-    public ComboBoxWrapper getTheDecayFunction() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return getDecayFunction();
-            }
-
-            public Object[] getObjects() {
-                return DecayFunction.values();
-            }
-        };
-    }
+    // /**
+    //  * @return the imageBox
+    //  */
+    // public ComboBoxWrapper getTheDecayFunction() {
+    //     return new ComboBoxWrapper() {
+    //         public Object getCurrentObject() {
+    //             return getDecayFunction();
+    //         }
+    //
+    //         public Object[] getObjects() {
+    //             return DecayFunction.values();
+    //         }
+    //     };
+    // }
 
     /**
      * @param decayFunctionBox

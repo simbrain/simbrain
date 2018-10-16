@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import org.simbrain.util.ComboBoxRenderer;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
@@ -85,10 +83,10 @@ public class EntityDialog extends StandardDialog {
 
         // Sensor / effector display
         if (entityRef.isSensorsEnabled()) {
-            tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
+            tabbedPane.addTab("Sensors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Sensor));
         }
         if (entityRef.isEffectorsEnabled()) {
-            tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
+            tabbedPane.addTab("Effectors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Effector));
         }
 
         setContentPane(tabbedPane);

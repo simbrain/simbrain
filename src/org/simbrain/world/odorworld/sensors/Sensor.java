@@ -20,7 +20,7 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.util.Arrays;
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Interface for 2d world sensors.
  */
-public abstract class Sensor implements CopyableObject {
+public abstract class Sensor implements CopyableObject, PeripheralAttribute {
 
     public static List<Class> SENSOR_LIST =
             Arrays.asList(SmellSensor.class, Hearing.class, TileSensor.class, ObjectSensor.class);
@@ -74,73 +74,31 @@ public abstract class Sensor implements CopyableObject {
      */
     public abstract void update();
 
-    /**
-     * Short description of the sensor type.
-     *
-     * @return the short description of the type
-     */
-    public abstract String getTypeDescription();
-
-    /**
-     * Return a list of entity types which can use this type of sensor.
-     *
-     * @return list of applicable types.
-     */
-    public List<Class<?>> getApplicableTypes() {
-        return null;
-    }
-
-    /**
-     * @return the parent
-     */
+    @Override
     public OdorWorldEntity getParent() {
         return parent;
     }
 
-    /**
-     * @return the name
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param name the name to set
-     */
     public void setId(String name) {
         this.id = name;
     }
 
-    /**
-     * @return the label
-     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getLabel() {
         return label;
     }
 
-    /**
-     * @param label the label to set
-     */
+    @Override
     public void setLabel(String label) {
         this.label = label;
     }
 
-    public static class Editor implements EditableObject {
-
-        @UserParameter(label = "Sensor", isObjectType = true)
-        private Sensor sensor;
-
-        public Editor(Sensor sensor) {
-            this.sensor = sensor;
-        }
-
-        public Sensor getSensor() {
-            return sensor;
-        }
-
-        public void setSensor(Sensor sensor) {
-            this.sensor = sensor;
-        }
-    }
+    @Override
+    public abstract String getTypeDescription();
 
 }

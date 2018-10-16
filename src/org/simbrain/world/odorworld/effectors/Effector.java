@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Abstract class for Odor World effectors.
  */
-public abstract class Effector implements CopyableObject {
+public abstract class Effector implements CopyableObject, PeripheralAttribute {
 
     /**
      * Reference to parent entity.
@@ -66,13 +67,6 @@ public abstract class Effector implements CopyableObject {
     public abstract void update();
 
     /**
-     * Short description of the effector type.
-     *
-     * @return the short description of the type
-     */
-    public abstract String getTypeDescription();
-
-    /**
      * Return a list of entity types which can use this type of sensor.
      *
      * @return list of applicable types.
@@ -81,44 +75,31 @@ public abstract class Effector implements CopyableObject {
         return null;
     }
 
-    /**
-     * @return the parent
-     */
+    @Override
     public OdorWorldEntity getParent() {
         return parent;
     }
 
-    /**
-     * @return the name
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param name the name to set
-     */
     public void setId(String name) {
         this.id = name;
     }
 
-    /**
-     * @return the label
-     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getLabel() {
         return label;
     }
 
-    /**
-     * @param label the label to set
-     */
+    @Override
     public void setLabel(String label) {
         this.label = label;
     }
 
-    //TODO
-    public String getMixedId() {
-        return this.getParent().getId() + ":" + this.getId();
-    }
+    @Override
+    public abstract String getTypeDescription();
 
 }

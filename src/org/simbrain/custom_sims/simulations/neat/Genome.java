@@ -29,8 +29,6 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.BiMap;
 
-import javafx.util.Pair;
-
 /**
  * This class consists of the list of node genes, connection genes to build a
  * network, and the implementation of genome mutation.

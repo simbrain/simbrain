@@ -43,6 +43,11 @@ public class LinearDecayFunction extends DecayFunction {
         return ret;
     }
 
+    @Override
+    public String getName() {
+        return "Linear";
+    }
+
     public static class LinearDecayFunctionBuilder
             extends DecayFunctionBuilder<
             LinearDecayFunctionBuilder,

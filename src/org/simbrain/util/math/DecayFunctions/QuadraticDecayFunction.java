@@ -37,6 +37,11 @@ public class QuadraticDecayFunction extends DecayFunction {
         return ret;
     }
 
+    @Override
+    public String getName() {
+        return "Quadratic";
+    }
+
     public static class QuadraticDecayFunctionBuilder
             extends DecayFunctionBuilder<
             QuadraticDecayFunctionBuilder,

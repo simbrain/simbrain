@@ -35,6 +35,11 @@ public class GaussianDecayFunction extends DecayFunction {
         return ret;
     }
 
+    @Override
+    public String getName() {
+        return "Gaussian";
+    }
+
     public static class GaussianDecayFunctionBuilder
             extends DecayFunctionBuilder<
             GaussianDecayFunctionBuilder,

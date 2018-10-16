@@ -31,6 +31,11 @@ public class StepDecayFunction extends DecayFunction {
         return ret;
     }
 
+    @Override
+    public String getName() {
+        return "Step";
+    }
+
     public static class StepDecayFunctionBuilder
         extends DecayFunctionBuilder<
                     StepDecayFunctionBuilder,

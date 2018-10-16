@@ -1,6 +1,9 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -19,23 +22,24 @@ public class ObjectSensor extends Sensor {
      */
     private double value = 0;
 
-    /**
-     * "Sensitivity" of this sensor.  Detects objects of a given type in a
-     * radius of this many pixels.
-     */
-    @UserParameter(label = "Sensor Radius",
-        description = "Sensor detects objects of a given type in a radius of this many pixels",
-        order = 10)
-    double sensorRadius = 100;
+    @UserParameter(
+            label = "Base Value",
+            description = "Base value of the output before decay function applies",
+            defaultValue = "1", order = 4)
+    private double baseValue = 1;
 
-    // TODO: Add decay function
+    /**
+     * Decay function
+     */
+    @UserParameter(label = "Decay Function", isObjectType = true, order = 5)
+    DecayFunction decayFunction = LinearDecayFunction.create();
 
     /**
      * The type of the object represented, e.g. Swiss.gif.
      */
     @UserParameter(label = "Object Type",
         description = "What type of object this sensor responds to",
-        order = 5)
+        order = 3)
     private OdorWorldEntity.EntityType objectType = OdorWorldEntity.EntityType.SWISS;
 
     /**
@@ -61,9 +65,14 @@ public class ObjectSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        for (OdorWorldEntity entity : parent.getEntitiesInRadius(sensorRadius)) {
+        for (OdorWorldEntity entity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
             if (entity.getEntityType() == objectType) {
-                value = 1;
+                value = baseValue * decayFunction.getScalingFactor(
+                        SimbrainMath.distance(
+                                new double[]{entity.getCenterX(), entity.getCenterY()},
+                                new double[]{parent.getCenterX(), entity.getCenterY()}
+                        )
+                );
                 break;
             }
         }

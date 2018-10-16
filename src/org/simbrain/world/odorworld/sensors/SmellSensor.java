@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
@@ -51,27 +50,25 @@ public class SmellSensor extends Sensor {
      * Relative location of the sensor in polar coordinates.
      */
     @UserParameter(label = "Sensor angle", description = "The angle at which the smell sensor will be added. "
-            + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
-            + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
-            + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
-            defaultValue = "" + (Math.PI / 4), order = 3)
+        + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
+        + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
+        + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
+        defaultValue = "" + (Math.PI / 4), order = 3)
     private double theta = DEFAULT_THETA;
 
     /**
      * Relative location of the sensor in polar coordinates.
      */
     @UserParameter(label = "Sensor length",
-            description = "The distance from the center of the entity to which the smell sensor is to be added."
-                    + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
-            defaultValue = "" + DEFAULT_RADIUS, order = 4)
+        description = "The distance from the center of the entity to which the smell sensor is to be added."
+            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
+        defaultValue = "" + DEFAULT_RADIUS, order = 4)
     private double radius = DEFAULT_RADIUS;
 
     /**
      * Current value of this sensor, as an array of doubles.
      */
-    // TODO: Settable numDims! Problem: what if the largest smell vector has more than
-    //    10 components.
-    private double[] currentValue = new double[10];
+    private double[] currentValue = new double[0];
 
     /**
      * Construct a smell sensor.
@@ -99,64 +96,50 @@ public class SmellSensor extends Sensor {
     }
 
     /**
-     * @return the location
+     * Update the smell array ({@link #currentValue}) by iterating over entities
+     * and adding up their distance-scaled smell vectors.
      */
-    public double[] getLocation() {
-        // TODO: Formalize rule that this sensor applies to rotating entity
-        // only,
-        // or relax the code so that it will work for non-rotating entities
-        OdorWorldEntity parent = this.getParent();
-        double x = parent.getCenterLocation()[0] + (radius * Math.cos(parent.getHeadingRadians() + theta));
-        double y = parent.getCenterLocation()[1] - (radius * Math.sin(parent.getHeadingRadians() + theta));
-        return new double[]{x, y};
-    }
-
     @Override
     public void update() {
-        currentValue = new double[currentValue.length];
+
+        // Start with an empty array. It will grow in size as smell vectors are
+        // added.
+        currentValue = new double[0];
         for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
             // Don't smell yourself
             if (entity != parent) {
                 double[] smell = entity.getSmellVector(getLocation());
-                if(smell != null) {
+                if (smell != null) {
                     currentValue = SimbrainMath.addVector(currentValue, smell);
                 }
             }
         }
     }
 
-    /**
-     * @return the currentValue
-     */
     @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
     public double[] getCurrentValues() {
         return currentValue;
     }
 
-    /**
-     * @return the theta
-     */
+    public double[] getLocation() {
+        OdorWorldEntity parent = this.getParent();
+        double x = parent.getCenterLocation()[0] + (radius * Math.cos(parent.getHeadingRadians() + theta));
+        double y = parent.getCenterLocation()[1] - (radius * Math.sin(parent.getHeadingRadians() + theta));
+        return new double[] {x, y};
+    }
+
     public double getTheta() {
         return theta;
     }
 
-    /**
-     * @param theta the theta to set
-     */
     public void setTheta(double theta) {
         this.theta = theta;
     }
 
-    /**
-     * @return the radius
-     */
     public double getRadius() {
         return radius;
     }
 
-    /**
-     * @param radius the radius to set
-     */
     public void setRadius(double radius) {
         this.radius = radius;
     }
@@ -171,8 +154,8 @@ public class SmellSensor extends Sensor {
      */
     public String getSensorDescription() {
         return getParent().getName() + ":" + "Smell sensor (" +
-            SimbrainMath.roundDouble(theta,2)+ "," +
-            SimbrainMath.roundDouble(radius ,2) + ")";
+            SimbrainMath.roundDouble(theta, 2) + "," +
+            SimbrainMath.roundDouble(radius, 2) + ")";
     }
 
     @Override

@@ -129,7 +129,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             Double maxValue = parameter.hasMaxValue() ? parameter.getAnnotation().maximumValue() : null;
 
             // Step size if bounds are missing
-            double stepSize = 0.1;
+            double stepSize = 1;
 
             // If bounds are given divide the spinner can step numsteps from top to bottom
             if (minValue != null && maxValue != null) {

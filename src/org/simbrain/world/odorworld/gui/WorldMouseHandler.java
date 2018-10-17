@@ -99,12 +99,18 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
     private final OdorWorldPanel odorWorldPanel;
 
     /**
+     * Reference to parent world.
+     */
+    private final OdorWorld world;
+
+    /**
      * Create a new selection event handler.
      *
      * @param odorWorldPanel parent panel
      */
     public WorldMouseHandler(OdorWorldPanel odorWorldPanel) {
         super();
+        world = odorWorldPanel.getWorld();
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
         this.odorWorldPanel = odorWorldPanel;
@@ -115,9 +121,13 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
 
         super.mousePressed(mouseEvent);
 
+        if(world == null) {
+            return;
+        }
+
         // Set last clicked position, used in many areas for "placement" of
         // objects in the last clicked position on screen.
-        odorWorldPanel.setLastClickedPosition(mouseEvent.getCanvasPosition());
+        world.setLastClickedPosition(mouseEvent.getCanvasPosition());
 
         // Set picked node
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
@@ -126,10 +136,10 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
             if (pickedNode.getParent() instanceof EntityNode) {
                 JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode) pickedNode.getParent()).getEntity());
-                menu.show(odorWorldPanel, (int) odorWorldPanel.getLastClickedPosition().getX(), (int) odorWorldPanel.getLastClickedPosition().getY());
+                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
             } else {
                 JPopupMenu menu = odorWorldPanel.getContextMenu(null);
-                menu.show(odorWorldPanel, (int) odorWorldPanel.getLastClickedPosition().getX(), (int) odorWorldPanel.getLastClickedPosition().getY());
+                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
             }
         }
 

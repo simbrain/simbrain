@@ -83,10 +83,10 @@ public class EntityDialog extends StandardDialog {
 
         // Sensor / effector display
         if (entityRef.isSensorsEnabled()) {
-            tabbedPane.addTab("Sensors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Sensor));
+            tabbedPane.addTab("Sensors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Sensor, this));
         }
         if (entityRef.isEffectorsEnabled()) {
-            tabbedPane.addTab("Effectors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Effector));
+            tabbedPane.addTab("Effectors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Effector, this));
         }
 
         setContentPane(tabbedPane);
@@ -98,7 +98,11 @@ public class EntityDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        commitChanges();
+        entityRef.commitEditorChanges();
+        mainEditor.commitChanges();
+        if (smellPanel != null) {
+            smellPanel.commitChanges();
+        }
     }
 
     @Override
@@ -115,15 +119,5 @@ public class EntityDialog extends StandardDialog {
         }
     }
 
-    /**
-     * Commits changes to the entity that are shown in the dialog.
-     */
-    public void commitChanges() {
-        mainEditor.commitChanges();
-        if (smellPanel != null) {
-            smellPanel.commitChanges();
-        }
-
-    }
 
 }

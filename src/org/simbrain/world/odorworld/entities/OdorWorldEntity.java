@@ -851,8 +851,6 @@ public class OdorWorldEntity implements EditableObject {
         changeSupport.firePropertyChange("propertiesChanged", null, this);
     }
 
-    ;
-
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }

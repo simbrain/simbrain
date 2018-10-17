@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
  * @author Lam Nguyen
  */
 
-public class AddSensorDialog extends StandardDialog implements ActionListener {
+public class AddSensorDialog extends StandardDialog {
 
     /**
      * String of Sensor types.
@@ -72,7 +72,6 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
      */
     private void init(String title) {
         setTitle(title);
-        sensorType.addActionListener(this);
         typePanel.addItem("Sensor Type", sensorType);
         sensorType.setSelectedItem("SmellSensor");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
@@ -105,15 +104,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         } else if (sensorType.getSelectedItem().equals("BumpSensor")) {
             setTitle("Add a bump sensor");
         }
-        pack();
-        setLocationRelativeTo(null);
-    }
 
-    /**
-     * @param e Action event.
-     */
-    public void actionPerformed(final ActionEvent e) {
-        initPanel();
     }
 
     /**

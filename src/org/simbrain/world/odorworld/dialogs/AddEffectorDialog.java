@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
  * @author Lam Nguyen
  */
 
-public class AddEffectorDialog extends StandardDialog implements ActionListener {
+public class AddEffectorDialog extends StandardDialog {
 
     /**
      * String of effector types.
@@ -79,7 +79,6 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
      */
     private void init(String title) {
         setTitle(title);
-        effectorType.addActionListener(this);
         typePanel.addItem("Effector Type", effectorType);
         effectorType.setSelectedItem("SmellEffector");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/effectors.html");
@@ -107,15 +106,6 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
         } else if (effectorType.getSelectedItem() == "Speech") {
             setTitle("Add a speech effector");
         }
-        pack();
-        setLocationRelativeTo(null);
-    }
-
-    /**
-     * @param e Action event.
-     */
-    public void actionPerformed(final ActionEvent e) {
-        initPanel();
     }
 
     /**

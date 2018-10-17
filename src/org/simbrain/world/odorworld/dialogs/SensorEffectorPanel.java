@@ -22,7 +22,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -59,6 +58,9 @@ public class SensorEffectorPanel extends JPanel {
      */
     private AttributeModel model;
 
+    /**
+     * Whether this is a sensor or effector panel.
+     */
     public enum PanelType {Sensor, Effector};
 
     /**
@@ -78,14 +80,20 @@ public class SensorEffectorPanel extends JPanel {
     private final OdorWorldEntity parentEntity;
 
     /**
+     * Parent window.
+     */
+    private final Window parentWindow;
+
+    /**
      * Construct the SensorEffectorPanel.
      *
      * @param type
      */
-    public SensorEffectorPanel(OdorWorldEntity parentEntity, final PanelType type) {
+    public SensorEffectorPanel(OdorWorldEntity parentEntity, final PanelType type, final Window parentWindow) {
 
         this.parentEntity = parentEntity;
         this.type = type;
+        this.parentWindow = parentWindow;
 
         model = new AttributeModel();
         table = new JTable(model);
@@ -94,6 +102,8 @@ public class SensorEffectorPanel extends JPanel {
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
         table.setFocusable(false);
+
+        // Context menu
         table.addMouseListener(new MouseAdapter() {
             public void mouseReleased(final MouseEvent e) {
                 if (e.isControlDown() || (e.getButton() == 3)) {
@@ -125,6 +135,7 @@ public class SensorEffectorPanel extends JPanel {
             }
         });
 
+        // Set selected item
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (table.getSelectedRow() >= 0) {
@@ -134,17 +145,34 @@ public class SensorEffectorPanel extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(table);
-
         JPanel buttonBar = new JPanel();
+
+        // Add attribute
         JButton addAttribute = new JButton("Add", ResourceManager.getImageIcon("plus.png"));
         addAttribute.setToolTipText("Add...");
+        buttonBar.add(addAttribute);
+        addAttribute.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                StandardDialog dialog;
+                if (type == PanelType.Sensor) {
+                    dialog = new AddSensorDialog(parentEntity);
+                } else {
+                    dialog = new AddEffectorDialog(parentEntity);
+                }
+                // Putting these on the side since I can't figure out a way to get this in front of its parent dialog
+                // after trying everything (toFront, alwaysOnTop, etc).
+                SwingUtilities.invokeLater(() -> {
+                    dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
+                });
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
+
+        // Delete attribute
         JButton deleteAttribute = new JButton("Delete", ResourceManager.getImageIcon("minus.png"));
         deleteAttribute.setToolTipText("Delete...");
-        JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("Properties.png"));
-        editAttribute.setToolTipText("Edit...");
-        buttonBar.add(addAttribute);
         buttonBar.add(deleteAttribute);
-        buttonBar.add(editAttribute);
         deleteAttribute.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int[] selectedRows = table.getSelectedRows();
@@ -164,29 +192,23 @@ public class SensorEffectorPanel extends JPanel {
                 }
             }
         });
-        addAttribute.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StandardDialog dialog;
-                if (type == PanelType.Sensor) {
-                    dialog = new AddSensorDialog(parentEntity);
-                } else {
-                    dialog = new AddEffectorDialog(parentEntity);
-                }
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-        });
+
+        // Edit attribute
+        JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("Properties.png"));
+        editAttribute.setToolTipText("Edit...");
+        buttonBar.add(editAttribute);
         editAttribute.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 editAttribute(selectedAttribute);
             }
         });
 
+        // Final GUI setup
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);
 
+        // Populate table
         if (type == PanelType.Sensor) {
             for (Sensor sensor : parentEntity.getSensors()) {
                 model.addAttribute(sensor);
@@ -197,6 +219,7 @@ public class SensorEffectorPanel extends JPanel {
             }
         }
 
+        // Set up event listeners
         if (type == PanelType.Sensor) {
             parentEntity.addPropertyChangeListener(evt -> {
                 if ("sensorAdded".equals(evt.getPropertyName())) {
@@ -221,16 +244,18 @@ public class SensorEffectorPanel extends JPanel {
      * Edit an attribute.
      */
     private void editAttribute(PeripheralAttribute attribute) {
-        // Cheap null fix.  Panel is null when no item is selected on opening.
-        // Should disable the edit button in this case.
+        // Panel is null when no item is selected on opening.
+        // TODO: Disable the edit button in this case.
         if (attribute == null) {
             return;
         }
 
         AnnotatedPropertyEditor attributePanel = new AnnotatedPropertyEditor((EditableObject) attribute);
         StandardDialog dialog = attributePanel.getDialog();
+        SwingUtilities.invokeLater(() -> {
+            dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
+        });
         dialog.pack();
-        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 

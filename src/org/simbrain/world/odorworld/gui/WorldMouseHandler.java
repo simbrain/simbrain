@@ -158,12 +158,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosed(WindowEvent arg) {
-                        dialog.commitChanges();
-                        entityNode.getEntity().commitEditorChanges();
-                    }
-                });
             }
             return;
         }

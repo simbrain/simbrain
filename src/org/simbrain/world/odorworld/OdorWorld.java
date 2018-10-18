@@ -27,6 +27,7 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
@@ -93,6 +94,11 @@ public class OdorWorld implements EditableObject {
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
+     * Last clicked position.
+     */
+    private Point2D lastClickedPosition = new Point2D.Double(50,50);
+
+    /**
      * Default constructor.
      */
     OdorWorld() {
@@ -147,6 +153,29 @@ public class OdorWorld implements EditableObject {
 
         // Recompute max stimulus length
         recomputeMaxStimulusLength();
+
+    }
+
+    /**
+     * Add new entity at last clicked position with default properties.
+     */
+    public void addEntity() {
+
+        OdorWorldEntity entity = new OdorWorldEntity(this);
+        entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        addEntity(entity);
+
+    }
+
+    /**
+     * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
+     */
+    public void addAgent() {
+
+        OdorWorldEntity entity = new OdorWorldEntity(this, OdorWorldEntity.EntityType.MOUSE);
+        entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
+        entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        addEntity(entity);
 
     }
 
@@ -551,5 +580,14 @@ public class OdorWorld implements EditableObject {
 
     public void start() {
         changeSupport.firePropertyChange("worldStarted", null, null);
+    }
+
+
+    public Point2D getLastClickedPosition() {
+        return lastClickedPosition;
+    }
+
+    public void setLastClickedPosition(Point2D position) {
+        lastClickedPosition = position;
     }
 }

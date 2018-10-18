@@ -30,6 +30,7 @@ import org.simbrain.world.odorworld.actions.LoadTileMapAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -181,7 +182,24 @@ public class OdorWorldFrameMenu extends JMenuBar {
             }
         });
         editMenu.add(clearAllItems);
-        // editMenu.addSeparator();
+        editMenu.addSeparator();
+
+        // TODO: Factor the code for placing new entities out of network, to utils, and reuse here.
+        JMenuItem addEntity = new JMenuItem("Add Entity");
+        addEntity.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                world.addEntity();
+            }
+        });
+        editMenu.add(addEntity);
+        JMenuItem addAgent = new JMenuItem("Add Agent");
+        addAgent.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                world.addAgent();
+            }
+        });
+        editMenu.add(addAgent);
+
         // JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
         // loadVectors.addActionListener(new ActionListener() {
         //     public void actionPerformed(ActionEvent e) {

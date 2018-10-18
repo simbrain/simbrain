@@ -390,18 +390,7 @@ public class OdorWorldPanel extends JPanel {
         selectionModel.setSelection(elements);
     }
 
-    /**
-     * Last clicked position.
-     */
-    private Point2D lastClickedPosition = new Point2D.Double(50,50);
 
-    public Point2D getLastClickedPosition() {
-        return lastClickedPosition;
-    }
-
-    public void setLastClickedPosition(Point2D position) {
-        lastClickedPosition = position;
-    }
 
     /**
      * Update selection handles.
@@ -526,9 +515,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "addEntity");
         canvas.getActionMap().put("addEntity", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                OdorWorldEntity entity = new OdorWorldEntity(world);
-                entity.setLocation(getLastClickedPosition().getX(), getLastClickedPosition().getY());
-                world.addEntity(entity);
+                world.addEntity();
                 // TODO: Reuse network panel "click stream" logic
             }
         });
@@ -536,10 +523,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.SHIFT_MASK), "addAgent");
         canvas.getActionMap().put("addAgent", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
-                entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
-                entity.setLocation(getLastClickedPosition().getX(), getLastClickedPosition().getY());
-                world.addEntity(entity);
+                world.addAgent();
             }
         });
 

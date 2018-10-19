@@ -34,6 +34,14 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
             defaultValue = "3", order = 1)
     private double timeConstant = 3;
 
+    public ConvolvedJumpAndDecay(){
+
+    }
+
+    public ConvolvedJumpAndDecay(double tau) {
+        this.timeConstant = tau;
+    }
+
     @Override
     public ConvolvedJumpAndDecay deepCopy() {
         ConvolvedJumpAndDecay jad = new ConvolvedJumpAndDecay();

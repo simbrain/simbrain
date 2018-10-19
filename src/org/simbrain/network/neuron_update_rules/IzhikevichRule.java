@@ -275,4 +275,12 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         this.refractoryPeriod = refractoryPeriod;
     }
 
+    public double getGraphicalUpperBound() {
+        return threshold;
+    }
+
+    public double getGraphicalLowerBound() {
+        return c;
+    }
+
 }

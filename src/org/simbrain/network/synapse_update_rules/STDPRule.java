@@ -39,31 +39,37 @@ public class STDPRule extends SynapseUpdateRule {
      * Time constant for LTD.
      */
     @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", defaultValue = "60", order = 0)
-    protected double tau_minus;
+    protected double tau_minus = 60;
 
     /**
      * Time constant for LTP.
      */
     @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", defaultValue = "30", order = 1)
-    protected double tau_plus;
+    protected double tau_plus = 30;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTP changes.
      */
     @UserParameter(label = "W+", description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.", defaultValue = "10", order = 2)
-    protected double W_plus;
+    protected double W_plus = 10;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTD changes.
      */
     @UserParameter(label = "W-", description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.", defaultValue = "10", order = 3)
-    protected double W_minus;
+    protected double W_minus = 10;
 
     /**
      * General learning rate.
      */
     @UserParameter(label = "Learning rate", description = "General learning " + "rate.", defaultValue = ".01", order = 4)
-    protected double learningRate;
+    protected double learningRate = 0.01;
+
+    /**
+     * Sets whether or not STDP acts directly on W or dW/dt
+     */
+    @UserParameter(label = "Smooth STDP", description = "Whether STDP acts directly on weight or on its derivative instead", defaultValue = "false", order = 5)
+    protected boolean continuous = false;
 
     @Override
     public void init(Synapse synapse) {
@@ -72,6 +78,24 @@ public class STDPRule extends SynapseUpdateRule {
     @Override
     public String getName() {
         return "STDP";
+    }
+
+    public STDPRule(){
+
+    }
+
+    public STDPRule(STDPRule toCpy) {
+        this(toCpy.getW_plus(), toCpy.getW_minus(), toCpy.getTau_plus(),
+                toCpy.getTau_minus(), toCpy.learningRate, toCpy.continuous);
+    }
+
+    public STDPRule(double w_plus, double w_minus, double tau_plus, double tau_minus, double learningRate, boolean continuous) {
+        this.W_plus=w_plus;
+        this.W_minus=w_minus;
+        this.tau_plus=tau_plus;
+        this.tau_minus=tau_minus;
+        this.learningRate=learningRate;
+        this.continuous=continuous;
     }
 
     @Override
@@ -92,25 +116,35 @@ public class STDPRule extends SynapseUpdateRule {
 
     @Override
     public void update(Synapse synapse) {
+        final double str = synapse.getStrength();
         if (synapse.getSource().isSpike() || synapse.getTarget().isSpike()) {
             try {
-                final double str = synapse.getStrength();
-                final double delta_t = ((((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule()).getLastSpikeTime()) - ((SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule()).getLastSpikeTime()) * (hebbian ? 1 : -1);   // Reverse time window for
-                // anti-hebbian
+
+                final double delta_t = ((((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
+                        .getLastSpikeTime())
+                        - ((SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule()).getLastSpikeTime())
+                        * (hebbian ? 1 : -1);
                 if (delta_t < 0) {
                     delta_w = W_plus * Math.exp(delta_t / tau_plus) * learningRate;
                 } else if (delta_t > 0) {
                     delta_w = -W_minus * Math.exp(-delta_t / tau_minus) * learningRate;
                 }
-                if (Math.signum(str) == -1) {
-                    synapse.setStrength(str - delta_w);
-                } else {
-                    synapse.setStrength(str + delta_w);
-                }
+
             } catch (ClassCastException cce) {
                 cce.printStackTrace();
                 System.out.println("Don't use non-spiking neurons with STDP!");
             }
+            if ( !continuous && Math.signum(str) == -1 ) {
+                synapse.setStrength(str - delta_w * synapse.getSource().getNetwork().getTimeStep());
+            } else {
+                synapse.setStrength(str + delta_w * synapse.getSource().getNetwork().getTimeStep());
+            }
+        }
+
+        if ( continuous && Math.signum(str) == -1 ) {
+            synapse.setStrength(str - delta_w * synapse.getSource().getNetwork().getTimeStep());
+        } else {
+            synapse.setStrength(str + delta_w * synapse.getSource().getNetwork().getTimeStep());
         }
     }
 
@@ -190,6 +224,22 @@ public class STDPRule extends SynapseUpdateRule {
 
     public void setHebbian(boolean hebbian) {
         this.hebbian = hebbian;
+    }
+
+    public boolean isContinuous() {
+        return continuous;
+    }
+
+    public void setContinuous(boolean continuous) {
+        this.continuous=continuous;
+    }
+
+    public double getDelta_w() {
+        return  delta_w;
+    }
+
+    public void setDelta_w(double delta_w) {
+        this.delta_w = delta_w;
     }
 
 }

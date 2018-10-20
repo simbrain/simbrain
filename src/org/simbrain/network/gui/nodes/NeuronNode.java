@@ -337,7 +337,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * Sets the color of this neuron based on its activation level.
      */
     private void updateColor() {
-        double activation = neuron.getActivation();
+        double activation = neuron.getUpdateRule().getGraphicalValue(neuron);
         // Force to blank if 0 (or close to it)
         double gLow = neuron.getUpdateRule().getGraphicalLowerBound();
         double gUp = neuron.getUpdateRule().getGraphicalUpperBound();

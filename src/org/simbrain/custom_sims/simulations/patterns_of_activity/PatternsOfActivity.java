@@ -13,11 +13,8 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.synapse_update_rules.LogSTDPRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -25,25 +22,19 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.workspace.CouplingFactory;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * The goal here is to create a patch of neurons that respond in a semi-reliable
@@ -71,7 +62,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
     private int spacing = 40;
     private int maxDly = 10;
     private NeuronGroup recNeurons;
-    private int dispersion = 125;
+    private int dispersion = 160;
     double maxDist = Math.sqrt(2 * netSize * spacing);
     private STDPRule ruleEx = new STDPRule(5, 1, 20, 100, 0.001,
             true);
@@ -188,7 +179,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up input synapses (connections from sensory group to the recurrent group)
         SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(sensoryNet, recNeurons,
-                new Sparse(0.25, true, false));
+                new Sparse(0.5, true, false));
         initializeSynParameters(inpSynG);
         inpSynG.setStrength(40, Polarity.EXCITATORY);
         //inpSynG.setStrength(-10, Polarity.INHIBITORY);
@@ -281,7 +272,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up the connections to the read out neurons
         SynapseGroup out2read = new SynapseGroup(outGroup, readGroup);
-        out2read.setSpikeResponder(new ConvolvedJumpAndDecay(50), Polarity.BOTH);
+        out2read.setSpikeResponder(new ConvolvedJumpAndDecay(100), Polarity.BOTH);
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), readGroup.getNeuron(0)));
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), readGroup.getNeuron(0)));
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), readGroup.getNeuron(1)));
@@ -424,7 +415,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
 
     private double[] frEsts = new double[netSize + 4];
-
+    private double[] graphicVal = new double[netSize + 4];
 
     /**
      * Extends the normal integrate and fire rule but also normalizes synapses
@@ -437,7 +428,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         private final double nv = 1 / Math.log(4.98);
 
-        private double saturation = 2000;
+        private double saturation = 3000;
 
         //
         public NormIFRule(int index) {
@@ -450,11 +441,14 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
             double dt = n.getNetwork().getTimeStep();
             totalTimeS += dt;
-            double tau_base = dt / 1E4;
+            double tau_base = dt / 1E5;
 //            frEsts[index] = (1 - (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50))) * frEsts[index])
 //                    + (n.isSpike() ? 1 : 0) * (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50)));
+            double spk = n.isSpike() ? 1: 0;
             frEsts[index] = ((1 - tau_base) * frEsts[index])
-                    + ((n.isSpike() ? 1 : 0)+frEsts[index]) * tau_base;// * tau_base;
+                    + spk * ((spk)+frEsts[index]) * tau_base;// * tau_base;
+            graphicVal[index] = ((1 - 0.1 * dt) * graphicVal[index])
+                    + spk * ((spk)+graphicVal[index]) * 0.1 * dt;
             double nrmVal = saturation / (1 + Math.exp(-frEsts[index] * 100)) - saturation/3;
             double totStrEx = 0;
             double totStrIn = 0;
@@ -465,6 +459,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
                     continue;
                 }
                 if(n.getFanIn().get(jj).getSource().getPolarity() == Polarity.EXCITATORY) {
+
                     totStrEx += Math.abs(n.getFanIn().get(jj).getStrength());
                 } else {
                     totStrIn += Math.abs(n.getFanIn().get(jj).getStrength());
@@ -480,10 +475,10 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 Synapse s = n.getFanIn().get(jj);
                 if(s.getSource().getPolarity() == Polarity.EXCITATORY) {
                     if(totStrEx != 0)
-                        s.setStrength(s.getStrength() * (nrmVal / totStrEx));
+                        s.setStrength(s.getStrength() * (nrmVal / (totStrEx)));
                 } else {
                     if(totStrIn !=0)
-                        s.setStrength(s.getStrength() * (nrmVal / totStrIn));
+                        s.setStrength(s.getStrength() * (nrmVal / (totStrIn)));
                 }
                 double dampFac = nv * Math.log(5 - (Math.abs(s.getStrength()) / 50));
                 ((STDPRule) s.getLearningRule()).setDelta_w(
@@ -511,6 +506,19 @@ public class PatternsOfActivity extends RegisteredSimulation {
         @Override
         public String toString() {
             return getName();
+        }
+
+        @Override
+        public double getGraphicalValue(Neuron n) {
+            return 1000* graphicVal[index];
+        }
+
+        public double getGraphicalLowerBound() {
+            return 0;
+        }
+
+        public double getGraphicalUpperBound() {
+            return 30;
         }
 
     }

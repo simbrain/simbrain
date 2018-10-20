@@ -111,22 +111,22 @@ public class PatternsOfActivity extends RegisteredSimulation {
         OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
         mouse.addSensor(new SmellSensor(mouse, "Smell", 0, 0));
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(150, 180, OdorWorldEntity.EntityType.SWISS,
+        OdorWorldEntity cheese = world.addEntity(52, 220, OdorWorldEntity.EntityType.SWISS,
                 new double[]{18, 0, 5, 10, 5});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(290, 180, OdorWorldEntity.EntityType.FLOWER,
+        OdorWorldEntity flower = world.addEntity(266, 221, OdorWorldEntity.EntityType.FLOWER,
                 new double[]{3, 18, 2, 5, 10});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity cow = world.addEntity(100, 20, OdorWorldEntity.EntityType.COW,
+        OdorWorldEntity cow = world.addEntity(90, 23, OdorWorldEntity.EntityType.COW,
                 new double[]{3, 7, 16, 19, 0});
         cow.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity lion = world.addEntity(340, 20, OdorWorldEntity.EntityType.LION,
+        OdorWorldEntity lion = world.addEntity(340, 34, OdorWorldEntity.EntityType.LION,
                 new double[]{5, 2, 13, 16, 0});
         lion.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity susi = world.addEntity(90, 340, OdorWorldEntity.EntityType.SUSI,
+        OdorWorldEntity susi = world.addEntity(97, 351, OdorWorldEntity.EntityType.SUSI,
                 new double[]{0, 12, 15, 20});
         susi.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity steve = world.addEntity(310, 340, OdorWorldEntity.EntityType.STEVE,
+        OdorWorldEntity steve = world.addEntity(335, 297, OdorWorldEntity.EntityType.STEVE,
                 new double[]{12, 0, 20, 15});
         steve.getSmellSource().setDispersion(dispersion);
 
@@ -263,16 +263,16 @@ public class PatternsOfActivity extends RegisteredSimulation {
         for (Neuron n : readGroup.getNeuronList()) {
             n.setUpdateRule(new SigmoidalRule());
             n.getUpdateRule().setInputType(NeuronUpdateRule.InputType.SYNAPTIC);
-            ((SigmoidalRule) n.getUpdateRule()).setLowerBound(-2);
-            ((SigmoidalRule) n.getUpdateRule()).setUpperBound(2);
-            ((SigmoidalRule) n.getUpdateRule()).setSlope(1);
-            n.setUpperBound(2);
-            n.setLowerBound(-2);
+            ((SigmoidalRule) n.getUpdateRule()).setLowerBound(-4);
+            ((SigmoidalRule) n.getUpdateRule()).setUpperBound(4);
+            ((SigmoidalRule) n.getUpdateRule()).setSlope(4);
+            n.setUpperBound(4);
+            n.setLowerBound(-4);
         }
 
         // Set up the connections to the read out neurons
         SynapseGroup out2read = new SynapseGroup(outGroup, readGroup);
-        out2read.setSpikeResponder(new ConvolvedJumpAndDecay(100), Polarity.BOTH);
+        out2read.setSpikeResponder(new ConvolvedJumpAndDecay(20), Polarity.BOTH);
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), readGroup.getNeuron(0)));
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), readGroup.getNeuron(0)));
         out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), readGroup.getNeuron(1)));

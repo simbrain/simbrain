@@ -290,7 +290,13 @@ public class Simulation {
      */
     public void couple(SmellSensor sensor, NeuronGroup ng) {
         Producer sensoryProducer = couplingFactory.getProducer(sensor, "getCurrentValues");
-        Consumer sensoryConsumer = couplingFactory.getConsumer(ng, "forceSetActivations");
+        Consumer sensoryConsumer;
+        if(ng.isSpikingNeuronGroup()) {
+            sensoryConsumer  = couplingFactory.getConsumer(ng, "setInputValues");
+
+        } else {
+           sensoryConsumer = couplingFactory.getConsumer(ng, "forceSetActivations");
+        }
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
 

@@ -117,6 +117,8 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     @Deprecated
     private boolean hasSpiked;
 
+    private double memPotential = 0;
+
     /**
      * {@inheritDoc}
      */
@@ -148,7 +150,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
 
         double timeStep = neuron.getNetwork().getTimeStep();
 
-        double memPotential = neuron.getActivation();
+        memPotential = neuron.getActivation();
 
         /*
          * Formula:
@@ -303,12 +305,12 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
 
     @Override
     public double getGraphicalLowerBound() {
-        return resetPotential - 10;
+        return resetPotential;
     }
 
     @Override
     public double getGraphicalUpperBound() {
-        return threshold + 10;
+        return threshold;
     }
 
     /**

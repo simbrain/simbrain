@@ -385,4 +385,8 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         return deepCopy();
     }
 
+    public double getGraphicalValue(Neuron n) {
+        return n.getActivation();
+    }
+
 }

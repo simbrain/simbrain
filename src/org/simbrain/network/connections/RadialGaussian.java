@@ -282,6 +282,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     @Override
     public void connectNeurons(SynapseGroup synGroup) {
         this.synapseGroup = synGroup;
+        synGroup.setConnectionManager(this);
         List<Neuron> source = synGroup.getSourceNeurons();
         List<Neuron> target = synGroup.getTargetNeurons();
         List<Synapse> synapses;

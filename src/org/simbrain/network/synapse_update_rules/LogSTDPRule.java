@@ -76,6 +76,8 @@ public class LogSTDPRule extends STDPRule {
      */
     private double noiseVar = 0.6;
 
+    private double delta_w=0;
+
     /**
      * Updates the synapse's strength using Log-STDP.
      */
@@ -88,22 +90,23 @@ public class LogSTDPRule extends STDPRule {
         }
         SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule();
         SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule();
-        double delta_t, delta_w;
+        double delta_t;
         final double timeStep = synapse.getNetwork().getTimeStep();
         //        final double delay = synapse.getDelay() * timeStep;
         //        if (synapse.getStrength() >= 0) {
-        delta_t = (src.getLastSpikeTime()) - tar.getLastSpikeTime();
+        delta_t = (src.getLastSpikeTime()) - (tar.getLastSpikeTime());
         //        } else {
         //        	delta_t = tar.getLastSpikeTime()
         //        			- (src.getLastSpikeTime());
         //        }
+
         if (synapse.getStrength() >= 0) {
             double noise =
                     (1 + NormalDistribution.builder()
                             .ofMean(0)
                             .ofStandardDeviation(noiseVar)
                             .build().nextRand()
-            );
+                    );
             if (delta_t < 0) {
                 calcW_plusTerm(synapse);
                 delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t / tau_plus)) * (1 + noise);
@@ -113,22 +116,19 @@ public class LogSTDPRule extends STDPRule {
             } else {
                 delta_w = 0;
             }
-            if (synapse.getTarget().isSpike()) {
-                synapse.setStrength(synapse.clip(synapse.getStrength() - (learningRate * 0.05)));
-            }
-        } else {
-            if (delta_t > 0) {
-                delta_w = timeStep * learningRate * -1.0 * Math.exp(-delta_t / tau_plus);
-            } else if (delta_t < 0) {
-                delta_w = timeStep * learningRate * 1.5 * Math.exp(delta_t / tau_plus);
-            } else {
-                delta_w = 0;
-            }
-            if (synapse.getSource().isSpike()) {
-                synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * 0.05)));
-            }
         }
-        if (synapse.getStrength() <= 0) {
+//        } else {
+//            if (delta_t > 0) {
+//                delta_w = timeStep * learningRate * -1.0 * Math.exp(-delta_t / tau_plus);
+//            } else if (delta_t < 0) {
+//                delta_w = timeStep * learningRate * 1.5 * Math.exp(delta_t / tau_plus);
+//            } else {
+//                delta_w = 0;
+//            }
+//            if (synapse.getSource().isSpike()) {
+//                synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * delta_w)));
+//            }
+         else if (synapse.getStrength() <= 0) {
             if (delta_t > 0) {
                 delta_w = learningRate * 1.5 * Math.exp(-delta_t / tau_plus);
             } else if (delta_t < 0) {
@@ -136,12 +136,10 @@ public class LogSTDPRule extends STDPRule {
             } else {
                 delta_w = 0;
             }
-            synapse.setStrength(synapse.clip(synapse.getStrength() - delta_w));
-            if (synapse.getSource().isSpike()) {
-                synapse.setStrength(synapse.clip(synapse.getStrength() + learningRate * 0.2));
-            }
         }
+        synapse.setStrength(synapse.clip(synapse.getStrength() - delta_w));
     }
+
 
     /**
      * @param s

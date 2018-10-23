@@ -337,15 +337,23 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * Sets the color of this neuron based on its activation level.
      */
     private void updateColor() {
-        double activation = neuron.getActivation();
+        double activation = neuron.getUpdateRule().getGraphicalValue(neuron);
         // Force to blank if 0 (or close to it)
-        if ((activation > -.1) && (activation < .1)) {
+        double gLow = neuron.getUpdateRule().getGraphicalLowerBound();
+        double gUp = neuron.getUpdateRule().getGraphicalUpperBound();
+        double zpt = ((gUp-gLow)/2) + gLow;
+        if ((activation > zpt-(.01*zpt)) && (activation < zpt+(.01*zpt))) {
             mainShape.setPaint(Color.white);
-        } else if (activation > 0) {
+        } else if (activation > zpt) {
             float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalUpperBound()));
             mainShape.setPaint(Color.getHSBColor(hotColor, saturation, 1));
-        } else if (activation < 0) {
-            float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalLowerBound()));
+        } else if (activation < zpt) {
+            float saturation;
+            if(activation<=gLow) {
+                saturation = 1.0f;
+            } else {
+                saturation = checkSaturationValid((float) ((zpt-activation)/(zpt-gLow)));
+            }
             mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 

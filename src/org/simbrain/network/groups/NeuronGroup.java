@@ -25,7 +25,9 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -70,6 +72,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * The description of the update rule governing the group.
      */
     private String updateRule;
+
+    private NeuronUpdateRule excitatoryUpdateRule = new LinearRule();
+
+    private NeuronUpdateRule inhibitoryUpdateRule = new LinearRule();
 
     /**
      * Mostly here for backwards compatibility {@link #recordAsSpikes} is
@@ -175,7 +181,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * @param net     the network
      * @param neurons the neurons
      */
-    public NeuronGroup(final Network net, final List<Neuron> neurons) {
+    public NeuronGroup(final Network net, final List<? extends Neuron> neurons) {
         super(net);
         neuronList = new ArrayList<Neuron>(neurons.size());
         for (Neuron neuron : neurons) {
@@ -1539,6 +1545,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
+     * Sets the polarities of every neuron in the group.
+     * @param p
+     */
+    public void setPolarity(SimbrainConstants.Polarity p) {
+        for(Neuron n : neuronList) {
+            n.setPolarity(p);
+        }
+    }
+
+    /**
      * @return the useSubSampling
      */
     public static boolean isUseSubSampling() {
@@ -1609,7 +1625,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * Release the neurons as loose neurons.
      */
     public void releaseNeurons() {
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             getParentNetwork().addNeuron(neuron);
         }
         neuronList.clear();

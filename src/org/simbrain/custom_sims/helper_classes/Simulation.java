@@ -34,25 +34,25 @@ public class Simulation {
     /**
      * Reference to parent desktop.
      */
-    SimbrainDesktop desktop;
+    private transient SimbrainDesktop desktop;
 
     /**
      * Reference to parent workspace.
      */
-    Workspace workspace;
+    private transient Workspace workspace;
 
     /**
      * Reference to workspace coupling factory.
      */
-    CouplingFactory couplingFactory;
+    private transient CouplingFactory couplingFactory;
 
     /**
      * Associate networks and worlds with their respective components. Entries are
      * added when networks or worlds are added using the sim object. Facilitates
      * making couplings using methods with fewer arguments.
      */
-    Hashtable<Network, NetworkComponent> netMap = new Hashtable();
-    Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
+    private transient Hashtable<Network, NetworkComponent> netMap = new Hashtable();
+    private transient Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
     /**
      * @param desktop

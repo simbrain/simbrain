@@ -14,6 +14,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * While the smell framework involves objects emitting smells, object type
  * sensors have a sensitivity, and are more "sensor" or "subject" based than
  * object based.
+ * <br>
+ * The sensor itself is currently fixed at the center of the agent. We may
+ * make the location editable at some point, if uses cases emerge.
  */
 public class ObjectSensor extends Sensor {
 

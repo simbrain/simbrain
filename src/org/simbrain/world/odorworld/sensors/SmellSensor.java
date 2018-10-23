@@ -23,13 +23,15 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.gui.SensorNode;
+import org.simbrain.world.odorworld.gui.SmellSensorNode;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
  *
  * @see org.simbrain.util.environment.SmellSource
  */
-public class SmellSensor extends Sensor {
+public class SmellSensor extends Sensor implements VisualizableSensor {
 
     /**
      * Default label.
@@ -122,10 +124,25 @@ public class SmellSensor extends Sensor {
     }
 
     public double[] getLocation() {
+        double[] ret = getRelativeLocation();
+        ret[0] += parent.getCenterX();
+        ret[1] += parent.getCenterY();
+        return ret;
+    }
+
+    public double[] getRelativeLocation() {
         OdorWorldEntity parent = this.getParent();
-        double x = parent.getCenterLocation()[0] + (radius * Math.cos(parent.getHeadingRadians() + theta));
-        double y = parent.getCenterLocation()[1] - (radius * Math.sin(parent.getHeadingRadians() + theta));
+        double x =  (radius * Math.cos(parent.getHeadingRadians() + theta));
+        double y = -(radius * Math.sin(parent.getHeadingRadians() + theta));
         return new double[] {x, y};
+    }
+
+    public double getRelativeCenterX() {
+        return (radius * Math.cos(parent.getHeadingRadians() + theta)) + parent.getEntityType().getImageWidth() / 2;
+    }
+
+    public double getRelativeCenterY() {
+        return -(radius * Math.sin(parent.getHeadingRadians() + theta)) + parent.getEntityType().getImageHeight() / 2;
     }
 
     public double getTheta() {
@@ -166,5 +183,10 @@ public class SmellSensor extends Sensor {
     @Override
     public String getName() {
         return "Smell";
+    }
+
+    @Override
+    public SensorNode getNode() {
+        return new SmellSensorNode(this);
     }
 }

@@ -19,14 +19,26 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.RotatingSprite;
 import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.sensors.VisualizableSensor;
 
+// import java.awt.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Piccolo representation of an {@link OdorWorldEntity}.
@@ -63,6 +75,10 @@ public class EntityNode extends PNode {
      */
     private double frameCounter = 0;
 
+    private Map<VisualizableSensor, SensorNode> visualizableSensorMap = new HashMap<>();
+
+    private final static int SENSOR_DIAMATER = 6;
+
     /**
      * Construct an entity node with a back-ref to parent.
      *
@@ -76,6 +92,7 @@ public class EntityNode extends PNode {
         // this.setPickable(true); //Needed?
 
         updateImage();
+        syncViewWithModel();
 
         setOffset(entity.getX(), entity.getY());
         entity.addPropertyChangeListener(evt -> {
@@ -101,12 +118,46 @@ public class EntityNode extends PNode {
         entity.setY(p.getY());
     }
 
+    private void syncViewWithModel() {
+        updateSmellSensorModel();
+    }
+
+    private void updateSmellSensorModel() {
+
+        List<VisualizableSensor> visualizableSensorList =
+                entity.getSensors().stream()
+                        .filter(VisualizableSensor.class::isInstance)
+                        .map(VisualizableSensor.class::cast)
+                        .collect(Collectors.toList());
+
+        // TODO: let event handler handle removal.
+        for (VisualizableSensor vs : visualizableSensorMap.keySet()) {
+            if (!visualizableSensorList.contains(vs)) {
+                removeChild(visualizableSensorMap.get(vs));
+                visualizableSensorMap.remove(vs);
+            }
+        }
+
+        for (VisualizableSensor vs : visualizableSensorList) {
+            SensorNode currentSensorNode;
+            if (!visualizableSensorMap.containsKey(vs)) {
+                currentSensorNode = vs.getNode();
+                addChild(currentSensorNode);
+                visualizableSensorMap.put(vs, currentSensorNode);
+            } else {
+                currentSensorNode = visualizableSensorMap.get(vs);
+            }
+            currentSensorNode.update();
+        }
+    }
+
     /**
      * Initialize the image associated with the object.
      */
     private void updateImage() {
 
         removeChild(sprite);
+        visualizableSensorMap.values().forEach(this::removeChild);
 
         switch (entity.getEntityType()) {
         case SWISS:
@@ -134,6 +185,10 @@ public class EntityNode extends PNode {
         }
 
         addChild(sprite);
+        visualizableSensorMap.values().forEach(this::addChild);
+        if(entity.isRotating()) {
+            ((RotatingSprite) sprite).updateHeading(entity.getHeading());
+        }
 
     }
 
@@ -147,6 +202,7 @@ public class EntityNode extends PNode {
                 ((RotatingSprite) sprite).updateHeading(entity.getHeading());
             }
             setOffset(entity.getX(), entity.getY());
+            syncViewWithModel();
             repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
             updateFlag = false;
         }
@@ -170,5 +226,6 @@ public class EntityNode extends PNode {
     public OdorWorldEntity getEntity() {
         return entity;
     }
+
 
 }

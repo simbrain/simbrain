@@ -1506,36 +1506,29 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         this.isSpikingNeuronGroup = isSpikingNeuronGroup;
     }
 
-    /**
-     * Whether to use subsampling (for large neuron groups, only using a sample
-     * of activations for external components).
-     */
-    private static boolean useSubSampling = true;
-
+    //TODO: Wire this up
     /**
      * Number of subsamples to take. This value is also implicitly a threshold.
      * If a neuron group has more than this many neurons, and subsampling is
      * turned on, a vector with this many components is returned by (
-     * {@link #getExternalActivations}
+     * {@link #getSubsampledActivations()}
      */
-    private static int numSubSamples = 100;
+    @UserParameter(label = "Number of subsamples")
+    private int numSubSamples = 100;
 
     /**
-     * Returns a vector of activations to be used by some object external to the
-     * neuron group. If subsampling is turned on only some sample of these
-     * activations will be returned. Thus if plotting activations of a thousand
+     * Returns a vector of subsampled activations to be used by some object external to the
+     * neuron group. If plotting activations of a thousand
      * node network, a sample of 100 activations might be returned.
      *
      * @return the vector of external activations.
      */
     @Producible(idMethod = "getId")
-    public double[] getExternalActivations() {
-        if (!useSubSampling) {
-            return getActivations();
-        }
+    public double[] getSubsampledActivations() {
         if (neuronList.size() < numSubSamples) {
             return getActivations();
         } else {
+            // TODO: Better subsampling?
             double[] retArray = new double[numSubSamples];
             for (int i = 0; i < numSubSamples; i++) {
                 retArray[i] = neuronList.get(i).getActivation();
@@ -1555,23 +1548,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
-     * @return the useSubSampling
-     */
-    public static boolean isUseSubSampling() {
-        return useSubSampling;
-    }
-
-    /**
-     * @param useSubSampling the useSubSampling to set
-     */
-    public static void setUseSubSampling(boolean useSubSampling) {
-        NeuronGroup.useSubSampling = useSubSampling;
-    }
-
-    /**
      * @return the numSubSamples
      */
-    public static int getNumSubSamples() {
+    public int getNumSubSamples() {
         return numSubSamples;
     }
 
@@ -1579,7 +1558,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * @param numSubSamples the numSubSamples to set
      */
     public static void setNumSubSamples(int numSubSamples) {
-        NeuronGroup.numSubSamples = numSubSamples;
+        numSubSamples = numSubSamples;
     }
 
     /**

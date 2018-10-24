@@ -166,16 +166,6 @@ public class NetworkPropertiesPanel extends JPanel {
     private JCheckBox showTimeBox = new JCheckBox();
 
     /**
-     * Check box for whether to use subsampling.
-     */
-    private JCheckBox cbUseSubSampling = new JCheckBox();
-
-    /**
-     * Text field for number of subsamples to use.
-     */
-    private JTextField tfNumSubSamples = new JTextField();
-
-    /**
      * This method is the default constructor.
      *
      * @param np reference to <code>NetworkPanel</code>.
@@ -231,12 +221,6 @@ public class NetworkPropertiesPanel extends JPanel {
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
         miscPanel.addItem("Wand radius", wandRadiusField);
 
-        // Subsampling Stuff
-        miscPanel.add(new JSeparator(JSeparator.HORIZONTAL));
-        miscPanel.addItem("Use Subsampling for large neuron groups", cbUseSubSampling);
-        miscPanel.addItem("Number of Subsamples / Subsampling Threshold", tfNumSubSamples);
-        updateSubSamplingStuff();
-
         // TODO: tooltips for all this
         mainVertical.add(miscPanel);
 
@@ -279,19 +263,6 @@ public class NetworkPropertiesPanel extends JPanel {
                 setIndicatorColor();
             }
         });
-        cbUseSubSampling.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSubSamplingStuff();
-            }
-        });
-    }
-
-    /**
-     * Update the num subsamples text field (enabled only if subsampling is selected).
-     */
-    protected void updateSubSamplingStuff() {
-        tfNumSubSamples.setEnabled(cbUseSubSampling.isSelected());
     }
 
     /**
@@ -350,8 +321,6 @@ public class NetworkPropertiesPanel extends JPanel {
         iterUpdateField.setText(Integer.toString(networkPanel.getNetwork().getUpdateFreq()));
         nudgeAmountField.setText(Double.toString(NetworkPanel.getNudgeAmount()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(Network.getSynapseVisibilityThreshold()));
-        cbUseSubSampling.setSelected(NeuronGroup.isUseSubSampling());
-        tfNumSubSamples.setText(Integer.toString(NeuronGroup.getNumSubSamples()));
     }
 
     /**
@@ -373,8 +342,6 @@ public class NetworkPropertiesPanel extends JPanel {
         networkPanel.setShowTime(showTimeBox.isSelected());
         networkPanel.repaint();
 
-        NeuronGroup.setUseSubSampling(cbUseSubSampling.isSelected());
-        NeuronGroup.setNumSubSamples(Integer.parseInt(tfNumSubSamples.getText()));
     }
 
     /**

@@ -137,7 +137,8 @@ public abstract class Attribute {
         }
 
         // The default description format
-        return getId() + ":" + method.getName() + " (" + getTypeName() + ")";
+        return getId() + ":" + method.getName();
+        //return getId() + ":" + readableMethodname + " (" + getTypeName() + ")";
     }
 
     private String getCustomDescription() {

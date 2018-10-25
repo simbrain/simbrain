@@ -205,11 +205,9 @@ public class TextWorldActions {
                 putValue(SHORT_DESCRIPTION, "Load text.");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(".", "Text import");
+                SFileChooser chooser = new SFileChooser(".", "Text import", "txt");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     world.setText(Utils.readFileContents(theFile));

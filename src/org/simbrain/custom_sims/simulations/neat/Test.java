@@ -133,7 +133,7 @@ public class Test {
         ((Turning) newEntity.getEffectors().get(2)).addAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
         // update world
-        w.update(1);
+        w.update();
 
         // compute fitness score
 
@@ -246,7 +246,7 @@ public class Test {
         ((Turning) pinnedMouse.getEffectors().get(1)).addAmount(n2.getNeuronGroups().get(1).getNeuron(1).getActivation());
         ((Turning) pinnedMouse.getEffectors().get(2)).addAmount(n2.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
-        w.update(1);
+        w.update();
 
         if (w.containsEntity(cheese)) {
             // fitness counting and making cheese move when touch

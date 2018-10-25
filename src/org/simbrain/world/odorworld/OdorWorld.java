@@ -106,10 +106,8 @@ public class OdorWorld implements EditableObject {
 
     /**
      * Update world.
-     *
-     * @param time an integer representation of time.
      */
-    public void update(int time) {
+    public void update() {
         for (OdorWorldEntity entity : entityList) {
             entity.updateSmellSource();
             entity.update();
@@ -302,8 +300,6 @@ public class OdorWorld implements EditableObject {
             recomputeMaxStimulusLength();
             changeSupport.firePropertyChange("entityDeleted", null, entity);
         }
-
-
 
     }
 

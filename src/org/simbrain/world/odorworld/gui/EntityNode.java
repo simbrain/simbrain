@@ -147,12 +147,12 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Initialize the image associated with the object.
+     * Initialize the image associated with the object. Only called when
+     * changing the image.
      */
     private void updateImage() {
 
         removeChild(sprite);
-        visualizablePeripheralMap.values().forEach(this::removeChild);
 
         switch (entity.getEntityType()) {
         case SWISS:
@@ -180,13 +180,12 @@ public class EntityNode extends PNode {
         }
 
         addChild(sprite);
-        visualizablePeripheralMap.values().forEach(this::addChild);
+        visualizablePeripheralMap.values().forEach(PNode::raiseToTop);
         if(entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }
 
     }
-
 
     private void update() {
 

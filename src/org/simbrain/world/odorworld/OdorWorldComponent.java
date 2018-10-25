@@ -143,7 +143,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        world.update(this.getWorkspace().getTime());
+        world.update();
     }
 
     /**

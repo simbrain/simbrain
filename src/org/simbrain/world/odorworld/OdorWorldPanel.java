@@ -509,6 +509,7 @@ public class OdorWorldPanel extends JPanel {
     }
 
 
+    //TODO: Maybe move to a new class like in network
     private void addKeyBindings(OdorWorld world) {
 
         // Add / delete

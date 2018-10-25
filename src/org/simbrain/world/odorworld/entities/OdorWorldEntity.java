@@ -35,6 +35,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
@@ -100,6 +101,14 @@ public class OdorWorldEntity implements EditableObject {
     protected double manualStraightMovementIncrement = 1;
 
     /**
+     * The velocity vector used to update the entity's position
+     * when it is manually moved using the keyboard commands.  This should not
+     * be set by the user.  It is computed from the entity's
+     * {@link #manualStraightMovementIncrement} and {@link #heading}.
+     */
+    private Point2D.Double manualMovementVelocity;
+
+    /**
      * Current heading / orientation.
      */
     private double heading = DEFAULT_HEADING;
@@ -158,9 +167,9 @@ public class OdorWorldEntity implements EditableObject {
     private boolean effectorsEnabled = false;
 
     /**
-     * If true, show sensors.
+     * If true, show peripheral attributes.
      */
-    @UserParameter(label = "Show sensors", order = 30)
+    @UserParameter(label = "Show Attributes", description= "Show Attributes (Sensors and Effectors)", order = 30)
     private boolean showSensors = true;
 
     /**
@@ -213,6 +222,10 @@ public class OdorWorldEntity implements EditableObject {
         if (currentlyHeardPhrases != null) {
             currentlyHeardPhrases.clear();
         }
+
+        // TODO: For now calling this by default. If this causes problems we
+        // can make it based on a flag.
+        updateHeadingBasedOnVelocity();
 
         changeSupport.firePropertyChange("updated", null, this);
 
@@ -961,6 +974,16 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     /**
+     * Set the heading to be in the direction of current velocity.
+     */
+    public void updateHeadingBasedOnVelocity() {
+        boolean velocityIsNonZero = !((dx == 0) && (dy == 0));
+        if (velocityIsNonZero) {
+            setHeading(Math.toDegrees(Math.atan2(getVelocityX(), getVelocityY())) - 90);
+        }
+    }
+
+    /**
      * Add some default sensors and effectors.
      */
     public void addDefaultSensorsEffectors() {
@@ -1085,6 +1108,7 @@ public class OdorWorldEntity implements EditableObject {
      * Type of this object.  These are mapped to images, etc.
      */
     public enum EntityType {
+
         SWISS("Swiss", false, false, false, 32, 32),
         FLOWER("Flower", false, false, false, 32, 32),
         MOUSE("Mouse", true, true, true, 40, 40),
@@ -1155,5 +1179,8 @@ public class OdorWorldEntity implements EditableObject {
         }
 
     }
+
+
+
 
 }

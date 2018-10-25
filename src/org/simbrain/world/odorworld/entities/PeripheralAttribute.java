@@ -11,7 +11,9 @@ public interface PeripheralAttribute {
 
 
     public String getId();
+
     public String getLabel();
+
     public String getTypeDescription();
 
     public OdorWorldEntity getParent();

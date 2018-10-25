@@ -35,6 +35,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
@@ -110,6 +111,14 @@ public class OdorWorldEntity implements EditableObject {
     protected double manualStraightMovementIncrement = 1;
 
     /**
+     * The velocity vector used to update the entity's position
+     * when it is manually moved using the keyboard commands.  This should not
+     * be set by the user.  It is computed from the entity's
+     * {@link #manualStraightMovementIncrement} and {@link #heading}.
+     */
+    private Point2D.Double manualMovementVelocity;
+
+    /**
      * Current heading / orientation.
      */
     private double heading = DEFAULT_HEADING;
@@ -168,9 +177,9 @@ public class OdorWorldEntity implements EditableObject {
     private boolean effectorsEnabled = false;
 
     /**
-     * If true, show sensors.
+     * If true, show peripheral attributes.
      */
-    @UserParameter(label = "Show sensors", order = 30)
+    @UserParameter(label = "Show Attributes", description= "Show Attributes (Sensors and Effectors)", order = 30)
     private boolean showSensors = true;
 
     /**
@@ -217,6 +226,10 @@ public class OdorWorldEntity implements EditableObject {
         if (currentlyHeardPhrases != null) {
             currentlyHeardPhrases.clear();
         }
+
+        // TODO: For now calling this by default. If this causes problems we
+        // can make it based on a flag.
+        updateHeadingBasedOnVelocity();
 
         changeSupport.firePropertyChange("updated", null, this);
 
@@ -1004,6 +1017,16 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     /**
+     * Set the heading to be in the direction of current velocity.
+     */
+    public void updateHeadingBasedOnVelocity() {
+        boolean velocityIsNonZero = !((dx == 0) && (dy == 0));
+        if (velocityIsNonZero) {
+            setHeading(Math.toDegrees(Math.atan2(getVelocityX(), getVelocityY())) - 90);
+        }
+    }
+
+    /**
      * Add some default sensors and effectors.
      */
     public void addDefaultSensorsEffectors() {
@@ -1126,6 +1149,48 @@ public class OdorWorldEntity implements EditableObject {
         return radius * radius > dx * dx + dy * dy;
     }
 
+    // Intializer
+    {
+        // When checking collision on the right of this entity
+        collisionConditions.put("right",
+            List.of(
+                // if the up bound of this entity is collided with the left of other entity,
+                // it is a right collision
+                new Pair<>("up", "left"),
+                // if down bound of this and left bound of other
+                new Pair<>("down", "left"),
+                // if right bound of this and up bound of other
+                new Pair<>("right", "up"),
+                // etc.
+                new Pair<>("right", "down")
+            )
+        );
+        collisionConditions.put("left",
+            List.of(
+                new Pair<>("up", "right"),
+                new Pair<>("down", "right"),
+                new Pair<>("left", "up"),
+                new Pair<>("left", "down")
+            )
+        );
+        collisionConditions.put("down",
+            List.of(
+                new Pair<>("left", "up"),
+                new Pair<>("right", "up"),
+                new Pair<>("down", "left"),
+                new Pair<>("down", "right")
+            )
+        );
+        collisionConditions.put("up",
+            List.of(
+                new Pair<>("left", "down"),
+                new Pair<>("right", "down"),
+                new Pair<>("up", "left"),
+                new Pair<>("up", "right")
+            )
+        );
+
+    }
 
     // TODO: Put in all missing static objects
     // TODO: Move to separate class?
@@ -1133,6 +1198,7 @@ public class OdorWorldEntity implements EditableObject {
      * Type of this object.  These are mapped to images, etc.
      */
     public enum EntityType {
+
         SWISS("Swiss", false, false, false, 32, 32),
         FLOWER("Flower", false, false, false, 32, 32),
         MOUSE("Mouse", true, true, true, 40, 40),
@@ -1205,47 +1271,6 @@ public class OdorWorldEntity implements EditableObject {
     }
 
 
-    // Intializer
-    {
-        // When checking collision on the right of this entity
-        collisionConditions.put("right",
-            List.of(
-                // if the up bound of this entity is collided with the left of other entity,
-                // it is a right collision
-                new Pair<>("up", "left"),
-                // if down bound of this and left bound of other
-                new Pair<>("down", "left"),
-                // if right bound of this and up bound of other
-                new Pair<>("right", "up"),
-                // etc.
-                new Pair<>("right", "down")
-            )
-        );
-        collisionConditions.put("left",
-            List.of(
-                new Pair<>("up", "right"),
-                new Pair<>("down", "right"),
-                new Pair<>("left", "up"),
-                new Pair<>("left", "down")
-            )
-        );
-        collisionConditions.put("down",
-            List.of(
-                new Pair<>("left", "up"),
-                new Pair<>("right", "up"),
-                new Pair<>("down", "left"),
-                new Pair<>("down", "right")
-            )
-        );
-        collisionConditions.put("up",
-            List.of(
-                new Pair<>("left", "down"),
-                new Pair<>("right", "down"),
-                new Pair<>("up", "left"),
-                new Pair<>("up", "right")
-            )
-        );
 
-    }
 
 }

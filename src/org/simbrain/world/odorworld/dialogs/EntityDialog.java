@@ -98,8 +98,8 @@ public class EntityDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
+        mainEditor.commitChanges(); // Note this must get called before entityRef, which checks the entity type, which may have changed
         entityRef.commitEditorChanges();
-        mainEditor.commitChanges();
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }

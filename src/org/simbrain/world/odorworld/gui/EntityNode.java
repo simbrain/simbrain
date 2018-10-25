@@ -124,6 +124,7 @@ public class EntityNode extends PNode {
 
     private void updateSmellSensorModel() {
 
+
         List<VisualizableSensor> visualizableSensorList =
                 entity.getSensors().stream()
                         .filter(VisualizableSensor.class::isInstance)
@@ -152,12 +153,12 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Initialize the image associated with the object.
+     * Initialize the image associated with the object. Only called when
+     * changing the image.
      */
     private void updateImage() {
 
         removeChild(sprite);
-        visualizableSensorMap.values().forEach(this::removeChild);
 
         switch (entity.getEntityType()) {
         case SWISS:
@@ -185,13 +186,12 @@ public class EntityNode extends PNode {
         }
 
         addChild(sprite);
-        visualizableSensorMap.values().forEach(this::addChild);
+        visualizableSensorMap.values().forEach(i -> i.raiseToTop());
         if(entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }
 
     }
-
 
     private void update() {
 

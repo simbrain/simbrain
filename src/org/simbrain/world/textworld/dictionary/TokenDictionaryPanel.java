@@ -201,7 +201,7 @@ public class TokenDictionaryPanel extends EditablePanel {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
                 putValue(NAME, "Extract vector tokens");
-                putValue(SHORT_DESCRIPTION, "Extract tokens from vectory dictionary.");
+                putValue(SHORT_DESCRIPTION, "Extract tokens from vector dictionary.");
             }
 
             public void actionPerformed(ActionEvent arg0) {

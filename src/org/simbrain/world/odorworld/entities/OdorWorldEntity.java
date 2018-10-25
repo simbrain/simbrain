@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import org.simbrain.util.Pair;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
@@ -26,6 +25,7 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.RectangleCollisionBound;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -34,7 +34,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
-import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
@@ -77,19 +77,9 @@ public class OdorWorldEntity implements EditableObject {
     protected double y;
 
     /**
-     * Approximated collision bound.
-     */
-    private double collisionRadius;
-
-    /**
      * Actual collision bound.
      */
-    private HashMap<String, Line2D.Double> collisionBounds = new HashMap<>();
-
-    /**
-     * Collision bound handling conditions
-     */
-    private HashMap<String, List<Pair<String, String>>> collisionConditions = new HashMap<>();
+    private RectangleCollisionBound collisionBound;
 
     /**
      * X Velocity.
@@ -185,7 +175,13 @@ public class OdorWorldEntity implements EditableObject {
      */
     public OdorWorldEntity(OdorWorld world) {
         this.parentWorld = world;
-        updateCollisionRadius();
+        collisionBound = new RectangleCollisionBound(
+                new Rectangle2D.Double(
+                        0,
+                        0,
+                        getEntityType().getImageWidth(),
+                        getEntityType().getImageHeight()
+                ));
         updateCollisionBound();
     }
 
@@ -207,8 +203,8 @@ public class OdorWorldEntity implements EditableObject {
      * velocity.
      */
     public void update() {
-        updateCollisionBound();
         simpleMotion();
+        updateCollisionBound();
 
         updateSensors();
         updateEffectors();
@@ -234,25 +230,12 @@ public class OdorWorldEntity implements EditableObject {
      */
     private void simpleMotion() {
         if (dx != 0) {
-            boolean collided = false;
-            if (dx > 0) {
-                collided = collideOn("right");
-            } else {
-                collided = collideOn("left");
-            }
-
-            if (!collided) {
+            if (!collideOn("x")) {
                 setX(x + dx);
             }
         }
         if (dy != 0) {
-            boolean collided = false;
-            if (dy > 0) {
-                collided = collideOn("down");
-            } else {
-                collided = collideOn("up");
-            }
-            if (!collided) {
+            if (!collideOn("y")) {
                 setY(y + dy);
             }
         }
@@ -273,7 +256,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void setX(final double newx) {
-        updateCollisionBound();
         // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
@@ -286,6 +268,7 @@ public class OdorWorldEntity implements EditableObject {
         } else {
             this.x = newx;
         }
+        updateCollisionBound();
         changeSupport.firePropertyChange("moved", null, null);
 
     }
@@ -297,7 +280,6 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void setY(final double newy) {
-        updateCollisionBound();
         // System.out.println("y:" + newy);
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
@@ -310,6 +292,7 @@ public class OdorWorldEntity implements EditableObject {
         } else {
             this.y = newy;
         }
+        updateCollisionBound();
         changeSupport.firePropertyChange("moved", null, null);
     }
 
@@ -344,6 +327,7 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void setVelocityX(final double dx) {
         this.dx = dx;
+        updateCollisionBound();
     }
 
     /**
@@ -355,6 +339,11 @@ public class OdorWorldEntity implements EditableObject {
     @Consumable(idMethod = "getId")
     public void setVelocityY(final double dy) {
         this.dy = dy;
+        updateCollisionBound();
+    }
+
+    public RectangleCollisionBound getCollisionBound() {
+        return collisionBound;
     }
 
     /**
@@ -498,6 +487,11 @@ public class OdorWorldEntity implements EditableObject {
                 sensor.update();
             }
         }
+    }
+
+    public void updateCollisionBound() {
+        collisionBound.setVelocity(dx, dy);
+        collisionBound.setLocation(x, y);
     }
 
     /**
@@ -795,55 +789,18 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void setEntityType(EntityType entityType) {
         this.entityType = entityType;
-        updateCollisionRadius();
+        collisionBound = new RectangleCollisionBound(
+                new Rectangle2D.Double(
+                        0,
+                        0,
+                        getEntityType().getImageWidth(),
+                        getEntityType().getImageHeight()
+                ));
         updateCollisionBound();
     }
 
     public EntityType getEntityType() {
         return entityType;
-    }
-
-    private void updateCollisionRadius() {
-        // the collision radius is approximately the circle enclosing the rectangular bound of this object.
-        // 1.5 is about sqrt(2), which is the ratio of length of the diagonal line to the side of a square,
-        // and the radius is half of that.
-        collisionRadius = Math.max(entityType.imageWidth, entityType.imageHeight) * 0.75;
-    }
-
-    /**
-     * Set collision bound based on the entity type information.
-     */
-    private void updateCollisionBound() {
-        if (collisionBounds.isEmpty()) {
-            collisionBounds.put("up", new Line2D.Double());
-            collisionBounds.put("down", new Line2D.Double());
-            collisionBounds.put("left", new Line2D.Double());
-            collisionBounds.put("right", new Line2D.Double());
-        }
-        collisionBounds.get("up").setLine(
-            x + dx,
-            y,
-            x + entityType.imageWidth + dx,
-            y
-        );
-        collisionBounds.get("down").setLine(
-            x + dx,
-            y + entityType.imageHeight,
-            x + entityType.imageWidth + dx,
-            y + entityType.imageHeight
-        );
-        collisionBounds.get("left").setLine(
-            x,
-            y + dy,
-            x,
-            y + entityType.imageHeight + dy
-        );
-        collisionBounds.get("right").setLine(
-            x + entityType.imageWidth,
-            y + dy,
-            x + entityType.imageWidth,
-            y + entityType.imageHeight + dy
-        );
     }
 
     // TODO: Make finer grained. entityTypeChange?
@@ -1054,23 +1011,18 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * Check if this entity is colliding with other entity in a given direction.
      *
-     * @param direction direction can be "up", "down", "left", "right.
+     * @param direction direction can be "x", "y", or "xy".
      * @param other     the other entity
      * @return true if collided
      */
     public boolean collideOn(String direction, OdorWorldEntity other) {
-        for (Pair p : collisionConditions.get(direction)) {
-            if (collisionBounds.get(p.getKey()).intersectsLine(other.collisionBounds.get(p.getValue()))) {
-                return true;
-            }
-        }
-        return false;
+        return collisionBound.collide(direction, other.collisionBound);
     }
 
     /**
      * Check if this entity is colliding with any entity in the world.
      *
-     * @param direction direction can be "up", "down", "left", "right.
+     * @param direction direction can be "x", "y".
      * @return true if collided
      */
     public boolean collideOn(String direction) {
@@ -1094,7 +1046,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     public List<OdorWorldEntity> getEntitiesInCollisionRadius() {
         return parentWorld.getEntityList().stream()
-            .filter(i -> isInRadius(i, collisionRadius + i.collisionRadius))
+            .filter(i -> collisionBound.isInCollisionRadius(i.collisionBound))
             .collect(Collectors.toList());
     }
 
@@ -1201,50 +1153,6 @@ public class OdorWorldEntity implements EditableObject {
         public double getImageHeight() {
             return imageHeight;
         }
-
-    }
-
-
-    // Intializer
-    {
-        // When checking collision on the right of this entity
-        collisionConditions.put("right",
-            List.of(
-                // if the up bound of this entity is collided with the left of other entity,
-                // it is a right collision
-                new Pair<>("up", "left"),
-                // if down bound of this and left bound of other
-                new Pair<>("down", "left"),
-                // if right bound of this and up bound of other
-                new Pair<>("right", "up"),
-                // etc.
-                new Pair<>("right", "down")
-            )
-        );
-        collisionConditions.put("left",
-            List.of(
-                new Pair<>("up", "right"),
-                new Pair<>("down", "right"),
-                new Pair<>("left", "up"),
-                new Pair<>("left", "down")
-            )
-        );
-        collisionConditions.put("down",
-            List.of(
-                new Pair<>("left", "up"),
-                new Pair<>("right", "up"),
-                new Pair<>("down", "left"),
-                new Pair<>("down", "right")
-            )
-        );
-        collisionConditions.put("up",
-            List.of(
-                new Pair<>("left", "down"),
-                new Pair<>("right", "down"),
-                new Pair<>("up", "left"),
-                new Pair<>("up", "right")
-            )
-        );
 
     }
 

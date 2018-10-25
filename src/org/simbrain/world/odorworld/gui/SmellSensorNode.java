@@ -10,7 +10,7 @@ import java.awt.*;
 /**
  * Visual representation of smell sensors.
  */
-public class SmellSensorNode extends SensorNode<SmellSensor> {
+public class SmellSensorNode extends EntityAttributeNode {
 
     /**
      * Sensor diameter
@@ -47,11 +47,6 @@ public class SmellSensorNode extends SensorNode<SmellSensor> {
     }
 
     @Override
-    public SmellSensor getSensor() {
-        return sensor;
-    }
-
-    @Override
     public void update() {
         shape.setOffset(sensor.getRelativeCenterX(), sensor.getRelativeCenterY());
         double val = SimbrainMath.getVectorNorm(sensor.getCurrentValues());
@@ -65,6 +60,6 @@ public class SmellSensorNode extends SensorNode<SmellSensor> {
         if (saturation < 0) {
             saturation = 0;
         }
-        shape.setPaint(Color.getHSBColor(sensorColor, saturation, 1));
+        shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));
     }
 }

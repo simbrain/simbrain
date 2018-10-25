@@ -19,22 +19,16 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PPath;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.RotatingSprite;
 import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
-import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.VisualizableSensor;
+import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 // import java.awt.*;
-import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +69,7 @@ public class EntityNode extends PNode {
      */
     private double frameCounter = 0;
 
-    private Map<VisualizableSensor, SensorNode> visualizableSensorMap = new HashMap<>();
-
-    private final static int SENSOR_DIAMATER = 6;
+    private Map<VisualizableEntityAttribute, EntityAttributeNode> visualizablePeripheralMap = new HashMap<>();
 
     /**
      * Construct an entity node with a back-ref to parent.
@@ -118,36 +110,39 @@ public class EntityNode extends PNode {
         entity.setY(p.getY());
     }
 
+    /**
+     * Update
+     */
     private void syncViewWithModel() {
         updateSmellSensorModel();
     }
 
     private void updateSmellSensorModel() {
 
-        List<VisualizableSensor> visualizableSensorList =
+        List<VisualizableEntityAttribute> visualizableEntityAttributeList =
                 entity.getSensors().stream()
-                        .filter(VisualizableSensor.class::isInstance)
-                        .map(VisualizableSensor.class::cast)
+                        .filter(VisualizableEntityAttribute.class::isInstance)
+                        .map(VisualizableEntityAttribute.class::cast)
                         .collect(Collectors.toList());
 
         // TODO: let event handler handle removal.
-        for (VisualizableSensor vs : visualizableSensorMap.keySet()) {
-            if (!visualizableSensorList.contains(vs)) {
-                removeChild(visualizableSensorMap.get(vs));
-                visualizableSensorMap.remove(vs);
+        for (VisualizableEntityAttribute vp : visualizablePeripheralMap.keySet()) {
+            if (!visualizableEntityAttributeList.contains(vp)) {
+                removeChild(visualizablePeripheralMap.get(vp));
+                visualizablePeripheralMap.remove(vp);
             }
         }
 
-        for (VisualizableSensor vs : visualizableSensorList) {
-            SensorNode currentSensorNode;
-            if (!visualizableSensorMap.containsKey(vs)) {
-                currentSensorNode = vs.getNode();
-                addChild(currentSensorNode);
-                visualizableSensorMap.put(vs, currentSensorNode);
+        for (VisualizableEntityAttribute vp : visualizableEntityAttributeList) {
+            EntityAttributeNode currentEntityAttributeNode;
+            if (!visualizablePeripheralMap.containsKey(vp)) {
+                currentEntityAttributeNode = vp.getNode();
+                addChild(currentEntityAttributeNode);
+                visualizablePeripheralMap.put(vp, currentEntityAttributeNode);
             } else {
-                currentSensorNode = visualizableSensorMap.get(vs);
+                currentEntityAttributeNode = visualizablePeripheralMap.get(vp);
             }
-            currentSensorNode.update();
+            currentEntityAttributeNode.update();
         }
     }
 
@@ -157,7 +152,7 @@ public class EntityNode extends PNode {
     private void updateImage() {
 
         removeChild(sprite);
-        visualizableSensorMap.values().forEach(this::removeChild);
+        visualizablePeripheralMap.values().forEach(this::removeChild);
 
         switch (entity.getEntityType()) {
         case SWISS:
@@ -185,7 +180,7 @@ public class EntityNode extends PNode {
         }
 
         addChild(sprite);
-        visualizableSensorMap.values().forEach(this::addChild);
+        visualizablePeripheralMap.values().forEach(this::addChild);
         if(entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }

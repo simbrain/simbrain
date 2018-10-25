@@ -23,7 +23,7 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.SensorNode;
+import org.simbrain.world.odorworld.gui.EntityAttributeNode;
 import org.simbrain.world.odorworld.gui.SmellSensorNode;
 
 /**
@@ -31,7 +31,7 @@ import org.simbrain.world.odorworld.gui.SmellSensorNode;
  *
  * @see org.simbrain.util.environment.SmellSource
  */
-public class SmellSensor extends Sensor implements VisualizableSensor {
+public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Default label.
@@ -186,7 +186,7 @@ public class SmellSensor extends Sensor implements VisualizableSensor {
     }
 
     @Override
-    public SensorNode getNode() {
+    public EntityAttributeNode getNode() {
         return new SmellSensorNode(this);
     }
 }

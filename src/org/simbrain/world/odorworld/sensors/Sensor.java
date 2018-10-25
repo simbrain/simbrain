@@ -32,7 +32,13 @@ import java.util.List;
 public abstract class Sensor implements CopyableObject, PeripheralAttribute {
 
     public static List<Class> SENSOR_LIST =
-            Arrays.asList(SmellSensor.class, Hearing.class, TileSensor.class, ObjectSensor.class);
+            Arrays.asList(
+                    SmellSensor.class,
+                    Hearing.class,
+                    TileSensor.class,
+                    ObjectSensor.class,
+                    BumpSensor.class
+            );
 
     public static List<Class> getTypes() {
         return SENSOR_LIST;

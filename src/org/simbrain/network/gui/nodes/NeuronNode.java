@@ -155,7 +155,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private static Color spikingColor = Color.yellow;
 
     /**
-     * Whether text should be visible (when zoomed out, it should be invisible).
+     * Whether text should be visible (when zoomed out, it should be
+     * invisible).
      */
     private boolean currentTextVisibility;
 
@@ -341,18 +342,28 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         // Force to blank if 0 (or close to it)
         double gLow = neuron.getUpdateRule().getGraphicalLowerBound();
         double gUp = neuron.getUpdateRule().getGraphicalUpperBound();
-        double zpt = ((gUp-gLow)/2) + gLow;
-        if ((activation > zpt-(.01*zpt)) && (activation < zpt+(.01*zpt))) {
+
+        // A "graphical zero point" (the midpoint of the graphical upper and lower bounds);
+        // the "white" state to be non-zero.  For example in some biological
+        // sims it makes sense to have the "graphical zero" be  non-zero, like when -55
+        // is the resting potential of a biological simulation of a neuron.  This way
+        // most spiking neurons will go through the full blue to red range of colors
+        // before spiking rather than sticking around just one or the other color, and
+        // blue will always correspond to a hyperpolarized,
+        // quiescent state while red will always correspond to an excited,
+        // near depolarized state.
+        double gZeroPoint = ((gUp - gLow) / 2) + gLow;
+        if (Math.abs(activation - gZeroPoint) < 0.001) {
             mainShape.setPaint(Color.white);
-        } else if (activation > zpt) {
+        } else if (activation > gZeroPoint) {
             float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalUpperBound()));
             mainShape.setPaint(Color.getHSBColor(hotColor, saturation, 1));
-        } else if (activation < zpt) {
+        } else if (activation < gZeroPoint) {
             float saturation;
-            if(activation<=gLow) {
+            if (activation <= gLow) {
                 saturation = 1.0f;
             } else {
-                saturation = checkSaturationValid((float) ((zpt-activation)/(zpt-gLow)));
+                saturation = checkSaturationValid((float) ((gZeroPoint - activation) / (gZeroPoint - gLow)));
             }
             mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
@@ -375,7 +386,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             return;
         }
 
-        if(neuron.getLabel() == null) {
+        if (neuron.getLabel() == null) {
             return;
         }
 

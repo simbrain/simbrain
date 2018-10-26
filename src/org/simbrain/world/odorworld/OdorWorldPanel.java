@@ -487,6 +487,8 @@ public class OdorWorldPanel extends JPanel {
     private void releaseManualMovement(OdorWorldEntity entity) {
         if (!getManualMovementState()) {
             entity.setManualMode(false);
+        }
+        if (!getManualMovementState("w") && !getManualMovementState("s")) {
             entity.resetManualVelocity();
         }
     }

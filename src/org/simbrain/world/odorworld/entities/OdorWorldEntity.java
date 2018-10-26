@@ -106,7 +106,9 @@ public class OdorWorldEntity implements EditableObject {
      * be set by the user.  It is computed from the entity's
      * {@link #manualStraightMovementIncrement} and {@link #heading}.
      */
-    private Point2D.Double manualMovementVelocity;
+    private Point2D.Double manualMovementVelocity = new Point2D.Double();
+
+    private boolean manualMode = false;
 
     /**
      * Current heading / orientation.
@@ -232,16 +234,30 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     public void manualMovementUpdate() {
-        updateCollisionBound();
-        simpleMotion();
-        changeSupport.firePropertyChange("updated", null, this);
-        changeSupport.firePropertyChange("manuallyUpdated", null, this);
+        if (manualMode) {
+            updateCollisionBound();
+            simpleMotion();
+            changeSupport.firePropertyChange("updated", null, this);
+            changeSupport.firePropertyChange("manuallyUpdated", null, this);
+        }
+    }
+
+    public void resetManualVelocity() {
+        manualMovementVelocity.setLocation(0.0, 0.0);
     }
 
     /**
      * Simple motion control.
      */
     private void simpleMotion() {
+        double dx, dy;
+        if (manualMode) {
+            dx = manualMovementVelocity.getX();
+            dy = manualMovementVelocity.getY();
+        } else {
+            dx = this.dx;
+            dy = this.dy;
+        }
         if (dx != 0) {
             if (!collideOn("x")) {
                 setX(x + dx);
@@ -257,8 +273,12 @@ public class OdorWorldEntity implements EditableObject {
             double dthetaRad = Math.toRadians(-dtheta);
             double dx2 = Math.cos(dthetaRad) * dx - Math.sin(dthetaRad) * dy;
             double dy2 = Math.sin(dthetaRad) * dx + Math.cos(dthetaRad) * dy;
-            dx = dx2;
-            dy = dy2;
+            if (manualMode) {
+                manualMovementVelocity.setLocation(dx2, dy2);
+            } else {
+                this.dx = dx2;
+                this.dy = dy2;
+            }
         }
     }
 
@@ -503,7 +523,11 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     public void updateCollisionBound() {
-        collisionBound.setVelocity(dx, dy);
+        if (manualMode) {
+            collisionBound.setVelocity(manualMovementVelocity.getX(), manualMovementVelocity.getY());
+        } else {
+            collisionBound.setVelocity(dx, dy);
+        }
         collisionBound.setLocation(x, y);
     }
 
@@ -946,15 +970,26 @@ public class OdorWorldEntity implements EditableObject {
 
     public void goStraight() {
         double radians = getHeadingRadians();
-        dx = manualStraightMovementIncrement * Math.cos(radians);
-        dy = -manualStraightMovementIncrement * Math.sin(radians);
+        double dx = manualStraightMovementIncrement * Math.cos(radians);
+        double dy = -manualStraightMovementIncrement * Math.sin(radians);
+        if (manualMode) {
+            manualMovementVelocity.setLocation(dx, dy);
+        } else {
+            this.dx = dx;
+            this.dy = dy;
+        }
     }
 
     public void goBackwards() {
         double radians = getHeadingRadians();
-        dx = -manualStraightMovementIncrement * Math.cos(radians);
-        dy = manualStraightMovementIncrement * Math.sin(radians);
-
+        double dx = -manualStraightMovementIncrement * Math.cos(radians);
+        double dy = manualStraightMovementIncrement * Math.sin(radians);
+        if (manualMode) {
+            manualMovementVelocity.setLocation(dx, dy);
+        } else {
+            this.dx = dx;
+            this.dy = dy;
+        }
     }
 
     public void turnLeft() {
@@ -1180,6 +1215,13 @@ public class OdorWorldEntity implements EditableObject {
 
     }
 
+    public boolean isManualMode() {
+        return manualMode;
+    }
+
+    public void setManualMode(boolean manualMode) {
+        this.manualMode = manualMode;
+    }
 
 
 

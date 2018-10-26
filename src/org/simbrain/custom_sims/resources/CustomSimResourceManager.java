@@ -40,7 +40,7 @@ public class CustomSimResourceManager {
     public static String getDocString(final String name) {
 
         URL url;
-        url = CustomSimResourceManager.class.getResource(name);
+        url = ClassLoader.getSystemClassLoader().getResource(name);
 
         try {
             String string = new Scanner(url.openStream(), "UTF-8").useDelimiter("\\A").next();

@@ -20,7 +20,8 @@ sourceSets {
         resources {
             srcDirs 'src/org/simbrain/resource',
                     'src/org/simbrain/world/odorworld/resources',
-                    'src/org/simbrain/world/threedworld/threedassets/'
+                    'src/org/simbrain/world/threedworld/threedassets/',
+                    'src/org/simbrain/custom_sims/resources/'
             exclude '**/*.java'
         }
     }

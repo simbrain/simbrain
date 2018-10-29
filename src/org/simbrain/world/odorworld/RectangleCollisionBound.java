@@ -60,14 +60,10 @@ public class RectangleCollisionBound extends CollisionBound {
 
     @Override
     public void updateCollisionRadius() {
-        // the collision radius is approximately the circle enclosing the rectangular bound of this object.
-        // 1.5 is about sqrt(2), which is the ratio of length of the diagonal line to the side of a square,
-        // and the radius is half of that.
-        // the velocity is also taken into account in case of high speed object.
-        collisionRadius = Math.max(
-                shape.getWidth() + Math.abs(getVelocity().getX()),
-                shape.getHeight() + Math.abs(getVelocity().getY())
-        ) * 0.75;
+        // approximating the radius using manhattan distance of the collision bound
+        double x = shape.getWidth() + Math.abs(getVelocity().getX());
+        double y = shape.getHeight() + Math.abs(getVelocity().getY());
+        collisionRadius = (x + y) / 2;
     }
 
     public boolean collide(String direction, CollisionBound other) {
@@ -86,6 +82,15 @@ public class RectangleCollisionBound extends CollisionBound {
         shape.setRect(x, y, shape.getWidth(), shape.getHeight());
         location.setLocation(x, y);
         centerLocation.setLocation(x + shape.getWidth() / 2, y + shape.getHeight() / 2);
+        updateCollisionRadius();
+        updateCollisionBounds("xy");
+    }
+
+    public void setSize(double w, double h) {
+        double x = shape.getX();
+        double y = shape.getY();
+        shape.setRect(x, y, w, h);
+        centerLocation.setLocation(x + w / 2, y + h / 2);
         updateCollisionRadius();
         updateCollisionBounds("xy");
     }

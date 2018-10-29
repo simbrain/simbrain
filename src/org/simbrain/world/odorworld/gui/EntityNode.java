@@ -29,9 +29,7 @@ import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 // import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -96,6 +94,8 @@ public class EntityNode extends PNode {
                 updateFlag = true;
             } else if ("updated".equals(evt.getPropertyName())) {
                 update();
+            } else if ("sensorAdded".equals(evt.getPropertyName())) {
+                updateEntityAttributeModel();
             }
         });
     }
@@ -114,22 +114,30 @@ public class EntityNode extends PNode {
      * Update
      */
     private void syncViewWithModel() {
-        updateSmellSensorModel();
+        updateEntityAttributeModel();
     }
 
-    private void updateSmellSensorModel() {
+    private void updateEntityAttributeModel() {
 
-        List<VisualizableEntityAttribute> visualizableEntityAttributeList =
-                entity.getSensors().stream()
-                        .filter(VisualizableEntityAttribute.class::isInstance)
-                        .map(VisualizableEntityAttribute.class::cast)
-                        .collect(Collectors.toList());
+        List<VisualizableEntityAttribute> visualizableEntityAttributeList;
+
+        if (entity.isShowSensors()) {
+            visualizableEntityAttributeList =
+                    entity.getSensors().stream() // TODO: add effectors
+                            .filter(VisualizableEntityAttribute.class::isInstance)
+                            .map(VisualizableEntityAttribute.class::cast)
+                            .collect(Collectors.toList());
+        } else {
+            visualizableEntityAttributeList = List.of();
+        }
 
         // TODO: let event handler handle removal.
-        for (VisualizableEntityAttribute vp : visualizablePeripheralMap.keySet()) {
-            if (!visualizableEntityAttributeList.contains(vp)) {
-                removeChild(visualizablePeripheralMap.get(vp));
-                visualizablePeripheralMap.remove(vp);
+        Iterator<VisualizableEntityAttribute> itr = visualizablePeripheralMap.keySet().iterator();
+        while (itr.hasNext()) {
+            VisualizableEntityAttribute next = itr.next();
+            if (!visualizableEntityAttributeList.contains(next)) {
+                removeChild(visualizablePeripheralMap.get(next));
+                itr.remove();
             }
         }
 
@@ -181,6 +189,7 @@ public class EntityNode extends PNode {
 
         addChild(sprite);
         visualizablePeripheralMap.values().forEach(PNode::raiseToTop);
+        visualizablePeripheralMap.values().forEach(EntityAttributeNode::update);
         if(entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }
@@ -203,9 +212,16 @@ public class EntityNode extends PNode {
     }
 
     public void advance() {
-        double dx = entity.getVelocityX();
-        double dy = entity.getVelocityY();
-        frameCounter += Math.sqrt(dx * dx + dy * dy);
+        double dx;
+        double dy;
+        if (entity.isManualMode()) {
+            dx = entity.getManualMovementVelocity().getX();
+            dy = entity.getManualMovementVelocity().getY();
+        } else {
+            dx = entity.getVelocityX();
+            dy = entity.getVelocityY();
+        }
+        frameCounter += Math.sqrt(dx * dx + dy * dy) / 5;
         int i = 0;
         for (; i < frameCounter; i++) {
             sprite.advance();

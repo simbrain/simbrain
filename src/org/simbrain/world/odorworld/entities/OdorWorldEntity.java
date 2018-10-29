@@ -375,6 +375,10 @@ public class OdorWorldEntity implements EditableObject {
         updateCollisionBound();
     }
 
+    public Point2D.Double getManualMovementVelocity() {
+        return manualMovementVelocity;
+    }
+
     public RectangleCollisionBound getCollisionBound() {
         return collisionBound;
     }
@@ -529,6 +533,7 @@ public class OdorWorldEntity implements EditableObject {
             collisionBound.setVelocity(dx, dy);
         }
         collisionBound.setLocation(x, y);
+        collisionBound.setSize(entityType.imageWidth, entityType.imageHeight); // TODO: optimize
     }
 
     /**
@@ -725,7 +730,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveNorth(double amount) {
-        if (!collideOn("up") && (amount > 0)) {
+        if (!collideOn("y") && (amount > 0)) {
             if (this.isRotating()) {
                 setHeading(90);
             }
@@ -740,7 +745,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveSouth(double amount) {
-        if (!collideOn("down") && (amount > 0)) {
+        if (!collideOn("y") && (amount > 0)) {
             if (this.isRotating()) {
                 setHeading(270);
             }
@@ -755,7 +760,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Consumable(idMethod = "getId")
     public void moveEast(double amount) {
-        if (!collideOn("right") && (amount > 0)) {
+        if (!collideOn("x") && (amount > 0)) {
             if (this.isRotating()) {
                 this.setHeading(0);
             }

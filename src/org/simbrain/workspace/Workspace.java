@@ -312,8 +312,8 @@ public class Workspace {
         resetTime();
         this.setWorkspaceChanged(false);
         currentFile = null;
+        couplings.clear();
         fireWorkspaceCleared();
-        // manager.clearCouplings();
         this.getUpdater().getUpdateManager().setDefaultUpdateActions();
     }
 

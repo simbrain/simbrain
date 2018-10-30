@@ -145,24 +145,19 @@ public class OdorWorld implements EditableObject {
         // map.addSprite(entity);
         entityList.add(entity);
 
-        entity.addDefaultSensorsEffectors();
-
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
         recomputeMaxStimulusLength();
-
     }
 
     /**
      * Add new entity at last clicked position with default properties.
      */
     public void addEntity() {
-
         OdorWorldEntity entity = new OdorWorldEntity(this);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
         addEntity(entity);
-
     }
 
     /**
@@ -173,6 +168,7 @@ public class OdorWorld implements EditableObject {
         OdorWorldEntity entity = new OdorWorldEntity(this, OdorWorldEntity.EntityType.MOUSE);
         entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        entity.addDefaultSensorsEffectors();
         addEntity(entity);
 
     }

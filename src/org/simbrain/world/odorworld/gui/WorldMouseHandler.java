@@ -108,9 +108,9 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
      *
      * @param odorWorldPanel parent panel
      */
-    public WorldMouseHandler(OdorWorldPanel odorWorldPanel) {
+    public WorldMouseHandler(OdorWorldPanel odorWorldPanel, OdorWorld world) {
         super();
-        world = odorWorldPanel.getWorld();
+        this.world = world;
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
         this.odorWorldPanel = odorWorldPanel;
@@ -118,7 +118,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
 
     @Override
     public void mousePressed(final PInputEvent mouseEvent) {
-
         super.mousePressed(mouseEvent);
 
         if(world == null) {

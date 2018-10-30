@@ -25,6 +25,7 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 // import java.awt.*;
@@ -94,8 +95,12 @@ public class EntityNode extends PNode {
                 updateFlag = true;
             } else if ("updated".equals(evt.getPropertyName())) {
                 update();
-            } else if ("sensorAdded".equals(evt.getPropertyName())) {
+            } else if ("sensorAdded".equals(evt.getPropertyName()) ) {
                 updateEntityAttributeModel();
+            } else if ("sensorRemoved".equals(evt.getPropertyName()) ) {
+                Sensor toRemove = (Sensor) evt.getNewValue();
+                this.removeChild(visualizablePeripheralMap.get(toRemove));
+                visualizablePeripheralMap.remove(toRemove);
             }
         });
     }
@@ -190,6 +195,7 @@ public class EntityNode extends PNode {
         addChild(sprite);
         visualizablePeripheralMap.values().forEach(PNode::raiseToTop);
         visualizablePeripheralMap.values().forEach(EntityAttributeNode::update);
+        updateEntityAttributeModel();
         if(entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }

@@ -25,7 +25,6 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
-import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 // import java.awt.*;
@@ -68,7 +67,7 @@ public class EntityNode extends PNode {
      */
     private double frameCounter = 0;
 
-    private Map<VisualizableEntityAttribute, EntityAttributeNode> visualizablePeripheralMap = new HashMap<>();
+    private Map<VisualizableEntityAttribute, EntityAttributeNode> visualizableAttributeMap = new HashMap<>();
 
     /**
      * Construct an entity node with a back-ref to parent.
@@ -89,20 +88,40 @@ public class EntityNode extends PNode {
         entity.addPropertyChangeListener(evt -> {
             if ("propertiesChanged".equals(evt.getPropertyName())) {
                 updateImage();
+                if (this.entity.isShowSensors()) {
+                    visualizableAttributeMap.values().forEach(n -> n.setVisible(true));
+                } else {
+                    visualizableAttributeMap.values().forEach(n -> n.setVisible(false));
+                }
             } else if ("deleted".equals(evt.getPropertyName())) {
                 this.removeFromParent();
             } else if ("moved".equals(evt.getPropertyName())) {
                 updateFlag = true;
             } else if ("updated".equals(evt.getPropertyName())) {
                 update();
-            } else if ("sensorAdded".equals(evt.getPropertyName()) ) {
-                updateEntityAttributeModel();
-            } else if ("sensorRemoved".equals(evt.getPropertyName()) ) {
-                Sensor toRemove = (Sensor) evt.getNewValue();
-                this.removeChild(visualizablePeripheralMap.get(toRemove));
-                visualizablePeripheralMap.remove(toRemove);
+            } else if ("sensorAdded".equals(evt.getPropertyName()) || "effectorAdded".equals(evt.getPropertyName())) {
+                if (evt.getNewValue() instanceof VisualizableEntityAttribute) {
+                    VisualizableEntityAttribute toAdd = (VisualizableEntityAttribute) evt.getNewValue();
+                    addAttribute(toAdd);
+                }
+            } else if ("sensorRemoved".equals(evt.getPropertyName())
+                    || "effectorRemoved".equals(evt.getPropertyName())) {
+                if (evt.getNewValue() instanceof VisualizableEntityAttribute) {
+                    VisualizableEntityAttribute toRemove = (VisualizableEntityAttribute) evt.getNewValue();
+                    removeAttribute(toRemove);
+                }
             }
         });
+    }
+
+    private void addAttribute(VisualizableEntityAttribute attribute) {
+        visualizableAttributeMap.put(attribute, attribute.getNode());
+        addChild(visualizableAttributeMap.get(attribute));
+    }
+
+    private void removeAttribute(VisualizableEntityAttribute attribute) {
+        removeChild(visualizableAttributeMap.get(attribute));
+        visualizableAttributeMap.remove(attribute);
     }
 
     /**
@@ -124,39 +143,34 @@ public class EntityNode extends PNode {
 
     private void updateEntityAttributeModel() {
 
-        List<VisualizableEntityAttribute> visualizableEntityAttributeList;
+        List<VisualizableEntityAttribute> visualizableEntityAttributeList =
+                entity.getSensors().stream()
+                        .filter(VisualizableEntityAttribute.class::isInstance)
+                        .map(VisualizableEntityAttribute.class::cast)
+                        .collect(Collectors.toList());
 
-        if (entity.isShowSensors()) {
-            visualizableEntityAttributeList =
-                    entity.getSensors().stream() // TODO: add effectors
-                            .filter(VisualizableEntityAttribute.class::isInstance)
-                            .map(VisualizableEntityAttribute.class::cast)
-                            .collect(Collectors.toList());
-        } else {
-            visualizableEntityAttributeList = List.of();
-        }
-
-        // TODO: let event handler handle removal.
-        Iterator<VisualizableEntityAttribute> itr = visualizablePeripheralMap.keySet().iterator();
-        while (itr.hasNext()) {
-            VisualizableEntityAttribute next = itr.next();
-            if (!visualizableEntityAttributeList.contains(next)) {
-                removeChild(visualizablePeripheralMap.get(next));
-                itr.remove();
-            }
-        }
+        visualizableEntityAttributeList.addAll(
+                entity.getEffectors().stream()
+                        .filter(VisualizableEntityAttribute.class::isInstance)
+                        .map(VisualizableEntityAttribute.class::cast)
+                        .collect(Collectors.toList())
+        );
 
         for (VisualizableEntityAttribute vp : visualizableEntityAttributeList) {
             EntityAttributeNode currentEntityAttributeNode;
-            if (!visualizablePeripheralMap.containsKey(vp)) {
+            if (!visualizableAttributeMap.containsKey(vp)) {
                 currentEntityAttributeNode = vp.getNode();
                 addChild(currentEntityAttributeNode);
-                visualizablePeripheralMap.put(vp, currentEntityAttributeNode);
+                visualizableAttributeMap.put(vp, currentEntityAttributeNode);
             } else {
-                currentEntityAttributeNode = visualizablePeripheralMap.get(vp);
+                currentEntityAttributeNode = visualizableAttributeMap.get(vp);
             }
             currentEntityAttributeNode.update();
         }
+    }
+
+    private void updateAttributesNodes() {
+        visualizableAttributeMap.values().forEach(EntityAttributeNode::update);
     }
 
     /**
@@ -193,10 +207,9 @@ public class EntityNode extends PNode {
         }
 
         addChild(sprite);
-        visualizablePeripheralMap.values().forEach(PNode::raiseToTop);
-        visualizablePeripheralMap.values().forEach(EntityAttributeNode::update);
-        updateEntityAttributeModel();
-        if(entity.isRotating()) {
+        visualizableAttributeMap.values().forEach(PNode::raiseToTop);
+        updateAttributesNodes();
+        if (entity.isRotating()) {
             ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }
 
@@ -211,8 +224,8 @@ public class EntityNode extends PNode {
                 ((RotatingSprite) sprite).updateHeading(entity.getHeading());
             }
             setOffset(entity.getX(), entity.getY());
-            syncViewWithModel();
-            repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
+            updateAttributesNodes();
+            // repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
             updateFlag = false;
         }
     }

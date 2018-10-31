@@ -23,6 +23,12 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.gui.EntityAttributeNode;
+import org.simbrain.world.odorworld.gui.SpeechNode;
+import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Model simple speech behaviors. Each speech effector is associated with a
@@ -31,7 +37,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  *
  * @author Jeff Yoshimi
  */
-public class Speech extends Effector {
+public class Speech extends Effector implements VisualizableEntityAttribute {
 
     // TODO: Possibly add a radius of influence
     // Possibly encapsulate phrase String in an utterance class
@@ -75,6 +81,11 @@ public class Speech extends Effector {
     private double amount;
 
     /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
      * Construct the speech effector.
      *
      * @param parent    parent entity
@@ -99,10 +110,16 @@ public class Speech extends Effector {
     @Override
     public void update() {
         if (amount > threshold) {
-            activated = true;
+            if (!activated) {
+                activated = true;
+                changeSupport.firePropertyChange("activationChanged", null, true);
+            }
             amount = 0; // reset
         } else {
-            activated = false;
+            if (activated) {
+                activated = false;
+                changeSupport.firePropertyChange("activationChanged", null, false);
+            }
         }
         if (activated) {
             for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
@@ -173,6 +190,10 @@ public class Speech extends Effector {
         this.threshold = threshold;
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
     @Override
     public String getTypeDescription() {
         return "Speech";
@@ -186,5 +207,10 @@ public class Speech extends Effector {
     @Override
     public String getName() {
         return "Speech";
+    }
+
+    @Override
+    public EntityAttributeNode getNode() {
+        return new SpeechNode(this);
     }
 }

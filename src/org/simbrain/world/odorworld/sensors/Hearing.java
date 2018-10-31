@@ -21,6 +21,11 @@ package org.simbrain.world.odorworld.sensors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.gui.EntityAttributeNode;
+import org.simbrain.world.odorworld.gui.HearingNode;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Implement a simple hearing sensor. When the phrase is heard, the sensor is
@@ -28,7 +33,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  *
  * @author Jeff Yoshimi
  */
-public class Hearing extends Sensor {
+public class Hearing extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Default phrase.
@@ -46,8 +51,9 @@ public class Hearing extends Sensor {
     @UserParameter(label = "Utterance",
             description = "The string or phrase associated with this sensor. Hearing sensors get activated "
                     + "when it senses a speech effectors of the same utterance.",
+            defaultValue = DEFAULT_PHRASE,
             order = 3)
-    private String phrase = "";
+    private String phrase = DEFAULT_PHRASE;
 
     /**
      * Whether this is activated.
@@ -88,17 +94,28 @@ public class Hearing extends Sensor {
     private int time = 0;
     private int lingerTime = 10;
 
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
     @Override
     public void update() {
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
-                activated = true;
+                if (!activated) {
+                    activated = true;
+                    changeSupport.firePropertyChange("activationChanged", null, true);
+                }
                 time = lingerTime;
             }
         }
         time--;
         if (!(time > 0)) {
-            activated = false;
+            if (activated) {
+                activated = false;
+                changeSupport.firePropertyChange("activationChanged", null, false);
+            }
         }
     }
 
@@ -113,6 +130,7 @@ public class Hearing extends Sensor {
      * @param phrase the phrase to set
      */
     public void setPhrase(String phrase) {
+        changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
     }
 
@@ -148,6 +166,10 @@ public class Hearing extends Sensor {
         }
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
     @Override
     public String getTypeDescription() {
         return "Hearing";
@@ -156,5 +178,10 @@ public class Hearing extends Sensor {
     @Override
     public EditableObject copy() {
         return new Hearing(parent, phrase, outputAmount);
+    }
+
+    @Override
+    public EntityAttributeNode getNode() {
+        return new HearingNode(this);
     }
 }

@@ -28,6 +28,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
@@ -97,6 +98,10 @@ public class OdorWorld implements EditableObject {
      * Last clicked position.
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
+
+    private RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+            0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+    ));
 
     /**
      * Default constructor.
@@ -566,6 +571,9 @@ public class OdorWorld implements EditableObject {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
+        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+        ));
         changeSupport.firePropertyChange("tileMapChanged", null, null);
     }
 
@@ -581,5 +589,9 @@ public class OdorWorld implements EditableObject {
 
     public void setLastClickedPosition(Point2D position) {
         lastClickedPosition = position;
+    }
+
+    public RectangleCollisionBound getWorldBoundary() {
+        return worldBoundary;
     }
 }

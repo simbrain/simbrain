@@ -58,8 +58,8 @@ public abstract class CollisionBound {
         if (other == this) {
             return false;
         }
-        double dx = this.location.getX() - other.location.getX();
-        double dy = this.location.getY() - other.location.getY();
+        double dx = this.centerLocation.getX() - other.centerLocation.getX();
+        double dy = this.centerLocation.getY() - other.centerLocation.getY();
         double totalRadius = this.collisionRadius + other.collisionRadius;
         return totalRadius * totalRadius > dx * dx + dy * dy;
     }

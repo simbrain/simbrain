@@ -1098,7 +1098,7 @@ public class OdorWorldEntity implements EditableObject {
                 }
             }
         }
-        return false;
+        return !parentWorld.getWrapAround() && collisionBound.collide(direction, parentWorld.getWorldBoundary());
     }
 
     /**

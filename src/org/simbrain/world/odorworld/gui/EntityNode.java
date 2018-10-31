@@ -27,7 +27,6 @@ import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
-// import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,6 +66,9 @@ public class EntityNode extends PNode {
      */
     private double frameCounter = 0;
 
+    /**
+     * A map from {@link VisualizableEntityAttribute} (model) to {@link EntityAttributeNode} (view).
+     */
     private Map<VisualizableEntityAttribute, EntityAttributeNode> visualizableAttributeMap = new HashMap<>();
 
     /**
@@ -114,11 +116,21 @@ public class EntityNode extends PNode {
         });
     }
 
+    /**
+     * Add an {@link VisualizableEntityAttribute}.
+     *
+     * @param attribute the attribute to add
+     */
     private void addAttribute(VisualizableEntityAttribute attribute) {
         visualizableAttributeMap.put(attribute, attribute.getNode());
         addChild(visualizableAttributeMap.get(attribute));
     }
 
+    /**
+     * Remove an {@link VisualizableEntityAttribute}
+     *
+     * @param attribute the attribute to remove
+     */
     private void removeAttribute(VisualizableEntityAttribute attribute) {
         removeChild(visualizableAttributeMap.get(attribute));
         visualizableAttributeMap.remove(attribute);
@@ -135,12 +147,17 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Update
+     * Rebuild this entity node from the parent entity model.
+     * For now only peripheral attributes are synced.
      */
     private void syncViewWithModel() {
         updateEntityAttributeModel();
     }
 
+    /**
+     * Sync all visualizable entity attributes to this node.
+     * Should only be called on initialization or deserialization
+     */
     private void updateEntityAttributeModel() {
 
         List<VisualizableEntityAttribute> visualizableEntityAttributeList =
@@ -169,6 +186,9 @@ public class EntityNode extends PNode {
         }
     }
 
+    /**
+     * Update all visualizable attribute nodes.
+     */
     private void updateAttributesNodes() {
         visualizableAttributeMap.values().forEach(EntityAttributeNode::update);
     }
@@ -230,6 +250,9 @@ public class EntityNode extends PNode {
         }
     }
 
+    /**
+     * Advancing animation frame based on the velocity of the entity.
+     */
     public void advance() {
         double dx;
         double dy;
@@ -248,6 +271,9 @@ public class EntityNode extends PNode {
         frameCounter -= i;
     }
 
+    /**
+     * Set the sprite to frame where the entity is standing still.
+     */
     public void resetToStaticFrame() {
         sprite.resetToStaticFrame();
     }

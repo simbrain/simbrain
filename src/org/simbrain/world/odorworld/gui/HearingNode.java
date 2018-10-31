@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 
 import java.awt.*;
@@ -17,6 +18,11 @@ public class HearingNode extends EntityAttributeNode {
      * Reference to the sensor this node is representing
      */
     private Hearing sensor;
+
+    /**
+     * Reference to the parent entity
+     */
+    private OdorWorldEntity entity;
 
     /**
      * The shape of this node
@@ -70,6 +76,7 @@ public class HearingNode extends EntityAttributeNode {
      */
     public HearingNode(Hearing sensor) {
         this.sensor = sensor;
+        this.entity = sensor.getParent();
         this.hearingBubbleTrailLarge = PPath.createEllipse(10, -20, 10, 10);
         this.hearingBubbleTrailSmall = PPath.createEllipse(10, -8, 5, 5);
         this.hearingText = new PText();
@@ -79,26 +86,40 @@ public class HearingNode extends EntityAttributeNode {
         shape.addChild(hearingText);
         hearingBubble.setStroke(new BasicStroke(1));
         addChild(shape);
+        updateLocation();
         hearingBubble.setPickable(false);
         hearingBubbleTrailLarge.setPickable(false);
         hearingBubbleTrailSmall.setPickable(false);
         hearingText.setPickable(false);
-        setVisible(false);
+        shape.setVisible(false);
 
         sensor.addPropertyChangeListener(evt -> {
             if ("activationChanged".equals(evt.getPropertyName())) {
-                setVisible((Boolean) evt.getNewValue());
+                shape.setVisible((Boolean) evt.getNewValue());
             } else if ("phraseChanged".equals(evt.getPropertyName())) {
                 updateText();
+            }
+        });
+
+        entity.addPropertyChangeListener(evt -> {
+            if ("propertiesChanged".equals(evt.getPropertyName())) {
+                updateText();
+                updateLocation();
             }
         });
     }
 
     @Override
     public void update() {
-        updateText(); // TODO: use method based annotation so this can be done with changeSupport events
+
     }
 
+    /**
+     * Update the location of this node to the center top of the entity.
+     */
+    public void updateLocation() {
+        setOffset(entity.getEntityType().getImageWidth() / 2 - 10, 0);
+    }
 
     /**
      * Update the text and the size hearing bubble.

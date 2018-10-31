@@ -4,6 +4,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.world.odorworld.effectors.Speech;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
@@ -18,6 +19,11 @@ public class SpeechNode extends EntityAttributeNode {
      * Reference to the effector this node is representing
      */
     private Speech effector;
+
+    /**
+     * Reference to the parent entity
+     */
+    private OdorWorldEntity entity;
 
     /**
      * The shape of this node
@@ -72,6 +78,7 @@ public class SpeechNode extends EntityAttributeNode {
      */
     public SpeechNode(Speech effector) {
         this.effector = effector;
+        this.entity = effector.getParent();
         GeneralPath trianglePath = new GeneralPath();
         trianglePath.moveTo(18, 0);
         trianglePath.lineTo(3, speechBubbleBottomLeftLocation.getY() - 4);
@@ -93,24 +100,39 @@ public class SpeechNode extends EntityAttributeNode {
         shape.addChild(speechText);
         speechBubble.setStroke(new BasicStroke(1));
         addChild(shape);
+        updateLocation();
         speechBubble.setPickable(false);
         speechBubbleTriangle.setPickable(false);
         speechBubblePatch.setPickable(false);
         speechText.setPickable(false);
-        setVisible(false);
+        shape.setVisible(false);
 
         effector.addPropertyChangeListener(evt -> {
             if ("activationChanged".equals(evt.getPropertyName())) {
-                setVisible((Boolean) evt.getNewValue());
+                shape.setVisible((Boolean) evt.getNewValue());
             } else if ("phraseChanged".equals(evt.getPropertyName())) {
                 updateText();
+            }
+        });
+
+        entity.addPropertyChangeListener(evt -> {
+            if ("propertiesChanged".equals(evt.getPropertyName())) {
+                updateText();
+                updateLocation();
             }
         });
     }
 
     @Override
     public void update() {
-        updateText(); // TODO: use method based annotation so this can be done with changeSupport events
+
+    }
+
+    /**
+     * Update the location of this node to the center top of the entity.
+     */
+    public void updateLocation() {
+        setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
     }
 
 

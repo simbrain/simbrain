@@ -134,17 +134,11 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         }
     }
 
-    /**
-     * @return the phrase
-     */
     public String getPhrase() {
         return phrase;
     }
 
-    /**
-     * @param phrase the phrase to set
-     */
-    @Consumable
+    @Consumable(idMethod = "getId")
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -156,36 +150,20 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         return activated;
     }
 
-    /**
-     * @param activated the activated to set
-     */
     public void setActivated(boolean activated) {
         this.activated = activated;
     }
 
-    @Producible
-    public double getAmount() {
-        return amount;
-    }
+    @Consumable(idMethod = "getId")
 
-    /**
-     * @param amount the amount to set
-     */
-    @Consumable
     public void setAmount(double amount) {
         this.amount = amount;
     }
 
-    /**
-     * @return the threshold
-     */
     public double getThreshold() {
         return threshold;
     }
 
-    /**
-     * @param threshold the threshold to set
-     */
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }

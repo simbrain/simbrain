@@ -20,6 +20,8 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.gui.EntityAttributeNode;
 import org.simbrain.world.odorworld.gui.HearingNode;
@@ -127,6 +129,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return phrase;
     }
 
+    @Consumable
     public void setPhrase(String phrase) {
         changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
@@ -136,14 +139,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return activated;
     }
 
-    public double getOutputAmount() {
-        return outputAmount;
-    }
-
-    public void setOutputAmount(double amount) {
-        this.outputAmount = amount;
-    }
-
+    @Producible(idMethod = "getId")
     public double getValue() {
         if (activated) {
             return outputAmount;

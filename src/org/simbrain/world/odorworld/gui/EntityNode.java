@@ -81,10 +81,8 @@ public class EntityNode extends PNode {
         this.parent = world;
         this.entity = entity;
 
-        // this.setPickable(true); //Needed?
-
         updateImage();
-        syncViewWithModel();
+        updateEntityAttributeModel();
 
         setOffset(entity.getX(), entity.getY());
         entity.addPropertyChangeListener(evt -> {
@@ -144,14 +142,6 @@ public class EntityNode extends PNode {
         Point2D p = this.getGlobalTranslation();
         entity.setX(p.getX());
         entity.setY(p.getY());
-    }
-
-    /**
-     * Rebuild this entity node from the parent entity model.
-     * For now only peripheral attributes are synced.
-     */
-    private void syncViewWithModel() {
-        updateEntityAttributeModel();
     }
 
     /**

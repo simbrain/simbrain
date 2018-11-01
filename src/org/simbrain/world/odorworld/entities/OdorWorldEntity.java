@@ -809,18 +809,10 @@ public class OdorWorldEntity implements EditableObject {
         }
     }
 
-    /**
-     * Add a phrase to the list of things currently being said.
-     *
-     * @param phrase the phrase to add
-     */
     public void speakToEntity(String phrase) {
         currentlyHeardPhrases.add(phrase);
     }
 
-    /**
-     * @return the currentlyHeardPhrases
-     */
     public List<String> getCurrentlyHeardPhrases() {
         return currentlyHeardPhrases;
     }

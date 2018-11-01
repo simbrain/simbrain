@@ -135,6 +135,13 @@ public class SpeechNode extends EntityAttributeNode {
         setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
     }
 
+    //TODO: Wire it up
+    private static String breakUpString(String str) {
+        str += "\n"; // Needed to handle last line correctly
+        // TODO Variable for 50
+        str = str.replaceAll("(.{1,50})\\s+", "$1\n");
+        return str;
+    }
 
     /**
      * Update the text and the size speech bubble.

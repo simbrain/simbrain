@@ -68,6 +68,16 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
             defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 4)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
+
+    //TODO: Clean up / Make this settable
+    private int time = 0;
+    private int lingerTime = 10;
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
     /**
      * Construct the hearing sensor.
      *
@@ -90,17 +100,11 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
-    //TODO: Clean up / Make this settable
-    private int time = 0;
-    private int lingerTime = 10;
-
-    /**
-     * Support for property change events.
-     */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
     @Override
     public void update() {
+
+        // TODO: Only hear if in range of speaker
+
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
                 if (!activated) {
@@ -119,45 +123,27 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         }
     }
 
-    /**
-     * @return the phrase
-     */
     public String getPhrase() {
         return phrase;
     }
 
-    /**
-     * @param phrase the phrase to set
-     */
     public void setPhrase(String phrase) {
         changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
     }
 
-    /**
-     * @return the activated
-     */
     public boolean isActivated() {
         return activated;
     }
 
-    /**
-     * @return the amount
-     */
     public double getOutputAmount() {
         return outputAmount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
     public void setOutputAmount(double amount) {
         this.outputAmount = amount;
     }
 
-    /**
-     * @return the value
-     */
     public double getValue() {
         if (activated) {
             return outputAmount;

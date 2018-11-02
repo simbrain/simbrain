@@ -133,7 +133,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<Object> getModels() {
         List<Object> retList = new ArrayList<Object>();
         retList.add(network);
-        retList.addAll(network.getNeuronList());
+        retList.addAll(network.getFlatNeuronList());
         retList.addAll(network.getSynapseList());
         retList.addAll(network.getNeuronGroups());
         retList.addAll(network.getSynapseGroups());

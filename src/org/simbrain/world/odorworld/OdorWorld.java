@@ -28,6 +28,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
@@ -98,6 +99,10 @@ public class OdorWorld implements EditableObject {
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
 
+    private RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+            0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+    ));
+
     /**
      * Default constructor.
      */
@@ -145,24 +150,19 @@ public class OdorWorld implements EditableObject {
         // map.addSprite(entity);
         entityList.add(entity);
 
-        entity.addDefaultSensorsEffectors();
-
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
         recomputeMaxStimulusLength();
-
     }
 
     /**
      * Add new entity at last clicked position with default properties.
      */
     public void addEntity() {
-
         OdorWorldEntity entity = new OdorWorldEntity(this);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
         addEntity(entity);
-
     }
 
     /**
@@ -173,6 +173,7 @@ public class OdorWorld implements EditableObject {
         OdorWorldEntity entity = new OdorWorldEntity(this, OdorWorldEntity.EntityType.MOUSE);
         entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        entity.addDefaultSensorsEffectors();
         addEntity(entity);
 
     }
@@ -570,6 +571,9 @@ public class OdorWorld implements EditableObject {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
+        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+        ));
         changeSupport.firePropertyChange("tileMapChanged", null, null);
     }
 
@@ -585,5 +589,9 @@ public class OdorWorld implements EditableObject {
 
     public void setLastClickedPosition(Point2D position) {
         lastClickedPosition = position;
+    }
+
+    public RectangleCollisionBound getWorldBoundary() {
+        return worldBoundary;
     }
 }

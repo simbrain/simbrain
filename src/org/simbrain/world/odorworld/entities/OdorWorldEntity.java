@@ -101,10 +101,10 @@ public class OdorWorldEntity implements EditableObject {
     protected double manualStraightMovementIncrement = 1;
 
     /**
-     * The velocity vector used to update the entity's position
-     * when it is manually moved using the keyboard commands.  This should not
-     * be set by the user.  It is computed from the entity's
-     * {@link #manualStraightMovementIncrement} and {@link #heading}.
+     * The velocity vector used to update the entity's position when it is
+     * manually moved using the keyboard commands.  This should not be set by
+     * the user.  It is computed from the entity's {@link
+     * #manualStraightMovementIncrement} and {@link #heading}.
      */
     private Point2D.Double manualMovementVelocity = new Point2D.Double();
 
@@ -152,7 +152,8 @@ public class OdorWorldEntity implements EditableObject {
     private List<Effector> effectors = new ArrayList<Effector>();
 
     /**
-     * Smell Source (if any). Initialize to random smell source with 10 components.
+     * Smell Source (if any). Initialize to random smell source with 10
+     * components.
      */
     private SmellSource smellSource = new SmellSource(10);
 
@@ -171,7 +172,7 @@ public class OdorWorldEntity implements EditableObject {
     /**
      * If true, show peripheral attributes.
      */
-    @UserParameter(label = "Show Attributes", description= "Show Attributes (Sensors and Effectors)", order = 30)
+    @UserParameter(label = "Show Attributes", description = "Show Attributes (Sensors and Effectors)", order = 30)
     private boolean showSensors = true;
 
     /**
@@ -187,12 +188,12 @@ public class OdorWorldEntity implements EditableObject {
     public OdorWorldEntity(OdorWorld world) {
         this.parentWorld = world;
         collisionBound = new RectangleCollisionBound(
-                new Rectangle2D.Double(
-                        0,
-                        0,
-                        getEntityType().getImageWidth(),
-                        getEntityType().getImageHeight()
-                ));
+            new Rectangle2D.Double(
+                0,
+                0,
+                getEntityType().getImageWidth(),
+                getEntityType().getImageHeight()
+            ));
         updateCollisionBound();
     }
 
@@ -808,18 +809,10 @@ public class OdorWorldEntity implements EditableObject {
         }
     }
 
-    /**
-     * Add a phrase to the list of things currently being said.
-     *
-     * @param phrase the phrase to add
-     */
     public void speakToEntity(String phrase) {
         currentlyHeardPhrases.add(phrase);
     }
 
-    /**
-     * @return the currentlyHeardPhrases
-     */
     public List<String> getCurrentlyHeardPhrases() {
         return currentlyHeardPhrases;
     }
@@ -832,12 +825,12 @@ public class OdorWorldEntity implements EditableObject {
     public void setEntityType(EntityType entityType) {
         this.entityType = entityType;
         collisionBound = new RectangleCollisionBound(
-                new Rectangle2D.Double(
-                        0,
-                        0,
-                        getEntityType().getImageWidth(),
-                        getEntityType().getImageHeight()
-                ));
+            new Rectangle2D.Double(
+                0,
+                0,
+                getEntityType().getImageWidth(),
+                getEntityType().getImageHeight()
+            ));
         updateCollisionBound();
     }
 
@@ -1028,27 +1021,24 @@ public class OdorWorldEntity implements EditableObject {
      */
     public void addDefaultSensorsEffectors() {
 
-        // Rotating entities are currently a proxy for "agents", though any object
-        // can have sensors and effectors
-        if (entityType.isRotating) {
-            // Add default effectors
-            addEffector(new StraightMovement(this,
-                "Go-straight"));
-            addEffector(new Turning(this, "Go-left",
-                Turning.LEFT));
-            addEffector(new Turning(this, "Go-right",
-                Turning.RIGHT));
+        // Add default effectors
+        addEffector(new StraightMovement(this,
+            "Go-straight"));
+        addEffector(new Turning(this, "Go-left",
+            Turning.LEFT));
+        addEffector(new Turning(this, "Go-right",
+            Turning.RIGHT));
 
-            // Add default sensors
-            addSensor(new SmellSensor(this, "Smell-Left", Math.PI / 8,
-                50));
-            addSensor(new SmellSensor(this, "Smell-Center", 0, 0));
-            addSensor(new SmellSensor(this, "Smell-Right",
-                -Math.PI / 8, 50));
+        // Add default sensors
+        addSensor(new SmellSensor(this, "Smell-Left", Math.PI / 8,
+            50));
+        addSensor(new SmellSensor(this, "Smell-Center", 0, 0));
+        addSensor(new SmellSensor(this, "Smell-Right",
+            -Math.PI / 8, 50));
 
-            // Add an object sensor
-            addSensor(new ObjectSensor(this, EntityType.SWISS));
-        }
+        // Add an object sensor
+        addSensor(new ObjectSensor(this, EntityType.SWISS));
+
     }
 
     /**
@@ -1105,7 +1095,8 @@ public class OdorWorldEntity implements EditableObject {
     }
 
     /**
-     * Check if this entity is colliding with other entity in a given direction.
+     * Check if this entity is colliding with other entity in a given
+     * direction.
      *
      * @param direction direction can be "x", "y", or "xy".
      * @param other     the other entity
@@ -1132,7 +1123,7 @@ public class OdorWorldEntity implements EditableObject {
                 }
             }
         }
-        return false;
+        return !parentWorld.getWrapAround() && collisionBound.collide(direction, parentWorld.getWorldBoundary());
     }
 
     /**
@@ -1177,6 +1168,7 @@ public class OdorWorldEntity implements EditableObject {
 
     // TODO: Put in all missing static objects
     // TODO: Move to separate class?
+
     /**
      * Type of this object.  These are mapped to images, etc.
      */
@@ -1260,7 +1252,6 @@ public class OdorWorldEntity implements EditableObject {
     public void setManualMode(boolean manualMode) {
         this.manualMode = manualMode;
     }
-
 
 
 }

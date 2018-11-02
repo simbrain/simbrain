@@ -137,6 +137,14 @@ public class WorkspaceSerializer {
         return components;
     }
 
+    /**
+     * Serialize one component to the zip stream
+     *
+     * @param serializer The serializer for the components.
+     * @param archive    The archive contents to update.
+     * @param component the component to serialize
+     * @param zipStream  The zipstream to write to.
+     */
     private void serializeComponent(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, WorkspaceComponent component, ZipOutputStream zipStream) {
         ArchivedWorkspaceComponent archiveComp = archive.addComponent(component);
         ZipEntry entry = new ZipEntry(archiveComp.getUri());
@@ -155,6 +163,11 @@ public class WorkspaceSerializer {
         }
     }
 
+    /**
+     * Serialize couplings.
+     *
+     * @param archive the archive objet to serialize to
+     */
     private void serializeCouplings(ArchivedWorkspace archive) {
         HashMap<Object, WorkspaceComponent> couplingComponents = mapCouplingComponents();
         for (Coupling<?> coupling : workspace.getCouplings()) {
@@ -162,6 +175,9 @@ public class WorkspaceSerializer {
         }
     }
 
+    /**
+     * Returns a map from coupling base objects ("models") to their parent components.
+     */
     private HashMap<Object, WorkspaceComponent> mapCouplingComponents() {
         HashMap<Object, WorkspaceComponent> couplingComponents = new HashMap<>();
         for (WorkspaceComponent component : workspace.getComponentList()) {
@@ -172,12 +188,24 @@ public class WorkspaceSerializer {
         return couplingComponents;
     }
 
+    /**
+     * Add a serialized coupling to the archive.
+     *
+     * @param couplingComponents a map from couplings to components
+     * @param coupling the coupling to save
+     * @param archive the archive object to save to
+     */
     private void serializeCoupling(HashMap<Object, WorkspaceComponent> couplingComponents, Coupling<?> coupling, ArchivedWorkspace archive) {
         ArchivedAttribute producer = new ArchivedAttribute(couplingComponents.get(coupling.getProducer().getBaseObject()), coupling.getProducer());
         ArchivedAttribute consumer = new ArchivedAttribute(couplingComponents.get(coupling.getConsumer().getBaseObject()), coupling.getConsumer());
         archive.addCoupling(new ArchivedCoupling(producer, consumer));
     }
 
+    /**
+     * Serialize all update actions  in the current workspace
+     *
+     * @param archive the archive object to serialize to
+     */
     private void serializeUpdateActions(ArchivedWorkspace archive) {
         for (UpdateAction action : workspace.getUpdater().getUpdateManager().getActionList()) {
             archive.addUpdateAction(action);

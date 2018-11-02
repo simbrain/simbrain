@@ -1,6 +1,5 @@
 package org.simbrain.world.odorworld;
 
-import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -17,6 +16,8 @@ public class RectangleCollisionBound extends CollisionBound {
         collisionBounds.put("left", new Line2D.Double());
         collisionBounds.put("right", new Line2D.Double());
         updateCollisionBounds("xy");
+        updateCollisionRadius();
+        setLocation(rect.getX(), rect.getY());
     }
 
 
@@ -60,10 +61,14 @@ public class RectangleCollisionBound extends CollisionBound {
 
     @Override
     public void updateCollisionRadius() {
-        // approximating the radius using manhattan distance of the collision bound
-        double x = shape.getWidth() + Math.abs(getVelocity().getX());
-        double y = shape.getHeight() + Math.abs(getVelocity().getY());
-        collisionRadius = (x + y) / 2;
+        // the collision radius is approximately the circle enclosing the rectangular bound of this object.
+        // 1.5 is about sqrt(2), which is the ratio of length of the diagonal line to the side of a square,
+        // and the radius is half of that.
+        // the velocity is also taken into account in case of high speed object.
+        collisionRadius = Math.max(
+                shape.getWidth() + Math.abs(getVelocity().getX()),
+                shape.getHeight() + Math.abs(getVelocity().getY())
+        ) * 0.75;
     }
 
     public boolean collide(String direction, CollisionBound other) {

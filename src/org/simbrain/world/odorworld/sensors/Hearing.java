@@ -20,7 +20,14 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.gui.EntityAttributeNode;
+import org.simbrain.world.odorworld.gui.HearingNode;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Implement a simple hearing sensor. When the phrase is heard, the sensor is
@@ -28,7 +35,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  *
  * @author Jeff Yoshimi
  */
-public class Hearing extends Sensor {
+public class Hearing extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Default phrase.
@@ -46,8 +53,9 @@ public class Hearing extends Sensor {
     @UserParameter(label = "Utterance",
             description = "The string or phrase associated with this sensor. Hearing sensors get activated "
                     + "when it senses a speech effectors of the same utterance.",
+            defaultValue = DEFAULT_PHRASE,
             order = 3)
-    private String phrase = "";
+    private String phrase = DEFAULT_PHRASE;
 
     /**
      * Whether this is activated.
@@ -61,6 +69,16 @@ public class Hearing extends Sensor {
             description = "The amount of activation to be sent to a neuron coupled with this sensor.",
             defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 4)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
+
+
+    //TODO: Clean up / Make this settable
+    private int time = 0;
+    private int lingerTime = 10;
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * Construct the hearing sensor.
@@ -84,68 +102,54 @@ public class Hearing extends Sensor {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
-    //TODO: Clean up / Make this settable
-    private int time = 0;
-    private int lingerTime = 10;
-
     @Override
     public void update() {
+
+        // TODO: Only hear if in range of speaker
+
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
-                activated = true;
+                if (!activated) {
+                    activated = true;
+                    changeSupport.firePropertyChange("activationChanged", null, true);
+                }
                 time = lingerTime;
             }
         }
         time--;
         if (!(time > 0)) {
-            activated = false;
+            if (activated) {
+                activated = false;
+                changeSupport.firePropertyChange("activationChanged", null, false);
+            }
         }
     }
 
-    /**
-     * @return the phrase
-     */
     public String getPhrase() {
         return phrase;
     }
 
-    /**
-     * @param phrase the phrase to set
-     */
+    @Consumable
     public void setPhrase(String phrase) {
+        changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
     }
 
-    /**
-     * @return the activated
-     */
     public boolean isActivated() {
         return activated;
     }
 
-    /**
-     * @return the amount
-     */
-    public double getOutputAmount() {
-        return outputAmount;
-    }
-
-    /**
-     * @param amount the amount to set
-     */
-    public void setOutputAmount(double amount) {
-        this.outputAmount = amount;
-    }
-
-    /**
-     * @return the value
-     */
+    @Producible(idMethod = "getId")
     public double getValue() {
         if (activated) {
             return outputAmount;
         } else {
             return 0;
         }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
@@ -156,5 +160,10 @@ public class Hearing extends Sensor {
     @Override
     public EditableObject copy() {
         return new Hearing(parent, phrase, outputAmount);
+    }
+
+    @Override
+    public EntityAttributeNode getNode() {
+        return new HearingNode(this);
     }
 }

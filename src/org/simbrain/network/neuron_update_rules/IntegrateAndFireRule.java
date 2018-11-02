@@ -31,6 +31,9 @@ import org.simbrain.util.math.ProbabilityDistribution;
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
  *
+ * Graphical upper and lower bounds is currently set to so that the 0 is halfway
+ * between its reset potential and firing threshold.
+ *
  * @author Zoë Tosi
  * <p>
  * TODO: Add custom tooltip
@@ -254,6 +257,9 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         return "Integrate and Fire";
     }
 
+    // An alternative here would be to have reset potential be the zero point
+    // so that colors would track hyper and de-polarization. That could be
+    // achieved by resetPotential-(resetPotential-threshold)
     @Override
     public double getGraphicalLowerBound() {
         return resetPotential;

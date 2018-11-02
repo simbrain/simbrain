@@ -1063,12 +1063,45 @@ public class OdorWorldEntity implements EditableObject {
         if (smellSource == null) {
             return null;
         }
-        double distanceToSensor = SimbrainMath.distance(getCenterLocation(), sensorLocation);
-        if (distanceToSensor < smellSource.getDispersion()) {
-            return smellSource.getStimulus(distanceToSensor);
+
+        if(parentWorld.getWrapAround()) {
+            double [] locO = getCenterLocation();
+            double[] dxdy = new double[2];
+            dxdy[0] = sensorLocation[0] - locO[0];
+            dxdy[1] = sensorLocation[1] - locO[1];
+            double dxWrap = parentWorld.getWidth() - Math.abs(dxdy[0]);
+            double dyWrap = parentWorld.getHeight() - Math.abs(dxdy[1]);
+
+            double [] dists = new double[4];
+            dists[0] = Math.sqrt(dxdy[0]*dxdy[0] + dxdy[1]*dxdy[1]);
+            dists[1] = Math.sqrt(dxWrap*dxWrap + dxdy[1]*dxdy[1]);
+            dists[2] = Math.sqrt(dxdy[0]*dxdy[0] + dyWrap*dyWrap);
+            dists[3] = Math.sqrt(dxWrap*dxWrap + dyWrap*dyWrap);
+
+            double [] stimulus = new double[smellSource.getStimulusDimension()];
+            int obCount = 0;
+            for(int ii=0; ii<4; ++ii) {
+                if(dists[ii] > smellSource.getDispersion()) {
+                    obCount++;
+                    continue;
+                }
+                SimbrainMath.addVectorI(stimulus, smellSource.getStimulus(dists[ii]));
+            }
+            if(obCount == 4) {
+                return  null;
+            } else {
+                return stimulus;
+            }
         } else {
-            return null;
+            double distanceToSensor = SimbrainMath.distance(getCenterLocation(), sensorLocation);
+            double [] stimulus = smellSource.getStimulus(distanceToSensor);
+            if (distanceToSensor < smellSource.getDispersion()) {
+                return stimulus;
+            } else {
+                return null;
+            }
         }
+
     }
 
     /**

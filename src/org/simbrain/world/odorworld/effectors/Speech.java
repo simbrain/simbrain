@@ -19,6 +19,8 @@
 package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -28,6 +30,7 @@ import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
 
 /**
  * Model simple speech behaviors. Each speech effector is associated with a
@@ -75,6 +78,12 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             description = "Threshold above which to \"the message\".",
             defaultValue = "" + DEFAULT_THRESHOLD, order = 5)
     private double threshold = DEFAULT_THRESHOLD;
+
+    @UserParameter(label = "Decay Function", isObjectType = true, order = 10, tab = "Dispersion")
+    private DecayFunction decayFunction =
+            LinearDecayFunction.builder()
+            .dispersion(128)
+            .build();
 
     /**
      * Whether this is activated. If so, display the phrase and notify all
@@ -129,10 +138,10 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             }
         }
         if (activated) {
-            for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
+            // TODO: now using dispersion distance only, get real decay value and set threshold later.
+            List<OdorWorldEntity> entitiesInRadius = parent.getEntitiesInRadius(decayFunction.getDispersion());
 
-                // TODO: Can add radius check here later
-
+            for (OdorWorldEntity entity : entitiesInRadius) {
                 // Don't talk to yourself
                 if (entity != parent) {
                     entity.speakToEntity(phrase);

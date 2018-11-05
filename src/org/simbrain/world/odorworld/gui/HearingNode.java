@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 
@@ -127,7 +128,7 @@ public class HearingNode extends EntityAttributeNode {
     private void updateText() {
         if (!sensor.getPhrase().equals(hearingTextString)) {
             this.hearingTextString = sensor.getPhrase();
-            hearingText.setText(hearingTextString);
+            hearingText.setText(Utils.getWarpAroundString(hearingTextString, sensor.getCharactersPerRow()));
             shape.removeChild(hearingBubble);
             hearingBubble =
                     PPath.createRoundRectangle(

@@ -21,7 +21,6 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.gui.EntityAttributeNode;
 import org.simbrain.world.odorworld.gui.SpeechNode;
@@ -47,7 +46,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     public static final String DEFAULT_PHRASE = "Hi!";
 
-    // TODO: reimplement oversize phrase render problem warning
     /**
      * The thing this speech effector says.
      */
@@ -55,6 +53,15 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             description = "The thing this speech effector says.",
             defaultValue = DEFAULT_PHRASE, order = 3)
     private String phrase = DEFAULT_PHRASE;
+
+    /**
+     * Maximum characters per row before warping around in a {@link SpeechNode}.
+     */
+    @UserParameter(label = "Characters per Row",
+            description = "The maximum number of characters that can be displayed in one row in the speech bubble. "
+                        + "This setting only affects visual representation.",
+            defaultValue = "32", order = 4)
+    private int charactersPerRow = 32;
 
     /**
      * Default threshold.
@@ -66,7 +73,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Threshold",
             description = "Threshold above which to \"the message\".",
-            defaultValue = "" + DEFAULT_THRESHOLD, order = 4)
+            defaultValue = "" + DEFAULT_THRESHOLD, order = 5)
     private double threshold = DEFAULT_THRESHOLD;
 
     /**
@@ -190,5 +197,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     @Override
     public EntityAttributeNode getNode() {
         return new SpeechNode(this);
+    }
+
+    public int getCharactersPerRow() {
+        return charactersPerRow;
+    }
+
+    public void setCharactersPerRow(int charactersPerRow) {
+        this.charactersPerRow = charactersPerRow;
     }
 }

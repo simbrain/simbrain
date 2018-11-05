@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -135,13 +136,6 @@ public class SpeechNode extends EntityAttributeNode {
         setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
     }
 
-    //TODO: Wire it up
-    private static String breakUpString(String str) {
-        str += "\n"; // Needed to handle last line correctly
-        // TODO Variable for 50
-        str = str.replaceAll("(.{1,50})\\s+", "$1\n");
-        return str;
-    }
 
     /**
      * Update the text and the size speech bubble.
@@ -149,7 +143,7 @@ public class SpeechNode extends EntityAttributeNode {
     private void updateText() {
         if (!effector.getPhrase().equals(speechTextString)) {
             this.speechTextString = effector.getPhrase();
-            speechText.setText(speechTextString);
+            speechText.setText(Utils.getWarpAroundString(speechTextString, effector.getCharactersPerRow()));
             shape.removeChild(speechBubble);
             speechBubble =
                     PPath.createRoundRectangle(

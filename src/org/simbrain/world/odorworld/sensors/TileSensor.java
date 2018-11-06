@@ -29,16 +29,6 @@ public class TileSensor extends Sensor {
     private int tileIdToSense = 0;
 
     /**
-     * X location in tile map
-     */
-    private int tileCoordinateX;
-
-    /**
-     * Y location in tile map
-     */
-    private int tileCoordinateY;
-
-    /**
      * Construct a tile sensor.
      *
      * @param parent the parent entity
@@ -61,14 +51,14 @@ public class TileSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        tileCoordinateX = (int) (parent.getCenterX() / parent.getParentWorld().getTileMap().getTilewidth());
-        tileCoordinateY = (int) (parent.getCenterY() / parent.getParentWorld().getTileMap().getTileheight());
+        int tileCoordinateX = (int) (parent.getCenterX() / parent.getParentWorld().getTileMap().getTilewidth());
+        int tileCoordinateY = (int) (parent.getCenterY() / parent.getParentWorld().getTileMap().getTileheight());
         if (parent.getParentWorld().getTileMap().hasTileIdAt(tileIdToSense, tileCoordinateX, tileCoordinateY)) {
             value = outputAmount;
         }
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

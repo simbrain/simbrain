@@ -154,7 +154,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         return phrase;
     }
 
-    @Consumable(idMethod = "getId")
+    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -170,8 +170,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.activated = activated;
     }
 
-    @Consumable(idMethod = "getId")
-
+    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }

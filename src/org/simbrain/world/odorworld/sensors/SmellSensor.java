@@ -118,7 +118,7 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
         }
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getSmellSensorDescription")
     public double[] getCurrentValues() {
         return currentValue;
     }
@@ -169,7 +169,7 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Called by reflection to return a custom description for couplings.
      */
-    public String getSensorDescription() {
+    public String getSmellSensorDescription() {
         return getParent().getName() + ":" + "Smell sensor (" +
             SimbrainMath.roundDouble(theta, 2) + "," +
             SimbrainMath.roundDouble(radius, 2) + ")";

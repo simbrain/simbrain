@@ -193,16 +193,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         return "Bump";
     }
 
-    /**
-     * Called by reflection to return a custom description for the {@link
-     * org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
-     * corresponding to object sensors.
-     */
-    public String getSensorDescription() {
-        return getParent().getName() + ":" + getTypeDescription() + " sensor";
-    }
-
-    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

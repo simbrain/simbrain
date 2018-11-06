@@ -33,10 +33,12 @@ import java.awt.event.ActionListener;
 
 public class AddEffectorDialog extends StandardDialog {
 
+    //TODO: Replace with annotated property editor
+
     /**
      * String of effector types.
      */
-    private String[] effectors = {"StraightMovement", "Turning", "Speech"};
+    private String[] effectors = { "Speech", "Straight Movement", "Turning"};
 
     /**
      * Entity to which effector is being added.
@@ -99,7 +101,7 @@ public class AddEffectorDialog extends StandardDialog {
      * type.
      */
     private void initPanel() {
-        if (effectorType.getSelectedItem() == "StraightMovement") {
+        if (effectorType.getSelectedItem() == "Straight Movement") {
             setTitle("Add a straight movement effector");
         } else if (effectorType.getSelectedItem() == "Turning") {
             setTitle("Add a turning effector");
@@ -112,7 +114,7 @@ public class AddEffectorDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        if (effectorType.getSelectedItem() == "StraightMovement") {
+        if (effectorType.getSelectedItem() == "Straight Movement") {
             parentEntity.addEffector(new StraightMovement(parentEntity));
         } else if (effectorType.getSelectedItem() == "Turning") {
             parentEntity.addEffector(new Turning(parentEntity, Turning.DEFAULT_LABEL, 0.0));

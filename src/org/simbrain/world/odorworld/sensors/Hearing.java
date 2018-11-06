@@ -105,7 +105,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct the hearing sensor.
      *
-     * @param parent       parent entity
+     * @param parent parent entity
      */
     public Hearing(OdorWorldEntity parent) {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
@@ -138,7 +138,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return phrase;
     }
 
-    @Consumable
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
@@ -148,14 +148,14 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return activated;
     }
 
-    @Producible(idMethod = "getId")
-    public double getValue() {
-        if (activated) {
-            return outputAmount;
-        } else {
-            return 0;
-        }
-    }
+//    @Producible(idMethod = "getId")
+//    public double getValue() {
+//        if (activated) {
+//            return outputAmount;
+//        } else {
+//            return 0;
+//        }
+//    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);

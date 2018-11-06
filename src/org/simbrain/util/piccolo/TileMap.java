@@ -26,14 +26,6 @@ import java.util.List;
  */
 public class TileMap {
 
-    public enum Orientation {
-        orthogonal
-    }
-
-    public enum RenderOrder {
-
-    }
-
     /**
      * The TMX format version. Was “1.0” so far, and will be incremented to match minor Tiled releases.
      */
@@ -46,7 +38,7 @@ public class TileMap {
 
     /**
      * Map orientation. Tiled supports “orthogonal”, “isometric”, “staggered” and “hexagonal” (since 0.11).
-     * This implementation supports only orthogonal.
+     * Odor world is in orthogonal orientation so other types won't be used.
      */
     private Orientation orientation;
 
@@ -56,6 +48,19 @@ public class TileMap {
      * In all cases, the map is drawn row-by-row. (only supported for orthogonal maps at the moment)
      */
     private RenderOrder renderorder;
+
+    /**
+     * Unused but required for .tmx parsing (see {@link #orientation}.
+     */
+    public enum Orientation {
+        orthogonal
+    }
+
+    /**
+     * Unused but required for .tmx parsing (see {@link #renderorder}.
+     */
+    public enum RenderOrder {
+    }
 
     /**
      * The map width in tiles.
@@ -149,7 +154,8 @@ public class TileMap {
     }
 
     /**
-     * Check if a tile of a given id exists at a location.
+     * Check if a tile with a given id exists at a specified location in
+     * tile coordinates.
      *
      * @param id the id of the tile to check
      * @param x the x location in tile coordinate
@@ -164,6 +170,13 @@ public class TileMap {
         return getTileStackAt(x, y).stream().anyMatch(t -> t.getId() == id);
     }
 
+    /**
+     * Returns the "stack" of tiles at a given location as a list.
+     *
+     * @param x tile coordinate x
+     * @param y tile coordinate y
+     * @return a list of tiles at that location in the same order as in the xml file
+     */
     public List<Tile> getTileStackAt(int x, int y) {
         ArrayList<Tile> stack = new ArrayList<>();
         for (TileMapLayer l : layers) {

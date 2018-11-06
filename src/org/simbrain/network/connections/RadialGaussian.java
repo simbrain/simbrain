@@ -54,6 +54,10 @@ import java.util.concurrent.*;
  * Set to 0, if you want no connections of that type to be made. Set to 1 to
  * have it make the most connections possible given the exponential
  * distribution.
+ * <p>
+ * The larger any of the constants is relative to the others, the more likely a connection
+ * of that type will occur. Lambad is roughly the average distance of connections that will be made.
+ * <p>
  *
  * @author Zoë Tosi
  */

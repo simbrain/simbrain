@@ -15,14 +15,11 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.*;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
@@ -112,11 +109,11 @@ public class AddSensorDialog extends StandardDialog {
      */
     public void commitChanges() {
         if (sensorType.getSelectedItem() == "TileSensor") {
-            entity.addSensor(new TileSensor(entity, 0, 0, 0, 0));
+            entity.addSensor(new TileSensor(entity));
         } else if (sensorType.getSelectedItem() == "SmellSensor") {
             entity.addSensor(new SmellSensor(entity));
         } else if (sensorType.getSelectedItem() == "Tile Set") {
-            entity.addSensor(new TileSensor(entity, 0, 0, 0, 0));
+            entity.addSensor(new LocationSensor(entity, 0, 0, 0, 0));
         } else if (sensorType.getSelectedItem() == "Hearing") {
             entity.addSensor(new Hearing(entity));
         } else if (sensorType.getSelectedItem().equals("ObjectSensor")) {

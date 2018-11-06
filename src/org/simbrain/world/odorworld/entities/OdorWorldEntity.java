@@ -32,7 +32,7 @@ import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.TileSensor;
+import org.simbrain.world.odorworld.sensors.LocationSensor;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
@@ -559,7 +559,7 @@ public class OdorWorldEntity implements EditableObject {
         int tileHeight = parentWorld.getHeight() / numTilesY;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new TileSensor(this, ((i * tileWidth) + offset), ((j * tileHeight) + offset), tileWidth, tileHeight));
+                addSensor(new LocationSensor(this, ((i * tileWidth) + offset), ((j * tileHeight) + offset), tileWidth, tileHeight));
             }
         }
     }
@@ -602,7 +602,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Producible(idMethod = "getId")
     public double getCenterX() {
-        return x;
+        return x + entityType.getImageWidth() / 2;
     }
 
     /**
@@ -612,7 +612,7 @@ public class OdorWorldEntity implements EditableObject {
      */
     @Producible(idMethod = "getId")
     public double getCenterY() {
-        return y;
+        return y + entityType.getImageHeight() / 2;
     }
 
     /**
@@ -622,8 +622,8 @@ public class OdorWorldEntity implements EditableObject {
      * @param y y coordinate
      */
     public void setCenterLocation(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.x = x - entityType.getImageWidth() / 2;
+        this.y = y - entityType.getImageHeight() / 2;
     }
 
     /**

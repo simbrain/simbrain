@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
@@ -87,6 +88,11 @@ public class TileMap {
     private ArrayList<TileMapLayer> layers = new ArrayList<>();
 
     /**
+     * Layers of the rendered map images
+     */
+    private ArrayList<PImage> renderedLayers = null;
+
+    /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
      */
     private Color backgroundcolor;
@@ -133,11 +139,37 @@ public class TileMap {
      * @return the list of layer images
      */
     public ArrayList<PImage> createImageList() {
-        ArrayList<PImage> renderedLayers = new ArrayList<>();
-        for (TileMapLayer l : layers) {
-            renderedLayers.add(l.renderImage(tileset));
+        if (renderedLayers == null) {
+            renderedLayers = new ArrayList<>();
+            for (TileMapLayer l : layers) {
+                renderedLayers.add(l.renderImage(tileset));
+            }
         }
         return renderedLayers;
+    }
+
+    /**
+     * Check if a tile of a given id exists at a location.
+     *
+     * @param id the id of the tile to check
+     * @param x the x location in tile coordinate
+     * @param y the y location in tile coordinate
+     * @return true if the given tile exists in the tile stack
+     */
+    public boolean hasTileIdAt(int id, int x, int y) {
+        // if id is less than first gid, the id could be a empty tile, so those should not be check.
+        if (id < tileset.getFirstgid()) {
+            return false;
+        }
+        return getTileStackAt(x, y).stream().anyMatch(t -> t.getId() == id);
+    }
+
+    public List<Tile> getTileStackAt(int x, int y) {
+        ArrayList<Tile> stack = new ArrayList<>();
+        for (TileMapLayer l : layers) {
+            stack.add(l.getTileAt(x, y));
+        }
+        return stack;
     }
 
     public int getMapHeight() {
@@ -148,4 +180,11 @@ public class TileMap {
         return width * tilewidth;
     }
 
+    public int getTilewidth() {
+        return tilewidth;
+    }
+
+    public int getTileheight() {
+        return tileheight;
+    }
 }

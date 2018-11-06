@@ -35,9 +35,10 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
             Arrays.asList(
                     SmellSensor.class,
                     Hearing.class,
-                    TileSensor.class,
+                    LocationSensor.class,
                     ObjectSensor.class,
-                    BumpSensor.class
+                    BumpSensor.class,
+                    TileSensor.class
             );
 
     public static List<Class> getTypes() {

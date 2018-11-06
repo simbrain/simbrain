@@ -1,226 +1,76 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-/**
- * A sensor which detects whether the entity is in a given sector or "tile" of
- * the world. Broadly inspired by "place cells".
- *
- * @author jyoshimi
- */
 public class TileSensor extends Sensor {
 
     /**
-     * Default Activation Amount.
-     */
-    public static final double DEFAULT_ACTIVATION = 1;
-
-    /**
-     * Default X coordinate of the upper left corner.
-     */
-    public static final int DEFAULT_X = 0;
-
-    /**
-     * Default Y coordinate of the upper left corner.
-     */
-    public static final int DEFAULT_Y = 0;
-
-    /**
-     * Default width.
-     */
-    public static final int DEFAULT_WIDTH = 20;
-
-    /**
-     * Default height.
-     */
-    public static final int DEFAULT_HEIGHT = 20;
-
-    /**
-     * Current value of the sensor; activationAmount if "active", 0 otherwise.
+     * Current value of the sensor.
      */
     private double value = 0;
 
     /**
-     * Value to return when the tile sensor is activated.
+     * The amount of activation when this sensor is activated
      */
-    @UserParameter(label = "Activation amount",
-            description = "Amount of activation that a neuron coupled with the tile sensor receives "
-                    + "when the tile sensor is activated. ",
-            defaultValue = "" + DEFAULT_ACTIVATION, order = 3)
-    private double activationAmount = DEFAULT_ACTIVATION;
+    @UserParameter(label = "Output Amount",
+            description = "The amount of activation to be sent to a neuron coupled with this sensor.",
+            defaultValue = "1", order = 3)
+    private double outputAmount = 1;
 
     /**
-     * Upper left corner.
+     * The tile id of the tile to sense
      */
-    @UserParameter(label = "X",
-            description = "x coordinates for the location of the top-left corner of the tile sensor.",
-            order = 4)
-    private int x;
-
-
-    /**
-     * Upper left corner.
-     */
-    @UserParameter(label = "Y",
-            description = "y coordinates for the location of the top-left corner of the tile sensor.",
-            order = 5)
-    private int y;
-    /**
-     * Width of the sensor.
-     */
-    @UserParameter(label = "Width",
-            description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
-            order = 6)
-    private int width;
+    @UserParameter(label = "Tile ID",
+            description = "The ID of the tile this sensor should sense.",
+            defaultValue = "0", order = 4)
+    private int tileIdToSense = 0;
 
     /**
-     * Height of the sensor.
+     * X location in tile map
      */
-    @UserParameter(label = "Height",
-            description = "Determines the size of the tile. Height specifies the vertical length.",
-            order = 7)
-    private int height;
+    private int tileCoordinateX;
+
+    /**
+     * Y location in tile map
+     */
+    private int tileCoordinateY;
 
     /**
      * Construct a tile sensor.
      *
-     * @param parent parent entity
-     * @param x      upper left
-     * @param y      upper right
-     * @param width  width in pixels
-     * @param height height
+     * @param parent the parent entity
      */
-    public TileSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
-        super(parent, "Tile (" + x + "," + y + "):" + width + "x" + height);
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    public TileSensor(OdorWorldEntity parent) {
+        super(parent, "Tile Sensor");
+    }
+
+    /**
+     * Construct a tile sensor to sense a specific tile of the given ID.
+     *
+     * @param parent the parent entity
+     * @param tileId the tile id of the tile to sense
+     */
+    public TileSensor(OdorWorldEntity parent, int tileId) {
+        this(parent);
+        this.tileIdToSense = tileId;
     }
 
     @Override
     public void update() {
-        double entityX = parent.getCenterLocation()[0];
-        double entityY = parent.getCenterLocation()[1];
-        boolean xone = entityX > x;
-        boolean xtwo = entityX < (x + width);
-        boolean yone = entityY > y;
-        boolean ytwo = entityY < (y + height);
-
-        // System.out.println(xone + " " + xtwo + " " + yone + " " + ytwo);
-        if (xone && xtwo && yone && ytwo) {
-            value = activationAmount;
-        } else {
-            value = 0;
+        value = 0;
+        tileCoordinateX = (int) (parent.getCenterX() / parent.getParentWorld().getTileMap().getTilewidth());
+        tileCoordinateY = (int) (parent.getCenterY() / parent.getParentWorld().getTileMap().getTileheight());
+        if (parent.getParentWorld().getTileMap().hasTileIdAt(tileIdToSense, tileCoordinateX, tileCoordinateY)) {
+            value = outputAmount;
         }
     }
 
-    /**
-     * @return value associated with this sensor, 0 if occupied,
-     */
-    @Producible(idMethod = "getMixedId")
-    public double getValue() {
+    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
+    public double getCurrentValue() {
         return value;
-    }
-
-    /**
-     * @param value the value to set
-     */
-    @Consumable(idMethod = "getMixedId")
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    /**
-     * @return the activationAmount
-     */
-    public double getActivationAmount() {
-        return activationAmount;
-    }
-
-    /**
-     * @return the x
-     */
-    public int getX() {
-        return x;
-    }
-
-    /**
-     * @param x the x to set
-     */
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    /**
-     * @return the y
-     */
-    public int getY() {
-        return y;
-    }
-
-    /**
-     * @param y the y to set
-     */
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    /**
-     * @return the width
-     */
-    public int getWidth() {
-        return width;
-    }
-
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    /**
-     * @return the height
-     */
-    public int getHeight() {
-        return height;
-    }
-
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    /**
-     * @param amount the activation amount to set
-     */
-    public void setActivationAmount(double amount) {
-        activationAmount = amount;
     }
 
     @Override
@@ -229,12 +79,12 @@ public class TileSensor extends Sensor {
     }
 
     @Override
-    public EditableObject copy() {
-        return new TileSensor(parent, x, y, width, height);
+    public String getName() {
+        return "Tile";
     }
 
     @Override
-    public String getName() {
-        return "Tile";
+    public EditableObject copy() {
+        return new TileSensor(parent, tileIdToSense);
     }
 }

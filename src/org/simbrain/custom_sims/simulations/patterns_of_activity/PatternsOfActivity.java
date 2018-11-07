@@ -67,12 +67,14 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
     private int netSize = 1024;
     private int spacing = 40;
-    private int maxDly = 10;
+    private int maxDly = 12;
     private NeuronGroup recNeurons;
-    private int dispersion = 160;
+    private int dispersion = 140;
     double maxDist = Math.sqrt(2 * netSize * spacing);
     private STDPRule ruleEx = new STDPRule(5, 1, 20, 100, 0.001,
         true);
+    private STDPRule ruleExRec = new STDPRule(5.2, .8, 25, 100, 0.001,
+            true);
     private STDPRule ruleIn = new STDPRule(2.5, -2.5, 40, 40, 0.001,
         true);
     private SpikeResponder spkR = new UDF();
@@ -102,14 +104,18 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
 
         // Set up sensory group and odor world
-        NeuronGroup sensoryNet = net.addNeuronGroup(-9.25, 95.93, 5);
-        sensoryNet.setNeuronType(new IntegrateAndFireRule());
-        sensoryNet.setPolarity(Polarity.EXCITATORY);
-        sensoryNet.setLabel("Sensory");
-        Neuron cheeseNeuron = sensoryNet.getNeuronList().get(0);
-        cheeseNeuron.setLabel("Cheese");
-        Neuron flowerNeuron = sensoryNet.getNeuronList().get(1);
-        flowerNeuron.setLabel("Flower");
+        NeuronGroup sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5);
+        sensoryNetL.setNeuronType(new IntegrateAndFireRule());
+        sensoryNetL.setPolarity(Polarity.EXCITATORY);
+        sensoryNetL.setLabel("Sensory Left");
+
+        // Set up sensory group and odor world
+        NeuronGroup sensoryNetR = net.addNeuronGroup(-9.25, 155.93, 5);
+        sensoryNetR.setNeuronType(new IntegrateAndFireRule());
+        sensoryNetR.setPolarity(Polarity.EXCITATORY);
+        sensoryNetR.setLabel("Sensory Right");
+
+
 
         // Set up odor world
         OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
@@ -118,22 +124,22 @@ public class PatternsOfActivity extends RegisteredSimulation {
         OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
         mouse.addSensor(new SmellSensor(mouse, "Smell", 0, 0));
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(52, 220, OdorWorldEntity.EntityType.SWISS,
+        OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(266, 221, OdorWorldEntity.EntityType.FLOWER,
+        OdorWorldEntity flower = world.addEntity(190, 221, OdorWorldEntity.EntityType.FLOWER,
             new double[] {3, 18, 2, 5, 10});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity cow = world.addEntity(90, 23, OdorWorldEntity.EntityType.COW,
+        OdorWorldEntity cow = world.addEntity(90, 50, OdorWorldEntity.EntityType.COW,
             new double[] {3, 7, 16, 19, 0});
         cow.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity lion = world.addEntity(340, 34, OdorWorldEntity.EntityType.LION,
+        OdorWorldEntity lion = world.addEntity(300, 54, OdorWorldEntity.EntityType.LION,
             new double[] {5, 2, 13, 16, 0});
         lion.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity susi = world.addEntity(97, 351, OdorWorldEntity.EntityType.SUSI,
+        OdorWorldEntity susi = world.addEntity(97, 331, OdorWorldEntity.EntityType.SUSI,
             new double[] {0, 12, 15, 20});
         susi.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity steve = world.addEntity(335, 297, OdorWorldEntity.EntityType.STEVE,
+        OdorWorldEntity steve = world.addEntity(315, 305, OdorWorldEntity.EntityType.STEVE,
             new double[] {12, 0, 20, 15});
         steve.getSmellSource().setDispersion(dispersion);
 
@@ -161,37 +167,47 @@ public class PatternsOfActivity extends RegisteredSimulation {
         recNeurons = new NeuronGroup(network, neuronList);
         new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
             .layoutNeurons(recNeurons.getNeuronListUnsafe());
-        sensoryNet.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
+        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
+        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
 
         // Set up recurrent synapses
         SynapseGroup recSyns = new SynapseGroup(recNeurons, recNeurons);
         new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
             200).connectNeurons(recSyns);
-//        recSyns.setStrength(10, Polarity.EXCITATORY);
-//        recSyns.setStrength(-10, Polarity.INHIBITORY);
         initializeSynParameters(recSyns);
+        recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
         for (Neuron n : neuronList) {
             for (Neuron m : neuronList) {
-                if (Math.random() < 0.001 && n != m) {
+                if (Math.random() < 0.002 && n != m) {
                     Synapse s = new Synapse(n, m);
                     s.setStrength(n.getPolarity().value(10));
                     recSyns.addNewSynapse(s);
                     // Delays based on distance
-                    double d = SimbrainMath.distance(s.getSource().getPosition3D(), s.getTarget().getPosition3D());
-                    s.setDelay((int) (maxDly * d / maxDist));
                 }
             }
         }
+        for(Synapse s : recSyns.getAllSynapses()) {
+            double d = SimbrainMath.distance(s.getSource().getPosition3D(), s.getTarget().getPosition3D());
+            s.setDelay((int) (maxDly * d / maxDist));
+        }
 
         // Set up input synapses (connections from sensory group to the recurrent group)
-        SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(sensoryNet, recNeurons,
-            new Sparse(0.5, true, false));
-        initializeSynParameters(inpSynG);
-        inpSynG.setStrength(40, Polarity.EXCITATORY);
-        //inpSynG.setStrength(-10, Polarity.INHIBITORY);
-        for (Synapse s : inpSynG.getAllSynapses()) {
-            s.setDelay(ThreadLocalRandom.current().nextInt(5, maxDly));
+        SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recNeurons,
+            new Sparse(0.25, true, false));
+        initializeSynParameters(inpSynGL);
+        inpSynGL.setStrength(40, Polarity.EXCITATORY);
+        //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
+        for (Synapse s : inpSynGL.getAllSynapses()) {
+            s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
+        }
+        SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recNeurons,
+                new Sparse(0.25, true, false));
+        initializeSynParameters(inpSynGR);
+        inpSynGR.setStrength(40, Polarity.EXCITATORY);
+        //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
+        for (Synapse s : inpSynGR.getAllSynapses()) {
+            s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
         }
 
         // Set up the first out group (comprised of LIF neurons to allow for STDP)
@@ -266,7 +282,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
         NeuronGroup readGroup = new NeuronGroup(network, 2);
-        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 300);
+        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
         for (Neuron n : readGroup.getNeuronList()) {
             n.setUpdateRule(new SigmoidalRule());
             n.getUpdateRule().setInputType(NeuronUpdateRule.InputType.SYNAPTIC);
@@ -294,95 +310,25 @@ public class PatternsOfActivity extends RegisteredSimulation {
             sim.getConsumer(mouse, "setVelocityX"));
         sim.tryCoupling(sim.getProducer(readGroup.getNeuron(1), "getActivation"),
             sim.getConsumer(mouse, "setVelocityY"));
-        sim.couple((SmellSensor) mouse.getSensor("Smell"), sensoryNet);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
         // Add everything to the network
         network.addGroup(recNeurons);
-        network.addGroup(inpSynG);
+        network.addGroup(inpSynGL);
+        network.addGroup(inpSynGR);
         network.addGroup(recSyns);
         network.addGroup(outGroup);
         network.addGroup(rec2out);
         network.addGroup(readGroup);
         network.addGroup(out2read);
+        network.addGroup(sensoryNetL);
+        network.addGroup(sensoryNetR);
 
         // Set up concurrent buffered update
         network.getUpdateManager().clear();
         network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
 
-        //TODO: Doesn't currently work
-        KeyListener k = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                switch (keyCode) {
-                case KeyEvent.VK_UP:
-                    ((IntegrateAndFireRule) upNeuron.getUpdateRule()).setBackgroundCurrent(20);
-                    for (Neuron n : upQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(14.5);
-                    }
-                    break;
-                case KeyEvent.VK_DOWN:
-                    ((IntegrateAndFireRule) dwNeuron.getUpdateRule()).setBackgroundCurrent(20);
-                    for (Neuron n : dwQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(14.5);
-                    }
-                    break;
-                case KeyEvent.VK_LEFT:
-                    System.out.println("LEFT");
-                    ((IntegrateAndFireRule) lfNeuron.getUpdateRule()).setBackgroundCurrent(20);
-                    for (Neuron n : lfQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(14.5);
-                    }
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    ((IntegrateAndFireRule) rtNeuron.getUpdateRule()).setBackgroundCurrent(20);
-                    for (Neuron n : rtQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(14.5);
-                    }
-                    break;
-                }
-
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                switch (keyCode) {
-                case KeyEvent.VK_UP:
-                    ((IntegrateAndFireRule) upNeuron.getUpdateRule()).setBackgroundCurrent(14.95);
-                    for (Neuron n : upQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(13.5);
-                    }
-                    break;
-                case KeyEvent.VK_DOWN:
-                    ((IntegrateAndFireRule) dwNeuron.getUpdateRule()).setBackgroundCurrent(14.95);
-                    for (Neuron n : dwQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(13.5);
-                    }
-                    break;
-                case KeyEvent.VK_LEFT:
-                    System.out.println();
-                    ((IntegrateAndFireRule) lfNeuron.getUpdateRule()).setBackgroundCurrent(14.95);
-                    for (Neuron n : lfQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(13.5);
-                    }
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    ((IntegrateAndFireRule) rtNeuron.getUpdateRule()).setBackgroundCurrent(14.95);
-                    for (Neuron n : rtQuad) {
-                        ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(13.5);
-                    }
-                    break;
-                }
-            }
-        };
-
-
-//        InputMap inMap = net.getNetworkPanel(sim).getInputMap();
-//        ActionMap actMap = net.getNetworkPanel(sim).getActionMap();
-//
-//        inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "Left");
-//        actMap.put("Left", new leftAction());
     }
 
 

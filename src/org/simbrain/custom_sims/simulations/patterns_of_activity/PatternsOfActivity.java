@@ -122,7 +122,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(new TileMap("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell", 0, 0));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/4, 60));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/4, 60));
         mouse.setHeading(90);
         OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});

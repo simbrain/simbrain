@@ -1075,7 +1075,7 @@ public class OdorWorldEntity implements EditableObject {
                     obCount++;
                     continue;
                 }
-                SimbrainMath.addVectorI(stimulus, smellSource.getStimulus(dists[ii]));
+                stimulus = SimbrainMath.addVector(stimulus, smellSource.getStimulus(dists[ii]));
             }
             if(obCount == 4) {
                 return  null;

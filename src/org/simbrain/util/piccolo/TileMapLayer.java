@@ -30,7 +30,7 @@ public class TileMapLayer {
     /**
      * the tile id matrix of the layer
      */
-    private ArrayList<ArrayList<Integer>> gid = new ArrayList<>();
+    private ArrayList<ArrayList<Tile>> tiles = new ArrayList<>();
 
     /**
      * The rendered image of the layer
@@ -57,11 +57,11 @@ public class TileMapLayer {
                 e.printStackTrace();
             }
             for (int i = 0; i < width; i++) {
-                ArrayList<Integer> currentRow = new ArrayList<>();
+                ArrayList<Tile> currentRow = new ArrayList<>();
                 for (int j = 0; j < height; j++) {
-                    currentRow.add(Integer.parseInt(allValues[i][j]));
+                    currentRow.add(new Tile(Integer.parseInt(allValues[i][j])));
                 }
-                gid.add(currentRow);
+                tiles.add(currentRow);
             }
         }
     }
@@ -84,7 +84,7 @@ public class TileMapLayer {
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
-                    Image image = tileSet.getTileImage(gid.get(i).get(j));
+                    Image image = tileSet.getTileImage(tiles.get(i).get(j).getId());
                     graphics.drawImage(image, j * tileSet.getTilewidth(), i * tileSet.getTileheight(), null);
                 }
             }
@@ -97,4 +97,15 @@ public class TileMapLayer {
         return layer;
     }
 
+    public Tile getTileAt(int x, int y) {
+        return tiles.get(y).get(x);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

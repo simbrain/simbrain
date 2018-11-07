@@ -769,4 +769,21 @@ public class Utils {
         return xstream;
     }
 
+    /**
+     * Returns a string that warps around to new line at the limit width.
+     *
+     * @param str the string to convert
+     * @param limit the width limit in characters
+     * @return the formatted string
+     */
+    public static String getWarpAroundString(String str, int limit) {
+        str += "\n"; // Needed to handle last line correctly
+        if (limit < 1) {
+            limit = 1;
+        }
+        String regex = String.format("(.{1,%d})\\s+", limit);
+        str = str.replaceAll(regex, "$1\n");
+        return str;
+    }
+
 }

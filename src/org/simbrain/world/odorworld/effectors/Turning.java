@@ -103,7 +103,7 @@ public class Turning extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod = "getMixedId", customDescriptionMethod = "getEffectorDescription")
+    @Consumable(idMethod = "getMixedId", customDescriptionMethod = "getTurningDescription")
     public void addAmount(double amount) {
         this.amount += amount;
     }
@@ -111,7 +111,7 @@ public class Turning extends Effector {
     /**
      * Called by reflection to return a custom description for couplings.
      */
-    public String getEffectorDescription() {
+    public String getTurningDescription() {
         String dirString = (direction == 1) ? "Left" : "Right";
         return getParent().getName() + ":" + "Turn " + dirString;
     }

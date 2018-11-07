@@ -81,7 +81,7 @@ public class ObjectSensor extends Sensor {
         }
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getSensorDescription")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }
@@ -91,14 +91,6 @@ public class ObjectSensor extends Sensor {
         return objectType.toString();
     }
 
-    /**
-     * Called by reflection to return a custom description for the {@link
-     * org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
-     * corresponding to object sensors.
-     */
-    public String getSensorDescription() {
-        return getParent().getName() + ":" + getTypeDescription() + " sensor";
-    }
 
     @Override
     public EditableObject copy() {

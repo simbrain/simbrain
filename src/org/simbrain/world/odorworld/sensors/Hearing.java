@@ -58,6 +58,15 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     private String phrase = DEFAULT_PHRASE;
 
     /**
+     * Maximum characters per row before warping around in a {@link HearingNode}.
+     */
+    @UserParameter(label = "Characters per Row",
+            description = "The maximum number of characters that can be displayed in one row in the hearing bubble. "
+                    + "This setting only affects visual representation.",
+            defaultValue = "32", order = 4)
+    private int charactersPerRow = 32;
+
+    /**
      * Whether this is activated.
      */
     private boolean activated = false;
@@ -67,7 +76,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Output Amount",
             description = "The amount of activation to be sent to a neuron coupled with this sensor.",
-            defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 4)
+            defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 5)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
 
@@ -96,7 +105,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct the hearing sensor.
      *
-     * @param parent       parent entity
+     * @param parent parent entity
      */
     public Hearing(OdorWorldEntity parent) {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
@@ -129,7 +138,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return phrase;
     }
 
-    @Consumable
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
@@ -139,14 +148,14 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return activated;
     }
 
-    @Producible(idMethod = "getId")
-    public double getValue() {
-        if (activated) {
-            return outputAmount;
-        } else {
-            return 0;
-        }
-    }
+//    @Producible(idMethod = "getId")
+//    public double getValue() {
+//        if (activated) {
+//            return outputAmount;
+//        } else {
+//            return 0;
+//        }
+//    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
@@ -165,5 +174,13 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @Override
     public EntityAttributeNode getNode() {
         return new HearingNode(this);
+    }
+
+    public int getCharactersPerRow() {
+        return charactersPerRow;
+    }
+
+    public void setCharactersPerRow(int charactersPerRow) {
+        this.charactersPerRow = charactersPerRow;
     }
 }

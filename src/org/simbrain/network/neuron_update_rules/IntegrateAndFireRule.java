@@ -31,6 +31,9 @@ import org.simbrain.util.math.ProbabilityDistribution;
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
  *
+ * Graphical upper and lower bounds is currently set to so that the 0 is halfway
+ * between its reset potential and firing threshold.
+ *
  * @author Zoë Tosi
  * <p>
  * TODO: Add custom tooltip
@@ -97,8 +100,12 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     private double backgroundCurrent = 13.5;
 
     /**
-     * Refractor Period (ms) .
+     * Refractory Period (ms) .
      */
+    @UserParameter(
+        label = "Refractory Period (ms)",
+        description = "The period of time after a spike during which a neuron will not fire and rejects external input",
+        order = 7)
     private double refractoryPeriod = 3;
 
     /**
@@ -112,16 +119,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     private boolean addNoise;
 
     /**
-     * @deprecated here for backwards compatibility.
+     * Membrane potential for the neuron.
      */
-    @Deprecated
-    private boolean hasSpiked;
-
     private double memPotential = 0;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public IntegrateAndFireRule deepCopy() {
         IntegrateAndFireRule ifn = new IntegrateAndFireRule();
         ifn.setRestingPotential(getRestingPotential());
@@ -135,9 +137,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         return ifn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
 
         // Incoming current is 0 during the refractory period, otherwise it's
@@ -163,7 +163,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
          * Isyn: synaptic input current Ibg: background input current tau: time
          * constant Vreset: reset potential theta: threshold
          */
-
         double dVm = timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant;
 
         memPotential += dVm;
@@ -180,9 +179,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         neuron.setBuffer(memPotential);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         // Equal chance of spiking or not spiking, taking on any value between
@@ -190,44 +186,26 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         return 2 * (threshold - restingPotential) * Math.random() + restingPotential;
     }
 
-    /**
-     * @return Returns the lowerValue.
-     */
     public double getRestingPotential() {
         return restingPotential;
     }
 
-    /**
-     * @param restingPotential The restingPotential to set.
-     */
     public void setRestingPotential(final double restingPotential) {
         this.restingPotential = restingPotential;
     }
 
-    /**
-     * @return Returns the upperValue.
-     */
     public double getResistance() {
         return resistance;
     }
 
-    /**
-     * @param resistance The resistance to set.
-     */
     public void setResistance(final double resistance) {
         this.resistance = resistance;
     }
 
-    /**
-     * @return Returns the lowerValue.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
@@ -242,58 +220,34 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the resetPotential.
-     */
     public double getResetPotential() {
         return resetPotential;
     }
 
-    /**
-     * @param resetPotential The resetPotential to set.
-     */
     public void setResetPotential(final double resetPotential) {
         this.resetPotential = resetPotential;
     }
 
-    /**
-     * @return Returns the background current
-     */
     public double getBackgroundCurrent() {
         return backgroundCurrent;
     }
 
-    /**
-     * @param backgroundCurrent The background current to set
-     */
     public void setBackgroundCurrent(double backgroundCurrent) {
         this.backgroundCurrent = backgroundCurrent;
     }
 
-    /**
-     * @return Returns the threshold.
-     */
     public double getThreshold() {
         return threshold;
     }
 
-    /**
-     * @param threshold The threshold to set.
-     */
     public void setThreshold(final double threshold) {
         this.threshold = threshold;
     }
 
-    /**
-     * @return Returns the timeConstant.
-     */
     public double getTimeConstant() {
         return timeConstant;
     }
 
-    /**
-     * @param timeConstant The timeConstant to set.
-     */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
     }
@@ -303,6 +257,9 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         return "Integrate and Fire";
     }
 
+    // An alternative here would be to have reset potential be the zero point
+    // so that colors would track hyper and de-polarization. That could be
+    // achieved by resetPotential-(resetPotential-threshold)
     @Override
     public double getGraphicalLowerBound() {
         return resetPotential;
@@ -313,16 +270,10 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         return threshold;
     }
 
-    /**
-     * @return the refractoryPeriod
-     */
     public double getRefractoryPeriod() {
         return refractoryPeriod;
     }
 
-    /**
-     * @param refractoryPeriod the refractoryPeriod to set
-     */
     public void setRefractoryPeriod(double refractoryPeriod) {
         this.refractoryPeriod = refractoryPeriod;
     }

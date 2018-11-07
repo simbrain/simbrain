@@ -19,9 +19,10 @@
 package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.gui.EntityAttributeNode;
 import org.simbrain.world.odorworld.gui.SpeechNode;
@@ -29,6 +30,7 @@ import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
 
 /**
  * Model simple speech behaviors. Each speech effector is associated with a
@@ -47,7 +49,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     public static final String DEFAULT_PHRASE = "Hi!";
 
-    // TODO: reimplement oversize phrase render problem warning
     /**
      * The thing this speech effector says.
      */
@@ -55,6 +56,15 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             description = "The thing this speech effector says.",
             defaultValue = DEFAULT_PHRASE, order = 3)
     private String phrase = DEFAULT_PHRASE;
+
+    /**
+     * Maximum characters per row before warping around in a {@link SpeechNode}.
+     */
+    @UserParameter(label = "Characters per Row",
+            description = "The maximum number of characters that can be displayed in one row in the speech bubble. "
+                        + "This setting only affects visual representation.",
+            defaultValue = "32", order = 4)
+    private int charactersPerRow = 32;
 
     /**
      * Default threshold.
@@ -66,8 +76,14 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Threshold",
             description = "Threshold above which to \"the message\".",
-            defaultValue = "" + DEFAULT_THRESHOLD, order = 4)
+            defaultValue = "" + DEFAULT_THRESHOLD, order = 5)
     private double threshold = DEFAULT_THRESHOLD;
+
+    @UserParameter(label = "Decay Function", isObjectType = true, order = 10, tab = "Dispersion")
+    private DecayFunction decayFunction =
+            LinearDecayFunction.builder()
+            .dispersion(128)
+            .build();
 
     /**
      * Whether this is activated. If so, display the phrase and notify all
@@ -122,10 +138,10 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             }
         }
         if (activated) {
-            for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
+            // TODO: now using dispersion distance only, get real decay value and set threshold later.
+            List<OdorWorldEntity> entitiesInRadius = parent.getEntitiesInRadius(decayFunction.getDispersion());
 
-                // TODO: Can add radius check here later
-
+            for (OdorWorldEntity entity : entitiesInRadius) {
                 // Don't talk to yourself
                 if (entity != parent) {
                     entity.speakToEntity(phrase);
@@ -138,7 +154,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         return phrase;
     }
 
-    @Consumable(idMethod = "getId")
+    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -154,8 +170,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.activated = activated;
     }
 
-    @Consumable(idMethod = "getId")
-
+    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -190,5 +205,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     @Override
     public EntityAttributeNode getNode() {
         return new SpeechNode(this);
+    }
+
+    public int getCharactersPerRow() {
+        return charactersPerRow;
+    }
+
+    public void setCharactersPerRow(int charactersPerRow) {
+        this.charactersPerRow = charactersPerRow;
     }
 }

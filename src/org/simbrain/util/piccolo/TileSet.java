@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
 public class TileSet {
 
@@ -72,6 +73,8 @@ public class TileSet {
 
     private transient BufferedImage transparentTexture = null;
 
+    private HashMap<Integer, Tile> tiles = new HashMap<>();
+
     /**
      * Create a tileset from one element of a Tilemap.
      *
@@ -136,5 +139,9 @@ public class TileSet {
 
     public int getTileheight() {
         return tileheight;
+    }
+
+    public int getFirstgid() {
+        return firstgid;
     }
 }

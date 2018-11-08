@@ -23,37 +23,47 @@ public class RectangleCollisionBound extends CollisionBound {
 
     @Override
     public void updateCollisionBounds(String direction) {
-        double dx = 0;
-        double dy = 0;
+        double dxLeft = 0;
+        double dxRight = 0;
+        double dyUp = 0;
+        double dyDown = 0;
         if (direction.contains("x")) {
-            dx = getVelocity().getX();
+            if (getVelocity().getX() > 0) {
+                dxRight = getVelocity().getX();
+            } else {
+                dxLeft = getVelocity().getX();
+            }
         }
         if (direction.contains("y")) {
-            dy = getVelocity().getY();
+            if (getVelocity().getY() > 0) {
+                dyDown = getVelocity().getY();
+            } else {
+                dyUp = getVelocity().getY();
+            }
         }
         collisionBounds.get("up").setLine(
-                shape.getX() + dx,
-                shape.getY() + dy,
-                shape.getX() + shape.getWidth() + dx,
-                shape.getY() + dy
+                shape.getX() + dxLeft,
+                shape.getY() + dyUp,
+                shape.getX() + shape.getWidth() + dxRight,
+                shape.getY() + dyUp
         );
         collisionBounds.get("down").setLine(
-                shape.getX() + dx,
-                shape.getY() + shape.getHeight() + dy,
-                shape.getX() + shape.getWidth() + dx,
-                shape.getY() + shape.getHeight() + dy
+                shape.getX() + dxLeft,
+                shape.getY() + shape.getHeight() + dyDown,
+                shape.getX() + shape.getWidth() + dxRight,
+                shape.getY() + shape.getHeight() + dyDown
         );
         collisionBounds.get("left").setLine(
-                shape.getX() + dx,
-                shape.getY() + dy,
-                shape.getX() + dx,
-                shape.getY() + shape.getHeight() + dy
+                shape.getX() + dxLeft,
+                shape.getY() + dyUp,
+                shape.getX() + dxLeft,
+                shape.getY() + shape.getHeight() + dyDown
         );
         collisionBounds.get("right").setLine(
-                shape.getX() + shape.getWidth() + dx,
-                shape.getY() + dy,
-                shape.getX() + shape.getWidth() + dx,
-                shape.getY() + shape.getHeight() + dy
+                shape.getX() + shape.getWidth() + dxRight,
+                shape.getY() + dyUp,
+                shape.getX() + shape.getWidth() + dxRight,
+                shape.getY() + shape.getHeight() + dyDown
         );
     }
 

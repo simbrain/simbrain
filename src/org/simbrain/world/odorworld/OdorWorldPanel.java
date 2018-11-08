@@ -24,6 +24,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.nodes.PImage;
+import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.util.StandardDialog;
@@ -68,6 +69,10 @@ public class OdorWorldPanel extends JPanel {
      * Selection model.
      */
     private final WorldSelectionModel selectionModel;
+
+    private PNode tileSelectionBox = null;
+
+    private Rectangle tileSelectionModel = null;
 
     /**
      * Color of the world background.
@@ -526,6 +531,42 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("deleteSelection", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 deleteSelectedEntities();
+            }
+        });
+
+        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("B"), "tooltipTest");
+        canvas.getActionMap().put("tooltipTest", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+
+                if (tileSelectionModel != null) {
+                    if (!tileSelectionModel.contains(world.getLastClickedPosition())) {
+                        canvas.getLayer().removeChild(tileSelectionBox);
+                        tileSelectionModel = null;
+                        tileSelectionBox = null;
+                    }
+                }
+
+                if (tileSelectionBox == null) {
+                    int tileCoordinateX =
+                            (int) (world.getLastClickedPosition().getX() / world.getTileMap().getTilewidth());
+                    int tileCoordinateY =
+                            (int) (world.getLastClickedPosition().getY() / world.getTileMap().getTileheight());
+                    tileSelectionModel = new Rectangle(
+                            tileCoordinateX * world.getTileMap().getTilewidth(),
+                            tileCoordinateY * world.getTileMap().getTileheight(),
+                            world.getTileMap().getTilewidth(),
+                            world.getTileMap().getTileheight()
+                    );
+                    tileSelectionBox = PPath.createRectangle(
+                            tileSelectionModel.getX(),
+                            tileSelectionModel.getY(),
+                            tileSelectionModel.getWidth(),
+                            tileSelectionModel.getHeight()
+                            );
+                    ((PPath) tileSelectionBox).setStrokePaint(Color.ORANGE);
+                    tileSelectionBox.setPaint(null);
+                    canvas.getLayer().addChild(tileSelectionBox);
+                }
             }
         });
 

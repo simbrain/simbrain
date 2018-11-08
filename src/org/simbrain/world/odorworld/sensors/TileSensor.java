@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -51,8 +52,18 @@ public class TileSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        int tileCoordinateX = (int) (parent.getCenterX() / parent.getParentWorld().getTileMap().getTilewidth());
-        int tileCoordinateY = (int) (parent.getCenterY() / parent.getParentWorld().getTileMap().getTileheight());
+        TileMap parentTileMap = parent.getParentWorld().getTileMap();
+
+        int tileCoordinateX = (int) (parent.getCenterX() / parentTileMap.getTilewidth());
+        int tileCoordinateY = (int) (parent.getCenterY() / parentTileMap.getTileheight());
+
+        if (tileCoordinateX < 0 || tileCoordinateX > parentTileMap.getMapWidthInTiles()) {
+            return;
+        }
+        if (tileCoordinateY < 0 || tileCoordinateY > parentTileMap.getMapHeightInTiles()) {
+            return;
+        }
+
         if (parent.getParentWorld().getTileMap().hasTileIdAt(tileIdToSense, tileCoordinateX, tileCoordinateY)) {
             value = outputAmount;
         }

@@ -193,6 +193,14 @@ public class TileMap {
         return width * tilewidth;
     }
 
+    public int getMapHeightInTiles() {
+        return height;
+    }
+
+    public int getMapWidthInTiles() {
+        return width;
+    }
+
     public int getTilewidth() {
         return tilewidth;
     }

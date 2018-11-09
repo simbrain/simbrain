@@ -1,7 +1,10 @@
 package org.simbrain.workspace;
 
+import org.simbrain.util.Pair;
+
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -10,6 +13,7 @@ import java.util.stream.Stream;
  * on Coupling directly so that couplings will be properly managed and serialized.
  */
 public class CouplingFactory {
+
     /**
      * The workspace in which the couplings created by this factory will be managed.
      */
@@ -30,6 +34,13 @@ public class CouplingFactory {
         workspace.addCoupling(coupling);
         return coupling;
     }
+
+    //TODO: Discuss and document
+    // TODO: When producers or consumers are removed these maps are not updated
+    private transient Map<Pair<Object, Method>, Producer> producers = new HashMap<>();
+
+    private transient Map<Pair<Object, Method>, Consumer> consumers = new HashMap<>();
+
 
     //TODO: Consider removing this. It seems to just be a convenience method to avoid dealing with exceptions.
     /**
@@ -107,12 +118,32 @@ public class CouplingFactory {
     }
 
     /**
+     * Get all visible producers on a specified component.
+     *
+     * @param component component to scan for visible producers
+     * @return the visible producers
+     */
+    public List<Producer<?>> getVisibleProducers(WorkspaceComponent component) {
+        return getProducers(component).stream().filter(Attribute::isVisible).collect(Collectors.toList());
+    }
+
+    /**
+     * Get all visible consumers on a specified component.
+     *
+     * @param component component to scan for visible consumers
+     * @return the visible consumers
+     */
+    public List<Consumer<?>> getVisibleConsumers(WorkspaceComponent component) {
+        return getConsumers(component).stream().filter(Attribute::isVisible).collect(Collectors.toList());
+    }
+
+    /**
      * Get all the potential producers for a given WorkspaceComponent.
      *
      * @param component The component to generate producers from.
      * @return A list of potential producers.
      */
-    public List<Producer<?>> getAllProducers(WorkspaceComponent component) {
+    public List<Producer<?>> getProducers(WorkspaceComponent component) {
         return getProducersFromModels(component.getModels());
     }
 
@@ -122,7 +153,7 @@ public class CouplingFactory {
      * @param component The component to generate consumers from.
      * @return A list of potential consumers.
      */
-    public List<Consumer<?>> getAllConsumers(WorkspaceComponent component) {
+    public List<Consumer<?>> getConsumers(WorkspaceComponent component) {
         return getConsumersFromModels(component.getModels());
     }
 
@@ -164,7 +195,7 @@ public class CouplingFactory {
         List<Producer<?>> producers = new ArrayList<>();
         for (Method method : model.getClass().getMethods()) {
             if (isProducible(method)) {
-                producers.add(createProducer(model, method));
+                producers.add(getProducer(model, method));
             }
         }
         return producers;
@@ -180,7 +211,7 @@ public class CouplingFactory {
         List<Consumer<?>> consumers = new ArrayList<>();
         for (Method method : model.getClass().getMethods()) {
             if (isConsumable(method)) {
-                consumers.add(createConsumer(model, method));
+                consumers.add(getConsumer(model, method));
             }
         }
         return consumers;
@@ -197,7 +228,7 @@ public class CouplingFactory {
         Stream<Method> stream = Arrays.stream(model.getClass().getMethods());
         Optional<Method> method = stream.filter(m -> m.getName().equals(methodName)).findFirst();
         if (method.isPresent()) {
-            return createConsumer(model, method.get());
+            return getConsumer(model, method.get());
         } else {
             throw new IllegalArgumentException(String.format("No consumable method with name %s was found in class %s.", methodName, model.getClass().getSimpleName()));
         }
@@ -230,7 +261,7 @@ public class CouplingFactory {
     public Producer<?> getProducer(Object model, String methodName) {
         try {
             Method method = model.getClass().getMethod(methodName);
-            return createProducer(model, method);
+            return getProducer(model, method);
         } catch (NoSuchMethodException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -270,7 +301,11 @@ public class CouplingFactory {
     /**
      * Create a producer from the specified method on the model object.
      */
-    private Producer<?> createProducer(Object model, Method method) {
+    private Producer<?> getProducer(Object model, Method method) {
+        Pair key = new Pair(model, method);
+        if(producers.containsKey(key)) {
+            return producers.get(key);
+        }
         Producible annotation = method.getAnnotation(Producible.class);
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not producible.", method.getName()));
@@ -278,13 +313,20 @@ public class CouplingFactory {
         Method idMethod = getMethod(model, annotation.idMethod());
         Method customDescriptionMethod = getMethod(model, annotation.customDescriptionMethod());
         String description = annotation.description();
-        return new Producer(model, method, description, idMethod, customDescriptionMethod );
+        boolean visibility = annotation.defaultVisibility();
+        Producer newProducer = new Producer(model, method, description, idMethod, customDescriptionMethod, visibility );
+        producers.put(key, newProducer);
+        return newProducer;
     }
 
     /**
      * Create a consumer from the specified method on the model object.
      */
-    private Consumer<?> createConsumer(Object model, Method method) {
+    private Consumer<?> getConsumer(Object model, Method method) {
+        Pair key = new Pair(model, method);
+        if(consumers.containsKey(key)) {
+            return consumers.get(key);
+        }
         Consumable annotation = method.getAnnotation(Consumable.class);
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
@@ -292,7 +334,11 @@ public class CouplingFactory {
         Method idMethod = getMethod(model, annotation.idMethod());
         Method customDescriptionMethod = getMethod(model, annotation.customDescriptionMethod());
         String description = annotation.description();
-        return new Consumer(model, method, description, idMethod, customDescriptionMethod);
+        boolean visibility = annotation.defaultVisibility();
+        Consumer newConsumer = new Consumer(model, method, description, idMethod, customDescriptionMethod, visibility);
+        consumers.put(key, newConsumer);
+        return newConsumer;
+
     }
 
     /**

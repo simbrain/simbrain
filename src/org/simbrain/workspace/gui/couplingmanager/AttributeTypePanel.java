@@ -29,178 +29,11 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Displays a list of attribute types.
+ * Panel for editing visibility of attributes.
  */
 public class AttributeTypePanel extends JPanel {
 
-    /**
-     * AttributeType is a string-based representation of unique kinds of Attributes.
-     */
-    static class AttributeType {
-        String source;
-        String name;
-        String type;
-        boolean visibility;
-
-        AttributeType() {
-        }
-
-        AttributeType(String source, String name, String type, boolean visibility) {
-            this.source = source;
-            this.name = name;
-            this.type = type;
-            this.visibility = visibility;
-        }
-
-        AttributeType(Attribute attribute) {
-            source = attribute.getBaseObject().getClass().getSimpleName();
-            name = attribute.getDescription();
-            type = attribute.getTypeName();
-            visibility = getDefaultVisibility(attribute);
-        }
-
-        private boolean getDefaultVisibility(Attribute attribute) {
-            if (attribute instanceof Consumer) {
-                Consumable annotation = attribute.getMethod().getAnnotation(Consumable.class);
-                return annotation.defaultVisibility();
-            } else {
-                Producible annotation = attribute.getMethod().getAnnotation(Producible.class);
-                return annotation.defaultVisibility();
-            }
-        }
-
-        public String getSource() {
-            return source;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public boolean isVisible() {
-            return visibility;
-        }
-
-        public void setVisible(boolean value) {
-            visibility = value;
-        }
-    }
-
-    /**
-     * Table model which represents types of attributes.
-     */
-    static class AttributeTypeModel extends AbstractTableModel {
-
-        /**
-         * Column names.
-         */
-        String[] columnNames = {"Source", "Name", "Type", "Visible"};
-
-        /**
-         * Internal list of components.
-         */
-        private List<AttributeType> data = new ArrayList<AttributeType>();
-
-        public void addRow(AttributeType type) {
-            data.add(type);
-        }
-
-        public int getColumnCount() {
-            return columnNames.length;
-        }
-
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
-
-        public int getRowCount() {
-            return data.size();
-        }
-
-        public Object getValueAt(int row, int col) {
-            switch (col) {
-                case 0:
-                    return data.get(row).getSource();
-                case 1:
-                    return data.get(row).getName();
-                case 2:
-                    return data.get(row).getType();
-                case 3:
-                    return data.get(row).isVisible();
-                default:
-                    return null;
-            }
-        }
-
-        public void setValueAt(Object value, int row, int col) {
-            switch (col) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    data.get(row).setVisible((boolean) value);
-                    fireTableDataChanged();
-                    break;
-            }
-        }
-
-        public boolean isCellEditable(int row, int col) {
-            return col == 3;
-        }
-
-        public Class getColumnClass(int col) {
-            switch (col) {
-                case 0:
-                    return String.class;
-                case 1:
-                    return String.class;
-                case 2:
-                    return String.class;
-                case 3:
-                    return Boolean.class;
-                default:
-                    return null;
-            }
-        }
-
-    }
-
-    /**
-     * uniqueAttributeTypes allows us to remember attribute visibility.
-     */
-    private static Map<String, AttributeType> uniqueAttributeTypes = new HashMap<String, AttributeType>();
-
-    /**
-     * Returns whether the attribute type is default visible or marked visible.
-     */
-    public static boolean isAttributeTypeVisible(Attribute attribute) {
-        return getUniqueType(new AttributeType(attribute)).isVisible();
-    }
-
-    /**
-     * Returns the unique AttributeType which was first added to the attribute type map.
-     */
-    private static AttributeType getUniqueType(AttributeType attributeType) {
-        String key = attributeType.source + attributeType.name + attributeType.type;
-        if (uniqueAttributeTypes.containsKey(key)) {
-            return uniqueAttributeTypes.get(key);
-        } else {
-            uniqueAttributeTypes.put(key, attributeType);
-            return attributeType;
-        }
-    }
-
-    /**
-     * Attribute types.
-     */
-    Set<AttributeType> attributeTypesInModel = new HashSet<AttributeType>();
+    //TODO: Consider using this: https://stackoverflow.com/questions/21847411/java-swing-need-a-good-quality-developed-jtree-with-checkboxes
 
     /**
      * Table representing attribute types.
@@ -210,7 +43,7 @@ public class AttributeTypePanel extends JPanel {
     /**
      * Table model.
      */
-    private AttributeTypeModel model;
+    private AttributeModel model;
 
     /**
      * Workspace component list panel constructor.
@@ -218,7 +51,7 @@ public class AttributeTypePanel extends JPanel {
     public AttributeTypePanel(WorkspaceComponent component, ProducerOrConsumer poc) {
         super(new BorderLayout());
 
-        model = new AttributeTypeModel();
+        model = new AttributeModel();
         table = new JTable(model);
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -236,28 +69,97 @@ public class AttributeTypePanel extends JPanel {
         CouplingFactory couplingFactory = component.getWorkspace().getCouplingFactory();
         if (poc == ProducerOrConsumer.Consuming) {
             setBorder(BorderFactory.createTitledBorder("Consumers"));
-            for (Consumer consumer : couplingFactory.getAllConsumers(component)) {
-                AttributeType attributeType = new AttributeType(consumer);
-                addTypeToModel(attributeType);
+            for (Consumer consumer : couplingFactory.getConsumers(component)) {
+                model.addRow(consumer);
             }
         } else {
             setBorder(BorderFactory.createTitledBorder("Producers"));
-            for (Producer producer : couplingFactory.getAllProducers(component)) {
-                AttributeType attributeType = new AttributeType(producer);
-                addTypeToModel(attributeType);
+            for (Producer producer : couplingFactory.getProducers(component)) {
+                model.addRow(producer);
             }
         }
     }
 
     /**
-     * Add an AttributeType to the table model.
+     * Table model which represents types of attributes.
      */
-    private void addTypeToModel(AttributeType attributeType) {
-        AttributeType uniqueType = getUniqueType(attributeType);
-        if (!attributeTypesInModel.contains(uniqueType)) {
-            attributeTypesInModel.add(uniqueType);
-            model.addRow(uniqueType);
+    static class AttributeModel extends AbstractTableModel {
+
+        /**
+         * Column names.
+         */
+        String[] columnNames = {"Source", "Name", "Type", "Visible"};
+
+        /**
+         * Internal list of attributes.
+         */
+        private List<Attribute> data = new ArrayList<>();
+
+        public void addRow(Attribute attribute) {
+            data.add(attribute);
         }
+
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
+
+        public int getRowCount() {
+            return data.size();
+        }
+
+        public Object getValueAt(int row, int col) {
+            switch (col) {
+            case 0:
+                return data.get(row).getBaseObject().getClass().getSimpleName();
+            case 1:
+                return data.get(row).getDescription();
+            case 2:
+                return data.get(row).getTypeName();
+            case 3:
+                return data.get(row).isVisible();
+            default:
+                return null;
+            }
+        }
+
+        public void setValueAt(Object value, int row, int col) {
+            switch (col) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                data.get(row).setVisible((boolean) value);
+                fireTableDataChanged();
+                break;
+            }
+        }
+
+        public boolean isCellEditable(int row, int col) {
+            return col == 3;
+        }
+
+        public Class getColumnClass(int col) {
+            switch (col) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            case 3:
+                return Boolean.class;
+            default:
+                return null;
+            }
+        }
+
     }
 
 }

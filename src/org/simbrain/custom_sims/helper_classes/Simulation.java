@@ -9,7 +9,6 @@ import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -19,7 +18,6 @@ import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
-import java.io.File;
 import java.util.Hashtable;
 
 /**
@@ -268,7 +266,7 @@ public class Simulation {
      */
     public Coupling<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
         Producer neuronProducer = couplingFactory.getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = couplingFactory.getAllConsumers(plot).get(index);
+        Consumer timeSeriesConsumer = couplingFactory.getConsumers(plot).get(index);
         timeSeriesConsumer.setDescription("Time series " + index);
         return tryCoupling(neuronProducer, timeSeriesConsumer);
     }

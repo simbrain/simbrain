@@ -39,6 +39,12 @@ public abstract class Attribute {
     protected Method customDescriptionMethod;
 
     /**
+     * Whether the attribute shows up in the GUI.  Invisible attribute can still
+     * be part of couplings (if created in a script).
+     */
+    protected boolean visibility;
+
+    /**
      * The String description of the attribute. By default has this form:
      * ID:methodName(Type).  E.g. Neuron1:getActivation(Double).
      * <p>
@@ -61,14 +67,15 @@ public abstract class Attribute {
      *                          string)
      * @param idMethod          method which returns an id for the object.
      * @param customDescription method which returns a custom description
-     *                          method
+     * @param visibility
      */
-    public Attribute(Object baseObject, Method method, String description, Method idMethod, Method customDescription) {
+    public Attribute(Object baseObject, Method method, String description, Method idMethod, Method customDescription, boolean visibility) {
         this.baseObject = baseObject;
         this.method = method;
         this.description = description;
         this.customDescriptionMethod = customDescription;
         this.idMethod = idMethod;
+        this.visibility = visibility;
     }
 
     /**
@@ -163,17 +170,19 @@ public abstract class Attribute {
         this.description = description;
     }
 
-    /**
-     * @return the object on which the method will be invoked.
-     */
     public Object getBaseObject() {
         return baseObject;
     }
 
-    /**
-     * @return the method to invoke to get or set this attribute.
-     */
     public Method getMethod() {
         return method;
+    }
+
+    public boolean isVisible() {
+        return visibility;
+    }
+
+    public void setVisible(boolean visible) {
+        visibility = visible;
     }
 }

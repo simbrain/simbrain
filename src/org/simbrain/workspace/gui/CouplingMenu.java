@@ -51,7 +51,7 @@ public class CouplingMenu extends JMenu {
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Consumer<?>> consumers = workspace.getCouplingFactory().getAllConsumers(targetComponent);
+            List<Consumer<?>> consumers = workspace.getCouplingFactory().getVisibleConsumers(targetComponent);
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
                     couplings.add(new CouplingMenuItem(workspace, targetComponent.getName() + "/" +
@@ -76,7 +76,7 @@ public class CouplingMenu extends JMenu {
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Producer<?>> producers = workspace.getCouplingFactory().getAllProducers(targetComponent);
+            List<Producer<?>> producers = workspace.getCouplingFactory().getVisibleProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
                     couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getDescription(), producer, consumer));

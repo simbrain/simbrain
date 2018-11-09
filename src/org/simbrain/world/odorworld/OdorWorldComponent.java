@@ -146,11 +146,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
         world.update();
     }
 
-    /**
-     * Returns a reference to the odor world.
-     *
-     * @return the odor world object.
-     */
     public OdorWorld getWorld() {
         return world;
     }

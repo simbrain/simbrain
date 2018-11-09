@@ -185,16 +185,12 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (Producer<?> producer : component.getWorkspace().getCouplingFactory().getAllProducers(component)) {
-                    if (AttributeTypePanel.isAttributeTypeVisible(producer)) {
-                        model.addElement(producer);
-                    }
+                for (Producer<?> producer : component.getWorkspace().getCouplingFactory().getVisibleProducers(component)) {
+                    model.addElement(producer);
                 }
             } else {
-                for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getAllConsumers(component)) {
-                    if (AttributeTypePanel.isAttributeTypeVisible(consumer)) {
-                        model.addElement(consumer);
-                    }
+                for (Consumer<?> consumer : component.getWorkspace().getCouplingFactory().getVisibleConsumers(component)) {
+                    model.addElement(consumer);
                 }
             }
             attributeTypePanel = new AttributeTypePanel(component, producerOrConsumer);

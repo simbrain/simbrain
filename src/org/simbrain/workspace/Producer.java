@@ -5,17 +5,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * {@inheritDoc}.
+ * The part of a {@link Coupling} that send values to a {@link Consumable}.
  *
- * @param <V> The type of value to be consumed.  Mostly double or double[].
+ * @param <V> The type of value to be produced.  Mostly double or double[].
  */
 public class Producer<V> extends Attribute {
 
     /**
-     * {@inheritDoc}.
+     * Contruct a producer.
+     *
+     * @param baseObject object producing values
+     * @param method the "setter" that produces values
+     * @param description description for the gui
+     * @param idMethod id method for base object, used in description
+     * @param customMethod method reference for custom descriptions
+     * @param visibility whether this attribute is visible in the gui
      */
-    public Producer(Object baseObject, Method method, String description, Method idMethod, Method customMethod) {
-        super(baseObject, method, description, idMethod, customMethod);
+    public Producer(Object baseObject, Method method, String description, Method idMethod, Method customMethod,  boolean visibility) {
+        super(baseObject, method, description, idMethod, customMethod, visibility);
     }
 
     /**

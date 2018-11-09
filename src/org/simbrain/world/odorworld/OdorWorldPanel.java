@@ -29,15 +29,22 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
+import org.simbrain.util.piccolo.Tile;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.*;
+import org.simbrain.world.odorworld.gui.EntityNode;
+import org.simbrain.world.odorworld.gui.WorldMouseHandler;
+import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
+import org.simbrain.world.odorworld.gui.WorldSelectionModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
@@ -53,7 +60,7 @@ public class OdorWorldPanel extends JPanel {
     /**
      * The Piccolo PCanvas.
      */
-    private final PCanvas canvas;
+    private final OdorWorldCanvas canvas;
 
     /**
      * Reference to WorkspaceComponent. // TODO: Needed?
@@ -89,16 +96,22 @@ public class OdorWorldPanel extends JPanel {
      */
     private int defaultHeight = 450;
 
-    /**
-     * The boolean that turns on and off wall drawing behavior for the mouse.
-     */
-    private boolean drawingWalls = false;
-
     private Timer movementTimer;
 
     private byte manualMovementState;
 
     private List<PImage> layerImageList;
+
+    /**
+     * Extend PCanvas for custom handling of tooltips
+     */
+    private class OdorWorldCanvas extends PCanvas {
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return "Id: " + getTile(event.getPoint()).getId();
+        }
+
+    }
 
     /**
      * Construct a world, set its background color.
@@ -107,7 +120,9 @@ public class OdorWorldPanel extends JPanel {
      */
     public OdorWorldPanel(OdorWorldComponent component, OdorWorld world) {
 
-        canvas = new PCanvas();
+        canvas = new OdorWorldCanvas();
+        ToolTipManager.sharedInstance().registerComponent(canvas);
+
         setLayout(new BorderLayout());
         this.add("Center", canvas);
 
@@ -127,6 +142,20 @@ public class OdorWorldPanel extends JPanel {
         PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
         zoomHandler.zoomAboutMouse();
         canvas.addInputEventListener(zoomHandler);
+
+        // Create tile dialog on double clicks
+        canvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(getTile(e.getPoint()));
+                    StandardDialog dialog = ape.getDialog();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            }
+        });
 
         selectionModel = new WorldSelectionModel(this);
         selectionModel.addSelectionListener((e) -> {
@@ -223,6 +252,21 @@ public class OdorWorldPanel extends JPanel {
             camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
             repaint();
         }
+    }
+
+    //TODO: This code overlaps TileSensor.  Factor it out in some appropriate way.
+    public Tile getTile(Point point) {
+        int tileCoordinateX = (int) (point.x / world.getTileMap().getTilewidth());
+        int tileCoordinateY = (int) (point.y / world.getTileMap().getTileheight());
+
+        if (tileCoordinateX < 0 || tileCoordinateX > world.getTileMap().getMapWidthInTiles()) {
+            return null;
+        }
+        if (tileCoordinateY < 0 || tileCoordinateY > world.getTileMap().getMapHeightInTiles()) {
+            return null;
+        }
+
+        return world.getTileMap().getTileStackAt(tileCoordinateX, tileCoordinateY).get(0);
     }
 
     public void manualMovementUpdate() {

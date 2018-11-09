@@ -147,6 +147,19 @@ public class TimeSeriesModel extends ChartModel {
         return series;
     }
 
+    @Consumable(idMethod = "getId")
+    public void addVector(double[] newPoint) {
+        if (newPoint.length != timeSeriesList.size()) {
+            timeSeriesList.clear();
+            for (int i = 0; i < newPoint.length; i++) {
+                addDataSource();
+            }
+        }
+        for (int i = 0; i < newPoint.length; i++) {
+            timeSeriesList.get(i).setValue(newPoint[i]);
+        }
+    }
+
     /**
      * Clears the plot.
      */

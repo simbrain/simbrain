@@ -217,6 +217,22 @@ public class BarChartModel extends ChartModel {
     public void addBar(double value) {
     }
 
+    @Consumable(idMethod = "getId")
+    public void addVector(double[] newPoint) {
+
+        if (newPoint.length != bars.size()) {
+            // Take care of size mismatch
+            dataset.clear();
+            bars.clear();
+            for (int i = 0; i < newPoint.length; i++) {
+                addBar();
+            }
+        }
+        for (int i = 0; i < newPoint.length; i++) {
+            bars.get(i).setValue(newPoint[i]);
+        }
+    }
+
     /**
      * Identify this model.
      */

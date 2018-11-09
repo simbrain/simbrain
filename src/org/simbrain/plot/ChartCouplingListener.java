@@ -34,9 +34,18 @@ public class ChartCouplingListener implements CouplingListener {
 
     @Override
     public void couplingAdded(Coupling<?> coupling) {
+        // An array coupling was added to the chart
+        if(coupling.getConsumer().getType() == double[].class) {
+            // TODO: Send the producer descriptions over to the bars somehow, as in the
+            // scalar approach below
+            return;
+        }
+        // Scalar coupling was added to the chart
+        // TODO: Consider removing this and focusing only on array couplings. Besides
+        // this is confusing.
         if (coupling.getConsumer().getBaseObject() == model) {
             Producer<?> producer = coupling.getProducer();
-            String description = descriptionPrefix + producer.getId();
+            String description = descriptionPrefix + " " + producer.getId();
             ChartDataSource source = model.addDataSource(description);
             Consumer<?> consumer = couplingFactory.getConsumer(source, "setValue");
             couplingFactory.tryCoupling(producer, consumer);

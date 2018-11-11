@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,11 +164,21 @@ public class TileMap {
      * @return true if the given tile exists in the tile stack
      */
     public boolean hasTileIdAt(int id, int x, int y) {
+
         // if id is less than first gid, the id could be a empty tile, so those should not be check.
         if (id < tileset.getFirstgid()) {
             return false;
         }
+
         return getTileStackAt(x, y).stream().anyMatch(t -> t.getId() == id);
+    }
+
+    public boolean hasTileIdAtPixel(int id, double x, double y) {
+        return getTileStackAtPixel(x, y).stream().anyMatch(t -> t.getId() == id);
+    }
+
+    public boolean hasTileIdAtPixel(int id, Point p) {
+        return getTileStackAtPixel(p.getX(), p.getY()).stream().anyMatch(t -> t.getId() == id);
     }
 
     /**
@@ -179,10 +190,39 @@ public class TileMap {
      */
     public List<Tile> getTileStackAt(int x, int y) {
         ArrayList<Tile> stack = new ArrayList<>();
+
+        // return empty if out of bound
+        if (x < 0 || x > width || y < 0 || y > height) {
+            return stack;
+        }
+
         for (TileMapLayer l : layers) {
             stack.add(l.getTileAt(x, y));
         }
+
         return stack;
+    }
+
+    public List<Tile> getTileStackAtPixel(double x, double y) {
+        Point tileCoordinate = pixelToTileCoordinate(x, y);
+        int tileCoordinateX = (int) tileCoordinate.getX();
+        int tileCoordinateY = (int) tileCoordinate.getY();
+        return getTileStackAt(tileCoordinateX, tileCoordinateY);
+    }
+
+    public List<Tile> getTileStackAtPixel(Point2D p) {
+        Point tileCoordinate = pixelToTileCoordinate(p);
+        int tileCoordinateX = (int) tileCoordinate.getX();
+        int tileCoordinateY = (int) tileCoordinate.getY();
+        return getTileStackAt(tileCoordinateX, tileCoordinateY);
+    }
+
+    public Point pixelToTileCoordinate(double x, double y) {
+        return new Point((int) (x / tilewidth), (int) (y / tileheight));
+    }
+
+    public Point pixelToTileCoordinate(Point2D p) {
+        return pixelToTileCoordinate(p.getX(), p.getY());
     }
 
     public int getMapHeight() {

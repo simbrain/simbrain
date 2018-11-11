@@ -52,19 +52,10 @@ public class TileSensor extends Sensor {
     @Override
     public void update() {
         value = 0;
-        TileMap parentTileMap = parent.getParentWorld().getTileMap();
 
-        int tileCoordinateX = (int) (parent.getCenterX() / parentTileMap.getTilewidth());
-        int tileCoordinateY = (int) (parent.getCenterY() / parentTileMap.getTileheight());
+        TileMap tileMap = parent.getParentWorld().getTileMap();
 
-        if (tileCoordinateX < 0 || tileCoordinateX > parentTileMap.getMapWidthInTiles()) {
-            return;
-        }
-        if (tileCoordinateY < 0 || tileCoordinateY > parentTileMap.getMapHeightInTiles()) {
-            return;
-        }
-
-        if (parent.getParentWorld().getTileMap().hasTileIdAt(tileIdToSense, tileCoordinateX, tileCoordinateY)) {
+        if (tileMap.hasTileIdAtPixel(tileIdToSense, parent.getCenterX(), parent.getCenterY())) {
             value = outputAmount;
         }
     }

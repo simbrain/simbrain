@@ -254,19 +254,8 @@ public class OdorWorldPanel extends JPanel {
         }
     }
 
-    //TODO: This code overlaps TileSensor.  Factor it out in some appropriate way.
     public Tile getTile(Point point) {
-        int tileCoordinateX = (int) (point.x / world.getTileMap().getTilewidth());
-        int tileCoordinateY = (int) (point.y / world.getTileMap().getTileheight());
-
-        if (tileCoordinateX < 0 || tileCoordinateX > world.getTileMap().getMapWidthInTiles()) {
-            return null;
-        }
-        if (tileCoordinateY < 0 || tileCoordinateY > world.getTileMap().getMapHeightInTiles()) {
-            return null;
-        }
-
-        return world.getTileMap().getTileStackAt(tileCoordinateX, tileCoordinateY).get(0);
+        return world.getTileMap().getTileStackAtPixel(point).get(0);
     }
 
     public void manualMovementUpdate() {

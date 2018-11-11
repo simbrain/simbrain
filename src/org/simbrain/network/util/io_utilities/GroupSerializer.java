@@ -136,9 +136,10 @@ public class GroupSerializer {
         for (byte b : buff.array()) {
             preByteArray.add(b);
         }
+
         int numNonZero = 0;
         for (int i = 1, n = riCompressedMat.length; i < n; i++) {
-            if (numNonZero < riCompressedMat[0]) {
+            if (numNonZero < riCompressedMat[0] || riCompressedMat[i] == -1) {
                 if (riCompressedMat[i] == -1) { // Blank row
                     // New Row code
                     for (int k = 0; k < 4; k++) {

@@ -987,6 +987,7 @@ public class SynapseGroup extends Group {
      * 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0 3 5.3 1 2 .9
      */
     public double[][] getNumericIndices() {
+
         double[][] pairs = new double[size()][3];
         int i = 0;
         int j = 0;
@@ -1100,13 +1101,15 @@ public class SynapseGroup extends Group {
      */
     public long[] getRowCompressedMatrixRepresentation() {
         double[][] pairs = getNumericIndices();
+        prune();
         int numSyns = size();
         int numSrc = sourceNeuronGroup.size();
         long[] compRowRep = new long[numSrc + (2 * numSyns)];
         int currRow = 0;
         int m = 0;
         compRowRep[0] = numSyns;
-        for (int l = 1, n = numSyns + numSrc; l < n; l++) {
+        int l = 1;
+        for (int n = numSyns + numSrc; l < n; l++) {
             if (m == numSyns) {
                 break;
             }
@@ -1119,6 +1122,13 @@ public class SynapseGroup extends Group {
                 m++;
             }
         }
+        // Adds trailing "new row" markers when the last synapse comes from a
+        // source neuron other than the last one. This represents empty rows on the end.
+        while(currRow < numSrc-1) {
+            compRowRep[l++] = -1L;
+            currRow++;
+        }
+
         return compRowRep;
     }
 

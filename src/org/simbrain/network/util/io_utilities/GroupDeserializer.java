@@ -153,6 +153,19 @@ public class GroupDeserializer {
                 synapses.add(s);
             }
 
+            while(row < sg.getSourceNeuronGroup().size()-1) {
+                if(usingBytes) {
+                    inStream.get();
+                }
+                if(usingShorts) {
+                    inStream.getShort();
+                }
+                if(usingInts) {
+                    inStream.getInt();
+                }
+                row++;
+            }
+
             if (inStream.remaining() == numSyns * 4) { // Float_32 encoding
                 for (Synapse s : synapses) {
                     s.setStrength(inStream.getFloat());

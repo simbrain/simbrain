@@ -32,7 +32,7 @@ public class LoadTileMapAction extends AbstractAction {
         SFileChooser chooser = new SFileChooser(".", "Load TMX tilemap");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            component.getWorld().setTileMap(new TileMap(theFile));
+            component.getWorld().setTileMap(TileMap.create(theFile));
         }
     }
 

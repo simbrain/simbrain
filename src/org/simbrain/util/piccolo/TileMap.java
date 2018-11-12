@@ -1,10 +1,10 @@
 package org.simbrain.util.piccolo;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.piccolo2d.nodes.PImage;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -25,62 +25,43 @@ import java.util.List;
  * Piccolo canvas.
  *
  */
+@XStreamAlias("map")
 public class TileMap {
 
     /**
      * The TMX format version. Was “1.0” so far, and will be incremented to match minor Tiled releases.
      */
+    @XStreamAsAttribute
     private String version;
 
     /**
      * The Tiled version used to save the file (since Tiled 1.0.1). May be a date (for snapshot builds).
      */
+    @XStreamAsAttribute
     private String tiledversion;
-
-    /**
-     * Map orientation. Tiled supports “orthogonal”, “isometric”, “staggered” and “hexagonal” (since 0.11).
-     * Odor world is in orthogonal orientation so other types won't be used.
-     */
-    private Orientation orientation;
-
-    /**
-     * The order in which tiles on tile layers are rendered.
-     * Valid values are right-down (the default), right-up, left-down and left-up.
-     * In all cases, the map is drawn row-by-row. (only supported for orthogonal maps at the moment)
-     */
-    private RenderOrder renderorder;
-
-    /**
-     * Unused but required for .tmx parsing (see {@link #orientation}.
-     */
-    public enum Orientation {
-        orthogonal
-    }
-
-    /**
-     * Unused but required for .tmx parsing (see {@link #renderorder}.
-     */
-    public enum RenderOrder {
-    }
 
     /**
      * The map width in tiles.
      */
+    @XStreamAsAttribute
     private int width;
 
     /**
      * The map height in tiles.
      */
+    @XStreamAsAttribute
     private int height;
 
     /**
      * The width of a tile.
      */
+    @XStreamAsAttribute
     private int tilewidth;
 
     /**
      * The height of a tile.
      */
+    @XStreamAsAttribute
     private int tileheight;
 
     /**
@@ -91,15 +72,17 @@ public class TileMap {
     /**
      * The layers of this map
      */
-    private ArrayList<TileMapLayer> layers = new ArrayList<>();
+    @XStreamImplicit
+    public ArrayList<TileMapLayer> layers = new ArrayList<>();
 
     /**
      * Layers of the rendered map images
      */
-    private ArrayList<PImage> renderedLayers = null;
+    private transient ArrayList<PImage> renderedLayers = null;
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
+     * (Not used for now)
      */
     private Color backgroundcolor;
 
@@ -107,38 +90,24 @@ public class TileMap {
      * Create a tilemap by parsing a tmx file, which is an xml representation
      * of a tilemap.
      *
-     * @param filename file to parse
+     * @param file file to parse
+     * @return the tilemap object from the given file
      */
-    public TileMap(String filename) {
-        Document doc = OdorWorldResourceManager.getTileMap(filename);
-        readDocument(doc);
+    public static TileMap create(File file) {
+        return (TileMap) TMXUtils.getXStream().fromXML(file);
     }
 
-    public TileMap(File file) {
-        Document doc = OdorWorldResourceManager.getTileMap(file);
-        readDocument(doc);
+    /**
+     * Create a tilemap by parsing a tmx file, which is an xml representation
+     * of a tilemap.
+     *
+     * @param filename name of the file to parse
+     * @return the tilemap object from the given file
+     */
+    public static TileMap create(String filename) {
+        return (TileMap) TMXUtils.getXStream().fromXML(OdorWorldResourceManager.getFileURL("tilemap/" + filename));
     }
 
-    private void readDocument(Document doc) {
-
-        Element root = doc.getDocumentElement();
-
-        this.version = root.getAttribute("version");
-        this.tiledversion = root.getAttribute("tiledversion");
-        this.orientation = Orientation.orthogonal;
-        // this.renderorder =
-        this.width = Integer.parseInt(root.getAttribute("width"));
-        this.height = Integer.parseInt(root.getAttribute("height"));
-        this.tilewidth = Integer.parseInt(root.getAttribute("tilewidth"));
-        this.tileheight = Integer.parseInt(root.getAttribute("tileheight"));
-
-        tileset = new TileSet((Element)(root.getElementsByTagName("tileset").item(0)));
-
-        NodeList layerElements = root.getElementsByTagName("layer");
-        for (int i = 0; i < layerElements.getLength(); i++) {
-            layers.add(new TileMapLayer((Element)(layerElements.item(i))));
-        }
-    }
 
     /**
      * Get a list of images of each layer of this map.
@@ -147,6 +116,9 @@ public class TileMap {
     public ArrayList<PImage> createImageList() {
         if (renderedLayers == null) {
             renderedLayers = new ArrayList<>();
+            if (tileset == null) {
+                tileset = new TileSet();
+            }
             for (TileMapLayer l : layers) {
                 renderedLayers.add(l.renderImage(tileset));
             }
@@ -173,10 +145,27 @@ public class TileMap {
         return getTileStackAt(x, y).stream().anyMatch(t -> t.getId() == id);
     }
 
+    /**
+     * Check if a tile with a given id exists at a specified location in
+     * pixel coordinates.
+     *
+     * @param id the id of the tile to check
+     * @param x the x pixel location
+     * @param y the y pixel location
+     * @return true if the given tile exists in the tile stack
+     */
     public boolean hasTileIdAtPixel(int id, double x, double y) {
         return getTileStackAtPixel(x, y).stream().anyMatch(t -> t.getId() == id);
     }
 
+    /**
+     * Check if a tile with a given id exists at a specified location in
+     * pixel coordinates.
+     *
+     * @param id the id of the tile to check
+     * @param p the location of the pixel to check
+     * @return true if the given tile exists in the tile stack
+     */
     public boolean hasTileIdAtPixel(int id, Point p) {
         return getTileStackAtPixel(p.getX(), p.getY()).stream().anyMatch(t -> t.getId() == id);
     }
@@ -197,12 +186,19 @@ public class TileMap {
         }
 
         for (TileMapLayer l : layers) {
-            stack.add(l.getTileAt(x, y));
+            stack.add(tileset.getTile(l.getTileIdAt(x, y)));
         }
 
         return stack;
     }
 
+    /**
+     * Returns the "stack" of tiles at a given location as a list.
+     *
+     * @param x pixel x location
+     * @param y pixel y location
+     * @return a list of tiles at that location in the same order as in the xml file
+     */
     public List<Tile> getTileStackAtPixel(double x, double y) {
         Point tileCoordinate = pixelToTileCoordinate(x, y);
         int tileCoordinateX = (int) tileCoordinate.getX();
@@ -210,6 +206,12 @@ public class TileMap {
         return getTileStackAt(tileCoordinateX, tileCoordinateY);
     }
 
+    /**
+     * Returns the "stack" of tiles at a given location as a list.
+     *
+     * @param p pixel location
+     * @return a list of tiles at that location in the same order as in the xml file
+     */
     public List<Tile> getTileStackAtPixel(Point2D p) {
         Point tileCoordinate = pixelToTileCoordinate(p);
         int tileCoordinateX = (int) tileCoordinate.getX();
@@ -217,10 +219,23 @@ public class TileMap {
         return getTileStackAt(tileCoordinateX, tileCoordinateY);
     }
 
+    /**
+     * Converts pixel location to tile coordinate.
+     *
+     * @param x pixel x location
+     * @param y pixel y location
+     * @return the corresponding tile location
+     */
     public Point pixelToTileCoordinate(double x, double y) {
         return new Point((int) (x / tilewidth), (int) (y / tileheight));
     }
 
+    /**
+     * Converts pixel location to tile coordinate.
+     *
+     * @param p pixel location
+     * @return the corresponding tile location
+     */
     public Point pixelToTileCoordinate(Point2D p) {
         return pixelToTileCoordinate(p.getX(), p.getY());
     }

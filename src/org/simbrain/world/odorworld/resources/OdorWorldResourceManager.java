@@ -98,6 +98,10 @@ public class OdorWorldResourceManager {
         return image;
     }
 
+    public static URL getFileURL(final String path) {
+        return ClassLoader.getSystemClassLoader().getResource(path);
+    }
+
     public static Document getDocument(final String name) {
         URL url = ClassLoader.getSystemClassLoader().getResource(name);
 

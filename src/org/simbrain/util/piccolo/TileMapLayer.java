@@ -1,70 +1,44 @@
 package org.simbrain.util.piccolo;
 
-import com.Ostermiller.util.CSVParser;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.piccolo2d.nodes.PImage;
-import org.w3c.dom.Element;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
+@XStreamAlias("layer")
 public class TileMapLayer {
 
     /**
      * the name of the layer
      */
+    @XStreamAsAttribute
     private String name;
 
     /**
      * width of the layer in tiles
      */
+    @XStreamAsAttribute
     private int width;
 
     /**
      * height of the layer in tiles
      */
+    @XStreamAsAttribute
     private int height;
 
     /**
-     * the tile id matrix of the layer
+     * The data from parsing tmx file.
+     * Use {@link TiledData#getGid()} to retrieve the processed data (tile id list)
      */
-    private ArrayList<ArrayList<Tile>> tiles = new ArrayList<>();
+    public TiledData data;
 
     /**
      * The rendered image of the layer
      */
     private transient PImage layer = null;
-
-
-    public TileMapLayer(Element layer) {
-
-        name = layer.getAttribute("name");
-        width = Integer.parseInt(layer.getAttribute("width"));
-        height = Integer.parseInt(layer.getAttribute("height"));
-
-        Element data = (Element)(layer.getElementsByTagName("data").item(0));
-
-        // TODO: support base64/xml encoding and gzip/zlib compression?
-        if (data.getAttribute("encoding").equals("csv")) {
-            String map = data.getTextContent();
-            CSVParser parser = new CSVParser(new ByteArrayInputStream(map.getBytes()));
-            String[][] allValues = null;
-            try {
-                allValues = parser.getAllValues();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            for (int i = 0; i < width; i++) {
-                ArrayList<Tile> currentRow = new ArrayList<>();
-                for (int j = 0; j < height; j++) {
-                    currentRow.add(new Tile(Integer.parseInt(allValues[i][j])));
-                }
-                tiles.add(currentRow);
-            }
-        }
-    }
 
     /**
      * Render one layer of a tileset.
@@ -82,9 +56,11 @@ public class TileMapLayer {
                     );
             Graphics2D graphics = layerImage.createGraphics();
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+            List<Integer> gid = data.getGid();
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
-                    Image image = tileSet.getTileImage(tiles.get(i).get(j).getId());
+                    Image image = tileSet.getTileImage(gid.get(i * width + j));
                     graphics.drawImage(image, j * tileSet.getTilewidth(), i * tileSet.getTileheight(), null);
                 }
             }
@@ -97,8 +73,15 @@ public class TileMapLayer {
         return layer;
     }
 
-    public Tile getTileAt(int x, int y) {
-        return tiles.get(y).get(x);
+    /**
+     * Get the id of a tile at the given tile coordinate location.
+     *
+     * @param x tile coordinate x
+     * @param y tile coordinate y
+     * @return the tile id
+     */
+    public Integer getTileIdAt(int x, int y) {
+        return data.getGid().get(x + y * width);
     }
 
     public String getName() {

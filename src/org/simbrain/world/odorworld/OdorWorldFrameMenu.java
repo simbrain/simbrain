@@ -135,21 +135,21 @@ public class OdorWorldFrameMenu extends JMenuBar {
         JMenuItem loadEmptyMapItem = new JMenuItem(new AbstractAction("Load Empty Map") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(new TileMap("empty.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("empty.tmx"));
             }
         });
 
         JMenuItem loadSampleMapItem = new JMenuItem(new AbstractAction("Load Sample Map") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(new TileMap("sample.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("sample.tmx"));
             }
         });
 
         JMenuItem loadLargeMapItem = new JMenuItem(new AbstractAction("Load Large Map") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(new TileMap("largeWorld.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("largeWorld.tmx"));
             }
         });
 

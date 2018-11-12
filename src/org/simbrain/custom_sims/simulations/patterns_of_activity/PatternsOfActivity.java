@@ -120,7 +120,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up odor world
         OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(new TileMap("empty.tmx"));
+        world.getWorld().setTileMap(TileMap.create("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
         mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/4, 60));
         mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/4, 60));

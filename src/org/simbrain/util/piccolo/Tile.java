@@ -17,8 +17,17 @@ import java.util.Map;
 @XStreamAlias("tile")
 public class Tile  implements EditableObject {
 
-    //TODO: Currently just based on the xml id.
-    // Can enhance this later with custom properties as in sample.tmx
+    // Ideal structure for Odor World version / notes for future javadoc comments
+    //
+    // TileType (= tmx tile id).
+    //  Based on tmx ids, integer.
+    //  Display label is "Tile Type ID".
+    //  This determines what image is used
+    //   Associated with custom properties.
+    //   We can add a custom property called SimbrainType, and if filled, use it to set SimbrainType
+    //
+    // SimbrainTileType (Grass, Water, etc). Initially just use a string.
+    //   Maybe later a list of strings if multiple type systems
 
     /**
      * The local tile ID within its tileset.

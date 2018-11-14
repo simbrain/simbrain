@@ -70,7 +70,7 @@ public class TileMap {
     private TileSet tileset;
 
     /**
-     * The layers of this map
+     * The layers of this map.
      */
     @XStreamImplicit
     public ArrayList<TileMapLayer> layers = new ArrayList<>();

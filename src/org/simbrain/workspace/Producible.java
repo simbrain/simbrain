@@ -30,6 +30,10 @@ public @interface Producible {
      */
     String customDescriptionMethod() default "";
 
+    // Override if this is an array producer and if you want to make it possible
+    // to have separate ids for each member of the list, e.g. when coupling to a barchart
+    //List<String> listDescriptorsMethod() default "";
+
     /**
      * Whether this method should be visible in the coupling panels and menus by default. User
      * visibility settings will override this value.

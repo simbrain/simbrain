@@ -21,6 +21,7 @@ package org.simbrain.network.util.io_utilities;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.trainers.InvalidDataException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A class for storing static methods for custom deserialization of custom
@@ -38,6 +40,74 @@ import java.util.List;
  * @author Zoë Tosi
  */
 public class GroupDeserializer {
+
+
+    /**
+     * Reconstructs a synapse group from connection and weight data encoded in bytes using a sparse encoding scheme.
+     * @param synBytes
+     * @param sg
+     * @return
+     */
+    public static boolean reconstructSynapsesFromCode(byte[] synBytes, SynapseGroup sg) {
+        try {
+            ByteBuffer inStream = ByteBuffer.wrap(synBytes);
+
+            inStream.getInt(); // skip flag
+            GroupSerializer.Precision precision = inStream.get() == (byte) 0x1 ? GroupSerializer.Precision.FLOAT_64
+                    : GroupSerializer.Precision.FLOAT_32;
+            int size = inStream.getInt();
+            int numSrc = inStream.getInt();
+
+            List<Neuron> src = sg.getSourceNeurons();
+            List<Neuron> tar = sg.getTargetNeurons();
+            // Store synapses before putting them in the group.
+            List<Synapse> synapses = new LinkedList<Synapse>();
+
+            for (int ii = 0; ii < numSrc; ++ii) {
+                int srcInd = inStream.getInt();
+                int outD = inStream.getInt();
+                for (int jj = 0, m = outD; jj < m; ++jj) {
+                    int tarInd = inStream.getInt();
+                    Synapse s = new Synapse(src.get(srcInd), tar.get(tarInd));
+                    synapses.add(s);
+                }
+            }
+
+            ListIterator<Synapse> synIter = synapses.listIterator();
+            if (GroupSerializer.Precision.FLOAT_64 == precision) {
+                if (inStream.remaining() / 8 != size) {
+                    throw new InvalidDataException("Meta-Data indicates a number of synapses inconsistent with the" +
+                            " remaining bytes. Check serialization configuration or file integrity.");
+                }
+                for (int ii = 0; ii < size; ++ii) {
+                    Synapse s = synIter.next();
+                    s.forceSetStrength(Double.longBitsToDouble(inStream.getLong()));
+                    sg.addSynapseUnsafe(s);
+                }
+            } else {
+                if (inStream.remaining() / 4 != size) {
+                    throw new InvalidDataException("Meta-Data indicates a number of synapses inconsistent with the" +
+                            " remaining bytes. Check serialization configuration or file integrity.");
+                }
+                for (int ii = 0; ii < size; ++ii) {
+                    Synapse s = synIter.next();
+                    s.forceSetStrength((double) Float.intBitsToFloat(inStream.getInt()));
+                    sg.addSynapseUnsafe(s);
+                }
+            }
+        } catch (IndexOutOfBoundsException ob) {
+            ob.printStackTrace();
+            System.out.println("Possible Causes: Source or target group doesn't"
+                    + " have proper number of neurons. Incorrect number of"
+                    + " synapses given as first number in file. Corrupted data file.");
+            return false;
+        } catch (InvalidDataException ide) {
+            ide.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @param rowCompByteArr the row compressed sparse matrix used to fill the
@@ -51,6 +121,9 @@ public class GroupDeserializer {
             ByteBuffer inStream = ByteBuffer.wrap(rowCompByteArr);
             // First number is always the number of synapses stored as an int
             int numSyns = inStream.getInt();
+            if (numSyns == -1) { // marker for new serialization scheme
+                return reconstructSynapsesFromCode(rowCompByteArr, sg);
+            }
             // Assume that the file is using bytes to encode the index values
             // this assumption can be countered if the byte -> short or
             // byte -> int end code is read.

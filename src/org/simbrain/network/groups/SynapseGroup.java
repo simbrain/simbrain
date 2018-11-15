@@ -86,6 +86,11 @@ public class SynapseGroup extends Group {
     private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
 
     /**
+     * The precision with which weights should be saved.
+     */
+    private Precision serialzationPrecision = Precision.FLOAT_64;
+
+    /**
      * A temporary set containing all the excitatory synapses in the group. Used
      * when saving synapse groups since the regular set is destroyed. If the
      * group is going to continue being used after saving the values in this
@@ -1101,7 +1106,6 @@ public class SynapseGroup extends Group {
      */
     public long[] getRowCompressedMatrixRepresentation() {
         double[][] pairs = getNumericIndices();
-        prune();
         int numSyns = size();
         int numSrc = sourceNeuronGroup.size();
         long[] compRowRep = new long[numSrc + (2 * numSyns)];
@@ -1130,6 +1134,72 @@ public class SynapseGroup extends Group {
         }
 
         return compRowRep;
+    }
+
+
+    /**
+     * Produces a sparse representation of the synapse group and returns that data as a byte buffer. Ordering is such
+     * that meta-data comes first indicating a marker which is currently used for backwards compatibility indicating that
+     * the bytes here represent the new serialization scheme. This is followed by the number of synapses. From there
+     * each source neuron index is followed by the number of outgoing connections it has and then the indices of the
+     * outgoing connections in the target neuron group. All indices and metadata are encoded as integers. The remaining
+     * bytes are bit represenations of the FP weight values either in single or double precision.
+     *
+     *
+     * @param precision what precision to story the weights.
+     * @return
+     */
+    public ByteBuffer getSparseCode(Precision precision) {
+        double[][] pairs = getNumericIndices();
+        // Can't use src group size because some neurons in the group may not have any synaptic connections to the target
+        int numSrc = 0;
+        int curSrc = -1;
+        // keeps track of indices of the beginnings and ends of target neuron to each source
+        List<Integer> localOutInds = new ArrayList<>();
+        for(int ii=0; ii<pairs.length; ++ii) {
+            if (curSrc != pairs[ii][0]) {
+                localOutInds.add(ii);
+                curSrc = (int) pairs[ii][0];
+                numSrc++;
+            }
+        }
+        localOutInds.add(pairs.length);
+        ByteBuffer buffer;
+        if(precision == Precision.FLOAT_64) {
+             buffer = ByteBuffer.allocate(4 * (2*numSrc + 3*pairs.length) + 4 + 1 + 4 + 4);
+        } else {
+             buffer = ByteBuffer.allocate(4 * (2*numSrc + 2*pairs.length) + 4 + 1 + 4 + 4);
+        }
+
+        buffer.putInt(-1); // Marker so what we know that the new serialization method is being used.
+        // Meta encoding whether or not double precision is being used
+        buffer.put((byte) (precision == Precision.FLOAT_64 ? 0x1 : 0x0));
+        // Meta number of synapses
+        buffer.putInt(pairs.length);
+        // Meta number of EFFECTIVE source neurons--ones with at least one outgoing connection in this group
+        buffer.putInt(numSrc);
+        for(int ii=0; ii < numSrc; ++ii) {
+            int start = localOutInds.get(ii);
+            int end = localOutInds.get(ii+1);
+            buffer.putInt((int) pairs[start][0]); // SourceIndex
+            buffer.putInt(end-start); // number of targets
+            for(int jj = start; jj< end; ++jj) {
+                buffer.putInt((int) pairs[jj][1]);
+            }
+        }
+
+        if (precision == Precision.FLOAT_64) {
+            for(int ii=0, n=pairs.length; ii<n; ++ii) {
+                buffer.putLong(Double.doubleToLongBits(pairs[ii][2]));
+            }
+        } else {
+            for(int ii=0, n=pairs.length; ii<n; ++ii) {
+                buffer.putInt(Float.floatToIntBits((float) pairs[ii][2]));
+            }
+        }
+
+        return  buffer;
+
     }
 
     /**
@@ -1824,7 +1894,7 @@ public class SynapseGroup extends Group {
             long[] rowCompression = getRowCompressedMatrixRepresentation();
             // long start = System.nanoTime();
             // System.out.println("Begin Serialization... ");
-            compressedMatrixRep = GroupSerializer.rowCompMat2CompByteArray(rowCompression, Precision.FLOAT_32);
+            compressedMatrixRep = getSparseCode(serialzationPrecision).array();//GroupSerializer.rowCompMat2CompByteArray(rowCompression, Precision.FLOAT_32);
             // long end = System.nanoTime();
             // System.out.println("Serialization Time: "
             // + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9),
@@ -1984,6 +2054,14 @@ public class SynapseGroup extends Group {
                 }
             }
         }
+    }
+
+    public Precision getSerialzationPrecision() {
+        return serialzationPrecision;
+    }
+
+    public void setSerialzationPrecision(Precision serialzationPrecision) {
+        this.serialzationPrecision = serialzationPrecision;
     }
 
     //TODO

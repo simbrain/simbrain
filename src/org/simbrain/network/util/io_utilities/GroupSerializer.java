@@ -91,26 +91,24 @@ public class GroupSerializer {
 
     /**
      * Saves a synapse group with a given precision representing its weights to
-     * a file with the given filename. The format it is stored in represents
-     * compressed row storage where the column indices are stored using the
-     * least possible number of discrete bytes and separating rows with an
-     * end-code of -1 as an integer or 0xffffffff. Column indexes are stored
-     * using the least possible bytes see
-     * {@link #rowCompMat2CompByteArray(long[], Precision)}.
+     * a file with the given filename.
      *
      * @param synGrp      the synapse group to serialize
      * @param wtPrecision the precision (32 or 64 bit) used to store the weight values
      * @param filename    the name of the file containing the synapse group information.
      */
     public static void serializeCompressedSynGroup(SynapseGroup synGrp, Precision wtPrecision, String filename) {
-        long[] rowCompression = synGrp.getRowCompressedMatrixRepresentation();
-        byte[] byteCompressedRowInds = rowCompMat2CompByteArray(rowCompression, wtPrecision);
+            byte[] byteCompressedRowInds = synGrp.getSparseCode(wtPrecision).array();
+//        long[] rowCompression = synGrp.getRowCompressedMatrixRepresentation();
+//        byte[] byteCompressedRowInds = rowCompMat2CompByteArray(rowCompression, wtPrecision);
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
             out.write(byteCompressedRowInds);
         } catch (IOException ie) {
             ie.printStackTrace();
         }
     }
+
+
 
     /**
      * Converts a complete row compressed represenation of a matrix into a byte
@@ -237,7 +235,7 @@ public class GroupSerializer {
                         .ofLocation(3.5)
                         .build();
 
-        Sparse rCon = new Sparse(0.01, false, false);
+        Sparse rCon = new Sparse(0.11, false, false);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
         System.out.println("Initial Construction complete...\n");
         long start = System.nanoTime();

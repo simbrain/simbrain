@@ -18,7 +18,9 @@
  */
 package org.simbrain.world.odorworld;
 
+import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.gui.EntityNode;
@@ -36,18 +38,6 @@ import java.util.*;
  */
 public class OdorWorldComponent extends WorkspaceComponent {
 
-    /**
-     * Recreates an instance of this class from a saved component.
-     *
-     * @param input
-     * @param name
-     * @param format
-     * @return
-     */
-    public static OdorWorldComponent open(InputStream input, String name, String format) {
-        OdorWorld newWorld = (OdorWorld) Utils.getSimbrainXStream().fromXML(input);
-        return new OdorWorldComponent(name, newWorld);
-    }
 
     /**
      * Reference to model world.
@@ -115,12 +105,31 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return Utils.getSimbrainXStream().toXML(world);
+        XStream xstream = Utils.getSimbrainXStream();
+        xstream.processAnnotations(TileMap.class);
+        return xstream.toXML(world);
     }
 
     @Override
     public void save(OutputStream output, String format) {
-        Utils.getSimbrainXStream().toXML(world, output);
+        XStream xstream = Utils.getSimbrainXStream();
+        xstream.processAnnotations(TileMap.class);
+        xstream.toXML(world, output);
+    }
+
+    /**
+     * Recreates an instance of this class from a saved component.
+     *
+     * @param input
+     * @param name
+     * @param format
+     * @return
+     */
+    public static OdorWorldComponent open(InputStream input, String name, String format) {
+        XStream xstream = Utils.getSimbrainXStream();
+        xstream.processAnnotations(TileMap.class);
+        OdorWorld newWorld = (OdorWorld) xstream.fromXML(input);
+        return new OdorWorldComponent(name, newWorld);
     }
 
     @Override

@@ -35,6 +35,9 @@ public class Tile  implements EditableObject {
     @XStreamAsAttribute
     private int id;
 
+    /**
+     * Custom properties defined in tmx.
+     */
     @XStreamConverter(
             value = NamedMapConverter.class,
             strings = {"property", "name", "value"},
@@ -43,17 +46,39 @@ public class Tile  implements EditableObject {
     )
     private HashMap<String, String> properties;
 
+    /**
+     * Label for this tile
+     */
     @UserParameter(label = "Label", description = "label", order = 1)
-    private String label = "Label";
+    private transient String label;
 
+    /**
+     * Type of this tile. Multiple tiles can be associated with the same type.
+     */
     @UserParameter(label = "Type", description = "type", order = 2)
-    private String type = "Label";
+    private transient String type;
 
+    /**
+     * Standard method call made to objects after they are deserialized. See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        label = properties.containsKey("label") ? properties.get("label") : "Tile" + id;
+        type = properties.containsKey("type") ?  properties.get("type:") : "" + id;
+        return this;
+    }
 
-
+    /**
+     * Construct a tile with a given local tileset id.
+     * @param id the local tileset id of this tile
+     */
     public Tile(int id) {
         this.id = id;
-        label = "type:" + id;
+        this.label = "Tile " + id;
+        this.type = "Type " + id;
     }
 
     public int getId() {

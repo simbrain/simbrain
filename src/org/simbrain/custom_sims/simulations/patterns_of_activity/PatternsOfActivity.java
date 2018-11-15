@@ -107,23 +107,19 @@ public class PatternsOfActivity extends RegisteredSimulation {
         NeuronGroup sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5);
         sensoryNetL.setNeuronType(new IntegrateAndFireRule());
         sensoryNetL.setPolarity(Polarity.EXCITATORY);
-        sensoryNetL.setLabel("Sensory Left");
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetR = net.addNeuronGroup(-9.25, 155.93, 5);
         sensoryNetR.setNeuronType(new IntegrateAndFireRule());
         sensoryNetR.setPolarity(Polarity.EXCITATORY);
-        sensoryNetR.setLabel("Sensory Right");
-
-
 
         // Set up odor world
         OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/4, 60));
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/4, 60));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 45));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 45));
         mouse.setHeading(90);
         OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
@@ -316,15 +312,25 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Add everything to the network
         network.addGroup(recNeurons);
+        recNeurons.setLabel("Recurrent Layer");
         network.addGroup(inpSynGL);
+        inpSynGL.setLabel("L. Sensor \u2192  Res.");
         network.addGroup(inpSynGR);
+        inpSynGR.setLabel("R. Sensor \u2192  Res.");
         network.addGroup(recSyns);
+        recSyns.setLabel("Recurrent");
         network.addGroup(outGroup);
+        outGroup.setLabel("Read Out");
         network.addGroup(rec2out);
+        rec2out.setLabel("Rec. \u2192 Read Out");
         network.addGroup(readGroup);
+        readGroup.setLabel("Affectors");
         network.addGroup(out2read);
+        out2read.setLabel("Read Out \u2192 Affectors");
         network.addGroup(sensoryNetL);
+        sensoryNetL.setLabel("Sensory Left");
         network.addGroup(sensoryNetR);
+        sensoryNetR.setLabel("Sensory Right");
 
         // Set up concurrent buffered update
         network.getUpdateManager().clear();

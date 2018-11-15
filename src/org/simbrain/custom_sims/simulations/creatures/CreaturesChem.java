@@ -1,5 +1,7 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
+import org.simbrain.workspace.AttributeContainer;
+
 /**
  * Creatures have a list of chemicals (see CreaturesBiochem) that evolve over
  * time, with a decay dynamic. They never disappear they just go to zero. When
@@ -19,7 +21,7 @@ package org.simbrain.custom_sims.simulations.creatures;
  * So for example a receptor might watch level of some chemical the creature
  * has, and if that goes above or below a threshold it will kill the creature.
  */
-public class CreaturesChem {
+public class CreaturesChem implements AttributeContainer {
 
     /**
      * The name of the chemical

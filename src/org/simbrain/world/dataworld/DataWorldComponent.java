@@ -36,7 +36,7 @@ import java.util.List;
  * <b>DataWorldComponent</b> is a data table which other Simbrain components can
  * use.
  */
-public class DataWorldComponent extends WorkspaceComponent {
+public class DataWorldComponent extends WorkspaceComponent implements AttributeContainer {
 
     /**
      * The static logger for this class.
@@ -147,7 +147,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.equals("DataTable")) {
             return this;
         } else if (objectKey.contains("Column")) {

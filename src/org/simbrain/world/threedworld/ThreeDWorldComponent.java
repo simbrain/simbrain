@@ -2,6 +2,7 @@ package org.simbrain.world.threedworld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
@@ -123,7 +124,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey == null || objectKey.isEmpty()) {
             return null;
         }
@@ -132,14 +133,14 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
         Optional<Entity> entity = getWorld().getEntity(parsedKey[0]);
         if (entity.isPresent()) {
             if (parsedKey.length == 1) {
-                return entity;
+                return entity.get();
             } else {
                 String objectType = parsedKey[1];
                 Agent agent = (Agent) entity.get();
                 if (objectType.toLowerCase().contains("sensor")) {
-                    return agent.getSensor(objectType);
+                    return agent.getSensor(objectType).get(); // TODO: Added the get() in a refactor may cause problems
                 } else if (objectType.toLowerCase().contains("effector")) {
-                    return agent.getEffector(objectType);
+                    return agent.getEffector(objectType).get();
                 }
                 return null;
             }

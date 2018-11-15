@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
 import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
@@ -81,7 +82,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         for (ImageSource source : world.getImageSources()) {
             if (objectKey.equals(source.getClass().getSimpleName())) {
                 return source;
@@ -95,8 +96,8 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return null;
     }
 
-    public List<Object> getSelectedModels() {
-        List<Object> models = new ArrayList<Object>();
+    public List<AttributeContainer> getSelectedModels() {
+        List<AttributeContainer> models = new ArrayList<>();
         models.add(world.getCurrentSensorMatrix());
         models.add(world.getCurrentImageSource());
         return models;

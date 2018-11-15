@@ -21,6 +21,7 @@ import org.simbrain.network.core.*;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -118,7 +119,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.startsWith("Neuron_")) {
             return this.getNetwork().getNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse_")) {
@@ -132,7 +133,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public List<Object> getAttributeContainers() {
         List<Object> retList = new ArrayList<Object>();
-        retList.add(network);
+        //retList.add(network);
         retList.addAll(network.getFlatNeuronList());
         retList.addAll(network.getSynapseList());
         retList.addAll(network.getNeuronGroups());

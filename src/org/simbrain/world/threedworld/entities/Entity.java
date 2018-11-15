@@ -4,13 +4,14 @@ import com.jme3.bounding.BoundingVolume;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 
 /**
  * Entity is an interface for an object in a ThreeDWorld simulation which can apply translations and rotations,
  * possibly produce or consume external values, and be updated, deleted, or edited.
  */
-public interface Entity {
+public interface Entity extends AttributeContainer {
 
     /**
      * @return Return the name of the entity within the ThreeDWorld.

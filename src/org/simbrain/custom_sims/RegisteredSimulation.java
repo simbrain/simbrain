@@ -32,6 +32,7 @@ import org.simbrain.custom_sims.simulations.neat.NEAT;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ import java.util.List;
  * @author ztosi
  * @author jyoshimi
  */
-public abstract class RegisteredSimulation {
+public abstract class RegisteredSimulation implements AttributeContainer {
 
     /**
      * The list used by calling classes to determine what custom simulations are

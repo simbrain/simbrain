@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.textworld;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -93,12 +94,12 @@ public class ReaderComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         return world;
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
+    public List<AttributeContainer> getAttributeContainers() {
         return Arrays.asList(world);
     }
 }

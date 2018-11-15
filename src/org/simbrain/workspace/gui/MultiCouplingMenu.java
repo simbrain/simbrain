@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 
 import javax.swing.*;
@@ -25,12 +26,12 @@ public class MultiCouplingMenu {
         }
     }
 
-    public void setSourceModels(List<Object> sources) {
+    public void setSourceModels(List<AttributeContainer> sources) {
         for (CouplingMenu menu : menus) {
             parentMenu.remove(menu);
         }
         Iterator<CouplingMenu> menuIterator = menus.iterator();
-        for (Object source : sources) {
+        for (AttributeContainer source : sources) {
             if (menuIterator.hasNext()) {
                 CouplingMenu menu = menuIterator.next();
                 menu.setSourceModel(source);

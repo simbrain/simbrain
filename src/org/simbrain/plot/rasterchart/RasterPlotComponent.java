@@ -20,6 +20,7 @@ package org.simbrain.plot.rasterchart;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -91,16 +92,13 @@ public class RasterPlotComponent extends WorkspaceComponent {
         });
     }
 
-    /**
-     * @return the model.
-     */
     public RasterModel getModel() {
         return model;
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
-        return this;
+    public AttributeContainer getObjectFromKey(String objectKey) {
+        return model;
     }
 
     /**

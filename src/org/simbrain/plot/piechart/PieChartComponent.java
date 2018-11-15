@@ -20,6 +20,7 @@ package org.simbrain.plot.piechart;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -86,7 +87,7 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         return model;
     }
 

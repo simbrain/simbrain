@@ -236,15 +236,15 @@ public class Simulation {
     /**
      * Helper for obtaining producers.
      */
-    public Producer getProducer(Object model, String methodName) {
-        return couplingFactory.getProducer(model, methodName);
+    public Producer getProducer(AttributeContainer container, String methodName) {
+        return couplingFactory.getProducer(container, methodName);
     }
 
     /**
      * Helper for obtaining consumers.
      */
-    public Consumer getConsumer(Object model, String methodName) {
-        return couplingFactory.getConsumer(model, methodName);
+    public Consumer getConsumer(AttributeContainer container, String methodName) {
+        return couplingFactory.getConsumer(container, methodName);
     }
 
     /**

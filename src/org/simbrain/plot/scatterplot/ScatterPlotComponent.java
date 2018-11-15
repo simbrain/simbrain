@@ -20,6 +20,7 @@ package org.simbrain.plot.scatterplot;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -159,7 +160,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);
             ScatterPlotSetter setter = getSetter(i);
@@ -194,7 +195,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     /**
      * Object which sets a value of one slice of a scatter chart.
      */
-    public class ScatterPlotSetter {
+    public class ScatterPlotSetter implements  AttributeContainer{
 
         /**
          * Index.

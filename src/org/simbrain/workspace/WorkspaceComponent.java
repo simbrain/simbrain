@@ -164,7 +164,7 @@ public abstract class WorkspaceComponent {
      * @param objectKey String key
      * @return the corresponding object
      */
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         return null;
     }
 

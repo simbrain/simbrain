@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 /**
@@ -37,7 +38,7 @@ import org.simbrain.workspace.Consumable;
  * world), and display world, where activations from neural nets can be used to
  * display text (e.g. modeled speech).
  */
-public abstract class TextWorld {
+public abstract class TextWorld implements AttributeContainer {
 
     /**
      * The main text in the text world.

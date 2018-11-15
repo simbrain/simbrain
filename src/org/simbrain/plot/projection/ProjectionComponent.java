@@ -21,6 +21,7 @@ package org.simbrain.plot.projection;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * Component for a projection plot.
  */
-public class ProjectionComponent extends WorkspaceComponent {
+public class ProjectionComponent extends WorkspaceComponent implements AttributeContainer {
 
     /**
      * Data model.
@@ -192,7 +193,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     @Override
-    public Object getObjectFromKey(String objectKey) {
+    public AttributeContainer getObjectFromKey(String objectKey) {
         return this;
     }
 

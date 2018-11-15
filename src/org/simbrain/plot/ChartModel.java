@@ -34,7 +34,7 @@ import java.util.Optional;
  * inefficient, since a graphics update fired every time. See projection for a
  * perhaps better model.
  */
-public class ChartModel {
+public class ChartModel implements AttributeContainer {
 
     /**
      * Creates an xtream object for serializing the model.

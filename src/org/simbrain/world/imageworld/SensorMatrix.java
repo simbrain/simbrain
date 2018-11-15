@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
 import java.awt.image.BufferedImage;
@@ -11,7 +12,7 @@ import java.awt.image.BufferedImage;
  * @author Jeff Yoshimi
  * @author Tim Shea
  */
-public class SensorMatrix implements ImageSourceListener {
+public class SensorMatrix implements ImageSourceListener, AttributeContainer {
 
     /**
      * Name of this matrix.

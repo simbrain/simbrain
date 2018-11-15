@@ -1,6 +1,8 @@
 package org.simbrain.world.threedworld.entities;
 
-public interface Effector {
+import org.simbrain.workspace.AttributeContainer;
+
+public interface Effector extends AttributeContainer {
     String getName();
 
     Agent getAgent();

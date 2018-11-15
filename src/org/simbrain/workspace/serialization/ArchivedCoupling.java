@@ -1,9 +1,6 @@
 package org.simbrain.workspace.serialization;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 /**
  * Class used to represent a coupling in the archive.
@@ -42,24 +39,24 @@ class ArchivedCoupling {
     }
 
     public Producer createProducer(Workspace workspace) {
-        Object object = getObjectFromWorkspace(workspace, producer);
+        AttributeContainer object = getObjectFromWorkspace(workspace, producer);
         String method = producer.getMethodName();
         return workspace.getCouplingManager().getProducer(object, method);
     }
 
     public Consumer createConsumer(Workspace workspace) {
-        Object object = getObjectFromWorkspace(workspace, consumer);
+        AttributeContainer container = getObjectFromWorkspace(workspace, consumer);
         String method = consumer.getMethodName();
-        return workspace.getCouplingManager().getConsumer(object, method);
+        return workspace.getCouplingManager().getConsumer(container, method);
     }
 
-    private Object getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
+    private AttributeContainer getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
         WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
-        Object object = component.getObjectFromKey(attribute.getId());
-        if (object == null) {
+        AttributeContainer container = component.getObjectFromKey(attribute.getId());
+        if (container == null) {
             throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.", attribute.getId(), attribute.getComponentId()));
         }
-        return object;
+        return container;
     }
 
 }

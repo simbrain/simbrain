@@ -215,7 +215,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Return sensor with matching id or null if none found.
      */
-    public Object getSensor(String id) {
+    public Sensor getSensor(String id) {
         for (OdorWorldEntity entity : entityList) {
             for (Sensor sensor : entity.getSensors()) {
                 if (sensor.getId().equalsIgnoreCase(id)) {
@@ -229,7 +229,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Return effector with matching id or null if none found.
      */
-    public Object getEffector(String id) {
+    public Effector getEffector(String id) {
         for (OdorWorldEntity entity : entityList) {
             for (Effector effector : entity.getEffectors()) {
                 if (effector.getId().equalsIgnoreCase(id)) {

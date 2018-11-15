@@ -42,7 +42,7 @@ public class Simulation {
     /**
      * Reference to workspace coupling factory.
      */
-    private transient CouplingFactory couplingFactory;
+    private transient CouplingManager couplingFactory;
 
     /**
      * Associate networks and worlds with their respective components. Entries are
@@ -59,7 +59,7 @@ public class Simulation {
         super();
         this.desktop = desktop;
         workspace = desktop.getWorkspace();
-        couplingFactory = workspace.getCouplingFactory();
+        couplingFactory = workspace.getCouplingManager();
     }
 
     // TODO: NEW STUFF USING NET WRAPPER. Work towards replacing netbuilder
@@ -252,7 +252,7 @@ public class Simulation {
      * ignores mismatch exceptions for simplicity.
      */
     public Coupling tryCoupling(Producer producer, Consumer consumer) {
-        return workspace.getCouplingFactory().tryCoupling(producer, consumer);
+        return workspace.getCouplingManager().tryCoupling(producer, consumer);
     }
 
     /**

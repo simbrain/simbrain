@@ -67,7 +67,7 @@ public class CouplingMenuItem extends JMenuItem {
         this.consumer = consumer;
         // Listen for events where this item is clicked.
         addActionListener(evt -> {
-            Coupling coupling = workspace.getCouplingFactory().tryCoupling(producer, consumer);
+            Coupling coupling = workspace.getCouplingManager().tryCoupling(producer, consumer);
             setSelected(true);
         });
     }

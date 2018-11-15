@@ -35,11 +35,11 @@ public class CouplingMenu extends JMenu {
 
     private void updateItems() {
         removeAll();
-        List<Producer<?>> producers = workspace.getCouplingFactory().getProducersFromModel(source);
+        List<Producer<?>> producers = workspace.getCouplingManager().getProducersFromModel(source);
         for (Producer<?> producer : producers) {
             createProducerSubmenu(producer);
         }
-        List<Consumer<?>> consumers = workspace.getCouplingFactory().getConsumersFromModel(source);
+        List<Consumer<?>> consumers = workspace.getCouplingManager().getConsumersFromModel(source);
         for (Consumer<?> consumer : consumers) {
             createConsumerSubmenu(consumer);
         }
@@ -51,7 +51,7 @@ public class CouplingMenu extends JMenu {
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Consumer<?>> consumers = workspace.getCouplingFactory().getVisibleConsumers(targetComponent);
+            List<Consumer<?>> consumers = workspace.getCouplingManager().getVisibleConsumers(targetComponent);
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
                     couplings.add(new CouplingMenuItem(workspace, targetComponent.getName() + "/" +
@@ -76,7 +76,7 @@ public class CouplingMenu extends JMenu {
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Producer<?>> producers = workspace.getCouplingFactory().getVisibleProducers(targetComponent);
+            List<Producer<?>> producers = workspace.getCouplingManager().getVisibleProducers(targetComponent);
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
                     couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getDescription(), producer, consumer));

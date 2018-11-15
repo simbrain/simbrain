@@ -126,7 +126,7 @@ public class Workspace {
     /**
      * The CouplingFactory for this workspace.
      */
-    private transient CouplingFactory couplingFactory = new CouplingFactory(this);
+    private transient CouplingManager couplingManager = new CouplingManager(this);
 
     /**
      * Construct a workspace.
@@ -312,7 +312,7 @@ public class Workspace {
         resetTime();
         this.setWorkspaceChanged(false);
         currentFile = null;
-        couplings.clear();
+        getCouplings().clear();
         fireWorkspaceCleared();
         this.getUpdater().getUpdateManager().setDefaultUpdateActions();
     }
@@ -559,24 +559,20 @@ public class Workspace {
         updater.getUpdateManager().addAction(action);
     }
 
-    /**
-     * All couplings for the workspace.
-     */
-    private final transient List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
     public void addCoupling(Coupling<?> coupling) {
-        couplings.add(coupling);
+        getCouplings().add(coupling);
         fireCouplingAdded(coupling);
     }
 
     public void updateCouplings() {
-        for (Coupling<?> coupling : couplings) {
+        for (Coupling<?> coupling : getCouplings()) {
             coupling.update();
         }
     }
 
     public void removeCoupling(Coupling<?> coupling) {
-        couplings.remove(coupling);
+        getCouplings().remove(coupling);
         fireCouplingRemoved(coupling);
     }
 
@@ -631,15 +627,8 @@ public class Workspace {
         }
     }
 
-    /**
-     * @return the couplings
-     */
-    public List<Coupling<?>> getCouplings() {
-        return couplings;
-    }
-
     public void removeCouplings(List<Coupling<?>> couplings) {
-        this.couplings.removeAll(couplings);
+        getCouplings().removeAll(couplings);
         // What to do here?
         this.fireCouplingsRemoved(couplings);
     }
@@ -648,7 +637,7 @@ public class Workspace {
      * Return a coupling in the workspace by the coupling id.
      */
     public Coupling<?> getCoupling(String id) {
-        return couplings.stream().filter(c -> c.getId().equalsIgnoreCase(id)).findFirst().get();
+        return getCouplings().stream().filter(c -> c.getId().equalsIgnoreCase(id)).findFirst().get();
     }
 
     /**
@@ -663,7 +652,15 @@ public class Workspace {
     }
 
     /* Get the CouplingFactory for this workspace. */
-    public CouplingFactory getCouplingFactory() {
-        return couplingFactory;
+    public CouplingManager getCouplingManager() {
+        return couplingManager;
+    }
+
+
+    /**
+     * Convenience method which gets the couplings the coupling manager stores.
+     */
+    public List<Coupling<?>> getCouplings() {
+        return couplingManager.getCouplings();
     }
 }

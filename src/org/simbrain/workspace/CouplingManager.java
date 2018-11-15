@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ *
+ * TODO: Update docs based on new responsibilities
+ *
  * CouplingFactory provides methods for instantiating couplings between components in a workspace.
  * Simulation and GUI code should rely on the factory methods here rather than invoking constructors
  * on Coupling directly so that couplings will be properly managed and serialized.
  */
-public class CouplingFactory {
+public class CouplingManager {
 
     /**
      * The workspace in which the couplings created by this factory will be managed.
@@ -22,7 +25,7 @@ public class CouplingFactory {
     /**
      * Create a new CouplingFactory in the specified workspace.
      */
-    public CouplingFactory(Workspace workspace) {
+    public CouplingManager(Workspace workspace) {
         this.workspace = workspace;
     }
 
@@ -37,10 +40,15 @@ public class CouplingFactory {
 
     //TODO: Discuss and document
     // TODO: When producers or consumers are removed these maps are not updated
-    private transient Map<Pair<Object, Method>, Producer> producers = new HashMap<>();
 
-    private transient Map<Pair<Object, Method>, Consumer> consumers = new HashMap<>();
+    /**
+     * All couplings for the workspace.
+     */
+    private final transient List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
+    // TODO: Rename potential producers
+    private Map<Pair<Object, Method>, Producer> producers = new HashMap<>();
+    private Map<Pair<Object, Method>, Consumer> consumers = new HashMap<>();
 
     //TODO: Consider removing this. It seems to just be a convenience method to avoid dealing with exceptions.
     /**
@@ -351,5 +359,10 @@ public class CouplingFactory {
             return null;
         }
     }
+
+    public List<Coupling<?>> getCouplings() {
+        return couplings;
+    }
+
 
 }

@@ -304,7 +304,7 @@ public class WorkspaceSerializer {
             for (ArchivedCoupling archivedCoupling : archive.getArchivedCouplings()) {
                 Producer producer = archivedCoupling.createProducer(workspace);
                 Consumer consumer = archivedCoupling.createConsumer(workspace);
-                workspace.getCouplingFactory().tryCoupling(producer, consumer);
+                workspace.getCouplingManager().tryCoupling(producer, consumer);
             }
         }
     }

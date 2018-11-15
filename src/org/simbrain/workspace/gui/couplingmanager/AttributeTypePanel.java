@@ -66,7 +66,7 @@ public class AttributeTypePanel extends JPanel {
     }
 
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
-        CouplingFactory couplingFactory = component.getWorkspace().getCouplingFactory();
+        CouplingManager couplingFactory = component.getWorkspace().getCouplingManager();
         if (poc == ProducerOrConsumer.Consuming) {
             setBorder(BorderFactory.createTitledBorder("Consumers"));
             for (Consumer consumer : couplingFactory.getConsumers(component)) {

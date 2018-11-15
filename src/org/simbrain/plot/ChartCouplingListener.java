@@ -14,7 +14,7 @@ import java.util.List;
 public class ChartCouplingListener implements CouplingListener {
 
     private Workspace workspace;
-    private CouplingFactory couplingFactory;
+    private CouplingManager couplingFactory;
     private ChartModel model;
     private String descriptionPrefix;
 
@@ -28,7 +28,7 @@ public class ChartCouplingListener implements CouplingListener {
     public ChartCouplingListener(Workspace workspace, ChartModel model, String descriptionPrefix) {
         this.workspace = workspace;
         this.model = model;
-        couplingFactory = workspace.getCouplingFactory();
+        couplingFactory = workspace.getCouplingManager();
         this.descriptionPrefix = descriptionPrefix;
     }
 

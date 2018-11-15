@@ -174,9 +174,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         try {
             String couplingMethod = (String) couplingMethodComboBox.getSelectedItem();
             if (couplingMethod.equalsIgnoreCase("One to One")) {
-                desktop.getWorkspace().getCouplingFactory().createOneToOneCouplings(producers, consumers);
+                desktop.getWorkspace().getCouplingManager().createOneToOneCouplings(producers, consumers);
             } else if (couplingMethod.equalsIgnoreCase("One to Many")) {
-                desktop.getWorkspace().getCouplingFactory().createOneToManyCouplings(producers, consumers);
+                desktop.getWorkspace().getCouplingManager().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);

@@ -21,6 +21,7 @@ package org.simbrain.network.groups;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -28,7 +29,7 @@ import org.simbrain.workspace.Producible;
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
  * representation is {@link org.simbrain.network.gui.nodes.GroupNode}.
  */
-public abstract class Group implements CopyableObject {
+public abstract class Group implements CopyableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.

@@ -67,12 +67,12 @@ public final class NetworkComponent extends WorkspaceComponent {
         network.addNeuronListener(new NeuronListener() {
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                fireModelAdded(e);
+                fireAttributeContainerAdded(e.getObject());
             }
 
             public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
                 setChangedSinceLastSave(true);
-                fireModelChanged(e);
+                fireAttributeContainerChanged(e.getObject());
             }
 
             public void neuronMoved(NetworkEvent<Neuron> e) {
@@ -81,12 +81,12 @@ public final class NetworkComponent extends WorkspaceComponent {
 
             public void neuronRemoved(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                fireModelRemoved(e);
+                fireAttributeContainerRemoved(e.getObject());
             }
 
             public void neuronChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-                fireModelChanged(e);
+                fireAttributeContainerChanged(e.getObject());
             }
 
             public void labelChanged(NetworkEvent<Neuron> e) {
@@ -97,22 +97,22 @@ public final class NetworkComponent extends WorkspaceComponent {
         network.addSynapseListener(new SynapseListener() {
             public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                fireModelAdded(networkEvent.getObject());
+                fireAttributeContainerAdded(networkEvent.getObject());
             }
 
             public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                fireModelChanged(networkEvent.getObject());
+                fireAttributeContainerChanged(networkEvent.getObject());
             }
 
             public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
-                fireModelRemoved(networkEvent.getObject());
+                fireAttributeContainerRemoved(networkEvent.getObject());
             }
 
             public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
                 setChangedSinceLastSave(true);
-                fireModelChanged(networkEvent.getObject());
+                fireAttributeContainerChanged(networkEvent.getObject());
             }
         });
     }
@@ -130,7 +130,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> retList = new ArrayList<Object>();
         retList.add(network);
         retList.addAll(network.getFlatNeuronList());

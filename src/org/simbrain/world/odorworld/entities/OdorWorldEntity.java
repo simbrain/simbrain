@@ -22,6 +22,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * Parent class for all Odor World objects.
  */
-public class OdorWorldEntity implements EditableObject {
+public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
     /**
      * Support for property change events.

@@ -181,7 +181,7 @@ public class WorkspaceSerializer {
     private HashMap<Object, WorkspaceComponent> mapCouplingComponents() {
         HashMap<Object, WorkspaceComponent> couplingComponents = new HashMap<>();
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            for (Object object : component.getModels()) {
+            for (Object object : component.getAttributeContainers()) {
                 couplingComponents.put(object, component);
             }
         }

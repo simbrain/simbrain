@@ -185,7 +185,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(this);
         return models;

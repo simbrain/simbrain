@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld.entities;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
@@ -9,7 +10,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  *
  * @author Jeff Yoshimi
  */
-public interface PeripheralAttribute {
+public interface PeripheralAttribute extends AttributeContainer {
 
 
     public String getId();

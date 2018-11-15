@@ -25,6 +25,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -39,7 +40,7 @@ import java.util.*;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Synapse implements EditableObject {
+public class Synapse implements EditableObject, AttributeContainer {
 
     /**
      * A default update rule for the synapse.

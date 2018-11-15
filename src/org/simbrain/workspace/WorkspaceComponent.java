@@ -29,7 +29,7 @@ import java.util.*;
 
 /**
  * Represents a component in a Simbrain {@link Workspace}. Extend this class to
- * create your own component type. See {@link Workspace} for more info.
+ * create your own component type.
  * <p>
  * Note that for deserialization sublclasses must have a static "open" method,
  * that is called using reflection by {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}.
@@ -169,12 +169,11 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Return a collection of all model objects currently managed by this
-     * component. Whenever this collection would
+     * Return a collection of all {@link AttributeContainer}'s currently managed by this
+     * component.
      */
-    public List getModels() {
-        // TODO: This should be abstract.
-        return new ArrayList<Object>();
+    public List getAttributeContainers() {
+        return new ArrayList<AttributeContainer>();
     }
 
     /**
@@ -231,28 +230,28 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Notify listeners that a model object has been added to the component.
+     * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
-    public void fireModelAdded(Object addedModel) {
+    public void fireAttributeContainerAdded(AttributeContainer addedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelAdded(addedModel);
         }
     }
 
     /**
-     * Notify listeners that a model object has been removed from the
+     * Notify listeners that an {@link AttributeContainer}  has been removed from the
      * component.
      */
-    public void fireModelRemoved(Object removedModel) {
+    public void fireAttributeContainerRemoved(AttributeContainer removedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelRemoved(removedModel);
         }
     }
 
     /**
-     * Notify listeners that a model object has been changed in the component.
+     * Notify listeners that an {@link AttributeContainer} has been changed in the component.
      */
-    public void fireModelChanged(Object removedModel) {
+    public void fireAttributeContainerChanged(AttributeContainer removedModel) {
         for (WorkspaceComponentListener listener : listeners) {
             listener.modelRemoved(removedModel);
         }

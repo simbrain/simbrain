@@ -71,11 +71,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     private void addListener() {
         model.addListener(new ChartListener() {
             public void dataSourceAdded(ChartDataSource source) {
-                fireModelAdded(source);
+                fireAttributeContainerAdded(source);
             }
 
             public void dataSourceRemoved(ChartDataSource source) {
-                fireModelRemoved(source);
+                fireAttributeContainerRemoved(source);
             }
         });
     }
@@ -88,7 +88,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
         models.addAll(model.getTimeSeriesList());

@@ -82,11 +82,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
 
         model.addListener(new ChartListener() {
             public void dataSourceAdded(ChartDataSource source) {
-                fireModelAdded(source);
+                fireAttributeContainerAdded(source);
             }
 
             public void dataSourceRemoved(ChartDataSource source) {
-                fireModelRemoved(source);
+                fireAttributeContainerRemoved(source);
             }
         });
     }
@@ -176,7 +176,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(this);
         return models;

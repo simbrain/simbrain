@@ -64,7 +64,7 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
         return models;
@@ -76,11 +76,11 @@ public class PieChartComponent extends WorkspaceComponent {
     private void initModelListener() {
         model.addListener(new ChartListener() {
             public void dataSourceAdded(ChartDataSource source) {
-                fireModelAdded(null);
+                fireAttributeContainerAdded(null);
             }
 
             public void dataSourceRemoved(ChartDataSource source) {
-                fireModelRemoved(null);
+                fireAttributeContainerRemoved(null);
             }
         });
     }

@@ -73,7 +73,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.addAll(world.getSensorMatrices());
         models.addAll(world.getImageSources());

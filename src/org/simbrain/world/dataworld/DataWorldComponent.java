@@ -20,6 +20,7 @@ package org.simbrain.world.dataworld;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -110,7 +111,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private void updateColumns() {
         while (dataTable.getColumnCount() < columns.size()) {
             TableColumn column = columns.remove(columns.size() - 1);
-            fireModelRemoved(column);
+            fireAttributeContainerRemoved(column);
         }
         while (dataTable.getColumnCount() > columns.size()) {
             TableColumn column = new TableColumn(columns.size());
@@ -126,7 +127,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<>();
         models.add(this);
         models.addAll(columns);
@@ -185,7 +186,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     /**
      * TableColumn writes to a specific column of the outer DataWorld.
      */
-    public class TableColumn {
+    public class TableColumn implements AttributeContainer {
 
         /**
          * The index of the column.

@@ -49,7 +49,7 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         return Arrays.asList(world);
     }
 

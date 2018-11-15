@@ -20,6 +20,7 @@ package org.simbrain.plot;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.AttributeContainer;
 
 import java.util.ArrayList;
 import java.util.List;

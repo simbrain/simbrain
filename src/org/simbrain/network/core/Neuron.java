@@ -26,6 +26,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron implements EditableObject {
+public class Neuron implements EditableObject, AttributeContainer {
 
     /**
      * The default neuron update rule. Neurons which are constructed without a

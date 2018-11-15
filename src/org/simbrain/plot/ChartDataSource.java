@@ -1,11 +1,12 @@
 package org.simbrain.plot;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 /**
  * Helper which encapsulates a source of data for charts.
  */
-public interface ChartDataSource {
+public interface ChartDataSource extends AttributeContainer {
 
     /**
      * Get a description of the data source.

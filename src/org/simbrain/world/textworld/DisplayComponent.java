@@ -170,7 +170,7 @@ public class DisplayComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getModels() {
+    public List<Object> getAttributeContainers() {
         List<Object> retList = new ArrayList<Object>();
         retList.add(world);
         //retList.addAll(world.get);

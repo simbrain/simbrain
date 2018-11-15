@@ -21,9 +21,9 @@ package org.simbrain.world.odorworld;
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.EntityNode;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -77,7 +77,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             // Add / remove entities
             if ("entityAdded".equals(evt.getPropertyName())) {
                 OdorWorldEntity entity = (OdorWorldEntity) evt.getNewValue();
-                fireModelAdded(entity);
+                fireAttributeContainerAdded(entity);
 
                 // Add / remove sensors to an entity
                 entity.addPropertyChangeListener(new PropertyChangeListener() {
@@ -87,18 +87,18 @@ public class OdorWorldComponent extends WorkspaceComponent {
                             || "effectorAdded".equals(entityEvent.getPropertyName())
                         )
                         {
-                            fireModelAdded(entityEvent.getNewValue());
+                            fireAttributeContainerAdded((AttributeContainer) entityEvent.getNewValue());
                         } else if ("sensorRemoved".equals(entityEvent.getPropertyName())
                             || "effectorRemoved".equals(entityEvent.getPropertyName())
                         )
                         {
-                            fireModelRemoved(entityEvent.getNewValue());
+                            fireAttributeContainerRemoved((AttributeContainer) entityEvent.getNewValue());
                         }
                     }
                 });
             }
             if ("entityDeleted".equals(evt.getPropertyName())) {
-                fireModelRemoved(evt.getNewValue());
+                fireAttributeContainerRemoved((AttributeContainer) evt.getNewValue());
             }
         });
     }
@@ -160,7 +160,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List getModels() {
+    public List getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         for (OdorWorldEntity entity : world.getEntityList()) {
             models.add(entity);

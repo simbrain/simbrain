@@ -152,7 +152,7 @@ public class CouplingManager {
      * @return A list of potential producers.
      */
     public List<Producer<?>> getProducers(WorkspaceComponent component) {
-        return getProducersFromModels(component.getModels());
+        return getProducersFromModels(component.getAttributeContainers());
     }
 
     /**
@@ -162,7 +162,7 @@ public class CouplingManager {
      * @return A list of potential consumers.
      */
     public List<Consumer<?>> getConsumers(WorkspaceComponent component) {
-        return getConsumersFromModels(component.getModels());
+        return getConsumersFromModels(component.getAttributeContainers());
     }
 
     /**

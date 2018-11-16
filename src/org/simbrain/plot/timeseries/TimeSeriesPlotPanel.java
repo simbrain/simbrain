@@ -18,10 +18,9 @@
  */
 package org.simbrain.plot.timeseries;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
+import org.jfree.chart.*;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.title.LegendTitle;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -73,7 +72,6 @@ public class TimeSeriesPlotPanel extends JPanel {
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
 
-        addAddDeleteButtons();
         addClearGraphDataButton();
         addPreferencesButton();
 
@@ -128,19 +126,6 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public JPanel getButtonPanel() {
         return buttonPanel;
-    }
-
-    /**
-     * Add buttons for adding and deleting sources.
-     */
-    public void addAddDeleteButtons() {
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
-        JButton addButton = new JButton("Add");
-        addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(addButton);
-
     }
 
     /**

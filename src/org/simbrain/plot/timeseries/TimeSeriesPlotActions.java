@@ -25,8 +25,6 @@ import java.awt.event.ActionEvent;
 
 /**
  * Contains actions for use in Time Series Component.
- * <p>
- * TODO: Possibly abstract these actions and move to top level of plot package.
  *
  * @author jyoshimi
  */
@@ -73,51 +71,5 @@ public class TimeSeriesPlotActions {
         };
     }
 
-    /**
-     * Add a data source.
-     *
-     * @param timeSeriesPanel reference to time series plot panel
-     * @return the action
-     */
-    public static Action getAddSourceAction(TimeSeriesPlotPanel timeSeriesPanel) {
-        return new AbstractAction() {
-            // Initialize
-            {
-                // putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Add");
-                putValue(SHORT_DESCRIPTION, "Add a data source");
-            }
 
-            public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().addDataSource();
-            }
-        };
-    }
-
-    /**
-     * Add a data source.
-     *
-     * @param timeSeriesPanel reference to time series plot panel
-     * @return the action
-     */
-    public static Action getRemoveSourceAction(final TimeSeriesPlotPanel timeSeriesPanel) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Remove");
-                putValue(SHORT_DESCRIPTION, "Remove a data source");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().removeDataSource();
-            }
-
-        };
-    }
 }

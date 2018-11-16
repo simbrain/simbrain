@@ -39,9 +39,7 @@ public class HistogramModel extends ChartModel {
 
     // Note that if there are more data sources than are currently
     // used that the unused data sources will print a single bar.
-    // A solution for now is to only have the user have as many
-    // data sources are they used.  But a solution before that is 
-    // just to have one data source :)
+
     /**
      * Default number of data sources for plot initialization.
      */
@@ -152,20 +150,9 @@ public class HistogramModel extends ChartModel {
     }
 
     /**
-     * For now only only coupling to a single histogram. Later draw on Barchart
-     * to allow coupling to multiple histograms
-     *
-     * @param histData the array of histogram data
-     */
-    @Consumable
-    public void addData(double[] histData) {
-        addData(histData, 0);
-    }
-
-    /**
      * Add double array data to a specified data series. This is the main method
      * used to dynamically add data when the histogram is used as a plot
-     * component. Called via reflection from HistogramComponent.
+     * component.
      *
      * @param index    data index
      * @param histData the data to add at that index
@@ -174,6 +161,18 @@ public class HistogramModel extends ChartModel {
         data.remove(index.intValue());
         data.add(index.intValue(), histData);
         redraw();
+    }
+
+    /**
+     * Called by coupling producers via reflection. For now only only coupling
+     * to a single histogram. Later possibly allow coupling to multiple
+     * histograms
+     *
+     * @param histData the array of histogram data
+     */
+    @Consumable(idMethod = "getId")
+    public void addData(double[] histData) {
+        addData(histData, 0);
     }
 
     /**
@@ -199,7 +198,8 @@ public class HistogramModel extends ChartModel {
     }
 
     /**
-     * Clears the data. Currently just adds a single vector to each data source.
+     * Clears the data. Currently just adds a single vector to each data
+     * source.
      */
     public void resetData() {
         data.clear();
@@ -224,7 +224,7 @@ public class HistogramModel extends ChartModel {
      */
     public void addDataSource() {
 
-        data.add(new double[]{0});
+        data.add(new double[] {0});
         dataNames.add("Hist " + data.size());
         this.fireDataSourceAdded(null);
         redraw();

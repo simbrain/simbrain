@@ -215,7 +215,9 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
      */
     public void resetData(List<String> names, List<double[]> data, int bins) {
         if (names.size() != data.size()) {
-            throw new IllegalStateException("Number of names for series does not" + "equal the number of data series.");
+            throw new IllegalStateException("Number of names for series (" +
+                names.size() + ") does not equal the number of data series (" +
+                data.size() + ")");
         }
         Iterator<double[]> dataIterator = data.iterator();
         for (String str : names) {

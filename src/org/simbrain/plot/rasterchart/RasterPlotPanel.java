@@ -24,6 +24,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -78,7 +79,6 @@ public class RasterPlotPanel extends JPanel {
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
 
-        addAddDeleteButtons();
         addClearGraphDataButton();
         addPreferencesButton();
 
@@ -97,7 +97,7 @@ public class RasterPlotPanel extends JPanel {
         chart = ChartFactory.createScatterPlot("", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
-                model.getDataset(), // Dataset
+                new XYSeriesCollection(model.getDataset()), // Dataset
                 PlotOrientation.VERTICAL, // Plot Orientation
                 true, // Show Legend
                 true, // Use tooltips
@@ -155,19 +155,6 @@ public class RasterPlotPanel extends JPanel {
      */
     public JPanel getButtonPanel() {
         return buttonPanel;
-    }
-
-    /**
-     * Add buttons for adding and deleting sources.
-     */
-    public void addAddDeleteButtons() {
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(RasterPlotActions.getRemoveSourceAction(this));
-        JButton addButton = new JButton("Add");
-        addButton.setAction(RasterPlotActions.getAddSourceAction(this));
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(addButton);
-
     }
 
     /**

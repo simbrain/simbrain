@@ -20,8 +20,8 @@ package org.simbrain.plot.histogram;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
+import org.w3c.dom.Attr;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -126,9 +126,9 @@ public class HistogramComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
-        models.add(model);
-        return models;
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> containers = new ArrayList<>();
+        containers.add(model);
+        return containers;
     }
 }

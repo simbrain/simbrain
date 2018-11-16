@@ -31,12 +31,7 @@ public class RasterModel extends ChartModel {
     /**
      * Raster Data.
      */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
-
-    /**
-     * Default number of data sources for plot initialization.
-     */
-    private static final int INITIAL_DATA_SOURCES = 1;
+    private XYSeries dataset = new XYSeries("Raster data");
 
     /**
      * Should the range automatically change to reflect the data.
@@ -67,72 +62,20 @@ public class RasterModel extends ChartModel {
      * Raster series model constructor.
      */
     public RasterModel() {
-        defaultInit();
-    }
 
-    /**
-     * Initialize model to specified number of data sources.
-     *
-     * @param numDataSources number of data sources to initialize
-     */
-    public RasterModel(int numDataSources) {
-        addDataSources(numDataSources);
-    }
-
-    /**
-     * Default plot initialization.
-     */
-    public void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
-    }
-
-    /**
-     * Create specified number of set of data sources. Adds these two existing
-     * data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addDataSource();
-        }
     }
 
     /**
      * Clears the plot.
      */
     public void clearData() {
-        int seriesCount = dataset.getSeriesCount();
-        for (int i = 0; seriesCount > i; ++i) {
-            dataset.getSeries(i).clear();
-        }
-    }
-
-    /**
-     * Removes a data source from the chart.
-     */
-    public void removeDataSource() {
-        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
-
-        if (lastSeriesIndex >= 0) {
-            fireDataSourceRemoved(null);
-            dataset.removeSeries(lastSeriesIndex);
-        }
-    }
-
-    /**
-     * Adds a data source to the chart.
-     */
-    public void addDataSource() {
-        Integer currentSize = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(currentSize + 1));
-        fireDataSourceAdded(null);
+        dataset.clear();
     }
 
     /**
      * @return JFreeChart data set.
      */
-    public XYSeriesCollection getDataset() {
+    public XYSeries getDataset() {
         return dataset;
     }
 
@@ -235,19 +178,12 @@ public class RasterModel extends ChartModel {
     /**
      * Add data to this model.
      *
-     * @param dataSourceIndex index of data source to use
      * @param time            data for x axis
      * @param value           data for y axis
      */
-    public void addData(final int dataSourceIndex, final double time, final double value) {
-        getDataset().getSeries(dataSourceIndex).add(time, value);
+    public void addData(final double time, final double value) {
+        getDataset().add(time, value);
     }
 
-    /**
-     * Update the model; currently used to remove unused data when in
-     * "fixed width" mode.
-     */
-    public void update() {
-    }
 
 }

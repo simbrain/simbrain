@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Represents raster data.
  */
-public class RasterPlotComponent extends WorkspaceComponent {
+public class RasterPlotComponent extends WorkspaceComponent implements AttributeContainer {
 
     /**
      * The data model.
@@ -48,7 +48,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
         super(name);
         model = new RasterModel();
         addListener();
-        model.defaultInit();
     }
 
     /**
@@ -61,18 +60,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
     public RasterPlotComponent(final String name, final RasterModel model) {
         super(name);
         this.model = model;
-        addListener();
-    }
-
-    /**
-     * Initializes a JFreeChart with specific number of data sources.
-     *
-     * @param name           name of component
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public RasterPlotComponent(final String name, final int numDataSources) {
-        super(name);
-        model = new RasterModel(numDataSources);
         addListener();
     }
 
@@ -140,11 +127,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void update() {
-        model.update();
-    }
-
-    @Override
     public String getXML() {
         return RasterModel.getXStream().toXML(model);
     }
@@ -156,27 +138,17 @@ public class RasterPlotComponent extends WorkspaceComponent {
      */
     @Consumable
     public void setValues(final double[] values) {
-        setValues(values, 0);
-    }
 
-    /**
-     * Set the value of a specified data source (one curve in the raster
-     * plot). This is the main method for updating the data in a raster plot
-     *
-     * @param values the current "y-axis" value for the raster series
-     * @param index  which raster series to set.
-     */
-    public void setValues(final double[] values, final Integer index) {
-        // TODO: Throw exception if index out of current bounds
+        // TODO: Move to model
         for (int i = 0, n = values.length; i < n; i++) {
-            model.addData(index, RasterPlotComponent.this.getWorkspace().getTime(), values[i]);
+            model.addData(RasterPlotComponent.this.getWorkspace().getTime(), values[i]);
         }
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
-        models.add(this);
-        return models;
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> containers = new ArrayList<>();
+        containers.add(this);
+        return containers;
     }
 }

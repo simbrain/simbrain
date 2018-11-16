@@ -44,9 +44,7 @@ public class RasterPlotActions {
                 putValue(SHORT_DESCRIPTION, "Show raster chart properties");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 rasterPlotPanel.showPropertiesDialog();
             }
@@ -68,65 +66,9 @@ public class RasterPlotActions {
                 putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 timeSeriesPanel.getRasterModel().clearData();
-            }
-
-        };
-    }
-
-    /**
-     * Add a data source.
-     *
-     * @param timeSeriesPanel reference to time series plot panel
-     * @return the action
-     */
-    public static Action getAddSourceAction(final RasterPlotPanel timeSeriesPanel) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Add");
-                putValue(SHORT_DESCRIPTION, "Add a data source");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getRasterModel().addDataSource();
-            }
-
-        };
-    }
-
-    /**
-     * Add a data source.
-     *
-     * @param rasterPanel reference to time series plot panel
-     * @return the action
-     */
-    public static Action getRemoveSourceAction(final RasterPlotPanel rasterPanel) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Remove");
-                putValue(SHORT_DESCRIPTION, "Remove a data source");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                rasterPanel.getRasterModel().removeDataSource();
             }
 
         };

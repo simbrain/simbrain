@@ -18,8 +18,6 @@
  */
 package org.simbrain.plot.piechart;
 
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
 
@@ -46,7 +44,6 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name) {
         super(name);
         model = new PieChartModel();
-        initModelListener();
     }
 
     @Override
@@ -74,7 +71,6 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name, final PieChartModel model) {
         super(name);
         this.model = model;
-        initModelListener();
     }
 
     @Override
@@ -82,21 +78,6 @@ public class PieChartComponent extends WorkspaceComponent {
         List<AttributeContainer> container = new ArrayList<>();
         container.add(model);
         return container;
-    }
-
-    /**
-     * Add chart listener to model for this component.
-     */
-    private void initModelListener() {
-        model.addListener(new ChartListener() {
-            public void dataSourceAdded(ChartDataSource source) {
-                fireAttributeContainerAdded(null);
-            }
-
-            public void dataSourceRemoved(ChartDataSource source) {
-                fireAttributeContainerRemoved(null);
-            }
-        });
     }
 
     @Override

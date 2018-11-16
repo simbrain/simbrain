@@ -18,8 +18,6 @@
  */
 package org.simbrain.plot.timeseries;
 
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.*;
 
 import java.io.InputStream;
@@ -45,7 +43,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(String name) {
         super(name);
         model = new TimeSeriesModel(() -> getWorkspace().getTime());
-        addListener();
     }
 
     /**
@@ -59,22 +56,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         super(name);
         this.model = model;
         model.setTimeSupplier(() -> getWorkspace().getTime());
-        addListener();
-    }
-
-    /**
-     * Add chart listener to model.
-     */
-    private void addListener() {
-        model.addListener(new ChartListener() {
-            public void dataSourceAdded(ChartDataSource source) {
-                fireAttributeContainerAdded(source);
-            }
-
-            public void dataSourceRemoved(ChartDataSource source) {
-                fireAttributeContainerRemoved(source);
-            }
-        });
     }
 
     @Override

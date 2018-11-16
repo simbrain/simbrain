@@ -18,10 +18,8 @@
  */
 package org.simbrain.plot.histogram;
 
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.*;
-import org.w3c.dom.Attr;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,7 +45,6 @@ public class HistogramComponent extends WorkspaceComponent {
     public HistogramComponent(final String name) {
         super(name);
         model = new HistogramModel(HistogramModel.INITIAL_DATA_SOURCES);
-        initModelListener();
     }
 
     /**
@@ -60,24 +57,8 @@ public class HistogramComponent extends WorkspaceComponent {
     public HistogramComponent(final String name, final HistogramModel model) {
         super(name);
         this.model = model;
-        initModelListener();
     }
 
-    /**
-     * Add chart listener to model.
-     */
-    private void initModelListener() {
-        model.addListener(new ChartListener() {
-            public void dataSourceAdded(ChartDataSource source) {
-                fireAttributeContainerAdded(source);
-            }
-
-            public void dataSourceRemoved(ChartDataSource source) {
-                fireAttributeContainerRemoved(source);
-            }
-
-        });
-    }
 
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {

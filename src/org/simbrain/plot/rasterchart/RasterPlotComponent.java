@@ -18,8 +18,6 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -47,7 +45,6 @@ public class RasterPlotComponent extends WorkspaceComponent implements Attribute
     public RasterPlotComponent(final String name) {
         super(name);
         model = new RasterModel();
-        addListener();
     }
 
     /**
@@ -60,23 +57,6 @@ public class RasterPlotComponent extends WorkspaceComponent implements Attribute
     public RasterPlotComponent(final String name, final RasterModel model) {
         super(name);
         this.model = model;
-        addListener();
-    }
-
-    /**
-     * Add chart listener to model.
-     */
-    private void addListener() {
-
-        model.addListener(new ChartListener() {
-            public void dataSourceAdded(ChartDataSource source) {
-                fireAttributeContainerAdded(source);
-            }
-
-            public void dataSourceRemoved(ChartDataSource source) {
-                fireAttributeContainerRemoved(source);
-            }
-        });
     }
 
     public RasterModel getModel() {

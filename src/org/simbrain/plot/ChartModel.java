@@ -41,11 +41,6 @@ public class ChartModel implements AttributeContainer {
     // being done for histogram
 
     /**
-     * Listeners on this chart.
-     */
-    private transient List<ChartListener> listenerList = new ArrayList<ChartListener>();
-
-    /**
      * Settings Listeners on this chart.
      */
     private transient List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
@@ -56,38 +51,6 @@ public class ChartModel implements AttributeContainer {
     public static XStream getXStream() {
         XStream xstream = Utils.getSimbrainXStream();
         return xstream;
-    }
-
-    /**
-     * Add a data source to the chart model.
-     */
-    public ChartDataSource addDataSource(String description) {
-        return null;
-    }
-
-    /**
-     * Remove the data source from the chart model.
-     */
-    public void removeDataSource(ChartDataSource source) {
-    }
-
-    /**
-     * Get the data source with the specified description, if it exists.
-     */
-    public Optional<? extends ChartDataSource> getDataSource(String description) {
-        return Optional.empty();
-    }
-
-    /**
-     * Add a chart listener.
-     *
-     * @param listener listener to add.
-     */
-    public void addListener(ChartListener listener) {
-        if (listenerList == null) {
-            listenerList = new ArrayList<ChartListener>();
-        }
-        listenerList.add(listener);
     }
 
     /**
@@ -109,28 +72,6 @@ public class ChartModel implements AttributeContainer {
     public void fireSettingsChanged() {
         for (ChartSettingsListener listener : settingsListenerList) {
             listener.chartSettingsUpdated(this);
-        }
-    }
-
-    /**
-     * Fire data source added event.
-     *
-     * @param source The added data source.
-     */
-    public void fireDataSourceAdded(ChartDataSource source) {
-        for (ChartListener listener : listenerList) {
-            listener.dataSourceAdded(source);
-        }
-    }
-
-    /**
-     * Fire data source removed event.
-     *
-     * @param source The removed data source.
-     */
-    public void fireDataSourceRemoved(ChartDataSource source) {
-        for (ChartListener listener : listenerList) {
-            listener.dataSourceRemoved(source);
         }
     }
 

@@ -16,8 +16,6 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionGui;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
 import org.simbrain.plot.rasterchart.RasterPlotGui;
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
-import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -100,9 +98,6 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
         putGuiComponentFactory(ProjectionComponent.class, ProjectionGui::new);
-
-        putWorkspaceComponentFactory("Scatter Plot", () -> new ScatterPlotComponent(""));
-        putGuiComponentFactory(ScatterPlotComponent.class, ScatterPlotGui::new);
 
         putWorkspaceComponentFactory("Time Series", () -> new TimeSeriesPlotComponent(""));
         putGuiComponentFactory(TimeSeriesPlotComponent.class, TimeSeriesPlotGui::new);

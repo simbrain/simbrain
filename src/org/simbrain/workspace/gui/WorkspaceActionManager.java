@@ -193,9 +193,8 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "Histogram", "BarChart.png"),
                 createComponentFactoryAction(workspace, "Pie Chart", "PieChart.png"),
                 createComponentFactoryAction(workspace, "Projection Plot", "ProjectionIcon.png"),
-                createComponentFactoryAction(workspace, "Scatter Plot", "ScatterIcon.png"),
-                createComponentFactoryAction(workspace, "Time Series", "CurveChart.png"),
-                createComponentFactoryAction(workspace, "Raster Plot", "ScatterIcon.png"));
+                createComponentFactoryAction(workspace, "Raster Plot", "ScatterIcon.png"),
+                createComponentFactoryAction(workspace, "Time Series", "CurveChart.png"));
 
         newWorldActions = Arrays.asList(
                 createComponentFactoryAction(workspace, "Data Table", "Table.png"),

@@ -2,9 +2,25 @@
 <map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <tileset firstgid="1" name="RoguelikeTileSet" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
   <image source="roguelikeSheet_transparent.png" width="1936" height="1052"/>
+  <tile id="5">
+   <properties>
+    <property name="type" value="Grass"/>
+   </properties>
+  </tile>
+  <tile id="62">
+   <properties>
+    <property name="type" value="Grass"/>
+   </properties>
+  </tile>
   <tile id="293">
    <properties>
     <property name="smell" value="1, 0.45, 0.22, 0.45, 0.02"/>
+   </properties>
+  </tile>
+  <tile id="406">
+   <properties>
+    <property name="label" value="DirtRoadTurnDownRight"/>
+    <property name="type" value="DirtRoad"/>
    </properties>
   </tile>
  </tileset>

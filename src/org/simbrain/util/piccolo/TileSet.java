@@ -139,10 +139,12 @@ public class TileSet {
     /**
      * Get tile of a given id.
      *
-     * @param id the id of the tile
+     * @param gid the global id of the tile
      * @return the tile of the given id.
      */
-    public Tile getTile(int id) {
+    public Tile getTile(int gid) {
+
+        int id = gid - firstgid; // converting global tile id to local tileset id.
 
         // field not initialized properly for some reason... temporary work around.
         if (idTileMap == null) {
@@ -154,7 +156,7 @@ public class TileSet {
 
         // moving tiles from tiles list or creating tiles for those that were not explicitly defined.
         if (!idTileMap.containsKey(id)) {
-            if (id >= firstgid && id < tilecount) {
+            if (id > -1 && id < tilecount) {
                 Tile newTile = null;
                 for (Tile t : tiles) {
                     if (t.getId() == id) {
@@ -163,8 +165,8 @@ public class TileSet {
                 }
                 if (newTile == null) {
                     newTile = new Tile(id);
-                    idTileMap.put(id, newTile);
                 }
+                idTileMap.put(id, newTile);
             }
         }
         return idTileMap.get(id);

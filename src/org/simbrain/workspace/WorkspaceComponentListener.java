@@ -47,18 +47,18 @@ public interface WorkspaceComponentListener {
     public void componentClosing();
 
     /**
-     * Called whenever a model object is added to this component.
+     * Called whenever an {@link AttributeContainer} is added to this component.
      */
-    public void modelAdded(Object addedModel);
+    public void attributeContainerAdded(AttributeContainer addedContainer);
 
     /**
-     * Called whenever a model object is removed from this component.
+     * Called whenever an {@link AttributeContainer} is removed from this component.
      */
-    public void modelRemoved(Object removedModel);
+    public void attributeContainerRemoved(AttributeContainer removedContainer);
 
     /**
-     * Called whenever a model object for this component changes.
+     * Called whenever an {@link AttributeContainer} for this component changes.
      */
-    public void modelChanged(Object changedModel);
+    public void attributeContainerChanged(AttributeContainer changedContainer);
 
 }

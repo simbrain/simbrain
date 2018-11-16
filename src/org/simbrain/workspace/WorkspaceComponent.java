@@ -232,9 +232,9 @@ public abstract class WorkspaceComponent {
     /**
      * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
-    public void fireAttributeContainerAdded(AttributeContainer addedModel) {
+    public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
         for (WorkspaceComponentListener listener : listeners) {
-            listener.modelAdded(addedModel);
+            listener.attributeContainerAdded(addedContainer);
         }
     }
 
@@ -242,18 +242,18 @@ public abstract class WorkspaceComponent {
      * Notify listeners that an {@link AttributeContainer}  has been removed from the
      * component.
      */
-    public void fireAttributeContainerRemoved(AttributeContainer removedModel) {
+    public void fireAttributeContainerRemoved(AttributeContainer removedContainer) {
         for (WorkspaceComponentListener listener : listeners) {
-            listener.modelRemoved(removedModel);
+            listener.attributeContainerRemoved(removedContainer);
         }
     }
 
     /**
      * Notify listeners that an {@link AttributeContainer} has been changed in the component.
      */
-    public void fireAttributeContainerChanged(AttributeContainer removedModel) {
+    public void fireAttributeContainerChanged(AttributeContainer removedContainer) {
         for (WorkspaceComponentListener listener : listeners) {
-            listener.modelRemoved(removedModel);
+            listener.attributeContainerRemoved(removedContainer);
         }
     }
 

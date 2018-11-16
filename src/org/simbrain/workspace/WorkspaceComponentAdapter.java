@@ -5,25 +5,33 @@ package org.simbrain.workspace;
  * events. Use this to listen to just a few events.
  */
 public class WorkspaceComponentAdapter implements WorkspaceComponentListener {
+
+    @Override
     public void componentUpdated() {
     }
 
+    @Override
     public void guiToggled() {
     }
 
+    @Override
     public void componentOnOffToggled() {
     }
 
+    @Override
     public void componentClosing() {
     }
 
-    public void modelAdded(Object addedModel) {
+    @Override
+    public void attributeContainerAdded(AttributeContainer addedModel) {
     }
 
-    public void modelRemoved(Object removedModel) {
+    @Override
+    public void attributeContainerRemoved(AttributeContainer removedModel) {
     }
 
-    public void modelChanged(Object changedModel) {
+    @Override
+    public void attributeContainerChanged(AttributeContainer changedModel) {
     }
 
 }

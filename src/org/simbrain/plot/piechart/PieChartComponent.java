@@ -20,8 +20,8 @@ package org.simbrain.plot.piechart;
 
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,8 +46,21 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name) {
         super(name);
         model = new PieChartModel();
-        model.defaultInit();
         initModelListener();
+    }
+
+    @Override
+    public void setWorkspace(Workspace workspace) {
+        // This is a bit of a hack because the workspace is not available in the constructor.
+        super.setWorkspace(workspace);
+        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
+            @Override
+            public void couplingAdded(Coupling<?> coupling) {
+                if (coupling.getConsumer().getBaseObject() == model) {
+                    model.setSliceNames(coupling.getProducer().getLabelArray());
+                }
+            }
+        });
     }
 
     /**
@@ -65,10 +78,10 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
-        models.add(model);
-        return models;
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> container = new ArrayList<>();
+        container.add(model);
+        return container;
     }
 
     /**
@@ -126,13 +139,8 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void update() {
-        model.updateTotalValue();
-    }
-
-    @Override
     public String getXML() {
-        return PieChartModel.getXStream().toXML(model);
+        return Utils.getSimbrainXStream().toXML(model);
     }
 
 }

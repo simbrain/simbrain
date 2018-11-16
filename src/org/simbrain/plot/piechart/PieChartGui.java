@@ -25,6 +25,9 @@ import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingListenerAdapter;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -70,21 +73,9 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setActionCommand("Delete");
-        deleteButton.addActionListener(this);
-        JButton addButton = new JButton("Add");
-        addButton.setActionCommand("Add");
-        addButton.addActionListener(this);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(addButton);
-
         createAttachMenuBar();
 
         add("Center", chartPanel);
-        add("South", buttonPanel);
     }
 
     /**
@@ -137,17 +128,13 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equalsIgnoreCase("Add")) {
-            this.getWorkspaceComponent().getModel().addDataSource();
-        } else if (e.getActionCommand().equalsIgnoreCase("dialog")) {
+        if (e.getActionCommand().equalsIgnoreCase("dialog")) {
             ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(getWorkspaceComponent().getModel()));
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-        } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
-            this.getWorkspaceComponent().getModel().removeDataSource();
         }
     }
 }

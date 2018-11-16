@@ -21,10 +21,7 @@ package org.simbrain.plot.projection;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,17 +46,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public ProjectionComponent(final String name) {
         super(name);
         projectionModel = new ProjectionModel();
-    }
-
-    /**
-     * Initializes a JFreeChart with specific number of data sources.
-     *
-     * @param name           name of component
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public ProjectionComponent(final String name, final int numDataSources) {
-        super(name);
-        projectionModel = new ProjectionModel(numDataSources);
     }
 
     /**
@@ -180,16 +166,15 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public void addPoint(double[] newPoint) {
         if (newPoint.length != projectionModel.getProjector().getDimensions()) {
             projectionModel.getProjector().init(newPoint.length);
-            System.out.println(newPoint.length);
         }
         projectionModel.getProjector().addDatapoint(new DataPointColored(newPoint));
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
-        models.add(this);
-        return models;
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> container = new ArrayList<>();
+        container.add(this);
+        return container;
     }
 
     @Override

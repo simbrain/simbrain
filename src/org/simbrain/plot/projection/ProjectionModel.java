@@ -134,6 +134,7 @@ public class ProjectionModel extends ChartModel {
         return projector;
     }
 
+    //TODO: Use transient keyword instead
     /**
      * Returns a properly initialized xstream object.
      *

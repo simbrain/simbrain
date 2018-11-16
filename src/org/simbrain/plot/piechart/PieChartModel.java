@@ -21,7 +21,10 @@ package org.simbrain.plot.piechart;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumable;
+
+import java.util.stream.DoubleStream;
 
 /**
  * Model data for pie charts.
@@ -29,80 +32,25 @@ import org.simbrain.workspace.Consumable;
 public class PieChartModel extends ChartModel {
 
     /**
-     * Initial Number of data sources.
-     */
-    private static final int INITIAL_DATA_SOURCES = 6;
-
-    /**
      * JFreeChart dataset for pie charts.
      */
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
     /**
-     * Current total value of all data items in pie chart dataset.
+     * Names for the "slices" in the barchart.  Set via coupling events.
      */
-    private double total = 0;
+    private String[] sliceNames = {};
+
+    /**
+     * Track how many slices there are.  If an array with a different number of
+     * components is sent to this component, numSlices is updated.
+     */
+    private int numSlices = 0;
 
     /**
      * Default constructor.
      */
     public PieChartModel() {
-    }
-
-    /**
-     * Default initialization.
-     */
-    public void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
-    }
-
-    /**
-     * Create specified number of set of data sources. Adds these two existing
-     * data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addDataSource();
-        }
-    }
-
-    /**
-     * Adds a data source to the plot.
-     */
-    public void addDataSource() {
-        Integer index = dataset.getItemCount() + 1;
-        dataset.setValue(index, 1);
-        this.fireDataSourceAdded(null);
-    }
-
-    /**
-     * Removes a data source from the plot.
-     */
-    public void removeDataSource() {
-        int removalIndex = dataset.getItemCount();
-        if (removalIndex > 0) {
-            this.fireDataSourceRemoved(null);
-            dataset.remove(removalIndex);
-        }
-    }
-
-    /**
-     * Clears data from the chart.
-     */
-    public void clearChart() {
-        dataset.clear();
-    }
-
-    /**
-     * Updates the total value across all data items.
-     */
-    public void updateTotalValue() {
-        total = 0;
-        for (int i = 0; i < dataset.getItemCount(); i++) {
-            total += dataset.getValue(i).doubleValue();
-        }
     }
 
     /**
@@ -118,7 +66,7 @@ public class PieChartModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = ChartModel.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         return xstream;
     }
 
@@ -134,29 +82,31 @@ public class PieChartModel extends ChartModel {
     }
 
     /**
-     * Set the value of a specified "slice".
-     *
-     * @param value the value to set
-     * @param index the index of the slice to set
+     * Called by coupling producers via reflection.
      */
-    public void setValue(double value, Integer index) {
-        if ((total == 0) || (index > dataset.getItemCount())) {
-            return;
+    @Consumable(idMethod = "getId")
+    public void setValues(double[] vector) {
+
+        // Take care of size mismatches
+        if (vector.length != numSlices) {
+            dataset.clear();
+            numSlices = vector.length;
         }
-        // System.out.println(index + "," + Math.abs(value) / total);
-        this.getDataset().setValue(index, Math.abs(value) / total);
+
+        // Write the data
+        double total = DoubleStream.of(vector).sum() + .001;
+        for (int i = 0; i < vector.length; i++) {
+            if (i < sliceNames.length) {
+                dataset.setValue(sliceNames[i], Math.abs(vector[i] / total));
+            } else {
+                dataset.setValue("" + i, Math.abs(vector[i] / total));
+            }
+        }
     }
 
-    /**
-     * Set the values for all the "slices" using an array.
-     *
-     * @param input the values for the slices as an array
-     */
-    @Consumable
-    public void setValues(double[] input) {
-        for (int i = 0; i < input.length; i++) {
-            setValue(input[i], new Integer(i));
-        }
+    public void setSliceNames(String[] names) {
+        this.sliceNames = names;
     }
+
 
 }

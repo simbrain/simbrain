@@ -145,7 +145,6 @@ public class TimeSeriesModel extends ChartModel {
         return "TimeSeriesPlot";
     }
 
-     */
     public boolean isAutoRange() {
         return autoRange;
     }

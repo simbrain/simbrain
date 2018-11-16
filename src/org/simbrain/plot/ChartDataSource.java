@@ -3,6 +3,7 @@ package org.simbrain.plot;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+//TODO: Consider getting rid of this in favor of vector couplings only
 /**
  * Helper which encapsulates a source of data for charts.
  */

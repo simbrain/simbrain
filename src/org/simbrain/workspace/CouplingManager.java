@@ -25,25 +25,25 @@ public class CouplingManager {
      */
     private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
+    //TODO: Special events for attributes or make that part of coupling listeners?
+    // Wire up more events.
+    // Attribute added or changed.
+    // Using updated attribute descriptions at these events, e.g. prodicible.listDescriptorsMethod()
+
     /**
      * List of listeners to fire updates when couplings are changed.
      */
     private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
 
-    //TODO: Special events for attributes or make that part of coupling listeners?
-
-
-    // TODO: Discuss and document
-    // TODO: When producers or consumers are removed these maps are not updated
+    /**
+     * List of potential producers to be used in couplings.
+     */
     private Map<Pair<Object, Method>, Producer> potentialProducers = new HashMap<>();
-    private Map<Pair<Object, Method>, Consumer> potentialConsumers = new HashMap<>();
-
-    //TODO: move coupling events here.
 
     /**
-     * The parent workspace.
+     * List of potential consumers to be updated in couplings.
      */
-    private Workspace workspace;
+    private Map<Pair<Object, Method>, Consumer> potentialConsumers = new HashMap<>();
 
     /**
      * Construct a new coupling manager.
@@ -51,7 +51,6 @@ public class CouplingManager {
      * @param workspace reference to parent workspace
      */
     CouplingManager(Workspace workspace) {
-        this.workspace = workspace;
 
         // Update coupling list as components are added or removed
         workspace.addListener(new WorkspaceListener() {
@@ -368,9 +367,11 @@ public class CouplingManager {
         }
         Method idMethod = getMethod(container, annotation.idMethod());
         Method customDescriptionMethod = getMethod(container, annotation.customDescriptionMethod());
+        Method arrayDescriptionMethod = getMethod(container, annotation.arrayDescriptionMethod());
+
         String description = annotation.description();
         boolean visibility = annotation.defaultVisibility();
-        Producer newProducer = new Producer(container, method, description, idMethod, customDescriptionMethod, visibility );
+        Producer newProducer = new Producer(container, method, description, idMethod, customDescriptionMethod, arrayDescriptionMethod, visibility );
         potentialProducers.put(key, newProducer);
         return newProducer;
     }

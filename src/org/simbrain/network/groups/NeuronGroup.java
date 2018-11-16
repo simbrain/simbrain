@@ -758,7 +758,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      *
      * @return the activation array
      */
-    @Producible(idMethod = "getId")
+    @Producible(idMethod = "getId", arrayDescriptionMethod = "getLabelArray")
     public double[] getActivations() {
         double[] retArray = new double[neuronList.size()];
         int i = 0;
@@ -1638,5 +1638,24 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             ng.applyLayout();
             return ng;
         }
+    }
+
+    /**
+     * Returns an array of labels, one for each neuron this group.
+     * Called by reflection for some coupling related events.
+     *
+     * @return the label array
+     */
+    public String[] getLabelArray() {
+        String[] retArray = new String[getNeuronList().size()];
+        int i = 0;
+        for(Neuron neuron : getNeuronList()) {
+            if (neuron.getLabel().isEmpty()) {
+                retArray[i++] = neuron.getId();
+            } else {
+                retArray[i++] = neuron.getLabel();
+            }
+        }
+        return retArray;
     }
 }

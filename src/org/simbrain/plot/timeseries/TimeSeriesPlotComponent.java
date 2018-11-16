@@ -18,7 +18,6 @@
  */
 package org.simbrain.plot.timeseries;
 
-import org.simbrain.plot.ChartCouplingListener;
 import org.simbrain.plot.ChartDataSource;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeContainer;
@@ -85,16 +84,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public void setWorkspace(Workspace workspace) {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
-        workspace.getCouplingManager().
-            addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "TimeSeries"));
+//        workspace.getCouplingManager().
+//            addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "TimeSeries"));
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
-        models.add(model);
-        models.addAll(model.getTimeSeriesList());
-        return models;
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> containers = new ArrayList<>();
+        containers.add(model);
+        containers.addAll(model.getTimeSeriesList());
+        return containers;
     }
 
     /**

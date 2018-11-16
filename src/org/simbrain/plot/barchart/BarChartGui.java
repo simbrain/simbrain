@@ -37,7 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Display a PieChart.
+ * GUI for a bar chart.
  */
 public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
 
@@ -73,21 +73,20 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setActionCommand("Delete");
-        deleteButton.addActionListener(this);
-        JButton addButton = new JButton("Add");
-        addButton.setActionCommand("Add");
-        addButton.addActionListener(this);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(addButton);
+        //JButton deleteButton = new JButton("Delete");
+        //deleteButton.setActionCommand("Delete");
+        //deleteButton.addActionListener(this);
+        //JButton addButton = new JButton("Add");
+        //addButton.setActionCommand("Add");
+        //addButton.addActionListener(this);
+        //JPanel buttonPanel = new JPanel();
+        //buttonPanel.add(deleteButton);
+        //buttonPanel.add(addButton);
 
         createAttachMenuBar();
 
         add("Center", chartPanel);
-        add("South", buttonPanel);
+        // add("South", buttonPanel);
     }
 
     /**
@@ -180,10 +179,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-        } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-            getWorkspaceComponent().getModel().removeBar();
-        } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-            getWorkspaceComponent().getModel().addBar();
         }
+
     }
 }

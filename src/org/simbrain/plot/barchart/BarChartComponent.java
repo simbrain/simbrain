@@ -18,18 +18,12 @@
  */
 package org.simbrain.plot.barchart;
 
-import org.simbrain.plot.ChartCouplingListener;
-import org.simbrain.plot.ChartDataSource;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Data for a JFreeChart bar chart.
@@ -49,7 +43,6 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(String name) {
         super(name);
         model = new BarChartModel();
-        initModelListener();
     }
 
     /**
@@ -62,54 +55,26 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(String name, BarChartModel model) {
         super(name);
         this.model = model;
-        initModelListener();
-    }
-
-    /**
-     * Initializes a jfreechart with specific number of data sources.
-     *
-     * @param name    name of component
-     * @param numBars number of bars in plot
-     */
-    public BarChartComponent(String name, int numBars) {
-        super(name);
-        model = new BarChartModel();
-        model.addBars(numBars);
-        initModelListener();
-    }
-
-    /**
-     * Add chart listener to model.
-     */
-    private void initModelListener() {
-        model.addListener(new ChartListener() {
-            public void dataSourceAdded(ChartDataSource source) {
-                fireAttributeContainerAdded(source);
-            }
-
-            public void dataSourceRemoved(ChartDataSource source) {
-                fireAttributeContainerRemoved(source);
-            }
-        });
     }
 
     @Override
     public void setWorkspace(Workspace workspace) {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
-        workspace.getCouplingManager().
-            addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "Bar"));
+        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
+            @Override
+            public void couplingAdded(Coupling<?> coupling) {
+                if (coupling.getConsumer().getBaseObject() == model) {
+                    model.setBarNames(coupling.getProducer().getLabelArray());
+                }
+            }
+        });
     }
 
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.equals(model.getId())) {
             return model;
-        } else {
-            Optional<BarChartModel.Bar> bar = model.getBar(objectKey);
-            if (bar.isPresent()) {
-                return bar.get();
-            }
         }
         return null;
     }
@@ -159,7 +124,7 @@ public class BarChartComponent extends WorkspaceComponent {
     public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
-        models.addAll(model.getBars());
+//        models.addAll(model.getBars());
         return models;
     }
 }

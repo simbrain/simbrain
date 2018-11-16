@@ -12,6 +12,13 @@ import java.lang.reflect.Type;
 public class Producer<V> extends Attribute {
 
     /**
+     * See {@link Producible#arrayDescriptionMethod()}.
+     * So far the only use cases are for producers. If consumer uses cases
+     * are found this can be moved to the attribute level.
+     */
+    private Method arrayDescriptionMethod;
+
+    /**
      * Contruct a producer.
      *
      * @param baseObject object producing values
@@ -21,8 +28,10 @@ public class Producer<V> extends Attribute {
      * @param customMethod method reference for custom descriptions
      * @param visibility whether this attribute is visible in the gui
      */
-    public Producer(Object baseObject, Method method, String description, Method idMethod, Method customMethod,  boolean visibility) {
+    public Producer(Object baseObject, Method method, String description,
+                    Method idMethod, Method customMethod, Method arrayDescriptionMethod,  boolean visibility) {
         super(baseObject, method, description, idMethod, customMethod, visibility);
+        this.arrayDescriptionMethod = arrayDescriptionMethod;
     }
 
     /**
@@ -43,4 +52,22 @@ public class Producer<V> extends Attribute {
     public Type getType() {
         return method.getReturnType();
     }
+
+    /**
+     * See {@link Producible#arrayDescriptionMethod()}.
+     * @return an array of string descriptions, one for each component of the
+     *  value this producer returns.
+     */
+    public String[] getLabelArray() {
+        if (arrayDescriptionMethod == null) {
+            return null;
+        } else {
+            try {
+                return (String[]) arrayDescriptionMethod.invoke(baseObject);
+            } catch (IllegalAccessException | InvocationTargetException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+    }
+
 }

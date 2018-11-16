@@ -20,6 +20,7 @@ package org.simbrain.plot;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.util.ArrayList;
@@ -36,14 +37,8 @@ import java.util.Optional;
  */
 public class ChartModel implements AttributeContainer {
 
-    /**
-     * Creates an xtream object for serializing the model.
-     */
-    public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.ignoreUnknownElements();
-        return xstream;
-    }
+    //TODO: Consider getting rid of this.  This type of thing may only end up
+    // being done for histogram
 
     /**
      * Listeners on this chart.
@@ -54,6 +49,14 @@ public class ChartModel implements AttributeContainer {
      * Settings Listeners on this chart.
      */
     private transient List<ChartSettingsListener> settingsListenerList = new ArrayList<ChartSettingsListener>();
+
+    /**
+     * Creates an xtream object for serializing the model.
+     */
+    public static XStream getXStream() {
+        XStream xstream = Utils.getSimbrainXStream();
+        return xstream;
+    }
 
     /**
      * Add a data source to the chart model.

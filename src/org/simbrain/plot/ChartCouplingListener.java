@@ -49,7 +49,7 @@ public class ChartCouplingListener implements CouplingListener {
             ChartDataSource source = model.addDataSource(description);
             Consumer<?> consumer = couplingFactory.getConsumer(source, "setValue");
             couplingFactory.tryCoupling(producer, consumer);
-            workspace.removeCoupling(coupling);
+            workspace.getCouplingManager().removeCoupling(coupling);
         }
     }
 

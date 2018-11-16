@@ -25,10 +25,20 @@ public class CouplingManager {
      */
     private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
+    /**
+     * List of listeners to fire updates when couplings are changed.
+     */
+    private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
+
+    //TODO: Special events for attributes or make that part of coupling listeners?
+
+
     // TODO: Discuss and document
     // TODO: When producers or consumers are removed these maps are not updated
     private Map<Pair<Object, Method>, Producer> potentialProducers = new HashMap<>();
     private Map<Pair<Object, Method>, Consumer> potentialConsumers = new HashMap<>();
+
+    //TODO: move coupling events here.
 
     /**
      * The parent workspace.
@@ -42,6 +52,29 @@ public class CouplingManager {
      */
     CouplingManager(Workspace workspace) {
         this.workspace = workspace;
+
+        // Update coupling list as components are added or removed
+        workspace.addListener(new WorkspaceListener() {
+            @Override
+            public void workspaceCleared() {
+            }
+
+            @Override
+            public void newWorkspaceOpened() {
+            }
+
+            @Override
+            public void componentAdded(WorkspaceComponent component) {
+                component.addListener(new WorkspaceComponentAdapter() {
+
+                });
+            }
+
+            @Override
+            public void componentRemoved(WorkspaceComponent component) {
+                // TODO: Remove the listener added above
+            }
+        });
     }
 
     /**
@@ -59,7 +92,7 @@ public class CouplingManager {
             Consumer<T> consumer)
         throws MismatchedAttributesException {
         Coupling<T> coupling = Coupling.create(producer, consumer);
-        workspace.addCoupling(coupling);
+        addCoupling(coupling);
         return coupling;
     }
 
@@ -380,5 +413,90 @@ public class CouplingManager {
         return couplings;
     }
 
+    /**
+     * Adds a new listener to be updated when changes are made.
+     *
+     * @param listener to be updated of changes
+     */
+    public void addCouplingListener(CouplingListener listener) {
+        couplingListeners.add(listener);
+    }
+
+    /**
+     * Removes the listener from the list.
+     *
+     * @param listener to be removed
+     */
+    public void removeCouplingListener(CouplingListener listener) {
+        couplingListeners.remove(listener);
+    }
+
+    /**
+     * Coupling added.
+     *
+     * @param coupling coupling that was added
+     */
+    private void fireCouplingAdded(Coupling<?> coupling) {
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingAdded(coupling);
+        }
+    }
+
+    /**
+     * Coupling removed.
+     *
+     * @param coupling coupling that was removed
+     */
+    private void fireCouplingRemoved(Coupling<?> coupling) {
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingRemoved(coupling);
+        }
+    }
+
+    private void fireCouplingsRemoved(List<Coupling<?>> couplings) {
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingsRemoved(couplings);
+        }
+    }
+
+    public void removeCouplings(List<Coupling<?>> couplings) {
+        getCouplings().removeAll(couplings);
+        // What to do here?
+        this.fireCouplingsRemoved(couplings);
+    }
+
+    /**
+     * Return a coupling in the workspace by the coupling id.
+     */
+    public Coupling<?> getCoupling(String id) {
+        return getCouplings().stream().filter(c -> c.getId().equalsIgnoreCase(id)).findFirst().get();
+    }
+
+    /**
+     * Convenience method for updating a set of couplings.
+     *
+     * @param couplingList the list of couplings to be updated
+     */
+    public void updateCouplings(List<Coupling<?>> couplingList) {
+        for (Coupling<?> coupling : couplingList) {
+            coupling.update();
+        }
+    }
+
+    public void addCoupling(Coupling<?> coupling) {
+        getCouplings().add(coupling);
+        fireCouplingAdded(coupling);
+    }
+
+    public void updateCouplings() {
+        for (Coupling<?> coupling : getCouplings()) {
+            coupling.update();
+        }
+    }
+
+    public void removeCoupling(Coupling<?> coupling) {
+        getCouplings().remove(coupling);
+        fireCouplingRemoved(coupling);
+    }
 
 }

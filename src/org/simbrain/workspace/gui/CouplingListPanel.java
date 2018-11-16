@@ -72,7 +72,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            desktop.getWorkspace().removeCouplings(getSelectedCouplings());
+            desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
         }
     };
 
@@ -94,10 +94,10 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         // Listens for frame closing for removal of listener.
         couplingFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(final WindowEvent w) {
-                desktop.getWorkspace().removeCouplingListener(CouplingListPanel.this);
+                desktop.getWorkspace().getCouplingManager().removeCouplingListener(CouplingListPanel.this);
             }
         });
-        desktop.getWorkspace().addCouplingListener(this);
+        desktop.getWorkspace().getCouplingManager().addCouplingListener(this);
 
         // Populates the coupling list with data.
         couplings.setListData(this.couplingList.toArray());

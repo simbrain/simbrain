@@ -140,7 +140,7 @@ public class UpdateActionManager {
         });
 
         // Add / remove coupling actions as needed
-        workspaceUpdater.getWorkspace().addCouplingListener(new CouplingListener() {
+        workspaceUpdater.getWorkspace().getCouplingManager().addCouplingListener(new CouplingListener() {
             @Override
             public void couplingAdded(Coupling<?> coupling) {
                 UpdateCoupling couplingAction = new UpdateCoupling(coupling);

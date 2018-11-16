@@ -85,7 +85,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public void setWorkspace(Workspace workspace) {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
-        workspace.addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "TimeSeries"));
+        workspace.getCouplingManager().
+            addCouplingListener(new ChartCouplingListener(getWorkspace(), model, "TimeSeries"));
     }
 
     @Override

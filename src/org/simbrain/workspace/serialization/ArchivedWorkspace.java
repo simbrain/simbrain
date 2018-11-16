@@ -213,7 +213,7 @@ class ArchivedWorkspace {
         } else if (serializedAction instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
-                Coupling<?> coupling = workspace.getCoupling(id);
+                Coupling<?> coupling = workspace.getCouplingManager().getCoupling(id);
                 Class<? extends UpdateAction> type = serializedAction.getClass();
                 action = type.getConstructor(Coupling.class).newInstance(coupling);
             } catch (Exception e) {

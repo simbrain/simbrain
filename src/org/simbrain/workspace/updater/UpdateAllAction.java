@@ -120,7 +120,7 @@ public class UpdateAllAction implements UpdateAction {
      * Update couplings.
      */
     public void updateCouplings() {
-        updater.getWorkspace().updateCouplings();
+        updater.getWorkspace().getCouplingManager().updateCouplings();
         LOGGER.trace("couplings updated");
         updater.notifyCouplingsUpdated();
     }

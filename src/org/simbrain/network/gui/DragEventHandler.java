@@ -35,9 +35,7 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
 import java.awt.event.InputEvent;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -350,9 +348,20 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
             // Allow selection of synapses via the line associated with it
             if (node instanceof SynapseNode) {
-                Line2D.Float line = ((SynapseNode) node).getLineBound();
-                if (bounds.intersectsLine(line)) {
-                    boundsIntersects = true;
+                SynapseNode synapseNode = (SynapseNode) node;
+                if (synapseNode.isSelfConnection()) {
+                    Arc2D.Float arc = synapseNode.getArcBound();
+                    Area boundArea = new Area(bounds);
+                    Area lineArea = new Area(arc);
+                    boundArea.intersect(lineArea);
+                    if (!boundArea.isEmpty()) {
+                        boundsIntersects = true;
+                    }
+                } else {
+                    Line2D.Float line = synapseNode.getLineBound();
+                    if (bounds.intersectsLine(line)) {
+                        boundsIntersects = true;
+                    }
                 }
 
             }

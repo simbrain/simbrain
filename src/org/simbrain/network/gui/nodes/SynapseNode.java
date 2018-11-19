@@ -62,6 +62,11 @@ public final class SynapseNode extends ScreenElement {
     private Line2D.Float lineBound = new Line2D.Float();
 
     /**
+     * The arc for bound checking when the synapse is a self connection.
+     */
+    private Arc2D.Float arcBound = new Arc2D.Float();
+
+    /**
      * Reference to source neuron.
      */
     private NeuronNode source;
@@ -179,6 +184,17 @@ public final class SynapseNode extends ScreenElement {
             line.reset();
             line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
             lineBound.setLine(source.getCenter(), localToGlobal(synapseCenter));
+        } else {
+            arcBound =
+                    new Arc2D.Float(
+                            (float) getGlobalBounds().getX(),
+                            (float) getGlobalBounds().getY() - 7,
+                            22,
+                            15,
+                            1,
+                            355,
+                            Arc2D.OPEN
+                    );
         }
     }
 
@@ -198,7 +214,7 @@ public final class SynapseNode extends ScreenElement {
      *
      * @return true if this synapse connects a neuron to itself.
      */
-    private boolean isSelfConnection() {
+    public boolean isSelfConnection() {
         return (source.getNeuron() == target.getNeuron());
     }
 
@@ -563,6 +579,10 @@ public final class SynapseNode extends ScreenElement {
      */
     public PPath.Float getLine() {
         return line;
+    }
+
+    public Arc2D.Float getArcBound() {
+        return arcBound;
     }
 
 

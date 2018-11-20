@@ -350,7 +350,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 // Don't save widgets in inconsistent state.
                 // System.out.println("null widget, not saving");
                 // Also used
-                break;
+                continue;
             }
 
             if (pw.getParameter().isObjectType()) {

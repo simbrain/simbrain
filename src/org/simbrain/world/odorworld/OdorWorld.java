@@ -142,6 +142,10 @@ public class OdorWorld implements EditableObject {
      */
     public void addEntity(final OdorWorldEntity entity) {
 
+        if(entityList.contains(entity)) {
+            return;
+        }
+
         // Set the entity's id
         entity.setId(entityIDGenerator.getId());
         entity.setName(entity.getId());
@@ -561,12 +565,6 @@ public class OdorWorld implements EditableObject {
 
     public TileMap getTileMap() {
         return tileMap;
-    }
-
-    //TODO: Get rid of these. Here now to prevent compile errors I don't feel like fixing.
-    public void setHeight(int i) {
-    }
-    public void setWidth(int i) {
     }
 
     public void setTileMap(TileMap tileMap) {

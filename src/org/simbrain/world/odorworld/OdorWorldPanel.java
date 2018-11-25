@@ -108,7 +108,11 @@ public class OdorWorldPanel extends JPanel {
     private class OdorWorldCanvas extends PCanvas {
         @Override
         public String getToolTipText(MouseEvent event) {
-            return "Id: " + getTile(event.getPoint()).getId();
+            Tile selectedTile = getTile(event.getPoint());
+            if(selectedTile == null) {
+                return "";
+            }
+            return "Id: " + selectedTile.getId();
         }
 
     }
@@ -148,7 +152,11 @@ public class OdorWorldPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(getTile(e.getPoint()));
+                    Tile tile = getTile(e.getPoint());
+                    if (tile == null) {
+                        return;
+                    }
+                    AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
                     StandardDialog dialog = ape.getDialog();
                     dialog.setLocationRelativeTo(null);
                     dialog.pack();
@@ -255,7 +263,12 @@ public class OdorWorldPanel extends JPanel {
     }
 
     public Tile getTile(Point point) {
-        return world.getTileMap().getTileStackAtPixel(point).get(0);
+        List<Tile> tileStack = world.getTileMap().getTileStackAtPixel(point);
+        if (tileStack == null) {
+            return null;
+        } else {
+            return tileStack.get(0);
+        }
     }
 
     public void manualMovementUpdate() {

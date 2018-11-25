@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
@@ -38,34 +37,6 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
      */
     public static final String DEFAULT_LABEL = "SmellSensor";
 
-    /**
-     * Angle of whisker in radians.
-     */
-    public static double DEFAULT_THETA = Math.PI / 4;
-
-    /**
-     * Initial length of mouse whisker.
-     */
-    public static final double DEFAULT_RADIUS = 23;
-
-    /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor angle", description = "The angle at which the smell sensor will be added. "
-        + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
-        + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
-        + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
-        defaultValue = "" + (Math.PI / 4), order = 3)
-    private double theta = DEFAULT_THETA;
-
-    /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor length",
-        description = "The distance from the center of the entity to which the smell sensor is to be added."
-            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
-        defaultValue = "" + DEFAULT_RADIUS, order = 4)
-    private double radius = DEFAULT_RADIUS;
 
     /**
      * Current value of this sensor, as an array of doubles.
@@ -121,44 +92,6 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     @Producible(idMethod = "getId", customDescriptionMethod = "getSmellSensorDescription")
     public double[] getCurrentValues() {
         return currentValue;
-    }
-
-    public double[] getLocation() {
-        double[] ret = getRelativeLocation();
-        ret[0] += parent.getCenterX();
-        ret[1] += parent.getCenterY();
-        return ret;
-    }
-
-    public double[] getRelativeLocation() {
-        OdorWorldEntity parent = this.getParent();
-        double x =  (radius * Math.cos(parent.getHeadingRadians() + theta));
-        double y = -(radius * Math.sin(parent.getHeadingRadians() + theta));
-        return new double[] {x, y};
-    }
-
-    public double getRelativeCenterX() {
-        return (radius * Math.cos(parent.getHeadingRadians() + theta)) + parent.getEntityType().getImageWidth() / 2;
-    }
-
-    public double getRelativeCenterY() {
-        return -(radius * Math.sin(parent.getHeadingRadians() + theta)) + parent.getEntityType().getImageHeight() / 2;
-    }
-
-    public double getTheta() {
-        return theta;
-    }
-
-    public void setTheta(double theta) {
-        this.theta = theta;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
     }
 
     @Override

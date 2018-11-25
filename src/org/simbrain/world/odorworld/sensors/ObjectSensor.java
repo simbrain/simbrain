@@ -16,7 +16,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * object based.
  * <br>
  * The sensor itself is currently fixed at the center of the agent. We may
- * make the location editable at some point, if uses cases emerge.
+ * make the location editable at some point, if use-cases emerge.
  */
 public class ObjectSensor extends Sensor {
 
@@ -65,18 +65,27 @@ public class ObjectSensor extends Sensor {
         super(parent, "Object Sensor");
     }
 
+    public DecayFunction getDecayFunction() {
+        return decayFunction;
+    }
+
+    public ObjectSensor(OdorWorldEntity parent, OdorWorldEntity.EntityType type, double angle, double radius) {
+        this(parent, type);
+        setTheta(angle);
+        setRadius(radius);
+    }
+
     @Override
     public void update() {
         value = 0;
         for (OdorWorldEntity entity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
             if (entity.getEntityType() == objectType) {
-                value = baseValue * decayFunction.getScalingFactor(
-                        SimbrainMath.distance(
-                                new double[]{entity.getCenterX(), entity.getCenterY()},
-                                new double[]{parent.getCenterX(), entity.getCenterY()}
-                        )
-                );
-                break;
+                double scaleFactor = decayFunction.getScalingFactor(
+                    SimbrainMath.distance(
+                        getLocation(),
+                        new double[]{entity.getCenterX(), entity.getCenterY()}
+                    ));
+                value += baseValue * scaleFactor;
             }
         }
     }
@@ -90,7 +99,6 @@ public class ObjectSensor extends Sensor {
     public String getTypeDescription() {
         return objectType.toString();
     }
-
 
     @Override
     public EditableObject copy() {

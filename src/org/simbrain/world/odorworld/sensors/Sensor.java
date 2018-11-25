@@ -23,6 +23,7 @@ import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +45,40 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     public static List<Class> getTypes() {
         return SENSOR_LIST;
     }
+
+    /**
+     * Angle of whisker in radians.
+     */
+    public static double DEFAULT_THETA = Math.PI / 4;
+
+    /**
+     * Initial length of mouse whisker.
+     */
+    public static final double DEFAULT_RADIUS = 23;
+
+    /**
+     * Relative location of the sensor in polar coordinates.
+     */
+    @UserParameter(label = "Sensor angle", description = "The angle at which the smell sensor will be added. "
+        + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
+        + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
+        + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
+        defaultValue = "" + (Math.PI / 4), order = 3)
+    protected double theta = DEFAULT_THETA;
+
+    /**
+     * Relative location of the sensor in polar coordinates.
+     */
+    @UserParameter(label = "Sensor length",
+        description = "The distance from the center of the entity to which the smell sensor is to be added."
+            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
+        defaultValue = "" + DEFAULT_RADIUS, order = 4)
+    protected double radius = DEFAULT_RADIUS;
+
+    /**
+     * The relative location of this sensor to the entity
+     */
+    private Point2D.Double relativeLocation = new Point2D.Double();
 
     /**
      * Reference to parent entity.
@@ -107,5 +142,53 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
 
     @Override
     public abstract String getTypeDescription();
+
+    public double getTheta() {
+        return theta;
+    }
+
+    public void setTheta(double theta) {
+        this.theta = theta;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    /**
+     * Location of sensor in "non-relative" world coordinates.
+     *
+     * @return the sensor location
+     */
+    public double[] getLocation() {
+        double[] ret = {relativeLocation.x, relativeLocation.y};
+        ret[0] += parent.getCenterX();
+        ret[1] += parent.getCenterY();
+        return ret;
+    }
+
+    /**
+     * Update the sensor {@link #relativeLocation} base on the heading of the entity.
+     */
+    public void updateRelativeLocation() {
+        double x =  (radius * Math.cos(parent.getHeadingRadians() + theta))
+            + parent.getEntityType().getImageWidth() / 2;
+        double y = -(radius * Math.sin(parent.getHeadingRadians() + theta))
+            + parent.getEntityType().getImageWidth() / 2;
+        relativeLocation.setLocation(x, y);
+    }
+
+    /**
+     * Update and get the {@link #relativeLocation} of this sensor.
+     * @return the updated {@link #relativeLocation}
+     */
+    public Point2D.Double getRelativeLocation() {
+        updateRelativeLocation();
+        return relativeLocation;
+    }
 
 }

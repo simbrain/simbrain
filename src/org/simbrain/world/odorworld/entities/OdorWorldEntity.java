@@ -114,6 +114,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Current heading / orientation.
      */
+    @UserParameter(label = "heading", description = "heading", order = 2)
     private double heading = DEFAULT_HEADING;
 
     /**
@@ -229,7 +230,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
         // TODO: For now calling this by default. If this causes problems we
         // can make it based on a flag.
-        updateHeadingBasedOnVelocity();
+        //updateHeadingBasedOnVelocity();
 
         changeSupport.firePropertyChange("updated", null, this);
 
@@ -1176,6 +1177,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public enum EntityType {
 
         SWISS("Swiss", false, false, false, 32, 32),
+        CANDLE("Candle", false, false, false, 32, 32),
+        FISH("Fish", false, false, false, 32, 32),
         FLOWER("Flower", false, false, false, 32, 32),
         MOUSE("Mouse", true, true, true, 40, 40),
         AMY("Amy", true, true, true, 96, 96),
@@ -1253,6 +1256,19 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public void setManualMode(boolean manualMode) {
         this.manualMode = manualMode;
     }
+
+    /**
+     * Returns the name of the closest nearby object, if any, in a fixed radius
+     *
+     * @return the name of the nearby object or an empty string if there is none
+     */
+    @Producible(idMethod = "getId")
+    public String getNearbyObjects() {
+        List<OdorWorldEntity> entities = this.getEntitiesInRadius(20);
+        //TODO: Need them ordered by distance
+        return entities.isEmpty() ? "" : entities.get(0).getEntityType().description;
+    }
+
 
 
 }

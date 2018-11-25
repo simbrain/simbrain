@@ -54,25 +54,6 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     private double baseValue = 1;
 
     /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor angle", description = "The angle at which the bump sensor will be added. "
-            + "A sensor angle of 0 a bump sensor that is directly in front of the agent. "
-            + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
-            + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
-            defaultValue = "0", order = 3)
-    private double theta = 0;
-
-    /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor length",
-            description = "The distance from the center of the entity to which the bump sensor is to be added."
-                    + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
-            defaultValue = "48", order = 4)
-    private double radius = 48;
-
-    /**
      * The length of the sides of the square sensor shape
      */
     private int sensorSize = 5;
@@ -121,9 +102,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         this.world = parent.getParentWorld();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
         value = 0;
         updateCollisionBound();
@@ -200,43 +179,6 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
 
     public int getSensorSize() {
         return sensorSize;
-    }
-
-    public double getTheta() {
-        return theta;
-    }
-
-    public void setTheta(double theta) {
-        this.theta = theta;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
-    public Point2D.Double getLocation() {
-        return location;
-    }
-
-    public void setLocation(Point2D.Double location) {
-        this.location = location;
-    }
-
-    /**
-     * Update and get the {@link #relativeLocation} of this sensor.
-     * @return the updated {@link #relativeLocation}
-     */
-    public Point2D.Double getRelativeLocation() {
-        updateRelativeLocation();
-        return relativeLocation;
-    }
-
-    public void setRelativeLocation(Point2D.Double relativeLocation) {
-        this.relativeLocation = relativeLocation;
     }
 
     @Override

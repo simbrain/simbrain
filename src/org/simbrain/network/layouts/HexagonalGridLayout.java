@@ -127,6 +127,17 @@ public class HexagonalGridLayout implements Layout {
         }
     }
 
+    /**
+     * Utility to layout a list of neurons with a hexagonal layout.
+     *
+     * @param neurons neurons to layout
+     * @param hSpacing horizontal spacing
+     * @param vSpacing vertical spacing
+     */
+    public static void layoutNeurons(List<Neuron> neurons, int hSpacing, int vSpacing) {
+        new HexagonalGridLayout(hSpacing, vSpacing, (int) Math.sqrt(neurons.size())).layoutNeurons(neurons);
+    }
+
     @Override
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
@@ -138,44 +149,26 @@ public class HexagonalGridLayout implements Layout {
         return "Hex Grid";
     }
 
-    /**
-     * @return the numColumns
-     */
     public int getNumColumns() {
         return numColumns;
     }
 
-    /**
-     * @param numColumns the numColumns to set
-     */
     public void setNumColumns(final int numColumns) {
         this.numColumns = numColumns;
     }
 
-    /**
-     * @return the hSpacing
-     */
     public double getHSpacing() {
         return hSpacing;
     }
 
-    /**
-     * @param spacing the hSpacing to set
-     */
     public void setHSpacing(final double spacing) {
         hSpacing = spacing;
     }
 
-    /**
-     * @return the vSpacing
-     */
     public double getVSpacing() {
         return vSpacing;
     }
 
-    /**
-     * @param spacing the vSpacing to set
-     */
     public void setVSpacing(final double spacing) {
         vSpacing = spacing;
     }
@@ -185,16 +178,10 @@ public class HexagonalGridLayout implements Layout {
         return "Hexagonal Grid Layout";
     }
 
-    /**
-     * @return the manualColumns
-     */
     public boolean isManualColumns() {
         return manualColumns;
     }
 
-    /**
-     * @param manualColumns the manualColumns to set
-     */
     public void setManualColumns(boolean manualColumns) {
         this.manualColumns = manualColumns;
     }

@@ -304,7 +304,9 @@ public class SynapsePropertiesPanel extends EditablePanel {
      * @param l
      */
     public void addApplyListenerEx(ActionListener l) {
-        exApplyPanel.addActionListener(l);
+        if(exApplyPanel != null) {
+            exApplyPanel.addActionListener(l);
+        }
     }
 
     /**
@@ -314,7 +316,9 @@ public class SynapsePropertiesPanel extends EditablePanel {
      * @param l
      */
     public void addApplyListenerIn(ActionListener l) {
-        inApplyPanel.addActionListener(l);
+        if(inApplyPanel != null) {
+            inApplyPanel.addActionListener(l);
+        }
     }
 
     @Override

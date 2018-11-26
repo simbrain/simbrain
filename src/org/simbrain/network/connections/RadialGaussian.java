@@ -56,7 +56,8 @@ import java.util.concurrent.*;
  * distribution.
  * <p>
  * The larger any of the constants is relative to the others, the more likely a connection
- * of that type will occur. Lambad is roughly the average distance of connections that will be made.
+ * of that type will occur.
+ * Lambda is roughly the average distance of connections that will be made.
  * <p>
  *
  * @author Zoë Tosi

@@ -26,6 +26,7 @@ import org.simbrain.workspace.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -153,8 +154,17 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
 
     @Producible
     public double[] getCurrentPoint() {
-        //TODO: Null pointer exceptions...
-        return projectionModel.getProjector().getCurrentPoint().getVector();
+        if (projectionModel.getProjector().getCurrentPoint() != null) {
+            return projectionModel.getProjector().getCurrentPoint().getVector();
+        }
+        return null;
+    }
+
+    @Consumable
+    public void setLabel(String text) {
+        if (projectionModel.getProjector().getCurrentPoint() != null) {
+            projectionModel.getProjector().getCurrentPoint().setLabel(text);
+        }
     }
 
     /**

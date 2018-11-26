@@ -29,6 +29,11 @@ public class DataPoint {
     private double[] data;
 
     /**
+     * String label that can be attached to a datapoint.
+     */
+    private String label;
+
+    /**
      * Initialize a datapoint.
      *
      * @param data the data to set this data point
@@ -86,6 +91,14 @@ public class DataPoint {
         }
 
         return builder.toString();
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
 }

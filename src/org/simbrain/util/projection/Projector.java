@@ -89,6 +89,12 @@ public class Projector {
     private ProjectionMethod projectionMethod;
 
     /**
+     * Set to false to turn off color manager and use custom point coloring,
+     * as in, e.g., the use of the {@link Halo} tool.
+     */
+    public boolean useColorManager = true;
+
+    /**
      * List of Neuron update rules; used in Gui Combo boxes.
      */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
@@ -202,7 +208,9 @@ public class Projector {
             projectionMethod.project();
             fireDataPointAdded();
         }
-        colorManager.updateDataPointColors(upstairs);
+        if(useColorManager) {
+            colorManager.updateDataPointColors(upstairs);
+        }
     }
 
     /**
@@ -386,7 +394,9 @@ public class Projector {
             DataPointColored point = (DataPointColored) upstairs.getPoint(i);
             point.resetActivation();
         }
-        colorManager.updateDataPointColors(upstairs);
+        if(useColorManager) {
+            colorManager.updateDataPointColors(upstairs);
+        }
     }
 
     /**

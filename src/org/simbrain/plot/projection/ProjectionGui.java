@@ -18,11 +18,16 @@
  */
 package org.simbrain.plot.projection;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
+import org.jfree.chart.*;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.CustomXYToolTipGenerator;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRendererState;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.actions.PlotActionManager;
@@ -42,6 +47,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 
@@ -204,6 +210,24 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     }
 
     /**
+     * Custom label generator that renders a point's label, if any.
+     */
+    public class LegendXYItemLabelGenerator extends StandardXYItemLabelGenerator
+        implements XYItemLabelGenerator
+    {
+
+        @Override
+        public String generateLabel(XYDataset dataset, int series, int item) {
+            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(item));
+            if (point != null) {
+                return point.getLabel();
+            }
+            return null;
+        }
+    }
+
+    /**
      * Datapoints return a tooltip showing the high dimensional point being
      * Represented by a given point in the plot.
      */
@@ -250,6 +274,10 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         renderer.setSeriesShape(0, new Ellipse2D.Double(-5, -5, 5, 5));
         CustomToolTipGenerator generator = new CustomToolTipGenerator();
         renderer.setSeriesToolTipGenerator(0, generator);
+
+        // Set up custom label generator, used with some couplings
+        renderer.setBaseItemLabelsVisible(true);
+        renderer.setBaseItemLabelGenerator(new LegendXYItemLabelGenerator());
 
         // Toolbar
         openBtn.setToolTipText("Open high-dimensional data");
@@ -653,4 +681,5 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
             iterateBtn.setEnabled(false);
         }
     }
+
 }

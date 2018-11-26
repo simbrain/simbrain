@@ -51,8 +51,6 @@ public class DataColoringManager {
         Frequency
     }
 
-    ;
-
     /**
      * How to color points.
      */
@@ -75,7 +73,8 @@ public class DataColoringManager {
     private boolean hotPointMode = true;
 
     /**
-     * The lower bound for "activation" of a point in frequency and decay trail.
+     * The lower bound for "activation" of a point in frequency and decay
+     * trail.
      */
     private double floor = DataPointColored.DEFAULT_ACTIVATION;
 

@@ -58,7 +58,7 @@ public class RL_Update implements NetworkUpdateAction {
     // fishy... but works for now
 
     /* Iterations to leave vehicle on between weight updates. */
-    private final int iterationsBetweenWeightUpdates = 15;
+    private final int iterationsBetweenWeightUpdates = 1;
 
     // Variables to help with the above
     private double previousReward;
@@ -79,8 +79,8 @@ public class RL_Update implements NetworkUpdateAction {
         value = sim.value;
         tdError = sim.tdError;
         initMap();
-//        lastPredictionLeft = sim.predictionLeft.getActivations();
-//        lastPredictionRight = sim.predictionRight.getActivations();
+        lastPredictionLeft = sim.predictionLeft.getActivations();
+        lastPredictionRight = sim.predictionRight.getActivations();
     }
 
     @Override
@@ -104,14 +104,20 @@ public class RL_Update implements NetworkUpdateAction {
         sim.rightInputs.update();
 
         // Update prediction nodes
-//        sim.predictionLeft.update();
-//        sim.predictionRight.update();
+        sim.predictionLeft.update();
+        sim.predictionRight.update();
+
+        // Reward node
+        Network.updateNeurons(Collections.singletonList(sim.reward));
 
         // Train prediction nodes
-//        trainPredictionNodes();
+        trainPredictionNodes();
+
+        // Value node
+        Network.updateNeurons(Collections.singletonList(sim.value));
+
 
         // Outputs and vehicles
-        Network.updateNeurons(Collections.singletonList(sim.value));
         if (winner != null) {
             updateVehicleNet(winner);
         }
@@ -147,15 +153,15 @@ public class RL_Update implements NetworkUpdateAction {
      */
     private void trainPredictionNodes() {
 
-//        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft);
-//        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight);
+        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft);
+        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight);
 
         trainDeltaRule(sim.rightToWta);
         trainDeltaRule(sim.leftToWta);
 
-//        trainDeltaRule(sim.outputToLeftPrediction);
-//        trainDeltaRule(sim.rightInputToRightPrediction);
-//        trainDeltaRule(sim.outputToRightPrediction);
+        trainDeltaRule(sim.outputToLeftPrediction);
+        trainDeltaRule(sim.rightInputToRightPrediction);
+        trainDeltaRule(sim.outputToRightPrediction);
 
         lastPredictionLeft = sim.predictionLeft.getActivations();
         lastPredictionRight = sim.predictionRight.getActivations();
@@ -178,7 +184,7 @@ public class RL_Update implements NetworkUpdateAction {
     }
 
     /**
-     * Train synapse groups.
+     * Train the synapses in a synapse group
      */
     void trainDeltaRule(SynapseGroup group) {
         for (Synapse synapse : group.getAllSynapses()) {
@@ -187,8 +193,10 @@ public class RL_Update implements NetworkUpdateAction {
         }
     }
 
+    /**
+     * Train the synapses directly
+=     */
     void trainDeltaRule(List<Synapse> synapses) {
-
         for (Synapse synapse : synapses) {
             double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
             synapse.setStrength(newStrength);
@@ -199,7 +207,8 @@ public class RL_Update implements NetworkUpdateAction {
      * TD Error. Used to drive all learning in the network.
      */
     void updateTDError() {
-        tdError.setActivation(sim.deltaReward.getActivation() + sim.gamma * value.getActivation() - value.getLastActivation());
+        double val = sim.deltaReward.getActivation() + sim.gamma * value.getActivation() - value.getLastActivation();
+        tdError.forceSetActivation(sim.deltaReward.getActivation() + sim.gamma * value.getActivation() - value.getLastActivation());
     }
 
     /**
@@ -211,7 +220,6 @@ public class RL_Update implements NetworkUpdateAction {
         for (NeuronGroup vehicle : sim.vehicles) {
             if (vehicle.getLabel().equalsIgnoreCase(winner.getLabel())) {
                 vehicle.update();
-                // System.out.println(vehicle.getLabel());
             } else {
                 vehicle.clearActivations();
             }

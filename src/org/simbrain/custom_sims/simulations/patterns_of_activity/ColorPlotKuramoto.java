@@ -1,5 +1,6 @@
-package org.simbrain.custom_sims.simulations.rl_sim;
+package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
+import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
 import org.simbrain.util.projection.Halo;
 import org.simbrain.workspace.updater.UpdateAction;
 
@@ -7,17 +8,17 @@ import org.simbrain.workspace.updater.UpdateAction;
  * Creates a halo around the predicted next point at each iteration, to make
  * clear what points are being predicted.
  */
-public class ColorPlot implements UpdateAction {
+public class ColorPlotKuramoto implements UpdateAction {
 
     /**
      * Reference to simulation object that has all the main variables used.
      */
-    RL_Sim_Main sim;
+    KuramotoOscillators sim;
 
     /**
      * Construct the updater.
      */
-    public ColorPlot(RL_Sim_Main sim) {
+    public ColorPlotKuramoto(KuramotoOscillators sim) {
         super();
         this.sim = sim;
     }
@@ -34,7 +35,8 @@ public class ColorPlot implements UpdateAction {
 
     @Override
     public void invoke() {
-         double[] predictedState = sim.getCombinedPredicted();
-         Halo.makeHalo(sim.plot.getProjectionModel().getProjector(), predictedState, (float) sim.preditionError+.01f);
+        double[] predictedState = sim.predictionRes.getActivations();
+        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(), predictedState, (float) sim.errorNeuron.getActivation());
     }
+
 }

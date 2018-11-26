@@ -8,6 +8,9 @@ import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -21,6 +24,7 @@ import java.util.List;
 
 /**
  * Todo Stop button.
+ * TODO: Redo with object sensors
  */
 // CHECKSTYLE:OFF
 public class AgentTrails extends RegisteredSimulation {
@@ -70,7 +74,7 @@ public class AgentTrails extends RegisteredSimulation {
         // Build a network
         net = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
         sensoryNet = net.addNeuronGroup(-9.25, 95.93, 3);
-        sensoryNet.setClamped(true);
+//        //sensoryNet.setClamped(true);
         sensoryNet.setLabel("Sensory");
         cheeseNeuron = sensoryNet.getNeuronList().get(0);
         cheeseNeuron.setLabel("Cheese");
@@ -81,7 +85,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         actionNet = net.addNeuronGroup(0, -0.79, 3);
         actionNet.setLabel("Actions");
-        actionNet.setClamped(true);
+//        actionNet.setClamped(true);
         actionNet.setLabel("Actions");
         leftNeuron = actionNet.getNeuronList().get(0);
         leftNeuron.setLabel("Left");
@@ -96,21 +100,23 @@ public class AgentTrails extends RegisteredSimulation {
         net.connectAllToAll(actionNet, predictionNet);
 
         errorNeuron = net.addNeuron(268, 108);
-        errorNeuron.setClamped(true);
+//        errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
         // Create the odor world
         world = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
         world.getWorld().setObjectsBlockMovement(false);
+        world.getWorld().setTileMap(TileMap.create("empty.tmx"));
         mouse = world.addAgent(120, 245, "Mouse");
         mouse.setHeading(90);
+        mouse.addDefaultSensorsEffectors();
 
         // Set up world
-        cheese = world.addEntity(120, 180, "Swiss.gif", new double[]{1, 0, 0});
+        cheese = world.addEntity(120, 180, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(65);
-        flower = world.addEntity(200, 100, "Pansy.gif", new double[]{0, 1, 0});
+        flower = world.addEntity(200, 100, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
         cheese.getSmellSource().setDispersion(65);
-        fish = world.addEntity(50, 100, "Fish.gif", new double[]{0, 0, 1});
+        fish = world.addEntity(50, 100, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
         cheese.getSmellSource().setDispersion(65);
 
         // Couple network to agent
@@ -120,9 +126,6 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Couple agent to network
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"),sensoryNet);
-//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0, cheeseNeuron);
-//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1, flowerNeuron);
-//        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2, fishNeuron);
 
         setUpControlPanel();
 
@@ -130,35 +133,43 @@ public class AgentTrails extends RegisteredSimulation {
         // Create a time series plot
         plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states + Predictions");
 
+        plot.getProjectionModel().getProjector().getColorManager().setColoringMethod(null);
         plot.getProjectionModel().init(3);
+        plot.getProjectionModel().getProjector().useColorManager = false;
+
         sim.couple(net.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
-        //TODO:Below gets reset as soon as the system runs
         plot.getProjectionModel().getProjector().setTolerance(.01);
 
+        // Label PCA points based on closest object
+        // (how nice this looks depends on tolerance. if tolerance too low then too many labels are created)
+        //Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        //Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
+        //sim.tryCoupling(currentObject, plotText);
+
         // Configure custom updating
-        net.getNetwork().getUpdateManager().clear();
-        net.getNetwork().addUpdateAction(new NetworkUpdateAction() {
-
-            // TODO: I'm not happy with this. Change!
-            @Override
-            public void invoke() {
-                //TODO: Below a hack since setting tolerance in run() fails.
-                plot.getProjectionModel().getProjector().setTolerance(.01);
-                actionNet.update();
-                sensoryNet.update();
-                predictionNet.update();
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-
-            @Override
-            public String getLongDescription() {
-                return "";
-            }
-        });
+//        net.getNetwork().getUpdateManager().clear();
+//        net.getNetwork().addUpdateAction(new NetworkUpdateAction() {
+//
+//            // TODO: I'm not happy with this. Change!
+//            @Override
+//            public void invoke() {
+//                //TODO: Below a hack since setting tolerance in run() fails.
+//                plot.getProjectionModel().getProjector().setTolerance(.01);
+//                actionNet.update();
+//                sensoryNet.update();
+//                predictionNet.update();
+//            }
+//
+//            @Override
+//            public String getDescription() {
+//                return "";
+//            }
+//
+//            @Override
+//            public String getLongDescription() {
+//                return "";
+//            }
+//        });
         net.getNetwork().addUpdateAction(new TrainPredictionNet(this));
 
         // Log activations
@@ -232,8 +243,6 @@ public class AgentTrails extends RegisteredSimulation {
         // TODO: Factor the velocity settings in to another method
         panel.addButton("Solar System", () -> {
             net.getNetwork().clearActivations();
-            world.getWorld().setHeight(100);
-            world.getWorld().setHeight(100);
             cheese.setVelocityX(2.05f);
             cheese.setVelocityY(2.05f);
             flower.setVelocityX(2.5f);

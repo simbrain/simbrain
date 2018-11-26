@@ -15,7 +15,7 @@ public class CheeseFlower extends RL_Sim {
 
         // Move past cheese alone
         controls.addButton("Cheese", () -> {
-            singleTrail(sim.cheese_1);
+            singleTrail(sim.cheese);
         });
 
         // Mouse past flower alone
@@ -27,35 +27,31 @@ public class CheeseFlower extends RL_Sim {
     @Override
     public void load() {
 
-        // Initialize world size
-        sim.world.setHeight(250);
-        sim.world.setWidth(350);
-
         // Initialize mouse
-        mouse_x = 43;
-        mouse_y = 110;
+        mouse_x = 65;
+        mouse_y = 121;
         mouse_heading = 0;
         sim.resetMouse();
 
-        // Set up cheese 1
-        sim.cheese_1.setLocation(351, 29);
-        sim.cheese_1.getSmellSource().setDispersion(350);
-        sim.world.addEntity(sim.cheese_1);
+        // Cheese
+        sim.cheese.getSmellSource().setDispersion(350);
+//        sim.cheese.vis
+        sim.cheese.setLocation(239, 42);
 
-        // Set up flower
-        sim.flower.setLocation(351, 215);
+        // Flower
         sim.flower.getSmellSource().setDispersion(350);
-        sim.world.addEntity(sim.flower);
+//        sim.world.addEntity(sim.flower);
+        sim.flower.setLocation(253, 228);
 
-        // Don't use cheese 2
-        sim.world.deleteEntity(sim.candle_1);
+        // Don't use candle
+        //sim.world.deleteEntity(sim.candle);
 
         // Update the world
         //sim.world.fireUpdateEvent();
 
         // Update goal states
         goalEntities.clear();
-        goalEntities.add(sim.cheese_1);
+        goalEntities.add(sim.cheese);
         goalEntities.add(sim.flower);
 
     }
@@ -63,7 +59,7 @@ public class CheeseFlower extends RL_Sim {
     /**
      * Make the mouse do a single pass by a specific object.
      *
-     * @param object the object to pass by.
+     * @param objectToFollow the object to pass by.
      */
     private void singleTrail(OdorWorldEntity objectToFollow) {
 
@@ -75,32 +71,29 @@ public class CheeseFlower extends RL_Sim {
         OdorWorldEntity objectToPass;
         OdorWorldEntity otherObject;
 
-        if (objectToFollow == sim.cheese_1) {
-            objectToPass = sim.cheese_1;
+        if (objectToFollow == sim.cheese) {
+            objectToPass = sim.cheese;
             otherObject = sim.flower;
         } else {
             objectToPass = sim.flower;
-            otherObject = sim.cheese_1;
+            otherObject = sim.cheese;
         }
 
         sim.network.clearActivations();
 
         // Remove other entity to get rid of interference
-        sim.world.deleteEntity(otherObject);
+        //sim.world.deleteEntity(otherObject);
 
         // Get mouse in position
-        sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - objectToPass.getSmellSource().getDispersion()), (float) objectToPass.getCenterY());
+        sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - 100), (float) objectToPass.getCenterY());
 
         // Run past the object
-        sim.mouse.setVelocityX(5);
+        sim.mouse.setVelocityX(10);
+        sim.mouse.setVelocityY(0);
         sim.mouse.setHeading(0);
         sim.getSimulation().iterate(100);
 
-        // Clean up the mess I've made
-        sim.mouse.setVelocityX(0);
-        sim.resetMouse();
-        sim.addCustomAction();
-        sim.world.addEntity(otherObject);
+
     }
 
 }

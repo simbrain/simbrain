@@ -29,6 +29,8 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM;
 import org.simbrain.custom_sims.simulations.neat.NEAT;
+import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators;
+import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatorNetwork;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.simpleNeuroevolution.SimpleNeuroevolution;
@@ -74,7 +76,9 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new CortexSimple());
+        REGISTERED_SIMS.add(new ModularOscillatorNetwork( ));
         REGISTERED_SIMS.add(new PatternsOfActivity( ));
+        REGISTERED_SIMS.add(new KuramotoOscillators( ));
         // REGISTERED_SIMS.add(new CreaturesSim());
         // REGISTERED_SIMS.add(new MpfsSOM());
         // REGISTERED_SIMS.add(new SimpleNeuroevolution());

@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.*;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
@@ -96,9 +97,9 @@ public class NetBuilder {
      */
     public void connect(Neuron source, Neuron target, double value, double lowerBound, double upperBound) {
         Synapse synapse = new Synapse(source, target);
-        synapse.setStrength(value);
         synapse.setLowerBound(lowerBound);
         synapse.setUpperBound(upperBound);
+        synapse.setStrength(value);
         source.getNetwork().addSynapse(synapse);
     }
 
@@ -137,14 +138,19 @@ public class NetBuilder {
         connector.connectAllToAll(inputs.getNeuronList(), Collections.singletonList(target));
     }
 
+    public SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target, ConnectionStrategy cs) {
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target, cs);
+        network.addGroup(sg);
+        return sg;
+    }
+
     public SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target) {
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target, new AllToAll());
         network.addGroup(sg);
         return sg;
     }
 
     //TODO: These redundant methods are a mess!
-
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons, String layoutName, NeuronUpdateRule rule) {
 
         NeuronGroup ng;
@@ -197,6 +203,7 @@ public class NetBuilder {
 
     }
 
+    //TODO: Setting location not always working
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons) {
         return addNeuronGroup(x, y, numNeurons, "line", "LinearRule");
     }
@@ -216,9 +223,6 @@ public class NetBuilder {
 
     }
 
-    /**
-     * @return the networkComponent
-     */
     public NetworkComponent getNetworkComponent() {
         return networkComponent;
     }

@@ -32,16 +32,28 @@ public class OdorWorldBuilder {
     /// NEW STUFF ///
 
     public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type) {
-        OdorWorldEntity entity = new OdorWorldEntity(world, type);
-        entity.setLocation(x, y);
-        entity.setSmellSource(new SmellSource(6));
+        OdorWorldEntity entity = createEntity(x,y, type);
         world.addEntity(entity);
         return entity;
     }
 
-    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
-        OdorWorldEntity entity = (OdorWorldEntity) addEntity(x, y, type);
+    public OdorWorldEntity createEntity(int x, int y, OdorWorldEntity.EntityType type) {
+        OdorWorldEntity entity = new OdorWorldEntity(world, type);
+        entity.setLocation(x, y);
+        entity.setSmellSource(new SmellSource(6));
+        entity.setEntityType(type);
+        return entity;
+    }
+
+    public OdorWorldEntity createEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
+        OdorWorldEntity entity = createEntity(x, y, type);
         entity.setSmellSource(new SmellSource(stimulus));
+        return entity;
+    }
+
+    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
+        OdorWorldEntity entity = createEntity(x,y,type,stimulus);
+        world.addEntity(entity);
         return entity;
     }
 
@@ -80,6 +92,7 @@ public class OdorWorldBuilder {
         return entity;
     }
 
+    //TODO: PHase out since EntityType not used
     /**
      * Add a static entity with a smell source.
      *

@@ -282,10 +282,13 @@ public class Workspace {
      * Update the workspace a single time.
      */
     public void iterate() {
+        for (WorkspaceComponent wc : getComponentList()) {
+            wc.start();
+        }
         synchronized (updaterLock) {
             updater.runOnce();
         }
-        updateStopped();
+        stop();
     }
 
     /**

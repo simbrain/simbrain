@@ -5,20 +5,14 @@ import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
-import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +37,7 @@ public class AgentTrails extends RegisteredSimulation {
     OdorWorldBuilder world;
 
     // Default values for these used by buttons
-    int dispersion = 65;
+    int dispersion = 45;
     int fishX = 50;
     int fishY = 100;
     int flowerX = 200;
@@ -112,12 +106,12 @@ public class AgentTrails extends RegisteredSimulation {
         mouse.addDefaultSensorsEffectors();
 
         // Set up world
-        cheese = world.addEntity(120, 180, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
-        cheese.getSmellSource().setDispersion(65);
-        flower = world.addEntity(200, 100, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
-        cheese.getSmellSource().setDispersion(65);
-        fish = world.addEntity(50, 100, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
-        cheese.getSmellSource().setDispersion(65);
+        cheese = world.addEntity(cheeseX, cheeseY, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
+        cheese.getSmellSource().setDispersion(dispersion);
+        flower = world.addEntity(flowerX, flowerY, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
+        flower.getSmellSource().setDispersion(dispersion);
+        fish = world.addEntity(fishX, fishY, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
+        fish.getSmellSource().setDispersion(dispersion);
 
         // Couple network to agent
         sim.couple(straightNeuron, mouse.getEffector("Go-straight"));

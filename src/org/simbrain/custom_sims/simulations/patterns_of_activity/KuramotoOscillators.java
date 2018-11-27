@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Simulate a reservoir of Kuramoto oscillators exposed to smell inputs
  * and visualize the "cognitive maps" that develop in a PCA projetion labelled
- * by environmental inputs
+ * by environmental inputs.
  */
 public class KuramotoOscillators extends RegisteredSimulation {
 
@@ -157,7 +157,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
 
         // Mouse
         mouse = world.addEntity(202, 176, OdorWorldEntity.EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Center", 0, 45));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Center", 0, 0));
         mouse.setHeading(90);
 
         // Objects

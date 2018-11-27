@@ -28,7 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Interface for 2d world sensors.
+ * Interface for 2d world sensors.  Sensors have a position given in polar
+ * coordinates.
  */
 public abstract class Sensor implements CopyableObject, PeripheralAttribute {
 
@@ -47,7 +48,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     }
 
     /**
-     * Angle of whisker in radians.
+     * Angle of sensor in radians.
      */
     public static double DEFAULT_THETA = Math.PI / 4;
 

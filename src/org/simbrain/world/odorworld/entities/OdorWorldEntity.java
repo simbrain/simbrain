@@ -1162,8 +1162,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         if (other == this) {
             return false;
         }
-        double dx = x - other.x;
-        double dy = y - other.y;
+        double dx = getCenterX() - other.getCenterX();
+        double dy = getCenterY() - other.getCenterY();
         return radius * radius > dx * dx + dy * dy;
     }
 
@@ -1258,7 +1258,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Returns the name of the closest nearby object, if any, in a fixed radius
+     * Returns the name of the closest nearby object, if any, in a fixed radius.
      *
      * @return the name of the nearby object or an empty string if there is none
      */

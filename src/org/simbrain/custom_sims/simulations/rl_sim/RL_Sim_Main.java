@@ -132,7 +132,6 @@ public class RL_Sim_Main extends RegisteredSimulation {
     double[] combinedInputs;
     double[] combinedPredicted;
     NeuronGroup predictionLeft, predictionRight;
-    // TODO: synapse group broken now so the sgs below not used
     SynapseGroup rightInputToRightPrediction, outputToRightPrediction, leftInputToLeftPrediction, outputToLeftPrediction;
     List<Synapse> rightToWta;
     List<Synapse> leftToWta;
@@ -154,11 +153,6 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * Initialize the simulation.
      */
     public void run() {
-
-        // TODO: Below is a problem. This is running on the EDT which explains
-        // the poor performance. Need to add utilities to Simbrain to make
-        // sure tasks are "loaded" on the right threads
-        // System.out.println(SwingUtilities.isEventDispatchThread());
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
@@ -182,8 +176,8 @@ public class RL_Sim_Main extends RegisteredSimulation {
 
         // Add all simulations (first added is default)
         addSim("All-Three", new ThreeObjects(this));
-        addSim("One Object", new OneCheese(this));
         addSim("Cheese-Flower", new CheeseFlower(this));
+        addSim("One Object", new OneCheese(this));
         simList.get(0).load();
 
         // Set up the main input-output network that is trained via RL
@@ -209,7 +203,9 @@ public class RL_Sim_Main extends RegisteredSimulation {
         setUpProjectionPlot();
 
         // Set custom network update
-        addCustomAction();
+        network.getUpdateManager().clear();
+        updateMethod = new RL_Update(this);
+        network.addUpdateAction(updateMethod);
 
     }
 
@@ -236,8 +232,16 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse.addSensor(leftSmell);
         mouse.addSensor(rightSmell);
 
-        double dispersion = 300;
+        // Set up smell sources
+        cheese = ob.addEntity(350, 29, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
+        cheese.getSmellSource().setDispersion(350);
+        candle = ob.addEntity(350, 29, OdorWorldEntity.EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
+        candle.getSmellSource().setDispersion(350);
+        flower = ob.addEntity(350, 212, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
+        flower.getSmellSource().setDispersion(350);
 
+        // Used in Vehicle class
+        double dispersion = 300;
         cheeseLeft = new ObjectSensor(mouse, OdorWorldEntity.EntityType.SWISS, Math.PI/8, 50);
         cheeseLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(cheeseLeft);
@@ -257,12 +261,6 @@ public class RL_Sim_Main extends RegisteredSimulation {
         candleRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(candleRight);
 
-        cheese = ob.addEntity(350, 29, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
-        cheese.getSmellSource().setDispersion(350);
-        candle = ob.addEntity(350, 29, OdorWorldEntity.EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
-        candle.getSmellSource().setDispersion(350);
-        flower = ob.addEntity(350, 212, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
-        flower.getSmellSource().setDispersion(350);
     }
 
 
@@ -283,10 +281,15 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Inputs
         rightInputs = net.addNeuronGroup(-104, 350, 6);
         rightInputs.setLabel("Right Inputs");
-//        rightInputs.setClamped(true);
+        // rightInputs.setClamped(true);
         leftInputs = net.addNeuronGroup(-481, 350, 6);
         leftInputs.setLabel("Left Inputs");
-//        leftInputs.setClamped(true);
+        // leftInputs.setClamped(true);
+
+        // Couple distributed smell sensors to neuron groups
+        sim.couple(rightSmell, rightInputs);
+        sim.couple(leftSmell, leftInputs);
+
 
         // Prediction Network
         predictionLeft = net.addNeuronGroup(-589.29, 188.50, 6);
@@ -302,9 +305,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
 
         // Connect input nodes to wta network
         rightToWta  = net.connectAllToAll(rightInputs, wtaNet);
-        sim.couple(rightSmell, rightInputs);
         leftToWta = net.connectAllToAll(leftInputs, wtaNet);
-        sim.couple(leftSmell, leftInputs);
 
     }
 
@@ -355,36 +356,36 @@ public class RL_Sim_Main extends RegisteredSimulation {
         NeuronGroup pursueCandle = vehicleBuilder.addAvoider(163, -475, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
         pursueCandle.setLabel(strPursueCandle);
 
-//        NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, OdorWorldEntity.EntityType.SWISS, cheeseLeft ,cheeseRight);
-//        avoidCheese.setLabel(strAvoidCheese);
-//        NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, OdorWorldEntity.EntityType.FLOWER, flowerLeft, flowerRight);
-//        avoidFlower.setLabel(strAvoidFlower);
-//        NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
-//        avoidCandle.setLabel(strAvoidCandle);
+        // NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, OdorWorldEntity.EntityType.SWISS, cheeseLeft ,cheeseRight);
+        // avoidCheese.setLabel(strAvoidCheese);
+        // NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, OdorWorldEntity.EntityType.FLOWER, flowerLeft, flowerRight);
+        // avoidFlower.setLabel(strAvoidFlower);
+        // NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
+        // avoidCandle.setLabel(strAvoidCandle);
 
         setUpVehicle(pursueCheese);
         setUpVehicle(pursueFlower);
         setUpVehicle(pursueCandle);
-//        setUpVehicle(avoidCheese);
-//        setUpVehicle(avoidFlower);
-//        setUpVehicle(avoidCandle);
+        //setUpVehicle(avoidCheese);
+        //setUpVehicle(avoidFlower);
+        //setUpVehicle(avoidCandle);
 
         // Label output nodes according to the subnetwork they control.
         // The label is also used in RL_Update to enable or disable vehicle nets
         wtaNet.getNeuronList().get(0).setLabel(strPursueCheese);
         wtaNet.getNeuronList().get(1).setLabel(strPursueFlower);
         wtaNet.getNeuronList().get(2).setLabel(strPursueCandle);
-//        wtaNet.getNeuronList().get(3).setLabel(strAvoidCheese);
-//        wtaNet.getNeuronList().get(4).setLabel(strAvoidFlower);
-//        wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
+        //wtaNet.getNeuronList().get(3).setLabel(strAvoidCheese);
+        //wtaNet.getNeuronList().get(4).setLabel(strAvoidFlower);
+        //wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
 
         // Connect output nodes to vehicle nodes
         net.connect(wtaNet.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
         net.connect(wtaNet.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
         net.connect(wtaNet.getNeuronByLabel(strPursueCandle), pursueCandle.getNeuronByLabel("Speed"), 10);
-//        net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
-//        net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
-//        net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);
+        //net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
+        //net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
+        //net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);
     }
 
     /**
@@ -526,7 +527,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         controlPanel.addButton("Clear Weights", () -> {
             clearWeights();
         });
-
+        
     }
 
     /**
@@ -547,15 +548,6 @@ public class RL_Sim_Main extends RegisteredSimulation {
     private void addSim(String simName, RL_Sim sim) {
         simList.add(sim);
         tabbedPane.add(simName, sim.controls);
-    }
-
-    /**
-     * Add the custom action which handles RL updates.
-     */
-    void addCustomAction() {
-        updateMethod = new RL_Update(this);
-        network.getUpdateManager().clear();
-        network.addUpdateAction(updateMethod);
     }
 
     /**

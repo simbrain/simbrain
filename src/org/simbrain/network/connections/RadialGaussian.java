@@ -57,7 +57,8 @@ import java.util.concurrent.*;
  * <p>
  * The larger any of the constants is relative to the others, the more likely a connection
  * of that type will occur.
- * Lambda is roughly the average distance of connections that will be made.
+ * <p>
+ * Lambda is roughly the average distance in pixels of connections that will be made.
  * <p>
  *
  * @author Zoë Tosi
@@ -123,7 +124,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     /**
      * A regulating constant governing overall connection density. Higher values
      * create denser connections. Lambda can be thought of as the average
-     * connection distance.
+     * connection distance in pixels.
      */
     @UserParameter(label = "Distance Drop-off", defaultValue = "200",
             minimumValue = 0.01, order = 1 )

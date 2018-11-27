@@ -35,19 +35,11 @@ public class CheeseFlower extends RL_Sim {
 
         // Cheese
         sim.cheese.getSmellSource().setDispersion(350);
-//        sim.cheese.vis
         sim.cheese.setLocation(239, 42);
 
         // Flower
         sim.flower.getSmellSource().setDispersion(350);
-//        sim.world.addEntity(sim.flower);
         sim.flower.setLocation(253, 228);
-
-        // Don't use candle
-        //sim.world.deleteEntity(sim.candle);
-
-        // Update the world
-        //sim.world.fireUpdateEvent();
 
         // Update goal states
         goalEntities.clear();
@@ -59,40 +51,24 @@ public class CheeseFlower extends RL_Sim {
     /**
      * Make the mouse do a single pass by a specific object.
      *
-     * @param objectToFollow the object to pass by.
+     * @param objectToPass the object to pass by.
      */
-    private void singleTrail(OdorWorldEntity objectToFollow) {
+    private void singleTrail(OdorWorldEntity objectToPass) {
 
-        //TODO: Possibly promote this so that other sims can use it?
 
-        // Don't do the RL updates while running this.
-        sim.removeCustomAction();
-
-        OdorWorldEntity objectToPass;
-        OdorWorldEntity otherObject;
-
-        if (objectToFollow == sim.cheese) {
-            objectToPass = sim.cheese;
-            otherObject = sim.flower;
-        } else {
-            objectToPass = sim.flower;
-            otherObject = sim.cheese;
-        }
+        // TODO: May have to disable RL_Update training action in future
 
         sim.network.clearActivations();
-
-        // Remove other entity to get rid of interference
-        //sim.world.deleteEntity(otherObject);
 
         // Get mouse in position
         sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - 100), (float) objectToPass.getCenterY());
 
         // Run past the object
-        sim.mouse.setVelocityX(10);
+        sim.mouse.setVelocityX(5);
         sim.mouse.setVelocityY(0);
         sim.mouse.setHeading(0);
-        sim.getSimulation().iterate(100);
-
+        sim.getSimulation().iterate(40);
+        sim.mouse.setVelocityX(0);
 
     }
 

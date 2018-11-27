@@ -679,7 +679,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
                 randomizer.setProbabilityDistribution(
                         UniformDistribution.builder()
-                                .ofPolarity(polarity)
+                                .polarity(polarity)
                                 .build());
 
                 enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);

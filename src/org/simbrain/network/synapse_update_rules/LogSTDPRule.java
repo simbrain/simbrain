@@ -103,8 +103,8 @@ public class LogSTDPRule extends STDPRule {
         if (synapse.getStrength() >= 0) {
             double noise =
                     (1 + NormalDistribution.builder()
-                            .ofMean(0)
-                            .ofStandardDeviation(noiseVar)
+                            .mean(0)
+                            .standardDeviation(noiseVar)
                             .build().nextRand()
                     );
             if (delta_t < 0) {

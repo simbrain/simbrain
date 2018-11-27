@@ -202,15 +202,15 @@ public class CortexSimple extends RegisteredSimulation {
 
         ProbabilityDistribution exRand =
             LogNormalDistribution.builder()
-                .ofPolarity(Polarity.EXCITATORY)
-                .ofLocation(exlocation)
-                .ofScale(exscale)
+                .polarity(Polarity.EXCITATORY)
+                .location(exlocation)
+                .scale(exscale)
                 .build();
         ProbabilityDistribution inRand =
             LogNormalDistribution.builder()
-                .ofPolarity(Polarity.INHIBITORY)
-                .ofLocation(exlocation)
-                .ofScale(exscale)
+                .polarity(Polarity.INHIBITORY)
+                .location(exlocation)
+                .scale(exscale)
                 .build();
 
         Sparse con = new Sparse(sparsity, false, false);

@@ -144,12 +144,12 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
         ParetoDistribution product = new ParetoDistribution();
 
-        public ParetoDistributionBuilder ofSlope(double slope) {
+        public ParetoDistributionBuilder slope(double slope) {
             product.setSlope(slope);
             return this;
         }
 
-        public ParetoDistributionBuilder ofMin(double min) {
+        public ParetoDistributionBuilder min(double min) {
             product.setMin(min);
             return this;
         }

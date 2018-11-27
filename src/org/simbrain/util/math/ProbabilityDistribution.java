@@ -104,8 +104,8 @@ public abstract class ProbabilityDistribution implements CopyableObject {
      * <code>
      *     ProbabilityDistribution randomizer =
      *      UniformDistribution.builder()
-     *          .ofPolarity(Polarity.EXCITATORY)
-     *          .ofLocation(2.5)
+     *          .polarity(Polarity.EXCITATORY)
+     *          .location(2.5)
      *          .build();
      * </code>
      *
@@ -131,7 +131,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          * @param upperBound the highest value of the interval for clipping
          * @return the Builder instance (for use in chained initialization)
          */
-        public B ofUpperBound(double upperBound) {
+        public B upperBound(double upperBound) {
             product().setUpperBound(upperBound);
             return (B) this;
         }
@@ -141,7 +141,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          * @param lowerBound the lowest value of the interval for clipping
          * @return the Builder instance (for use in chained initialization)
          */
-        public B ofLowerBound(double lowerBound) {
+        public B lowerBound(double lowerBound) {
             product().setLowerBound(lowerBound);
             return (B) this;
         }
@@ -151,7 +151,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          * @param clipping if the random number should be clip
          * @return the Builder instance (for use in chained initialization)
          */
-        public B ofClipping(boolean clipping) {
+        public B clipping(boolean clipping) {
             product().setClipping(clipping);
             return (B) this;
         }
@@ -161,7 +161,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          * @param polarity the polarity
          * @return the Builder instance (for use in chained initialization)
          */
-        public B ofPolarity(Polarity polarity) {
+        public B polarity(Polarity polarity) {
             product().setPolarity(polarity);
             return (B) this;
         }

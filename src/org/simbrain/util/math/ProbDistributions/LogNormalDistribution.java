@@ -145,12 +145,12 @@ public class LogNormalDistribution extends ProbabilityDistribution {
 
         LogNormalDistribution product = new LogNormalDistribution();
 
-        public LogNormalDistributionBuilder ofLocation(double location) {
+        public LogNormalDistributionBuilder location(double location) {
             product.setLocation(location);
             return this;
         }
 
-        public LogNormalDistributionBuilder ofScale(double scale) {
+        public LogNormalDistributionBuilder scale(double scale) {
             product.setScale(scale);
             return this;
         }

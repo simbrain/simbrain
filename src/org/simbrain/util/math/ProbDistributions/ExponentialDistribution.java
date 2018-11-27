@@ -138,7 +138,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
 
         ExponentialDistribution product = new ExponentialDistribution();
 
-        public ExponentialDistributionBuilder ofLambda(double lambda) {
+        public ExponentialDistributionBuilder lambda(double lambda) {
             product.setLambda(lambda);
             return this;
         }

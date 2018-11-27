@@ -21,15 +21,8 @@ package org.simbrain.util.environment;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
-import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -146,8 +139,8 @@ public class SmellSource {
     public void randomize() {
         UniformDistribution randomizer =
                 UniformDistribution.builder()
-                .ofLowerBound(0)
-                .ofUpperBound(10)
+                .lowerBound(0)
+                .upperBound(10)
                 .build();
 
         for (int i = 0; i < getStimulusDimension(); i++) {

@@ -28,9 +28,6 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -158,7 +155,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
             }
             ((IntegrateAndFireRule) n.getUpdateRule()).setAddNoise(true);
             ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-                .ofMean(0).ofStandardDeviation(0.2).build());
+                .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
         recNeurons = new NeuronGroup(network, neuronList);
@@ -218,7 +215,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
             }
             n.setUpdateRule(new NormIFRule(netSize + tmp));
 //            ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-//                    .ofMean(0).ofStandardDeviation(0.2).build());
+//                    .mean(0).standardDeviation(0.2).build());
             ((IntegrateAndFireRule) (n.getUpdateRule())).setBackgroundCurrent(14.99);
             tmp++;
         }
@@ -348,8 +345,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
         synG.setSpikeResponder(spkR, Polarity.BOTH);
         synG.setUpperBound(200, Polarity.BOTH);
         synG.setLowerBound(-200, Polarity.BOTH);
-        synG.setRandomizers(NormalDistribution.builder().ofMean(10).ofStandardDeviation(2.5).build(),
-            NormalDistribution.builder().ofMean(-10).ofStandardDeviation(2.5).build());
+        synG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
+            NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         synG.randomizeConnectionWeights();
     }
 

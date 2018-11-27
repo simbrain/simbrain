@@ -155,12 +155,12 @@ public class GammaDistribution extends ProbabilityDistribution {
 
         GammaDistribution product = new GammaDistribution();
 
-        public GammaDistributionBuilder ofShape(double shape) {
+        public GammaDistributionBuilder shape(double shape) {
             product.setShape(shape);
             return this;
         }
 
-        public GammaDistributionBuilder ofScale(double scale) {
+        public GammaDistributionBuilder scale(double scale) {
             product.setScale(scale);
             return this;
         }

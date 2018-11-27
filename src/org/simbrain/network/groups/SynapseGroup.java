@@ -24,7 +24,6 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.io_utilities.GroupDeserializer;
-import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -53,7 +52,7 @@ public class SynapseGroup extends Group {
      */
     private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
         UniformDistribution.builder()
-            .ofPolarity(Polarity.EXCITATORY)
+            .polarity(Polarity.EXCITATORY)
             .build();
 
     /**
@@ -62,7 +61,7 @@ public class SynapseGroup extends Group {
      */
     private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
         UniformDistribution.builder()
-            .ofPolarity(Polarity.INHIBITORY)
+            .polarity(Polarity.INHIBITORY)
             .build();
 
     /**

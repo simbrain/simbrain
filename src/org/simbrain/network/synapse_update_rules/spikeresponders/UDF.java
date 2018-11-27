@@ -160,9 +160,9 @@ public class UDF extends SpikeResponder {
     public void init(Synapse s) {
         NormalDistribution rand =
                 NormalDistribution.builder()
-                    .ofUpperBound(Double.MAX_VALUE)
-                    .ofLowerBound(0.0000001)
-                    .ofClipping(true)
+                    .upperBound(Double.MAX_VALUE)
+                    .lowerBound(0.0000001)
+                    .clipping(true)
                     .build();
 
         if (s.getSource().getPolarity() == Polarity.EXCITATORY

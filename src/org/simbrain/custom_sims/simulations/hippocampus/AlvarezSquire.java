@@ -35,8 +35,8 @@ public class AlvarezSquire extends CompetitiveGroup {
 
         noiseGenerator =
             UniformDistribution.builder()
-                .ofLowerBound(-0.05)
-                .ofUpperBound(0.05)
+                .lowerBound(-0.05)
+                .upperBound(0.05)
                 .build();
     }
 

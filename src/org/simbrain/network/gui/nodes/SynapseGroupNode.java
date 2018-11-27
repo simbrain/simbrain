@@ -92,9 +92,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         layoutChildren();
     }
 
-    ;
-
-
     /**
      * @return the networkPanel
      */

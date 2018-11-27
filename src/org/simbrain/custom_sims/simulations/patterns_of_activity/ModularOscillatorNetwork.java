@@ -10,9 +10,12 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.layouts.HexagonalGridLayout;
+import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.piccolo.TileMap;
@@ -61,9 +64,9 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
         addNetwork();
 
         // Set up separate projections for each module
-        addProjection(inputGroup, 950, 400);
-        addProjection(sensory, 950, 5);
-        addProjection(motor, 500, 400);
+        addProjection(inputGroup, 8, 304, .01);
+        addProjection(sensory, 359, 304, 4);
+        addProjection(motor, 706, 304, 4);
 
         // Set up workspace updating
         //sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
@@ -72,15 +75,15 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
 
     private void addWorld() {
 
-        OdorWorldBuilder world = sim.addOdorWorldTMX(547, 5,  400, 400, "largeWorld.tmx");
+        OdorWorldBuilder world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
 
         // Mouse
-        mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
+        mouse = world.addEntity(184, 7, OdorWorldEntity.EntityType.MOUSE);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS);
+        OdorWorldEntity cheese = world.addEntity(313, 23, OdorWorldEntity.EntityType.SWISS);
         worldEntities.add(cheese);
-        OdorWorldEntity flower = world.addEntity(290, 21, OdorWorldEntity.EntityType.FLOWER);
+        OdorWorldEntity flower = world.addEntity(50, 38, OdorWorldEntity.EntityType.FLOWER);
         flower.getSmellSource().setDispersion(dispersion);
         worldEntities.add(flower);
 
@@ -96,22 +99,19 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
     private void addNetwork() {
 
         // Set up network
-        netBuilder = sim.addNetwork(10, 10, 543, 545,
+        netBuilder = sim.addNetwork(10, 10, 581, 297,
             "Patterns of Activity");
         network = netBuilder.getNetwork();
         network.setTimeStep(0.5);
 
-        // Main network
-        sensory = addModule(10,10,40, "Sensory");
-        motor = addModule((int)sensory.getMinX(),
-            (int)(sensory.getMinY() - sensory.getHeight()-200),40, "Motor");
+        // Sensory network, Motor Network
+        sensory = addModule(-115,10,40, "Sensory");
+        motor = addModule(322, 10,30, "Motor");
         SynapseGroup sensoriMotor = connectModules(sensory, motor, .5);
 
         // Input Network
-        inputGroup = addInputGroup((int) sensory.getCenterX()-20, (int) sensory.getMaxY()+150);
+        inputGroup = addInputGroup(-336, 30);
         SynapseGroup inputSensory = connectModules(inputGroup, sensory, .5);
-
-        //TODO: Reward, Frontal
 
     }
 
@@ -151,15 +151,18 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
         sparse.setConnectionDensity(density);
         sparse.setExcitatoryRatio(.5); // Abstract this out?
         SynapseGroup sg = netBuilder.addSynapseGroup(sourceNg, targetNg, sparse);
+        sg.setDisplaySynapses(false);
+        sg.getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(sg.getParentNetwork(), sg, sg),
+            SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
         return sg;
     }
 
-    private void addProjection(NeuronGroup toPlot, int x, int y) {
+    private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance) {
 
         // Create projection component
-        plot = sim.addProjectionPlot(x,y,400,400,toPlot.getLabel());
+        plot = sim.addProjectionPlot(x,y,362,320,toPlot.getLabel());
         plot.getProjectionModel().init(toPlot.size());
-        plot.getProjectionModel().getProjector().setTolerance(1);
+        plot.getProjectionModel().getProjector().setTolerance(tolerance);
         //plot.getProjectionModel().getProjector().useColorManager = false;
 
         // Coupling
@@ -168,9 +171,9 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
         sim.tryCoupling(inputProducer, plotConsumer);
 
         //text of nearest world object to projection plot current dot
-        //Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        //Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
-        //sim.tryCoupling(currentObject, plotText);
+        Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
+        sim.tryCoupling(currentObject, plotText);
 
     }
 

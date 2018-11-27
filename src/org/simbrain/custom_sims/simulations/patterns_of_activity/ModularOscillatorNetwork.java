@@ -152,8 +152,6 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
         sparse.setExcitatoryRatio(.5); // Abstract this out?
         SynapseGroup sg = netBuilder.addSynapseGroup(sourceNg, targetNg, sparse);
         sg.setDisplaySynapses(false);
-        sg.getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(sg.getParentNetwork(), sg, sg),
-            SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
         return sg;
     }
 

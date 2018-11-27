@@ -146,42 +146,17 @@ public class AgentTrails extends RegisteredSimulation {
         //Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
         //sim.tryCoupling(currentObject, plotText);
 
-        // Configure custom updating
-//        net.getNetwork().getUpdateManager().clear();
-//        net.getNetwork().addUpdateAction(new NetworkUpdateAction() {
-//
-//            // TODO: I'm not happy with this. Change!
-//            @Override
-//            public void invoke() {
-//                //TODO: Below a hack since setting tolerance in run() fails.
-//                plot.getProjectionModel().getProjector().setTolerance(.01);
-//                actionNet.update();
-//                sensoryNet.update();
-//                predictionNet.update();
-//            }
-//
-//            @Override
-//            public String getDescription() {
-//                return "";
-//            }
-//
-//            @Override
-//            public String getLongDescription() {
-//                return "";
-//            }
-//        });
+        // Custom training
         net.getNetwork().addUpdateAction(new TrainPredictionNet(this));
 
-        // Log activations
-        csvFile = Paths.get("agentTrails.csv");
-        net.getNetwork().addUpdateAction(new LogActivations(this));
+        // Uncomment lines below to Log activations, as well as save file below
+        // csvFile = Paths.get("agentTrails.csv");
+        // net.getNetwork().addUpdateAction(new LogActivations(this));
 
         // Add workspace level update action
         sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
     }
-
-    // Separate class?
 
     private void setUpControlPanel() {
 
@@ -241,6 +216,7 @@ public class AgentTrails extends RegisteredSimulation {
         });
 
         // TODO: Factor the velocity settings in to another method
+        // also need to reset velocities to 0 after pressing this
         panel.addButton("Solar System", () -> {
             net.getNetwork().clearActivations();
             cheese.setVelocityX(2.05f);
@@ -255,14 +231,14 @@ public class AgentTrails extends RegisteredSimulation {
             sim.iterate(200);
         });
 
-        // Save File
-        panel.addButton("Save", () -> {
-            try {
-                Files.write(csvFile, activationList);
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        });
+//        // Save File
+//        panel.addButton("Save", () -> {
+//            try {
+//                Files.write(csvFile, activationList);
+//            } catch (IOException ioe) {
+//                ioe.printStackTrace();
+//            }
+//        });
 
     }
 

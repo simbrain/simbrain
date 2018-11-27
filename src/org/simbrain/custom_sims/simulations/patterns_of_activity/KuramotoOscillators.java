@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
+import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -70,7 +71,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetBuilder net = sim.addNetwork(10, 10, 543, 545,
+        NetBuilder net = sim.addNetwork(10, 10, 337, 588,
             "Patterns of Activity");
         network = net.getNetwork();
         network.setTimeStep(0.5);
@@ -99,19 +100,23 @@ public class KuramotoOscillators extends RegisteredSimulation {
         reservoirNet.setLabel("Recurrent Layer");
 
         // Set up recurrent synapses
-        SynapseGroup recSyns = new SynapseGroup(reservoirNet, reservoirNet);
-        ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
-            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
-            20);
-        recConnection.connectNeurons(recSyns);
-        network.addGroup(recSyns);
-        recSyns.setLabel("Recurrent");
+        EdgeOfChaos.connectReservoir(network, reservoirNet);
+
+//        SynapseGroup recSyns = new SynapseGroup(reservoirNet, reservoirNet);
+//        ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 3,
+//            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
+//            50);
+//        recConnection.connectNeurons(recSyns);
+//        network.addGroup(recSyns);
+//        recSyns.setLabel("Recurrent");
 
         // Inputs
         inputNetwork = net.addNeuronGroup(1, 1, 3);
         inputNetwork.setLocation(reservoirNet.getCenterX() - inputNetwork.getWidth()/2, reservoirNet.getMaxY()+150);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
+        network.addGroup(inputNetwork);
+        inputNetwork.setLabel("Sensory Neurons");
 
         // Inputs to reservoir
         SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
@@ -120,11 +125,10 @@ public class KuramotoOscillators extends RegisteredSimulation {
         inpSynG.setRandomizers(NormalDistribution.builder().ofMean(10).ofStandardDeviation(2.5).build(),
             NormalDistribution.builder().ofMean(-10).ofStandardDeviation(2.5).build());
         inpSynG.randomizeConnectionWeights();
-        // Sensory Couplings
-
-        network.addGroup(inputNetwork);
+        inpSynG.setDisplaySynapses(false);
         network.addGroup(inpSynG);
-        inputNetwork.setLabel("Sensory Neurons");
+
+        // Couple from mouse to input nodes
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), inputNetwork);
 
         // Prediction net
@@ -152,7 +156,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Set up odor world
-        OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
+        OdorWorldBuilder world = sim.addOdorWorld(338, 10, 436, 516, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
 
@@ -178,9 +182,9 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpProjectionPlot() {
 
         // Projection of main reservoir
-        plot = sim.addProjectionPlot(31,21,450,419,"Reservoir States");
+        plot = sim.addProjectionPlot(800,10,452,492,"Cognitive Map");
         plot.getProjectionModel().init(reservoirNet.size());
-        plot.getProjectionModel().getProjector().setTolerance(5);
+        plot.getProjectionModel().getProjector().setTolerance(9);
         //plot.getProjectionModel().getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
         Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");

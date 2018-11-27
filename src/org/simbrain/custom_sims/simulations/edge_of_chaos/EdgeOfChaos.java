@@ -144,7 +144,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         return ng;
     }
 
-    static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
+    public static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
 
         ProbabilityDistribution exRand =
             NormalDistribution.builder()

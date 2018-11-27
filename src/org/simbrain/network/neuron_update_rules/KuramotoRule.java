@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -38,6 +39,10 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     /**
      * Natural Frequency.
      */
+    @UserParameter(
+        label = "Natural frequency",
+        description = "todo.",
+        defaultValue = "0.2", order = 1)
     public double naturalFrequency = 1;
 
     /**
@@ -249,6 +254,14 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
      */
     public double getSlope() {
         return naturalFrequency;
+    }
+
+    public double getNaturalFrequency() {
+        return naturalFrequency;
+    }
+
+    public void setNaturalFrequency(double naturalFrequency) {
+        this.naturalFrequency = naturalFrequency;
     }
 
 }

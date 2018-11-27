@@ -16,6 +16,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -38,7 +39,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     // References
     Network network;
     PlotBuilder plot;
-    NeuronGroup reservoirNet, predictionRes, sensoryNetL, sensoryNetR;
+    NeuronGroup reservoirNet, predictionRes, inputNetwork;
     SynapseGroup predictionSg;
     Neuron errorNeuron;
 
@@ -64,9 +65,6 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // Set up plot
         setUpProjectionPlot();
 
-        // Set up workspace updating
-        sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
-
     }
 
     private void setUpNetwork() {
@@ -89,7 +87,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
                 n.setPolarity(Polarity.INHIBITORY);
                 //((KuramotoRule) n.getUpdateRule()).setAddNoise(true);
             }
-            //((KuramotoRule) n.getUpdateRule()).setAddNoise(true);
+            ((KuramotoRule) n.getUpdateRule()).setNaturalFrequency(.1);
             //((KuramotoRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
             //    .ofMean(0).ofStandardDeviation(0.2).build());
             neuronList.add(n);
@@ -110,65 +108,44 @@ public class KuramotoOscillators extends RegisteredSimulation {
         recSyns.setLabel("Recurrent");
 
         // Inputs
-        sensoryNetL = net.addNeuronGroup(1, 1, 5);
-        sensoryNetL.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 100, reservoirNet.getMaxY()+200);
-        sensoryNetL.setLowerBound(-100);
-        sensoryNetL.setUpperBound(100);
+        inputNetwork = net.addNeuronGroup(1, 1, 3);
+        inputNetwork.setLocation(reservoirNet.getCenterX() - inputNetwork.getWidth()/2, reservoirNet.getMaxY()+150);
+        inputNetwork.setLowerBound(-100);
+        inputNetwork.setUpperBound(100);
 
-        sensoryNetR = net.addNeuronGroup(1, 1, 5);
-        sensoryNetR.setLocation(reservoirNet.getMinX()+ reservoirNet.getWidth() + 100, reservoirNet.getMaxY()+200);
-        sensoryNetR.setLowerBound(-100);
-        sensoryNetR.setUpperBound(100);
-
-        SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, reservoirNet,
-            new Sparse(0.25, true, false));
-        inpSynGL.setStrength(40, Polarity.EXCITATORY);
-        inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (Synapse s : inpSynGL.getAllSynapses()) {
-            s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
-        }
-        SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, reservoirNet,
-                new Sparse(0.25, true, false));
-        inpSynGR.setStrength(40, Polarity.EXCITATORY);
-        inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (Synapse s : inpSynGR.getAllSynapses()) {
-            s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
-        }
-        network.addGroup(inpSynGL);
-        inpSynGL.setLabel("L. Sensor \u2192  Res.");
-        network.addGroup(inpSynGR);
-        inpSynGR.setLabel("R. Sensor \u2192  Res.");
-
+        // Inputs to reservoir
+        SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
+            new Sparse(0.7, true, false));
+        inpSynG.setStrength(40, Polarity.EXCITATORY);
+        inpSynG.setRandomizers(NormalDistribution.builder().ofMean(10).ofStandardDeviation(2.5).build(),
+            NormalDistribution.builder().ofMean(-10).ofStandardDeviation(2.5).build());
+        inpSynG.randomizeConnectionWeights();
         // Sensory Couplings
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
-        network.addGroup(sensoryNetL);
-        sensoryNetL.setLabel("Sensory Left");
-        network.addGroup(sensoryNetR);
-        sensoryNetR.setLabel("Sensory Right");
 
-        // Motor Couplings
-        // sim.couple(lfNeuron, mouse.getEffector("Go-left"));
-        // sim.couple(rtNeuron, mouse.getEffector("Go-right"));
-        // sim.couple(upNeuron, mouse.getEffector("Go-straight"));
+        network.addGroup(inputNetwork);
+        network.addGroup(inpSynG);
+        inputNetwork.setLabel("Sensory Neurons");
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), inputNetwork);
 
         // Prediction net
-        predictionRes = net.addNeuronGroup(1,1,  netSize);
-        HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronListUnsafe(), spacing, spacing);
-        predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
-        predictionRes.setLabel("Predicted States");
-        predictionRes.setLowerBound(-10);
-        predictionRes.setUpperBound(10);
-        predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
+        // predictionRes = net.addNeuronGroup(1,1,  netSize);
+        // HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronListUnsafe(), spacing, spacing);
+        // predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
+        // predictionRes.setLabel("Predicted States");
+        // predictionRes.setLowerBound(-10);
+        // predictionRes.setUpperBound(10);
+        // predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
 
-        // Some custom network updating
-        network.addUpdateAction((new TrainPredictionNet(this)));
+        // Train prediction network
+        // network.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
-        errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
+        //errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
         //errorNeuron.setClamped(true);
-        errorNeuron.setLabel("Error");
+        //errorNeuron.setLabel("Error");
 
+        // "Halo" based on prediction error
+        //sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
 
     }
 
@@ -180,31 +157,21 @@ public class KuramotoOscillators extends RegisteredSimulation {
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
 
         // Mouse
-        mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 45));
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 45));
+        mouse = world.addEntity(202, 176, OdorWorldEntity.EntityType.MOUSE);
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Center", 0, 45));
         mouse.setHeading(90);
-        mouse.addDefaultSensorsEffectors();
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS,
-            new double[] {18, 0, 5, 10, 5});
+        OdorWorldEntity cheese = world.addEntity(55, 306, OdorWorldEntity.EntityType.SWISS,
+            new double[] {25,0,0});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(190, 221, OdorWorldEntity.EntityType.FLOWER,
-            new double[] {3, 18, 2, 5, 10});
+        OdorWorldEntity flower = world.addEntity(351, 311, OdorWorldEntity.EntityType.FLOWER,
+            new double[] {0,25,0});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity cow = world.addEntity(90, 50, OdorWorldEntity.EntityType.COW,
-            new double[] {3, 7, 16, 19, 0});
-        cow.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity lion = world.addEntity(300, 54, OdorWorldEntity.EntityType.LION,
-            new double[] {5, 2, 13, 16, 0});
-        lion.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity susi = world.addEntity(97, 331, OdorWorldEntity.EntityType.SUSI,
-            new double[] {0, 12, 15, 20});
-        susi.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity steve = world.addEntity(315, 305, OdorWorldEntity.EntityType.STEVE,
-            new double[] {12, 0, 20, 15});
-        steve.getSmellSource().setDispersion(dispersion);
+        OdorWorldEntity fish = world.addEntity(160, 14, OdorWorldEntity.EntityType.FISH,
+            new double[] {0,0,25});
+        fish.getSmellSource().setDispersion(dispersion);
+
 
     }
 
@@ -214,7 +181,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         plot = sim.addProjectionPlot(31,21,450,419,"Reservoir States");
         plot.getProjectionModel().init(reservoirNet.size());
         plot.getProjectionModel().getProjector().setTolerance(5);
-        plot.getProjectionModel().getProjector().useColorManager = false;
+        //plot.getProjectionModel().getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
         Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);

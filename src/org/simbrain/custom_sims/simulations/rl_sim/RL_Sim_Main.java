@@ -602,7 +602,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
 
     private void setUpProjectionPlot() {
         plot = sim.addProjectionPlot(798, 326, 355, 330, "Sensory states + Predictions");
-        plot.getProjectionModel().getProjector().useColorManager = false; //todo
+        plot.getProjectionModel().getProjector().setUseColorManager(false);
         plot.getProjectionModel().getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
         Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");

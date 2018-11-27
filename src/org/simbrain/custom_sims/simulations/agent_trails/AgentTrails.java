@@ -129,7 +129,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         plot.getProjectionModel().getProjector().getColorManager().setColoringMethod(null);
         plot.getProjectionModel().init(3);
-        plot.getProjectionModel().getProjector().useColorManager = false;
+        plot.getProjectionModel().getProjector().setUseColorManager(false);
 
         sim.couple(net.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
         plot.getProjectionModel().getProjector().setTolerance(.01);

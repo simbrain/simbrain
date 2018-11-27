@@ -92,7 +92,7 @@ public class Projector {
      * Set to false to turn off color manager and use custom point coloring,
      * as in, e.g., the use of the {@link Halo} tool.
      */
-    public boolean useColorManager = true;
+    private boolean useColorManager = true;
 
     /**
      * List of Neuron update rules; used in Gui Combo boxes.
@@ -492,4 +492,11 @@ public class Projector {
         return currentPoint;
     }
 
+    public boolean isUseColorManager() {
+        return useColorManager;
+    }
+
+    public void setUseColorManager(boolean useColorManager) {
+        this.useColorManager = useColorManager;
+    }
 }

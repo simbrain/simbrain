@@ -115,12 +115,12 @@ public class ConnectionUtilities {
 
         ProbabilityDistribution exciteRand =
                 UniformDistribution.builder()
-                        .ofPolarity(Polarity.EXCITATORY)
+                        .polarity(Polarity.EXCITATORY)
                         .build();
 
         ProbabilityDistribution inhibRand =
                 UniformDistribution.builder()
-                        .ofPolarity(Polarity.INHIBITORY)
+                        .polarity(Polarity.INHIBITORY)
                         .build();
 
         randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio);

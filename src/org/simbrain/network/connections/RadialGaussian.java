@@ -471,8 +471,8 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
 
         UniformDistribution rand =
             UniformDistribution.builder()
-                .ofLowerBound(0)
-                .ofUpperBound(1)
+                .lowerBound(0)
+                .upperBound(1)
                 .build();
 
         @Override

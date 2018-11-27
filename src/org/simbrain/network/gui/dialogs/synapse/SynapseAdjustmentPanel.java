@@ -59,7 +59,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      */
     private ProbabilityDistribution inhibitoryRandomizer =
             UniformDistribution.builder()
-                    .ofPolarity(Polarity.INHIBITORY)
+                    .polarity(Polarity.INHIBITORY)
                     .build();
 
     /**
@@ -67,7 +67,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      */
     private ProbabilityDistribution excitatoryRandomizer =
             UniformDistribution.builder()
-                    .ofPolarity(Polarity.EXCITATORY)
+                    .polarity(Polarity.EXCITATORY)
                     .build();
 
     /**

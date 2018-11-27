@@ -139,16 +139,16 @@ public class TestSim extends RegisteredSimulation {
 
         ProbabilityDistribution exRand =
                 LogNormalDistribution.builder()
-                        .ofPolarity(Polarity.EXCITATORY)
-                        .ofLocation(2)
-                        .ofScale(1)
+                        .polarity(Polarity.EXCITATORY)
+                        .location(2)
+                        .scale(1)
                         .build();
 
         ProbabilityDistribution inRand =
                 UniformDistribution.builder()
-                        .ofPolarity(Polarity.INHIBITORY)
-                        .ofLowerBound(1.5)
-                        .ofUpperBound(3)
+                        .polarity(Polarity.INHIBITORY)
+                        .lowerBound(1.5)
+                        .upperBound(3)
                         .build();
 
 //        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);

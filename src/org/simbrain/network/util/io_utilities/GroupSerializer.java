@@ -224,15 +224,15 @@ public class GroupSerializer {
 
         ProbabilityDistribution exRand =
                 LogNormalDistribution.builder()
-                        .ofPolarity(Polarity.EXCITATORY)
-                        .ofLocation(2.5)
+                        .polarity(Polarity.EXCITATORY)
+                        .location(2.5)
                         .build();
 
 
         ProbabilityDistribution inRand =
                 LogNormalDistribution.builder()
-                        .ofPolarity(Polarity.INHIBITORY)
-                        .ofLocation(3.5)
+                        .polarity(Polarity.INHIBITORY)
+                        .location(3.5)
                         .build();
 
         Sparse rCon = new Sparse(0.11, false, false);

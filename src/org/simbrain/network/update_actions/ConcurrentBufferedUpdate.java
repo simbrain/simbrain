@@ -597,16 +597,16 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
         gl.layoutNeurons(ng.getNeuronList());
         ProbabilityDistribution exRand =
                 LogNormalDistribution.builder()
-                        .ofPolarity(Polarity.EXCITATORY)
-                        .ofLocation(0.25)
-                        .ofScale(1)
+                        .polarity(Polarity.EXCITATORY)
+                        .location(0.25)
+                        .scale(1)
                         .build();
 
         ProbabilityDistribution inRand =
                 LogNormalDistribution.builder()
-                        .ofPolarity(Polarity.INHIBITORY)
-                        .ofLocation(2)
-                        .ofScale(2)
+                        .polarity(Polarity.INHIBITORY)
+                        .location(2)
+                        .scale(2)
                         .build();
 
         System.out.println("Begin Network Construction...");

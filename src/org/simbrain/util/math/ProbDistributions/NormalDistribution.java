@@ -157,12 +157,12 @@ public class NormalDistribution extends ProbabilityDistribution {
 
         NormalDistribution product = new NormalDistribution();
 
-        public NormalDistributionBuilder ofMean(double mean) {
+        public NormalDistributionBuilder mean(double mean) {
             product.setMean(mean);
             return this;
         }
 
-        public NormalDistributionBuilder ofStandardDeviation(double standardDeviation) {
+        public NormalDistributionBuilder standardDeviation(double standardDeviation) {
             product.setStandardDeviation(standardDeviation);
             return this;
         }

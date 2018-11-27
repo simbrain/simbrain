@@ -5,13 +5,9 @@ import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
-import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -27,7 +23,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -90,7 +85,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
             }
             ((KuramotoRule) n.getUpdateRule()).setNaturalFrequency(.1);
             //((KuramotoRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-            //    .ofMean(0).ofStandardDeviation(0.2).build());
+            //    .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
         reservoirNet = new NeuronGroup(network, neuronList);
@@ -122,8 +117,8 @@ public class KuramotoOscillators extends RegisteredSimulation {
         SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
             new Sparse(0.7, true, false));
         inpSynG.setStrength(40, Polarity.EXCITATORY);
-        inpSynG.setRandomizers(NormalDistribution.builder().ofMean(10).ofStandardDeviation(2.5).build(),
-            NormalDistribution.builder().ofMean(-10).ofStandardDeviation(2.5).build());
+        inpSynG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
+            NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomizeConnectionWeights();
         inpSynG.setDisplaySynapses(false);
         network.addGroup(inpSynG);

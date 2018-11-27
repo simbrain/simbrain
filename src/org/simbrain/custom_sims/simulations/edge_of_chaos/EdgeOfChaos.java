@@ -148,16 +148,16 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         ProbabilityDistribution exRand =
             NormalDistribution.builder()
-                .ofPolarity(Polarity.EXCITATORY)
-                .ofMean(0)
-                .ofStandardDeviation(Math.sqrt(variance))
+                .polarity(Polarity.EXCITATORY)
+                .mean(0)
+                .standardDeviation(Math.sqrt(variance))
                 .build();
 
         ProbabilityDistribution inRand =
             NormalDistribution.builder()
-                .ofPolarity(Polarity.INHIBITORY)
-                .ofMean(0)
-                .ofStandardDeviation(Math.sqrt(variance))
+                .polarity(Polarity.INHIBITORY)
+                .mean(0)
+                .standardDeviation(Math.sqrt(variance))
                 .build();
 
         RadialSimple con = new RadialSimple(parentNet, res.getNeuronList());

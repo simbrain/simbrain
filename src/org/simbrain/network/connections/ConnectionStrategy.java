@@ -66,7 +66,7 @@ public abstract class ConnectionStrategy implements EditableObject {
      */
     private ProbabilityDistribution exRandomizer =
         UniformDistribution.builder()
-            .ofPolarity(SimbrainConstants.Polarity.EXCITATORY)
+            .polarity(SimbrainConstants.Polarity.EXCITATORY)
             .build();
 
     /**
@@ -74,7 +74,7 @@ public abstract class ConnectionStrategy implements EditableObject {
      */
     private ProbabilityDistribution inRandomizer =
         UniformDistribution.builder()
-            .ofPolarity(SimbrainConstants.Polarity.INHIBITORY)
+            .polarity(SimbrainConstants.Polarity.INHIBITORY)
             .build();
 
     /**

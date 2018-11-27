@@ -34,7 +34,7 @@ public class Hippocampus extends RegisteredSimulation {
      */
     ProbabilityDistribution exRand =
             UniformDistribution.builder()
-                    .ofPolarity(Polarity.EXCITATORY)
+                    .polarity(Polarity.EXCITATORY)
                     .build();
 
     /**

@@ -157,7 +157,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
      */
     private ProbabilityDistribution noiseGenerator =
             NormalDistribution.builder()
-                .ofStandardDeviation(1)
+                .standardDeviation(1)
                 .build();
 
     @Override

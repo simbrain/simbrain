@@ -186,7 +186,6 @@ public class SynapseGroupInteractionBox extends InteractionBox {
                 } else {
                     synapseGroup.setDisplaySynapses(true);
                 }
-                synapseGroup.getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(synapseGroup.getParentNetwork(), synapseGroup, synapseGroup), SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
                 tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
             }
         };

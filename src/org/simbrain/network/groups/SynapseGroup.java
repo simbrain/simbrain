@@ -21,6 +21,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
+import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.io_utilities.GroupDeserializer;
@@ -575,6 +577,9 @@ public class SynapseGroup extends Group {
      */
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
+        getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(getParentNetwork(), this, this),
+            SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+
     }
 
     /**

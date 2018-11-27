@@ -297,10 +297,13 @@ public class Workspace {
      *                      latch.
      */
     public void iterate(int numIterations) {
+        for (WorkspaceComponent wc : getComponentList()) {
+            wc.start();
+        }
         synchronized (updaterLock) {
             updater.iterate(numIterations);
         }
-        updateStopped();
+        stop();
     }
 
     /**

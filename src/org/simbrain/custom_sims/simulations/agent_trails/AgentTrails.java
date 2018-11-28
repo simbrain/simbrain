@@ -34,7 +34,7 @@ public class AgentTrails extends RegisteredSimulation {
     Path csvFile;
     List<String> activationList = new ArrayList<String>();
     PlotBuilder plot;
-    OdorWorldBuilder world;
+    OdorWorldBuilder worldBuilder;
 
     // Default values for these used by buttons
     int dispersion = 45;
@@ -68,7 +68,7 @@ public class AgentTrails extends RegisteredSimulation {
         // Build a network
         net = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
         sensoryNet = net.addNeuronGroup(-9.25, 95.93, 3);
-//        //sensoryNet.setClamped(true);
+        //sensoryNet.setClamped(true);
         sensoryNet.setLabel("Sensory");
         cheeseNeuron = sensoryNet.getNeuronList().get(0);
         cheeseNeuron.setLabel("Cheese");
@@ -79,7 +79,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         actionNet = net.addNeuronGroup(0, -0.79, 3);
         actionNet.setLabel("Actions");
-//        actionNet.setClamped(true);
+        //actionNet.setClamped(true);
         actionNet.setLabel("Actions");
         leftNeuron = actionNet.getNeuronList().get(0);
         leftNeuron.setLabel("Left");
@@ -94,24 +94,23 @@ public class AgentTrails extends RegisteredSimulation {
         net.connectAllToAll(actionNet, predictionNet);
 
         errorNeuron = net.addNeuron(268, 108);
-//        errorNeuron.setClamped(true);
+        //errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
         // Create the odor world
-        world = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
-        world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(TileMap.create("empty.tmx"));
-        mouse = world.addAgent(120, 245, "Mouse");
+        worldBuilder = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
+        worldBuilder.getWorld().setObjectsBlockMovement(false);
+        worldBuilder.getWorld().setTileMap(TileMap.create("empty.tmx"));
+        mouse = worldBuilder.addAgent(120, 245, "Mouse");
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
-
-        // Set up world
-        cheese = world.addEntity(cheeseX, cheeseY, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
+        cheese = worldBuilder.addEntity(cheeseX, cheeseY, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(dispersion);
-        flower = world.addEntity(flowerX, flowerY, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
+        flower = worldBuilder.addEntity(flowerX, flowerY, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
         flower.getSmellSource().setDispersion(dispersion);
-        fish = world.addEntity(fishX, fishY, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
+        fish = worldBuilder.addEntity(fishX, fishY, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
         fish.getSmellSource().setDispersion(dispersion);
+        worldBuilder.getWorld().update();
 
         // Couple network to agent
         sim.couple(straightNeuron, mouse.getEffector("Go-straight"));
@@ -223,6 +222,12 @@ public class AgentTrails extends RegisteredSimulation {
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(0);
             sim.iterate(200);
+            cheese.setVelocityX(0);
+            cheese.setVelocityY(0);
+            flower.setVelocityX(0);
+            flower.setVelocityY(0);
+            fish.setVelocityX(0);
+            fish.setVelocityY(0);
         });
 
 //        // Save File

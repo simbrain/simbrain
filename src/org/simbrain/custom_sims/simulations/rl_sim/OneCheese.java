@@ -20,9 +20,15 @@ public class OneCheese extends RL_Sim {
         mouse_heading = 315;
         sim.resetMouse();
 
+        // Set up objects
+        sim.world.addEntity(sim.cheese);
+        sim.world.deleteEntity(sim.flower);
+        sim.world.deleteEntity(sim.candle);
+
         // Set goal state
         goalEntities.clear();
         goalEntities.add(sim.cheese);
+
     }
 
 }

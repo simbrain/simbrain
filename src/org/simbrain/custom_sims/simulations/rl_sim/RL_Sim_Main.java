@@ -97,7 +97,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
-    OdorWorldBuilder ob;
+    OdorWorldBuilder worldBuilder;
     PlotBuilder plot;
 
     SmellSensor leftSmell, rightSmell;
@@ -158,20 +158,18 @@ public class RL_Sim_Main extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Create the network builder
-        NetBuilder net = sim.addNetwork(252, 0, 563, 597, "Neural Network");
+        NetBuilder net = sim.addNetwork(228, 3,563,597, "Neural Network");
         network = net.getNetwork();
 
         // Set up the control panel and tabbed pane
         setUpControlPanel();
 
         // Create the odor world builder with default vals
-        ob = sim.addOdorWorld(803, 1, 350, 350, "Virtual World");
-        world = ob.getWorld();
+        worldBuilder = sim.addOdorWorld(778,3,472,330, "Virtual World");
+        world = worldBuilder.getWorld();
         world.setObjectsBlockMovement(false);
         //world.setWrapAround(false);
         world.setTileMap(TileMap.create("empty.tmx"));
-
-        // Load initial simulation
         initializeWorldObjects();
 
         // Add all simulations (first added is default)
@@ -179,6 +177,9 @@ public class RL_Sim_Main extends RegisteredSimulation {
         addSim("Cheese-Flower", new CheeseFlower(this));
         addSim("One Object", new OneCheese(this));
         simList.get(0).load();
+
+        // Force an update on the world so that graphics show properly
+        world.update();
 
         // Set up the main input-output network that is trained via RL
         setupNetworks(net);
@@ -190,7 +191,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         clearWeights();
 
         // Set up the vehicle networks
-        setUpVehicleNets(net, ob);
+        setUpVehicleNets(net, worldBuilder);
 
         // Initialize arrays for concatenating left/right inputs
         combinedInputs = new double[leftInputs.size() + rightInputs.size()];
@@ -215,7 +216,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
      */
     private void initializeWorldObjects() {
 
-        mouse = ob.addAgent(43, 110, "Mouse");
+        mouse = worldBuilder.addAgent(43, 110, "Mouse");
         mouse.setHeading(0);
         // Add default effectors
         mouse.addEffector(new StraightMovement(mouse,
@@ -233,11 +234,11 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse.addSensor(rightSmell);
 
         // Set up smell sources
-        cheese = ob.addEntity(350, 29, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
+        cheese = worldBuilder.addEntity(350, 29, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
         cheese.getSmellSource().setDispersion(350);
-        candle = ob.addEntity(350, 29, OdorWorldEntity.EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
+        candle = worldBuilder.addEntity(350, 29, OdorWorldEntity.EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
         candle.getSmellSource().setDispersion(350);
-        flower = ob.addEntity(350, 212, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
+        flower = worldBuilder.addEntity(350, 212, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
         flower.getSmellSource().setDispersion(350);
 
         // Used in Vehicle class
@@ -353,7 +354,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         pursueCheese.setLabel(strPursueCheese);
         NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, OdorWorldEntity.EntityType.FLOWER, flowerLeft, flowerRight);
         pursueFlower.setLabel(strPursueFlower);
-        NeuronGroup pursueCandle = vehicleBuilder.addAvoider(163, -475, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
+        NeuronGroup pursueCandle = vehicleBuilder.addPursuer(163, -475, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
         pursueCandle.setLabel(strPursueCandle);
 
         // NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, OdorWorldEntity.EntityType.SWISS, cheeseLeft ,cheeseRight);
@@ -501,7 +502,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     void setUpControlPanel() {
 
         // Create control panel
-        controlPanel = ControlPanel.makePanel(sim, "RL Controls", -6, 1);
+        controlPanel = ControlPanel.makePanel(sim, "RL Controls", -6,1,246,597);
 
         // Set up text fields
         trialField = controlPanel.addTextField("Trials", "" + numTrials);
@@ -593,7 +594,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     }
 
     private void setUpProjectionPlot() {
-        plot = sim.addProjectionPlot(798, 326, 355, 330, "Sensory states + Predictions");
+        plot = sim.addProjectionPlot(779,339,355,330, "Sensory states + Predictions");
         plot.getProjectionModel().getProjector().setUseColorManager(false);
         plot.getProjectionModel().getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");

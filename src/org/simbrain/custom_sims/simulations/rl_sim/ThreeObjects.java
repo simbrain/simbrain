@@ -19,22 +19,19 @@ public class ThreeObjects extends RL_Sim {
         mouse_heading = 0;
         sim.resetMouse();
 
-        // Set up cheese
+        // Set up objects
         sim.cheese.setLocation(257, 53);
-
-        // Set up candle
-        sim.candle.setLocation(257, 207);
-
-        // Set up flower
+        sim.world.addEntity(sim.cheese);
         sim.flower.setLocation(20, 207);
-
-        // Update the world
-         sim.world.update();
+        sim.world.addEntity(sim.flower);
+        sim.candle.setLocation(257, 207);
+        sim.world.addEntity(sim.candle);
 
         // Set goal states
         goalEntities.clear();
         goalEntities.add(sim.cheese);
         goalEntities.add(sim.flower);
+
     }
 
 }

@@ -20,6 +20,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Hashtable;
 
 /**
@@ -196,7 +197,8 @@ public class Simulation {
     public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name);
         workspace.addWorkspaceComponent(odorWorldComponent);
-        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setBounds(x, y, width, height);
+        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
+        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setPreferredSize(new Dimension(width, height));
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
         return new OdorWorldBuilder(odorWorldComponent);
     }

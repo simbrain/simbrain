@@ -33,13 +33,12 @@ public class CheeseFlower extends RL_Sim {
         mouse_heading = 0;
         sim.resetMouse();
 
-        // Cheese
-        sim.cheese.getSmellSource().setDispersion(350);
+        // Set up objects
         sim.cheese.setLocation(239, 42);
-
-        // Flower
-        sim.flower.getSmellSource().setDispersion(350);
+        sim.world.addEntity(sim.cheese);
         sim.flower.setLocation(253, 228);
+        sim.world.addEntity(sim.flower);
+        sim.world.deleteEntity(sim.candle);
 
         // Update goal states
         goalEntities.clear();
@@ -55,8 +54,7 @@ public class CheeseFlower extends RL_Sim {
      */
     private void singleTrail(OdorWorldEntity objectToPass) {
 
-
-        // TODO: May have to disable RL_Update training action in future
+        // TODO: May have to disable RL_Update training action for this to work properly
 
         sim.network.clearActivations();
 

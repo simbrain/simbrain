@@ -164,7 +164,17 @@ public class ControlPanel extends JPanel {
     }
 
     /**
-     * Embed a controlpanel in an internal frame and get a reference to it.
+     * Make a control panel with a specified width and height.
+     * Otherwise see {@link #makePanel(Simulation, String, int, int)}
+     */
+    public static ControlPanel makePanel(Simulation sim, String name, int x, int y, int width, int height) {
+        ControlPanel panel = makePanel(sim, name, x, y);
+        panel.internalFrame.setPreferredSize(new Dimension(width, height));
+        return panel;
+    }
+
+    /**
+     * Embed a control panel in an internal frame and get a reference to it.
      *
      * @param sim  reference to parent simulation
      * @param name title to display in panel frame
@@ -175,10 +185,8 @@ public class ControlPanel extends JPanel {
     public static ControlPanel makePanel(Simulation sim, String name, int x, int y) {
         ControlPanel panel = new ControlPanel();
         panel.internalFrame = new JInternalFrame(name, true, true);
-        // Set up Frame
         panel.internalFrame.setLocation(x, y);
         panel.internalFrame.getContentPane().add(panel);
-
         panel.internalFrame.setVisible(true);
         panel.internalFrame.pack();
         sim.getDesktop().addInternalFrame(panel.internalFrame);

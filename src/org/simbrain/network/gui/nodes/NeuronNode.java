@@ -38,8 +38,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-//import org.piccolo2d.nodes.PText;
-
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
  * network model.
@@ -164,6 +162,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * If true then a custom color is being used for stroke.
      */
     private boolean customStrokeColor = false;
+
+    /**
+     * If true, use a custom zero point. Currently this is set to be between
+     * upper and lower bounds.  In the future more options could be added and
+     * this could become an enum.
+     */
+    // TODO: Wire this up on the GUI!
+    private boolean useCustomZeroPoint = false;
 
     /**
      * Create a new neuron node.
@@ -343,16 +349,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         double gLow = neuron.getUpdateRule().getGraphicalLowerBound();
         double gUp = neuron.getUpdateRule().getGraphicalUpperBound();
 
-        // A "graphical zero point" (the midpoint of the graphical upper and lower bounds);
-        // the "white" state to be non-zero.  For example in some biological
-        // sims it makes sense to have the "graphical zero" be  non-zero, like when -55
-        // is the resting potential of a biological simulation of a neuron.  This way
-        // most spiking neurons will go through the full blue to red range of colors
-        // before spiking rather than sticking around just one or the other color, and
-        // blue will always correspond to a hyperpolarized,
-        // quiescent state while red will always correspond to an excited,
-        // near depolarized state.
-        double gZeroPoint = ((gUp - gLow) / 2) + gLow;
+        // A "graphical zero point" that shows as white
+        double gZeroPoint = 0;
+        if (useCustomZeroPoint) {
+            // Current custom choice is between upper and lower bounds.
+            // For example useful to capture whether a biological neuron is
+            // depolarized or hyperpolarized
+            gZeroPoint = ((gUp - gLow) / 2) + gLow;
+        }
+
         if (Math.abs(activation - gZeroPoint) < 0.001) {
             mainShape.setPaint(Color.white);
         } else if (activation > gZeroPoint) {

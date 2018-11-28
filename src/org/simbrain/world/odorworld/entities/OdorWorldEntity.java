@@ -98,7 +98,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Amount to manually move forward or in cardinal directions.
      */
-    @UserParameter(label = "Straigh movement", order = 10)
+    @UserParameter(label = "Straight movement", order = 10)
     protected double manualStraightMovementIncrement = 1;
 
     /**
@@ -652,11 +652,14 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Initialize the animation from stored image location(s).
+     * Perform initialization of objects after de-serializing.
      */
     public void postSerializationInit() {
         changeSupport = new PropertyChangeSupport(this);
         currentlyHeardPhrases = new ArrayList<String>();
+        for(Sensor sensor : sensors) {
+            sensor.postSerializationInit();
+        }
     }
 
     /**
@@ -1264,11 +1267,18 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     @Producible(idMethod = "getId")
     public String getNearbyObjects() {
-        List<OdorWorldEntity> entities = this.getEntitiesInRadius(20);
+        List<OdorWorldEntity> entities = this.getEntitiesInRadius(7);
         //TODO: Need them ordered by distance
         return entities.isEmpty() ? "" : entities.get(0).getEntityType().description;
     }
 
+    public void setManualMotionTurnIncrement(double manualMotionTurnIncrement) {
+        this.manualMotionTurnIncrement = manualMotionTurnIncrement;
+    }
+
+    public void setManualStraightMovementIncrement(double manualStraightMovementIncrement) {
+        this.manualStraightMovementIncrement = manualStraightMovementIncrement;
+    }
 
 
 }

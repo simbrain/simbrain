@@ -193,4 +193,10 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         return relativeLocation;
     }
 
+    /**
+     * Perform initialization of objects after de-serializing.
+     */
+    public void postSerializationInit() {
+        relativeLocation = new Point2D.Double();
+    }
 }

@@ -166,6 +166,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      * @return the sensor location
      */
     public double[] getLocation() {
+        updateRelativeLocation();
         double[] ret = {relativeLocation.x, relativeLocation.y};
         ret[0] += parent.getCenterX();
         ret[1] += parent.getCenterY();

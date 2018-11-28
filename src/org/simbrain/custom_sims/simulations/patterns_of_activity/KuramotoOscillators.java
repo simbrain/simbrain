@@ -5,6 +5,8 @@ import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
+import org.simbrain.network.connections.ConnectionStrategy;
+import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -95,15 +97,15 @@ public class KuramotoOscillators extends RegisteredSimulation {
         reservoirNet.setLabel("Recurrent Layer");
 
         // Set up recurrent synapses
-        EdgeOfChaos.connectReservoir(network, reservoirNet);
+        //EdgeOfChaos.connectReservoir(network, reservoirNet);
 
-//        SynapseGroup recSyns = new SynapseGroup(reservoirNet, reservoirNet);
-//        ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 3,
-//            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
-//            50);
-//        recConnection.connectNeurons(recSyns);
-//        network.addGroup(recSyns);
-//        recSyns.setLabel("Recurrent");
+        SynapseGroup recSyns = new SynapseGroup(reservoirNet, reservoirNet);
+        ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 3,
+            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
+            50);
+        recConnection.connectNeurons(recSyns);
+        network.addGroup(recSyns);
+        recSyns.setLabel("Recurrent");
 
         // Inputs
         inputNetwork = net.addNeuronGroup(1, 1, 3);
@@ -179,7 +181,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // Projection of main reservoir
         plot = sim.addProjectionPlot(800,10,452,492,"Cognitive Map");
         plot.getProjectionModel().init(reservoirNet.size());
-        plot.getProjectionModel().getProjector().setTolerance(9);
+        plot.getProjectionModel().getProjector().setTolerance(1);
         //plot.getProjectionModel().getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
         Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");

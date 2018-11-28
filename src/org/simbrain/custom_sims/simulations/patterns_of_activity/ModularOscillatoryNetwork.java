@@ -4,48 +4,38 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.PlotBuilder;
+import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
  * Simulate a set of oscillatory brain networks and display their projected
  * activity when exposed to inputs in a simple 2d world.
  */
-public class ModularOscillatorNetwork extends RegisteredSimulation {
+public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     // References
     Network network;
     NetBuilder netBuilder;
-
-    PlotBuilder plot;
+    PlotBuilder plotBuilder;
     NeuronGroup sensory, motor, inputGroup;
-    Neuron rewardNeuron;
-
     OdorWorldEntity mouse;
     List<OdorWorldEntity> worldEntities = new ArrayList<>();
 
@@ -58,32 +48,32 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Set up world
-        addWorld();
+        setUpWorld();
 
         // Set up network
-        addNetwork();
+        setUpNetwork();
 
         // Set up separate projections for each module
         addProjection(inputGroup, 8, 304, .01);
-        addProjection(sensory, 359, 304, 4);
-        addProjection(motor, 706, 304, 4);
+        addProjection(sensory, 359, 304, 1);
+        addProjection(motor, 706, 304, 1);
 
         // Set up workspace updating
         //sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
 
     }
 
-    private void addWorld() {
+    private void setUpWorld() {
 
         OdorWorldBuilder world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
 
         // Mouse
-        mouse = world.addEntity(184, 7, OdorWorldEntity.EntityType.MOUSE);
+        mouse = world.addEntity(187, 113, OdorWorldEntity.EntityType.MOUSE);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(313, 23, OdorWorldEntity.EntityType.SWISS);
+        OdorWorldEntity cheese = world.addEntity(315, 31, OdorWorldEntity.EntityType.SWISS);
         worldEntities.add(cheese);
-        OdorWorldEntity flower = world.addEntity(50, 38, OdorWorldEntity.EntityType.FLOWER);
+        OdorWorldEntity flower = world.addEntity(41, 31, OdorWorldEntity.EntityType.FLOWER);
         flower.getSmellSource().setDispersion(dispersion);
         worldEntities.add(flower);
 
@@ -93,25 +83,35 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
             sensor.getDecayFunction().setDispersion(dispersion);
             mouse.addSensor(sensor);
         }
-
     }
 
-    private void addNetwork() {
+    private void setUpNetwork() {
 
         // Set up network
         netBuilder = sim.addNetwork(10, 10, 581, 297,
             "Patterns of Activity");
         network = netBuilder.getNetwork();
-        network.setTimeStep(0.5);
 
-        // Sensory network, Motor Network
-        sensory = addModule(-115,10,40, "Sensory");
-        motor = addModule(322, 10,30, "Motor");
-        SynapseGroup sensoriMotor = connectModules(sensory, motor, .5);
+        // Sensory network
+        sensory = addModule(-115,10,49, "Sensory");
+        //SynapseGroup recSensory = connectRadialGaussian(sensory,sensory);
+        SynapseGroup recSensory = EdgeOfChaos.connectReservoir(network, sensory);
+        recSensory.setLabel("Recurrent Sensory");
+
+        // Motor Network
+        motor = addModule(322, 10,16, "Motor");
+        SynapseGroup recMotor = connectRadialGaussian(motor,motor);
+        //SynapseGroup recMotor = EdgeOfChaos.connectReservoir(network, motor);
+        recMotor.setLabel("Recurrent Motor");
+
+        // Sensori-Motor Connection
+        connectModules(sensory, motor, .5);
 
         // Input Network
         inputGroup = addInputGroup(-336, 30);
-        SynapseGroup inputSensory = connectModules(inputGroup, sensory, .5);
+
+        // Input to Sensory Connection
+        connectModules(inputGroup, sensory, .5);
 
     }
 
@@ -132,24 +132,32 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
 
     }
 
-
     private NeuronGroup addModule(int x, int y, int numNeurons, String name) {
         NeuronGroup ng = netBuilder.addNeuronGroup(x,y,numNeurons);
         KuramotoRule oscillator = new KuramotoRule();
+        oscillator.setNaturalFrequency(.8);
         ng.setNeuronType(oscillator);
         HexagonalGridLayout.layoutNeurons(ng.getNeuronListUnsafe(), 40, 40);
         ng.setLocation(x,y);
         ng.setLabel(name);
-
-        SynapseGroup recurrent = connectModules(ng, ng, .4);
-
         return ng;
+    }
+
+    private SynapseGroup connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
+        SynapseGroup sg = new SynapseGroup(sourceNg, targetNg);
+        ConnectionStrategy radialConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 2, RadialGaussian.DEFAULT_EI_CONST * 1,
+            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
+            50);
+        radialConnection.connectNeurons(sg);
+        network.addGroup(sg);
+        sg.setDisplaySynapses(false);
+        return sg;
     }
 
     private SynapseGroup connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density) {
         Sparse sparse = new Sparse();
         sparse.setConnectionDensity(density);
-        sparse.setExcitatoryRatio(.5); // Abstract this out?
+        sparse.setExcitatoryRatio(1);
         SynapseGroup sg = netBuilder.addSynapseGroup(sourceNg, targetNg, sparse);
         sg.setDisplaySynapses(false);
         return sg;
@@ -158,28 +166,28 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
     private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance) {
 
         // Create projection component
-        plot = sim.addProjectionPlot(x,y,362,320,toPlot.getLabel());
-        plot.getProjectionModel().init(toPlot.size());
-        plot.getProjectionModel().getProjector().setTolerance(tolerance);
+        plotBuilder = sim.addProjectionPlot(x,y,362,320,toPlot.getLabel());
+        plotBuilder.getProjectionModel().init(toPlot.size());
+        plotBuilder.getProjectionModel().getProjector().setTolerance(tolerance);
         //plot.getProjectionModel().getProjector().useColorManager = false;
 
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, "getActivations");
-        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
+        Consumer plotConsumer = sim.getConsumer(plotBuilder.getProjectionPlotComponent(), "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);
 
         //text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
+        Consumer plotText = sim.getConsumer(plotBuilder.getProjectionPlotComponent(), "setLabel");
         sim.tryCoupling(currentObject, plotText);
 
     }
 
-    public ModularOscillatorNetwork(SimbrainDesktop desktop) {
+    public ModularOscillatoryNetwork(SimbrainDesktop desktop) {
         super(desktop);
     }
 
-    public ModularOscillatorNetwork() {
+    public ModularOscillatoryNetwork() {
         super();
     }
 
@@ -189,8 +197,7 @@ public class ModularOscillatorNetwork extends RegisteredSimulation {
     }
 
     @Override
-    public ModularOscillatorNetwork instantiate(SimbrainDesktop desktop) {
-        return new ModularOscillatorNetwork(desktop);
+    public ModularOscillatoryNetwork instantiate(SimbrainDesktop desktop) {
+        return new ModularOscillatoryNetwork(desktop);
     }
-
 }

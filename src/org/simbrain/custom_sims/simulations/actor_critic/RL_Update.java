@@ -86,14 +86,13 @@ public class RL_Update implements NetworkUpdateAction {
             // since that is what the current td error reflects.
             double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
             // synapse.setStrength(synapse.clip(newStrength));
-            synapse.forceSetStrength(newStrength); // TODO: Why is this needed?
+            synapse.forceSetStrength(newStrength);
             // System.out.println("Value Neuron / Tile neuron (" +
             // sourceNeuron.getId() + "):" + newStrength);
         }
 
         // Update all actor neurons. Reinforce input > output connection that
-        // were
-        // active at the last time-step.
+        // were active at the last time-step.
         for (Neuron neuron : sim.outputs.getNeuronList()) {
             // Just update the last winner
             if (neuron.getLastActivation() > 0) {

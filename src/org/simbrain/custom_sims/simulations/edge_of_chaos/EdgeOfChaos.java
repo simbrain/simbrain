@@ -43,7 +43,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     static int GRID_SPACE = 25;
     // Since mean is 0, lower variance means lower average weight strength
     //  For 120 neurons: .01,.1, and > .4
-    private static double variance = .01;
+    private static double variance = .1;
     private static int K = 4; // in-degree (num connections to each neuron)
 
     // References

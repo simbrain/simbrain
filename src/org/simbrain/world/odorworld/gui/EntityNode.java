@@ -120,7 +120,7 @@ public class EntityNode extends PNode {
      * @param attribute the attribute to add
      */
     private void addAttribute(VisualizableEntityAttribute attribute) {
-        visualizableAttributeMap.put(attribute, attribute.getNode());
+        visualizableAttributeMap.put(attribute, EntityAttributeNode.getNode(attribute));
         addChild(visualizableAttributeMap.get(attribute));
     }
 
@@ -166,7 +166,7 @@ public class EntityNode extends PNode {
         for (VisualizableEntityAttribute vp : visualizableEntityAttributeList) {
             EntityAttributeNode currentEntityAttributeNode;
             if (!visualizableAttributeMap.containsKey(vp)) {
-                currentEntityAttributeNode = vp.getNode();
+                currentEntityAttributeNode = EntityAttributeNode.getNode(vp);
                 addChild(currentEntityAttributeNode);
                 visualizableAttributeMap.put(vp, currentEntityAttributeNode);
             } else {

@@ -23,8 +23,6 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.EntityAttributeNode;
-import org.simbrain.world.odorworld.gui.HearingNode;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -58,7 +56,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     private String phrase = DEFAULT_PHRASE;
 
     /**
-     * Maximum characters per row before warping around in a {@link HearingNode}.
+     * Maximum characters per row before warping around in a HearingNode.
      */
     @UserParameter(label = "Characters per Row",
             description = "The maximum number of characters that can be displayed in one row in the hearing bubble. "
@@ -171,11 +169,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return new Hearing(parent, phrase, outputAmount);
     }
 
-    @Override
-    public EntityAttributeNode getNode() {
-        return new HearingNode(this);
-    }
-
     public int getCharactersPerRow() {
         return charactersPerRow;
     }
@@ -183,4 +176,5 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     public void setCharactersPerRow(int charactersPerRow) {
         this.charactersPerRow = charactersPerRow;
     }
+
 }

@@ -2,10 +2,7 @@ package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
 import org.simbrain.world.odorworld.effectors.Speech;
-import org.simbrain.world.odorworld.sensors.BumpSensor;
-import org.simbrain.world.odorworld.sensors.Hearing;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
+import org.simbrain.world.odorworld.sensors.*;
 
 import java.awt.*;
 
@@ -42,6 +39,9 @@ public abstract class EntityAttributeNode extends PNode {
         }
         if (visualizableEntityAttribute instanceof Speech) {
             return new SpeechNode((Speech) visualizableEntityAttribute);
+        }
+        if (visualizableEntityAttribute instanceof ObjectSensor) {
+            return new ObjectSensorNode((ObjectSensor) visualizableEntityAttribute);
         }
         return null;
     }

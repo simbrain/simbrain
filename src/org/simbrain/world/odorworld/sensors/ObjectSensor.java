@@ -18,7 +18,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * The sensor itself is currently fixed at the center of the agent. We may
  * make the location editable at some point, if use-cases emerge.
  */
-public class ObjectSensor extends Sensor {
+public class ObjectSensor extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Current value of the sensor.
@@ -108,5 +108,9 @@ public class ObjectSensor extends Sensor {
     @Override
     public String getName() {
         return "ObjectSensor";
+    }
+
+    public double getBaseValue() {
+        return baseValue;
     }
 }

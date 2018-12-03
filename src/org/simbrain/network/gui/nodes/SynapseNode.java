@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-
-import javax.swing.JDialog;
-import javax.swing.JPopupMenu;
 
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
@@ -38,55 +36,90 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
  */
 public final class SynapseNode extends ScreenElement {
 
-    /** The logical synapse this screen element represents. */
+    /**
+     * The logical synapse this screen element represents.
+     */
     private Synapse synapse;
 
-    /** Location of circle relative to target node. */
+    /**
+     * Location of circle relative to target node.
+     */
     private final double offset = 7;
 
-    /** Main circle of synapse. */
+    /**
+     * Main circle of synapse.
+     */
     private PPath circle;
 
-    /** Line connecting nodes. More of a loop for self cocnections. */
+    /**
+     * Line connecting nodes. More of a loop for self cocnections.
+     */
     private PPath.Float line;
 
-    /** Reference to source neuron. */
+    /**
+     * The line for bound checking.
+     */
+    private Line2D.Float lineBound = new Line2D.Float();
+
+    /**
+     * The arc for bound checking when the synapse is a self connection.
+     */
+    private Arc2D.Float arcBound = new Arc2D.Float();
+
+    /**
+     * Reference to source neuron.
+     */
     private NeuronNode source;
 
-    /** Reference to target neuron. */
+    /**
+     * Reference to target neuron.
+     */
     private NeuronNode target;
 
-    /** Used to approximate zero to prevent divide-by-zero errors. */
+    /**
+     * Used to approximate zero to prevent divide-by-zero errors.
+     */
     private static final double ZERO_PROXY = .001;
 
-    /** Color of "excitatory" synapses, with positive values. */
+    /**
+     * Color of "excitatory" synapses, with positive values.
+     */
     private static Color excitatoryColor = Color.red;
 
-    /** Color of "inhibitory" synapses, with negative values. */
+    /**
+     * Color of "inhibitory" synapses, with negative values.
+     */
     private static Color inhibitoryColor = Color.blue;
 
-    /** Color of "zero" weights. */
+    /**
+     * Color of "zero" weights.
+     */
     private static Color zeroWeightColor = Color.gray;
 
-    /** Maximum diameter of the circle representing the synapse. */
+    /**
+     * Maximum diameter of the circle representing the synapse.
+     */
     private static int maxDiameter = 20;
 
-    /** Minimum diameter of the circle representing the synapse. */
+    /**
+     * Minimum diameter of the circle representing the synapse.
+     */
     private static int minDiameter = 7;
 
-    /** Color of lines in synapse representation. */
+    /**
+     * Color of lines in synapse representation.
+     */
     private static Color lineColor = Color.black;
-    
+
     /**
      * Create a new synapse node connecting a source and target neuron.
      *
-     * @param net Reference to NetworkPanel
-     * @param source source neuronnode
-     * @param target target neuronmode
+     * @param net     Reference to NetworkPanel
+     * @param source  source neuronnode
+     * @param target  target neuronmode
      * @param synapse the model synapse this PNode represents
      */
-    public SynapseNode(final NetworkPanel net, final NeuronNode source,
-            final NeuronNode target, final Synapse synapse) {
+    public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target, final Synapse synapse) {
 
         super(net);
         this.source = source;
@@ -125,27 +158,21 @@ public final class SynapseNode extends ScreenElement {
 
         // Position the synapse
         if (isSelfConnection()) {
-            synapseCenter = globalToLocal(
-                    new Point2D.Double(target.getCenter().getX() + offset + 3,
-                            target.getCenter().getY() + offset + 3));
+            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + offset + 3, target.getCenter().getY() + offset + 3));
         } else {
-            synapseCenter = globalToLocal(
-                    calcCenter(source.getCenter(), target.getCenter()));
+            synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
         }
-        this.offset(synapseCenter.getX() - offset,
-                synapseCenter.getY() - offset);
+        this.offset(synapseCenter.getX() - offset, synapseCenter.getY() - offset);
 
         // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse(0, 0, (float) offset * 2,
-                    (float) offset * 2);
+            circle = PPath.createEllipse(0, 0, (float) offset * 2, (float) offset * 2);
             ((PPath) circle).setStrokePaint(null);
         }
         double ea = 1;
         double ea2 = ea * 2;
         PBounds tempBounds = circle.getFullBounds();
-        setBounds(tempBounds.x - ea, tempBounds.y - ea, tempBounds.width + ea2,
-                tempBounds.height + ea2);
+        setBounds(tempBounds.x - ea, tempBounds.y - ea, tempBounds.width + ea2, tempBounds.height + ea2);
 
         // Create the line
         if (line == null) {
@@ -155,13 +182,22 @@ public final class SynapseNode extends ScreenElement {
         // Update the line (unless it's a self connection)
         if (!isSelfConnection()) {
             line.reset();
-            line.append(new Line2D.Double(globalToLocal(source.getCenter()),
-                    synapseCenter), false);
-            // publicLine
-            // .setLine(source.getCenter(), localToGlobal(synapseCenter));
+            line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
+            lineBound.setLine(source.getCenter(), localToGlobal(synapseCenter));
+        } else {
+            arcBound =
+                    new Arc2D.Float(
+                            (float) getGlobalBounds().getX(),
+                            (float) getGlobalBounds().getY() - 7,
+                            22,
+                            15,
+                            1,
+                            355,
+                            Arc2D.OPEN
+                    );
         }
     }
-    
+
     /**
      * of a synapse based on whether it is clamped or not.
      */
@@ -178,7 +214,7 @@ public final class SynapseNode extends ScreenElement {
      *
      * @return true if this synapse connects a neuron to itself.
      */
-    private boolean isSelfConnection() {
+    public boolean isSelfConnection() {
         return (source.getNeuron() == target.getNeuron());
     }
 
@@ -190,11 +226,9 @@ public final class SynapseNode extends ScreenElement {
      */
     private PPath.Float createLine(final Point2D center) {
         if (isSelfConnection()) {
-            return new PPath.Float(new Arc2D.Float((float) getX(),
-                    (float) getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
+            return new PPath.Float(new Arc2D.Float((float) getX(), (float) getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
         } else {
-            return new PPath.Float(new Line2D.Float(
-                    globalToLocal(source.getCenter()), center));
+            return new PPath.Float(new Line2D.Float(globalToLocal(source.getCenter()), center));
         }
     }
 
@@ -250,11 +284,9 @@ public final class SynapseNode extends ScreenElement {
         if (synapse.getStrength() == 0) {
             diameter = minDiameter;
         } else if (synapse.getStrength() > 0) {
-            diameter = ((maxDiameter - minDiameter) * (strength / upperBound)
-                    + minDiameter);
+            diameter = ((maxDiameter - minDiameter) * (strength / upperBound) + minDiameter);
         } else {
-            diameter = (((maxDiameter - minDiameter)
-                    * (Math.abs(strength / lowerBound))) + minDiameter);
+            diameter = (((maxDiameter - minDiameter) * (Math.abs(strength / lowerBound))) + minDiameter);
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;
@@ -306,48 +338,54 @@ public final class SynapseNode extends ScreenElement {
     }
 
     /**
-     * @see ScreenElement
      * @return
+     * @see ScreenElement
      */
     public boolean isSelectable() {
         return true;
     }
 
     /**
-     * @see ScreenElement
      * @return
+     * @see ScreenElement
      */
     public boolean showSelectionHandle() {
         return true;
     }
 
     /**
-     * @see ScreenElement
      * @return
+     * @see ScreenElement
      */
     public boolean isDraggable() {
         return false;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected boolean hasToolTipText() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected String getToolTipText() {
         return String.valueOf(synapse.getToolTipText());
     }
 
     /**
-     * @see ScreenElement
      * @return
+     * @see ScreenElement
      */
     public boolean hasContextMenu() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected JPopupMenu getContextMenu() {
 
         // JPopupMenu contextMenu = new JPopupMenu();
@@ -375,15 +413,18 @@ public final class SynapseNode extends ScreenElement {
         return this.getNetworkPanel().getSynapseContextMenu(synapse);
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected boolean hasPropertyDialog() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     protected JDialog getPropertyDialog() {
-        SynapseDialog dialog = (SynapseDialog) getNetworkPanel()
-                .getSynapseDialog(getNetworkPanel().getSelectedSynapses());
+        SynapseDialog dialog = (SynapseDialog) getNetworkPanel().getSynapseDialog(getNetworkPanel().getSelectedSynapses());
         return dialog;
     }
 
@@ -394,8 +435,7 @@ public final class SynapseNode extends ScreenElement {
      */
     public String toString() {
         String ret = new String();
-        ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")("
-                + getGlobalFullBounds().y + ")\n";
+        ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
         return ret;
     }
 
@@ -441,7 +481,9 @@ public final class SynapseNode extends ScreenElement {
         this.target = target;
     }
 
-    /** @see ScreenElement */
+    /**
+     * @see ScreenElement
+     */
     public void resetColors() {
         line.setStrokePaint(lineColor);
         updateColor();
@@ -539,4 +581,12 @@ public final class SynapseNode extends ScreenElement {
         return line;
     }
 
+    public Arc2D.Float getArcBound() {
+        return arcBound;
+    }
+
+
+    public Line2D.Float getLineBound() {
+        return lineBound;
+    }
 }

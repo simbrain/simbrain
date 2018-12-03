@@ -62,16 +62,6 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     private OdorWorld world;
 
     /**
-     * The absolute location of this sensor in the world
-     */
-    private Point2D.Double location = new Point2D.Double();
-
-    /**
-     * The relative location of this sensor to the entity
-     */
-    private Point2D.Double relativeLocation = new Point2D.Double();
-
-    /**
      * The collision bound of this sensor
      */
     private RectangleCollisionBound collisionBound = new RectangleCollisionBound(
@@ -123,36 +113,14 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     /**
-     * Update the sensor {@link #location} and {@link #relativeLocation} base on the location information
-     * from the entity.
-     */
-    public void updateLocation() {
-        updateRelativeLocation();
-        location.setLocation(
-                relativeLocation.getX() + parent.getCenterX(),
-                relativeLocation.getY() + parent.getCenterY()
-        );
-    }
-
-    /**
-     * Update the sensor {@link #relativeLocation} base on the heading of the entity.
-     */
-    public void updateRelativeLocation() {
-        double x =  (radius * Math.cos(parent.getHeadingRadians() + theta))
-                        + parent.getEntityType().getImageWidth() / 2;
-        double y = -(radius * Math.sin(parent.getHeadingRadians() + theta))
-                        + parent.getEntityType().getImageWidth() / 2;
-        relativeLocation.setLocation(x, y);
-    }
-
-    /**
-     * Update the {@link #collisionBound} base on the updated {@link #location} of this sensor.
-     * This method will update both {@link #location} and {@link #relativeLocation} when called.
+     * Update the {@link #collisionBound} base on the updated location of this sensor.
      */
     public void updateCollisionBound() {
-        updateLocation();
         collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
-        collisionBound.setLocation(location.getX(), location.getY());
+        collisionBound.setLocation(
+                getRelativeLocation().getX() + parent.getX(),
+                getRelativeLocation().getY() + parent.getY()
+        );
     }
 
     @Override

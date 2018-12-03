@@ -77,7 +77,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     protected double radius = DEFAULT_RADIUS;
 
     /**
-     * The relative location of this sensor to the entity
+     * The relative location of this sensor to the top left of the entity
      */
     private Point2D.Double relativeLocation = new Point2D.Double();
 
@@ -168,8 +168,8 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     public double[] getLocation() {
         updateRelativeLocation();
         double[] ret = {relativeLocation.x, relativeLocation.y};
-        ret[0] += parent.getCenterX();
-        ret[1] += parent.getCenterY();
+        ret[0] += parent.getX();
+        ret[1] += parent.getY();
         return ret;
     }
 

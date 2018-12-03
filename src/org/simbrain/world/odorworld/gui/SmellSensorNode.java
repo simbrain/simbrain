@@ -39,7 +39,12 @@ public class SmellSensorNode extends EntityAttributeNode {
      */
     public SmellSensorNode(SmellSensor sensor) {
         this.sensor = sensor;
-        this.shape = PPath.createEllipse(0, 0, SENSOR_DIAMETER, SENSOR_DIAMETER);
+        this.shape = PPath.createEllipse(
+                - SENSOR_DIAMETER / 2,
+                - SENSOR_DIAMETER / 2,
+                SENSOR_DIAMETER,
+                SENSOR_DIAMETER
+        );
         setPickable(false);
         shape.setPickable(false);
         this.world = sensor.getParent().getParentWorld();

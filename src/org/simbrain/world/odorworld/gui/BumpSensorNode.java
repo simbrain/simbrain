@@ -24,7 +24,12 @@ public class BumpSensorNode extends EntityAttributeNode {
      */
     public BumpSensorNode(BumpSensor sensor) {
         this.sensor = sensor;
-        this.shape = PPath.createRectangle(0, 0, sensor.getSensorSize(), sensor.getSensorSize());
+        this.shape = PPath.createRectangle(
+                - sensor.getSensorSize() / 2,
+                - sensor.getSensorSize() / 2,
+                sensor.getSensorSize(),
+                sensor.getSensorSize()
+        );
         update();
         setPickable(false);
         shape.setPickable(false);

@@ -64,7 +64,7 @@ public class TrainPredictionNet implements NetworkUpdateAction {
         sim.errorNeuron.forceSetActivation(Math.sqrt(sumError));
 
         // Update all value synapses
-        for (Synapse synapse : sim.net.getNetwork().getFlatSynapseList()) {
+        for (Synapse synapse : sim.netBuilder.getNetwork().getFlatSynapseList()) {
             double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
             synapse.setStrength(newStrength);
             // System.out.println(newStrength);

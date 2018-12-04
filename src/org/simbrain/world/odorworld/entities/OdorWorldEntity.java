@@ -962,9 +962,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     //@Consumible(customDescriptionMethod="getId")
     public void goStraight(double amount) {
-        if (amount == 0) {
-            return;
-        }
         double radians = getHeadingRadians();
         dx = amount * Math.cos(radians);
         dy = -amount * Math.sin(radians);

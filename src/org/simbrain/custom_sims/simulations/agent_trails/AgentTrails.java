@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class AgentTrails extends RegisteredSimulation {
 
-    NetBuilder net;
+    NetBuilder netBuilder;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
@@ -80,8 +80,8 @@ public class AgentTrails extends RegisteredSimulation {
 
 
     private void buildNetwork() {
-        net = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
-        sensoryNet = net.addNeuronGroup(-9.25, 95.93, 3);
+        netBuilder = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
+        sensoryNet = netBuilder.addNeuronGroup(-9.25, 95.93, 3);
         //sensoryNet.setClamped(true);
         sensoryNet.setLabel("Sensory");
         cheeseNeuron = sensoryNet.getNeuronList().get(0);
@@ -91,7 +91,7 @@ public class AgentTrails extends RegisteredSimulation {
         fishNeuron = sensoryNet.getNeuronList().get(2);
         fishNeuron.setLabel("Fish");
 
-        actionNet = net.addNeuronGroup(0, -0.79, 3);
+        actionNet = netBuilder.addNeuronGroup(0, -0.79, 3);
         actionNet.setLabel("Actions");
         actionNet.setClamped(true);
         actionNet.setLabel("Actions");
@@ -103,17 +103,17 @@ public class AgentTrails extends RegisteredSimulation {
         leftNeuron = actionNet.getNeuronList().get(0);
         leftNeuron.setLabel("Left");
 
-        predictionNet = net.addNeuronGroup(231.02, 24.74, 3);
+        predictionNet = netBuilder.addNeuronGroup(231.02, 24.74, 3);
         predictionNet.setLabel("Predicted");
 
-        net.connectAllToAll(sensoryNet, predictionNet);
-        net.connectAllToAll(actionNet, predictionNet);
+        netBuilder.connectAllToAll(sensoryNet, predictionNet);
+        netBuilder.connectAllToAll(actionNet, predictionNet);
 
-        errorNeuron = net.addNeuron(268, 108);
+        errorNeuron = netBuilder.addNeuron(268, 108);
         //errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
-        net.getNetwork().addUpdateAction(new TrainPredictionNet(this));
+        netBuilder.getNetwork().addUpdateAction(new TrainPredictionNet(this));
 
     }
 
@@ -148,7 +148,7 @@ public class AgentTrails extends RegisteredSimulation {
     private void setUpPlot() {
         plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states + Predictions");
         plot.getProjectionModel().getProjector().setTolerance(.001);
-        sim.couple(net.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
+        sim.couple(netBuilder.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
 
         // Uncomment for prediction halo
         plot.getProjectionModel().getProjector().setUseColorManager(false);
@@ -168,37 +168,40 @@ public class AgentTrails extends RegisteredSimulation {
         // TODO: Finish fine-tuning all these values so that appropriate "trails" are created
         // Move past cheese
         panel.addButton("Cheese", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         // Move past Fish
         panel.addButton("Fish", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             mouse.setLocation(fishX, fishY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         // Move past flower
         panel.addButton("Flower", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             mouse.setLocation(flowerX, flowerY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         // Cheese > Fish
         panel.addButton("Cheese > Flower", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -207,11 +210,13 @@ public class AgentTrails extends RegisteredSimulation {
             sim.iterate(25);
             rightNeuron.forceSetActivation(0);
             sim.iterate(220);
+            straightNeuron.forceSetActivation(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         // Cheese > Flower
         panel.addButton("Cheese > Fish", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -220,10 +225,12 @@ public class AgentTrails extends RegisteredSimulation {
             sim.iterate(25);
             leftNeuron.forceSetActivation(0);
             sim.iterate(220);
+            straightNeuron.forceSetActivation(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         panel.addButton("Solar System", () -> {
-            net.getNetwork().clearActivations();
+            netBuilder.getNetwork().clearActivations();
             cheese.setVelocityX(2.05f);
             cheese.setVelocityY(2.05f);
             flower.setVelocityX(2.5f);
@@ -240,6 +247,7 @@ public class AgentTrails extends RegisteredSimulation {
             flower.setVelocityY(0);
             fish.setVelocityX(0);
             fish.setVelocityY(0);
+            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
       //// Save File

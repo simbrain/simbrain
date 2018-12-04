@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -86,7 +87,7 @@ public class CondensedConnectionPanel {
         connectorPanel.commitChanges();
         Sparse dbc = (Sparse) connectorPanel.getConnection();
 
-        SynapseGroup synGrp = new SynapseGroup(source, target, dbc);
+        SynapseGroup synGrp = SynapseGroup.createSynapseGroup(source, target, dbc);
 
         polarityPanel.commitChanges(synGrp);
 

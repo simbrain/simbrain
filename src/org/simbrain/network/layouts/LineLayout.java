@@ -80,6 +80,15 @@ public class LineLayout implements Layout {
     private double initialY;
 
     /**
+     * Create a line layout with a specified orientation and default spacing.
+     *
+     * @param orientation vertical or horizontal
+     */
+    public LineLayout(LineOrientation orientation) {
+        this(DEFAULT_SPACING, orientation);
+    }
+
+    /**
      * Create a layout.
      *
      * @param spacing     spacing between neurons

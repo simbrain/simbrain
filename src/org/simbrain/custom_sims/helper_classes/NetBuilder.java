@@ -55,6 +55,7 @@ public class NetBuilder {
         return neuron;
     }
 
+    //TODO: Rewrite with layout and rule objects
     /**
      * Add neurons at a specified location with a specified layout.
      */

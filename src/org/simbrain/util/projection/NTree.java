@@ -72,15 +72,13 @@ public class NTree implements Iterable<DataPoint> {
         branch, leaf
     }
 
-    ;
-
     /**
      * The root node, initialized to a leaf
      */
     private Node root = new Leaf();
 
     /**
-     * The number of dimensions this structure supports
+     * The number of dimensions this structure supports.
      */
     public final int dimensions;
 

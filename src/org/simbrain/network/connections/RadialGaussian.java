@@ -225,7 +225,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     }
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public RadialGaussian() {
         //this.setPermitDensityEditing(false);

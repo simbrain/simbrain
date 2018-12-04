@@ -788,7 +788,7 @@ public class Dataset {
             persistentData.add(getPoint(i));
         }
     }
-
+    
     /**
      * Initializes Dataset from persistent data.
      */
@@ -796,6 +796,7 @@ public class Dataset {
         logger = Logger.getLogger(Dataset.class);
         clear();
         for (DataPoint point : persistentData) {
+            //point.setLabel("");
             addPoint(point);
         }
     }

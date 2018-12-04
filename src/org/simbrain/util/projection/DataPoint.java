@@ -31,7 +31,7 @@ public class DataPoint {
     /**
      * String label that can be attached to a datapoint.
      */
-    private String label;
+    private String label = "";
 
     /**
      * Initialize a datapoint.

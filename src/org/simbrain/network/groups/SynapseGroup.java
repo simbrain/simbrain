@@ -282,7 +282,13 @@ public class SynapseGroup extends Group {
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
-        return createSynapseGroup(source, target, connectionManager, DEFAULT_EXCITATORY_RATIO, null, null);
+        SynapseGroup synGroup = new SynapseGroup(source, target, connectionManager);
+        synGroup.setRandomizers(DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
+        synGroup.makeConnections();
+        // Ensure that displayed ratio is consistent with actual ratio.
+        // Process of determining synapse polarity is stochastic.
+        synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
+        return synGroup;
     }
 
     /**
@@ -361,7 +367,7 @@ public class SynapseGroup extends Group {
      * @param target            target neuron group
      * @param connectionManager a connection object which builds this group
      */
-    public SynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
+    private SynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
         super(source.getParentNetwork());
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;

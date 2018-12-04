@@ -22,8 +22,6 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.EntityAttributeNode;
-import org.simbrain.world.odorworld.gui.SmellSensorNode;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
@@ -118,8 +116,4 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
         return "Smell";
     }
 
-    @Override
-    public EntityAttributeNode getNode() {
-        return new SmellSensorNode(this);
-    }
 }

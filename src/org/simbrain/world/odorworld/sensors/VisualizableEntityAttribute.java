@@ -7,11 +7,4 @@ import org.simbrain.world.odorworld.gui.EntityAttributeNode;
  */
 public interface VisualizableEntityAttribute {
 
-    /**
-     * Get the visual representation of this attribute.
-     *
-     * @return the sensor node
-     */
-    EntityAttributeNode getNode();
-
 }

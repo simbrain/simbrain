@@ -24,8 +24,6 @@ import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.EntityAttributeNode;
-import org.simbrain.world.odorworld.gui.SpeechNode;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.beans.PropertyChangeListener;
@@ -58,7 +56,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     private String phrase = DEFAULT_PHRASE;
 
     /**
-     * Maximum characters per row before warping around in a {@link SpeechNode}.
+     * Maximum characters per row before warping around in a SpeechNode.
      */
     @UserParameter(label = "Characters per Row",
             description = "The maximum number of characters that can be displayed in one row in the speech bubble. "
@@ -200,11 +198,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     @Override
     public String getName() {
         return "Speech";
-    }
-
-    @Override
-    public EntityAttributeNode getNode() {
-        return new SpeechNode(this);
     }
 
     public int getCharactersPerRow() {

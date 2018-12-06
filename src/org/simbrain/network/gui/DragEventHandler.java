@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PLayer;
 import org.piccolo2d.PNode;
@@ -34,6 +35,7 @@ import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.geom.*;
 import java.util.ArrayList;
@@ -214,9 +216,18 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
         super.drag(event);
 
-        // If the command/control button is down,
-        // pan the canvas.
-        if (event.isMetaDown()) {
+        // Pan the canvas for command-click on Mac and control-click on other systems
+        boolean panMode = false;
+        if(SystemUtils.IS_OS_MAC) {
+            if(event.isMetaDown()) {
+                panMode = true;
+            }
+        } else {
+            if (event.isControlDown()) {
+                panMode = true;
+            }
+        }
+        if (panMode) {
             pan(event);
             return;
         }

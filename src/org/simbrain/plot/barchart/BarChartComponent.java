@@ -77,10 +77,7 @@ public class BarChartComponent extends WorkspaceComponent {
 
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {
-        if (objectKey.equals(model.getId())) {
-            return model;
-        }
-        return null;
+        return model;
     }
 
     /**

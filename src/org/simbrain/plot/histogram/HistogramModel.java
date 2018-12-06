@@ -170,7 +170,7 @@ public class HistogramModel implements AttributeContainer {
      *
      * @param histData the array of histogram data
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void addData(double[] histData) {
         addData(histData, 0);
     }

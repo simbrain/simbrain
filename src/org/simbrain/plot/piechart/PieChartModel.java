@@ -84,7 +84,7 @@ public class PieChartModel implements AttributeContainer {
     /**
      * Called by coupling producers via reflection.
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setValues(double[] vector) {
 
         // Take care of size mismatches

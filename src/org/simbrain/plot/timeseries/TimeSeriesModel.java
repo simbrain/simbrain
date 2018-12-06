@@ -110,7 +110,7 @@ public class TimeSeriesModel implements AttributeContainer {
     /**
      * Called by coupling producers via reflection.
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void addValues(double[] vector) {
 
         // Take care of size mismatches

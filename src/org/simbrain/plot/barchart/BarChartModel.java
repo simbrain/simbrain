@@ -143,7 +143,7 @@ public class BarChartModel implements AttributeContainer {
     /**
      * Called by coupling producers via reflection.
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setBarValues(double[] newPoint) {
 
         // Take care of size mismatches
@@ -165,13 +165,6 @@ public class BarChartModel implements AttributeContainer {
 
     public void setBarNames(String[] names) {
         this.barNames = names;
-    }
-
-    /**
-     * Identify this model.
-     */
-    public String getId() {
-        return "BarChart";
     }
 
 }

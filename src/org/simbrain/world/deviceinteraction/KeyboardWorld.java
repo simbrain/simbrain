@@ -2,6 +2,7 @@ package org.simbrain.world.deviceinteraction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.util.Utils;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * @author Amanda Pandey
  */
-public class KeyboardWorld {
+public class KeyboardWorld implements AttributeContainer {
 
     protected final List<Character> tokenDictionary = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 

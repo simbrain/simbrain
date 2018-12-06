@@ -172,7 +172,7 @@ public abstract class WorkspaceComponent {
      * Return a collection of all {@link AttributeContainer}'s currently managed by this
      * component.
      */
-    public List getAttributeContainers() {
+    public List<AttributeContainer> getAttributeContainers() {
         return new ArrayList<AttributeContainer>();
     }
 
@@ -253,7 +253,7 @@ public abstract class WorkspaceComponent {
      */
     public void fireAttributeContainerChanged(AttributeContainer removedContainer) {
         for (WorkspaceComponentListener listener : listeners) {
-            listener.attributeContainerRemoved(removedContainer);
+            listener.attributeContainerChanged(removedContainer);
         }
     }
 

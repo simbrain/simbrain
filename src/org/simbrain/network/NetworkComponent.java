@@ -131,8 +131,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> retList = new ArrayList<Object>();
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> retList = new ArrayList<>();
         //retList.add(network);
         retList.addAll(network.getFlatNeuronList());
         retList.addAll(network.getSynapseList());

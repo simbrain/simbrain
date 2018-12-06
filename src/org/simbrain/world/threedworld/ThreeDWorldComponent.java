@@ -101,8 +101,8 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> models = new ArrayList<>();
         models.add(world);
         for (Entity entity : world.getEntities()) {
             models.add(entity);

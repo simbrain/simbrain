@@ -125,8 +125,8 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<Object>();
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> models = new ArrayList<>();
         models.add(model);
         return models;
     }

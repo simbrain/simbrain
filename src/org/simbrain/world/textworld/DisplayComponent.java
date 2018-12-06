@@ -171,12 +171,11 @@ public class DisplayComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> retList = new ArrayList<Object>();
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> retList = new ArrayList<>();
         retList.add(world);
         //retList.addAll(world.get);
         return retList;
-
     }
 
     /**

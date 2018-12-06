@@ -127,8 +127,8 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
-        List<Object> models = new ArrayList<>();
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> models = new ArrayList<>();
         models.add(this);
         models.addAll(columns);
         return models;

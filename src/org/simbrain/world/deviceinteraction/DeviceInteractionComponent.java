@@ -1,5 +1,6 @@
 package org.simbrain.world.deviceinteraction;
 
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -49,7 +50,7 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Object> getAttributeContainers() {
+    public List<AttributeContainer> getAttributeContainers() {
         return Arrays.asList(world);
     }
 

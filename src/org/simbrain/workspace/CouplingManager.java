@@ -25,25 +25,20 @@ public class CouplingManager {
      */
     private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
-    //TODO: Special events for attributes or make that part of coupling listeners?
-    // Wire up more events.
-    // Attribute added or changed.
-    // Using updated attribute descriptions at these events, e.g. prodicible.listDescriptorsMethod()
+    /**
+     * List of potential producers to be used in couplings.
+     */
+    private Map<Pair<AttributeContainer, Method>, Producer> potentialProducers = new HashMap<>();
+
+    /**
+     * List of potential consumers to be updated in couplings.
+     */
+    private Map<Pair<AttributeContainer, Method>, Consumer> potentialConsumers = new HashMap<>();
 
     /**
      * List of listeners to fire updates when couplings are changed.
      */
     private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
-
-    /**
-     * List of potential producers to be used in couplings.
-     */
-    private Map<Pair<Object, Method>, Producer> potentialProducers = new HashMap<>();
-
-    /**
-     * List of potential consumers to be updated in couplings.
-     */
-    private Map<Pair<Object, Method>, Consumer> potentialConsumers = new HashMap<>();
 
     /**
      * Construct a new coupling manager.
@@ -54,8 +49,13 @@ public class CouplingManager {
 
         // Update coupling list as components are added or removed
         workspace.addListener(new WorkspaceListener() {
+
             @Override
             public void workspaceCleared() {
+                // This should clear all couplings, producers, and consumers
+                // This is happening now in different ways
+                //   Couplings are cleared by directly getting the list from here and clearning it
+                //   Producers, consumers is not as clear. But see AttributePanel#Refresh
             }
 
             @Override
@@ -64,14 +64,38 @@ public class CouplingManager {
 
             @Override
             public void componentAdded(WorkspaceComponent component) {
+
+                // Any new producers or consumers should be added
+                // Example, when a new odor world is added, all the producers and consumers
+                // corresponding to the default objects should be added
+
+                // This might be enough, may not need anything above.
                 component.addListener(new WorkspaceComponentAdapter() {
 
+                    @Override
+                    public void attributeContainerAdded(AttributeContainer addedModel) {
+                        // Update producer/consumer list
+                        // Example; when a neuron is added, producers must be added
+
+                        System.out.println("CouplingManager.attributeContainerAdded");
+                    }
+
+                    @Override
+                    public void attributeContainerRemoved(AttributeContainer removedModel) {
+                        // Update producer / consumer list
+                        // Example; when a neuron is removed, producers must be removed
+
+                        System.out.println("CouplingManager.attributeContainerRemoved");
+                    }
                 });
             }
 
             @Override
             public void componentRemoved(WorkspaceComponent component) {
-                // TODO: Remove the listener added above
+                // Any producers, consumers, or couplings containing them
+                // that have been removed should also be removed
+
+                // May not be needed. If the attributeContainerRemoved events are fired
             }
         });
     }
@@ -197,7 +221,12 @@ public class CouplingManager {
      * @return A list of potential producers.
      */
     public List<Producer<?>> getProducers(WorkspaceComponent component) {
-        return getProducersFromContainers(component.getAttributeContainers());
+        List<Producer<?>> producers = new ArrayList<>();
+        // TODO: Note this is not using the internal map of producers
+        for (AttributeContainer container : component.getAttributeContainers()) {
+            producers.addAll(getProducersFromContainers(container));
+        }
+        return producers;
     }
 
     /**
@@ -207,36 +236,13 @@ public class CouplingManager {
      * @return A list of potential consumers.
      */
     public List<Consumer<?>> getConsumers(WorkspaceComponent component) {
-        return getConsumersFromContainers(component.getAttributeContainers());
-    }
-
-    /**
-     * Get all the potential producers from a list of  {@link AttributeContainer}'s.
-     *
-     * @param containers A list of models to check for Producibles.
-     * @return A list of producers.
-     */
-    public List<Producer<?>> getProducersFromContainers(List<AttributeContainer> containers) {
-        List<Producer<?>> producers = new ArrayList<>();
-        for (AttributeContainer container : containers) {
-            producers.addAll(getProducersFromContainers(container));
-        }
-        return producers;
-    }
-
-    /**
-     * Get all the potential consumers from a list of attribute containers.
-     *
-     * @param containers A list of attributecontainers to check for Consumables.
-     * @return A list of consumers.
-     */
-    public List<Consumer<?>> getConsumersFromContainers(List<AttributeContainer> containers) {
         List<Consumer<?>> consumers = new ArrayList<>();
-        for (AttributeContainer container : containers) {
+        for (AttributeContainer container : component.getAttributeContainers()) {
             consumers.addAll(getConsumersFromContainer(container));
         }
         return consumers;
     }
+
 
     /**
      * Get all the potential producers from an {@link AttributeContainer}.

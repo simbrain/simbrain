@@ -18,11 +18,10 @@
  */
 package org.simbrain.plot.timeseries;
 
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.title.LegendTitle;
-import org.simbrain.plot.ChartModel;
-import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 import javax.swing.*;
@@ -95,20 +94,20 @@ public class TimeSeriesPlotPanel extends JPanel {
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
-        // Create chart settings listener
-        model.addChartSettingsListener(new ChartSettingsListener() {
-            public void chartSettingsUpdated(ChartModel theModel) {
-                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-                if (!model.isAutoRange()) {
-                    chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
-                }
-                chart.getXYPlot().getDomainAxis().setAutoRange(true);
-                //chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
-            }
-        });
-
-        // Invoke an initial event in order to set default settings
-        model.fireSettingsChanged();
+        // // Create chart settings listener
+        // model.addChartSettingsListener(new ChartSettingsListener() {
+        //     public void chartSettingsUpdated(ChartModel theModel) {
+        //         chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+        //         if (!model.isAutoRange()) {
+        //             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
+        //         }
+        //         chart.getXYPlot().getDomainAxis().setAutoRange(true);
+        //         //chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
+        //     }
+        // });
+        //
+        // // Invoke an initial event in order to set default settings
+        // model.fireSettingsChanged();
     }
 
     /**

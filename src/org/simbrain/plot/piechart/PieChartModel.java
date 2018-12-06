@@ -20,8 +20,8 @@ package org.simbrain.plot.piechart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
-import org.simbrain.plot.ChartModel;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import java.util.stream.DoubleStream;
@@ -29,7 +29,7 @@ import java.util.stream.DoubleStream;
 /**
  * Model data for pie charts.
  */
-public class PieChartModel extends ChartModel {
+public class PieChartModel implements AttributeContainer {
 
     /**
      * JFreeChart dataset for pie charts.

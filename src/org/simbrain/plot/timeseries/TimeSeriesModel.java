@@ -21,7 +21,8 @@ package org.simbrain.plot.timeseries;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.ChartModel;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import java.util.function.Supplier;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 /**
  * Data model for a time series plot.
  */
-public class TimeSeriesModel extends ChartModel {
+public class TimeSeriesModel implements AttributeContainer {
 
     /**
      * Time Series Data.
@@ -151,7 +152,6 @@ public class TimeSeriesModel extends ChartModel {
 
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
-        fireSettingsChanged();
     }
 
     public double getRangeUpperBound() {
@@ -160,7 +160,6 @@ public class TimeSeriesModel extends ChartModel {
 
     public void setRangeUpperBound(final double upperBound) {
         this.rangeUpperBound = upperBound;
-        fireSettingsChanged();
     }
 
     public double getRangeLowerBound() {
@@ -169,7 +168,6 @@ public class TimeSeriesModel extends ChartModel {
 
     public void setRangeLowerBound(final double lowerRangeBoundary) {
         this.rangeLowerBound = lowerRangeBoundary;
-        fireSettingsChanged();
     }
 
     public XYSeriesCollection getDataset() {
@@ -182,7 +180,7 @@ public class TimeSeriesModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = ChartModel.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         return xstream;
     }
 
@@ -209,6 +207,5 @@ public class TimeSeriesModel extends ChartModel {
         for (Object s : dataset.getSeries()) {
             ((XYSeries) s).setMaximumItemCount(value);
         }
-        fireSettingsChanged();
     }
 }

@@ -22,8 +22,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.plot.ChartModel;
-import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
@@ -109,23 +107,23 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         }
 
         // Add a chart setting listener
-        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
-            // TODO: Explore parameters in chart, chart.getCategoryPlot(),
-            // chart.getCategoryPlot().getRenderer(), chartPanel..
-            public void chartSettingsUpdated(ChartModel model) {
-                // Update colors
-                chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
-                // Update auto-range
-                chart.getCategoryPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
-                // Update ranges
-                if (!getWorkspaceComponent().getModel().isAutoRange()) {
-                    chart.getCategoryPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerBound(), getWorkspaceComponent().getModel().getUpperBound());
-                }
-            }
-        });
+        // getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
+        //     // TODO: Explore parameters in chart, chart.getCategoryPlot(),
+        //     // chart.getCategoryPlot().getRenderer(), chartPanel..
+        //     public void chartSettingsUpdated(ChartModel model) {
+        //         // Update colors
+        //         chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
+        //         // Update auto-range
+        //         chart.getCategoryPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
+        //         // Update ranges
+        //         if (!getWorkspaceComponent().getModel().isAutoRange()) {
+        //             chart.getCategoryPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerBound(), getWorkspaceComponent().getModel().getUpperBound());
+        //         }
+        //     }
+        // });
 
         // Fire the chart listener to update settings
-        getWorkspaceComponent().getModel().fireSettingsChanged();
+        // getWorkspaceComponent().getModel().fireSettingsChanged();
     }
 
     /**
@@ -167,10 +165,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     public void update() {
     }
 
-    /**
-     * @param arg0
-     * @see ActionListener
-     */
+    @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             ReflectivePropertyEditor editor = new ReflectivePropertyEditor(getWorkspaceComponent().getModel());

@@ -21,15 +21,16 @@ package org.simbrain.plot.projection;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.ChartModel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.projection.*;
+import org.simbrain.workspace.AttributeContainer;
 
 import java.awt.*;
 
 /**
  * Main data for a projection chart.
  */
-public class ProjectionModel extends ChartModel {
+public class ProjectionModel implements AttributeContainer {
 
     /**
      * The underlying projector object.
@@ -141,7 +142,7 @@ public class ProjectionModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = ChartModel.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.omitField(ProjectionModel.class, "dataset");
         xstream.omitField(ProjectionModel.class, "isUpdateCompleted");
         xstream.omitField(ProjectionModel.class, "isRunning");

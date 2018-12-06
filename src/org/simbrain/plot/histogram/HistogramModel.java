@@ -13,8 +13,8 @@
 package org.simbrain.plot.histogram;
 
 import org.jfree.data.xy.IntervalXYDataset;
-import org.simbrain.plot.ChartModel;
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import java.awt.*;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class HistogramModel extends ChartModel {
+public class HistogramModel implements AttributeContainer {
 
     /**
      * The default number of bins.

@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.histogram;
 
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -83,13 +84,13 @@ public class HistogramComponent extends WorkspaceComponent {
      * @return bar chart component to be opened
      */
     public static HistogramComponent open(final InputStream input, final String name, final String format) {
-        HistogramModel dataModel = (HistogramModel) HistogramModel.getXStream().fromXML(input);
+        HistogramModel dataModel = (HistogramModel) Utils.getSimbrainXStream().fromXML(input);
         return new HistogramComponent(name, dataModel);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        HistogramModel.getXStream().toXML(model, output);
+        Utils.getSimbrainXStream().toXML(model, output);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return HistogramModel.getXStream().toXML(model);
+        return Utils.getSimbrainXStream().toXML(model);
     }
 
     @Override

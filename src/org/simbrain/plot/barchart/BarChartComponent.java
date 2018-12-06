@@ -59,8 +59,12 @@ public class BarChartComponent extends WorkspaceComponent {
 
     @Override
     public void setWorkspace(Workspace workspace) {
+
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
+
+        // When couplings are added, if the consumer is this bar chart, set the bar labels to the label array, if any
+        // of the producer
         getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
             @Override
             public void couplingAdded(Coupling<?> coupling) {
@@ -124,7 +128,6 @@ public class BarChartComponent extends WorkspaceComponent {
     public List<Object> getAttributeContainers() {
         List<Object> models = new ArrayList<Object>();
         models.add(model);
-//        models.addAll(model.getBars());
         return models;
     }
 }

@@ -20,7 +20,8 @@ package org.simbrain.plot.barchart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.simbrain.plot.ChartModel;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import java.awt.*;
@@ -28,7 +29,7 @@ import java.awt.*;
 /**
  * Data for a JFreeChart bar chart.
  */
-public class BarChartModel extends ChartModel {
+public class BarChartModel implements AttributeContainer {
 
     /**
      * JFreeChart dataset for bar charts.
@@ -87,7 +88,7 @@ public class BarChartModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = ChartModel.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         return xstream;
     }
 
@@ -102,19 +103,12 @@ public class BarChartModel extends ChartModel {
         return this;
     }
 
-    /**
-     * @return the barColor
-     */
     public Color getBarColor() {
         return barColor;
     }
 
-    /**
-     * @param barColor the barColor to set
-     */
     public void setBarColor(final Color barColor) {
         this.barColor = barColor;
-        fireSettingsChanged();
     }
 
     public boolean isAutoRange() {
@@ -123,7 +117,6 @@ public class BarChartModel extends ChartModel {
 
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
-        fireSettingsChanged();
     }
 
     public double getUpperBound() {
@@ -132,7 +125,6 @@ public class BarChartModel extends ChartModel {
 
     public void setUpperBound(final double upperBound) {
         this.upperBound = upperBound;
-        fireSettingsChanged();
     }
 
     public double getLowerBound() {
@@ -141,13 +133,11 @@ public class BarChartModel extends ChartModel {
 
     public void setLowerBound(final double lowerBound) {
         this.lowerBound = lowerBound;
-        fireSettingsChanged();
     }
 
     public void setRange(double lowerBound, double upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-        fireSettingsChanged();
     }
 
     /**
@@ -167,6 +157,7 @@ public class BarChartModel extends ChartModel {
             if (i < barNames.length) {
                 dataset.setValue((Number) newPoint[i], 1, barNames[i]);
             } else {
+                // TODO: May need to go to this condition for if barNames is empty
                 dataset.setValue((Number) newPoint[i], 1, "" + (i + 1));
             }
         }

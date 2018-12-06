@@ -25,8 +25,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.ChartModel;
-import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 import javax.swing.*;
@@ -116,28 +114,28 @@ public class RasterPlotPanel extends JPanel {
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
-        // Create chart settings listener
-        model.addChartSettingsListener(new ChartSettingsListener() {
-            public void chartSettingsUpdated(ChartModel theModel) {
-
-                // Handle range properties
-                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-                if (!model.isAutoRange()) {
-                    chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
-                }
-
-                // Handle domain properties
-                if (model.isFixedWidth()) {
-                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
-                } else {
-                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
-                    chart.getXYPlot().getDomainAxis().setAutoRange(true);
-                }
-            }
-        });
-
-        // Invoke an initial event in order to set default settings
-        model.fireSettingsChanged();
+        // // Create chart settings listener
+        // model.addChartSettingsListener(new ChartSettingsListener() {
+        //     public void chartSettingsUpdated(ChartModel theModel) {
+        //
+        //         // Handle range properties
+        //         chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+        //         if (!model.isAutoRange()) {
+        //             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
+        //         }
+        //
+        //         // Handle domain properties
+        //         if (model.isFixedWidth()) {
+        //             chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
+        //         } else {
+        //             chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
+        //             chart.getXYPlot().getDomainAxis().setAutoRange(true);
+        //         }
+        //     }
+        // });
+        //
+        // // Invoke an initial event in order to set default settings
+        // model.fireSettingsChanged();
     }
 
     /**

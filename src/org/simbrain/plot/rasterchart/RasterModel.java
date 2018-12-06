@@ -20,13 +20,13 @@ package org.simbrain.plot.rasterchart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.ChartModel;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.AttributeContainer;
 
 /**
  * Data model for a raster plot.
  */
-public class RasterModel extends ChartModel {
+public class RasterModel implements AttributeContainer {
 
     /**
      * Raster Data.
@@ -85,7 +85,7 @@ public class RasterModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = ChartModel.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         return xstream;
     }
 
@@ -112,7 +112,6 @@ public class RasterModel extends ChartModel {
      */
     public void setFixedWidth(final boolean fixedWidth) {
         this.fixedWidth = fixedWidth;
-        fireSettingsChanged();
     }
 
     /**
@@ -127,7 +126,6 @@ public class RasterModel extends ChartModel {
      */
     public void setWindowSize(final int windowSize) {
         this.windowSize = windowSize;
-        fireSettingsChanged();
     }
 
     /**
@@ -142,7 +140,6 @@ public class RasterModel extends ChartModel {
      */
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
-        fireSettingsChanged();
     }
 
     /**
@@ -157,7 +154,6 @@ public class RasterModel extends ChartModel {
      */
     public void setRangeUpperBound(final double upperBound) {
         this.rangeUpperBound = upperBound;
-        fireSettingsChanged();
     }
 
     /**
@@ -172,7 +168,6 @@ public class RasterModel extends ChartModel {
      */
     public void setRangeLowerBound(final double lowerRangeBoundary) {
         this.rangeLowerBound = lowerRangeBoundary;
-        fireSettingsChanged();
     }
 
     /**

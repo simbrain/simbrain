@@ -76,16 +76,12 @@ public class CouplingManager {
                     public void attributeContainerAdded(AttributeContainer addedModel) {
                         // Update producer/consumer list
                         // Example; when a neuron is added, producers must be added
-
-                        System.out.println("CouplingManager.attributeContainerAdded");
                     }
 
                     @Override
                     public void attributeContainerRemoved(AttributeContainer removedModel) {
                         // Update producer / consumer list
                         // Example; when a neuron is removed, producers must be removed
-
-                        System.out.println("CouplingManager.attributeContainerRemoved");
                     }
                 });
             }

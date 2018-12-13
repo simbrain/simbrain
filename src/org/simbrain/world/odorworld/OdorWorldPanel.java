@@ -40,6 +40,7 @@ import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
 import org.simbrain.world.odorworld.gui.WorldSelectionModel;
 
 import javax.swing.*;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -150,24 +151,6 @@ public class OdorWorldPanel extends JPanel {
         zoomHandler.zoomAboutMouse();
         canvas.addInputEventListener(zoomHandler);
 
-        // Create tile dialog on double clicks
-        canvas.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    Tile tile = getTile(e.getPoint());
-                    if (tile == null) {
-                        return;
-                    }
-                    AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
-                    StandardDialog dialog = ape.getDialog();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            }
-        });
-
         selectionModel = new WorldSelectionModel(this);
         selectionModel.addSelectionListener((e) -> {
             updateSelectionHandles(e);
@@ -276,7 +259,7 @@ public class OdorWorldPanel extends JPanel {
         return world.getTileMap().getTileStackAtPixel(point);
     }
 
-    public Tile getTile(Point point) {
+    public Tile getTile(Point2D point) {
         List<Tile> tileStack = world.getTileMap().getTileStackAtPixel(point);
         if (tileStack == null) {
             return null;

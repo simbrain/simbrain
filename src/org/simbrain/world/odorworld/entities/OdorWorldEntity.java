@@ -1047,9 +1047,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         addSensor(new SmellSensor(this, "Smell-Right",
             -Math.PI / 8, 50));
 
-        // Add an object sensor
-        addSensor(new ObjectSensor(this, EntityType.SWISS));
-
     }
 
     /**

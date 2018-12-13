@@ -32,6 +32,7 @@ import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.Tile;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
@@ -40,6 +41,7 @@ import org.simbrain.world.odorworld.dialogs.EntityDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -166,6 +168,16 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 EntityDialog dialog = new EntityDialog(entityNode.getEntity());
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            } else {
+                Tile tile = odorWorldPanel.getTile(event.getPosition());
+                if (tile == null) {
+                    return;
+                }
+                AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
+                StandardDialog dialog = ape.getDialog();
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
                 dialog.setVisible(true);
             }
             return;

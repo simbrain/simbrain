@@ -46,8 +46,10 @@ public class ObjectSensorNode extends EntityAttributeNode {
         diamondPath.closePath();
         this.shape = new PPath.Float(diamondPath);
         setPickable(false);
+        shape.setPickable(false);
         addChild(shape);
         labelText = new PText();
+        labelText.setPickable(false);
         labelText.setFont(labelText.getFont().deriveFont(9.0f));
         updateLabel();
         shape.addChild(labelText);

@@ -109,6 +109,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     private Point2D.Double manualMovementVelocity = new Point2D.Double();
 
+    /**
+     * Set to true when keyboard is being used for movement (instead of couplings, etc.).
+     */
     private boolean manualMode = false;
 
     /**
@@ -183,6 +186,12 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     private List<String> currentlyHeardPhrases = new ArrayList<String>();
 
     /**
+     * If true, the agent's heading is always updated based on its velocity.
+     */
+    @UserParameter(label = "Heading based on velocity", description = "If true, the agent's heading is updated at each iteration based on its velocity.", order = 100)
+    private boolean updateHeadingBasedOnVelocity = false;
+
+    /**
      * Construct an entity.
      *
      * @param world parent world of entity
@@ -228,9 +237,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             currentlyHeardPhrases.clear();
         }
 
-        // TODO: For now calling this by default. If this causes problems we
-        // can make it based on a flag.
-        //updateHeadingBasedOnVelocity();
+        if(updateHeadingBasedOnVelocity) {
+            updateHeadingBasedOnVelocity();
+        }
 
         changeSupport.firePropertyChange("updated", null, this);
 
@@ -1277,5 +1286,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         this.manualStraightMovementIncrement = manualStraightMovementIncrement;
     }
 
+    public boolean isUpdateHeadingBasedOnVelocity() {
+        return updateHeadingBasedOnVelocity;
+    }
 
+    public void setUpdateHeadingBasedOnVelocity(boolean updateHeadingBasedOnVelocity) {
+        this.updateHeadingBasedOnVelocity = updateHeadingBasedOnVelocity;
+    }
 }

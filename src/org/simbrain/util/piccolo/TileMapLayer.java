@@ -81,6 +81,9 @@ public class TileMapLayer {
      * @return the tile id
      */
     public Integer getTileIdAt(int x, int y) {
+        if (data.getGid().size() < (x + y * width)) {
+            return 0;
+        }
         return data.getGid().get(x + y * width);
     }
 

@@ -108,11 +108,14 @@ public class OdorWorldPanel extends JPanel {
     private class OdorWorldCanvas extends PCanvas {
         @Override
         public String getToolTipText(MouseEvent event) {
-            Tile selectedTile = getTile(event.getPoint());
-            if(selectedTile == null) {
+            List<Tile> selectedTiles = getTileStack(event.getPoint());
+            if(selectedTiles == null) {
                 return "";
             }
-            return "Id: " + selectedTile.getId();
+            StringBuilder sb = new StringBuilder("Tile Ids: ");
+            selectedTiles.stream().filter(Objects::nonNull).forEach(tile -> sb.append(" (" + tile.getId() + ")"));
+
+            return sb.toString();
         }
 
     }
@@ -241,6 +244,10 @@ public class OdorWorldPanel extends JPanel {
             PBounds cameraBounds = camera.getFullBounds();
 
             PNode firstNode = getFirstSelectedEntityNode();
+            if(firstNode == null) {
+                return;
+            }
+
             PBounds firstNodeBounds = firstNode.getFullBounds();
 
             double cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2;
@@ -263,6 +270,10 @@ public class OdorWorldPanel extends JPanel {
             camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));
             repaint();
         }
+    }
+
+    public List<Tile> getTileStack(Point point) {
+        return world.getTileMap().getTileStackAtPixel(point);
     }
 
     public Tile getTile(Point point) {

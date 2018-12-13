@@ -47,6 +47,14 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     private EntityType objectType = EntityType.SWISS;
 
     /**
+     * Should the sensor node show a label on top.
+     */
+    @UserParameter(label = "Show Label",
+            description = "Show label on top of the sensor node",
+            order = 4, defaultValue = "false")
+    private boolean showLabel = false;
+
+    /**
      * Instantiate an object sensor.
      *
      * @param parent     parent entity
@@ -113,5 +121,9 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
 
     public double getBaseValue() {
         return baseValue;
+    }
+
+    public boolean isShowLabel() {
+        return showLabel;
     }
 }

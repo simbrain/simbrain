@@ -27,6 +27,7 @@ import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 
 import javax.swing.*;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -101,6 +102,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isBoolean()) {
             return new YesNoNull();
+        }
+
+        if (parameter.isColor()) {
+            return new ColorSelector();
         }
 
         if (parameter.isEnum()) {
@@ -243,6 +248,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 ((YesNoNull) component).setSelected((Boolean) value);
             }
+        } else if (parameter.isColor()) {
+            ((ColorSelector) component).setValue((Color) value);
         } else if (parameter.isNumeric()) {
             ((JNumberSpinnerWithNull) component).setValue(value);
         } else if (parameter.getAnnotation().isObjectType()) {
@@ -271,6 +278,11 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.isBoolean()) {
             return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
         }
+
+        if (parameter.isColor()) {
+            return ((ColorSelector) component).getValue();
+        }
+
         if (parameter.isNumeric()) {
             return ((JNumberSpinnerWithNull) component).getValue();
         }

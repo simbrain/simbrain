@@ -20,7 +20,9 @@ package org.simbrain.plot.barchart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
@@ -29,7 +31,7 @@ import java.awt.*;
 /**
  * Data for a JFreeChart bar chart.
  */
-public class BarChartModel implements AttributeContainer {
+public class BarChartModel implements AttributeContainer, EditableObject {
 
     /**
      * JFreeChart dataset for bar charts.
@@ -39,21 +41,25 @@ public class BarChartModel implements AttributeContainer {
     /**
      * Color of bars in barchart.
      */
+    @UserParameter(label = "Bar Color", order = 4)
     private Color barColor = Color.red;
 
     /**
      * Auto range bar chart.
      */
+    @UserParameter(label = "Auto Range", order = 3, defaultValue = "true")
     private boolean autoRange = true;
 
     /**
      * Maximum range.
      */
+    @UserParameter(label = "Upper Bound", defaultValue = "10", order = 2)
     private double upperBound = 10;
 
     /**
      * Minimum range.
      */
+    @UserParameter(label = "Lower Bound", order = 1)
     private double lowerBound = 0;
 
     /**

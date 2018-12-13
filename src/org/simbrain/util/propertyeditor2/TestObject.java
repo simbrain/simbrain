@@ -17,7 +17,10 @@ import java.util.Arrays;
  */
 public class TestObject implements EditableObject {
 
-    // Color test
+    /**
+     * Color test
+     */
+    @UserParameter(label = "Color")
     Color theColor = Color.red;
 
     // Boolean tests

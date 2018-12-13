@@ -18,12 +18,14 @@
  */
 package org.simbrain.util;
 
+import java.awt.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,6 +143,13 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
+     * Returns true if the type of the field or method is Color.
+     */
+    public boolean isColor() {
+        return getType().equals(Color.class);
+    }
+
+    /**
      * Returns true iff the type of the field or method is String.
      */
     public boolean isString() {
@@ -205,6 +214,10 @@ public class Parameter implements Comparable<Parameter> {
 
         if (isBoolean()) {
             return false;
+        }
+
+        if (isColor()) {
+            return Color.BLACK;
         }
 
         if (isString()) {

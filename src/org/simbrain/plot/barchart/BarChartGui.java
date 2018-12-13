@@ -23,8 +23,10 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -168,8 +170,22 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            ReflectivePropertyEditor editor = new ReflectivePropertyEditor(getWorkspaceComponent().getModel());
-            JDialog dialog = editor.getDialog();
+            AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(getWorkspaceComponent().getModel());
+            StandardDialog dialog = editor.getDialog();
+            dialog.addClosingTask(() -> {
+                chart.getCategoryPlot()
+                        .getRenderer()
+                        .setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
+                chart.getCategoryPlot().getRangeAxis()
+                        .setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
+                if (!getWorkspaceComponent().getModel().isAutoRange()) {
+                    chart.getCategoryPlot().getRangeAxis()
+                            .setRange(
+                                    getWorkspaceComponent().getModel().getLowerBound(),
+                                    getWorkspaceComponent().getModel().getUpperBound()
+                            );
+                }
+            });
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);

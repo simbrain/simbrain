@@ -417,8 +417,8 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         @Override
         protected void closeDialogOk() {
-            super.closeDialogOk();
             commitChanges();
+            super.closeDialogOk();
             dispose();
         }
     }

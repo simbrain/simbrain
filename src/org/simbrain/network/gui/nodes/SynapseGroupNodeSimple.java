@@ -121,10 +121,12 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         if (halt.get()) {
             return;
         }
-
         if (group.isMarkedForDeletion()) {
             return;
         }
+        // if((sourceNode == null) || (targetNode == null)) {
+        //     return;
+        // }
 
         determineProperEndPoints();
         Point2D src = sourceNode.getDockingPoint(startPort, this);

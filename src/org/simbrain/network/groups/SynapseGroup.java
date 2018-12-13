@@ -582,9 +582,8 @@ public class SynapseGroup extends Group {
      */
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
-        getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(getParentNetwork(), this, this),
-            SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
-
+        // getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(getParentNetwork(), this, this),
+        //     SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
     }
 
     /**

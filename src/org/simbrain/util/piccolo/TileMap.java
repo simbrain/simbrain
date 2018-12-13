@@ -213,6 +213,7 @@ public class TileMap {
      * @return a list of tiles at that location in the same order as in the xml file
      */
     public List<Tile> getTileStackAtPixel(Point2D p) {
+        // TODO: This returns some null tiles, not sure why
         Point tileCoordinate = pixelToTileCoordinate(p);
         int tileCoordinateX = (int) tileCoordinate.getX();
         int tileCoordinateY = (int) tileCoordinate.getY();

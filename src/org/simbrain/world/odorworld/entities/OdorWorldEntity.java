@@ -217,8 +217,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public OdorWorldEntity(final OdorWorld world, final EntityType type) {
         this.parentWorld = world;
         setEntityType(type);
-        sensorsEnabled = type.useSensors;
-        effectorsEnabled = type.useEffectors;
+        sensorsEnabled = type.isUseSensors();
+        effectorsEnabled = type.isUseEffectors();
     }
 
     /**
@@ -545,7 +545,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             collisionBound.setVelocity(dx, dy);
         }
         collisionBound.setLocation(x, y);
-        collisionBound.setSize(entityType.imageWidth, entityType.imageHeight); // TODO: optimize
+        collisionBound.setSize(entityType.getImageWidth(), entityType.getImageHeight()); // TODO: optimize
     }
 
     /**
@@ -1014,7 +1014,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     public boolean isRotating() {
-        return entityType.isRotating;
+        return entityType.isRotating();
     }
 
     /**
@@ -1176,88 +1176,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         return radius * radius > dx * dx + dy * dy;
     }
 
-
-    // TODO: Put in all missing static objects
-    // TODO: Move to separate class?
-
-    /**
-     * Type of this object.  These are mapped to images, etc.
-     */
-    public enum EntityType {
-
-        SWISS("Swiss", false, false, false, 32, 32),
-        CANDLE("Candle", false, false, false, 32, 32),
-        FISH("Fish", false, false, false, 32, 32),
-        FLOWER("Flower", false, false, false, 32, 32),
-        MOUSE("Mouse", true, true, true, 40, 40),
-        AMY("Amy", true, true, true, 96, 96),
-        ARNO("Arno", true, true, true, 96, 96),
-        BOY("Boy", true, true, true, 96, 96),
-        COW("Cow", true, true, true, 96, 96),
-        GIRL("Girl", true, true, true, 96, 96),
-        JAKE("Jake", true, true, true, 96, 96),
-        LION("Lion", true, true, true, 96, 96),
-        STEVE("Steve", true, true, true, 96, 96),
-        SUSI("Susi", true, true, true, 96, 96);
-
-        /**
-         * String description that shows up in dialog boxes.
-         */
-        private final String description;
-
-        /**
-         * Whether the sprite representing this entity is based on heading.
-         */
-        private boolean isRotating;
-
-        /**
-         * Whether this entity type uses sensors by default.
-         */
-        private boolean useSensors;
-
-        /**
-         * Whether this entity type uses effectors by default.
-         */
-        private boolean useEffectors;
-
-        private int imageWidth;
-
-        private int imageHeight;
-
-        /**
-         * Create the entity
-         */
-        EntityType(
-            String description,
-            boolean isRotating,
-            boolean sensors,
-            boolean effectors,
-            int imageWidth,
-            int imageHeight
-        ) {
-            this.description = description;
-            this.isRotating = isRotating;
-            this.useSensors = sensors;
-            this.useEffectors = effectors;
-            this.imageWidth = imageWidth;
-            this.imageHeight = imageHeight;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-
-        public double getImageWidth() {
-            return imageWidth;
-        }
-
-        public double getImageHeight() {
-            return imageHeight;
-        }
-
-    }
-
     public boolean isManualMode() {
         return manualMode;
     }
@@ -1275,7 +1193,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public String getNearbyObjects() {
         List<OdorWorldEntity> entities = this.getEntitiesInRadius(7);
         //TODO: Need them ordered by distance
-        return entities.isEmpty() ? "" : entities.get(0).getEntityType().description;
+        return entities.isEmpty() ? "" : entities.get(0).getEntityType().getDescription();
     }
 
     public void setManualMotionTurnIncrement(double manualMotionTurnIncrement) {

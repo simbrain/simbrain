@@ -24,6 +24,7 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
@@ -174,8 +175,8 @@ public class OdorWorld implements EditableObject {
      */
     public void addAgent() {
 
-        OdorWorldEntity entity = new OdorWorldEntity(this, OdorWorldEntity.EntityType.MOUSE);
-        entity.setEntityType(OdorWorldEntity.EntityType.MOUSE);
+        OdorWorldEntity entity = new OdorWorldEntity(this, EntityType.MOUSE);
+        entity.setEntityType(EntityType.MOUSE);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
         entity.addDefaultSensorsEffectors();
         addEntity(entity);

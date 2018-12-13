@@ -23,6 +23,7 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -189,12 +190,12 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         OdorWorldBuilder world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
 
         // Mouse
-        mouse = world.addEntity(187, 113, OdorWorldEntity.EntityType.MOUSE);
+        mouse = world.addEntity(187, 113, EntityType.MOUSE);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(315, 31, OdorWorldEntity.EntityType.SWISS);
+        OdorWorldEntity cheese = world.addEntity(315, 31, EntityType.SWISS);
         worldEntities.add(cheese);
-        OdorWorldEntity flower = world.addEntity(41, 31, OdorWorldEntity.EntityType.FLOWER);
+        OdorWorldEntity flower = world.addEntity(41, 31, EntityType.FLOWER);
         flower.getSmellSource().setDispersion(dispersion);
         worldEntities.add(flower);
 

@@ -6,6 +6,7 @@ import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Producible;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -43,7 +44,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @UserParameter(label = "Object Type",
         description = "What type of object this sensor responds to",
         order = 3)
-    private OdorWorldEntity.EntityType objectType = OdorWorldEntity.EntityType.SWISS;
+    private EntityType objectType = EntityType.SWISS;
 
     /**
      * Instantiate an object sensor.
@@ -51,7 +52,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      * @param parent     parent entity
      * @param objectType the type (e.g. Swiss.gif)
      */
-    public ObjectSensor(OdorWorldEntity parent, OdorWorldEntity.EntityType objectType) {
+    public ObjectSensor(OdorWorldEntity parent, EntityType objectType) {
         super(parent, objectType.toString());
         this.objectType = objectType;
     }
@@ -69,7 +70,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         return decayFunction;
     }
 
-    public ObjectSensor(OdorWorldEntity parent, OdorWorldEntity.EntityType type, double angle, double radius) {
+    public ObjectSensor(OdorWorldEntity parent, EntityType type, double angle, double radius) {
         this(parent, type);
         setTheta(angle);
         setRadius(radius);

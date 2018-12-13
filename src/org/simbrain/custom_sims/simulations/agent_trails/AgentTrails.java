@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -128,11 +129,11 @@ public class AgentTrails extends RegisteredSimulation {
         mouse.setManualStraightMovementIncrement(2);
         mouse.setManualMotionTurnIncrement(2);
 
-        cheese = worldBuilder.addEntity(cheeseX, cheeseY, OdorWorldEntity.EntityType.SWISS, new double[]{1, 0, 0});
+        cheese = worldBuilder.addEntity(cheeseX, cheeseY, EntityType.SWISS, new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(dispersion);
-        flower = worldBuilder.addEntity(flowerX, flowerY, OdorWorldEntity.EntityType.FLOWER, new double[]{0, 1, 0});
+        flower = worldBuilder.addEntity(flowerX, flowerY, EntityType.FLOWER, new double[]{0, 1, 0});
         flower.getSmellSource().setDispersion(dispersion);
-        fish = worldBuilder.addEntity(fishX, fishY, OdorWorldEntity.EntityType.FISH, new double[]{0, 0, 1});
+        fish = worldBuilder.addEntity(fishX, fishY, EntityType.FISH, new double[]{0, 0, 1});
         fish.getSmellSource().setDispersion(dispersion);
         worldBuilder.getWorld().update();
 

@@ -20,6 +20,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.LocationSensor;
 
@@ -229,11 +230,11 @@ public class ActorCritic extends RegisteredSimulation {
         world.setObjectsBlockMovement(true);
         world.setWrapAround(false);
 
-        mouse = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
+        mouse = new OdorWorldEntity(world, EntityType.MOUSE);
         world.addEntity(mouse);
         resetMouse();
 
-        cheese = new OdorWorldEntity(world, OdorWorldEntity.EntityType.SWISS);
+        cheese = new OdorWorldEntity(world, EntityType.SWISS);
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
         cheese.setSmellSource(new SmellSource(new double[]{1, 0}, StepDecayFunction.create(), dispersion));

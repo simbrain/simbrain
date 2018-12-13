@@ -25,6 +25,7 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -114,27 +115,27 @@ public class PatternsOfActivity extends RegisteredSimulation {
         OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
-        OdorWorldEntity mouse = world.addEntity(120, 245, OdorWorldEntity.EntityType.MOUSE);
+        OdorWorldEntity mouse = world.addEntity(120, 245, EntityType.MOUSE);
         mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 45));
         mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 45));
         mouse.setUpdateHeadingBasedOnVelocity(true);
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(92, 220, OdorWorldEntity.EntityType.SWISS,
+        OdorWorldEntity cheese = world.addEntity(92, 220, EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(190, 221, OdorWorldEntity.EntityType.FLOWER,
+        OdorWorldEntity flower = world.addEntity(190, 221, EntityType.FLOWER,
             new double[] {3, 18, 2, 5, 10});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity cow = world.addEntity(90, 50, OdorWorldEntity.EntityType.COW,
+        OdorWorldEntity cow = world.addEntity(90, 50, EntityType.COW,
             new double[] {3, 7, 16, 19, 0});
         cow.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity lion = world.addEntity(300, 54, OdorWorldEntity.EntityType.LION,
+        OdorWorldEntity lion = world.addEntity(300, 54, EntityType.LION,
             new double[] {5, 2, 13, 16, 0});
         lion.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity susi = world.addEntity(97, 331, OdorWorldEntity.EntityType.SUSI,
+        OdorWorldEntity susi = world.addEntity(97, 331, EntityType.SUSI,
             new double[] {0, 12, 15, 20});
         susi.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity steve = world.addEntity(315, 305, OdorWorldEntity.EntityType.STEVE,
+        OdorWorldEntity steve = world.addEntity(315, 305, EntityType.STEVE,
             new double[] {12, 0, 20, 15});
         steve.getSmellSource().setDispersion(dispersion);
 

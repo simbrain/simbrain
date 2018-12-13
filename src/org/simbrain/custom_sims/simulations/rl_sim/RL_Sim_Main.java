@@ -18,6 +18,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -234,31 +235,31 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse.addSensor(rightSmell);
 
         // Set up smell sources
-        cheese = worldBuilder.addEntity(350, 29, OdorWorldEntity.EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
+        cheese = worldBuilder.addEntity(350, 29, EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
         cheese.getSmellSource().setDispersion(350);
-        candle = worldBuilder.addEntity(350, 29, OdorWorldEntity.EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
+        candle = worldBuilder.addEntity(350, 29, EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
         candle.getSmellSource().setDispersion(350);
-        flower = worldBuilder.addEntity(350, 212, OdorWorldEntity.EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
+        flower = worldBuilder.addEntity(350, 212, EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
         flower.getSmellSource().setDispersion(350);
 
         // Used in Vehicle class
         double dispersion = 300;
-        cheeseLeft = new ObjectSensor(mouse, OdorWorldEntity.EntityType.SWISS, Math.PI/8, 50);
+        cheeseLeft = new ObjectSensor(mouse, EntityType.SWISS, Math.PI/8, 50);
         cheeseLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(cheeseLeft);
-        cheeseRight = new ObjectSensor(mouse, OdorWorldEntity.EntityType.SWISS, -Math.PI/8, 50);
+        cheeseRight = new ObjectSensor(mouse, EntityType.SWISS, -Math.PI/8, 50);
         cheeseRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(cheeseRight);
-        flowerLeft = new ObjectSensor(mouse, OdorWorldEntity.EntityType.FLOWER, Math.PI/8, 50);
+        flowerLeft = new ObjectSensor(mouse, EntityType.FLOWER, Math.PI/8, 50);
         flowerLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(flowerLeft);
-        flowerRight = new ObjectSensor(mouse, OdorWorldEntity.EntityType.FLOWER, -Math.PI/8, 50);
+        flowerRight = new ObjectSensor(mouse, EntityType.FLOWER, -Math.PI/8, 50);
         flowerRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(flowerRight);
-        candleLeft = new ObjectSensor(mouse, OdorWorldEntity.EntityType.CANDLE, Math.PI/8, 50);
+        candleLeft = new ObjectSensor(mouse, EntityType.CANDLE, Math.PI/8, 50);
         candleLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(candleLeft);
-        candleRight = new ObjectSensor(mouse, OdorWorldEntity.EntityType.CANDLE, -Math.PI/8, 50);
+        candleRight = new ObjectSensor(mouse, EntityType.CANDLE, -Math.PI/8, 50);
         candleRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(candleRight);
 
@@ -350,18 +351,18 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // Positions determined by laying by hand and in console running
         // print(getNetwork("Neural Network"));
         Vehicle vehicleBuilder = new Vehicle(sim, net, world);
-        NeuronGroup pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, OdorWorldEntity.EntityType.SWISS, cheeseLeft, cheeseRight);
+        NeuronGroup pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, EntityType.SWISS, cheeseLeft, cheeseRight);
         pursueCheese.setLabel(strPursueCheese);
-        NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, OdorWorldEntity.EntityType.FLOWER, flowerLeft, flowerRight);
+        NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, EntityType.FLOWER, flowerLeft, flowerRight);
         pursueFlower.setLabel(strPursueFlower);
-        NeuronGroup pursueCandle = vehicleBuilder.addPursuer(163, -475, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
+        NeuronGroup pursueCandle = vehicleBuilder.addPursuer(163, -475, mouse, EntityType.CANDLE, candleLeft, candleRight);
         pursueCandle.setLabel(strPursueCandle);
 
-        // NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, OdorWorldEntity.EntityType.SWISS, cheeseLeft ,cheeseRight);
+        // NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, EntityType.SWISS, cheeseLeft ,cheeseRight);
         // avoidCheese.setLabel(strAvoidCheese);
-        // NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, OdorWorldEntity.EntityType.FLOWER, flowerLeft, flowerRight);
+        // NeuronGroup avoidFlower = vehicleBuilder.addAvoider(-41, -240, mouse, EntityType.FLOWER, flowerLeft, flowerRight);
         // avoidFlower.setLabel(strAvoidFlower);
-        // NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, OdorWorldEntity.EntityType.CANDLE, candleLeft, candleRight);
+        // NeuronGroup avoidCandle = vehicleBuilder.addAvoider(218, -239, mouse, EntityType.CANDLE, candleLeft, candleRight);
         // avoidCandle.setLabel(strAvoidCandle);
 
         setUpVehicle(pursueCheese);

@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -31,13 +32,13 @@ public class OdorWorldBuilder {
 
     /// NEW STUFF ///
 
-    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type) {
+    public OdorWorldEntity addEntity(int x, int y, EntityType type) {
         OdorWorldEntity entity = createEntity(x,y, type);
         world.addEntity(entity);
         return entity;
     }
 
-    public OdorWorldEntity createEntity(int x, int y, OdorWorldEntity.EntityType type) {
+    public OdorWorldEntity createEntity(int x, int y, EntityType type) {
         OdorWorldEntity entity = new OdorWorldEntity(world, type);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
@@ -45,13 +46,13 @@ public class OdorWorldBuilder {
         return entity;
     }
 
-    public OdorWorldEntity createEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
+    public OdorWorldEntity createEntity(int x, int y, EntityType type, double[] stimulus) {
         OdorWorldEntity entity = createEntity(x, y, type);
         entity.setSmellSource(new SmellSource(stimulus));
         return entity;
     }
 
-    public OdorWorldEntity addEntity(int x, int y, OdorWorldEntity.EntityType type, double[] stimulus) {
+    public OdorWorldEntity addEntity(int x, int y, EntityType type, double[] stimulus) {
         OdorWorldEntity entity = createEntity(x,y,type,stimulus);
         world.addEntity(entity);
         return entity;
@@ -69,7 +70,7 @@ public class OdorWorldBuilder {
      * @return reference to the agent
      */
     public OdorWorldEntity addAgent(int x, int y, String type) {
-        OdorWorldEntity entity = new OdorWorldEntity(world, OdorWorldEntity.EntityType.MOUSE);
+        OdorWorldEntity entity = new OdorWorldEntity(world, EntityType.MOUSE);
         world.addEntity(entity);
         entity.setLocation(x, y);
         return entity;

@@ -20,6 +20,7 @@ import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -158,18 +159,18 @@ public class KuramotoOscillators extends RegisteredSimulation {
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
 
         // Mouse
-        mouse = world.addEntity(202, 176, OdorWorldEntity.EntityType.MOUSE);
+        mouse = world.addEntity(202, 176, EntityType.MOUSE);
         mouse.addSensor(new SmellSensor(mouse, "Smell-Center", 0, 0));
         mouse.setHeading(90);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(55, 306, OdorWorldEntity.EntityType.SWISS,
+        OdorWorldEntity cheese = world.addEntity(55, 306, EntityType.SWISS,
             new double[] {25,0,0});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(351, 311, OdorWorldEntity.EntityType.FLOWER,
+        OdorWorldEntity flower = world.addEntity(351, 311, EntityType.FLOWER,
             new double[] {0,25,0});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity fish = world.addEntity(160, 14, OdorWorldEntity.EntityType.FISH,
+        OdorWorldEntity fish = world.addEntity(160, 14, EntityType.FISH,
             new double[] {0,0,25});
         fish.getSmellSource().setDispersion(dispersion);
 

@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
@@ -76,7 +77,7 @@ public class Vehicle {
      * @param objectType  what kind of object this vehicles pursues or avoids
      * @return a reference to the resulting neuron group
      */
-    public NeuronGroup addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, OdorWorldEntity.EntityType objectType,
+    public NeuronGroup addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, EntityType objectType,
         ObjectSensor leftSensor, ObjectSensor rightSensor) {
 
         // Create the network
@@ -132,14 +133,14 @@ public class Vehicle {
     /**
      * Add a pursuer.
      */
-    public NeuronGroup addPursuer(int x, int y, OdorWorldEntity agent, OdorWorldEntity.EntityType objectType, ObjectSensor left, ObjectSensor right) {
+    public NeuronGroup addPursuer(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
         return addVehicle(x, y, agent, VehicleType.PURSUER, objectType, left, right);
     }
 
     /**
      * Add an avoider.
      */
-    public NeuronGroup addAvoider(int x, int y, OdorWorldEntity agent, OdorWorldEntity.EntityType objectType, ObjectSensor left, ObjectSensor right) {
+    public NeuronGroup addAvoider(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
         return addVehicle(x, y, agent, VehicleType.AVOIDER, objectType, left, right);
     }
 

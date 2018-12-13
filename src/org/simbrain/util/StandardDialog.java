@@ -21,8 +21,12 @@ package org.simbrain.util;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 /**
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
@@ -90,6 +94,12 @@ public class StandardDialog extends GenericJDialog {
      * The content pane for holding user components.
      */
     private Container myUserContentPane;
+
+    /**
+     * Tasks to execute whe closing with "Ok" (when cancel is pressed these
+     * are _not_ invoked).
+     */
+    private List<Runnable> invokeWhenClosing = new ArrayList<>();
 
     /**
      * This method is the default constructor.
@@ -198,9 +208,21 @@ public class StandardDialog extends GenericJDialog {
     }
 
     /**
+     * Adds a function to invoke when closing the dialog.
+     *
+     * @param task a Runnable to execute when closing
+     */
+    public void addClosingTask(Runnable task) {
+        invokeWhenClosing.add(task);
+    }
+
+    /**
      * Override to perform specific clean up when dialog closed.
      */
     protected void closeDialogOk() {
+        for (Runnable task : invokeWhenClosing) {
+            task.run();
+        }
         dispose();
     }
 

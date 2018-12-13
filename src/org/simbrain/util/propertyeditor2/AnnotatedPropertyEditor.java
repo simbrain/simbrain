@@ -414,8 +414,10 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      * Extension of Standard Dialog for Editor Panel
      */
     private class EditorDialog extends StandardDialog {
+
         @Override
         protected void closeDialogOk() {
+            super.closeDialogOk();
             commitChanges();
             dispose();
         }

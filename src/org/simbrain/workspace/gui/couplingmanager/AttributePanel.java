@@ -133,19 +133,19 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      */
     private void addAttributeListener(WorkspaceComponent component) {
         component.addListener(new WorkspaceComponentAdapter() {
-            public void modelAdded(Object model) {
+            public void attributeContainerAdded(AttributeContainer model) {
                 if (isSelectedComponent(component)) {
                     refresh(component);
                 }
             }
 
-            public void modelRemoved(Object model) {
+            public void attributeContainerRemoved(AttributeContainer model) {
                 if (isSelectedComponent(component)) {
                     refresh(component);
                 }
             }
 
-            public void modelChanged() {
+            public void attributeContainerChanged(AttributeContainer model) {
                 if (isSelectedComponent(component)) {
                     refresh(component);
                 }

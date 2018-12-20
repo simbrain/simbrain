@@ -81,6 +81,7 @@ public class CouplingManager {
                     @Override
                     public void attributeContainerRemoved(AttributeContainer removedModel) {
                         // Update producer / consumer list
+                        removeDeadCouplings(removedModel);
                         // Example; when a neuron is removed, producers must be removed
                     }
                 });
@@ -489,6 +490,26 @@ public class CouplingManager {
     public void addCoupling(Coupling<?> coupling) {
         getCouplings().add(coupling);
         fireCouplingAdded(coupling);
+    }
+
+    /**
+     * Remove any couplings associated with the "dead" object.
+     *
+     * @param object the object that has been removed
+     */
+    private void removeDeadCouplings(AttributeContainer object) {
+        List<Coupling<?>> toRemove = new ArrayList<>();
+        for (Coupling<?> coupling : getCouplings()) {
+            if (coupling.getConsumer().getBaseObject() == object) {
+                toRemove.add(coupling);
+            }
+            if (coupling.getProducer().getBaseObject() == object) {
+                toRemove.add(coupling);
+            }
+        }
+        for (Coupling<?> coupling : toRemove) {
+            removeCoupling(coupling);
+        }
     }
 
     public void updateCouplings() {

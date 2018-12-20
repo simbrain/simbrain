@@ -141,6 +141,7 @@ public abstract class WorkspaceComponent {
      */
     public void close() {
         closing();
+        getAttributeContainers().forEach(this::fireAttributeContainerRemoved);
         workspace.removeWorkspaceComponent(this);
     }
 
@@ -173,7 +174,7 @@ public abstract class WorkspaceComponent {
      * component.
      */
     public List<AttributeContainer> getAttributeContainers() {
-        return new ArrayList<AttributeContainer>();
+        return new ArrayList<>();
     }
 
     /**

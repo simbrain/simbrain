@@ -25,8 +25,10 @@ import org.simbrain.workspace.gui.GuiComponent;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a component in a Simbrain {@link Workspace}. Extend this class to
@@ -181,6 +183,24 @@ public abstract class WorkspaceComponent {
      */
     public List<AttributeContainer> getAttributeContainers() {
         return new ArrayList<>();
+    }
+
+    /**
+     * Get all {@link Producible} or {@link Consumable} methods in this workspace component.
+     *
+     * @param annotation Annotation of the methods. Expect {@link Producible} or {@link Consumable}.
+     * @return a list of all attribute methods in this component.
+     */
+    public List<Method> getAttributeMethods(Class<? extends Annotation> annotation) {
+        if (annotation != Producible.class && annotation != Consumable.class) {
+            return null;
+        }
+        return getAttributeContainers().stream()
+                .map(Object::getClass)
+                .distinct()
+                .flatMap(c -> Arrays.stream(c.getMethods()))
+                .filter(m -> m.isAnnotationPresent(annotation))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -368,19 +388,11 @@ public abstract class WorkspaceComponent {
      */
     public Map<Method, Boolean> getAttributeTypeVisibilityMap() {
         if (attributeTypeVisibilityMap.isEmpty()) {
-            getAttributeContainers().stream()
-                    .map(Object::getClass)
-                    .distinct()
-                    .flatMap(c -> Arrays.stream(c.getMethods()))
-                    .filter(m -> m.isAnnotationPresent(Producible.class))
+            getAttributeMethods(Producible.class)
                     .forEach(m -> attributeTypeVisibilityMap
                             .put(m, m.getAnnotation(Producible.class).defaultVisibility())
                     );
-            getAttributeContainers().stream()
-                    .map(Object::getClass)
-                    .distinct()
-                    .flatMap(c -> Arrays.stream(c.getMethods()))
-                    .filter(m -> m.isAnnotationPresent(Consumable.class))
+            getAttributeMethods(Consumable.class)
                     .forEach(m -> attributeTypeVisibilityMap
                             .put(m, m.getAnnotation(Consumable.class).defaultVisibility())
                     );

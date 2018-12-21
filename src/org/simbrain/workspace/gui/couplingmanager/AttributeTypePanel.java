@@ -70,19 +70,11 @@ public class AttributeTypePanel extends JPanel {
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
         if (poc == ProducerOrConsumer.Consuming) {
             setBorder(BorderFactory.createTitledBorder("Consumers"));
-            component.getAttributeContainers().stream()
-                    .map(Object::getClass)
-                    .distinct()
-                    .flatMap(c -> Arrays.stream(c.getMethods()))
-                    .filter(m -> m.isAnnotationPresent(Consumable.class))
+            component.getAttributeMethods(Consumable.class)
                     .forEach(a -> model.addRow(a));
         } else {
             setBorder(BorderFactory.createTitledBorder("Producers"));
-            component.getAttributeContainers().stream()
-                    .map(Object::getClass)
-                    .distinct()
-                    .flatMap(c -> Arrays.stream(c.getMethods()))
-                    .filter(m -> m.isAnnotationPresent(Producible.class))
+            component.getAttributeMethods(Producible.class)
                     .forEach(a -> model.addRow(a));
         }
     }

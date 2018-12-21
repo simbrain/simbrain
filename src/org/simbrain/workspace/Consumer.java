@@ -16,13 +16,20 @@ public class Consumer<V> extends Attribute {
      *
      * @param baseObject object consuming values
      * @param method the "getter" that consumes values
-     * @param description description for the gui
-     * @param idMethod id method for base object, used in description
-     * @param customDescMethod method reference for custom descriptions
-     * @param visibility whether this attribute is visible in the gui
      */
-    public Consumer(Object baseObject, Method method, String description, Method idMethod, Method customDescMethod, boolean visibility) {
-        super(baseObject, method, description, idMethod, customDescMethod, visibility);
+    private Consumer(AttributeContainer baseObject, Method method) {
+        super(baseObject, method);
+    }
+
+    /**
+     * Create an consumer with no custom options.
+     *
+     * @param baseObject The object that contains the setter to be called
+     * @param method The setter method
+     * @return a consumer with only required fields.
+     */
+    private static Consumer create(AttributeContainer baseObject, Method method) {
+        return builder(baseObject, method).build();
     }
 
     /**
@@ -42,5 +49,47 @@ public class Consumer<V> extends Attribute {
     @Override
     public Type getType() {
         return method.getGenericParameterTypes()[0];
+    }
+
+    /**
+     * Get the builder to create and customize a Consumer.
+     *
+     * @param baseObject The object that contains the setter to be called
+     * @param method The setter method
+     * @return the builder
+     */
+    public static ConsumerBuilder builder(AttributeContainer baseObject, Method method) {
+        return new ConsumerBuilder(baseObject, method);
+    }
+
+    public static class ConsumerBuilder extends AttributeBuilder<
+            ConsumerBuilder,
+            Consumer
+            > {
+
+        /**
+         * The product from this builder.
+         */
+        private Consumer product;
+
+        /**
+         * Construct a builder.
+         *
+         * @param baseObject The object that contains the setter to be called
+         * @param method The setter method
+         */
+        ConsumerBuilder(AttributeContainer baseObject, Method method) {
+            product = new Consumer(baseObject, method);
+        }
+
+        @Override
+        protected Consumer product() {
+            return product;
+        }
+
+        @Override
+        public Consumer build() {
+            return product;
+        }
     }
 }

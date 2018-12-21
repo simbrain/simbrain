@@ -18,7 +18,7 @@ public abstract class Attribute {
     /**
      * The object that contains the getter or setter to be called.
      */
-    protected Object baseObject;
+    protected AttributeContainer baseObject;
 
     /**
      * The getter method (for produces) or setter method (for consumers).
@@ -42,7 +42,7 @@ public abstract class Attribute {
      * Whether the attribute shows up in the GUI.  Invisible attribute can still
      * be part of couplings (if created in a script).
      */
-    protected boolean visibility;
+    protected boolean visibility = true;
 
     /**
      * The String description of the attribute. By default has this form:
@@ -63,19 +63,10 @@ public abstract class Attribute {
      *                          be called.
      * @param method            The getter method (for produces) or setter
      *                          method (for consumers).
-     * @param description       optional simple custom description (just a
-     *                          string)
-     * @param idMethod          method which returns an id for the object.
-     * @param customDescription method which returns a custom description
-     * @param visibility
      */
-    public Attribute(Object baseObject, Method method, String description, Method idMethod, Method customDescription, boolean visibility) {
+    public Attribute(AttributeContainer baseObject, Method method) {
         this.baseObject = baseObject;
         this.method = method;
-        this.description = description;
-        this.customDescriptionMethod = customDescription;
-        this.idMethod = idMethod;
-        this.visibility = visibility;
     }
 
     /**
@@ -184,5 +175,83 @@ public abstract class Attribute {
 
     public void setVisible(boolean visible) {
         visibility = visible;
+    }
+
+    /**
+     * Base builder for {@link Consumer} and {@link Producer} instances.
+     * Create custom instances of the specific implementation of {@link Attribute} by using
+     * the setter methods on this class.
+     * After zero or more of these, use the build() method to create a specific {@link Attribute} instance.
+     * If no special set-up is needed, just use, for example, in the case of Consumer,
+     * {@code Consumer.builder(container, method).build()} or the short-cut equivalent
+     * {@code Consumer.create(container, method)}.
+     *
+     * See {@link org.simbrain.util.math.ProbabilityDistribution.ProbabilityDistributionBuilder} for a detailed example.
+     *
+     * @param <B> The type of the builder to return when building
+     * @param <T> The type of the final product to return when finish building.
+     */
+    public abstract static class AttributeBuilder<
+            B extends AttributeBuilder,
+            T extends Attribute
+            > {
+
+        /**
+         * Uniform access to the product being build. Only used in this abstract class
+         * where the product cannot be instantiate yet.
+         *
+         * @return the product being build
+         */
+        protected abstract T product();
+
+        /**
+         * Set a simple custom description string.
+         *
+         * @param description a simple custom description
+         * @return the Builder instance (for use in chained initialization)
+         */
+        public B description(String description) {
+            product().description = description;
+            return (B) this;
+        }
+
+        /**
+         * Set method used to get an id for the attribute.
+         *
+         * @param idMethod the method used to get an id for the attribute
+         * @return the Builder instance (for use in chained initialization)
+         */
+        public B idMethod(Method idMethod) {
+            product().idMethod = idMethod;
+            return (B) this;
+        }
+
+        /**
+         * Set method that supplies a custom description method.
+         *
+         * @param customDescription the custom description method
+         * @return the Builder instance (for use in chained initialization)
+         */
+        public B customDescription(Method customDescription) {
+            product().customDescriptionMethod = customDescription;
+            return (B) this;
+        }
+
+        /**
+         * Set whether the attribute shows up in the GUI.
+         *
+         * @param visibility true if the attribute should show up in the GUI
+         * @return the Builder instance (for use in chained initialization)
+         */
+        public B visibility(boolean visibility) {
+            product().visibility = visibility;
+            return (B) this;
+        }
+
+        /**
+         * Builds a instance of specific Attribute of given states.
+         * @return the final product
+         */
+        public abstract T build();
     }
 }

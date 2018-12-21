@@ -23,15 +23,20 @@ public class Producer<V> extends Attribute {
      *
      * @param baseObject object producing values
      * @param method the "setter" that produces values
-     * @param description description for the gui
-     * @param idMethod id method for base object, used in description
-     * @param customMethod method reference for custom descriptions
-     * @param visibility whether this attribute is visible in the gui
      */
-    public Producer(Object baseObject, Method method, String description,
-                    Method idMethod, Method customMethod, Method arrayDescriptionMethod,  boolean visibility) {
-        super(baseObject, method, description, idMethod, customMethod, visibility);
-        this.arrayDescriptionMethod = arrayDescriptionMethod;
+    private Producer(AttributeContainer baseObject, Method method) {
+        super(baseObject, method);
+    }
+
+    /**
+     * Create an Producer with no custom options.
+     *
+     * @param baseObject The object that contains the getter to be called
+     * @param method The getter method
+     * @return a Producer with only required fields.
+     */
+    private static Producer create(AttributeContainer baseObject, Method method) {
+        return builder(baseObject, method).build();
     }
 
     /**
@@ -70,4 +75,57 @@ public class Producer<V> extends Attribute {
         }
     }
 
+    /**
+     * Get the builder to create and customize a Producer.
+     *
+     * @param baseObject The object that contains the getter to be called
+     * @param method The getter method
+     * @return the builder
+     */
+    public static ProducerBuilder builder(AttributeContainer baseObject, Method method) {
+        return new ProducerBuilder(baseObject, method);
+    }
+
+    public static class ProducerBuilder extends AttributeBuilder<
+            ProducerBuilder,
+            Producer
+            > {
+
+        /**
+         * The product from this builder.
+         */
+        private Producer product;
+
+        /**
+         * Construct a builder.
+         *
+         * @param baseObject The object that contains the getter to be called
+         * @param method The getter method
+         */
+        ProducerBuilder(AttributeContainer baseObject, Method method) {
+            product = new Producer(baseObject, method);
+        }
+
+        /**
+         * Set an array description method.
+         * {@see Producible#arrayDescriptionMethod()}.
+         *
+         * @param arrayDescriptionMethod the array description method to set
+         * @return the Builder instance (for use in chained initialization)
+         */
+        public ProducerBuilder arrayDescriptionMethod(Method arrayDescriptionMethod) {
+            product.arrayDescriptionMethod = arrayDescriptionMethod;
+            return this;
+        }
+
+        @Override
+        protected Producer product() {
+            return product;
+        }
+
+        @Override
+        public Producer build() {
+            return product;
+        }
+    }
 }

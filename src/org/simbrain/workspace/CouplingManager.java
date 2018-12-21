@@ -358,13 +358,14 @@ public class CouplingManager {
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not producible.", method.getName()));
         }
-        Method idMethod = getMethod(container, annotation.idMethod());
-        Method customDescriptionMethod = getMethod(container, annotation.customDescriptionMethod());
-        Method arrayDescriptionMethod = getMethod(container, annotation.arrayDescriptionMethod());
 
-        String description = annotation.description();
-        boolean visibility = annotation.defaultVisibility();
-        return new Producer(container, method, description, idMethod, customDescriptionMethod, arrayDescriptionMethod, visibility);
+        return Producer.builder(container, method)
+                .description(annotation.description())
+                .idMethod(getMethod(container, annotation.idMethod()))
+                .customDescription(getMethod(container, annotation.customDescriptionMethod()))
+                .arrayDescriptionMethod(getMethod(container, annotation.arrayDescriptionMethod()))
+                .visibility(annotation.defaultVisibility())
+                .build();
     }
 
     /**
@@ -376,11 +377,13 @@ public class CouplingManager {
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
         }
-        Method idMethod = getMethod(container, annotation.idMethod());
-        Method customDescriptionMethod = getMethod(container, annotation.customDescriptionMethod());
-        String description = annotation.description();
-        boolean visibility = annotation.defaultVisibility();
-        return new Consumer(container, method, description, idMethod, customDescriptionMethod, visibility);
+
+        return Consumer.builder(container, method)
+                .idMethod(getMethod(container, annotation.idMethod()))
+                .customDescription(getMethod(container, annotation.customDescriptionMethod()))
+                .description(annotation.description())
+                .visibility(annotation.defaultVisibility())
+                .build();
 
     }
 

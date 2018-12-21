@@ -35,7 +35,7 @@ public class Producer<V> extends Attribute {
      * @param method The getter method
      * @return a Producer with only required fields.
      */
-    private static Producer create(AttributeContainer baseObject, Method method) {
+    public static Producer create(AttributeContainer baseObject, Method method) {
         return builder(baseObject, method).build();
     }
 

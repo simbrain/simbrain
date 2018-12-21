@@ -28,7 +28,7 @@ public class Consumer<V> extends Attribute {
      * @param method The setter method
      * @return a consumer with only required fields.
      */
-    private static Consumer create(AttributeContainer baseObject, Method method) {
+    public static Consumer create(AttributeContainer baseObject, Method method) {
         return builder(baseObject, method).build();
     }
 

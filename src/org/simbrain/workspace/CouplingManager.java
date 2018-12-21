@@ -26,16 +26,6 @@ public class CouplingManager {
     private final List<Coupling<?>> couplings = new ArrayList<Coupling<?>>();
 
     /**
-     * List of potential producers to be used in couplings.
-     */
-    private Map<Pair<AttributeContainer, Method>, Producer> potentialProducers = new HashMap<>();
-
-    /**
-     * List of potential consumers to be updated in couplings.
-     */
-    private Map<Pair<AttributeContainer, Method>, Consumer> potentialConsumers = new HashMap<>();
-
-    /**
      * List of listeners to fire updates when couplings are changed.
      */
     private transient List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
@@ -198,7 +188,9 @@ public class CouplingManager {
      * @return the visible producers
      */
     public List<Producer<?>> getVisibleProducers(WorkspaceComponent component) {
-        return getProducers(component).stream().filter(Attribute::isVisible).collect(Collectors.toList());
+        return getProducers(component).stream()
+                .filter(a -> component.getAttributeTypeVisibilityMap().get(a.method))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -208,7 +200,9 @@ public class CouplingManager {
      * @return the visible consumers
      */
     public List<Consumer<?>> getVisibleConsumers(WorkspaceComponent component) {
-        return getConsumers(component).stream().filter(Attribute::isVisible).collect(Collectors.toList());
+        return getConsumers(component).stream()
+                .filter(a -> component.getAttributeTypeVisibilityMap().get(a.method))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -360,10 +354,6 @@ public class CouplingManager {
      * Create a producer from the specified method on the {@link AttributeContainer}.
      */
     private Producer<?> getProducer(AttributeContainer container, Method method) {
-        Pair key = new Pair(container, method);
-        if(potentialProducers.containsKey(key)) {
-            return potentialProducers.get(key);
-        }
         Producible annotation = method.getAnnotation(Producible.class);
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not producible.", method.getName()));
@@ -374,9 +364,7 @@ public class CouplingManager {
 
         String description = annotation.description();
         boolean visibility = annotation.defaultVisibility();
-        Producer newProducer = new Producer(container, method, description, idMethod, customDescriptionMethod, arrayDescriptionMethod, visibility );
-        potentialProducers.put(key, newProducer);
-        return newProducer;
+        return new Producer(container, method, description, idMethod, customDescriptionMethod, arrayDescriptionMethod, visibility);
     }
 
     /**
@@ -384,10 +372,6 @@ public class CouplingManager {
      * {@link AttributeContainer}.
      */
     private Consumer<?> getConsumer(AttributeContainer container, Method method) {
-        Pair key = new Pair(container, method);
-        if(potentialConsumers.containsKey(key)) {
-            return potentialConsumers.get(key);
-        }
         Consumable annotation = method.getAnnotation(Consumable.class);
         if (annotation == null) {
             throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
@@ -396,9 +380,7 @@ public class CouplingManager {
         Method customDescriptionMethod = getMethod(container, annotation.customDescriptionMethod());
         String description = annotation.description();
         boolean visibility = annotation.defaultVisibility();
-        Consumer newConsumer = new Consumer(container, method, description, idMethod, customDescriptionMethod, visibility);
-        potentialConsumers.put(key, newConsumer);
-        return newConsumer;
+        return new Consumer(container, method, description, idMethod, customDescriptionMethod, visibility);
 
     }
 

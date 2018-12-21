@@ -25,6 +25,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -52,6 +53,11 @@ public abstract class WorkspaceComponent {
      * The set of all WorkspaceComponentListeners on this component.
      */
     private Collection<WorkspaceComponentListener> listeners;
+
+    /**
+     * The attribute type method to visibility map.
+     */
+    private final Map<Method, Boolean> attributeTypeVisibilityMap = new HashMap<>();
 
     /**
      * Whether this component has changed since last save.
@@ -353,6 +359,33 @@ public abstract class WorkspaceComponent {
      */
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
+    }
+
+    /**
+     * Get {@link #attributeTypeVisibilityMap}. If the map is not initialized, it will be initialized here.
+     *
+     * @return the {@link #attributeTypeVisibilityMap}
+     */
+    public Map<Method, Boolean> getAttributeTypeVisibilityMap() {
+        if (attributeTypeVisibilityMap.isEmpty()) {
+            getAttributeContainers().stream()
+                    .map(Object::getClass)
+                    .distinct()
+                    .flatMap(c -> Arrays.stream(c.getMethods()))
+                    .filter(m -> m.isAnnotationPresent(Producible.class))
+                    .forEach(m -> attributeTypeVisibilityMap
+                            .put(m, m.getAnnotation(Producible.class).defaultVisibility())
+                    );
+            getAttributeContainers().stream()
+                    .map(Object::getClass)
+                    .distinct()
+                    .flatMap(c -> Arrays.stream(c.getMethods()))
+                    .filter(m -> m.isAnnotationPresent(Consumable.class))
+                    .forEach(m -> attributeTypeVisibilityMap
+                            .put(m, m.getAnnotation(Consumable.class).defaultVisibility())
+                    );
+        }
+        return attributeTypeVisibilityMap;
     }
 
     /**

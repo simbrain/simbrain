@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class AttributeTypePanel extends JPanel {
         super(new BorderLayout());
 
         model = new AttributeModel();
+        model.setWorkspaceComponent(component);
         table = new JTable(model);
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -66,17 +68,22 @@ public class AttributeTypePanel extends JPanel {
     }
 
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
-        CouplingManager couplingFactory = component.getWorkspace().getCouplingManager();
         if (poc == ProducerOrConsumer.Consuming) {
             setBorder(BorderFactory.createTitledBorder("Consumers"));
-            for (Consumer consumer : couplingFactory.getConsumers(component)) {
-                model.addRow(consumer);
-            }
+            component.getAttributeContainers().stream()
+                    .map(Object::getClass)
+                    .distinct()
+                    .flatMap(c -> Arrays.stream(c.getMethods()))
+                    .filter(m -> m.isAnnotationPresent(Consumable.class))
+                    .forEach(a -> model.addRow(a));
         } else {
             setBorder(BorderFactory.createTitledBorder("Producers"));
-            for (Producer producer : couplingFactory.getProducers(component)) {
-                model.addRow(producer);
-            }
+            component.getAttributeContainers().stream()
+                    .map(Object::getClass)
+                    .distinct()
+                    .flatMap(c -> Arrays.stream(c.getMethods()))
+                    .filter(m -> m.isAnnotationPresent(Producible.class))
+                    .forEach(a -> model.addRow(a));
         }
     }
 
@@ -93,9 +100,11 @@ public class AttributeTypePanel extends JPanel {
         /**
          * Internal list of attributes.
          */
-        private List<Attribute> data = new ArrayList<>();
+        private List<Method> data = new ArrayList<>();
 
-        public void addRow(Attribute attribute) {
+        private WorkspaceComponent workspaceComponent;
+
+        public void addRow(Method attribute) {
             data.add(attribute);
         }
 
@@ -114,13 +123,17 @@ public class AttributeTypePanel extends JPanel {
         public Object getValueAt(int row, int col) {
             switch (col) {
             case 0:
-                return data.get(row).getBaseObject().getClass().getSimpleName();
+                return data.get(row).getDeclaringClass().getSimpleName();
             case 1:
-                return data.get(row).getDescription();
+                return data.get(row).getName(); // TODO: currently using raw method name. Consider user friendly name.
             case 2:
-                return data.get(row).getTypeName();
+                if (data.get(row).getParameterCount() > 0) {    // if attribute type is Consumable
+                    return data.get(row).getParameterTypes()[0].getSimpleName();
+                } else {
+                    return data.get(row).getReturnType().getSimpleName();
+                }
             case 3:
-                return data.get(row).isVisible();
+                return workspaceComponent.getAttributeTypeVisibilityMap().get(data.get(row));
             default:
                 return null;
             }
@@ -135,7 +148,7 @@ public class AttributeTypePanel extends JPanel {
             case 2:
                 break;
             case 3:
-                data.get(row).setVisible((boolean) value);
+                workspaceComponent.getAttributeTypeVisibilityMap().put(data.get(row), (Boolean) value);
                 fireTableDataChanged();
                 break;
             }
@@ -160,6 +173,9 @@ public class AttributeTypePanel extends JPanel {
             }
         }
 
+        public void setWorkspaceComponent(WorkspaceComponent workspaceComponent) {
+            this.workspaceComponent = workspaceComponent;
+        }
     }
 
 }

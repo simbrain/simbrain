@@ -330,6 +330,7 @@ public abstract class WorkspaceComponent {
         for (WorkspaceComponentListener listener : listeners) {
             listener.attributeContainerAdded(addedContainer);
         }
+        updateVisibilityMap(addedContainer);
     }
 
     /**

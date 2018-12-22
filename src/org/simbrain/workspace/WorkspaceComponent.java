@@ -30,6 +30,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.simbrain.workspace.CouplingUtils.getConsumersFromContainer;
+import static org.simbrain.workspace.CouplingUtils.getProducersFromContainers;
+
 /**
  * Represents a component in a Simbrain {@link Workspace}. Extend this class to
  * create your own component type.
@@ -204,6 +207,50 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Get all visible producers on a specified component.
+     *
+     * @return the visible producers
+     */
+    public List<Producer<?>> getVisibleProducers() {
+        return getProducers().stream()
+                .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all visible consumers on a specified component.
+     *
+     * @return the visible consumers
+     */
+    public List<Consumer<?>> getVisibleConsumers() {
+        return getConsumers().stream()
+                .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all the potential producers for a given WorkspaceComponent.
+     *
+     * @return A list of potential producers.
+     */
+    public List<Producer<?>> getProducers() {
+        return getAttributeContainers().stream()
+                .flatMap(ac -> getProducersFromContainers(ac).stream())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all the potential consumers for a given WorkspaceComponent.
+     *
+     * @return A list of potential consumers.
+     */
+    public List<Consumer<?>> getConsumers() {
+        return getAttributeContainers().stream()
+                .flatMap(ac -> getConsumersFromContainer(ac).stream())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of
      * each part.
@@ -257,6 +304,26 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Update the visibility map when new attribute type is added.
+     *
+     * @param updatedContainer the new attribute container added to this workspace
+     */
+    public void updateVisibilityMap(AttributeContainer updatedContainer) {
+        CouplingUtils.getConsumableMethodsFromContainer(updatedContainer)
+                .forEach(m -> {
+                    if (!attributeTypeVisibilityMap.containsKey(m)) {
+                        attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility());
+                    }
+                });
+        CouplingUtils.getProducibleMethodsFromContainer(updatedContainer)
+                .forEach(m -> {
+                    if (!attributeTypeVisibilityMap.containsKey(m)) {
+                        attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility());
+                    }
+                });
+    }
+
+    /**
      * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
     public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
@@ -278,9 +345,9 @@ public abstract class WorkspaceComponent {
     /**
      * Notify listeners that an {@link AttributeContainer} has been changed in the component.
      */
-    public void fireAttributeContainerChanged(AttributeContainer removedContainer) {
+    public void fireAttributeContainerChanged(AttributeContainer updatedContainer) {
         for (WorkspaceComponentListener listener : listeners) {
-            listener.attributeContainerChanged(removedContainer);
+            listener.attributeContainerChanged(updatedContainer);
         }
     }
 
@@ -381,22 +448,7 @@ public abstract class WorkspaceComponent {
         this.workspace = workspace;
     }
 
-    /**
-     * Get {@link #attributeTypeVisibilityMap}. If the map is not initialized, it will be initialized here.
-     *
-     * @return the {@link #attributeTypeVisibilityMap}
-     */
     public Map<Method, Boolean> getAttributeTypeVisibilityMap() {
-        if (attributeTypeVisibilityMap.isEmpty()) {
-            getAttributeMethods(Producible.class)
-                    .forEach(m -> attributeTypeVisibilityMap
-                            .put(m, m.getAnnotation(Producible.class).defaultVisibility())
-                    );
-            getAttributeMethods(Consumable.class)
-                    .forEach(m -> attributeTypeVisibilityMap
-                            .put(m, m.getAnnotation(Consumable.class).defaultVisibility())
-                    );
-        }
         return attributeTypeVisibilityMap;
     }
 

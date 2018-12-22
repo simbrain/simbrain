@@ -32,11 +32,11 @@ public class CouplingMenu extends JMenu {
 
     private void updateItems() {
         removeAll();
-        List<Producer<?>> producers = workspace.getCouplingManager().getProducersFromContainers(source);
+        List<Producer<?>> producers = CouplingUtils.getProducersFromContainers(source);
         for (Producer<?> producer : producers) {
             createProducerSubmenu(producer);
         }
-        List<Consumer<?>> consumers = workspace.getCouplingManager().getConsumersFromContainer(source);
+        List<Consumer<?>> consumers = CouplingUtils.getConsumersFromContainer(source);
         for (Consumer<?> consumer : consumers) {
             createConsumerSubmenu(consumer);
         }
@@ -47,12 +47,18 @@ public class CouplingMenu extends JMenu {
         JMenu producerSubmenu = new JMenu(producer.getDescription() + " send " + producer.getTypeName() + " to");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
-            List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Consumer<?>> consumers = workspace.getCouplingManager().getVisibleConsumers(targetComponent);
+            List<CouplingMenuItem> couplings = new ArrayList<>();
+            List<Consumer<?>> consumers = targetComponent.getVisibleConsumers();
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace, targetComponent.getName() + "/" +
-                        consumer.getDescription(), producer, consumer));
+                    couplings.add(
+                            new CouplingMenuItem(
+                                    workspace,
+                                    targetComponent.getName() + "/" + consumer.getDescription(),
+                                    producer,
+                                    consumer
+                            )
+                    );
                 }
             }
             if (!couplings.isEmpty()) {
@@ -72,11 +78,18 @@ public class CouplingMenu extends JMenu {
         JMenu consumerSubmenu = new JMenu(consumer.getDescription() + " receive " + consumer.getTypeName() + " from");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
-            List<CouplingMenuItem> couplings = new ArrayList<CouplingMenuItem>();
-            List<Producer<?>> producers = workspace.getCouplingManager().getVisibleProducers(targetComponent);
+            List<CouplingMenuItem> couplings = new ArrayList<>();
+            List<Producer<?>> producers = targetComponent.getVisibleProducers();
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
-                    couplings.add(new CouplingMenuItem(workspace,  targetComponent.getName() + "/" + producer.getDescription(), producer, consumer));
+                    couplings.add(
+                            new CouplingMenuItem(
+                                    workspace,
+                                    targetComponent.getName() + "/" + producer.getDescription(),
+                                    producer,
+                                    consumer
+                            )
+                    );
                 }
             }
             if (!couplings.isEmpty()) {

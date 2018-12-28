@@ -71,7 +71,7 @@ public class RunningAverageRule extends NeuronUpdateRule {
      */
     public void update(Neuron neuron) {
         // "val" on right is activation at last time step
-        val = rateConstant * inputType.getInput(neuron) + (1 - rateConstant) * val;
+        val = rateConstant * neuron.getInput() + (1 - rateConstant) * val;
         neuron.setBuffer(val);
     }
 

@@ -34,6 +34,11 @@ public class SimbrainConstants {
     public static final String NULL_STRING = "...";
 
     /**
+     * A string used in parts of the GUI to indicate the absence of something.
+     */
+    public static final String NONE_STRING = "None";
+
+    /**
      * Convenience constant referring to current Locale.
      */
     public static final NumberFormat LOCAL_FORMATTER = NumberFormat.getNumberInstance(Locale.getDefault());

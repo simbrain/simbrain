@@ -163,7 +163,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @Override
     public void update(Neuron neuron) {
         double dt = neuron.getNetwork().getTimeStep();
-        double i_syn = inputType.getInput(neuron);
+        double i_syn = neuron.getInput();
         // Under normal circumstances this will cause no change.
         double vMembrane = neuron.getActivation();
 

@@ -115,7 +115,7 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         //                >= neuron.getNetwork().getTime();
         // final double activation = neuron.getActivation();
         double inputs = 0;
-        inputs = inputType.getInput(neuron);
+        inputs = neuron.getInput();
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }

@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -216,6 +217,8 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
      */
     private double refractoryPeriod = 1.0;
 
+    private double[] ei = new double[2];
+
     @Override
     public void update(Neuron neuron) {
         if (v_mem >= v_Peak) {
@@ -235,8 +238,18 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         // potential between updates.
         v_mem = neuron.getActivation();
 
+
         // Retrieve incoming ex/in currents or proportion of open channels
-        double[] ei = inputType.getSeparatedInput(neuron);
+        ei[0] = 0;
+        ei[1] = 0;
+        for(int ii=0; ii<neuron.getFanIn().size(); ++ii) {
+            double val = neuron.getFanIn().get(ii).calcPSR();
+            if(neuron.getPolarity() == SimbrainConstants.Polarity.INHIBITORY) {
+                ei[1] += val;
+            } else {
+                ei[0] += val;
+            }
+        }
 
         // Calculate incoming excitatory and inhibitory voltage changes
         double iSyn_ex = g_e_bar * ei[0] * (exReversal - v_mem);
@@ -295,7 +308,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         cpy.addNoise = this.addNoise;
         cpy.b = this.b;
         cpy.g_L = this.g_L;
-        cpy.inputType = this.inputType;
         cpy.leakReversal = this.leakReversal;
         cpy.memCapacitance = this.memCapacitance;
         cpy.noiseGenerator = noiseGenerator.deepCopy();

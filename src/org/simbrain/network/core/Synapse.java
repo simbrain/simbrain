@@ -340,8 +340,12 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Set a default spike responder if the spike responder has not been initialized.
      */
     public void initSpikeResponder() {
-        if (getSpikeResponder() == null) {
+        if(source == null) {
             setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
+        } else if (getSpikeResponder() == null && source.getUpdateRule().isSpikingNeuron()) {
+            setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
+        } else if (!source.getUpdateRule().isSpikingNeuron()) {
+            setSpikeResponder(null);
         }
     }
 
@@ -687,7 +691,10 @@ public class Synapse implements EditableObject, AttributeContainer {
      * @param sr The spikeResponder to set.
      */
     public void setSpikeResponder(final SpikeResponder sr) {
-        this.spikeResponder = sr;
+        if(source == null || source.getUpdateRule().isSpikingNeuron()) {
+            this.spikeResponder = sr;
+            return;
+        }
     }
 
     /**

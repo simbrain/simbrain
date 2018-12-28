@@ -22,6 +22,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
+import umontreal.iro.lecuyer.simevents.Sim;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -169,13 +170,24 @@ public class ObjectTypeEditor extends JComponent {
         this.parent = parent;
         this.label = label;
         this.typeMap = typeMap;
-        boolean consistent = objectList.stream().allMatch(o -> o.getClass() == objectList.get(0).getClass());
+        boolean consistent = objectList.stream().allMatch(o -> {
+            if(o != null && objectList.get(0) != null) {
+                return o.getClass() == objectList.get(0).getClass();
+            } else {
+                return o == null && objectList.get(0) == null;
+            }
+        } );
         if (!consistent) {
             cbStartState = SimbrainConstants.NULL_STRING;
             editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
         } else {
-            cbStartState = typeMap.getInverse(objectList.get(0).getClass());
-            editorPanel = new AnnotatedPropertyEditor(objectList);
+            if(objectList.get(0) == null) {
+                cbStartState = SimbrainConstants.NONE_STRING;
+                editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
+            } else {
+                cbStartState = typeMap.getInverse(objectList.get(0).getClass());
+                editorPanel = new AnnotatedPropertyEditor(objectList);
+            }
         }
         layoutPanel();
 
@@ -263,6 +275,25 @@ public class ObjectTypeEditor extends JComponent {
             cbObjectType.addItem(label);
         }
         cbObjectType.setSelectedIndex(0);
+        cbObjectType.repaint();
+    }
+
+    /**
+     * Set the editor to a null state (editing an inconsistent set of objects)
+     * <p>
+     * Should only be called once.
+     */
+    public void setNone() {
+        cbObjectType.removeAllItems();
+        if(!typeMap.keySet().contains(SimbrainConstants.NONE_STRING)) {
+            cbObjectType.addItem(SimbrainConstants.NONE_STRING);
+            for (String label : typeMap.keySet()) {
+                cbObjectType.addItem(label);
+            }
+            cbObjectType.setSelectedIndex(0);
+        } else {
+            cbObjectType.setSelectedItem(SimbrainConstants.NONE_STRING);
+        }
         cbObjectType.repaint();
     }
 

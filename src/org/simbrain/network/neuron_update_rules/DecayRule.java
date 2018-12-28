@@ -116,7 +116,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
 
     @Override
     public void update(Neuron neuron) {
-        double val = neuron.getActivation() + inputType.getInput(neuron);
+        double val = neuron.getActivation() + neuron.getInput();
         double decayVal = 0;
 
         if (relAbs == RELATIVE) {

@@ -133,7 +133,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         timeStep = neuron.getNetwork().getTimeStep();
         final double activation = neuron.getActivation();
         double inputs = 0;
-        inputs = inputType.getInput(neuron);
+        inputs = neuron.getInput();
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }

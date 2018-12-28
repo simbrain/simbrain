@@ -118,7 +118,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = inputType.getInput(neuron);
+        double wtdInput = neuron.getInput();
 
         if (wtdInput < lowerThreshold) {
             neuron.setBuffer(lowerValue);

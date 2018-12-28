@@ -59,7 +59,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     @Override
     public final void update(Neuron neuron) {
 
-        double val = inputType.getInput(neuron) + bias;
+        double val = neuron.getInput() + bias;
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

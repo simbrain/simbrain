@@ -8,7 +8,6 @@ import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -133,7 +132,6 @@ public class EdgeOfChaos extends RegisteredSimulation {
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(parentNet);
             BinaryRule thresholdUnit = new BinaryRule();
-            thresholdUnit.setInputType(InputType.WEIGHTED);
             neuron.setUpdateRule(thresholdUnit);
             neurons.add(neuron);
         }

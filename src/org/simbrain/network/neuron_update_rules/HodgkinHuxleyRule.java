@@ -131,7 +131,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
 
         // Advances the model by dt and returns the new voltage
 
-        double v = inputType.getInput(neuron);
+        double v = neuron.getInput();
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
         dh = (ah * (1 - h) - bh * h) * neuron.getNetwork().getTimeStep();

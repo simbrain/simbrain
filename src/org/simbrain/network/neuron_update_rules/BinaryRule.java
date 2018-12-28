@@ -95,7 +95,7 @@ public class BinaryRule extends NeuronUpdateRule {
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = inputType.getInput(neuron) + bias;
+        double wtdInput = neuron.getInput() + bias;
 
         if (wtdInput > threshold) {
             neuron.setBuffer(getUpperBound());

@@ -18,13 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -202,14 +199,6 @@ public final class SynapseDialog extends StandardDialog {
             return false;
         }
 
-        // Check for synaptic inputs in target
-        for (Synapse s : synapses) {
-            if (s.getTarget() != null) {
-                if (s.getTarget().getUpdateRule().getInputType() == InputType.SYNAPTIC) {
-                    return true;
-                }
-            }
-        }
         return false;
     }
 

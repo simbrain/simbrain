@@ -25,7 +25,6 @@ import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor2.EditableObject;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
@@ -89,7 +88,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
 
     @Override
     public void update(Neuron neuron) {
-        double wtdInput = inputType.getInput(neuron);
+        double wtdInput = neuron.getInput();
         double val = (slope * wtdInput) + bias;
 
         if (addNoise) {

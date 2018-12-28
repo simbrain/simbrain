@@ -241,7 +241,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     public void setWidgetValue(Object value) {
         if(!parameter.isEditable()) {
+
             ((JLabel) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
+
         } else if (parameter.isBoolean()) {
             if (value == null) {
                 ((YesNoNull) component).setNull();

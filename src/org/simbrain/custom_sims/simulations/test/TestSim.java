@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -123,7 +122,6 @@ public class TestSim extends RegisteredSimulation {
             Neuron neuron = new Neuron(network);
             neuron.setPolarity(Polarity.EXCITATORY);
             TimedAccumulatorRule tar = new TimedAccumulatorRule();
-            tar.setInputType(InputType.WEIGHTED);
             tar.setMaxState(REFRACTORY);
             tar.setKappa(KAPPA);
             tar.setB(B_VALUE);

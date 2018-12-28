@@ -161,7 +161,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
 
         // See Spikes (Hugh Wilson), pp. 20-21
 
-        double p = inputType.getInput(neuron);
+        double p = neuron.getInput();
         double val = neuron.getActivation();
 
         // Update adaptation term; see Spike, p. 81

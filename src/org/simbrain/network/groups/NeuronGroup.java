@@ -161,6 +161,19 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      */
     private int writeCounter = 0;
 
+
+    //TODO: Wire this up
+    /**
+     * Number of subsamples to take. This value is also implicitly a threshold.
+     * If a neuron group has more than this many neurons, and subsampling is
+     * turned on, a vector with this many components is returned by (
+     * {@link #getSubsampledActivations()}
+     */
+    @UserParameter(label = "Number of subsamples")
+    private int numSubSamples = 100;
+
+    private double [] subSampledValues;
+
     /**
      * Indices used with subsampling.
      */
@@ -1506,16 +1519,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         this.isSpikingNeuronGroup = isSpikingNeuronGroup;
     }
 
-    //TODO: Wire this up
-    /**
-     * Number of subsamples to take. This value is also implicitly a threshold.
-     * If a neuron group has more than this many neurons, and subsampling is
-     * turned on, a vector with this many components is returned by (
-     * {@link #getSubsampledActivations()}
-     */
-    @UserParameter(label = "Number of subsamples")
-    private int numSubSamples = 100;
-
     /**
      * Returns a vector of subsampled activations to be used by some object external to the
      * neuron group. If plotting activations of a thousand
@@ -1525,16 +1528,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      */
     @Producible(idMethod = "getId")
     public double[] getSubsampledActivations() {
-        if (neuronList.size() < numSubSamples) {
-            return getActivations();
-        } else {
-            // TODO: Better subsampling?
-            double[] retArray = new double[numSubSamples];
-            for (int i = 0; i < numSubSamples; i++) {
-                retArray[i] = neuronList.get(i).getActivation();
-            }
-            return retArray;
+        if (subSampledValues == null) {
+            subSampledValues = new double[numSubSamples];
         }
+        for (int ii = 0; ii < numSubSamples; ii++) {
+            subSampledValues[ii] = neuronList.get(subsamplingIndices[ii]).getActivation();
+        }
+        return subSampledValues;
     }
 
     /**
@@ -1555,10 +1555,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
-     * @param numSubSamples the numSubSamples to set
+     * @param _numSubSamples the numSubSamples to set
      */
-    public static void setNumSubSamples(int numSubSamples) {
-        numSubSamples = numSubSamples;
+    public void setNumSubSamples(int _numSubSamples) {
+       double [] newSubSamples = new double[_numSubSamples];
+       int len = _numSubSamples > subsamplingIndices.length ? subsamplingIndices.length : _numSubSamples;
+       System.arraycopy(subSampledValues, 0, newSubSamples, 0, len);
+       subSampledValues = newSubSamples;
+       this.numSubSamples = _numSubSamples;
     }
 
     /**

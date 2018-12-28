@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 /**
  * Panel to display spike responder settings.
  *
- * @author ztosi
+ * @author Zoë Tosi
  */
 public class SpikeResponderSettingsPanel extends JPanel {
 
@@ -103,6 +103,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
             new AnnotatedPropertyEditor(new ProbabilisticResponder()));
         RESPONDER_MAP.put(new RiseAndDecay().getDescription(), new AnnotatedPropertyEditor(new RiseAndDecay()));
         RESPONDER_MAP.put(new Step().getDescription(), new AnnotatedPropertyEditor(new Step()));
+        RESPONDER_MAP.put(SimbrainConstants.NONE_STRING , new AnnotatedPropertyEditor(Collections.EMPTY_LIST));
     }
 
     /**
@@ -180,13 +181,29 @@ public class SpikeResponderSettingsPanel extends JPanel {
         Iterator<Synapse> synIter = synapseList.iterator();
         Synapse firstSynapse = synIter.next();
 
-        boolean discrepancy = false;
-        while (synIter.hasNext()) {
-            if (!firstSynapse.getSpikeResponder().getClass().equals(synIter.next().getSpikeResponder().getClass())) {
-                discrepancy = true;
-                break;
+        boolean srcSpiking = synapseList.stream().anyMatch(s->{
+            if(s.getSource() != null) {
+                return s.getSource().getUpdateRule().isSpikingNeuron();
             }
+            return true;
+        });
+
+        if(!srcSpiking) {
+            cbResponderType.setSelectedItem(SimbrainConstants.NONE_STRING);
+            spikeResponderPanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
+            cbResponderType.setEnabled(false);
+            spikeResponderPanel.setEnabled(false);
+            return;
         }
+
+        Class synRClass = firstSynapse.getSpikeResponder() == null ? null : firstSynapse.getSpikeResponder().getClass();
+        boolean discrepancy = !synapseList.stream().allMatch(s ->  {
+            if(s.getSpikeResponder() == null) {
+                return synRClass==null;
+            } else {
+                return s.getSpikeResponder().getClass().equals(synRClass);
+            }
+        } );
 
         // If they are different types, display combo box as null
         if (discrepancy) {
@@ -195,13 +212,18 @@ public class SpikeResponderSettingsPanel extends JPanel {
             // Simply to serve as an empty panel
             spikeResponderPanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
         } else {
-            String responderName = firstSynapse.getSpikeResponder().getDescription();
-            spikeResponderPanel = RESPONDER_MAP.get(responderName);
-            List<EditableObject> responderList = synapseList.stream()
-                .map(Synapse::getSpikeResponder)
-                .collect(Collectors.toList());
-            spikeResponderPanel.fillFieldValues(responderList);
-            cbResponderType.setSelectedItem(responderName);
+            if(firstSynapse.getSpikeResponder() == null) {
+                cbResponderType.setSelectedItem(SimbrainConstants.NONE_STRING);
+                spikeResponderPanel = new AnnotatedPropertyEditor(Collections.EMPTY_LIST);
+            } else {
+                String responderName = firstSynapse.getSpikeResponder().getDescription();
+                spikeResponderPanel = RESPONDER_MAP.get(responderName);
+                List<EditableObject> responderList = synapseList.stream()
+                        .map(Synapse::getSpikeResponder)
+                        .collect(Collectors.toList());
+                spikeResponderPanel.fillFieldValues(responderList);
+                cbResponderType.setSelectedItem(responderName);
+            }
         }
     }
 
@@ -288,15 +310,23 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
         SpikeResponder selectedResponder = (SpikeResponder) spikeResponderPanel.getEditedObject();
 
-        if (selectedResponder == null) {
+        if (selectedResponder == null && cbResponderType.getSelectedItem() != SimbrainConstants.NONE_STRING) {
             return true;
         }
 
-        for (Synapse s : synapseList) {
-            if (!s.getSpikeResponder().getClass().equals(selectedResponder.getClass())) {
-                s.setSpikeResponder(selectedResponder.deepCopy());
-            }
+        if(cbResponderType.getSelectedItem() == SimbrainConstants.NONE_STRING) {
+            synapseList.stream().forEach(s->s.setSpikeResponder(null));
+            return true;
         }
+
+        synapseList.stream().filter(s->{
+            if(s.getSpikeResponder() == null) {
+                return  true;
+            } else {
+                return !selectedResponder.getClass().equals(s.getSpikeResponder().getClass());
+            }
+        }).forEach(s->s.setSpikeResponder(selectedResponder.deepCopy()));
+
 
         List<EditableObject> responderList = synapseList.stream()
             .map(Synapse::getSpikeResponder)

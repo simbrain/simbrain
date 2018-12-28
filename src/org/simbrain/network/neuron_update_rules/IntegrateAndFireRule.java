@@ -142,7 +142,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
 
         // Incoming current is 0 during the refractory period, otherwise it's
         // equal to input and background current
-        double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 0 : inputType.getInput(neuron) + backgroundCurrent;
+        double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 0 : neuron.getInput() + backgroundCurrent;
 
         if (addNoise) {
             synCurrent += noiseGenerator.getRandom();

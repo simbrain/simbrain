@@ -248,10 +248,6 @@ public class Neuron implements EditableObject, AttributeContainer {
         this.parent = parent;
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
-        // Hack, this should be done in NeuronUpdateRule... but because of
-        // current api changes would have to be made to add neuron update rule's
-        // sub classes.
-        getUpdateRule().setInputType(n.getUpdateRule().getInputType());
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
         setInputValue(n.getInputValue());
@@ -335,9 +331,13 @@ public class Neuron implements EditableObject, AttributeContainer {
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
-        for (Synapse s : getFanOut().values()) {
-            s.initSpikeResponder();
+
+        if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
+            for (Synapse s : getFanOut().values()) {
+                s.initSpikeResponder();
+            }
         }
+
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
             getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
@@ -524,10 +524,10 @@ public class Neuron implements EditableObject, AttributeContainer {
      * response to spikes and mediated by spike responders) impinging on this
      * neuron.
      */
-    public double getSynapticInput() {
+    public double getInput() {
         double wtdSum = inputValue;
         for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcPSR();
+            wtdSum += fanIn.get(i).calcPSR(); // Automatically gives a normal weighted sum if the spike responder is null
         }
         return wtdSum;
     }

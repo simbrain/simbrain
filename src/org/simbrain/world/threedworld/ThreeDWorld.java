@@ -65,7 +65,6 @@ public class ThreeDWorld implements AppState, AttributeContainer {
     public ThreeDWorld() {
         initialized = false;
         engine = new ThreeDEngine();
-        engine.initialize(); // TODO: This was added to force a call. Not sure the correct way to make sure this called.
         engine.getStateManager().attach(this);
         cameraController = new CameraController(this);
         selectionController = new SelectionController(this);
@@ -77,7 +76,6 @@ public class ThreeDWorld implements AppState, AttributeContainer {
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         idCounter = new AtomicInteger();
-
     }
 
     /**

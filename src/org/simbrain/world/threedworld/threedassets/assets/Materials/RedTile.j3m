@@ -1,9 +1,7 @@
 Material RedTile : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
-        HighQuality : true
         DiffuseMap : Textures/seamless_tile_red_d.png
         UseMaterialColors : true
-        WardIso : true
         SpecularMap : Textures/seamless_tile_white_d.png
         NormalMap : Textures/seamless_tile_n.png
         Specular : 1.0 1.0 1.0 1.0

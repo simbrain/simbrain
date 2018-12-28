@@ -1,6 +1,5 @@
 Material Hand : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
-        HighQuality: True
         UseMaterialColors: True
         DiffuseMap : Textures/hand_d.png
         Shininess : 0.01

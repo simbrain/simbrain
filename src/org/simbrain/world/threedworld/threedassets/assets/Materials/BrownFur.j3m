@@ -1,6 +1,5 @@
 Material BrownFur : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
-        HighQuality : true
         UseMaterialColors : true
         DiffuseMap : Textures/brown_fur_d.png
         SpecularMap : Textures/brown_fur_s.png

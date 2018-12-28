@@ -41,9 +41,7 @@ public class ThreeDContext implements JmeContext {
     private AwtKeyInput keyInput = new AwtKeyInput();
     private boolean lastThrottleState = false;
 
-    public ThreeDContext(JmeContext context) {
-        actualContext = context;
-    }
+    public ThreeDContext() {}
 
     @Override
     public Type getType() {

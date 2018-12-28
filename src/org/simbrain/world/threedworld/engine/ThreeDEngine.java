@@ -70,7 +70,9 @@ public class ThreeDEngine extends LegacyApplication {
         settings.setHeight(400);
         setSettings(settings);
 
-        context = new ThreeDContext(super.getContext());
+        this.start();
+
+        context = (ThreeDContext)getContext();
         panel = context.createPanel();
         panel.setPreferredSize(new Dimension(settings.getWidth(), settings.getHeight()));
         setPauseOnLostFocus(false);
@@ -230,9 +232,6 @@ public class ThreeDEngine extends LegacyApplication {
     @Override
     public void initialize() {
         try {
-
-            System.out.println("initialize(begin):" + Thread.currentThread().getContextClassLoader() );
-
             super.initialize();
 
             String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
@@ -257,13 +256,8 @@ public class ThreeDEngine extends LegacyApplication {
             updateSync = false;
             setState(State.RunAll);
             update();
-            System.out.println("initialize(End): " + Thread.currentThread().getContextClassLoader() );
 
-            // java.lang.UnsatisfiedLinkError: com.jme3.bullet.PhysicsSpace.createPhysicsSpace(FFFFFFIZ)
-            getStateManager().attach(bulletAppState);
-
-
-
+            //getStateManager().attach(bulletAppState);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Failed to initialize 3D World.");
             setState(State.SystemPause);
@@ -273,8 +267,6 @@ public class ThreeDEngine extends LegacyApplication {
 
     @Override
     public void update() {
-        System.out.println("update-->" + Thread.currentThread().getContextClassLoader() );
-
         try {
             runQueuedTasks();
         } catch (RuntimeException ex) {

@@ -1,8 +1,6 @@
 Material Mouse : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
-        HighQuality : false
         UseMaterialColors : true
-        WardIso : true
         DiffuseMap : Flip Textures/mouse_01.tga
         Specular : 1.0 1.0 1.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0

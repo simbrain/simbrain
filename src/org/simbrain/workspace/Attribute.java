@@ -186,7 +186,7 @@ public abstract class Attribute {
      * {@code Consumer.builder(container, method).build()} or the short-cut equivalent
      * {@code Consumer.create(container, method)}.
      *
-     * See {@link org.simbrain.util.math.ProbabilityDistribution.ProbabilityDistributionBuilder} for a detailed example.
+     * See {@link CouplingUtils#getProducer} for an example.
      *
      * @param <B> The type of the builder to return when building
      * @param <T> The type of the final product to return when finish building.

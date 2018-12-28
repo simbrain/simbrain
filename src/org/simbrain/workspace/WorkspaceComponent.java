@@ -60,7 +60,9 @@ public abstract class WorkspaceComponent {
     private Collection<WorkspaceComponentListener> listeners;
 
     /**
-     * The attribute type method to visibility map.
+     * The attribute type method to visibility map. If a given method
+     * should be invisible in the {@link org.simbrain.workspace.gui.couplingmanager.AttributePanel}
+     * (for example if synapse couplings are visible this can crowd that panel).
      */
     private final Map<Method, Boolean> attributeTypeVisibilityMap = new HashMap<>();
 

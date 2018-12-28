@@ -545,7 +545,7 @@ public class Neuron implements EditableObject, AttributeContainer {
     /**
      * Normalizes the excitatory synaptic strengths impinging on this neuron,
      * that is finds the sum of the exctiatory weights and divides each weight
-     * value by that sum;
+     * value by that sum.
      */
     public void normalizeExcitatoryFanIn() {
         double sum = 0;

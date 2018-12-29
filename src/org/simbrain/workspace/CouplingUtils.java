@@ -3,7 +3,9 @@ package org.simbrain.workspace;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A utility class for coupling. Most of the methods are helpers to get {@link Consumer}s and {@link Producer}s.
@@ -66,11 +68,18 @@ public abstract class CouplingUtils {
      * @return The consumer
      */
     public static Consumer<?> getConsumer(AttributeContainer container, String methodName) {
-        try {
-            Method method = container.getClass().getMethod(methodName);
-            return getConsumer(container, method);
-        } catch (NoSuchMethodException ex) {
-            throw new IllegalArgumentException(ex);
+        Stream<Method> stream = Arrays.stream(container.getClass().getMethods());
+        Optional<Method> method = stream.filter(m -> m.getName().equals(methodName)).findFirst();
+        if (method.isPresent()) {
+            return getConsumer(container, method.get());
+        } else {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "No consumable method with name %s was found in class %s.",
+                            methodName,
+                            container.getClass().getSimpleName()
+                    )
+            );
         }
     }
 

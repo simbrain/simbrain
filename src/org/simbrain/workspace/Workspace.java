@@ -188,6 +188,7 @@ public class Workspace {
      * @param component the component added
      */
     private void fireWorkspaceComponentRemoved(WorkspaceComponent component) {
+        component.getAttributeTypeVisibilityMap().clear();
         for (WorkspaceListener listener : listeners) {
             listener.componentRemoved(component);
         }

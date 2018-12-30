@@ -6,11 +6,18 @@ import org.simbrain.workspace.Producible;
 import java.awt.image.BufferedImage;
 
 /**
- * A rectangular matrix of filtered sensors on an ImageSource which
- * can be coupled to.
+ * A rectangular matrix of filtered sensors on an {@link ImageSource} which
+ * can be coupled to.  Arrays tracking int rgb colors and doubles for
+ * brightness, red, green, and blue separately are maintained and can serve
+ * as producers for couplings.
+ * <br>
+ * The actual filtering happens in the {@link org.simbrain.world.imageworld.filters}
+ * package. Sensor matrices do the work of allowing the filtered images to
+ * couple to something else.  This makes sense biologically: retinal patterns
+ * are what neurons "sense".
  *
- * @author Jeff Yoshimi
  * @author Tim Shea
+ * @author Jeff Yoshimi
  */
 public class SensorMatrix implements ImageSourceListener, AttributeContainer {
 
@@ -25,14 +32,18 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
     private ImageSource source;
 
     /**
-     * The vales this matrix produces for floating point channel couplings.
+     * The values this matrix produces for floating point channel couplings.
+     * Four copies of the (flattened) matrix are stored for brightness (0),
+     * red (1), green (2), and blue (3).
+     * See {@link #updateSensorValues(BufferedImage)}.
      */
     private transient double[][] channels;
 
     /**
-     * The values this matrix produces for integer color coupling.
+     * Array of ints representing rgb colors. See
+     * {@link BufferedImage#getRGB(int, int)}
      */
-    private transient int[] colors;
+    private transient int[] rgbColors;
 
     /**
      * Construct a sensor matrix without attaching it to a source.
@@ -62,16 +73,10 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
         return this;
     }
 
-    /**
-     * @return the name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * @return the image source this sensor matrix reads
-     */
     public ImageSource getSource() {
         return source;
     }
@@ -87,58 +92,37 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
         this.source.addListener(this);
     }
 
-    /**
-     * @return the width
-     */
     public int getWidth() {
         return source.getWidth();
     }
 
-    /**
-     * @return the height
-     */
     public int getHeight() {
         return source.getHeight();
     }
 
-    /**
-     * Returns an array of doubles which corresponds to the brightness of the pixels.
-     */
     @Producible(idMethod = "getName")
     public double[] getBrightness() {
         return channels[0];
     }
 
-    /**
-     * @return Returns an array of doubles for the each pixel
-     */
     @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getRed() {
         return channels[1];
     }
 
-    /**
-     * @return Returns an array of doubles for the each pixel
-     */
     @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getGreen() {
         return channels[2];
     }
 
-    /**
-     * @return Returns an array of doubles for the each pixel
-     */
     @Producible(idMethod = "getName", defaultVisibility = false)
     public double[] getBlue() {
         return channels[3];
     }
 
-    /**
-     * Returns an array of RGB colors encoded in integers.
-     */
-    @Producible(idMethod = "getName", defaultVisibility = true)
+    @Producible(idMethod = "getName")
     public int[] getRGBColor() {
-        return colors;
+        return rgbColors;
     }
 
     @Override
@@ -149,6 +133,12 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
     @Override
     public void onImageUpdate(ImageSource source) {
         updateSensorValues(source.getCurrentImage());
+    }
+
+    @Override
+    public void onResize(ImageSource source) {
+        channels = new double[4][getWidth() * getHeight()];
+        rgbColors = new int[getWidth() * getHeight()];
     }
 
     /**
@@ -164,26 +154,22 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
         for (int y = 0; y < image.getHeight(); ++y) {
             for (int x = 0; x < image.getWidth(); ++x) {
                 int color = image.getRGB(x, y);
-                // Get red, green and blue as values between 0 and 1
-                // For my (jky) benefit, an overview of the bit twiddling here:
-                //    https://stackoverflow.com/questions/2534116/how-to-convert-get-rgbx-y-integer-pixel-to-colorr-g-b-a-in-java
+
+                // Update rgb colors
+                rgbColors[y * getWidth() + x] = color;
+
+                // Update other color channels
+                // Cf https://stackoverflow.com/questions/2534116/how-to-convert-get-rgbx-y-integer-pixel-to-colorr-g-b-a-in-java
                 double red = ((color >>> 16) & 0xFF) / 255.0;
                 double green = ((color >>> 8) & 0xFF) / 255.0;
                 double blue = (color & 0xFF) / 255.0;
-                // I (JKY) believe the brightness channel is based on this:
-                // https://en.wikipedia.org/wiki/Luma_(video)
+                // Cf. https://en.wikipedia.org/wiki/Luma_(video)
                 channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
                 channels[1][y * getWidth() + x] = red;
                 channels[2][y * getWidth() + x] = green;
                 channels[3][y * getWidth() + x] = blue;
-                colors[y * getWidth() + x] = color;
             }
         }
     }
 
-    @Override
-    public void onResize(ImageSource source) {
-        channels = new double[4][getWidth() * getHeight()];
-        colors = new int[getWidth() * getHeight()];
-    }
 }

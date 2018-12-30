@@ -18,10 +18,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * ImageWorld contains an image and a series of sensor matrices
+ * ImageWorld contains an {@link ImageSource} and a series of {@link SensorMatrix}
+ * objects. The image source is what outputs an image of some kind, either a
+ * static image or a video or a pixel display, something like that.  The sensor
+ * matrices allow the current image in an image source to be in couplings and
+ * thereby communicate with other workspace components.
  * that can be used to convert the image into numbers.
  *
- * The image is accessed using a {@link ImageSource} object.
+ * @author Tim Shea
+ * @author Jeff Yoshimi
  */
 public class ImageWorld {
 

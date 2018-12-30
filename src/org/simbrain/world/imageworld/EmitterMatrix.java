@@ -7,25 +7,56 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
+/**
+ * An {@link ImageSource} which contains several arrays which can consume
+ * array values and then "emit" them as a kind of pixel display.  The consumed
+ * values are stored in two arrays, one for rgb colors and
+ * another with separate channels for brightness, red, green, and blue.
+ * <br>
+ * An emitter matrix is a kind of countepart to a {@link SensorMatrix}. Rather
+ * than sensing visual locations emitters are like pixels that an "organism" can emits
+ * cf. a squid's iridiphores.
+ *
+ * @author Tim Shea
+ * @author Jeff Yoshimi
+ */
 public class EmitterMatrix extends ImageSourceAdapter {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
 
+    /**
+     * The values this matrix produces for floating point channel couplings.
+     * Four copies of the (flattened) matrix are stored for brightness (0),
+     * red (1), green (2), and blue (3).
+     * See {@link #emitImage()}.
+     */
     private double[][] channels;
 
-    private int[] colors;
+    /**
+     * Array of ints representing rgb colors. See
+     * {@link BufferedImage#getRGB(int, int)}
+     */
+    private int[] rgbColors;
 
+    /**
+     * Construct an empty emitter matrix.
+     */
     public EmitterMatrix() {
         super();
         channels = new double[3][getWidth() * getHeight()];
-        colors = new int[getWidth() * getHeight()];
+        rgbColors = new int[getWidth() * getHeight()];
     }
 
+    /**
+     * Construct an emitter matrix from an image.
+     *
+     * @param currentImage
+     */
     public EmitterMatrix(BufferedImage currentImage) {
         super(currentImage);
         channels = new double[3][getWidth() * getHeight()];
-        colors = new int[getWidth() * getHeight()];
+        rgbColors = new int[getWidth() * getHeight()];
     }
 
     /**
@@ -54,7 +85,7 @@ public class EmitterMatrix extends ImageSourceAdapter {
     @Consumable
     public void setRGBColor(int[] values) {
         int length = Math.min(values.length, getWidth() * getHeight());
-        System.arraycopy(values, 0, colors, 0, length);
+        System.arraycopy(values, 0, rgbColors, 0, length);
     }
 
     @Consumable(defaultVisibility = false)
@@ -78,7 +109,17 @@ public class EmitterMatrix extends ImageSourceAdapter {
     public void setSize(int width, int height) {
         setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
         channels = new double[3][getWidth() * getHeight()];
-        colors = new int[getWidth() * getHeight()];
+        rgbColors = new int[getWidth() * getHeight()];
+    }
+
+    /**
+     * Clears the image and sets it to black.
+     */
+    public void clear() {
+        Arrays.fill(channels[0], 0.0);
+        Arrays.fill(channels[1], 0.0);
+        Arrays.fill(channels[2], 0.0);
+        Arrays.fill(rgbColors, 0);
     }
 
     /**
@@ -95,7 +136,7 @@ public class EmitterMatrix extends ImageSourceAdapter {
             BufferedImage image = getCurrentImage();
             for (int y = 0; y < image.getHeight(); ++y) {
                 for (int x = 0; x < image.getWidth(); ++x) {
-                    int rgb = colors[y * getWidth() + x];
+                    int rgb = rgbColors[y * getWidth() + x];
                     image.setRGB(x, y, rgb);
                 }
             }
@@ -116,19 +157,6 @@ public class EmitterMatrix extends ImageSourceAdapter {
         }
 
         notifyImageUpdate();
-    }
-
-    // Testing image editing. obviously not done!
-    public void setBrightness(Point loc, int value) {
-        // TODO: Downsample location
-        channels[1][14] = value;
-    }
-
-    public void clear() {
-        Arrays.fill(channels[0], 0.0);
-        Arrays.fill(channels[1], 0.0);
-        Arrays.fill(channels[2], 0.0);
-        Arrays.fill(colors, 0);
     }
 
     @Override

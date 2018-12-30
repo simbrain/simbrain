@@ -21,16 +21,6 @@ import java.util.List;
 public class ImageWorldComponent extends WorkspaceComponent {
 
     /**
-     * Create an xstream from this class.
-     */
-    public static XStream getXStream() {
-        XStream stream = new XStream(new DomDriver());
-        stream.registerConverter(new BufferedImageConverter());
-        stream.registerConverter(new CouplingArrayConverter());
-        return stream;
-    }
-
-    /**
      * Open a saved ImageWorldComponent from an XML input stream.
      *
      * @param input  The input stream to read.
@@ -62,6 +52,16 @@ public class ImageWorldComponent extends WorkspaceComponent {
     private ImageWorldComponent(String name, ImageWorld world) {
         super(name);
         this.world = world;
+    }
+
+    /**
+     * Create an xstream from this class.
+     */
+    public static XStream getXStream() {
+        XStream stream = new XStream(new DomDriver());
+        stream.registerConverter(new BufferedImageConverter());
+        stream.registerConverter(new CouplingArrayConverter());
+        return stream;
     }
 
     @Override

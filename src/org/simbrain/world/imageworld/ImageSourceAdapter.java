@@ -15,8 +15,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class ImageSourceAdapter implements ImageSource {
 
+    /**
+     * See {@link ImageSource}.
+     */
     private boolean enabled = true;
-    
+
+    /**
+     * Default buffered image to work with.
+     */
     private BufferedImage currentImage;
     
     private transient List<ImageSourceListener> listeners;

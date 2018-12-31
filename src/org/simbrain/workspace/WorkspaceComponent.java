@@ -214,6 +214,10 @@ public abstract class WorkspaceComponent {
      * @return the visible producers
      */
     public List<Producer<?>> getVisibleProducers() {
+        getProducers().stream()
+                .map(Attribute::getMethod)
+                .filter(m -> !attributeTypeVisibilityMap.containsKey(m))
+                .forEach(m -> attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility()));
         return getProducers().stream()
                 .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
                 .collect(Collectors.toList());
@@ -225,6 +229,10 @@ public abstract class WorkspaceComponent {
      * @return the visible consumers
      */
     public List<Consumer<?>> getVisibleConsumers() {
+        getConsumers().stream()
+                .map(Attribute::getMethod)
+                .filter(m -> !attributeTypeVisibilityMap.containsKey(m))
+                .forEach(m -> attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility()));
         return getConsumers().stream()
                 .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
                 .collect(Collectors.toList());

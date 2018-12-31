@@ -46,15 +46,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
- * Layers in feed-forward networks are neuron groups. Self
- * -organizing-maps
+ * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
 
     // TODO: If 3.x is developed and neurongroup sticks around:
-    //  Add prototype neuron as in synapse group
-    //  Add group level polarity
     //  Fix isSpiking
 
     /**
@@ -161,8 +158,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      */
     private int writeCounter = 0;
 
-
-    //TODO: Wire this up
     /**
      * Number of subsamples to take. This value is also implicitly a threshold.
      * If a neuron group has more than this many neurons, and subsampling is
@@ -172,21 +167,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     @UserParameter(label = "Number of subsamples")
     private int numSubSamples = 100;
 
+    /**
+     * Array to hold subsamples to be used when, for example, plotting the
+     * state of large network.
+     */
     private double [] subSampledValues;
 
     /**
      * Indices used with subsampling.
      */
     private int[] subsamplingIndices;
-
-    /**
-     * Reset the indices used for subsampling.
-     */
-    public void resetSubsamplingIndices() {
-        if (neuronList != null) {
-            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
-        }
-    }
 
     /**
      * Construct a new neuron group from a list of neurons.
@@ -1581,7 +1571,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         return null;
     }
 
-
     /**
      * A hack to guess that the neuron group is spiking and thus that spike
      * indices menu should be shown.   The isSpikingNeuronGroup field is
@@ -1661,5 +1650,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             }
         }
         return retArray;
+    }
+
+    /**
+     * Reset the indices used for subsampling.
+     */
+    public void resetSubsamplingIndices() {
+        if (neuronList != null) {
+            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
+        }
     }
 }

@@ -18,11 +18,9 @@
  */
 package org.simbrain.util.propertyeditor2;
 
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
-import umontreal.iro.lecuyer.simevents.Sim;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -30,8 +28,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -170,21 +166,28 @@ public class ObjectTypeEditor extends JComponent {
         this.parent = parent;
         this.label = label;
         this.typeMap = typeMap;
+
+        // Check whether the objects being edited are of the same type
         boolean consistent = objectList.stream().allMatch(o -> {
             if(o != null && objectList.get(0) != null) {
                 return o.getClass() == objectList.get(0).getClass();
             } else {
                 return o == null && objectList.get(0) == null;
             }
-        } );
+        });
+
         if (!consistent) {
+            // In the case of inconsistent objects, put the null string in the
+            // combo box and use an empty editor panel
             cbStartState = SimbrainConstants.NULL_STRING;
             editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
         } else {
+            // Explictly treat null objects as "None" objects
             if(objectList.get(0) == null) {
                 cbStartState = SimbrainConstants.NONE_STRING;
                 editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
             } else {
+                // Main case: edit a group of consistent objects
                 cbStartState = typeMap.getInverse(objectList.get(0).getClass());
                 editorPanel = new AnnotatedPropertyEditor(objectList);
             }

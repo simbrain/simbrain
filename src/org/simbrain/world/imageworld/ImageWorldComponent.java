@@ -21,6 +21,11 @@ import java.util.List;
 public class ImageWorldComponent extends WorkspaceComponent {
 
     /**
+     * The image world this component displays.
+     */
+    private ImageWorld world;
+    
+    /**
      * Open a saved ImageWorldComponent from an XML input stream.
      *
      * @param input  The input stream to read.
@@ -32,11 +37,6 @@ public class ImageWorldComponent extends WorkspaceComponent {
         ImageWorld world = (ImageWorld) getXStream().fromXML(input);
         return new ImageWorldComponent(name, world);
     }
-
-    /**
-     * The image world this component displays.
-     */
-    private ImageWorld world;
 
     /**
      * Construct a new ImageWorldComponent.

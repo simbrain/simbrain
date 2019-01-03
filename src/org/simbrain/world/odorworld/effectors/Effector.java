@@ -81,7 +81,11 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
     }
 
     /**
-     * Default constructor for AnnotatedPropertyEditor
+     * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
+     *
+     * NOTE:
+     * {@link org.simbrain.world.odorworld.dialogs.AddEffectorDialog} handles the set up of {@link #parent}.
+     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
      */
     public Effector() {
         super();

@@ -67,6 +67,12 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public SmellSensor() {
+    }
+
+    /**
      * Update the smell array ({@link #currentValue}) by iterating over entities
      * and adding up their distance-scaled smell vectors.
      */
@@ -95,6 +101,11 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getTypeDescription() {
         return "Smell";
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     /**

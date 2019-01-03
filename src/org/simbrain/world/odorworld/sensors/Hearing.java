@@ -109,6 +109,12 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public Hearing() {
+    }
+
     @Override
     public void update() {
 
@@ -162,6 +168,16 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getTypeDescription() {
         return "Hearing";
+    }
+
+    @Override
+    public String getName() {
+        return "Hearing";
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     @Override

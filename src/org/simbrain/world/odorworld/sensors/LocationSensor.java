@@ -120,6 +120,12 @@ public class LocationSensor extends Sensor {
         this.height = height;
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public LocationSensor() {
+    }
+
     @Override
     public void update() {
         double entityX = parent.getCenterLocation()[0];
@@ -226,6 +232,11 @@ public class LocationSensor extends Sensor {
     @Override
     public String getTypeDescription() {
         return "Tile";
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     @Override

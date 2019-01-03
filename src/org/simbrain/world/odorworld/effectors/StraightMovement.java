@@ -72,10 +72,22 @@ public class StraightMovement extends Effector {
         super(parent, DEFAULT_LABEL);
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor
+     */
+    public StraightMovement() {
+        super();
+    }
+
     @Override
     public void update() {
         parent.goStraight(amount * scalingFactor);
         this.amount = 0;
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     /**

@@ -90,6 +90,12 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         this.world = parent.getParentWorld();
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public BumpSensor() {
+    }
+
     @Override
     public void update() {
         value = 0;
@@ -126,6 +132,11 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getTypeDescription() {
         return "Bump";
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     @Override

@@ -74,6 +74,12 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         super(parent, "Object Sensor");
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public ObjectSensor() {
+    }
+
     public DecayFunction getDecayFunction() {
         return decayFunction;
     }
@@ -107,6 +113,11 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @Override
     public String getTypeDescription() {
         return objectType.toString();
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     @Override

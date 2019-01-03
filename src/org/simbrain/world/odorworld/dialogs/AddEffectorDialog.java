@@ -15,7 +15,9 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -33,37 +35,25 @@ import java.awt.event.ActionListener;
 
 public class AddEffectorDialog extends StandardDialog {
 
-    //TODO: Replace with annotated property editor
-
-    /**
-     * String of effector types.
-     */
-    private String[] effectors = { "Speech", "Straight Movement", "Turning"};
-
     /**
      * Entity to which effector is being added.
      */
     private OdorWorldEntity entity;
 
     /**
-     * Instantiated entity to which effector is being added.
+     * The editable object APE is going to edit.
      */
-    private OdorWorldEntity parentEntity;
+    private Effector.EffectorCreator effectorCreator = new Effector.EffectorCreator();
 
     /**
-     * Select effector type.
+     * Main editing panel.
      */
-    private JComboBox effectorType = new JComboBox(effectors);
+    private AnnotatedPropertyEditor effectorCreatorPanel = new AnnotatedPropertyEditor(effectorCreator);
 
     /**
      * Main dialog box.
      */
     private Box mainPanel = Box.createVerticalBox();
-
-    /**
-     * Panel for setting effector type.
-     */
-    private LabelledItemPanel typePanel = new LabelledItemPanel();
 
     /**
      * Effector Dialog add effector constructor.
@@ -72,7 +62,6 @@ public class AddEffectorDialog extends StandardDialog {
      */
     public AddEffectorDialog(OdorWorldEntity entity) {
         this.entity = entity;
-        this.parentEntity = entity;
         init("Add effector");
     }
 
@@ -81,45 +70,25 @@ public class AddEffectorDialog extends StandardDialog {
      */
     private void init(String title) {
         setTitle(title);
-        typePanel.addItem("Effector Type", effectorType);
-        effectorType.setSelectedItem("SmellEffector");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/effectors.html");
         addButton(new JButton(helpAction));
-        initPanel();
-        mainPanel.add(typePanel);
+        mainPanel.add(effectorCreatorPanel);
         setContentPane(mainPanel);
     }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
+        effectorCreatorPanel.commitChanges();
         commitChanges();
     }
 
-    /**
-     * Initialize the effector Dialog Panel based upon the current effector
-     * type.
-     */
-    private void initPanel() {
-        if (effectorType.getSelectedItem() == "Straight Movement") {
-            setTitle("Add a straight movement effector");
-        } else if (effectorType.getSelectedItem() == "Turning") {
-            setTitle("Add a turning effector");
-        } else if (effectorType.getSelectedItem() == "Speech") {
-            setTitle("Add a speech effector");
-        }
-    }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        if (effectorType.getSelectedItem() == "Straight Movement") {
-            parentEntity.addEffector(new StraightMovement(parentEntity));
-        } else if (effectorType.getSelectedItem() == "Turning") {
-            parentEntity.addEffector(new Turning(parentEntity, Turning.DEFAULT_LABEL, 0.0));
-        } else if (effectorType.getSelectedItem() == "Speech") {
-            parentEntity.addEffector(new Speech(entity));
-        }
+        effectorCreator.getEffector().setParent(entity);
+        entity.addEffector(effectorCreator.getEffector());
     }
 }

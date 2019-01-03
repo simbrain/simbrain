@@ -21,6 +21,8 @@ public interface PeripheralAttribute extends AttributeContainer {
 
     public OdorWorldEntity getParent();
 
+    public void setParent(OdorWorldEntity parent);
+
     public void setLabel(String label);
 
     /**

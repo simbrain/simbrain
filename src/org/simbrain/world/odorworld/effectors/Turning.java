@@ -85,10 +85,22 @@ public class Turning extends Effector {
         this.direction = direction;
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public Turning() {
+        super();
+    }
+
     @Override
     public void update() {
         parent.turn(direction * amount);
         this.amount = 0;
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     /**

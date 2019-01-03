@@ -15,6 +15,7 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.*;
@@ -29,12 +30,6 @@ import javax.swing.*;
 
 public class AddSensorDialog extends StandardDialog {
 
-    //TODO: Replace with annotated property editor
-
-    /**
-     * String of Sensor types.
-     */
-    private String[] sensors = {"Bump Sensor", "Hearing Sensor", "Object Sensor", "Smell Sensor", "Tile Sensor" };
 
     /**
      * Entity to which sensor is being added.
@@ -42,19 +37,20 @@ public class AddSensorDialog extends StandardDialog {
     private OdorWorldEntity entity;
 
     /**
-     * Select sensor type.
+     * The editable object APE is going to edit.
      */
-    private JComboBox sensorType = new JComboBox(sensors);
+    private Sensor.SensorCreator sensorCreator = new Sensor.SensorCreator();
+
+    /**
+     * Main editing panel.
+     */
+    private AnnotatedPropertyEditor sensorCreatorPanel = new AnnotatedPropertyEditor(sensorCreator);
 
     /**
      * Main dialog box.
      */
     private Box mainPanel = Box.createVerticalBox();
 
-    /**
-     * Panel for setting sensor type.
-     */
-    private LabelledItemPanel typePanel = new LabelledItemPanel();
 
     /**
      * Sensor Dialog add sensor constructor.
@@ -71,57 +67,24 @@ public class AddSensorDialog extends StandardDialog {
      */
     private void init(String title) {
         setTitle(title);
-        typePanel.addItem("Sensor Type", sensorType);
-        sensorType.setSelectedItem("Smell Sensor");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
-        initPanel();
-        mainPanel.add(typePanel);
+        mainPanel.add(sensorCreatorPanel);
         setContentPane(mainPanel);
     }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
+        sensorCreatorPanel.commitChanges();
         commitChanges();
-    }
-
-    /**
-     * Initialize the Sensor Dialog Panel based upon the current sensor type.
-     */
-    private void initPanel() {
-        if (sensorType.getSelectedItem() == "Tile Sensor") {
-            setTitle("Add a tile sensor");
-        } else if (sensorType.getSelectedItem() == "Smell Sensor") {
-            setTitle("Add a smell sensor");
-        } else if (sensorType.getSelectedItem() == "Tile Set") {
-            setTitle("Add a grid of tile sensors");
-        } else if (sensorType.getSelectedItem() == "Hearing Sensor") {
-            setTitle("Add a hearing sensor");
-        } else if (sensorType.getSelectedItem().equals("Object Sensor")) {
-            setTitle("Add an object sensor");
-        } else if (sensorType.getSelectedItem().equals("Bump Sensor")) {
-            setTitle("Add a bump sensor");
-        }
-
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        if (sensorType.getSelectedItem() == "Tile Sensor") {
-            entity.addSensor(new TileSensor(entity));
-        } else if (sensorType.getSelectedItem() == "Smell Sensor") {
-            entity.addSensor(new SmellSensor(entity));
-        } else if (sensorType.getSelectedItem() == "Tile Set") {
-            entity.addSensor(new LocationSensor(entity, 0, 0, 0, 0));
-        } else if (sensorType.getSelectedItem() == "Hearing Sensor") {
-            entity.addSensor(new Hearing(entity));
-        } else if (sensorType.getSelectedItem().equals("Object Sensor")) {
-            entity.addSensor(new ObjectSensor(entity));
-        } else if (sensorType.getSelectedItem().equals("Bump Sensor")) {
-            entity.addSensor(new BumpSensor(entity));
-        }
+        sensorCreator.getSensor().setParent(entity);
+        entity.addSensor(sensorCreator.getSensor());
     }
 }

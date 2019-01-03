@@ -49,6 +49,12 @@ public class TileSensor extends Sensor {
         this.tileIdToSense = tileId;
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public TileSensor() {
+    }
+
     @Override
     public void update() {
         value = 0;
@@ -68,6 +74,11 @@ public class TileSensor extends Sensor {
     @Override
     public String getTypeDescription() {
         return "Tile";
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     @Override

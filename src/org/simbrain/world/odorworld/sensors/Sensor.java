@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -113,6 +114,13 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     }
 
     /**
+     * Default constructor for AnnotatedPropertyEditor.
+     */
+    public Sensor() {
+        super();
+    }
+
+    /**
      * Update the sensor.
      */
     public abstract void update();
@@ -198,5 +206,19 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      */
     public void postSerializationInit() {
         relativeLocation = new Point2D.Double();
+    }
+
+    public static class SensorCreator implements EditableObject {
+
+        @UserParameter(label="Sensor", isObjectType = true)
+        private Sensor sensor = new SmellSensor();
+
+        public Sensor getSensor() {
+            return sensor;
+        }
+
+        public void setSensor(Sensor sensor) {
+            this.sensor = sensor;
+        }
     }
 }

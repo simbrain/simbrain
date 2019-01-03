@@ -121,6 +121,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         super(parent, "Say: \"" + DEFAULT_PHRASE + "\"");
     }
 
+    /**
+     * Default constructor for AnnotatedPropertyEditor
+     */
+    public Speech() {
+        super();
+    }
+
     @Override
     public void update() {
         if (amount > threshold) {
@@ -146,6 +153,11 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
                 }
             }
         }
+    }
+
+    @Override
+    public void setParent(OdorWorldEntity parent) {
+        this.parent = parent;
     }
 
     public String getPhrase() {

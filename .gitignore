@@ -1,6 +1,5 @@
 /bin
-/build/main
-/build/apidocs
+/build
 /dist
 /scripts/scriptmenu/archives
 *.sublime-project
@@ -17,3 +16,6 @@ out/*
 .checkstyle
 *.dylib
 *.dll
+.gradle/
+*.ipr
+*.iws

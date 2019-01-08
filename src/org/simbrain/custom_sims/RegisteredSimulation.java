@@ -21,6 +21,7 @@ package org.simbrain.custom_sims;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
+import org.simbrain.custom_sims.simulations.behaviorism.Behaviorism;
 import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -65,6 +66,7 @@ public abstract class RegisteredSimulation {
         // REGISTERED_SIMS.add(new CreaturesSim());
         // REGISTERED_SIMS.add(new MpfsSOM());
         // REGISTERED_SIMS.add(new SimpleNeuroevolution());
+        REGISTERED_SIMS.add(new Behaviorism());
 
         // Alphabetize
         REGISTERED_SIMS

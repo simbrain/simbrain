@@ -90,17 +90,21 @@ public class Behaviorism extends RegisteredSimulation {
                 //norm all probabilities
                 normalizeNeurons();
                 //pick a behavior
+                sensoryNet.getNeuronList().get(0).setLabel(String.valueOf(sensoryNet.getNeuronList().get(0).getAuxValue()));
+                sensoryNet.getNeuronList().get(1).setLabel(String.valueOf(sensoryNet.getNeuronList().get(1).getAuxValue()));
+                sensoryNet.getNeuronList().get(2).setLabel(String.valueOf(sensoryNet.getNeuronList().get(2).getAuxValue()));
+
                 double random = Math.random();
                 if(random < sensoryNet.getNeuronList().get(0).getAuxValue()){
                     sensoryNet.getNeuronList().get(0).setActivation(1);
-                } else if(random < sensoryNet.getNeuronList().get(1).getAuxValue()){
+                } else if(random < sensoryNet.getNeuronList().get(1).getAuxValue() + sensoryNet.getNeuronList().get(0).getAuxValue()){
                     sensoryNet.getNeuronList().get(1).setActivation(1);
                 }else{
                     sensoryNet.getNeuronList().get(2).setActivation(1);
                 }
                 //change behaviors not every iteration, thats too fast
                 //
-                //System.out.println("Probability:" + probability);
+                System.out.println(random);
                 //sensoryNet.getNeuronList().get(0).setActivation(probability);
 
             }
@@ -157,25 +161,21 @@ public class Behaviorism extends RegisteredSimulation {
 
         panel.addButton("Reward Agent", () -> {
 
-            int locbiggest;
             for(Neuron n : sensoryNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    locbiggest = n;
+                    n.setAuxValue(n.getAuxValue() + .1*n.getAuxValue()); ;
                 }
             }
-            sensoryNet.getNeuronList().get(locbiggest).setAuxValue(sensoryNet.getNeuronList().get(locbiggest).getAuxValue() + .1*(sensoryNet.getNeuronList().get(locbiggest).getAuxValue()));
             sim.iterate();
         });
 
         panel.addButton("Punish Agent", () -> {
 
-            int locbiggest;
             for(Neuron n : sensoryNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    locbiggest = n;
+                    n.setAuxValue(n.getAuxValue() - .1*n.getAuxValue()); ;
                 }
             }
-            sensoryNet.getNeuronList().get(locbiggest).setAuxValue(sensoryNet.getNeuronList().get(locbiggest).getAuxValue() - .1*(sensoryNet.getNeuronList().get(locbiggest).getAuxValue()));
             sim.iterate();
         });
 
@@ -249,8 +249,7 @@ public class Behaviorism extends RegisteredSimulation {
     }
 
     @Override
-    public Behaviorism instantiate(SimbrainDesktop desktop) {
-        return new Behaviorism(desktop);
+    public Behaviorism instantiate(SimbrainDesktop desktop) { return new Behaviorism(desktop);
     }
 
 }

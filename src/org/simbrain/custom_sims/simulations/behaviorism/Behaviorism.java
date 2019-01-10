@@ -42,6 +42,10 @@ public class Behaviorism extends RegisteredSimulation {
 
     int probability = 0; // Temp to demo
 
+    final int numNeurons = 3;
+
+
+
     public Behaviorism() {
         super();
     }
@@ -62,12 +66,19 @@ public class Behaviorism extends RegisteredSimulation {
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
 
+
+
         // Build a network
         netBuilder = sim.addNetwork(195, 9, 447, 296, "Behaviors");
-        sensoryNet = netBuilder.addNeuronGroup(-9.25, 95.93, 3);
+        sensoryNet = netBuilder.addNeuronGroup(-9.25, 95.93, numNeurons);
         sensoryNet.getNeuronList().get(0).setLabel("B1");
         sensoryNet.getNeuronList().get(1).setLabel("B2");
         sensoryNet.getNeuronList().get(2).setLabel("B3");
+        sensoryNet.getNeuronList().get(0).setAuxValue(.34);
+        sensoryNet.getNeuronList().get(1).setAuxValue(.33);
+        sensoryNet.getNeuronList().get(2).setAuxValue(.33);
+
+
 
 
         //net.getNetwork().getUpdateManager().clear();
@@ -75,9 +86,22 @@ public class Behaviorism extends RegisteredSimulation {
         netBuilder.getNetwork().addUpdateAction(new NetworkUpdateAction() {
             @Override
             public void invoke() {
-
-                System.out.println("Probability:" + probability);
-                sensoryNet.getNeuronList().get(0).setActivation(probability);
+                //clear activation?
+                //norm all probabilities
+                normalizeNeurons();
+                //pick a behavior
+                double random = Math.random();
+                if(random < sensoryNet.getNeuronList().get(0).getAuxValue()){
+                    sensoryNet.getNeuronList().get(0).setActivation(1);
+                } else if(random < sensoryNet.getNeuronList().get(1).getAuxValue()){
+                    sensoryNet.getNeuronList().get(1).setActivation(1);
+                }else{
+                    sensoryNet.getNeuronList().get(2).setActivation(1);
+                }
+                //change behaviors not every iteration, thats too fast
+                //
+                //System.out.println("Probability:" + probability);
+                //sensoryNet.getNeuronList().get(0).setActivation(probability);
 
             }
 
@@ -132,12 +156,26 @@ public class Behaviorism extends RegisteredSimulation {
         panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
 
         panel.addButton("Reward Agent", () -> {
-            probability += 1;
+
+            int locbiggest;
+            for(Neuron n : sensoryNet.getNeuronList()) {
+                if(n.getActivation() > 0){
+                    locbiggest = n;
+                }
+            }
+            sensoryNet.getNeuronList().get(locbiggest).setAuxValue(sensoryNet.getNeuronList().get(locbiggest).getAuxValue() + .1*(sensoryNet.getNeuronList().get(locbiggest).getAuxValue()));
             sim.iterate();
         });
 
         panel.addButton("Punish Agent", () -> {
-            probability -= 1;
+
+            int locbiggest;
+            for(Neuron n : sensoryNet.getNeuronList()) {
+                if(n.getActivation() > 0){
+                    locbiggest = n;
+                }
+            }
+            sensoryNet.getNeuronList().get(locbiggest).setAuxValue(sensoryNet.getNeuronList().get(locbiggest).getAuxValue() - .1*(sensoryNet.getNeuronList().get(locbiggest).getAuxValue()));
             sim.iterate();
         });
 
@@ -196,6 +234,15 @@ public class Behaviorism extends RegisteredSimulation {
 
     }
 
+    private  void normalizeNeurons() {
+        int forNorm = 0;
+        for(Neuron n : sensoryNet.getNeuronList()) {
+            forNorm += n.getAuxValue();
+        }
+        for(Neuron n : sensoryNet.getNeuronList()) {
+            n.setAuxValue(n.getAuxValue()/forNorm);
+        }
+    }
     @Override
     public String getName() {
         return "Behaviorism";

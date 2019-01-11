@@ -7,9 +7,13 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simulation to demonstrate classical and operant conditioning.
@@ -19,40 +23,19 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class Behaviorism extends RegisteredSimulation {
 
-    // TODO: Display probabilities of behaviors
-
     NetBuilder netBuilder;
-    RotatingEntity mouse;
-    OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
-    NeuronGroup sensoryNet, actionNet, predictionNet;
-    Neuron leftNeuron, straightNeuron, rightNeuron;
-    Neuron cheeseNeuron, flowerNeuron, fishNeuron;
-    Neuron errorNeuron;
-    OdorWorldBuilder world;
+    NeuronGroup sensoryNet;
 
-    // Default values for these used by buttons
-    int dispersion = 65;
-    int fishX = 50;
-    int fishY = 100;
-    int flowerX = 200;
-    int flowerY = 100;
-    int cheeseX = 120;
-    int cheeseY = 180;
-
-    int probability = 0; // Temp to demo
+    Map<Neuron, String> nodeToLabel = new HashMap();
 
     final int numNeurons = 3;
-
 
 
     public Behaviorism() {
         super();
     }
 
-    /**
-     * @param desktop
-     */
     public Behaviorism(SimbrainDesktop desktop) {
         super(desktop);
     }
@@ -66,93 +49,64 @@ public class Behaviorism extends RegisteredSimulation {
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
 
-
-
         // Build a network
         netBuilder = sim.addNetwork(195, 9, 447, 296, "Behaviors");
         sensoryNet = netBuilder.addNeuronGroup(-9.25, 95.93, numNeurons);
-        sensoryNet.getNeuronList().get(0).setLabel("B1");
-        sensoryNet.getNeuronList().get(1).setLabel("B2");
-        sensoryNet.getNeuronList().get(2).setLabel("B3");
-        sensoryNet.getNeuronList().get(0).setAuxValue(.34);
-        sensoryNet.getNeuronList().get(1).setAuxValue(.33);
-        sensoryNet.getNeuronList().get(2).setAuxValue(.33);
+        sensoryNet.setClamped(true);
 
+        // Set base text for labels
+        nodeToLabel.put(sensoryNet.getNeuron(0), "B1");
+        nodeToLabel.put(sensoryNet.getNeuron(1), "B2");
+        nodeToLabel.put(sensoryNet.getNeuron(2), "B3");
 
+        // Use aux values to store firing probabilities
+        sensoryNet.getNeuron(0).setAuxValue(.34);
+        sensoryNet.getNeuron(1).setAuxValue(.33);
+        sensoryNet.getNeuron(2).setAuxValue(.33);
 
-
-        //net.getNetwork().getUpdateManager().clear();
-
+        // Add custom network update action
         netBuilder.getNetwork().addUpdateAction(new NetworkUpdateAction() {
+
             @Override
             public void invoke() {
-                //clear activation?
-                //norm all probabilities
-                normalizeNeurons();
-                //pick a behavior
-                sensoryNet.getNeuronList().get(0).setLabel(String.valueOf(sensoryNet.getNeuronList().get(0).getAuxValue()));
-                sensoryNet.getNeuronList().get(1).setLabel(String.valueOf(sensoryNet.getNeuronList().get(1).getAuxValue()));
-                sensoryNet.getNeuronList().get(2).setLabel(String.valueOf(sensoryNet.getNeuronList().get(2).getAuxValue()));
-
+                // Select "winning" neuron based on its probability
+                // TODO: There must be a better, generalizable way to do this
                 double random = Math.random();
-                if(random < sensoryNet.getNeuronList().get(0).getAuxValue()){
-                    sensoryNet.getNeuronList().get(0).setActivation(1);
-                } else if(random < sensoryNet.getNeuronList().get(1).getAuxValue() + sensoryNet.getNeuronList().get(0).getAuxValue()){
-                    sensoryNet.getNeuronList().get(1).setActivation(1);
-                }else{
-                    sensoryNet.getNeuronList().get(2).setActivation(1);
+                if(random < sensoryNet.getNeuron(0).getAuxValue()){
+                    setWinningNode(0);
+                } else if(random < sensoryNet.getNeuron(0).getAuxValue()
+                    + sensoryNet.getNeuron(1).getAuxValue()) {
+                    setWinningNode(1);
+                } else{
+                    setWinningNode(2);
                 }
-                //change behaviors not every iteration, thats too fast
-                //
-                System.out.println(random);
-                //sensoryNet.getNeuronList().get(0).setActivation(probability);
 
             }
 
             @Override
             public String getDescription() {
-                return null;
+                return "Custom behaviorism update";
             }
 
             @Override
             public String getLongDescription() {
-                return null;
+                return "Custom behaviorism update";
             }
         });
 
-
-        // // Create the odor world
-        // world = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
-        // world.getWorld().setObjectsBlockMovement(false);
-        // mouse = world.addAgent(120, 245, "Mouse");
-        // mouse.setHeading(90);
-        //
-        // // Set up world
-        // cheese = world.addEntity(120, 180, "Swiss.gif",
-        //         new double[] { 1, 0, 0 });
-        // cheese.getSmellSource().setDispersion(65);
-        // flower = world.addEntity(200, 100, "Pansy.gif",
-        //         new double[] { 0, 1, 0 });
-        // cheese.getSmellSource().setDispersion(65);
-        // fish = world.addEntity(50, 100, "Fish.gif",
-        //         new double[] { 0, 0, 1 });
-        // cheese.getSmellSource().setDispersion(65);
-        //
-        // // Couple network to agent
-        // sim.couple(straightNeuron, mouse.getEffector("Go-straight"));
-        // sim.couple(rightNeuron, mouse.getEffector("Go-left"));
-        // sim.couple(leftNeuron, mouse.getEffector("Go-right"));
-        //
-        // // Couple agent to network
-        // sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
-        //         cheeseNeuron);
-        // sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1,
-        //         flowerNeuron);
-        // sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2,
-        //         fishNeuron);
-
         setUpControlPanel();
 
+    }
+
+    private void setWinningNode(int nodeIndex) {
+        System.out.println("Winner: " + nodeIndex);
+        for (int i = 0; i < sensoryNet.size(); i++) {
+            if (i == nodeIndex) {
+                sensoryNet.getNeuron(i).forceSetActivation(1);
+            } else {
+                sensoryNet.getNeuron(i).forceSetActivation(0);
+            }
+        }
     }
 
     private void setUpControlPanel() {
@@ -163,86 +117,50 @@ public class Behaviorism extends RegisteredSimulation {
 
             for(Neuron n : sensoryNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    n.setAuxValue(n.getAuxValue() + .1*n.getAuxValue()); ;
+                    n.setAuxValue(n.getAuxValue() + .1); ;
                 }
             }
+            normalizeProbabilities();
+            updateNodeLabels();
             sim.iterate();
         });
 
         panel.addButton("Punish Agent", () -> {
-
             for(Neuron n : sensoryNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    n.setAuxValue(n.getAuxValue() - .1*n.getAuxValue()); ;
+                    n.setAuxValue(n.getAuxValue() - .1); ;
                 }
             }
+            normalizeProbabilities();
+            updateNodeLabels();
             sim.iterate();
         });
 
-        // // Move past cheese
-        // panel.addButton("Cheese", () -> {
-        //     net.getNetwork().clearActivations();
-        //     mouse.setLocation(cheeseX, cheeseY + dispersion);
-        //     mouse.setHeading(90);
-        //     straightNeuron.forceSetActivation(1);
-        //     sim.iterate(180);
-        // });
-        //
-        // // Move past Fish
-        // panel.addButton("Fish", () -> {
-        //     net.getNetwork().clearActivations();
-        //     mouse.setLocation(fishX, fishY + dispersion);
-        //     mouse.setHeading(90);
-        //     straightNeuron.forceSetActivation(1);
-        //     sim.iterate(180);
-        // });
-        //
-        // // Move past flower
-        // panel.addButton("Flower", () -> {
-        //     net.getNetwork().clearActivations();
-        //     mouse.setLocation(flowerX, flowerY + dispersion);
-        //     mouse.setHeading(90);
-        //     straightNeuron.forceSetActivation(1);
-        //     sim.iterate(180);
-        // });
-        //
-        // // Cheese > Fish
-        // panel.addButton("Cheese > Flower", () -> {
-        //     net.getNetwork().clearActivations();
-        //     mouse.setLocation(cheeseX, cheeseY + dispersion);
-        //     mouse.setHeading(90);
-        //     straightNeuron.forceSetActivation(1);
-        //     sim.iterate(50);
-        //     rightNeuron.forceSetActivation(1.5);
-        //     sim.iterate(25);
-        //     rightNeuron.forceSetActivation(0);
-        //     sim.iterate(220);
-        // });
-        //
-        // // Cheese > Flower
-        // panel.addButton("Cheese > Fish", () -> {
-        //     net.getNetwork().clearActivations();
-        //     mouse.setLocation(cheeseX, cheeseY + dispersion);
-        //     mouse.setHeading(90);
-        //     straightNeuron.forceSetActivation(1);
-        //     sim.iterate(50);
-        //     leftNeuron.forceSetActivation(1.5);
-        //     sim.iterate(25);
-        //     leftNeuron.forceSetActivation(0);
-        //     sim.iterate(220);
-        // });
-
     }
 
-    private  void normalizeNeurons() {
-        int forNorm = 0;
+    private void normalizeProbabilities() {
+        int totalMass = 0;
         for(Neuron n : sensoryNet.getNeuronList()) {
-            forNorm += n.getAuxValue();
+            totalMass += n.getAuxValue();
+        }
+        System.out.println("Total mass = " + totalMass);
+        if (totalMass == 0) {
+            System.err.println("Mass was 0!");
+            return;
         }
         for(Neuron n : sensoryNet.getNeuronList()) {
-            n.setAuxValue(n.getAuxValue()/forNorm);
+            n.setAuxValue(n.getAuxValue()/totalMass);
         }
     }
+
+    private void updateNodeLabels() {
+        for(Neuron n : sensoryNet.getNeuronList()) {
+            n.setLabel(nodeToLabel.get(n) + ": "
+                + SimbrainMath.roundDouble(n.getAuxValue(), 2));
+        }
+    }
+
+
     @Override
     public String getName() {
         return "Behaviorism";

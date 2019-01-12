@@ -187,7 +187,7 @@ public class SimbrainDesktop {
     /**
      * Name to display in Simbrain desktop window.
      */
-    private static String FRAME_TITLE = "Simbrain 3.1 Beta";
+    private static String FRAME_TITLE = "Simbrain 4 Beta";
 
     /**
      * Associates workspace components with their corresponding gui components.

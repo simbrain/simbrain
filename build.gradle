@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'checkstyle'
 
-def versionName = "Simbrain3.1Beta"
+def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '[3.2,)'
 def log4jVer = '2.5'
 def dl4j_version = "1.0.0-beta"

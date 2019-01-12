@@ -10,7 +10,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -95,9 +94,9 @@ public class Behaviorism3 extends RegisteredSimulation {
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels
-        nodeToLabel.put(behaviorNet.getNeuron(0), "Spin");
-        nodeToLabel.put(behaviorNet.getNeuron(1), "Move Left");
-        nodeToLabel.put(behaviorNet.getNeuron(2), "Move Up");
+        nodeToLabel.put(behaviorNet.getNeuron(0), "Wiggle");
+        nodeToLabel.put(behaviorNet.getNeuron(1), "Misc");
+        nodeToLabel.put(behaviorNet.getNeuron(2), "Move Down");
 
         // Set stimulus labels
         stimulusNet.getNeuron(0).setLabel("Light");
@@ -151,10 +150,9 @@ public class Behaviorism3 extends RegisteredSimulation {
             public void invoke() {
 
                 if (sim.getWorkspace().getTime() % 100 == 0) {
-                    behaviorNet.setClamped(false);
                     updateNetwork();
                 }
-                updateWorld();
+                updateBehaviors();
             }
 
             @Override
@@ -172,12 +170,29 @@ public class Behaviorism3 extends RegisteredSimulation {
 
     }
 
-    private void updateWorld() {
+    /**
+     * Update behavior of odor world agent based on which node is active.
+     * Assumes behaviors partitioned into increments of (currently) 100 time steps
+     */
+    private void updateBehaviors() {
 
+        int loopTime = sim.getWorkspace().getTime() % 100;
         if(winningNode == 0) {
-            mouse.setHeading(mouse.getHeading() + 1);
+            if (loopTime < 50) {
+                mouse.setHeading(mouse.getHeading() + 1);
+            } else {
+                mouse.setHeading(mouse.getHeading() - 1);
+            }
         } else if (winningNode == 1) {
-            mouse.setX(mouse.getX() + 1);
+            if (loopTime < 20) {
+                mouse.setX(mouse.getX() + 1);
+            } else if (loopTime < 30) {
+                mouse.setY(mouse.getY() + 1);
+            } else if (loopTime < 50) {
+                mouse.setHeading(mouse.getHeading() - 1);
+            } else {
+                mouse.setX(mouse.getX() + 1);
+            }
         } else {
             mouse.setY(mouse.getY() + 1);
         }
@@ -185,6 +200,8 @@ public class Behaviorism3 extends RegisteredSimulation {
 
 
     private void updateNetwork() {
+
+        behaviorNet.setClamped(false);
 
         // Update firing probabilities
         for (int i = 0; i < behaviorNet.size(); i++) {
@@ -241,7 +258,7 @@ public class Behaviorism3 extends RegisteredSimulation {
     private void learn(double valence) {
         // todo: possibly separate learning rates out
 
-        
+
         for(Neuron tar : behaviorNet.getNeuronList()) {
 
             // The "winning" node

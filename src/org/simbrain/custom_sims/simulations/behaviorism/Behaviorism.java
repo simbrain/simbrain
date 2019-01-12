@@ -3,14 +3,12 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +23,11 @@ public class Behaviorism extends RegisteredSimulation {
 
     NetBuilder netBuilder;
     ControlPanel panel;
-    NeuronGroup sensoryNet;
+    NeuronGroup behaviorNet;
 
     Map<Neuron, String> nodeToLabel = new HashMap();
 
     final int numNeurons = 3;
-
 
     public Behaviorism() {
         super();
@@ -51,18 +48,23 @@ public class Behaviorism extends RegisteredSimulation {
 
         // Build a network
         netBuilder = sim.addNetwork(195, 9, 447, 296, "Behaviors");
-        sensoryNet = netBuilder.addNeuronGroup(-9.25, 95.93, numNeurons);
-        sensoryNet.setClamped(true);
+        behaviorNet = netBuilder.addNeuronGroup(-9.25, 95.93, numNeurons);
+        ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
+        behaviorNet.applyLayout();
+        behaviorNet.setClamped(true);
 
         // Set base text for labels
-        nodeToLabel.put(sensoryNet.getNeuron(0), "B1");
-        nodeToLabel.put(sensoryNet.getNeuron(1), "B2");
-        nodeToLabel.put(sensoryNet.getNeuron(2), "B3");
+        nodeToLabel.put(behaviorNet.getNeuron(0), "Yell");
+        nodeToLabel.put(behaviorNet.getNeuron(1), "Sit");
+        nodeToLabel.put(behaviorNet.getNeuron(2), "Run");
 
         // Use aux values to store firing probabilities
-        sensoryNet.getNeuron(0).setAuxValue(.34);
-        sensoryNet.getNeuron(1).setAuxValue(.33);
-        sensoryNet.getNeuron(2).setAuxValue(.33);
+        behaviorNet.getNeuron(0).setAuxValue(.34);
+        behaviorNet.getNeuron(1).setAuxValue(.33);
+        behaviorNet.getNeuron(2).setAuxValue(.33);
+
+        // Initialize labels
+        updateNodeLabels();
 
         // Add custom network update action
         netBuilder.getNetwork().addUpdateAction(new NetworkUpdateAction() {
@@ -72,10 +74,10 @@ public class Behaviorism extends RegisteredSimulation {
                 // Select "winning" neuron based on its probability
                 // TODO: There must be a better, generalizable way to do this
                 double random = Math.random();
-                if(random < sensoryNet.getNeuron(0).getAuxValue()){
+                if(random < behaviorNet.getNeuron(0).getAuxValue()){
                     setWinningNode(0);
-                } else if(random < sensoryNet.getNeuron(0).getAuxValue()
-                    + sensoryNet.getNeuron(1).getAuxValue()) {
+                } else if(random < behaviorNet.getNeuron(0).getAuxValue()
+                    + behaviorNet.getNeuron(1).getAuxValue()) {
                     setWinningNode(1);
                 } else{
                     setWinningNode(2);
@@ -99,12 +101,11 @@ public class Behaviorism extends RegisteredSimulation {
     }
 
     private void setWinningNode(int nodeIndex) {
-        System.out.println("Winner: " + nodeIndex);
-        for (int i = 0; i < sensoryNet.size(); i++) {
+        for (int i = 0; i < behaviorNet.size(); i++) {
             if (i == nodeIndex) {
-                sensoryNet.getNeuron(i).forceSetActivation(1);
+                behaviorNet.getNeuron(i).forceSetActivation(1);
             } else {
-                sensoryNet.getNeuron(i).forceSetActivation(0);
+                behaviorNet.getNeuron(i).forceSetActivation(0);
             }
         }
     }
@@ -115,9 +116,10 @@ public class Behaviorism extends RegisteredSimulation {
 
         panel.addButton("Reward Agent", () -> {
 
-            for(Neuron n : sensoryNet.getNeuronList()) {
+            for(Neuron n : behaviorNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    n.setAuxValue(n.getAuxValue() + .1); ;
+                    double p = n.getAuxValue();
+                    n.setAuxValue(Math.max(p + .1 * p, 0));
                 }
             }
             normalizeProbabilities();
@@ -126,9 +128,10 @@ public class Behaviorism extends RegisteredSimulation {
         });
 
         panel.addButton("Punish Agent", () -> {
-            for(Neuron n : sensoryNet.getNeuronList()) {
+            for(Neuron n : behaviorNet.getNeuronList()) {
                 if(n.getActivation() > 0){
-                    n.setAuxValue(n.getAuxValue() - .1); ;
+                    double p = n.getAuxValue();
+                    n.setAuxValue(Math.max(p - .1 * p, 0));
                 }
             }
             normalizeProbabilities();
@@ -139,22 +142,17 @@ public class Behaviorism extends RegisteredSimulation {
     }
 
     private void normalizeProbabilities() {
-        int totalMass = 0;
-        for(Neuron n : sensoryNet.getNeuronList()) {
+        double totalMass = 0;
+        for(Neuron n : behaviorNet.getNeuronList()) {
             totalMass += n.getAuxValue();
         }
-        System.out.println("Total mass = " + totalMass);
-        if (totalMass == 0) {
-            System.err.println("Mass was 0!");
-            return;
-        }
-        for(Neuron n : sensoryNet.getNeuronList()) {
+        for(Neuron n : behaviorNet.getNeuronList()) {
             n.setAuxValue(n.getAuxValue()/totalMass);
         }
     }
 
     private void updateNodeLabels() {
-        for(Neuron n : sensoryNet.getNeuronList()) {
+        for(Neuron n : behaviorNet.getNeuronList()) {
             n.setLabel(nodeToLabel.get(n) + ": "
                 + SimbrainMath.roundDouble(n.getAuxValue(), 2));
         }

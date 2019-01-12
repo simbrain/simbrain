@@ -138,15 +138,15 @@ public class NetBuilder {
                 target.getNeuronList());
     }
 
-    public void connectAllToAll(NeuronGroup source, NeuronGroup target) {
+    public  List<Synapse>  connectAllToAll(NeuronGroup source, NeuronGroup target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(source.getNeuronList(),
+        return connector.connectAllToAll(source.getNeuronList(),
                 target.getNeuronList());
     }
 
-    public void connectAllToAll(NeuronGroup inputs, Neuron target) {
+    public List<Synapse>  connectAllToAll(NeuronGroup inputs, Neuron target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(inputs.getNeuronList(),
+        return connector.connectAllToAll(inputs.getNeuronList(),
                 Collections.singletonList(target));
     }
 

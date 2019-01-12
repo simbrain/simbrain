@@ -421,46 +421,4 @@ public class ConnectionUtilities {
             }
         }
     }
-
-    /**
-     * A functional interface that is intended to be used to set some parameter
-     * of the synapse to the specified value. Essentially, this interface
-     * supports a generic setter, which can be used to create any given setter
-     * which can then be applied across multiple synapses.
-     *
-     * @param <T>
-     * @author Zoë Tosi
-     */
-    public static interface SynapseParameterSetter<T> {
-        /**
-         * A generic setter intended to be used to set some parameter of the
-         * synapse parameter to the given value.
-         *
-         * @param synapse the synapse whose parameter is being set
-         * @param val     the value that parameter will be set to
-         */
-        void setSynapseParameter(Synapse synapse, T val);
-    }
-
-    /**
-     * A functional interface that is intended to check/return the value of some
-     * parameter(s) of a(some) synapse(s). The function checks only one synapse
-     * but the interface is meant to be used as a generic getter which can be
-     * applied over a list of synapses.
-     *
-     * @param <T>
-     * @author Zoë Tosi
-     */
-    public static interface SynapseParameterGetter<T> {
-        /**
-         * A generic getter intended to be used to return the value of some
-         * parameter of the given synapse.
-         *
-         * @param synapse the synapse from which some parameter value is being
-         *                returned
-         * @return the value of some parameter of the synapse.
-         */
-        T getParameterFromSynapse(Synapse synapse);
-    }
-
 }

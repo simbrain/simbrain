@@ -3,16 +3,24 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Simulation to demonstrate classical and operant conditioning.
@@ -21,7 +29,11 @@ import java.util.*;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class Behaviorism2 extends RegisteredSimulation {
+public class Behaviorism3 extends RegisteredSimulation {
+
+    //TODOS
+
+    // Add odor world in subsequent simulation
 
     NetBuilder netBuilder;
     Network network;
@@ -29,18 +41,21 @@ public class Behaviorism2 extends RegisteredSimulation {
     NeuronGroup behaviorNet;
     NeuronGroup stimulusNet;
     Neuron rewardNeuron, punishNeuron;
-
     Map<Neuron, String> nodeToLabel = new HashMap();
-
     final int numNeurons = 3;
-
     double[] firingProbabilities = new double[numNeurons];
+    int winningNode;
 
-    public Behaviorism2() {
+    OdorWorldBuilder world;
+    RotatingEntity mouse;
+    OdorWorldEntity cheese, flower, fish;
+
+
+    public Behaviorism3() {
         super();
     }
 
-    public Behaviorism2(SimbrainDesktop desktop) {
+    public Behaviorism3(SimbrainDesktop desktop) {
         super(desktop);
     }
 
@@ -80,16 +95,16 @@ public class Behaviorism2 extends RegisteredSimulation {
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels
-        nodeToLabel.put(behaviorNet.getNeuron(0), "Bar Press");
-        nodeToLabel.put(behaviorNet.getNeuron(1), "Spin");
-        nodeToLabel.put(behaviorNet.getNeuron(2), "Sit");
+        nodeToLabel.put(behaviorNet.getNeuron(0), "Spin");
+        nodeToLabel.put(behaviorNet.getNeuron(1), "Move Left");
+        nodeToLabel.put(behaviorNet.getNeuron(2), "Move Up");
 
         // Set stimulus labels
         stimulusNet.getNeuron(0).setLabel("Light");
         stimulusNet.getNeuron(1).setLabel("Speaker");
         stimulusNet.getNeuron(2).setLabel("Person");
 
-        // Use aux values to store "intrinsict" firing probabilities for behaviors
+        // Use aux values to store "intrinsic" firing probabilities for behaviors
         behaviorNet.getNeuron(0).setAuxValue(.33);
         behaviorNet.getNeuron(1).setAuxValue(.33);
         behaviorNet.getNeuron(2).setAuxValue(.34);
@@ -104,12 +119,42 @@ public class Behaviorism2 extends RegisteredSimulation {
         }
         network.fireSynapsesUpdated();
 
+        // Create the odor world
+        world = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
+        world.getWorld().setObjectsBlockMovement(false);
+        mouse = world.addAgent(120, 245, "Mouse");
+        mouse.setHeading(90);
+
+        // Set up world
+        cheese = world.addEntity(120, 180, "Swiss.gif",
+            new double[] { 1, 0, 0 });
+        cheese.getSmellSource().setDispersion(65);
+        flower = world.addEntity(200, 100, "Pansy.gif",
+            new double[] { 0, 1, 0 });
+        cheese.getSmellSource().setDispersion(65);
+        fish = world.addEntity(50, 100, "Fish.gif",
+            new double[] { 0, 0, 1 });
+        cheese.getSmellSource().setDispersion(65);
+
+        // Couple agent to network
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
+            stimulusNet.getNeuron(0));
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1,
+            stimulusNet.getNeuron(1));
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2,
+            stimulusNet.getNeuron(2));
+
         // Add custom network update action
         network.getUpdateManager().addAction(new NetworkUpdateAction() {
 
             @Override
             public void invoke() {
-                updateNetwork();
+
+                if (sim.getWorkspace().getTime() % 100 == 0) {
+                    behaviorNet.setClamped(false);
+                    updateNetwork();
+                }
+                updateWorld();
             }
 
             @Override
@@ -126,6 +171,18 @@ public class Behaviorism2 extends RegisteredSimulation {
         setUpControlPanel();
 
     }
+
+    private void updateWorld() {
+
+        if(winningNode == 0) {
+            mouse.setHeading(mouse.getHeading() + 1);
+        } else if (winningNode == 1) {
+            mouse.setX(mouse.getX() + 1);
+        } else {
+            mouse.setY(mouse.getY() + 1);
+        }
+    }
+
 
     private void updateNetwork() {
 
@@ -146,9 +203,12 @@ public class Behaviorism2 extends RegisteredSimulation {
         } else{
             setWinningNode(2);
         }
+
+        behaviorNet.setClamped(true);
     }
 
     private void setWinningNode(int nodeIndex) {
+        winningNode = nodeIndex;
         for (int i = 0; i < behaviorNet.size(); i++) {
             if (i == nodeIndex) {
                 behaviorNet.getNeuron(i).forceSetActivation(1);
@@ -180,6 +240,8 @@ public class Behaviorism2 extends RegisteredSimulation {
 
     private void learn(double valence) {
         // todo: possibly separate learning rates out
+
+        
         for(Neuron tar : behaviorNet.getNeuronList()) {
 
             // The "winning" node
@@ -221,11 +283,11 @@ public class Behaviorism2 extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism 2";
+        return "Behaviorism 3";
     }
 
     @Override
-    public Behaviorism2 instantiate(SimbrainDesktop desktop) { return new Behaviorism2(desktop);
+    public Behaviorism3 instantiate(SimbrainDesktop desktop) { return new Behaviorism3(desktop);
     }
 
 }

@@ -197,27 +197,6 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
         return neuron.getId() + ".  Location: (" + (int) neuron.getX() + "," + (int) neuron.getY() + "). Activation: " + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
-//    /**
-//     * @return the increment
-//     */
-//    public double getIncrement() {
-//        return increment;
-//    }
-//
-//    /**
-//     * @param increment the increment to set
-//     */
-//    public void setIncrement(double increment) {
-//        this.increment = increment;
-//    }
-//
-//    public InputType getInputType() {
-//        return inputType;
-//    }
-//
-//    public void setInputType(InputType inputType) {
-//        this.inputType = inputType;
-//    }
 
     public boolean isSpikingNeuron() {
         return false;

@@ -21,6 +21,7 @@ package org.simbrain.network.core;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -340,12 +341,14 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Set a default spike responder if the spike responder has not been initialized.
      */
     public void initSpikeResponder() {
-        if(source == null) {
-            setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
-        } else if (getSpikeResponder() == null && source.getUpdateRule().isSpikingNeuron()) {
-            setSpikeResponder(DEFAULT_SPIKE_RESPONDER);
-        } else if (!source.getUpdateRule().isSpikingNeuron()) {
-            setSpikeResponder(null);
+        if (source != null) {
+            if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+                if (spikeResponder == null) {
+                    spikeResponder = DEFAULT_SPIKE_RESPONDER;
+                }
+            } else {
+                spikeResponder = new NonResponder();
+            }
         }
     }
 
@@ -369,11 +372,7 @@ public class Synapse implements EditableObject, AttributeContainer {
         if (!enabled) {
             return 0;
         } else {
-            if (spikeResponder != null) {
-                spikeResponder.update(this);
-            } else {
-                return calcWeightedSum();
-            }
+            spikeResponder.update(this);
             if (delay == 0) {
                 return psr;
             } else {
@@ -680,21 +679,12 @@ public class Synapse implements EditableObject, AttributeContainer {
         this.id = id;
     }
 
-    /**
-     * @return Returns the spikeResponder.
-     */
     public SpikeResponder getSpikeResponder() {
         return spikeResponder;
     }
 
-    /**
-     * @param sr The spikeResponder to set.
-     */
     public void setSpikeResponder(final SpikeResponder sr) {
-        if(source == null || source.getUpdateRule().isSpikingNeuron()) {
-            this.spikeResponder = sr;
-            return;
-        }
+        this.spikeResponder = sr;
     }
 
     /**

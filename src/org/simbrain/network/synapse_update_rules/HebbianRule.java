@@ -31,7 +31,7 @@ public class HebbianRule extends SynapseUpdateRule {
      * Learning rate.
      */
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", minimumValue = -10, maximumValue = 10, defaultValue = ".01", order = 1)
-    private double learningRate;
+    private double learningRate = .1;
 
     @Override
     public void init(Synapse synapse) {

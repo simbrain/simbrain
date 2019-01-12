@@ -252,26 +252,19 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
             Object refValue = pw.getParameter().getFieldValue(objectList.get(0));
             if (pw.getParameter().isObjectType()) {
-                if(refValue != null)
-                    refValue = refValue.getClass();
+                refValue = refValue.getClass();
             }
 
             for (int i = 1; i < objectList.size(); i++) {
                 Object obj = objectList.get(i);
                 Object objValue = pw.getParameter().getFieldValue(obj);
                 if (pw.getParameter().isObjectType()) {
-                    if(objValue == null)
-                        objValue = objValue.getClass();
+                    objValue = objValue.getClass();
                 }
                 // System.out.println("ref value:" + refValue + " == object value:" + objValue + "\n");
-                if ((refValue == null) != (objValue == null)) {
+                if ((refValue == null && objValue != null) || (refValue != null && !refValue.equals(objValue))) {
                     consistent = false;
                     break;
-                } else if(refValue != null && objValue != null) {
-                    if(!refValue.equals(objValue)) {
-                        consistent = false;
-                        break;
-                    }
                 }
             }
 
@@ -284,11 +277,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             } else {
                 pw.setWidgetValue(refValue);
                 if (pw.getParameter().isObjectType()) {
-                    if(refValue == null) {
-                        ((ObjectTypeEditor) pw.getComponent()).setNone();
-                    } else {
-                        ((ObjectTypeEditor) pw.getComponent()).fillFieldValues();
-                    }
+                    ((ObjectTypeEditor) pw.getComponent()).fillFieldValues();
                 }
 
             }

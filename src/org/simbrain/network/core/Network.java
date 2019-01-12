@@ -374,13 +374,14 @@ public class Network {
     }
 
     /**
-     * @param index Number of neuron in array list.
-     * @return Neuron at the point of the index
+     * Return the neuron at the specified index of the internal list storing neurons.
+     *
+     * @param neuronIndex index of the neuron
+     * @return the neuron at that index
      */
-    public Neuron getNeuron(int index) {
-        return neuronList.get(index);
+    public Neuron getNeuron(int neuronIndex) {
+        return neuronList.get(neuronIndex);
     }
-
     /**
      * Find a neuron with a given string id.
      *

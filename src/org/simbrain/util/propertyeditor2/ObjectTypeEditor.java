@@ -166,31 +166,13 @@ public class ObjectTypeEditor extends JComponent {
         this.parent = parent;
         this.label = label;
         this.typeMap = typeMap;
-
-        // Check whether the objects being edited are of the same type
-        boolean consistent = objectList.stream().allMatch(o -> {
-            if(o != null && objectList.get(0) != null) {
-                return o.getClass() == objectList.get(0).getClass();
-            } else {
-                return o == null && objectList.get(0) == null;
-            }
-        });
-
+        boolean consistent = objectList.stream().allMatch(o -> o.getClass() == objectList.get(0).getClass());
         if (!consistent) {
-            // In the case of inconsistent objects, put the null string in the
-            // combo box and use an empty editor panel
             cbStartState = SimbrainConstants.NULL_STRING;
             editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
         } else {
-            // Explictly treat null objects as "None" objects
-            if(objectList.get(0) == null) {
-                cbStartState = SimbrainConstants.NONE_STRING;
-                editorPanel = new AnnotatedPropertyEditor(Collections.emptyList());
-            } else {
-                // Main case: edit a group of consistent objects
-                cbStartState = typeMap.getInverse(objectList.get(0).getClass());
-                editorPanel = new AnnotatedPropertyEditor(objectList);
-            }
+            cbStartState = typeMap.getInverse(objectList.get(0).getClass());
+            editorPanel = new AnnotatedPropertyEditor(objectList);
         }
         layoutPanel();
 
@@ -278,25 +260,6 @@ public class ObjectTypeEditor extends JComponent {
             cbObjectType.addItem(label);
         }
         cbObjectType.setSelectedIndex(0);
-        cbObjectType.repaint();
-    }
-
-    /**
-     * Set the editor to a null state (editing an inconsistent set of objects)
-     * <p>
-     * Should only be called once.
-     */
-    public void setNone() {
-        cbObjectType.removeAllItems();
-        if(!typeMap.keySet().contains(SimbrainConstants.NONE_STRING)) {
-            cbObjectType.addItem(SimbrainConstants.NONE_STRING);
-            for (String label : typeMap.keySet()) {
-                cbObjectType.addItem(label);
-            }
-            cbObjectType.setSelectedIndex(0);
-        } else {
-            cbObjectType.setSelectedItem(SimbrainConstants.NONE_STRING);
-        }
         cbObjectType.repaint();
     }
 

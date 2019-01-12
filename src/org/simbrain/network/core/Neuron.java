@@ -516,18 +516,19 @@ public class Neuron implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Sums the weighted <b>synaptic</b> inputs to a given neuron based on that
-     * synapse's spike responder. This is usually only appropriate for
-     * biological model neurons.
-     *
-     * @return the sum of the post-synaptic responses (synapse values in
+     * Returns the weighted input to this neuron, i.e. for each incoming neuron
+     * n, n's activation times the intervening weights. If n is a spiking
+     * neuron its {@link org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder}
+     * is used, so that this returns the sum of the post-synaptic responses (synapse values in
      * response to spikes and mediated by spike responders) impinging on this
      * neuron.
+     *
+     * @return total input to this neuron from other neurons
      */
     public double getInput() {
         double wtdSum = inputValue;
         for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcPSR(); // Automatically gives a normal weighted sum if the spike responder is null
+            wtdSum += fanIn.get(i).calcPSR();
         }
         return wtdSum;
     }

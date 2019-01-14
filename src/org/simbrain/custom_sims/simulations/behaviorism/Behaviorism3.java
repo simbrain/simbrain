@@ -10,6 +10,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -28,6 +29,7 @@ import java.util.Map;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
+
 public class Behaviorism3 extends RegisteredSimulation {
 
     //TODOS
@@ -38,6 +40,7 @@ public class Behaviorism3 extends RegisteredSimulation {
     Network network;
     ControlPanel panel;
     NeuronGroup behaviorNet;
+    NeuronGroup pCheeseNet;
     NeuronGroup stimulusNet;
     Neuron rewardNeuron, punishNeuron;
     Map<Neuron, String> nodeToLabel = new HashMap();
@@ -98,6 +101,14 @@ public class Behaviorism3 extends RegisteredSimulation {
         nodeToLabel.put(behaviorNet.getNeuron(1), "Misc");
         nodeToLabel.put(behaviorNet.getNeuron(2), "Move Down");
 
+        //create behavior
+        pCheeseNet = netBuilder.addNeuronGroup(-30.25, 10.93, 3);
+        pCheeseNet.setLabel("Behaviors");
+        pCheeseNet.setNeuronType(new BinaryRule(0,5,1.0));
+        netBuilder.connect(behaviorNet.getNeuron(0),pCheeseNet.getNeuron(0),1.0);
+        netBuilder.connect(behaviorNet.getNeuron(0),pCheeseNet.getNeuron(1),1.0);
+        netBuilder.connect(behaviorNet.getNeuron(0),pCheeseNet.getNeuron(2),1.0);
+
         // Set stimulus labels
         stimulusNet.getNeuron(0).setLabel("Light");
         stimulusNet.getNeuron(1).setLabel("Speaker");
@@ -136,12 +147,12 @@ public class Behaviorism3 extends RegisteredSimulation {
         cheese.getSmellSource().setDispersion(65);
 
         // Couple agent to network
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), 0,
+            pCheeseNet.getNeuron(0));
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
-            stimulusNet.getNeuron(0));
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1,
-            stimulusNet.getNeuron(1));
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2,
-            stimulusNet.getNeuron(2));
+            pCheeseNet.getNeuron(1));
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), 0,
+            pCheeseNet.getNeuron(2));
 
         // Add custom network update action
         network.getUpdateManager().addAction(new NetworkUpdateAction() {
@@ -179,6 +190,7 @@ public class Behaviorism3 extends RegisteredSimulation {
         int loopTime = sim.getWorkspace().getTime() % 100;
         if(winningNode == 0) {
             if (loopTime < 50) {
+
                 mouse.setHeading(mouse.getHeading() + 1);
             } else {
                 mouse.setHeading(mouse.getHeading() - 1);

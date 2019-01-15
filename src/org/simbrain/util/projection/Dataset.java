@@ -42,12 +42,12 @@ public class Dataset {
     /**
      * Logger.
      */
-    Logger logger = Logger.getLogger(Dataset.class);
+    private transient Logger logger = Logger.getLogger(Dataset.class);
 
     /**
      * The data.
      */
-    private NTree ntree;
+    private transient NTree ntree;
 
     /**
      * Number of dimensions in the dataset.
@@ -57,7 +57,7 @@ public class Dataset {
     /**
      * Matrix of interpoint distances.
      */
-    private double[] distances = new double[10240];
+    private transient double[] distances = new double[10240];
 
     /**
      * Persistent form of data, which is read back in to the dataset to recreate

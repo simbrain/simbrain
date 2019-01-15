@@ -57,7 +57,7 @@ public class DisplayWorld extends TextWorld {
     /**
      * Tree associating vectors with tokens.
      */
-    private NTree vectorToTokenDict = new NTree(3);
+    private transient NTree vectorToTokenDict = new NTree(3);
 
     /**
      * Persistent form of data for the ntree.
@@ -133,17 +133,6 @@ public class DisplayWorld extends TextWorld {
             addText(string + " "); // TODO: Replace space with user-specified
             // "buffer" string
         }
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    static XStream getXStream() {
-        XStream xstream = TextWorld.getXStream();
-        xstream.omitField(DisplayWorld.class, "vectorToTokenDict");
-        return xstream;
     }
 
     /**

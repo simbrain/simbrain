@@ -397,7 +397,7 @@ public final class ReaderWorld extends TextWorld {
      * @return the XStream object
      */
     static XStream getXStream() {
-        XStream xstream = TextWorld.getXStream();
+        XStream xstream = Utils.getSimbrainXStream();
         return xstream;
     }
 

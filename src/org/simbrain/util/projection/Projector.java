@@ -42,12 +42,12 @@ public class Projector {
     /**
      * Log4j logger.
      */
-    private static Logger logger = Logger.getLogger(Projector.class);
+    private static transient Logger logger = Logger.getLogger(Projector.class);
 
     /**
      * Listener list.
      */
-    private List<ProjectorListener> listeners = new ArrayList<ProjectorListener>();
+    private transient List<ProjectorListener> listeners;
 
     /**
      * A set of hi-d datapoints, each of which is an array of doubles The data

@@ -63,7 +63,7 @@ public abstract class TextWorld implements AttributeContainer {
     /**
      * List of listeners on this world.
      */
-    private List<TextListener> listenerList = new ArrayList<TextListener>();
+    private transient List<TextListener> listenerList = new ArrayList<TextListener>();
 
     /**
      * Highlight color.
@@ -317,17 +317,6 @@ public abstract class TextWorld implements AttributeContainer {
      */
     public void addWordToTokenDictionary(String word) {
         tokenDictionary.add(word);
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.omitField(TextWorld.class, "listenerList");
-        return xstream;
     }
 
     /**

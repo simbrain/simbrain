@@ -30,7 +30,7 @@ public abstract class ProjectionMethod {
     /**
      * Logger.
      */
-    private Logger logger = Logger.getLogger(ProjectionMethod.class);
+    private transient Logger logger = Logger.getLogger(ProjectionMethod.class);
 
     /**
      * Reference to parent projector.

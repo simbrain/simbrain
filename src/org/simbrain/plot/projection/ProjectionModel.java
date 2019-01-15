@@ -40,18 +40,18 @@ public class ProjectionModel implements AttributeContainer {
     /**
      * Scatter Plot Data.
      */
-    private XYSeriesCollection dataset;
+    private transient XYSeriesCollection dataset;
 
     /**
      * Flag which allows the user to start and stop iterative projection
      * techniques..
      */
-    private volatile boolean isRunning = true;
+    private transient volatile boolean isRunning = true;
 
     /**
      * Flag for checking that GUI update is completed.
      */
-    private volatile boolean isUpdateCompleted;
+    private transient volatile boolean isUpdateCompleted;
 
     /**
      * Default constructor.
@@ -133,27 +133,6 @@ public class ProjectionModel implements AttributeContainer {
      */
     public Projector getProjector() {
         return projector;
-    }
-
-    //TODO: Use transient keyword instead
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    public static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.omitField(ProjectionModel.class, "dataset");
-        xstream.omitField(ProjectionModel.class, "isUpdateCompleted");
-        xstream.omitField(ProjectionModel.class, "isRunning");
-        xstream.omitField(Projector.class, "logger");
-        xstream.omitField(Projector.class, "listeners");
-        xstream.omitField(ProjectionMethod.class, "logger");
-        xstream.omitField(Dataset.class, "ntree");
-        xstream.omitField(Dataset.class, "distances");
-        xstream.omitField(Dataset.class, "logger");
-        xstream.omitField(NTree.class, "logger");
-        return xstream;
     }
 
     /**

@@ -48,22 +48,14 @@ import java.util.*;
 public class NTree implements Iterable<DataPoint> {
 
     /**
-     * The number of elements to allow in a leaf before splitting
-     */
-    static final int MAX = 50; /*
-     * determined ad hoc testing and hand-waving
-     * optimization theories
-     */
-
-    /**
      * The static logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(NTree.class);
+    private static final transient Logger LOGGER = Logger.getLogger(NTree.class);
 
     /**
      * An instance specific logger
      */
-    private Logger logger = LOGGER;
+    private transient Logger logger = LOGGER;
 
     /**
      * An enumeration for quick switching on the node type
@@ -91,6 +83,12 @@ public class NTree implements Iterable<DataPoint> {
      * Map of all elements mapped to their leafs
      */
     private Map<DataPoint, Leaf> all = new LinkedHashMap<DataPoint, Leaf>();
+
+    /**
+     * The number of elements to allow in a leaf before splitting
+     * (Determined by ad hoc testing and hand-waving optimization theories
+     */
+    static final int MAX = 50;
 
     /**
      * Constructs an NTree with the given number of dimensions.

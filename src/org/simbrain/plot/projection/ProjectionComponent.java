@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.projection;
 
+import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
@@ -73,7 +74,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
 
     @Override
     public String getXML() {
-        return ProjectionModel.getXStream().toXML(this);
+        return Utils.getSimbrainXStream().toXML(this);
     }
 
     /**
@@ -85,7 +86,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      * @return component to be opened
      */
     public static ProjectionComponent open(InputStream input, final String name, final String format) {
-        ProjectionModel model = (ProjectionModel) ProjectionModel.getXStream().fromXML(input);
+        ProjectionModel model = (ProjectionModel) Utils.getSimbrainXStream().fromXML(input);
         return new ProjectionComponent(model, name);
     }
 
@@ -93,7 +94,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public void save(final OutputStream output, final String format) {
         projectionModel.getProjector().getUpstairs().preSaveInit();
         projectionModel.getProjector().getDownstairs().preSaveInit();
-        ProjectionModel.getXStream().toXML(projectionModel, output);
+        Utils.getSimbrainXStream().toXML(projectionModel, output);
     }
 
     @Override

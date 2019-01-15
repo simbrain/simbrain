@@ -488,33 +488,22 @@ public class SynapseGroup extends Group {
         }
     }
 
-    /**
-     *
-     */
     private void updateInhibitorySynapses() {
         for (Synapse synapse : inSynapseSet) {
             synapse.update();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int size() {
         return exSynapseSet.size() + inSynapseSet.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEmpty() {
         return exSynapseSet.isEmpty() && inSynapseSet.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void delete() {
         if (isMarkedForDeletion()) {
@@ -541,9 +530,6 @@ public class SynapseGroup extends Group {
         Runtime.getRuntime().gc();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         String ret = new String();
@@ -552,9 +538,6 @@ public class SynapseGroup extends Group {
         return ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getUpdateMethodDesecription() {
         return "Update synapses";
@@ -576,18 +559,12 @@ public class SynapseGroup extends Group {
         }
     }
 
-    /**
-     * @param displaySynapses the displaySynapses to set
-     */
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
         // getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(getParentNetwork(), this, this),
         //     SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
     }
 
-    /**
-     * @return the displaySynapses
-     */
     public boolean isDisplaySynapses() {
         return displaySynapses;
     }
@@ -895,16 +872,10 @@ public class SynapseGroup extends Group {
         return flatList;
     }
 
-    /**
-     * @return the set of excitatory synapses
-     */
     public Set<Synapse> getExcitatorySynapses() {
         return new HashSet<Synapse>(exSynapseSet);
     }
 
-    /**
-     * @return the set of inhibitory synapses
-     */
     public Set<Synapse> getInhibitorySynapses() {
         return new HashSet<Synapse>(inSynapseSet);
     }
@@ -1312,25 +1283,15 @@ public class SynapseGroup extends Group {
         this.inhibRand = inhibitoryRandomizer;
     }
 
-    /**
-     * @param excitatoryRandomizer
-     * @param inhibitoryRandomizer
-     */
     public void setRandomizers(ProbabilityDistribution excitatoryRandomizer, ProbabilityDistribution inhibitoryRandomizer) {
         setExcitatoryRandomizer(excitatoryRandomizer);
         setInhibitoryRandomizer(inhibitoryRandomizer);
     }
 
-    /**
-     * @return
-     */
     public ProbabilityDistribution getExcitatoryRandomizer() {
         return exciteRand;
     }
 
-    /**
-     * @return
-     */
     public ProbabilityDistribution getInhibitoryRandomizer() {
         return inhibRand;
     }
@@ -1399,16 +1360,10 @@ public class SynapseGroup extends Group {
         return !inSynapseSet.isEmpty();
     }
 
-    /**
-     * @return the sourceNeuronGroup
-     */
     public NeuronGroup getSourceNeuronGroup() {
         return sourceNeuronGroup;
     }
 
-    /**
-     * @return the targetNeuronGroup
-     */
     public NeuronGroup getTargetNeuronGroup() {
         return targetNeuronGroup;
     }

@@ -1537,16 +1537,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         }
     }
 
-    /**
-     * @return the numSubSamples
-     */
     public int getNumSubSamples() {
         return numSubSamples;
     }
 
-    /**
-     * @param _numSubSamples the numSubSamples to set
-     */
     public void setNumSubSamples(int _numSubSamples) {
        double [] newSubSamples = new double[_numSubSamples];
        int len = _numSubSamples > subsamplingIndices.length ? subsamplingIndices.length : _numSubSamples;

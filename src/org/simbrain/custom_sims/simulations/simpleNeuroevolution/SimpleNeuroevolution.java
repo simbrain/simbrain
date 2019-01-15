@@ -296,15 +296,15 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
         // TODO: make flexible
         //		for(int k = 0; k < 3; k++) {
         //			sim.couple((SmellSensor) mouse.get(netIndex).getSensor("Smell-Left"), k,
-        //	                input.get(netIndex).getNeuron(k));
+        //	                input.get(netIndex).getLooseNeuron(k));
         //		}
         //		for(int k = 3; k < 6; k++) {
         //			sim.couple((SmellSensor) mouse.get(netIndex).getSensor("Smell-Center"), k,
-        //	                input.get(netIndex).getNeuron(k));
+        //	                input.get(netIndex).getLooseNeuron(k));
         //		}
         //		for(int k = 6; k < 9; k++) {
         //			sim.couple((SmellSensor) mouse.get(netIndex).getSensor("Smell-Right"), k,
-        //	                input.get(netIndex).getNeuron(k));
+        //	                input.get(netIndex).getLooseNeuron(k));
         //		}
         int sensoorSize = mouse.get(netIndex).getSensors().size();
         // TODO: Couple sensor to input.

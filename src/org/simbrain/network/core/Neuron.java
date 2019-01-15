@@ -54,12 +54,6 @@ public class Neuron implements EditableObject, AttributeContainer {
     public static final NeuronUpdateRule DEFAULT_UPDATE_RULE = new LinearRule();
 
     /**
-     * Pre-allocates the number of bins in this neuron's fanIn/Out for
-     * efficiency.
-     */
-    public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500 / 0.75);
-
-    /**
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
@@ -108,7 +102,7 @@ public class Neuron implements EditableObject, AttributeContainer {
     private boolean spike;
 
     /**
-     * Temporary activation value.
+     * Temporary activation value for synchronous updating.
      */
     private double buffer;
 
@@ -128,6 +122,12 @@ public class Neuron implements EditableObject, AttributeContainer {
      * Reference to network this neuron is part of.
      */
     private final Network parent;
+
+    /**
+     * Pre-allocates the number of bins in this neuron's fanIn/Out for
+     * efficiency.
+     */
+    public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500 / 0.75);
 
     /**
      * List of synapses this neuron attaches to.

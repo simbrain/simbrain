@@ -128,12 +128,12 @@ public class Hopfield extends Subnetwork implements Trainable {
     public void randomize() {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             for (int j = 0; j < i; j++) {
-                Synapse w = Network.getSynapse(getNeuronGroup().getNeuronList().get(i), getNeuronGroup().getNeuronList().get(j));
+                Synapse w = Network.getLooseSynapse(getNeuronGroup().getNeuronList().get(i), getNeuronGroup().getNeuronList().get(j));
                 if (w != null) {
                     w.randomize();
                     w.setStrength(Math.round(w.getStrength()));
                 }
-                Synapse w2 = Network.getSynapse(getNeuronGroup().getNeuronList().get(j), getNeuronGroup().getNeuronList().get(i));
+                Synapse w2 = Network.getLooseSynapse(getNeuronGroup().getNeuronList().get(j), getNeuronGroup().getNeuronList().get(i));
                 if (w2 != null) {
                     w2.setStrength(w.getStrength());
                 }

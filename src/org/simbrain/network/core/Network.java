@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * <b>Network</b> provides core neural network functionality and is the the
  * main
+ * <p>
  * API for external calls. Network objects are sets of neurons and weights
  * connecting them. Most update and learning logic occurs in the neurons and
  * weights themselves, as well as in special groups.
@@ -82,14 +83,14 @@ public class Network {
     }
 
     /**
-     * Array list of neurons.
+     * List of "loose neurons" (as opposed to neurons in neuron groups)
      */
-    private final List<Neuron> neuronList = new ArrayList<Neuron>();
+    private final List<Neuron> looseNeurons = new ArrayList<Neuron>();
 
     /**
-     * Array list of synapses.
+     * Array list of "loose synapses" (as opposed to synapses in synapse groups)
      */
-    private final Set<Synapse> synapseList = new LinkedHashSet<Synapse>();
+    private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -105,7 +106,6 @@ public class Network {
      * Array list of neurons.
      */
     private final List<NeuronArray> naList = new ArrayList();
-
 
     /**
      * The update manager for this network.
@@ -226,7 +226,6 @@ public class Network {
      */
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-
     /**
      * Used to create an instance of network (Default constructor).
      */
@@ -250,8 +249,8 @@ public class Network {
             // Fire update events for GUI update. Loose items, then groups.
             // Todo: fireSynapsesUpdated(synapseList) is a performance drain,
             // but needed e.g. to view Hebbian dynamics
-            fireSynapsesUpdated(synapseList); // Loose synapses
-            fireNeuronsUpdated(neuronList); // Loose neurons
+            fireSynapsesUpdated(looseSynapses); // Loose synapses
+            fireNeuronsUpdated(looseNeurons); // Loose neurons
             for (Group group : groupList) {
                 fireGroupUpdated(group);
             }
@@ -299,12 +298,12 @@ public class Network {
     public void bufferedUpdateAllNeurons() {
 
         // First update the activation buffers
-        for (Neuron n : neuronList) {
+        for (Neuron n : looseNeurons) {
             n.update(); // update neuron buffers
         }
 
         // Then update the activations themselves
-        for (Neuron n : neuronList) {
+        for (Neuron n : looseNeurons) {
             n.setToBufferVals();
         }
     }
@@ -331,7 +330,7 @@ public class Network {
      * @return List of neurons in network.
      */
     public List<? extends Neuron> getNeuronList() {
-        return Collections.unmodifiableList(neuronList);
+        return Collections.unmodifiableList(looseNeurons);
     }
 
     /**
@@ -342,21 +341,21 @@ public class Network {
      * @return List of synapses in network.
      */
     public Collection<Synapse> getSynapseList() {
-        return Collections.unmodifiableCollection(synapseList);
+        return Collections.unmodifiableCollection(looseSynapses);
     }
 
     /**
      * @return Number of neurons in network.
      */
     public int getNeuronCount() {
-        return neuronList.size();
+        return looseNeurons.size();
     }
 
     /**
      * @return Number of weights in network
      */
     public int getSynapseCount() {
-        return synapseList.size();
+        return looseSynapses.size();
     }
 
     /**
@@ -379,8 +378,8 @@ public class Network {
      * @param neuronIndex index of the neuron
      * @return the neuron at that index
      */
-    public Neuron getNeuron(int neuronIndex) {
-        return neuronList.get(neuronIndex);
+    public Neuron getLooseNeuron(int neuronIndex) {
+        return looseNeurons.get(neuronIndex);
     }
     /**
      * Find a neuron with a given string id.
@@ -388,7 +387,7 @@ public class Network {
      * @param id id to search for.
      * @return neuron with that id, null otherwise
      */
-    public Neuron getNeuron(String id) {
+    public Neuron getLooseNeuron(String id) {
         for (Neuron n : getFlatNeuronList()) {
             if (n.getId().equalsIgnoreCase(id)) {
                 return n;
@@ -494,7 +493,7 @@ public class Network {
      * @param id id to search for.
      * @return synapse with that id, null otherwise
      */
-    public Synapse getSynapse(String id) {
+    public Synapse getLooseSynapse(String id) {
         for (Synapse s : getFlatSynapseList()) {
             if (s.getId().equalsIgnoreCase(id)) {
                 return s;
@@ -509,13 +508,17 @@ public class Network {
      * @param neuron Type of neuron to add
      */
     public void addNeuron(Neuron neuron) {
-        neuronList.add(neuron);
+        looseNeurons.add(neuron);
         neuron.setId(getNeuronIdGenerator().getId());
         updatePriorityList();
         fireNeuronAdded(neuron);
     }
 
 
+    /**
+     * TODO: This is initial (still experiental) support for ND4J
+     * neuron arrays
+     */
     public void addNeuronArray(NeuronArray na) {
         // Set id
         naList.add(na);
@@ -530,7 +533,7 @@ public class Network {
      */
     public void addSynapse(Synapse synapse) {
         synapse.initSpikeResponder();
-        synapseList.add(synapse);
+        looseSynapses.add(synapse);
         synapse.setId(getSynapseIdGenerator().getId());
         fireSynapseAdded(synapse);
     }
@@ -540,7 +543,7 @@ public class Network {
      */
     public void updateAllSynapses() {
         // No Buffering necessary because the values of weights don't depend on one another
-        for (Synapse s : synapseList) {
+        for (Synapse s : looseSynapses) {
             s.update();
         }
     }
@@ -566,7 +569,7 @@ public class Network {
                 removeGroup(toDelete.getParentGroup());
             }
         } else {
-            neuronList.remove(toDelete);
+            looseNeurons.remove(toDelete);
         }
 
         // Notify listeners that this neuron has been deleted
@@ -600,7 +603,7 @@ public class Network {
                 removeGroup(toDelete.getParentGroup());
             }
         } else {
-            synapseList.remove(toDelete);
+            looseSynapses.remove(toDelete);
             // Notify listeners that this synapse has been deleted
             fireSynapseRemoved(toDelete);
         }
@@ -624,7 +627,7 @@ public class Network {
      */
     public void transferNeuronsToGroup(List<Neuron> list, NeuronGroup group) {
         for (Neuron neuron : list) {
-            neuronList.remove(neuron);
+            looseNeurons.remove(neuron);
             group.addNeuron(neuron, false);
         }
     }
@@ -703,7 +706,8 @@ public class Network {
     }
 
     /**
-     * Returns the "state" of the network--the activation level of its neurons.
+     * Returns the "state" of the network: the activation level of its neurons.
+     * An activation vector.
      *
      * @return an array representing the activation levels of all the neurons in
      * this network
@@ -712,7 +716,7 @@ public class Network {
         double[] ret = new double[this.getNeuronCount()];
 
         for (int i = 0; i < this.getNeuronCount(); i++) {
-            Neuron n = getNeuron(i);
+            Neuron n = getLooseNeuron(i);
             ret[i] = (int) n.getActivation();
         }
 
@@ -723,7 +727,7 @@ public class Network {
      * Sets all weight values to zero, effectively eliminating them.
      */
     public void setWeightsToZero() {
-        for (Synapse s : synapseList) {
+        for (Synapse s : looseSynapses) {
             s.setStrength(0);
         }
     }
@@ -732,7 +736,7 @@ public class Network {
      * Randomizes all neurons.
      */
     public void randomizeNeurons() {
-        for (Neuron n : neuronList) {
+        for (Neuron n : looseNeurons) {
             n.randomize();
         }
     }
@@ -741,7 +745,7 @@ public class Network {
      * Randomizes all loose weights.
      */
     public void randomizeWeights() {
-        for (Synapse s : synapseList) {
+        for (Synapse s : looseSynapses) {
             s.randomize();
         }
     }
@@ -753,19 +757,8 @@ public class Network {
      * @param upper upper bound for randomization.
      */
     public void randomizeBiases(double lower, double upper) {
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : looseNeurons) {
             neuron.randomizeBias(lower, upper);
-        }
-    }
-
-    /**
-     * Add an array of neurons and set their parents to this.
-     *
-     * @param neurons list of neurons to add
-     */
-    protected void addNeuronList(final ArrayList<Neuron> neurons) {
-        for (Neuron n : neurons) {
-            addNeuron(n);
         }
     }
 
@@ -777,7 +770,7 @@ public class Network {
      * @param tar target neuron
      * @return synapse from source to target
      */
-    public static Synapse getSynapse(final Neuron src, final Neuron tar) {
+    public static Synapse getLooseSynapse(final Neuron src, final Neuron tar) {
         return src.getFanOut().get(tar);
     }
 
@@ -790,7 +783,7 @@ public class Network {
      */
     // TODO: Either fix this or make its assumptions explicit
     public Synapse getWeight(final int i, final int j) {
-        return getNeuron(i).getFanOut().get(getNeuron(j));
+        return getLooseNeuron(i).getFanOut().get(getLooseNeuron(j));
     }
 
     /**
@@ -855,7 +848,7 @@ public class Network {
     public List<Neuron> getFlatNeuronList() {
 
         List<Neuron> ret = new ArrayList<Neuron>();
-        ret.addAll(neuronList);
+        ret.addAll(looseNeurons);
 
         // TODO: Base this on an overridable method?
         for (int i = 0; i < groupList.size(); i++) {
@@ -879,7 +872,7 @@ public class Network {
      */
     public List<Synapse> getFlatSynapseList() {
         List<Synapse> ret = new ArrayList<Synapse>(10000);
-        ret.addAll(synapseList);
+        ret.addAll(looseSynapses);
         for (int i = 0; i < groupList.size(); i++) {
             if (groupList.get(i) instanceof SynapseGroup) {
                 SynapseGroup group = (SynapseGroup) groupList.get(i);
@@ -1004,8 +997,8 @@ public class Network {
         return (Network) Network.getXStream().fromXML(xml_rep);
     }
 
-    // TODO: Use transient instead. Most if not all of this not needed.
 
+    // TODO: Use transient instead. Most if not all of this not needed.
     /**
      * Returns a properly initialized xstream object.
      *
@@ -1539,7 +1532,7 @@ public class Network {
         }
 
         if (this.getSynapseList().size() > 0) {
-            Iterator<Synapse> synapseIterator = synapseList.iterator();
+            Iterator<Synapse> synapseIterator = looseSynapses.iterator();
             for (int i = 0; i < getSynapseList().size(); i++) {
                 Synapse tempRef = synapseIterator.next();
                 ret += tempRef;
@@ -1684,9 +1677,6 @@ public class Network {
         }
     }
 
-    /**
-     * @return the groupIdGenerator
-     */
     public SimpleId getGroupIdGenerator() {
         return groupIdGenerator;
     }
@@ -1712,7 +1702,7 @@ public class Network {
     }
 
     /**
-     * @return the textList
+     * Returns the list of text objects
      */
     public List<NetworkTextObject> getTextList() {
         if (textList == null) {
@@ -1731,9 +1721,6 @@ public class Network {
         updateManager.addAction(action);
     }
 
-    /**
-     * @return the updateManager
-     */
     public NetworkUpdateManager getUpdateManager() {
         return updateManager;
     }
@@ -1834,16 +1821,10 @@ public class Network {
         return retList;
     }
 
-    /**
-     * @return the synapseVisibilityThreshold
-     */
     public static int getSynapseVisibilityThreshold() {
         return synapseVisibilityThreshold;
     }
 
-    /**
-     * @param svt the synapseVisibilityThreshold to set
-     */
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
     }

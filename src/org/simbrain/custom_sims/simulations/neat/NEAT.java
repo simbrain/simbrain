@@ -127,7 +127,7 @@ public class NEAT extends RegisteredSimulation {
         pinnedMouse.setLocation(450 / 2 + 40, 450 / 8);
 
         sim.addOdorWorld(570, 15, 500, 500, "NEAT world", w);
-//        sim.couple(n.getNeuronGroups().get(1).getNeuron(0), newEntity.getEffectors().get(0));
+//        sim.couple(n.getNeuronGroups().get(1).getLooseNeuron(0), newEntity.getEffectors().get(0));
 //        sim.couple((SmellSensor) w.getObjectList().get(0).getSensor("Smell-Left"), n.getNeuronGroups().get(0));
 //      JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
 //      dialog.setSize(500, 500);

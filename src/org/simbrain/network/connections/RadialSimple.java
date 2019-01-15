@@ -246,7 +246,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         }
         for (Neuron otherNeu : neusInRadius) {
             // Don't add a connection if there is already one present
-            if (Network.getSynapse(neuron, otherNeu) != null) {
+            if (Network.getLooseSynapse(neuron, otherNeu) != null) {
                 continue;
             }
             if (!allowSelfConnections) {
@@ -311,7 +311,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         }
         for (Neuron otherNeu : neusInRadius) {
             // Don't add a connection if there is already one present
-            if (Network.getSynapse(neuron, otherNeu) != null) {
+            if (Network.getLooseSynapse(neuron, otherNeu) != null) {
                 continue;
             }
             if (!allowSelfConnections) {

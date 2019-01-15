@@ -49,7 +49,7 @@ public class SimnetUtils {
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer.get(j));
+                Synapse s = Network.getLooseSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s.getStrength();
@@ -76,7 +76,7 @@ public class SimnetUtils {
     public static void setWeights(final List<Neuron> src, final List<Neuron> tar, final double[][] w) {
         for (int i = 0; i < src.size(); i++) {
             for (int j = 0; j < tar.size(); j++) {
-                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
+                Synapse s = Network.getLooseSynapse(src.get(i), tar.get(j));
                 if (s != null) {
                     s.forceSetStrength(w[i][j]);
                 } else {
@@ -102,7 +102,7 @@ public class SimnetUtils {
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer.get(j));
+                Synapse s = Network.getLooseSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s;
@@ -126,9 +126,9 @@ public class SimnetUtils {
     public static void scaleWeights(List<Neuron> src, List<Neuron> tar, double scalar) {
         for (Neuron source : src) {
             for (Neuron target : tar) {
-                Synapse weight = Network.getSynapse(source, target);
+                Synapse weight = Network.getLooseSynapse(source, target);
                 if (weight != null) {
-                    Network.getSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
+                    Network.getLooseSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
                 }
             }
         }

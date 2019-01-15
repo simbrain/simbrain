@@ -121,9 +121,9 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.startsWith("Neuron_")) {
-            return this.getNetwork().getNeuron(objectKey);
+            return this.getNetwork().getLooseNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse_")) {
-            return this.getNetwork().getSynapse(objectKey);
+            return this.getNetwork().getLooseSynapse(objectKey);
         } else if (objectKey.startsWith("Group_")) {
             return this.getNetwork().getGroup(objectKey);
         }

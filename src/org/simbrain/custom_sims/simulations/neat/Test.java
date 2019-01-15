@@ -98,21 +98,21 @@ public class Test {
 //        // Theses for loops are substitutes to coupling.
 //        // input neuron 0 - 7 receive coupling from mouse 1 left sensor
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValue(j)
 //            );
 //        }
 //
 //        // input neuron 8 - 15 receive coupling from mouse 1 left sensor
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j + 8).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValue(j)
 //            );
 //        }
 //
 //        // input neuron 16 - 24 receive coupling from mouse 1 left sensor
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j + 16).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValue(j)
 //            );
 //        }
@@ -186,19 +186,19 @@ public class Test {
 //        // 8 is the stimulus vector dimension this simulation will be using
 //
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValue(j)
 //            );
 //        }
 //
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j + 8).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValue(j)
 //            );
 //        }
 //
 //        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getNeuron(j + 16).forceSetActivation(
+//            n.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
 //                    ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValue(j)
 //            );
 //        }
@@ -206,19 +206,19 @@ public class Test {
 //        // n2
 //
 //        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getNeuron(j).forceSetActivation(
+//            n2.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
 //                    ((SmellSensor) pinnedMouse.getSensor("Smell-Left")).getCurrentValue(j)
 //            );
 //        }
 //
 //        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getNeuron(j + 8).forceSetActivation(
+//            n2.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
 //                    ((SmellSensor) pinnedMouse.getSensor("Smell-Center")).getCurrentValue(j)
 //            );
 //        }
 //
 //        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getNeuron(j + 16).forceSetActivation(
+//            n2.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
 //                    ((SmellSensor) pinnedMouse.getSensor("Smell-Right")).getCurrentValue(j)
 //            );
 //        }

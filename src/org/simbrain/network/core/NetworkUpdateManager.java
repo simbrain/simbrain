@@ -66,7 +66,7 @@ public class NetworkUpdateManager {
     /**
      * List of listeners on this update manager.
      */
-    private List<Listener> listeners = new ArrayList<>();
+    private transient List<Listener> listeners = new ArrayList<>();
 
     /**
      * Reference to parent network.

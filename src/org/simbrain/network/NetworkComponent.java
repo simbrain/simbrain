@@ -21,6 +21,7 @@ import org.simbrain.network.core.*;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -142,14 +143,14 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     public static NetworkComponent open(final InputStream input, final String name, final String format) {
-        Network newNetwork = (Network) Network.getXStream().fromXML(input);
+        Network newNetwork = (Network) Utils.getSimbrainXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
         network.preSaveInit();
-        Network.getXStream().toXML(network, output);
+        Utils.getSimbrainXStream().toXML(network, output);
         network.postSaveReInit();
     }
 
@@ -195,6 +196,6 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return Network.getXStream().toXML(network);
+        return Utils.getSimbrainXStream().toXML(network);
     }
 }

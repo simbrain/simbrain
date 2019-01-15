@@ -87,7 +87,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
      * A list of threads being used as our "consumers" of tasks (updating
      * neurons).
      */
-    private final List<Consumer> consumerThreads = new ArrayList<Consumer>();
+    private final transient List<Consumer> consumerThreads = new ArrayList<Consumer>();
 
     /**
      * The current number of available processors to the JVM, should that value
@@ -99,9 +99,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
     /**
      * This class's private set of neurons in the network, used for updating.
      */
-    private final Set<Neuron> neurons = Collections.synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
+    private final transient Set<Neuron> neurons = Collections.synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
 
-    private CyclicTaskQueue taskSet;
+    private transient CyclicTaskQueue taskSet;
 
     /**
      * A count of the number of network changes which have taken place.
@@ -111,18 +111,18 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
     /**
      * A copy of the network.
      */
-    private final Network network;
+    private final transient Network network;
 
     /**
      * A reference to the current thread which is acting as a producer.
      */
-    private volatile Thread producer;
+    private transient volatile Thread producer;
 
     private final List<NeuronGroup> inputGroups = new ArrayList<NeuronGroup>();
 
     private final List<NeuronGroup> outputGroups = new ArrayList<NeuronGroup>();
 
-    private Thread collectorThread = new Thread(new Runnable() {
+    private transient Thread collectorThread = new Thread(new Runnable() {
         @Override
         public void run() {
             try {
@@ -157,7 +157,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction, NeuronList
 
     //private final SynchronizationPoint syncPoint;
 
-    private ExecutorService executors;
+    private transient ExecutorService executors;
 
     /**
      * A static factory method that creates a concurrent buffered update class

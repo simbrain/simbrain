@@ -65,7 +65,7 @@ public class Network {
      * If a subnetwork or synapse group has more than this many synapses, then
      * the initial synapse visibility flag is set false.
      */
-    private static int synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold");
+    private transient static int synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold");
 
     /**
      * Two types of time used in simulations.
@@ -135,32 +135,32 @@ public class Network {
     /**
      * List of objects registered to observe general network events.
      */
-    private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
+    private transient List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
 
     /**
      * List of objects registered to observe neuron-related network events.
      */
-    private List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
+    private transient List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
 
     /**
      * List of objects registered to observe synapse-related network events.
      */
-    private List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
+    private transient List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
 
     /**
      * List of objects registered to observe group-related network events.
      */
-    private List<GroupListener> groupListeners = new ArrayList<GroupListener>();
+    private transient List<GroupListener> groupListeners = new ArrayList<GroupListener>();
 
     /**
      * List of objects registered to observe text-related network events.
      */
-    private List<TextListener> textListeners = new ArrayList<TextListener>();
+    private transient List<TextListener> textListeners = new ArrayList<TextListener>();
 
     /**
      * Whether network has been updated yet; used by thread.
      */
-    private AtomicBoolean updateCompleted = new AtomicBoolean(false);
+    private transient AtomicBoolean updateCompleted = new AtomicBoolean(false);
 
     /**
      * List of neurons sorted by their update priority. Used in priority based
@@ -992,55 +992,9 @@ public class Network {
      */
     public Network copy() {
         preSaveInit();
-        String xml_rep = Network.getXStream().toXML(this);
+        String xml_rep = Utils.getSimbrainXStream().toXML(this);
         postSaveReInit();
-        return (Network) Network.getXStream().fromXML(xml_rep);
-    }
-
-
-    // TODO: Use transient instead. Most if not all of this not needed.
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    public static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.omitField(Network.class, "groupListeners");
-        xstream.omitField(Network.class, "neuronListeners");
-        xstream.omitField(Network.class, "networkListeners");
-        xstream.omitField(Network.class, "synapseListeners");
-        xstream.omitField(Network.class, "textListeners");
-        xstream.omitField(Network.class, "updateCompleted");
-        xstream.omitField(Network.class, "logger");
-        xstream.omitField(Network.class, "synapseVisibilityThreshold");
-
-        xstream.omitField(NetworkUpdateManager.class, "listeners");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "consumerThreads");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "neurons");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "taskSet");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "network");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "producer");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "collectorThread");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "executors");
-
-        xstream.omitField(CustomUpdate.class, "interpreter");
-        xstream.omitField(CustomUpdate.class, "theAction");
-
-        xstream.omitField(SynapseGroup.class, "exTemp");
-        xstream.omitField(SynapseGroup.class, "inTemp");
-        xstream.omitField(Sparse.class, "sparseOrdering");
-        xstream.omitField(Sparse.class, "currentOrderingIndices");
-        xstream.omitField(Sparse.class, "sourceNeurons");
-        xstream.omitField(Sparse.class, "targetNeurons");
-
-        xstream.omitField(Neuron.class, "fanOut");
-        xstream.omitField(Neuron.class, "fanIn");
-        xstream.omitField(Neuron.class, "generator");
-
-        xstream.omitField(AllToAll.class, "selfConnectionAllowed");
-
-        return xstream;
+        return (Network) Utils.getSimbrainXStream().fromXML(xml_rep);
     }
 
     /**

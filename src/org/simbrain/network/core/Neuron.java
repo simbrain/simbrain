@@ -132,12 +132,12 @@ public class Neuron implements EditableObject, AttributeContainer {
     /**
      * List of synapses this neuron attaches to.
      */
-    private Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
+    private transient Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
      * List of synapses attaching to this neuron.
      */
-    private ArrayList<Synapse> fanIn = new ArrayList<Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
+    private transient ArrayList<Synapse> fanIn = new ArrayList<Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
      * x-coordinate of this neuron in 2-space.

@@ -9,6 +9,7 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.Utils;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -324,9 +325,9 @@ public class EvolveNet extends Network {
 
     public EvolveNet copy() {
         preSaveInit();
-        String xml_rep = Network.getXStream().toXML(this);
+        String xml_rep = Utils.getSimbrainXStream().toXML(this);
         postSaveReInit();
-        return (EvolveNet) Network.getXStream().fromXML(xml_rep);
+        return (EvolveNet) Utils.getSimbrainXStream().fromXML(xml_rep);
     }
 
     public static void increaseGeneration() {

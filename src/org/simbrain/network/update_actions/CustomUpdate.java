@@ -49,12 +49,12 @@ public class CustomUpdate implements NetworkUpdateAction {
      * The interpreter for converting the the script into an executable update
      * action.
      */
-    private Interpreter interpreter = new Interpreter();
+    private transient Interpreter interpreter = new Interpreter();
 
     /**
      * Custom update action.
      */
-    private NetworkUpdateAction theAction;
+    private transient NetworkUpdateAction theAction;
 
     /**
      * Create a new custom update action.

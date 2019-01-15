@@ -80,24 +80,24 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * connection, or in what order connections are removed for each source
      * neuron if density is lowered.
      */
-    private int[][] sparseOrdering;
+    private transient int[][] sparseOrdering;
 
     /**
      * If efferent synapses are not equalized among source neurons, this array
      * contains the number of possible target neurons a given source neuron is
      * connected to.
      */
-    private int[] currentOrderingIndices;
+    private transient int[] currentOrderingIndices;
 
     /**
      * The source neurons.
      */
-    private Neuron[] sourceNeurons;
+    private transient Neuron[] sourceNeurons;
 
     /**
      * The target neurons.
      */
-    private Neuron[] targetNeurons;
+    private transient Neuron[] targetNeurons;
 
     /**
      * The synapse group associated with this connection object.

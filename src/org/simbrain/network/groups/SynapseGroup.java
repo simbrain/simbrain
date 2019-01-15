@@ -96,7 +96,7 @@ public class SynapseGroup extends Group {
      * group is going to continue being used after saving the values in this
      * temporary holder are used to repopulate the excitatory synapse set.
      */
-    private Set<Synapse> exTemp;
+    private transient Set<Synapse> exTemp;
 
     /**
      * A temporary set containing all the inhibitory synapses in the group. Used
@@ -104,7 +104,7 @@ public class SynapseGroup extends Group {
      * group is going to continue being used after saving the values in this
      * temporary holder are used to repopulate the inhibitory synapse set.
      */
-    private Set<Synapse> inTemp;
+    private transient Set<Synapse> inTemp;
 
     /**
      * Reference to source neuron group.

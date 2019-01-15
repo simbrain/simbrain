@@ -89,7 +89,7 @@ public class Behaviorism3 extends RegisteredSimulation {
         // Reward and punish nodes
         rewardNeuron = netBuilder.addNeuron((int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
-        rewardNeuron.setUpperBound(.4);
+        rewardNeuron.setUpperBound(1);
         rewardNeuron.setLabel("Food Pellet");
         punishNeuron = netBuilder.addNeuron((int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
@@ -147,12 +147,14 @@ public class Behaviorism3 extends RegisteredSimulation {
         cheese.getSmellSource().setDispersion(65);
 
         // Couple agent to network
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), 0,
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), 1,
             pCheeseNet.getNeuron(0));
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
             pCheeseNet.getNeuron(1));
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), 0,
             pCheeseNet.getNeuron(2));
+
+
 
         // Add custom network update action
         network.getUpdateManager().addAction(new NetworkUpdateAction() {
@@ -160,7 +162,15 @@ public class Behaviorism3 extends RegisteredSimulation {
             @Override
             public void invoke() {
 
-                if (sim.getWorkspace().getTime() % 100 == 0) {
+                if(rewardNeuron.getActivation() >= .7){
+                    //System.out.println("");
+                    //updateNetwork();
+                    learn(.1);
+
+                    rewardNeuron.forceSetActivation(0);
+
+                }
+                else if (sim.getWorkspace().getTime() % 100 == 0) {
                     updateNetwork();
                 }
                 updateBehaviors();
@@ -253,8 +263,8 @@ public class Behaviorism3 extends RegisteredSimulation {
 
         panel.addButton("Reward", () -> {
             learn(.1);
-            rewardNeuron.setInputValue(.1);
-            punishNeuron.forceSetActivation(0);
+            //rewardNeuron.setInputValue();
+            //punishNeuron.forceSetActivation(0);
             sim.iterate();
        });
 
@@ -272,15 +282,20 @@ public class Behaviorism3 extends RegisteredSimulation {
 
 
         for(Neuron tar : behaviorNet.getNeuronList()) {
+            System.out.println("l1");
 
             // The "winning" node
             if(tar.getActivation() > 0){
+                System.out.println("l2");
+
                 // Update intrinsic probability
                 double p = tar.getAuxValue();
                 tar.setAuxValue(Math.max(p + valence * p, 0));
 
                 // Update weight on active node
                 for(Neuron src : stimulusNet.getNeuronList()) {
+                    System.out.println("l3");
+
                     if (src.getActivation() > 0) {
                         Synapse s = Network.getSynapse(src,tar);
                         s.setStrength(Math.max(s.getStrength() + valence, 0));

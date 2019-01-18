@@ -59,7 +59,8 @@ public class Splasher {
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
-            args);
+                args);
         SplashWindow.disposeSplash();
+        System.out.println("G'day mates");
     }
 }

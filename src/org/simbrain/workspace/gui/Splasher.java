@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.resource.ResourceManager;
 
 /*
@@ -61,5 +62,7 @@ public class Splasher {
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
             args);
         SplashWindow.disposeSplash();
+
+        System.out.println("Hello World");
     }
 }

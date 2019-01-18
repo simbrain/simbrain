@@ -46,6 +46,7 @@ public class Splasher {
      *            the command line arguments
      */
     public static void main(final String[] args) {
+
         // try {
         // UIManager.setLookAndFeel(new NimbusLookAndFeel());
         // } catch (Exception e) {

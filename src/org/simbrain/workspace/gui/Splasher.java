@@ -61,5 +61,7 @@ public class Splasher {
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
             args);
         SplashWindow.disposeSplash();
+
+        System.out.println("Hello World");
     }
 }

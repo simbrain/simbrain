@@ -16,6 +16,9 @@ out/*
 .checkstyle
 *.dylib
 *.dll
-.gradle/
+.gradle*
+gradle/*
 *.ipr
 *.iws
+gradlew
+gradlew.bat

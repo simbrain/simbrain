@@ -418,9 +418,12 @@ public class ConnectionUtilities {
     }
 
     /**
-     * @param exciteRule
-     * @param inhibRule
-     * @param synapses
+     * Automatically applies separate learning rules for excitatory
+     * and inhibitory synapses.
+     *
+     * @param exciteRule excitatory rule to appy
+     * @param inhibRule inhibitory rule to apply
+     * @param synapses list of synapses to apply rule to
      */
     public static void applyLearningRules(SynapseUpdateRule exciteRule, SynapseUpdateRule inhibRule, List<Synapse> synapses) {
         for (Synapse s : synapses) {
@@ -432,7 +435,14 @@ public class ConnectionUtilities {
         }
     }
 
-    public static double[] getNormalizedSeparatedInput(Neuron n) {
+    /**
+     * Like {@link #getSeparatedInput(Neuron)} but excitatory
+     * and inhibitory inputs are separated.
+     *
+     * @param n neuron to get normalized separated inputs from
+     * @return the separated inputs
+     */
+    public static double[] getAverageSeparatedInput(Neuron n) {
         double[] ei = new double[2];
         double e = 0;
         double i = 0;
@@ -455,7 +465,16 @@ public class ConnectionUtilities {
         return ei;
     }
 
+    /**
+     * Returns summed excitatory and inhibitory inputs.
+     * Used for conductance-based models.
+     *
+     * @param n neuron to get separated inputs from
+     * @return the separated inputs
+     */
     public static double[] getSeparatedInput(Neuron n) {
+        //TODO: Make this an argument so the array is not re-created
+        // for each neuron
         double[] ei = new double[2];
         for (Synapse s : n.getFanIn()) {
             double psr = s.calcPSR();

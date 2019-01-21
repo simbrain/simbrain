@@ -6,6 +6,11 @@ import org.simbrain.network.core.Synapse;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * A stochastic spiking neural model that takes a softmax
+ * over the weights of inputs and for each input randomly
+ * spikes or doesn't.
+ */
 public class TimedAccumulatorRule extends SpikingThresholdRule {
 
     public static final double DEFAULT_KAPPA = 0.9;

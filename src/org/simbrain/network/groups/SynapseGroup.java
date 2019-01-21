@@ -86,11 +86,6 @@ public class SynapseGroup extends Group {
     private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
 
     /**
-     * The precision with which weights should be saved.
-     */
-    private Precision serialzationPrecision = Precision.FLOAT_64;
-
-    /**
      * A temporary set containing all the excitatory synapses in the group. Used
      * when saving synapse groups since the regular set is destroyed. If the
      * group is going to continue being used after saving the values in this
@@ -229,17 +224,21 @@ public class SynapseGroup extends Group {
     private byte[] compressedMatrixRep = null;
 
     /**
-     * A byte-encoded representation of all relevant synapse parameters of all
-     * synapses in the group. The compressed rep only stores synapse weights,
-     * relying on the prototype synapses ({@link #excitatoryPrototype} and
-     * {@link #inhibitoryPrototype}) to fill in the remaining values. But if the
+     * Used when {@link #useFullRepOnSave} is true. A byte-encoded
+     * representation of all relevant synapse parameters of all synapses in the
+     * group. The compressed rep only stores synapse weights, relying on the
+     * prototype synapses ({@link #excitatoryPrototype} and {@link
+     * #inhibitoryPrototype}) to fill in the remaining values. But if the
      * synapses also all have different delays, PSRs, etc. This representation
      * saves all of those.
      */
     private byte[] fullSynapseRep = null;
 
     /**
-     * Whether or not to use the compressed rep or the full rep.
+     * If false, only save a compressed representation of synapse strengths.
+     * This assumes synapse properties are consistent and can thus be stored
+     * with {@link #excitatoryPrototype} and {@link #inhibitoryPrototype}.
+     * If true, all synapses have separate rules and are thus saved separately.
      */
     private boolean useFullRepOnSave = false;
 
@@ -1598,16 +1597,23 @@ public class SynapseGroup extends Group {
         }
     }
 
+    /**
+     * See {@link #useFullRepOnSave}
+     */
     public boolean isUseFullRepOnSave() {
         return useFullRepOnSave;
     }
 
+    /**
+     * See {@link #useFullRepOnSave}
+     */
     public void setUseFullRepOnSave(boolean useFullRepOnSave) {
         this.useFullRepOnSave = useFullRepOnSave;
     }
 
     /**
-     * Perform operations required before saving a synapse group.
+     * Perform operations required before saving a synapse group. The default
+     * pre-save init.
      */
     public void preSaveInit() {
         if (isUseFullRepOnSave()) {
@@ -1636,8 +1642,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * The pre-save init to be used to save all relevant synapse parameters in
-     * the byte array.
+     * The pre-save init to be used when {@link #fullSynapseRep} is set to true.
      */
     public void preSaveInitFull() {
         Map<Neuron, Integer> srcMap = new HashMap<Neuron, Integer>((int) (sourceNeuronGroup.size() / 0.75));

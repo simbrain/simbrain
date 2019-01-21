@@ -51,9 +51,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
 
-    // TODO: If 3.x is developed and neurongroup sticks around:
-    //  Fix isSpiking
-
     /**
      * The default for how often {@link #writeActsToFile()} should flush
      * the output stream when writing to a file.
@@ -70,13 +67,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      */
     private String updateRule;
 
-    private NeuronUpdateRule excitatoryUpdateRule = new LinearRule();
-
-    private NeuronUpdateRule inhibitoryUpdateRule = new LinearRule();
-
     /**
-     * Mostly here for backwards compatibility {@link #recordAsSpikes} is
-     * ultimately the more important variable.
+     * Used when reading inputs from an input file, so it knows how to parse
+     * the file. Normally we have a csv whose rows are activation vectors. Here
+     * we have a set of spike times and neuron indices as tuples. See
+     * {@link #readNextInputUnsafe}.
      */
     private boolean isSpikingNeuronGroup = false;
 
@@ -795,22 +790,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         }
         return vals;
     }
-
-    // public byte [] getSpikes() {
-    // if (!isSpikingNeuronGroup) {
-    // return null;
-    // }
-    // int numBytes = size() % 8 == 0 ? size()/8 : size()/8 + 1;
-    // byte [] actArr = new byte[numBytes];
-    // int actInt = 0;
-    // for (int i = 0; i < size(); i++) {
-    // if (((SpikingNeuronUpdateRule) neuronList.get(i).getUpdateRule())
-    // .hasSpiked()) {
-    // actInt = actInt | (1 << (i % 32));
-    // }
-    // }
-    //
-    // }
 
     /**
      * Return biases as a double array.
@@ -1563,22 +1542,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             }
         }
         return null;
-    }
-
-    /**
-     * A hack to guess that the neuron group is spiking and thus that spike
-     * indices menu should be shown.   The isSpikingNeuronGroup field is
-     * not currently being maintained, though we may bring it back.
-     *
-     * @return true if the first node in the group is spiking, false otherwise.
-     */
-    public boolean isSpiking2() {
-        if (neuronList.size() > 0) {
-            if (neuronList.get(0).getUpdateRule().isSpikingNeuron()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

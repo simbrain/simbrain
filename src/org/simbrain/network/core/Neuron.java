@@ -168,8 +168,9 @@ public class Neuron implements EditableObject, AttributeContainer {
 
     /**
      * The polarity of this neuron (excitatory, inhibitory, or none, which is
-     * null).
+     * null). Used in synapse randomization, and in adding synapses.
      */
+    // TODO: See notes at setter. May or may not make sense to have this be settable.
     @UserParameter(label = "Polarity", order = 10)
     private Polarity polarity = Polarity.BOTH;
 
@@ -333,12 +334,12 @@ public class Neuron implements EditableObject, AttributeContainer {
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
 
-
+        // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
+        // But this check caused problems so commented out for null
         // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
-            for (Synapse s : getFanOut().values()) {
-                s.initSpikeResponder();
-            }
-        // }
+        for (Synapse s : getFanOut().values()) {
+            s.initSpikeResponder();
+        }
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
@@ -1180,6 +1181,10 @@ public class Neuron implements EditableObject, AttributeContainer {
     }
 
     // TODO: Unsafe discuss design of this feature.
+    // Should check.  For example, setting a neuron to inhibitory when
+    // all of its fan-out is excitatory, or before anything has been changed
+    // Could make Polarity final and disallow changes.  May be useful to have
+    // in "sandbox" mode.  Need to discuss further.
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
     }

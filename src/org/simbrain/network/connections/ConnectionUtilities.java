@@ -31,9 +31,9 @@ import java.util.List;
 
 /**
  * A set of static utility functions/interfaces/etc for manipulating synapses.
- * Usually, for manipulating loose synapses since most changes to
- * Synapses in a synapse group should be done through the synapse group, but
- * there are counter-examples.
+ * Usually, for manipulating loose synapses since most changes to Synapses in a
+ * synapse group should be done through the synapse group, but there are
+ * counter-examples.
  * <p>
  * TODO: Make synapse group use more of these functions.
  *
@@ -67,8 +67,10 @@ public class ConnectionUtilities {
      * assigned default strengths based on their polarity depending on which
      * randomizers are null.
      *
-     * @param exciteRand      the randomizer to be used to determine the weights of excitatory synapses.
-     * @param inhibRand       the randomizer to be used to determine the weights of inhibitory synapses.
+     * @param exciteRand      the randomizer to be used to determine the weights
+     *                        of excitatory synapses.
+     * @param inhibRand       the randomizer to be used to determine the weights
+     *                        of inhibitory synapses.
      * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
      * @param synapses        the synapses to modify
      * @throws IllegalArgumentException
@@ -114,22 +116,24 @@ public class ConnectionUtilities {
     public static void randomizeAndPolarizeSynapses(Collection<Synapse> synapses, double excitatoryRatio) {
 
         ProbabilityDistribution exciteRand =
-                UniformDistribution.builder()
-                        .polarity(Polarity.EXCITATORY)
-                        .build();
+            UniformDistribution.builder()
+                .polarity(Polarity.EXCITATORY)
+                .build();
 
         ProbabilityDistribution inhibRand =
-                UniformDistribution.builder()
-                        .polarity(Polarity.INHIBITORY)
-                        .build();
+            UniformDistribution.builder()
+                .polarity(Polarity.INHIBITORY)
+                .build();
 
         randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio);
     }
 
     /**
      * @param synapses   the synapses to modify
-     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
-     * @param inhibRand  the randomizer to be used to determine the weights of inhibitory synapses.
+     * @param exciteRand the randomizer to be used to determine the weights of
+     *                   excitatory synapses.
+     * @param inhibRand  the randomizer to be used to determine the weights of
+     *                   inhibitory synapses.
      */
     public static void randomizeSynapses(Collection<Synapse> synapses, ProbabilityDistribution exciteRand, ProbabilityDistribution inhibRand) {
         if (exciteRand.equals(inhibRand)) {
@@ -155,7 +159,8 @@ public class ConnectionUtilities {
      * the given excitatory randomizer.
      *
      * @param synapses   the synapses to modify
-     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
+     * @param exciteRand the randomizer to be used to determine the weights of
+     *                   excitatory synapses.
      */
     public static void randomizeExcitatorySynapses(Collection<Synapse> synapses, ProbabilityDistribution exciteRand) {
         checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
@@ -173,7 +178,8 @@ public class ConnectionUtilities {
      * the synapses in the list is known ahead of time.
      *
      * @param synapses   the synapses to modify
-     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses.
+     * @param exciteRand the randomizer to be used to determine the weights of
+     *                   excitatory synapses.
      */
     public static void randomizeExcitatorySynapsesUnsafe(Collection<Synapse> synapses, ProbabilityDistribution exciteRand) {
         checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
@@ -187,7 +193,8 @@ public class ConnectionUtilities {
      * the given inhibitory randomizer.
      *
      * @param synapses  the synapses to modify
-     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
+     * @param inhibRand the randomizer to be used to determine the weights of
+     *                  inhibitory synapses.
      */
     public static void randomizeInhibitorySynapses(Collection<Synapse> synapses, ProbabilityDistribution inhibRand) {
         checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
@@ -205,7 +212,8 @@ public class ConnectionUtilities {
      * the synapses in the list is known ahead of time.
      *
      * @param synapses  the synapses to modify
-     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
+     * @param inhibRand the randomizer to be used to determine the weights of
+     *                  inhibitory synapses.
      */
     public static void randomizeInhibitorySynapsesUnsafe(Collection<Synapse> synapses, ProbabilityDistribution inhibRand) {
         checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
@@ -252,8 +260,7 @@ public class ConnectionUtilities {
      * if some or all of the source neurons are themselves polarized. In such
      * cases the polarity of the Neurons efferent synapses will not be
      * overridden. Though it may not be possible to obtain the desired
-     * excitatoryRatio in this case, this method will get as close as
-     * possible.
+     * excitatoryRatio in this case, this method will get as close as possible.
      *
      * @param synapses        the synapses to polarize
      * @param excitatoryRatio the ration of excitatory synapses (1 for all
@@ -293,8 +300,10 @@ public class ConnectionUtilities {
      * polarities implied by their names.
      *
      * @param synapses          the synpases to modify
-     * @param exTemplateSynapse temporary set containing all excitatory synapses
-     * @param inTemplateSynapse temporary set containing all inhibitory synapses
+     * @param exTemplateSynapse temporary set containing all excitatory
+     *                          synapses
+     * @param inTemplateSynapse temporary set containing all inhibitory
+     *                          synapses
      */
     public static void conformToTemplates(Collection<Synapse> synapses, Synapse exTemplateSynapse, Synapse inTemplateSynapse) {
         if (exTemplateSynapse.getStrength() <= 0) {
@@ -340,11 +349,12 @@ public class ConnectionUtilities {
      */
     private static void checkPolarityMatches(ProbabilityDistribution inQuestion, Polarity expectedPolarity) throws IllegalArgumentException {
         // TODO: Use "optional" instead when upgrade to Java 8
-        if (inQuestion == null)
+        if (inQuestion == null) {
             return;
+        }
 
         // TODO: I'm commenting this out for now just to test code, but
-     //     it's being thrown a lot and testing is needed.
+        //     it's being thrown a lot and testing is needed.
         if (!expectedPolarity.equals(inQuestion.getPolarity())) {
             throw new IllegalArgumentException("Randomizer's polarity does" + " not match its implied polarity");
         }
@@ -420,5 +430,41 @@ public class ConnectionUtilities {
                 s.setLearningRule(exciteRule);
             }
         }
+    }
+
+    public static double[] getNormalizedSeparatedInput(Neuron n) {
+        double[] ei = new double[2];
+        double e = 0;
+        double i = 0;
+        for (Synapse s : n.getFanIn()) {
+            double psr = s.calcPSR();
+            if (psr > 0) {
+                ei[0] += psr;
+                e++;
+            } else {
+                ei[1] += psr;
+                i++;
+            }
+        }
+        if (e > 1) {
+            ei[0] /= e;
+        }
+        if (i > 1) {
+            ei[1] /= i;
+        }
+        return ei;
+    }
+
+    public static double[] getSeparatedInput(Neuron n) {
+        double[] ei = new double[2];
+        for (Synapse s : n.getFanIn()) {
+            double psr = s.calcPSR();
+            if (psr > 0) {
+                ei[0] += psr;
+            } else {
+                ei[1] += psr;
+            }
+        }
+        return ei;
     }
 }

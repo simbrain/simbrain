@@ -329,14 +329,16 @@ public class Neuron implements EditableObject, AttributeContainer {
      * @param updateRule the neuronUpdateRule to set
      */
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
+
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
 
-        if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
+
+        // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
             for (Synapse s : getFanOut().values()) {
                 s.initSpikeResponder();
             }
-        }
+        // }
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();

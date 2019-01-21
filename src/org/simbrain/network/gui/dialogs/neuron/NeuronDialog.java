@@ -138,12 +138,15 @@ public final class NeuronDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
+
         neuronPropertiesPanel.commitChanges();
 
         // Notify the network that changes have been made
         neuronList.get(0).getNetwork().fireNeuronsUpdated(neuronList);
         // TODO: Below is not great. Need to refactor networkpanel events
         if (!neuronList.isEmpty()) {
+            // TODO: Hacks pending calls to setters when using ape
+            neuronList.forEach(n -> n.setUpdateRule(n.getUpdateRule()));
             neuronList.forEach(neuronList.get(0).getNetwork()::fireNeuronLabelChanged);
         }
 

@@ -91,7 +91,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Only used of source neuron is a spiking neuron.
      */
     @UserParameter(label = "Spike Responder", isObjectType = true, order = 200)
-    private SpikeResponder spikeResponder;
+    private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /**
      * Synapse id.
@@ -110,7 +110,12 @@ public class Synapse implements EditableObject, AttributeContainer {
     private double strength = 0;
 
     /**
-     * Post-Synaptic Response
+     * Post synaptic response. The totality of the output of this synapse; the
+     * total contribution of this synapse to the post-synaptic or target neuron.
+     * This is computed using a {@link SpikeResponder} in the
+     * case of a spiking pre-synaptic neuron. In the case of a non-spiking node
+     * this is the product of the source activation and the weight of a synapse,
+     * i.e. one term in a classical weighted input.
      */
     private double psr;
 
@@ -343,7 +348,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     public void initSpikeResponder() {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-                if (spikeResponder == null) {
+                if (spikeResponder instanceof NonResponder) {
                     spikeResponder = DEFAULT_SPIKE_RESPONDER;
                 }
             } else {

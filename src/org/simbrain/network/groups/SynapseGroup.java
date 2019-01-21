@@ -1431,7 +1431,6 @@ public class SynapseGroup extends Group {
 
     public void setDelay(int delay, Polarity polarity) {
         setProperty(s -> s.setDelay(delay), Polarity.BOTH);
-
     }
 
     public void setEnabled(boolean enabled) {

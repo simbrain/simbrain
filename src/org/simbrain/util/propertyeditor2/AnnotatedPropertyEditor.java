@@ -107,7 +107,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
 
-        if (objects.isEmpty()) {
+        if (objects.isEmpty() || objects == null) {
             return;
         }
         this.editedObjects = objects;

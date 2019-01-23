@@ -517,6 +517,7 @@ public class Synapse {
     public void decrementWeight() {
         if (strength > lowerBound) {
             strength -= increment;
+            strength = Math.max(lowerBound,strength);
         }
         if (getNetwork() != null && !isTemplate)
             getNetwork().fireSynapseChanged(this);

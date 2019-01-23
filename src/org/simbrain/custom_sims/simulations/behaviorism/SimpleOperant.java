@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class Behaviorism extends RegisteredSimulation {
+public class SimpleOperant extends RegisteredSimulation {
 
     NetBuilder netBuilder;
     ControlPanel panel;
@@ -29,11 +29,11 @@ public class Behaviorism extends RegisteredSimulation {
 
     final int numNeurons = 3;
 
-    public Behaviorism() {
+    public SimpleOperant() {
         super();
     }
 
-    public Behaviorism(SimbrainDesktop desktop) {
+    public SimpleOperant(SimbrainDesktop desktop) {
         super(desktop);
     }
 
@@ -161,11 +161,11 @@ public class Behaviorism extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism";
+        return "Behaviorism: Simple Operant Conditioning";
     }
 
     @Override
-    public Behaviorism instantiate(SimbrainDesktop desktop) { return new Behaviorism(desktop);
+    public SimpleOperant instantiate(SimbrainDesktop desktop) { return new SimpleOperant(desktop);
     }
 
 }

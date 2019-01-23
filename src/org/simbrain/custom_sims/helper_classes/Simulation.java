@@ -11,6 +11,7 @@ import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -283,6 +284,21 @@ public class Simulation {
 	}
 
 	/**
+	 * Coupling a synapse to a time series plot.
+	 * TODO: Create a generalized coupling to time series method.
+	 */
+	public Coupling<?> couple(NetworkComponent networkComponent, Synapse synapse, TimeSeriesPlotComponent plot, int index) {
+		PotentialProducer synapseProducer = networkComponent.getAttributeManager()
+			.createPotentialProducer(synapse, "getStrength", double.class);
+		PotentialConsumer timeSeriesConsumer1 = plot.getPotentialConsumers().get(index);
+		timeSeriesConsumer1.setCustomDescription("Time series " + index);
+		Coupling<?> coupling = null;
+		coupling = new Coupling(synapseProducer, timeSeriesConsumer1);
+		addCoupling(coupling);
+		return coupling;
+	}
+
+	/**
 	 * Coupling a neuron group to a projection plot.
 	 */
 	public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
@@ -310,8 +326,7 @@ public class Simulation {
 	}
 
 	/**
-	 * Make a coupling from a smell sensor to a neuron. Couples the provided smell
-	 * sensor one the indicated dimension to the provided neuron.
+	 * Add a coupling to a specific neuron activation method.
 	 *
 	 * @param producingSensor
 	 *            the smell sensor. Takes a scalar value.
@@ -320,19 +335,27 @@ public class Simulation {
 	 *            beginning at index "0"
 	 * @param consumingNeuron
 	 *            the neuron to write the values to
+	 * @param methodName which method on the consuming neuron to use: setActivation, setInputValue, or forceSetActivation
 	 */
-	public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
+	public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron, String methodName) {
 
 		NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
 		OdorWorldComponent ow = odorMap.get(producingSensor.getParent().getParentWorld());
 
 		PotentialProducer agentSensor = ow.getAttributeManager().createPotentialProducer(producingSensor,
-				"getCurrentValue", double.class, new Class[] { int.class }, new Object[] { stimulusDimension });
+			"getCurrentValue", double.class, new Class[] { int.class }, new Object[] { stimulusDimension });
 
-		PotentialConsumer sensoryNeuron = nc.getNeuronConsumer(nc, consumingNeuron, "forceSetActivation");
+		PotentialConsumer sensoryNeuron = nc.getNeuronConsumer(nc, consumingNeuron, methodName);
 
 		addCoupling(new Coupling(agentSensor, sensoryNeuron));
 
+	}
+
+	/**
+	 * {@see #couple(SmellSensor, int, Neuron, methodName)}
+	 */
+	public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
+		couple(producingSensor, stimulusDimension, consumingNeuron, "forceSetActivation");
 	}
 
 	/**

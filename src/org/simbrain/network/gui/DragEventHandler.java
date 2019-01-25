@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import com.sun.deploy.util.SystemUtils;
+//import com.sun.deploy.util.SystemUtils;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PLayer;
 import org.piccolo2d.PNode;

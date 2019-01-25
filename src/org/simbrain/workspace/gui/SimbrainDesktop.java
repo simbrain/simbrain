@@ -207,7 +207,7 @@ public class SimbrainDesktop {
     private JLabel runningLabel = new JLabel();
 
     /** Name to display in Simbrain desktop window. */
-    private static String FRAME_TITLE = "Simbrain 3.03";
+    private static String FRAME_TITLE = "Simbrain 3.04 beta";
 
     /**
      * Associates workspace components with their corresponding gui components.

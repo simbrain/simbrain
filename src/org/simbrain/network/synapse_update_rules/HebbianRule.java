@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -27,12 +28,9 @@ import org.simbrain.util.UserParameter;
  */
 public class HebbianRule extends SynapseUpdateRule {
 
-    /**
-     * Learning rate.
-     */
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",
-        minimumValue = -10, maximumValue = 10, increment = .1, defaultValue = ".01", order = 1)
-    private double learningRate = .1;
+        preferenceKey = "hebbLearningRate",  increment = .1,  order = 1)
+    private double learningRate = SimbrainPreferences.getDouble("hebbLearningRate");
 
     @Override
     public void init(Synapse synapse) {

@@ -18,13 +18,11 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.util.BiMap;
-import org.simbrain.util.Parameter;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
+import org.simbrain.util.*;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
+import org.simbrain.world.imageworld.ImageWorld;
 
 import javax.swing.*;
 import java.awt.*;
@@ -112,21 +110,22 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             try {
                 Class<?> clazz = parameter.getType();
                 Method method = clazz.getDeclaredMethod("values");
-                Object[] enumValues = (Object[]) method.invoke(parameter.getDefaultValue());
+                // TODO: Not sure the null argument is correct below.
+                Object[] enumValues = (Object[]) method.invoke(null);
                 ChoicesWithNull comboBox = new ChoicesWithNull(enumValues);
                 return comboBox;
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
             return null;
         }
 
         if (parameter.isNumeric()) {
-            Number defaultValue = (Number) parameter.getDefaultValue();
+
+            // For when default values are used
+            // if(!parameter.getAnnotation().preferenceKey().isEmpty()) {
+            //     System.out.println(SimbrainPreferences.getDouble(parameter.getAnnotation().preferenceKey()));
+            // }
 
             SpinnerNumberModelWithNull spinnerModel;
 
@@ -141,9 +140,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             if (parameter.isNumericInteger()) {
                 int step = (int) Math.max(1, stepSize);
-                spinnerModel = new SpinnerNumberModelWithNull((Integer) defaultValue, minValue == null ? null : minValue.intValue(), maxValue == null ? null : maxValue.intValue(), step);
+                spinnerModel = new SpinnerNumberModelWithNull((Integer) 0, minValue == null ? null : minValue.intValue(), maxValue == null ? null : maxValue.intValue(), step);
             } else {
-                spinnerModel = new SpinnerNumberModelWithNull((Double) defaultValue, minValue, maxValue, stepSize);
+                spinnerModel = new SpinnerNumberModelWithNull((Double) 0.0, minValue, maxValue, stepSize);
             }
 
             return new JNumberSpinnerWithNull(spinnerModel);
@@ -189,9 +188,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else {
             tips.add(anot.description());
         }
-        if (parameter.hasDefaultValue()) {
-            tips.add("Default: " + parameter.getDefaultValue());
-        }
+        // if (parameter.hasDefaultValue()) {
+        //     tips.add("Default: " + parameter.getDefaultValue());
+        // }
         if (parameter.hasMinValue()) {
             tips.add("Minimum: " + (parameter.isNumericInteger() ? "" + ((int) anot.minimumValue()) : "" + anot.minimumValue()));
         }

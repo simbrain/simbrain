@@ -284,14 +284,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         }
     }
 
-    /**
-     * Fill widgets with default values given in the annotations.
-     */
-    public void fillDefaultValues() {
-        for (ParameterWidget pw : widgets) {
-            pw.setWidgetValue(pw.getParameter().getDefaultValue());
-        }
-    }
 
     //TODO: Below not currently throwing an exception, while still testing.
     // But once everything is working better make it throw an exception!

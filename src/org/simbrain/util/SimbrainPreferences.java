@@ -86,6 +86,7 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("textWorldDictionaryDirectory", ".");
         DEFAULT_MAP.put("visionWorldDirectory", ".");
         DEFAULT_MAP.put("selfConnectionAllowed", false);
+        DEFAULT_MAP.put("hebbLearningRate", .1);
     }
 
     /**

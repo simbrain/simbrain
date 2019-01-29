@@ -55,10 +55,19 @@ public @interface UserParameter {
      */
     String description() default "";
 
+    //TODO: Remove if not needed
     /**
      * A default value for the parameter.
      */
     String defaultValue() default "";
+
+    /**
+     * A string to indicate a user preference stored in {@link SimbrainPreferences}.
+     * If this optional field is set a restore defaults button will appear in the
+     * property editor which, if pressed, will restore a fields value using
+     * this key.
+     */
+    String preferenceKey() default "";
 
     /**
      * An optional parameter which prevents the dialog from accepting values

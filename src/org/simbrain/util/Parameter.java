@@ -157,13 +157,6 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Returns true iff the UserParameter defines a default value.
-     */
-    public boolean hasDefaultValue() {
-        return !"".equals(annotation.defaultValue());
-    }
-
-    /**
      * Returns true iff the UserParameter defines a minimum value.
      */
     public boolean hasMinValue() {
@@ -176,57 +169,6 @@ public class Parameter implements Comparable<Parameter> {
     public boolean hasMaxValue() {
         return !Double.isNaN(annotation.maximumValue());
     }
-
-    /**
-     * Returns the default value for this parameter, or null if none is
-     * specified.
-     */
-    public Object getDefaultValue() {
-        if (!annotation.defaultValue().trim().equals("")) {
-            try {
-                return interpretValue(annotation.defaultValue());
-            } catch (Exception e) {
-                String message = "The type of parameter field " + getDeclaringClass().getSimpleName() + "." + getName() + " is " + getType().getSimpleName() + " but it looks like the default value specified, '" + annotation.defaultValue() + "', cannot be interpreted as such.";
-                System.err.println(message);
-            }
-        }
-
-        if (isNumeric()) {
-            // Respect/use bounds to determine default numeric value.
-            double val = 0;
-            if (hasMinValue() && hasMaxValue()) {
-                val = (annotation.maximumValue() - annotation.minimumValue()) / 2;
-            } else {
-                if (hasMinValue() && val < annotation.minimumValue()) {
-                    val = annotation.minimumValue();
-                } else if (hasMaxValue() && val > annotation.maximumValue()) {
-                    val = annotation.maximumValue();
-                }
-            }
-
-            if (isNumericFloat()) {
-                return val;
-            }
-            if (isNumericInteger()) {
-                return (int) Math.round(val);
-            }
-        }
-
-        if (isBoolean()) {
-            return false;
-        }
-
-        if (isColor()) {
-            return Color.BLACK;
-        }
-
-        if (isString()) {
-            return "";
-        }
-
-        return null;
-    }
-
 
     /**
      * Get the value for this parameter on an object instance.
@@ -257,7 +199,6 @@ public class Parameter implements Comparable<Parameter> {
         }
         return null;
     }
-
 
     /**
      * Set the value for this parameter on an object instance.
@@ -292,7 +233,6 @@ public class Parameter implements Comparable<Parameter> {
             throw new RuntimeException("Something went wrong setting the value: " + e.getMessage(), e);
         }
     }
-
 
     /**
      * Attempt to convert the given value to the type of this parameter field.
@@ -347,7 +287,6 @@ public class Parameter implements Comparable<Parameter> {
         return value;
     }
 
-
     /**
      * Validate the given value.
      *
@@ -382,7 +321,6 @@ public class Parameter implements Comparable<Parameter> {
 
         return null;
     }
-
 
     // Static cache of annotated fields for a class.
     // Avoids multiple runs of expensive reflection code.

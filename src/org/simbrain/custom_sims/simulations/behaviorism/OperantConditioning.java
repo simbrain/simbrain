@@ -21,7 +21,7 @@ import java.util.*;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class ThreeTermContingency extends RegisteredSimulation {
+public class OperantConditioning extends RegisteredSimulation {
 
     NetBuilder netBuilder;
     Network network;
@@ -36,11 +36,11 @@ public class ThreeTermContingency extends RegisteredSimulation {
 
     double[] firingProbabilities = new double[numNeurons];
 
-    public ThreeTermContingency() {
+    public OperantConditioning() {
         super();
     }
 
-    public ThreeTermContingency(SimbrainDesktop desktop) {
+    public OperantConditioning(SimbrainDesktop desktop) {
         super(desktop);
     }
 
@@ -73,22 +73,22 @@ public class ThreeTermContingency extends RegisteredSimulation {
         // Reward and punish nodes
         rewardNeuron = netBuilder.addNeuron((int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
-        rewardNeuron.setUpperBound(.4);
+        //rewardNeuron.setUpperBound(.4);
         rewardNeuron.setLabel("Food Pellet");
         punishNeuron = netBuilder.addNeuron((int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
-        punishNeuron.setUpperBound(.4);
+        //punishNeuron.setUpperBound(.4);
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels
         nodeToLabel.put(behaviorNet.getNeuron(0), "Bar Press");
-        nodeToLabel.put(behaviorNet.getNeuron(1), "Spin");
-        nodeToLabel.put(behaviorNet.getNeuron(2), "Sit");
+        nodeToLabel.put(behaviorNet.getNeuron(1), "Jump");
+        nodeToLabel.put(behaviorNet.getNeuron(2), "Scratch Nose");
 
         // Set stimulus labels
-        stimulusNet.getNeuron(0).setLabel("Light");
-        stimulusNet.getNeuron(1).setLabel("Speaker");
-        stimulusNet.getNeuron(2).setLabel("Person");
+        stimulusNet.getNeuron(0).setLabel("Red Light");
+        stimulusNet.getNeuron(1).setLabel("Green Light");
+        stimulusNet.getNeuron(2).setLabel("Speaker");
 
         // Use aux values to store "intrinsict" firing probabilities for behaviors
         behaviorNet.getNeuron(0).setAuxValue(.33);
@@ -97,6 +97,9 @@ public class ThreeTermContingency extends RegisteredSimulation {
 
         // Initialize behaviorism labels
         updateNodeLabels();
+
+        // Clear selection
+        netBuilder.getNetworkPanel(sim).clearSelection(); // todo: why needed?
 
         // Connect the layers together
         List<Synapse> syns = netBuilder.connectAllToAll(stimulusNet, behaviorNet);
@@ -135,8 +138,9 @@ public class ThreeTermContingency extends RegisteredSimulation {
             Neuron n = behaviorNet.getNeuron(i);
             firingProbabilities[i] = n.getWeightedInputs() + n.getAuxValue();
         }
+
         firingProbabilities = SimbrainMath.normalizeVec(firingProbabilities);
-        System.out.println(Arrays.toString(firingProbabilities));
+        //System.out.println(Arrays.toString(firingProbabilities));
 
         // Select "winning" neuron based on its probability
         double random = Math.random();
@@ -164,27 +168,43 @@ public class ThreeTermContingency extends RegisteredSimulation {
         panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
 
         panel.addButton("Reward", () -> {
-            learn(.1);
-            rewardNeuron.setInputValue(.1);
+            learn(1);
+            rewardNeuron.setInputValue(1);
             punishNeuron.forceSetActivation(0);
             sim.iterate();
        });
 
         panel.addButton("Punish", () -> {
-            learn(-.1);
+            learn(-1);
             rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(.1);
+            punishNeuron.setInputValue(1);
+            sim.iterate();
+        });
+
+        panel.addButton("Do nothing", () -> {
+            rewardNeuron.forceSetActivation(0);
+            punishNeuron.setInputValue(0);
             sim.iterate();
         });
 
     }
 
     private void learn(double valence) {
-        // todo: possibly separate learning rates out
+
+        double rewardLearningRate = .1;
+        double punishLearningRate = .1;
+
+        if(valence > 0) {
+            valence *= rewardLearningRate;
+        } else {
+            valence *= punishLearningRate;
+        }
+
         for(Neuron tar : behaviorNet.getNeuronList()) {
 
             // The "winning" node
             if(tar.getActivation() > 0){
+
                 // Update intrinsic probability
                 double p = tar.getAuxValue();
                 tar.setAuxValue(Math.max(p + valence * p, 0));
@@ -222,11 +242,11 @@ public class ThreeTermContingency extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism: Three Term Contingency";
+        return "Behaviorism: Operant Conditioning";
     }
 
     @Override
-    public ThreeTermContingency instantiate(SimbrainDesktop desktop) { return new ThreeTermContingency(desktop);
+    public OperantConditioning instantiate(SimbrainDesktop desktop) { return new OperantConditioning(desktop);
     }
 
 }

@@ -145,33 +145,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
             }
         });
 
-        //setUpControlPanel();
-
     }
-
-
-
-    private void setUpControlPanel() {
-
-       //  panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
-       //
-       //  panel.addButton("Reward", () -> {
-       //      learn(.1);
-       //      rewardNeuron.setInputValue(.1);
-       //      punishNeuron.forceSetActivation(0);
-       //      sim.iterate();
-       // });
-       //
-       //  panel.addButton("Punish", () -> {
-       //      learn(-.1);
-       //      rewardNeuron.forceSetActivation(0);
-       //      punishNeuron.setInputValue(.1);
-       //      sim.iterate();
-       //  });
-
-    }
-
-
 
     @Override
     public String getName() {

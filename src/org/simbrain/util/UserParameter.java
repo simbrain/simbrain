@@ -28,9 +28,9 @@ import java.lang.annotation.*;
  * Annotation for user-configurable parameter fields that provides for
  * specifying meta-data such as label, description, and validation criteria.
  * This information may be used by dialog builders to construct input fields.
- *
+ * <br>
  * The annotation can be used on fields, or on methods of interfaces.
- *
+ * <br>
  * When used in a method, it should be used on a getter, and the interface that
  * contains the getter should have an appropriately named corresponding setter.
  * E.g. <code>getLowerBound</code> will try to find a setter named
@@ -50,15 +50,10 @@ public @interface UserParameter {
     String label();
 
     /**
-     * Description for the parameter.
+     * Description for the parameter. Displayed in the corresponding widget's
+     * tooltip.
      */
     String description() default "";
-
-    /**
-     * Whether the parameter is optional. Note that if a defaultValue is
-     * specified then this will be used even if optional is set.
-     */
-    boolean optional() default false;
 
     /**
      * A default value for the parameter.
@@ -66,20 +61,25 @@ public @interface UserParameter {
     String defaultValue() default "";
 
     /**
-     * For numeric types, a minimum value, inclusive. Optional.
+     * An optional parameter which prevents the dialog from accepting values
+     * smaller than this.  Distinct from model code which enforces upper or lower
+     * bounds.
      */
     double minimumValue() default Double.NaN;
 
     /**
-     * For numeric types, a maximum value, inclusive. Optional.
+     * An optional parameter which prevents the dialog from accepting values
+     * larger than this. Distinct from model code which enforces upper or lower
+     * bounds.
      */
     double maximumValue() default Double.NaN;
 
     /**
-     * Regular expression to validate (String) values against. This is only
-     * applied to parameters that are provided as strings. Optional.
+     * Amount that the {@link org.simbrain.util.widgets.SpinnerNumberModelWithNull}
+     * changes when clicked up or down. Note that it is up to the user of the
+     * annotation to set this so that it makes sense.
      */
-    String regexValidation() default "";
+    double increment() default 1;
 
     /**
      * The probability distribution to use when generating random values for
@@ -126,10 +126,15 @@ public @interface UserParameter {
      */
     String typeListMethod() default "getTypes";
 
-
     /**
      * Set to false to make this a "display" type.
      */
     boolean editable() default true;
+
+    /**
+     * Regular expression to validate (String) values against. This is only
+     * applied to parameters that are provided as strings. Optional.
+     */
+    String regexValidation() default "";
 
 }

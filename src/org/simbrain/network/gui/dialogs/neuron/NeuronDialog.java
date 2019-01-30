@@ -111,27 +111,27 @@ public final class NeuronDialog extends StandardDialog {
     private void updateHelp() {
 
         ParameterWidget pw = neuronPropertiesPanel.getWidget("Update Rule");
-//        String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
-//
-//        if (selection == SimbrainConstants.NULL_STRING) {
-//            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
-//        } else {
-//
-//            // Use combo box label (with spaces removed) for doc page.
-//            String name = selection.replaceAll("\\s", ""); // Remove white space
-//
-//            // Docs are in different places for activity generators and neurons
-//            String docFolder = "";
-//            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
-//                docFolder = "activity_generator";
-//            } else {
-//                docFolder = "neuron";
-//            }
-//
-//            // Create the help action
-//            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
-//        }
-//        helpButton.setAction(helpAction);
+        String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
+
+        if (selection == SimbrainConstants.NULL_STRING) {
+            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+        } else {
+
+            // Use combo box label (with spaces removed) for doc page.
+            String name = selection.replaceAll("\\s", ""); // Remove white space
+
+            // Docs are in different places for activity generators and neurons
+            String docFolder = "";
+            if (neuronList.get(0).getUpdateRule() instanceof ActivityGenerator) {
+                docFolder = "activity_generator";
+            } else {
+                docFolder = "neuron";
+            }
+
+            // Create the help action
+            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
+        }
+        helpButton.setAction(helpAction);
     }
 
     /**

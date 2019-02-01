@@ -30,7 +30,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  *
  * @author jyoshimi
  */
-public class LocationSensor extends Sensor {
+public class LocationSensor extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Default Activation Amount.
@@ -50,17 +50,17 @@ public class LocationSensor extends Sensor {
     /**
      * Default width.
      */
-    public static final int DEFAULT_WIDTH = 20;
+    public static final int DEFAULT_WIDTH = 32;
 
     /**
      * Default height.
      */
-    public static final int DEFAULT_HEIGHT = 20;
+    public static final int DEFAULT_HEIGHT = 32;
 
     /**
      * Current value of the sensor; activationAmount if "active", 0 otherwise.
      */
-    private double value = 0;
+    private double[] values;
 
     /**
      * Value to return when the tile sensor is activated.
@@ -93,7 +93,7 @@ public class LocationSensor extends Sensor {
     @UserParameter(label = "Width",
             description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
             order = 6)
-    private int width;
+    private int width = DEFAULT_WIDTH;
 
     /**
      * Height of the sensor.
@@ -101,7 +101,21 @@ public class LocationSensor extends Sensor {
     @UserParameter(label = "Height",
             description = "Determines the size of the tile. Height specifies the vertical length.",
             order = 7)
-    private int height;
+    private int height = DEFAULT_HEIGHT;
+
+    @UserParameter(
+            label = "Columns",
+            description = "Number of columns of the sensor grid",
+            order = 8
+    )
+    private int columns = 5;
+
+    @UserParameter(
+            label = "Rows",
+            description = "Number of columns of the sensor grid",
+            order = 9
+    )
+    private int rows = 5;
 
     /**
      * Construct a tile sensor.
@@ -133,18 +147,11 @@ public class LocationSensor extends Sensor {
 
     @Override
     public void update() {
-        double entityX = parent.getCenterLocation()[0];
-        double entityY = parent.getCenterLocation()[1];
-        boolean xone = entityX > x;
-        boolean xtwo = entityX < (x + width);
-        boolean yone = entityY > y;
-        boolean ytwo = entityY < (y + height);
-
-        // System.out.println(xone + " " + xtwo + " " + yone + " " + ytwo);
-        if (xone && xtwo && yone && ytwo) {
-            value = activationAmount;
-        } else {
-            value = 0;
+        values = new double[columns * rows];
+        int gridX = (int) (getLocation()[0] / width - x);
+        int gridY = (int) (getLocation()[1] / height - y);
+        if (gridX < columns && gridY < rows) {
+            values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
         }
     }
 
@@ -152,17 +159,17 @@ public class LocationSensor extends Sensor {
      * @return value associated with this sensor, 0 if occupied,
      */
     @Producible(idMethod = "getMixedId")
-    public double getValue() {
-        return value;
+    public double[] getValues() {
+        return values;
     }
 
-    /**
-     * @param value the value to set
-     */
-    @Consumable(idMethod = "getMixedId")
-    public void setValue(double value) {
-        this.value = value;
-    }
+    // /**
+    //  * @param values the value to set
+    //  */
+    // @Consumable(idMethod = "getMixedId")
+    // public void setValue(double[] values) {
+    //     this.values = values;
+    // }
 
     /**
      * @return the activationAmount
@@ -236,7 +243,7 @@ public class LocationSensor extends Sensor {
 
     @Override
     public String getTypeDescription() {
-        return "Tile";
+        return "Location";
     }
 
     @Override
@@ -251,6 +258,6 @@ public class LocationSensor extends Sensor {
 
     @Override
     public String getName() {
-        return "Tile";
+        return "Location";
     }
 }

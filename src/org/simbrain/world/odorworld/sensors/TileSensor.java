@@ -50,6 +50,17 @@ public class TileSensor extends Sensor {
     }
 
     /**
+     * Construct a copy of a tile sensor.
+     *
+     * @param tileSensor the tile sensor to copy
+     */
+    public TileSensor(TileSensor tileSensor) {
+        super(tileSensor);
+        this.outputAmount = tileSensor.outputAmount;
+        this.tileIdToSense = tileSensor.tileIdToSense;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -93,6 +104,6 @@ public class TileSensor extends Sensor {
 
     @Override
     public EditableObject copy() {
-        return new TileSensor(parent, tileIdToSense);
+        return new TileSensor(this);
     }
 }

@@ -81,6 +81,17 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
     }
 
     /**
+     * Construct a copy of an effector.
+     *
+     * @param effector the effector to copy
+     */
+    public Effector(Effector effector) {
+        super();
+        this.parent = effector.parent;
+        this.label = effector.label;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:

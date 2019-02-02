@@ -109,6 +109,12 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
+    public Hearing(Hearing hearing) {
+        super(hearing);
+        this.phrase = hearing.phrase;
+        this.charactersPerRow = hearing.charactersPerRow;
+    }
+
     /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
@@ -187,7 +193,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public EditableObject copy() {
-        return new Hearing(parent, phrase, outputAmount);
+        return new Hearing(this);
     }
 
     public int getCharactersPerRow() {

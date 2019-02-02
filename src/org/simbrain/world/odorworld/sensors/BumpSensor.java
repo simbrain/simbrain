@@ -91,6 +91,16 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     /**
+     * Construct a copy of a bump sensor.
+     *
+     * @param bumpSensor the bump sensor to copy
+     */
+    public BumpSensor(BumpSensor bumpSensor) {
+        super(bumpSensor);
+        this.baseValue = bumpSensor.baseValue;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -146,7 +156,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public EditableObject copy() {
-        return new BumpSensor(parent, baseValue);
+        return new BumpSensor(this);
     }
 
     @Override

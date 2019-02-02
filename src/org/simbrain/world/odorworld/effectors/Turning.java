@@ -86,6 +86,17 @@ public class Turning extends Effector {
     }
 
     /**
+     * Construct a copy of a turning effector.
+     *
+     * @param turning the turning effector to copy
+     */
+    public Turning(Turning turning) {
+        super(turning);
+        this.direction = turning.direction;
+        this.amount = turning.amount;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -168,6 +179,6 @@ public class Turning extends Effector {
 
     @Override
     public EditableObject copy() {
-        return new Turning(parent, getLabel(), direction);
+        return new Turning(this);
     }
 }

@@ -135,6 +135,22 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
     }
 
     /**
+     * Construct a copy of a location sensor.
+     *
+     * @param locationSensor the location sensor to copy
+     */
+    public LocationSensor(LocationSensor locationSensor) {
+        super(locationSensor);
+        this.activationAmount = locationSensor.activationAmount;
+        this.x = locationSensor.x;
+        this.y = locationSensor.y;
+        this.width = locationSensor.width;
+        this.height = locationSensor.height;
+        this.rows = locationSensor.rows;
+        this.columns = locationSensor.columns;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -253,7 +269,7 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
 
     @Override
     public EditableObject copy() {
-        return new LocationSensor(parent, x, y, width, height);
+        return new LocationSensor(this);
     }
 
     @Override

@@ -67,6 +67,15 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     /**
+     * Construct a copy of a smell sensor.
+     *
+     * @param smellSensor The smell sensor to copy
+     */
+    public SmellSensor(SmellSensor smellSensor) {
+        super(smellSensor);
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -124,7 +133,7 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public EditableObject copy() {
-        return new SmellSensor(parent, getLabel(), theta, radius);
+        return new SmellSensor(this);
     }
 
     @Override

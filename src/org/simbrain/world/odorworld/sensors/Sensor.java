@@ -114,6 +114,17 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     }
 
     /**
+     * Construct a copy of a sensor.
+     *
+     * @param sensor the sensor to copy
+     */
+    public Sensor(Sensor sensor) {
+        this.radius = sensor.radius;
+        this.theta = sensor.theta;
+        this.label = sensor.label;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:

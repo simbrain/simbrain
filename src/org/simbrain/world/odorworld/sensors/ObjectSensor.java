@@ -75,6 +75,19 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     }
 
     /**
+     * Construct a copy of a object sensor.
+     *
+     * @param objectSensor the object sensor to copy
+     */
+    public ObjectSensor(ObjectSensor objectSensor) {
+        super(objectSensor);
+        this.baseValue = objectSensor.baseValue;
+        this.decayFunction = (DecayFunction) objectSensor.decayFunction.copy();
+        this.objectType = objectSensor.objectType;
+        this.showLabel = objectSensor.showLabel;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -127,7 +140,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
 
     @Override
     public EditableObject copy() {
-        return new ObjectSensor(parent, objectType);
+        return new ObjectSensor(this);
     }
 
     @Override

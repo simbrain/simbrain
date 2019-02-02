@@ -121,6 +121,14 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         super(parent, "Say: \"" + DEFAULT_PHRASE + "\"");
     }
 
+    public Speech(Speech speech) {
+        super(speech);
+        this.phrase = speech.phrase;
+        this.charactersPerRow = speech.charactersPerRow;
+        this.threshold = speech.threshold;
+        this.decayFunction = (DecayFunction) speech.decayFunction.copy();
+    }
+
     /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
@@ -208,7 +216,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
 
     @Override
     public EditableObject copy() {
-        return new Speech(parent, phrase, threshold);
+        return new Speech(this);
     }
 
     @Override

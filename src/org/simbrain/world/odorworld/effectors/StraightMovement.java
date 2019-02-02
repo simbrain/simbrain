@@ -73,6 +73,16 @@ public class StraightMovement extends Effector {
     }
 
     /**
+     * Construct a copy of a straight movement effector.
+     *
+     * @param straightMovement the straight movement effector to copy
+     */
+    public StraightMovement(StraightMovement straightMovement) {
+        super(straightMovement);
+        this.amount = straightMovement.amount;
+    }
+
+    /**
      * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
      *
      * NOTE:
@@ -147,6 +157,6 @@ public class StraightMovement extends Effector {
 
     @Override
     public EditableObject copy() {
-        return new StraightMovement(parent, getLabel());
+        return new StraightMovement(this);
     }
 }

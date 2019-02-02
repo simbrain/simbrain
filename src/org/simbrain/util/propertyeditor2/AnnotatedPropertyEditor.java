@@ -32,6 +32,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A panel for editing collections of objects based on {@link UserParameter}
@@ -371,6 +372,26 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         }
 
+    }
+
+    /**
+     * Returns a string describing what object or objects are being edited
+     */
+    public String getTitleString() {
+
+        List<String> names =
+            editedObjects.stream()
+                .map(EditableObject::getName)
+                .collect(Collectors.toList());
+        Collections.sort(names);
+
+        String firstObject = names.get(0);
+        if(editedObjects.size() == 1) {
+            return "Edit " + firstObject;
+        } else {
+            String lastObject = names.get(names.size()-1);
+            return "Edit " + firstObject + "..." + lastObject;
+        }
     }
 
     /**

@@ -63,6 +63,11 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     private static double DEFAULT_LOWER_BOUND = -100;
 
+    @Override
+    public String getName() {
+        return getId();
+    }
+
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
      * and their parents can occur at different levels of the network hierarchy.

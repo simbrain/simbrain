@@ -78,7 +78,7 @@ public final class NeuronDialog extends StandardDialog {
 //            // Create error message and somehow prevent dialog from being created
 //        }
         neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
-        setTitle("Neuron Dialog");
+        setTitle(neuronPropertiesPanel.getTitleString());
 
         JScrollPane scroller = new JScrollPane(neuronPropertiesPanel);
         scroller.setBorder(null);

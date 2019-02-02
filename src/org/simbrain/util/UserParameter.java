@@ -55,19 +55,12 @@ public @interface UserParameter {
      */
     String description() default "";
 
-    //TODO: Remove if not needed
+    //TODO: Remove when all uses of this are removed
     /**
      * A default value for the parameter.
      */
     String defaultValue() default "";
 
-    /**
-     * A string to indicate a user preference stored in {@link SimbrainPreferences}.
-     * If this optional field is set a restore defaults button will appear in the
-     * property editor which, if pressed, will restore a fields value using
-     * this key.
-     */
-    String preferenceKey() default "";
 
     /**
      * An optional parameter which prevents the dialog from accepting values
@@ -89,6 +82,23 @@ public @interface UserParameter {
      * annotation to set this so that it makes sense.
      */
     double increment() default 1;
+
+    /**
+     * If set to true, then when setting a parameter value the setter is invoked.
+     * Assumes that the setter is named set + fieldName, where the first letter
+     *  of field name is capitalized. E.g. activation -> setActivation.
+     */
+    boolean useSetter() default false;
+
+    /**
+     * A string to indicate a user preference stored in {@link SimbrainPreferences}.
+     * If this optional field is set a restore defaults button will appear in the
+     * property editor which, if pressed, will restore a fields value using
+     * this key.
+     *
+     * TODO: Note that "restore defaults" has not yet been implemented.
+     */
+    String preferenceKey() default "";
 
     /**
      * The probability distribution to use when generating random values for

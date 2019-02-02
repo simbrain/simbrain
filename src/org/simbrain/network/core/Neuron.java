@@ -57,7 +57,8 @@ public class Neuron implements EditableObject, AttributeContainer {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", isObjectType = true, order = 100)
+    @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
+        order = 100)
     private NeuronUpdateRule updateRule;
 
     /**

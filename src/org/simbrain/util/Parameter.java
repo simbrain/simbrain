@@ -57,7 +57,9 @@ public class Parameter implements Comparable<Parameter> {
 
     /**
      * The Setter for this Parameter, when  {@link UserParameter} annotates a
-     * method. NOTE: The setter should not be annotated, but should be inferred
+     * method OR when {@link UserParameter#useSetter()} is set to true;
+     * <br>
+     * </b>NOTE: The setter should not be annotated, but should be inferred
      * using the standard naming conventions. E.g. if <code>double
      * neuron.getActivation()</code> is annotated then Parameter assumes that
      * the <code>neuron.setActivation(double)</code> exists as well.
@@ -72,6 +74,15 @@ public class Parameter implements Comparable<Parameter> {
     public Parameter(Field field) {
         this.field = field;
         annotation = field.getAnnotation(UserParameter.class);
+        if(annotation.useSetter()) {
+            String cappedName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+            String setterName = "set" + cappedName;
+            try {
+                setter = field.getDeclaringClass().getDeclaredMethod(setterName, field.getType());
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException("Field " + field.getName() + " does not have a setter named " + setterName);
+            }
+        }
     }
 
     /**
@@ -102,6 +113,7 @@ public class Parameter implements Comparable<Parameter> {
                 "corresponding setter (" + setterName + ")");
         }
     }
+
 
     /**
      * Returns true if this is an annotation for an object type field to be
@@ -223,7 +235,9 @@ public class Parameter implements Comparable<Parameter> {
 
         try {
             setAccessible(true);
-            if (isFieldAnnotation()) {
+            if (annotation.useSetter()) {
+                setter.invoke(object, value);
+            } else if (isFieldAnnotation()) {
                 field.set(object, value);
             } else {
                 setter.invoke(object, value);
@@ -335,7 +349,7 @@ public class Parameter implements Comparable<Parameter> {
      * UserParameter#order()}()}.
      */
     public static Set<Parameter> getParameters(final Class<?> paramClass) {
-        //System.out.println("Parameter.getParameters");
+
         if (!classParameters.containsKey(paramClass)) {
 
             Set<Parameter> params = new TreeSet<>();

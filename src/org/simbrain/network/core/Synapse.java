@@ -90,7 +90,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Only used of source neuron is a spiking neuron.
      */
-    @UserParameter(label = "Spike Responder", isObjectType = true, order = 200)
+    @UserParameter(label = "Spike Responder", isObjectType = true,
+        showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /**

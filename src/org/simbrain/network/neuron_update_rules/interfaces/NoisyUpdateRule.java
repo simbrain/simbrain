@@ -34,7 +34,8 @@ public interface NoisyUpdateRule {
      *
      * @return the noise generator.
      */
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000, tab="Noise")
+    @UserParameter(label = "Randomizer", isObjectType = true, showDetails = false,
+        order = 1000, tab="Noise")
     ProbabilityDistribution getNoiseGenerator();
 
     /**

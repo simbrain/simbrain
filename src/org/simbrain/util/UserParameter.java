@@ -136,6 +136,12 @@ public @interface UserParameter {
     boolean isObjectType() default false;
 
     /**
+     * For object type editors, whether the detail triangle should be present when opening
+     * the editor
+     */
+    boolean showDetails() default true;
+
+    /**
      * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
      * e.g. "getTypeMap".  Defaults to "getTypes". This method should be contained in the
      * class whose types are being edited. For example {@link ProbabilityDistribution} has a {@code getTypes()} method that

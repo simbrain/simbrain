@@ -11,6 +11,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -92,7 +93,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         nodeToLabel.put(behaviorNet.getNeuron(2), "Spin");
 
         // Set stimulus labels
-        stimulusNet.getNeuron(0).setLabel("Cheese");
+        stimulusNet.getNeuron(0).setLabel("Candle");
         stimulusNet.getNeuron(1).setLabel("Flower");
         stimulusNet.getNeuron(2).setLabel("Bell");
 
@@ -103,6 +104,9 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         // Initialize behaviorism labels
         updateNodeLabels();
+
+        // Clear selection
+        netBuilder.getNetworkPanel(sim).clearSelection(); // todo: why needed?
 
         // Connect the layers together
         List<Synapse> syns = netBuilder.connectAllToAll(stimulusNet, behaviorNet);
@@ -118,7 +122,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         mouse.setHeading(90);
 
         // Set up world
-        cheese = world.addEntity(27, 20, "Swiss.gif",
+        cheese = world.addEntity(27, 20, "Candle.png",
             new double[] { 1, 0, 0 });
         cheese.getSmellSource().setDispersion(65);
         flower = world.addEntity(79, 20, "Pansy.gif",
@@ -137,7 +141,8 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             stimulusNet.getNeuron(2));
 
         // Add custom network update action
-        network.getUpdateManager().addAction(0,new NetworkUpdateAction() {
+        network.getUpdateManager().clear();
+        network.getUpdateManager().addAction(new NetworkUpdateAction() {
 
             @Override
             public void invoke() {
@@ -191,13 +196,13 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
     private void updateNetwork() {
 
-        // Update firing probabilities
+        // Update actual firing probabilities, which combine
+        // intrinsic probs with weighted inputs
         for (int i = 0; i < behaviorNet.size(); i++) {
             Neuron n = behaviorNet.getNeuron(i);
             firingProbabilities[i] = n.getWeightedInputs() + n.getAuxValue();
         }
         firingProbabilities = SimbrainMath.normalizeVec(firingProbabilities);
-        //System.out.println(Arrays.toString(firingProbabilities));
 
         // Select "winning" neuron based on its probability
         double random = Math.random();
@@ -209,6 +214,8 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             setWinningNode(2);
         }
 
+        network.bufferedUpdateAllNeurons();
+
     }
 
     private void setWinningNode(int nodeIndex) {
@@ -216,8 +223,10 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         for (int i = 0; i < behaviorNet.size(); i++) {
             if (i == nodeIndex) {
                 behaviorNet.getNeuron(i).setInputValue(1);
+                behaviorNet.getNeuron(i).setActivation(1);
             } else {
                 behaviorNet.getNeuron(i).setInputValue(0);
+                behaviorNet.getNeuron(i).setActivation(0);
             }
         }
     }
@@ -260,27 +269,23 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             valence *= punishLearningRate;
         }
 
-        for(Neuron tar : behaviorNet.getNeuronList()) {
+        double totalActivation = stimulusNet.getNeuronList().stream().mapToDouble(Neuron::getActivation).sum();
+        Neuron winner = WinnerTakeAll.getWinner(behaviorNet.getNeuronList(), true);
 
-            // The "winning" node
-            if(tar.getActivation() > 0){
-
-                // Update intrinsic probability
-                double p = tar.getAuxValue();
-                tar.setAuxValue(Math.max(p + valence * p, 0));
-
-                // Update weight on active node
-                for(Neuron src : stimulusNet.getNeuronList()) {
-                    if (src.getActivation() > 0) {
-                        Synapse s = Network.getSynapse(src,tar);
-                        s.setStrength(Math.max(s.getStrength() + valence, 0));
-                    }
-                }
-            }
+        // If there are inputs, update weights
+        if(totalActivation > .1) {
+            // Only update weight from most active input to "winning" output
+            Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
+            Synapse s = Network.getSynapse(src,winner);
+            s.setStrength(Math.max(s.getStrength() + valence, 0));
+        } else {
+            // Update intrinsic probability
+            double p = winner.getAuxValue();
+            winner.setAuxValue(Math.max(p + valence * p, 0));
+            normIntrinsicProbabilities();
+            updateNodeLabels();
         }
-        normIntrinsicProbabilities();
-        updateNodeLabels();
-        sim.iterate();
+
     }
 
     private void normIntrinsicProbabilities() {

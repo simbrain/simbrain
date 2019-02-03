@@ -29,13 +29,9 @@ import java.util.Map;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-
 public class OperantWithEnvironment extends RegisteredSimulation {
 
-    //TODOS
-
-    // Add odor world in subsequent simulation
-
+    // Network
     NetBuilder netBuilder;
     Network network;
     ControlPanel panel;
@@ -47,10 +43,10 @@ public class OperantWithEnvironment extends RegisteredSimulation {
     double[] firingProbabilities = new double[numNeurons];
     int winningNode;
 
+    // World
     OdorWorldBuilder world;
     RotatingEntity mouse;
     OdorWorldEntity cheese, flower, fish;
-
 
     public OperantWithEnvironment() {
         super();
@@ -60,15 +56,12 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         super(desktop);
     }
 
-    /**
-     * Run the simulation!
-     */
     @Override
     public void run() {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        netBuilder = sim.addNetwork(195, 9, 624, 500, "Behaviorism");
+        netBuilder = sim.addNetwork(155,9,575,500, "Brain");
         network = netBuilder.getNetwork();
 
         // Behavioral nodes
@@ -88,27 +81,25 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // Reward and punish nodes
         rewardNeuron = netBuilder.addNeuron((int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
-        rewardNeuron.setUpperBound(1);
         rewardNeuron.setLabel("Food Pellet");
         punishNeuron = netBuilder.addNeuron((int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
-        punishNeuron.setUpperBound(.4);
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels
         nodeToLabel.put(behaviorNet.getNeuron(0), "Wiggle");
-        nodeToLabel.put(behaviorNet.getNeuron(1), "Misc");
-        nodeToLabel.put(behaviorNet.getNeuron(2), "Move Down");
+        nodeToLabel.put(behaviorNet.getNeuron(1), "Explore");
+        nodeToLabel.put(behaviorNet.getNeuron(2), "Spin");
 
         // Set stimulus labels
-        stimulusNet.getNeuron(0).setLabel("Light");
-        stimulusNet.getNeuron(1).setLabel("Speaker");
-        stimulusNet.getNeuron(2).setLabel("Person");
+        stimulusNet.getNeuron(0).setLabel("Cheese");
+        stimulusNet.getNeuron(1).setLabel("Flower");
+        stimulusNet.getNeuron(2).setLabel("Bell");
 
         // Use aux values to store "intrinsic" firing probabilities for behaviors
-        behaviorNet.getNeuron(0).setAuxValue(.33);
-        behaviorNet.getNeuron(1).setAuxValue(.33);
-        behaviorNet.getNeuron(2).setAuxValue(.34);
+        behaviorNet.getNeuron(0).setAuxValue(.33); // Node 0
+        behaviorNet.getNeuron(1).setAuxValue(.33); // Node 1
+        behaviorNet.getNeuron(2).setAuxValue(.33); // Node 2
 
         // Initialize behaviorism labels
         updateNodeLabels();
@@ -121,40 +112,36 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         network.fireSynapsesUpdated();
 
         // Create the odor world
-        world = sim.addOdorWorld(629, 9, 315, 383, "Three Objects");
+        world = sim.addOdorWorld(730,7,315,383, "Three Objects");
         world.getWorld().setObjectsBlockMovement(false);
         mouse = world.addAgent(120, 245, "Mouse");
         mouse.setHeading(90);
 
         // Set up world
-        cheese = world.addEntity(120, 180, "Swiss.gif",
+        cheese = world.addEntity(27, 20, "Swiss.gif",
             new double[] { 1, 0, 0 });
         cheese.getSmellSource().setDispersion(65);
-        flower = world.addEntity(200, 100, "Pansy.gif",
+        flower = world.addEntity(79, 20, "Pansy.gif",
             new double[] { 0, 1, 0 });
         cheese.getSmellSource().setDispersion(65);
-        fish = world.addEntity(50, 100, "Fish.gif",
+        fish = world.addEntity(125, 20, "Bell.gif",
             new double[] { 0, 0, 1 });
         cheese.getSmellSource().setDispersion(65);
 
+        // Couple agent to network
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 0,
+            stimulusNet.getNeuron(0));
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 1,
+            stimulusNet.getNeuron(1));
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), 2,
+            stimulusNet.getNeuron(2));
 
         // Add custom network update action
-        network.getUpdateManager().addAction(new NetworkUpdateAction() {
+        network.getUpdateManager().addAction(0,new NetworkUpdateAction() {
 
             @Override
             public void invoke() {
-
-                if(rewardNeuron.getActivation() >= .7){
-                    //System.out.println("");
-                    //updateNetwork();
-                    learn(.1);
-
-                    rewardNeuron.forceSetActivation(0);
-
-                }
-                else if (sim.getWorkspace().getTime() % 100 == 0) {
-                    updateNetwork();
-                }
+                updateNetwork();
                 updateBehaviors();
             }
 
@@ -179,33 +166,30 @@ public class OperantWithEnvironment extends RegisteredSimulation {
      */
     private void updateBehaviors() {
 
-        int loopTime = sim.getWorkspace().getTime() % 100;
-        if(winningNode == 0) {
-            if (loopTime < 50) {
+        int loopTime = sim.getWorkspace().getTime() % 10;
 
-                mouse.setHeading(mouse.getHeading() + 1);
+        // Node 0: Wiggle
+        if(winningNode == 0) {
+            if (loopTime < 5) {
+                mouse.setHeading(mouse.getHeading() + 5);
             } else {
-                mouse.setHeading(mouse.getHeading() - 1);
+                mouse.setHeading(mouse.getHeading() - 5);
             }
-        } else if (winningNode == 1) {
-            if (loopTime < 20) {
-                mouse.setX(mouse.getX() + 1);
-            } else if (loopTime < 30) {
-                mouse.setY(mouse.getY() + 1);
-            } else if (loopTime < 50) {
-                mouse.setHeading(mouse.getHeading() - 1);
-            } else {
-                mouse.setX(mouse.getX() + 1);
+        }
+        // Node 1: Explore
+        else if (winningNode == 1) {
+            if (Math.random() < .2) {
+                mouse.setHeading(mouse.getHeading() + Math.random()*20-10);
             }
-        } else {
-            mouse.setY(mouse.getY() + 1);
+            mouse.goStraight(2.5);
+        }
+        // Node 2: Spin
+        else {
+            mouse.setHeading(mouse.getHeading()+20);
         }
     }
 
-
     private void updateNetwork() {
-
-        behaviorNet.setClamped(false);
 
         // Update firing probabilities
         for (int i = 0; i < behaviorNet.size(); i++) {
@@ -213,7 +197,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             firingProbabilities[i] = n.getWeightedInputs() + n.getAuxValue();
         }
         firingProbabilities = SimbrainMath.normalizeVec(firingProbabilities);
-        System.out.println(Arrays.toString(firingProbabilities));
+        //System.out.println(Arrays.toString(firingProbabilities));
 
         // Select "winning" neuron based on its probability
         double random = Math.random();
@@ -225,16 +209,15 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             setWinningNode(2);
         }
 
-        behaviorNet.setClamped(true);
     }
 
     private void setWinningNode(int nodeIndex) {
         winningNode = nodeIndex;
         for (int i = 0; i < behaviorNet.size(); i++) {
             if (i == nodeIndex) {
-                behaviorNet.getNeuron(i).forceSetActivation(1);
+                behaviorNet.getNeuron(i).setInputValue(1);
             } else {
-                behaviorNet.getNeuron(i).forceSetActivation(0);
+                behaviorNet.getNeuron(i).setInputValue(0);
             }
         }
     }
@@ -244,26 +227,41 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
 
         panel.addButton("Reward", () -> {
-            learn(.1);
-            //rewardNeuron.setInputValue();
-            //punishNeuron.forceSetActivation(0);
-            sim.iterate();
-       });
-
-        panel.addButton("Punish", () -> {
-            learn(-.1);
-            rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(.1);
+            learn(1);
+            rewardNeuron.setInputValue(1);
+            punishNeuron.forceSetActivation(0);
             sim.iterate();
         });
+
+        panel.addButton("Punish", () -> {
+            learn(-1);
+            rewardNeuron.forceSetActivation(0);
+            punishNeuron.setInputValue(1);
+            sim.iterate();
+        });
+
+        panel.addButton("Do nothing", () -> {
+            rewardNeuron.forceSetActivation(0);
+            punishNeuron.setInputValue(0);
+            sim.iterate();
+        });
+
 
     }
 
     private void learn(double valence) {
-        // todo: possibly separate learning rates out
 
+        double rewardLearningRate = .1;
+        double punishLearningRate = .1;
+
+        if(valence > 0) {
+            valence *= rewardLearningRate;
+        } else {
+            valence *= punishLearningRate;
+        }
 
         for(Neuron tar : behaviorNet.getNeuronList()) {
+
             // The "winning" node
             if(tar.getActivation() > 0){
 
@@ -304,7 +302,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism: Operant with World";
+        return "Behaviorism: Operant with Mouse";
     }
 
     @Override

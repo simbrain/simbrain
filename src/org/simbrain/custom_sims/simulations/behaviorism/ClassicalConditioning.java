@@ -26,6 +26,8 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  */
 public class ClassicalConditioning extends RegisteredSimulation {
 
+    // TODO: Factor common methods out to a utility class in this directory
+
     // Network stuff
     NetBuilder netBuilder;
     Network network;

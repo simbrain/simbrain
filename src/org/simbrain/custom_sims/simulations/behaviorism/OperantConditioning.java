@@ -52,7 +52,7 @@ public class OperantConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        netBuilder = sim.addNetwork(195, 9, 624, 500, "Behaviorism");
+        netBuilder = sim.addNetwork(195, 9, 624, 500, "Simulation");
         network = netBuilder.getNetwork();
 
         // Behavioral nodes
@@ -60,7 +60,6 @@ public class OperantConditioning extends RegisteredSimulation {
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
-
 
         // Stimulus nodes
         stimulusNet = netBuilder.addNeuronGroup(-9.25, 295.93, numNeurons);
@@ -73,11 +72,9 @@ public class OperantConditioning extends RegisteredSimulation {
         // Reward and punish nodes
         rewardNeuron = netBuilder.addNeuron((int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
-        //rewardNeuron.setUpperBound(.4);
         rewardNeuron.setLabel("Food Pellet");
         punishNeuron = netBuilder.addNeuron((int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
-        //punishNeuron.setUpperBound(.4);
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels

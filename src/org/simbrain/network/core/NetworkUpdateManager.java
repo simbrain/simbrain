@@ -220,6 +220,18 @@ public class NetworkUpdateManager {
     }
 
     /**
+     * Add the action at a specified location in the action list
+     * @param location index in the list to add the action
+     * @param action action to add
+     */
+    public void addAction(int location, NetworkUpdateAction action) {
+        actionList.add(location,action);
+        for (UpdateManagerListener listener : listeners) {
+            listener.actionAdded(action);
+        }
+    }
+
+    /**
      * Completely remove an action.
      *
      * @param action

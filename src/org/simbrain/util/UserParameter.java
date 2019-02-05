@@ -112,6 +112,8 @@ public @interface UserParameter {
      */
     double probStdDev() default 1.0;
 
+    boolean useRandom() default false;
+
     /**
      * Used to determine the order of parameters when displayed to a user.
      * Optional. If two parameters have the same order value then they will be

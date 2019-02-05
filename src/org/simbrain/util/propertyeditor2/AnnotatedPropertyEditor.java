@@ -154,7 +154,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
                 widgets.add(pw);
             } else {
-                ParameterWidget pw = new ParameterWidget(param);
+                ParameterWidget pw = new ParameterWidget(editedObjects, param);
                 widgets.add(pw);
             }
 

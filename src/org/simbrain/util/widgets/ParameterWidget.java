@@ -19,6 +19,7 @@
 package org.simbrain.util.widgets;
 
 import org.simbrain.util.*;
+import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
@@ -30,6 +31,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +59,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     private List<CopyableObject> editedObjects;
 
+    private List<? extends EditableObject> editableObjects;
+
     /**
      * Construct a parameter widget from a parameter, which in turn represents a
      * field.
@@ -77,6 +82,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public ParameterWidget(Parameter param, List<CopyableObject> editedObjects) {
         parameter = param;
         this.editedObjects = editedObjects;
+        component = makeWidget();
+    }
+
+    public ParameterWidget(List<? extends EditableObject> editableObjects, Parameter parameter) {
+        this.parameter = parameter;
+        this.editableObjects = editableObjects;
         component = makeWidget();
     }
 
@@ -126,6 +137,20 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // if(!parameter.getAnnotation().preferenceKey().isEmpty()) {
             //     System.out.println(SimbrainPreferences.getDouble(parameter.getAnnotation().preferenceKey()));
             // }
+            Consumer<ProbabilityDistribution> randomize = null;
+
+            if (parameter.getAnnotation().useRandom()) {
+                randomize = pd -> {
+                    editableObjects.forEach(o -> {
+                        if (parameter.isNumericInteger()) {
+                            parameter.setFieldValue(o, pd.nextRandInt());
+                        } else {
+                            parameter.setFieldValue(o, pd.nextRand());
+                        }
+                        setWidgetValue(null);
+                    });
+                };
+            }
 
             SpinnerNumberModelWithNull spinnerModel;
 
@@ -145,7 +170,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 spinnerModel = new SpinnerNumberModelWithNull((Double) 0.0, minValue, maxValue, stepSize);
             }
 
-            return new JNumberSpinnerWithNull(spinnerModel);
+            return new NumericWidget(spinnerModel, randomize);
         }
 
         return new JTextField();
@@ -221,7 +246,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else if (parameter.isColor()) {
             ((ColorSelector) component).setValue((Color) value);
         } else if (parameter.isNumeric()) {
-            ((JNumberSpinnerWithNull) component).setValue(value);
+            ((NumericWidget) component).setValue(value);
         } else if (parameter.getAnnotation().isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
         } else if (parameter.isEnum()) {
@@ -254,7 +279,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
 
         if (parameter.isNumeric()) {
-            return ((JNumberSpinnerWithNull) component).getValue();
+            return ((NumericWidget) component).getValue();
         }
         if (parameter.getAnnotation().isObjectType()) {
             return ((ObjectTypeEditor) component).getValue();
@@ -314,7 +339,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ((YesNoNull) component).isNull();
         }
         if (parameter.isNumeric()) {
-            Object val = ((JNumberSpinnerWithNull) component).getValue();
+            Object val = ((NumericWidget) component).getValue();
             if (val == null) {
                 return true;
             }

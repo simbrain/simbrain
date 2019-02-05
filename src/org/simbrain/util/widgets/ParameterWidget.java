@@ -102,7 +102,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // ProbabilityDistribution maintains a list of types of prob distributions
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
-            return ObjectTypeEditor.createEditor(editedObjects, typeMap, parameter.getAnnotation().label());
+            return ObjectTypeEditor.createEditor(editedObjects, typeMap,
+                parameter.getAnnotation().label(),  parameter.getAnnotation().showDetails());
         }
 
         if(!parameter.isEditable()) {

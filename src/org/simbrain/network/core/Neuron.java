@@ -1239,4 +1239,8 @@ public class Neuron implements EditableObject, AttributeContainer {
         return new double[]{x, y, z};
     }
 
+    @Override
+    public String getName() {
+        return getId();
+    }
 }

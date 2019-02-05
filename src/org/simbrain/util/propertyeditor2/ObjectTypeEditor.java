@@ -144,10 +144,12 @@ public class ObjectTypeEditor extends JComponent {
      * @param objects the objects to edit
      * @param tm      type map
      * @param label   label to use for display
+     * @param showDetails if true open with the detail triangle open; else open with it closed.
      * @return the editor object
      */
-    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, BiMap<String, Class> tm, String label) {
-        return new ObjectTypeEditor(objects, tm, label, null);
+    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, BiMap<String, Class> tm,
+                                                String label, boolean showDetails) {
+        return new ObjectTypeEditor(objects, tm, label, showDetails, null);
     }
 
     /**
@@ -156,9 +158,11 @@ public class ObjectTypeEditor extends JComponent {
      *
      * @param objectList the list of objects to edit
      * @param typeMap    the mapping from strings to types
+     * @param label      label around border
+     * @param showDetails whether the detail triangle should be down when open
      * @param parent     the parent window
      */
-    private ObjectTypeEditor(List objectList, BiMap<String, Class> typeMap, String label, Window parent) {
+    private ObjectTypeEditor(List objectList, BiMap<String, Class> typeMap, String label, boolean showDetails, Window parent) {
         if (objectList.isEmpty()) {
             throw new IllegalStateException("Can't edit empty list of objects");
         }
@@ -174,14 +178,14 @@ public class ObjectTypeEditor extends JComponent {
             cbStartState = typeMap.getInverse(objectList.get(0).getClass());
             editorPanel = new AnnotatedPropertyEditor(objectList);
         }
-        layoutPanel();
+        layoutPanel(showDetails);
 
     }
 
     /**
      * Initialize the panel.
      */
-    private void layoutPanel() {
+    private void layoutPanel(boolean showDetails) {
 
         // General layout setup
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -213,17 +217,12 @@ public class ObjectTypeEditor extends JComponent {
         addDropDownListener();
 
         // Set up detail triangle
-        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.LEFT, false, "Settings", "Settings", parent);
+        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.LEFT, showDetails, "Settings", "Settings", parent);
         detailTriangle.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                if (parent == null) {
-                    parent = SwingUtilities.getWindowAncestor(ObjectTypeEditor.this);
-                }
-                editorPanel.setVisible(detailTriangle.isDown());
-                repaint();
-                parent.pack();
+                syncPanelToTriangle();
             }
 
         });
@@ -292,6 +291,9 @@ public class ObjectTypeEditor extends JComponent {
                 editorPanel = new AnnotatedPropertyEditor(prototypeObject);
                 editorPanelContainer.removeAll();
                 editorPanelContainer.add(editorPanel);
+
+                syncPanelToTriangle();
+
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -309,6 +311,18 @@ public class ObjectTypeEditor extends JComponent {
             }
 
         });
+    }
+
+    /**
+     * If detail triangle is down, show the panel; if not hide the panel.
+     */
+    private void syncPanelToTriangle() {
+        editorPanel.setVisible(detailTriangle.isDown());
+        repaint();
+        if (parent == null) {
+            parent = SwingUtilities.getWindowAncestor(ObjectTypeEditor.this);
+        }
+        parent.pack();
     }
 
 

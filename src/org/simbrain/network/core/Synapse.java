@@ -63,6 +63,11 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     private static double DEFAULT_LOWER_BOUND = -100;
 
+    @Override
+    public String getName() {
+        return getId();
+    }
+
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
      * and their parents can occur at different levels of the network hierarchy.
@@ -90,7 +95,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Only used of source neuron is a spiking neuron.
      */
-    @UserParameter(label = "Spike Responder", isObjectType = true, order = 200)
+    @UserParameter(label = "Spike Responder", isObjectType = true,
+        showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /**

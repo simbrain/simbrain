@@ -135,12 +135,11 @@ public final class SynapseDialog extends StandardDialog {
             e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
-
     /**
      * Initializes the components on the panel.
      */
     private void initializeLayout() {
-        setTitle("Synapse Dialog");
+        setTitle(synapseEditingPanel.getTitleString());
         JScrollPane scroller = new JScrollPane(synapseEditingPanel);
         scroller.setBorder(null);
         setContentPane(scroller);

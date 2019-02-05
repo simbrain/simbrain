@@ -19,9 +19,12 @@
 package org.simbrain.util.widgets;
 
 import org.simbrain.util.*;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor2.NumericWidget;
 import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
 import org.simbrain.world.imageworld.ImageWorld;
 
@@ -103,10 +106,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
             return ObjectTypeEditor.createEditor(editedObjects, typeMap,
-                parameter.getAnnotation().label(),  parameter.getAnnotation().showDetails());
+                parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
-        if(!parameter.isEditable()) {
+        if (!parameter.isEditable()) {
             return new JLabel();
         }
 
@@ -134,23 +137,28 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isNumeric()) {
 
-            // For when default values are used
+            // For when preference values are implemented later
             // if(!parameter.getAnnotation().preferenceKey().isEmpty()) {
             //     System.out.println(SimbrainPreferences.getDouble(parameter.getAnnotation().preferenceKey()));
             // }
-            Consumer<ProbabilityDistribution> randomize = null;
 
-            if (parameter.getAnnotation().useRandom()) {
-                randomize = pd -> {
-                    editableObjects.forEach(o -> {
-                        if (parameter.isNumericInteger()) {
-                            parameter.setFieldValue(o, pd.nextRandInt());
-                        } else {
-                            parameter.setFieldValue(o, pd.nextRand());
-                        }
-                        setWidgetValue(null);
-                    });
-                };
+            // Set up randomizer, if there is one
+            ProbabilityDistribution pd = null;
+            String distName = parameter.getAnnotation().probDist();
+            if (!distName.isEmpty()) {
+                switch (distName) {
+                case "Uniform":
+                    pd = UniformDistribution.builder().build();
+                    break;
+                case "Normal":
+                    double mean = parameter.getAnnotation().probMean();
+                    double std = parameter.getAnnotation().probStdDev();
+                    pd = NormalDistribution.builder()
+                        .standardDeviation(std)
+                        .mean(mean)
+                        .build();
+                    break;
+                }
             }
 
             SpinnerNumberModelWithNull spinnerModel;
@@ -171,7 +179,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 spinnerModel = new SpinnerNumberModelWithNull((Double) 0.0, minValue, maxValue, stepSize);
             }
 
-            return new NumericWidget(spinnerModel, randomize);
+            return new NumericWidget(editableObjects, parameter, spinnerModel, pd);
         }
 
         return new JTextField();
@@ -209,7 +217,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public String getToolTipText() {
         UserParameter anot = parameter.getAnnotation();
         List<String> tips = new ArrayList<>();
-        if(anot.description().isEmpty()) {
+        if (anot.description().isEmpty()) {
             tips.add(anot.label());
         } else {
             tips.add(anot.description());
@@ -234,7 +242,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * the widget is displayed.
      */
     public void setWidgetValue(Object value) {
-        if(!parameter.isEditable()) {
+        if (!parameter.isEditable()) {
 
             ((JLabel) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
 
@@ -251,7 +259,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else if (parameter.getAnnotation().isObjectType()) {
             // No action. ObjectTypeEditor handles its own init
         } else if (parameter.isEnum()) {
-            if(value == null) {
+            if (value == null) {
                 ((ChoicesWithNull) component).setNull();
             } else {
                 ((ChoicesWithNull) component).setSelectedItem(value);

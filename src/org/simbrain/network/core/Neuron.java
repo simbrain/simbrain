@@ -77,7 +77,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      * Activation value of the neuron. The main state variable.
      */
     @UserParameter(label = "Activation", description = "Main activation property",
-        increment = .5, useRandom = true, order = 1)
+        increment = .5, probDist = "Normal", order = 1)
     private double activation;
 
     /**

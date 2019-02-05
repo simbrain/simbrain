@@ -18,6 +18,8 @@
  */
 package org.simbrain.util;
 
+import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor2.CopyableObject;
@@ -102,17 +104,21 @@ public @interface UserParameter {
 
     /**
      * The probability distribution to use when generating random values for
-     * this parameter. Optional. NOT IMPLEMENTED YET.
+     * this parameter. Current opions are "Normal" and "Uniform".
      */
-    Class<? extends ProbabilityDistribution> probDistribution() default UniformDistribution.class;
+    String probDist() default "";
 
     /**
      * The standard deviation to use when generating random values for this
      * parameter. Optional. NOT IMPLEMENTED YET.
      */
-    double probStdDev() default 1.0;
+    double probMean() default 0;
 
-    boolean useRandom() default false;
+    /**
+     * The standard deviation to use when generating random values for this
+     * parameter
+     */
+    double probStdDev() default 1.0;
 
     /**
      * Used to determine the order of parameters when displayed to a user.

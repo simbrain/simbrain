@@ -71,7 +71,7 @@ public abstract class RegisteredSimulation {
         // REGISTERED_SIMS.add(new SimpleNeuroevolution());
         REGISTERED_SIMS.add(new ClassicalConditioning());
         // REGISTERED_SIMS.add(new SimpleOperant());
-        REGISTERED_SIMS.add(new OperantConditioning());
+        // REGISTERED_SIMS.add(new OperantConditioning());
         REGISTERED_SIMS.add(new OperantWithEnvironment());
 
         // Alphabetize

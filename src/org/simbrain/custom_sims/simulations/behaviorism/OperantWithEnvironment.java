@@ -237,7 +237,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         panel.addButton("Reward", () -> {
             learn(1);
-            rewardNeuron.setInputValue(1);
+            rewardNeuron.forceSetActivation(1);
             punishNeuron.forceSetActivation(0);
             sim.iterate();
         });
@@ -245,17 +245,16 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         panel.addButton("Punish", () -> {
             learn(-1);
             rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(1);
+            punishNeuron.forceSetActivation(1);
             sim.iterate();
         });
 
         panel.addButton("Do nothing", () -> {
             rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(0);
+            punishNeuron.forceSetActivation(0);
             sim.iterate();
         });
-
-
+        
     }
 
     private void learn(double valence) {
@@ -274,12 +273,13 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         // If there are inputs, update weights
         if(totalActivation > .1) {
-            // Only update weight from most active input to "winning" output
             Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
-            Synapse s = Network.getSynapse(src,winner);
-            s.setStrength(Math.max(s.getStrength() + valence, 0));
+            Synapse s_r = Network.getSynapse(src,winner);
+            // Strengthen or weaken active S-R Pair
+            s_r.setStrength(s_r.getStrength() + valence);
+
         } else {
-            // Update intrinsic probability
+            // Else update intrinsic probability
             double p = winner.getAuxValue();
             winner.setAuxValue(Math.max(p + valence * p, 0));
             normIntrinsicProbabilities();
@@ -307,7 +307,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism: Operant with Mouse";
+        return "Behaviorism: Operant Conditioning";
     }
 
     @Override

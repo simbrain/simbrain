@@ -197,12 +197,16 @@ public class OperantWithEnvironment extends RegisteredSimulation {
     private void updateNetwork() {
 
         // Update actual firing probabilities, which combine
-        // intrinsic probs with weighted inputs
+        // intrinsic probabilities with weighted inputs
         for (int i = 0; i < behaviorNet.size(); i++) {
             Neuron n = behaviorNet.getNeuron(i);
             firingProbabilities[i] = n.getWeightedInputs() + n.getAuxValue();
         }
+        if (SimbrainMath.getMinimum(firingProbabilities) < 0) {
+            firingProbabilities = SimbrainMath.minMaxNormalize(firingProbabilities);
+        }
         firingProbabilities = SimbrainMath.normalizeVec(firingProbabilities);
+        //System.out.println(Arrays.toString(firingProbabilities));
 
         // Select "winning" neuron based on its probability
         double random = Math.random();
@@ -254,7 +258,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             punishNeuron.forceSetActivation(0);
             sim.iterate();
         });
-        
+
     }
 
     private void learn(double valence) {

@@ -84,7 +84,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         network.addSynapse(cheeseToSalivation);
 
         Synapse association = new Synapse(bellDetector, cheeseDetector);
-        association.setStrength(.2);
+        association.setStrength(0);
         association.setLowerBound(0);
         association.setUpperBound(1);
 

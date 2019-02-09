@@ -21,7 +21,9 @@ package org.simbrain.plot.timeseries;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
@@ -30,7 +32,7 @@ import java.util.function.Supplier;
 /**
  * Data model for a time series plot.
  */
-public class TimeSeriesModel implements AttributeContainer {
+public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
     /**
      * Time Series Data.
@@ -45,21 +47,25 @@ public class TimeSeriesModel implements AttributeContainer {
     /**
      * Should the range automatically change to reflect the data.
      */
+    @UserParameter(label = "Auto Range", order = 3)
     private boolean autoRange = true;
 
     /**
      * Upper bound of the chart range.
      */
+    @UserParameter(label = "Range upper Bound", order = 10)
     private double rangeUpperBound = 1;
 
     /**
      * Lower bound of the chart range.
      */
+    @UserParameter(label = "Range Lower Bound", order = 20)
     private double rangeLowerBound = 0;
 
     /**
      * Set the maximum number of data points per series to plot.
      */
+    @UserParameter(label = "Max Points", increment = 100, minimumValue = 1, order = 40)
     private int maxDataPoints = 1000;
 
     /**

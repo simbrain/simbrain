@@ -20,13 +20,15 @@ package org.simbrain.plot.rasterchart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 /**
  * Data model for a raster plot.
  */
-public class RasterModel implements AttributeContainer {
+public class RasterModel implements AttributeContainer, EditableObject {
 
     /**
      * Raster Data.
@@ -36,26 +38,31 @@ public class RasterModel implements AttributeContainer {
     /**
      * Should the range automatically change to reflect the data.
      */
+    @UserParameter(label = "Auto Range", order = 3)
     private boolean autoRange = true;
 
     /**
      * Size of window.
      */
+    @UserParameter(label = "Window Size", order = 5)
     private int windowSize = 100;
 
     /**
      * Upper bound of the chart range.
      */
+    @UserParameter(label = "Range upper Bound", order = 10)
     private double rangeUpperBound = 1;
 
     /**
      * Lower bound of the chart range.
      */
+    @UserParameter(label = "Range Lower Bound", order = 20)
     private double rangeLowerBound = 0;
 
     /**
      * Whether this chart if fixed width or not.
      */
+    @UserParameter(label = "Fixed width", order = 30)
     private boolean fixedWidth = true;
 
     /**

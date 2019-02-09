@@ -25,7 +25,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,9 +35,6 @@ import java.awt.geom.Rectangle2D;
 /**
  * Display a raster plot. This component can be used independently of the
  * raster plot workspace component.
- * <p>
- * TODO: Make a version that extends this, like network panel case. Then
- * document in UML
  */
 public class RasterPlotPanel extends JPanel {
 
@@ -148,8 +145,6 @@ public class RasterPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
-     *
-     * @return
      */
     public JPanel getButtonPanel() {
         return buttonPanel;
@@ -178,7 +173,7 @@ public class RasterPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(model));
+        AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
         JDialog dialog = editor.getDialog();
         dialog.setModal(true);
         dialog.pack();
@@ -186,16 +181,10 @@ public class RasterPlotPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * @return the chartPanel
-     */
     public ChartPanel getChartPanel() {
         return chartPanel;
     }
 
-    /**
-     * @return the model
-     */
     public RasterModel getRasterModel() {
         return model;
     }

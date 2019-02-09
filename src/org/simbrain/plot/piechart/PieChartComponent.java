@@ -98,9 +98,6 @@ public class PieChartComponent extends WorkspaceComponent {
         return new PieChartComponent(name, dataModel);
     }
 
-    /**
-     * @return the model.
-     */
     public PieChartModel getModel() {
         return model;
     }

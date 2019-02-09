@@ -23,11 +23,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingListenerAdapter;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -128,13 +124,14 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equalsIgnoreCase("dialog")) {
-            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(getWorkspaceComponent().getModel()));
-            JDialog dialog = editor.getDialog();
-            dialog.setModal(true);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-        }
+        // As of now, there are no properties to set
+        // if (e.getActionCommand().equalsIgnoreCase("dialog")) {
+        //     AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(getWorkspaceComponent().getModel()));
+        //     JDialog dialog = editor.getDialog();
+        //     dialog.setModal(true);
+        //     dialog.pack();
+        //     dialog.setLocationRelativeTo(null);
+        //     dialog.setVisible(true);
+        // }
     }
 }

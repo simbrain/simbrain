@@ -22,7 +22,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -150,7 +150,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(model));
+        AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
         JDialog dialog = editor.getDialog();
         dialog.setModal(true);
         dialog.pack();

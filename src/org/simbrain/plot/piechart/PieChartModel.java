@@ -21,6 +21,7 @@ package org.simbrain.plot.piechart;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
@@ -29,7 +30,7 @@ import java.util.stream.DoubleStream;
 /**
  * Model data for pie charts.
  */
-public class PieChartModel implements AttributeContainer {
+public class PieChartModel implements AttributeContainer, EditableObject {
 
     /**
      * JFreeChart dataset for pie charts.

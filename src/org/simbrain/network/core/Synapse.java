@@ -53,6 +53,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
 
+
     /**
      * Default upper bound.
      */
@@ -62,6 +63,12 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Default lower bound.
      */
     private static double DEFAULT_LOWER_BOUND = -100;
+
+    /**
+     * Strength of synapse.
+     */
+    @UserParameter(label = "Strength", description = "Weight Strength", minimumValue = -10, maximumValue = 10, order = 1)
+    private double strength = 0;
 
     @Override
     public String getName() {
@@ -89,7 +96,8 @@ public class Synapse implements EditableObject, AttributeContainer {
      * The update method of this synapse, which corresponds to what kind of
      * synapse it is.
      */
-    @UserParameter(label = "Learning Rule", isObjectType = true, order = 100)
+    @UserParameter(label = "Learning Rule", useSetter = true,
+        isObjectType = true, order = 100)
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /**
@@ -108,12 +116,6 @@ public class Synapse implements EditableObject, AttributeContainer {
      * The maximum number of digits to display in the tool tip.
      */
     private static final int MAX_DIGITS = 2;
-
-    /**
-     * Strength of synapse.
-     */
-    @UserParameter(label = "Strength", description = "Weight Strength", minimumValue = -10, maximumValue = 10, defaultValue = "01", order = 1)
-    private double strength = 0;
 
     /**
      * Post synaptic response. The totality of the output of this synapse; the

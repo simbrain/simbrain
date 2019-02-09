@@ -70,7 +70,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      * Optional string description of neuron.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this neuron",
-        defaultValue = "", order = 2)
+        useSetter = true, order = 2)
     private String label = "";
 
     /**
@@ -91,7 +91,7 @@ public class Neuron implements EditableObject, AttributeContainer {
     @UserParameter(
         label = "Increment",
         description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
-        defaultValue = "1" + DEFAULT_INCREMENT, order = 6)
+        order = 6)
     protected double increment = DEFAULT_INCREMENT;
 
     /**

@@ -19,12 +19,11 @@
 package org.simbrain.network.gui.dialogs;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SelectionHandle;
-import org.simbrain.network.gui.nodes.SelectionMarquee;
+import org.simbrain.util.piccolo.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;

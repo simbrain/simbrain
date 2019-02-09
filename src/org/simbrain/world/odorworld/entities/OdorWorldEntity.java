@@ -575,23 +575,14 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @return the smellSource
-     */
     public SmellSource getSmellSource() {
         return smellSource;
     }
 
-    /**
-     * @param smellSource the smellSource to set
-     */
     public void setSmellSource(final SmellSource smellSource) {
         this.smellSource = smellSource;
     }
 
-    /**
-     * @return the parentWorld
-     */
     public OdorWorld getParentWorld() {
         return parentWorld;
     }

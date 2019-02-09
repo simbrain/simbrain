@@ -26,22 +26,19 @@ import org.piccolo2d.event.PDragSequenceEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.extras.nodes.PStyledText;
-import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.SelectionMarquee;
 
-import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  * Handle simbrain drag events, which pan the canvas, create lassos for

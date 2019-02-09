@@ -39,7 +39,6 @@ import java.util.*;
  */
 public class OdorWorldComponent extends WorkspaceComponent {
 
-
     /**
      * Reference to model world.
      */

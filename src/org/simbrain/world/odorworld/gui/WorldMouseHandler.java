@@ -24,34 +24,26 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.event.PDragSequenceEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
-import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.gui.nodes.SelectionMarquee;
-import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.util.piccolo.SelectionMarquee;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.Tile;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
-import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.dialogs.EntityDialog;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  * Handle simbrain drag events, which pan the canvas, create lassos for
@@ -330,7 +322,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
      * A filter that determines whether a given pnode is selectable or not.
      * Bounds are updated as the lasso tool is dragged.
      */
-    private class BoundsFilter implements PNodeFilter {
+    class BoundsFilter implements PNodeFilter {
 
         /**
          * Bounds.
@@ -354,14 +346,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
-            // Allow selection of synapses via the line associated with it
-            if (node instanceof SynapseNode) {
-                PPath.Float line = ((SynapseNode) node).getLine();
-                if (bounds.intersects(line.getGlobalBounds())) {
-                    boundsIntersects = true;
-                }
-
-            }
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
             boolean isMarquee = (marquee == node);

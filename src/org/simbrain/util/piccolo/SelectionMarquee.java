@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes;
+package org.simbrain.util.piccolo;
 
 import org.piccolo2d.extras.util.PFixedWidthStroke;
 import org.piccolo2d.nodes.PPath;
@@ -70,9 +70,7 @@ public final class SelectionMarquee extends PPath.Float {
         setTransparency(DEFAULT_TRANSPARENCY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void paint(final PPaintContext paintContext) {
         Paint p = getPaint();
         Stroke stroke = getStroke();
@@ -92,16 +90,10 @@ public final class SelectionMarquee extends PPath.Float {
         }
     }
 
-    /**
-     * @return Returns the marqueeColor.
-     */
     public static Color getMarqueeColor() {
         return marqueeColor;
     }
 
-    /**
-     * @param marqueeColor The marqueeColor to set.
-     */
     public static void setMarqueeColor(final Color marqueeColor) {
         SelectionMarquee.marqueeColor = marqueeColor;
     }

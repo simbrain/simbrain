@@ -73,4 +73,54 @@ public class RasterPlotActions {
 
         };
     }
+
+    /**
+     * Add a data source.
+     *
+     * @param timeSeriesPanel reference to time series plot panel
+     * @return the action
+     */
+    public static Action getAddSourceAction(final RasterPlotPanel timeSeriesPanel) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
+                putValue(NAME, "Add");
+                putValue(SHORT_DESCRIPTION, "Add a data source");
+            }
+
+            public void actionPerformed(ActionEvent arg0) {
+                timeSeriesPanel.getRasterModel().addDataSource();
+            }
+
+        };
+    }
+
+    /**
+     * Add a data source.
+     *
+     * @param rasterPanel reference to time series plot panel
+     * @return the action
+     */
+    public static Action getRemoveSourceAction(final RasterPlotPanel rasterPanel) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
+                putValue(NAME, "Remove");
+                putValue(SHORT_DESCRIPTION, "Remove a data source");
+            }
+
+            public void actionPerformed(ActionEvent arg0) {
+                rasterPanel.getRasterModel().removeDataSource();
+            }
+
+        };
+    }
+
+
 }

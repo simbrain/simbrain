@@ -20,10 +20,16 @@ package org.simbrain.plot.rasterchart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Data model for a raster plot.
@@ -31,9 +37,19 @@ import org.simbrain.workspace.AttributeContainer;
 public class RasterModel implements AttributeContainer, EditableObject {
 
     /**
+     * Default number of data sources for plot initialization.
+     */
+    private static final int INITIAL_DATA_SOURCES = 1;
+
+    /**
+     * Lambda to supply time to the time series model.
+     */
+    private transient Supplier<Integer> timeSupplier;
+
+    /**
      * Raster Data.
      */
-    private XYSeries dataset = new XYSeries("Raster data");
+    private XYSeriesCollection dataset = new XYSeriesCollection();
 
     /**
      * Should the range automatically change to reflect the data.
@@ -68,21 +84,55 @@ public class RasterModel implements AttributeContainer, EditableObject {
     /**
      * Raster series model constructor.
      */
-    public RasterModel() {
+    public RasterModel(Supplier<Integer> timeSupplier) {
+        addDataSources(INITIAL_DATA_SOURCES);
+        this.timeSupplier = timeSupplier;
+    }
 
+    /**
+     * Create specified number of set of data sources. Adds these two existing
+     * data sources.
+     *
+     * @param numDataSources number of data sources to initialize plot with
+     */
+    public void addDataSources(final int numDataSources) {
+        for (int i = 0; i < numDataSources; i++) {
+            addDataSource();
+        }
+    }
+
+    /**
+     * Removes a data source from the chart.
+     */
+    public void removeDataSource() {
+        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
+        if (lastSeriesIndex >= 0) {
+            dataset.removeSeries(lastSeriesIndex);
+            rasterConsumerList.remove(lastSeriesIndex);
+        }
+
+    }
+
+    /**
+     * Adds a data source to the chart.
+     */
+    public void addDataSource() {
+        Integer currentSize = dataset.getSeriesCount();
+        dataset.addSeries(new XYSeries(currentSize + 1));
+        rasterConsumerList.add(new RasterConsumer(currentSize));
     }
 
     /**
      * Clears the plot.
      */
     public void clearData() {
-        dataset.clear();
+        int seriesCount = dataset.getSeriesCount();
+        for (int i = 0; seriesCount > i; ++i) {
+            dataset.getSeries(i).clear();
+        }
     }
 
-    /**
-     * @return JFreeChart data set.
-     */
-    public XYSeries getDataset() {
+    public XYSeriesCollection getDataset() {
         return dataset;
     }
 
@@ -170,9 +220,6 @@ public class RasterModel implements AttributeContainer, EditableObject {
         return rangeLowerBound;
     }
 
-    /**
-     * @param lowerRangeBoundary the lowerRangeBoundary to set
-     */
     public void setRangeLowerBound(final double lowerRangeBoundary) {
         this.rangeLowerBound = lowerRangeBoundary;
     }
@@ -180,12 +227,37 @@ public class RasterModel implements AttributeContainer, EditableObject {
     /**
      * Add data to this model.
      *
+     * @param dataSourceIndex index of data source to use
      * @param time            data for x axis
      * @param value           data for y axis
      */
-    public void addData(final double time, final double value) {
-        getDataset().add(time, value);
+    public void addData(final int dataSourceIndex, final double time, final double value) {
+        getDataset().getSeries(dataSourceIndex).add(time, value);
     }
 
+    ///
+
+    public List<RasterConsumer> rasterConsumerList = new ArrayList<>();
+
+    public class RasterConsumer implements AttributeContainer {
+        int index = 0;
+
+        RasterConsumer(int index) {
+            this.index = index;
+        }
+
+        @Consumable(idMethod = "getId")
+        public void setValues(final double[] values) {
+            for (int i = 0, n = values.length; i < n; i++) {
+                getDataset().getSeries(index).add(timeSupplier.get(), (Double) values[i]);
+            }
+        }
+
+        public String getId() {
+            return "Raster " + (index + 1);
+        }
+
+
+    }
 
 }

@@ -74,6 +74,7 @@ public class RasterPlotPanel extends JPanel {
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
 
+        addAddDeleteButtons();
         addClearGraphDataButton();
         addPreferencesButton();
 
@@ -92,7 +93,7 @@ public class RasterPlotPanel extends JPanel {
         chart = ChartFactory.createScatterPlot("", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
-                new XYSeriesCollection(model.getDataset()), // Dataset
+                model.getDataset(), // Dataset
                 PlotOrientation.VERTICAL, // Plot Orientation
                 true, // Show Legend
                 true, // Use tooltips
@@ -168,6 +169,20 @@ public class RasterPlotPanel extends JPanel {
         prefsButton.setAction(RasterPlotActions.getPropertiesDialogAction(this));
         buttonPanel.add(prefsButton);
     }
+
+    /**
+     * Add buttons for adding and deleting sources.
+     */
+    public void addAddDeleteButtons() {
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setAction(RasterPlotActions.getRemoveSourceAction(this));
+        JButton addButton = new JButton("Add");
+        addButton.setAction(RasterPlotActions.getAddSourceAction(this));
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
+
+    }
+
 
     /**
      * Show properties dialog.

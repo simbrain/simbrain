@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.rasterchart;
 
+import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  * Represents raster data.
  */
-public class RasterPlotComponent extends WorkspaceComponent implements AttributeContainer {
+public class RasterPlotComponent extends WorkspaceComponent {
 
     /**
      * The data model.
@@ -44,7 +45,7 @@ public class RasterPlotComponent extends WorkspaceComponent implements Attribute
      */
     public RasterPlotComponent(final String name) {
         super(name);
-        model = new RasterModel();
+        model = new RasterModel(() -> getWorkspace().getTime());
     }
 
     /**
@@ -111,24 +112,14 @@ public class RasterPlotComponent extends WorkspaceComponent implements Attribute
         return RasterModel.getXStream().toXML(model);
     }
 
-    /**
-     * Set raster values.  Can couple to this.
-     *
-     * @param values the current "y-axis" value for the raster series
-     */
-    @Consumable
-    public void setValues(final double[] values) {
-
-        // TODO: Move to model
-        for (int i = 0, n = values.length; i < n; i++) {
-            model.addData(RasterPlotComponent.this.getWorkspace().getTime(), values[i]);
-        }
-    }
-
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.add(this);
+        for(RasterModel.RasterConsumer consumer : model.rasterConsumerList) {
+            containers.add(consumer);
+        }
         return containers;
     }
+
+
 }

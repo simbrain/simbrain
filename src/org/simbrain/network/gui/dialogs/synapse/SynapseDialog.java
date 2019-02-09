@@ -103,7 +103,7 @@ public final class SynapseDialog extends StandardDialog {
      * @param synapseList the logical synapses being adjusted
      */
     private SynapseDialog(final List<Synapse> synapseList) {
-        this.synapseList = (ArrayList<Synapse>) synapseList;
+        this.synapseList = synapseList;
         synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
         initializeLayout();
         updateHelp();

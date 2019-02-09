@@ -45,7 +45,8 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     /**
      * Name of this group. Null strings lead to default labeling conventions.
      */
-    @UserParameter(label = "Label", description = "Group label", order = 10)
+    @UserParameter(label = "Label", description = "Group label", useSetter = true,
+        order = 10)
     private String label = "";
 
     /**
@@ -72,11 +73,6 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public Group(final Network net) {
         parentNetwork = net;
-    }
-    public Group(final Network net, String id) {
-        parentNetwork = net;
-        this.id = id;
-        this.label = id;
     }
 
     /**
@@ -121,26 +117,14 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @return the parent
-     */
     public Network getParentNetwork() {
         return parentNetwork;
     }
 
-    /**
-     * @return the id
-     */
     public String getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
 
     @Producible(idMethod = "getId", defaultVisibility = false)
     public String getLabel() {
@@ -226,23 +210,16 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     }
 
     /**
-     * Set the id for this group.   A default label based
+     * Initialize the id for this group.   A default label based
      * on the id is also set.   This is overridden  by
-     * subnetowrk so that sub-groups also are given ids.
+     * {@link Subnetwork} so that sub-groups also are given ids.
      */
-    public void recursivelySetIds() {
+    public void initializeId() {
 
-        String id = getParentNetwork().getGroupIdGenerator().getId();
-        setId(id);
-
+        id = getParentNetwork().getGroupIdGenerator().getId();
         // Create a default label based on the id
-        if (getLabel() == null) {
-            setLabel(id.replaceAll("_", " "));
-        }
-        //TODO: Below should be part of group initalization.
-        if (getLabel().isEmpty()) {
-            setLabel(id);
-        }
+        setLabel(id.replaceAll("_", " "));
+
     }
 
 }

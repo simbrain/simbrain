@@ -25,13 +25,11 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor2.CopyableObject;
 import org.simbrain.util.propertyeditor2.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -159,19 +157,19 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * turned on, a vector with this many components is returned by (
      * {@link #getSubsampledActivations()}
      */
-    @UserParameter(label = "Number of subsamples")
+    @UserParameter(label = "Number of subsamples", useSetter = true)
     private int numSubSamples = 100;
 
     /**
      * Array to hold subsamples to be used when, for example, plotting the
      * state of large network.
      */
-    private double [] subSampledValues;
+    private double[] subSampledValues = {};
 
     /**
      * Indices used with subsampling.
      */
-    private int[] subsamplingIndices;
+    private int[] subsamplingIndices = {};
 
     /**
      * Construct a new neuron group from a list of neurons.

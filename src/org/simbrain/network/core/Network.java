@@ -18,18 +18,13 @@
  */
 package org.simbrain.network.core;
 
-import com.thoughtworks.xstream.XStream;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.listeners.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
-import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleId;
@@ -796,7 +791,7 @@ public class Network {
     public void addGroup(final Group group) {
 
         // Set id for this group and all constituent groups
-        group.recursivelySetIds();
+        group.initializeId();
 
         // Only add top level groups to the group list.
         if (group.isTopLevelGroup()) {

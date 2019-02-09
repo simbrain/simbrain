@@ -506,16 +506,16 @@ public abstract class Subnetwork extends Group {
     }
 
     @Override
-    public void recursivelySetIds() {
+    public void initializeId() {
         // Set id for subnetwork
-        super.recursivelySetIds();
+        super.initializeId();
         // Set ids for neuron groups
         for (Group ng : neuronGroupList) {
-            ng.recursivelySetIds();
+            ng.initializeId();
         }
         // Set ids for synapse groups
         for (Group sg : synapseGroupList) {
-            sg.recursivelySetIds();
+            sg.initializeId();
         }
     }
 

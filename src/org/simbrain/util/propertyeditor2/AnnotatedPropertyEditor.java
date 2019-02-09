@@ -138,28 +138,9 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         // Create a list of widgets
         widgets = new TreeSet<>();
 
-        for (Parameter param : Parameter.getParameters(editedObjects.get(0).getClass())) {
-
-            if (param.isObjectType()) {
-
-                // ObjectTypeEditors require special initialization
-
-                // Create a list of objects corresponding to the field associated with the parameter
-                // E.g. a list of neuronupdaterules objects within a list of neuron objects
-                List objectList = new ArrayList();
-                for (Object o : editedObjects) {
-                    objectList.add(param.getFieldValue(o));
-                }
-
-                ParameterWidget pw = new ParameterWidget(param, objectList);
-
-                widgets.add(pw);
-            } else {
-                ParameterWidget pw = new ParameterWidget(editedObjects, param);
-                widgets.add(pw);
-            }
-
-        }
+        Parameter.getParameters(editedObjects.get(0).getClass()).forEach(p -> {
+            widgets.add(new ParameterWidget(p, editedObjects));
+        });
 
         // Add parameter widgets after collecting list of params so they're in
         // the right order.

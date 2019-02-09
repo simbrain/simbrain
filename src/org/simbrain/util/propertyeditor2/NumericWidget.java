@@ -34,8 +34,15 @@ public class NumericWidget extends JPanel {
      * @param spinnerModel    the spinner model
      * @param pd              an optional randomizer for edited object (null if
      *                        not used)
+     * @param setNull         a function to set the field to null (inconsistent) when the randomize button is clicked
      */
-    public NumericWidget(List<? extends EditableObject> editableObjects, Parameter parameter, SpinnerNumberModelWithNull spinnerModel, ProbabilityDistribution pd) {
+    public NumericWidget(
+            List<? extends EditableObject> editableObjects,
+            Parameter parameter,
+            SpinnerNumberModelWithNull spinnerModel,
+            ProbabilityDistribution pd,
+            Runnable setNull
+    ) {
         super();
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -53,10 +60,12 @@ public class NumericWidget extends JPanel {
                     }
                     // TODO: Check consistency for null
                 });
+                if (setNull != null) {
+                    setNull.run();
+                }
             });
             gridBagConstraints.weightx = 2;
             add(randomizeButton, gridBagConstraints);
-
         }
     }
 

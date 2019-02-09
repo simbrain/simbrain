@@ -56,41 +56,37 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     private final JComponent component;
 
+
     /**
-     * List of edited objects. Used in conjunction with {@link
+     * The list of object this parameter is editing.
+     */
+    private List<? extends EditableObject> editableObjects;
+
+    /**
+     * List of edited objects. Only used in conjunction with {@link
      * ObjectTypeEditor}, which must be initialized with edited objects.
      */
-    private List<CopyableObject> editedObjects;
-
-    private List<? extends EditableObject> editableObjects;
+    private List<CopyableObject> objectTypeList;
 
     /**
      * Construct a parameter widget from a parameter, which in turn represents a
      * field.
-     *
-     * @param param the parameter object
+     * @param parameter the parameter object
+     * @param editableObjects objects to edit
      */
-    public ParameterWidget(Parameter param) {
-        parameter = param;
-        component = makeWidget();
-    }
-
-    /**
-     * Construct a widget with a parameter object and a list of objects to
-     * edit.
-     *
-     * @param param         parameter to wrap
-     * @param editedObjects objects to edit
-     */
-    public ParameterWidget(Parameter param, List<CopyableObject> editedObjects) {
-        parameter = param;
-        this.editedObjects = editedObjects;
-        component = makeWidget();
-    }
-
-    public ParameterWidget(List<? extends EditableObject> editableObjects, Parameter parameter) {
+    public ParameterWidget(Parameter parameter, List<? extends EditableObject> editableObjects) {
         this.parameter = parameter;
         this.editableObjects = editableObjects;
+        if (parameter.isObjectType()) {
+            // ObjectTypeEditors require special initialization
+
+            // Create a list of objects corresponding to the field associated with the parameter
+            // E.g. a list of neuronupdaterules objects within a list of neuron objects
+            objectTypeList = new ArrayList<>();
+            for (Object o : editableObjects) {
+                objectTypeList.add((CopyableObject) parameter.getFieldValue(o));
+            }
+        }
         component = makeWidget();
     }
 
@@ -105,7 +101,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // ProbabilityDistribution maintains a list of types of prob distributions
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
-            return ObjectTypeEditor.createEditor(editedObjects, typeMap,
+            return ObjectTypeEditor.createEditor(objectTypeList, typeMap,
                 parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
@@ -179,7 +175,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 spinnerModel = new SpinnerNumberModelWithNull((Double) 0.0, minValue, maxValue, stepSize);
             }
 
-            return new NumericWidget(editableObjects, parameter, spinnerModel, pd);
+            Runnable setNull = () -> setWidgetValue(null);
+
+            NumericWidget ret = new NumericWidget(editableObjects, parameter, spinnerModel, pd, setNull);
+            return ret;
         }
 
         return new JTextField();

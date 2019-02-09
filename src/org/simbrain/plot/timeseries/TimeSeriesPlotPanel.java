@@ -22,6 +22,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
@@ -94,21 +95,17 @@ public class TimeSeriesPlotPanel extends JPanel {
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
-        // // Create chart settings listener
-        // model.addChartSettingsListener(new ChartSettingsListener() {
-        //     public void chartSettingsUpdated(ChartModel theModel) {
-        //         chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-        //         if (!model.isAutoRange()) {
-        //             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
-        //         }
-        //         chart.getXYPlot().getDomainAxis().setAutoRange(true);
-        //         //chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getMaximumDataPoints());
-        //     }
-        // });
-        //
-        // // Invoke an initial event in order to set default settings
-        // model.fireSettingsChanged();
     }
+
+    private void updateChartSettings() {
+
+        chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+        if (!model.isAutoRange()) {
+            chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
+        }
+        chart.getXYPlot().getDomainAxis().setAutoRange(true);
+    }
+
 
     /**
      * Remove all buttons from the button panel; used when customzing the
@@ -151,7 +148,10 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void showPropertiesDialog() {
         AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
-        JDialog dialog = editor.getDialog();
+        StandardDialog dialog = editor.getDialog();
+        dialog.addClosingTask(() -> {
+            updateChartSettings();
+        });
         dialog.setModal(true);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

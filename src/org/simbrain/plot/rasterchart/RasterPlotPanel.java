@@ -24,7 +24,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 
 import javax.swing.*;
@@ -33,8 +33,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * Display a raster plot. This component can be used independently of the
- * raster plot workspace component.
+ * Display a raster plot. This component can be used independently of the raster
+ * plot workspace component.
  */
 public class RasterPlotPanel extends JPanel {
 
@@ -64,6 +64,12 @@ public class RasterPlotPanel extends JPanel {
     private JPanel buttonPanel = new JPanel();
 
     /**
+     * Renderer object where things like dot color and size are set.
+     */
+    private XYItemRenderer renderer;
+
+
+    /**
      * Construct a raster panel.
      *
      * @param rasterModel model underlying model
@@ -91,17 +97,25 @@ public class RasterPlotPanel extends JPanel {
 
         // Generate the graph
         chart = ChartFactory.createScatterPlot("", // Title
-                "Iterations", // x-axis Label
-                "Value(s)", // y-axis Label
-                model.getDataset(), // Dataset
-                PlotOrientation.VERTICAL, // Plot Orientation
-                true, // Show Legend
-                true, // Use tooltips
-                false // Configure chart to generate URLs?
+            "Iterations", // x-axis Label
+            "Value(s)", // y-axis Label
+            model.getDataset(), // Dataset
+            PlotOrientation.VERTICAL, // Plot Orientation
+            true, // Show Legend
+            true, // Use tooltips
+            false // Configure chart to generate URLs?
         );
-        XYItemRenderer renderer = ((XYPlot) chart.getPlot()).getRenderer();
-        renderer.setSeriesPaint(0, Color.BLACK);
-        double size = 1.0;
+        renderer = ((XYPlot) chart.getPlot()).getRenderer();
+        updateChartSettings();
+        chartPanel.setChart(chart);
+        chart.setBackgroundPaint(null);
+
+    }
+
+    private void updateChartSettings() {
+
+        // Renderer properties
+        double size = model.getDotSize();
         double delta = size / 2.0;
         Shape shape1 = new Rectangle2D.Double(-delta, -delta, size, size);
         Shape shape2 = new Ellipse2D.Double(-delta, -delta, size, size);
@@ -109,31 +123,20 @@ public class RasterPlotPanel extends JPanel {
         renderer.setSeriesShape(1, shape2);
         renderer.setSeriesShape(2, shape1);
         renderer.setSeriesShape(3, shape2);
-        chartPanel.setChart(chart);
-        chart.setBackgroundPaint(null);
 
-        // // Create chart settings listener
-        // model.addChartSettingsListener(new ChartSettingsListener() {
-        //     public void chartSettingsUpdated(ChartModel theModel) {
-        //
-        //         // Handle range properties
-        //         chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-        //         if (!model.isAutoRange()) {
-        //             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
-        //         }
-        //
-        //         // Handle domain properties
-        //         if (model.isFixedWidth()) {
-        //             chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
-        //         } else {
-        //             chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
-        //             chart.getXYPlot().getDomainAxis().setAutoRange(true);
-        //         }
-        //     }
-        // });
-        //
-        // // Invoke an initial event in order to set default settings
-        // model.fireSettingsChanged();
+        // Handle range properties
+        chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+        if (!model.isAutoRange()) {
+            chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
+        }
+
+        // Handle domain properties
+        if (model.isFixedWidth()) {
+            chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
+        } else {
+            chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
+            chart.getXYPlot().getDomainAxis().setAutoRange(true);
+        }
     }
 
     /**
@@ -180,16 +183,17 @@ public class RasterPlotPanel extends JPanel {
         addButton.setAction(RasterPlotActions.getAddSourceAction(this));
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
-
     }
-
 
     /**
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
         AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
-        JDialog dialog = editor.getDialog();
+        StandardDialog dialog = editor.getDialog();
+        dialog.addClosingTask(() -> {
+            updateChartSettings();
+        });
         dialog.setModal(true);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

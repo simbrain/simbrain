@@ -38,7 +38,8 @@ public class PieChartModel implements AttributeContainer, EditableObject {
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
     /**
-     * Names for the "slices" in the barchart.  Set via coupling events.
+     * Names for the "slices" in the barchart.  Set via coupling events
+     * in {@link PieChartComponent}.
      */
     private String[] sliceNames = {};
 

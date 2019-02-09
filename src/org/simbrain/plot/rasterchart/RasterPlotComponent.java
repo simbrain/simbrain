@@ -19,9 +19,7 @@
 package org.simbrain.plot.rasterchart;
 
 import org.simbrain.plot.timeseries.TimeSeriesModel;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -115,7 +113,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        for(RasterModel.RasterConsumer consumer : model.rasterConsumerList) {
+        for(RasterModel.RasterConsumer consumer : model.getRasterConsumerList()) {
             containers.add(consumer);
         }
         return containers;

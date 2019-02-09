@@ -21,6 +21,7 @@ package org.simbrain.plot.rasterchart;
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor2.EditableObject;
@@ -42,6 +43,11 @@ public class RasterModel implements AttributeContainer, EditableObject {
     private static final int INITIAL_DATA_SOURCES = 1;
 
     /**
+     * List of {@link RasterConsumer}'s that consume raster data.
+     */
+    private List<RasterConsumer> rasterConsumerList = new ArrayList<>();
+
+    /**
      * Lambda to supply time to the time series model.
      */
     private transient Supplier<Integer> timeSupplier;
@@ -56,6 +62,12 @@ public class RasterModel implements AttributeContainer, EditableObject {
      */
     @UserParameter(label = "Auto Range", order = 3)
     private boolean autoRange = true;
+
+    /**
+     * Size of window.
+     */
+    @UserParameter(label = "Dot Size", description = "Size of dots in chart", order = 5)
+    private int dotSize = 4;
 
     /**
      * Size of window.
@@ -106,7 +118,7 @@ public class RasterModel implements AttributeContainer, EditableObject {
      */
     public void removeDataSource() {
         Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
-        if (lastSeriesIndex >= 0) {
+        if (lastSeriesIndex > 0) {
             dataset.removeSeries(lastSeriesIndex);
             rasterConsumerList.remove(lastSeriesIndex);
         }
@@ -157,65 +169,51 @@ public class RasterModel implements AttributeContainer, EditableObject {
         return this;
     }
 
-    /**
-     * @return the fixedWidth
-     */
     public boolean isFixedWidth() {
         return fixedWidth;
     }
 
-    /**
-     * @param fixedWidth the fixedWidth to set
-     */
     public void setFixedWidth(final boolean fixedWidth) {
         this.fixedWidth = fixedWidth;
     }
 
-    /**
-     * @return the windowSize
-     */
+
+    public List<RasterConsumer> getRasterConsumerList() {
+        return rasterConsumerList;
+    }
+
+    public Supplier<Integer> getTimeSupplier() {
+        return timeSupplier;
+    }
+
+    public int getDotSize() {
+        return dotSize;
+    }
+
     public int getWindowSize() {
         return windowSize;
     }
 
-    /**
-     * @param windowSize the windowSize to set
-     */
     public void setWindowSize(final int windowSize) {
         this.windowSize = windowSize;
     }
 
-    /**
-     * @return the autoRange
-     */
     public boolean isAutoRange() {
         return autoRange;
     }
 
-    /**
-     * @param autoRange the autoRange to set
-     */
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
     }
 
-    /**
-     * @return the upperRangeBoundary
-     */
     public double getRangeUpperBound() {
         return rangeUpperBound;
     }
 
-    /**
-     * @param upperBound the upperBound to set
-     */
     public void setRangeUpperBound(final double upperBound) {
         this.rangeUpperBound = upperBound;
     }
 
-    /**
-     * @return the lowerRangeBoundary
-     */
     public double getRangeLowerBound() {
         return rangeLowerBound;
     }
@@ -225,21 +223,14 @@ public class RasterModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Add data to this model.
-     *
-     * @param dataSourceIndex index of data source to use
-     * @param time            data for x axis
-     * @param value           data for y axis
+     *  Objects that represent separate sets of raster points, shown in a different color in the
+     *      chart.
      */
-    public void addData(final int dataSourceIndex, final double time, final double value) {
-        getDataset().getSeries(dataSourceIndex).add(time, value);
-    }
-
-    ///
-
-    public List<RasterConsumer> rasterConsumerList = new ArrayList<>();
-
     public class RasterConsumer implements AttributeContainer {
+
+        /**
+         * Index of this consumer in an {@link XYSeriesCollection}
+         */
         int index = 0;
 
         RasterConsumer(int index) {
@@ -256,7 +247,6 @@ public class RasterModel implements AttributeContainer, EditableObject {
         public String getId() {
             return "Raster " + (index + 1);
         }
-
 
     }
 

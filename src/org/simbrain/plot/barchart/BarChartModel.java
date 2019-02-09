@@ -63,7 +63,8 @@ public class BarChartModel implements AttributeContainer, EditableObject {
     private double lowerBound = 0;
 
     /**
-     * Names for the bars in the barchart.  Set via coupling events.
+     * Names for the bars in the barchart.  Set via coupling events in
+     * {@link BarChartComponent}.
      */
     private String[] barNames = {};
 

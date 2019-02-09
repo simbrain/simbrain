@@ -366,22 +366,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         //menu.addSeparator();
         //menu.add(testInputsAction);
 
-        // Coupling menus
-        JMenu consumerMenu = networkPanel.getNeuronGroupConsumerMenu(neuronGroup);
-        JMenu producerMenu = networkPanel.getNeuronGroupProducerMenu(neuronGroup);
-        if ((consumerMenu != null) || (producerMenu != null)) {
-            menu.addSeparator();
-        }
-        if (consumerMenu != null) {
-            menu.add(consumerMenu);
-        }
-        if (producerMenu != null) {
-            menu.add(producerMenu);
-        }
-
+        // Recording action
         menu.addSeparator();
-
-
         Action recordingAction = new AbstractAction((neuronGroup.isRecording() ? "Stop" : "Start") + " Recording") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -397,6 +383,19 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
             }
         };
         menu.add(recordingAction);
+
+        // Coupling menus
+        JMenu consumerMenu = networkPanel.getNeuronGroupConsumerMenu(neuronGroup);
+        JMenu producerMenu = networkPanel.getNeuronGroupProducerMenu(neuronGroup);
+        if ((consumerMenu != null) || (producerMenu != null)) {
+            menu.addSeparator();
+        }
+        if (consumerMenu != null) {
+            menu.add(consumerMenu);
+        }
+        if (producerMenu != null) {
+            menu.add(producerMenu);
+        }
 
         // Add the menu
         return menu;

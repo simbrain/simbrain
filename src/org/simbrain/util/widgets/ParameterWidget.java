@@ -117,6 +117,11 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return new ColorSelector();
         }
 
+        if (parameter.isDoubleArray()) {
+            DoubleArrayWidget doubleArrayWidget = new DoubleArrayWidget();
+            return new DoubleArrayWidget();
+        }
+
         if (parameter.isEnum()) {
             try {
                 Class<?> clazz = parameter.getType();
@@ -253,6 +258,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         } else if (parameter.isColor()) {
             ((ColorSelector) component).setValue((Color) value);
+        } else if (parameter.isDoubleArray()) {
+            ((DoubleArrayWidget) component).setValues((double[]) value);
         } else if (parameter.isNumeric()) {
             ((NumericWidget) component).setValue(value);
         } else if (parameter.getAnnotation().isObjectType()) {
@@ -284,6 +291,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isColor()) {
             return ((ColorSelector) component).getValue();
+        }
+
+        if (parameter.isDoubleArray()) {
+            return ((DoubleArrayWidget) component).getValues();
         }
 
         if (parameter.isNumeric()) {

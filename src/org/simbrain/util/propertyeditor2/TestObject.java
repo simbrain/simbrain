@@ -47,6 +47,7 @@ public class TestObject implements EditableObject {
 //    short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
+    @UserParameter(label = "Double Array")
     double[] doubleArray = new double[] {.1, .2, .3, 4};
 
     // Enum / Combo Box test

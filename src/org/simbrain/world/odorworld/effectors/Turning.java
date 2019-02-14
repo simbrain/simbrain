@@ -19,8 +19,7 @@
 package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -97,7 +96,7 @@ public class Turning extends Effector {
     }
 
     /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
+     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      *
      * NOTE:
      * {@link org.simbrain.world.odorworld.dialogs.AddEffectorDialog} handles the set up of {@link #parent}.

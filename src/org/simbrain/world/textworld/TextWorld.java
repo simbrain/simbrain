@@ -18,17 +18,13 @@
  */
 package org.simbrain.world.textworld;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 

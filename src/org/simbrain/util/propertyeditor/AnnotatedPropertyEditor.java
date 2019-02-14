@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.propertyeditor2;
+package org.simbrain.util.propertyeditor;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
@@ -27,7 +27,6 @@ import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
-import javax.swing.plaf.TabbedPaneUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;

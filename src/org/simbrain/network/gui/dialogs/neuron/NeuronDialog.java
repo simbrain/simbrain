@@ -22,8 +22,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.ObjectTypeEditor;
 import org.simbrain.util.widgets.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 

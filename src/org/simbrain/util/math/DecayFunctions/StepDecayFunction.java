@@ -1,7 +1,7 @@
 package org.simbrain.util.math.DecayFunctions;
 
 import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 public class StepDecayFunction extends DecayFunction {
 

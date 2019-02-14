@@ -3,13 +3,11 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.extended.NamedMapConverter;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Simbrain wrapper for a {@link TileMap} tile.

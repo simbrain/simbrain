@@ -25,7 +25,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;

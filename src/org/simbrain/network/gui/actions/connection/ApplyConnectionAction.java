@@ -17,7 +17,7 @@ import org.simbrain.network.connections.*;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

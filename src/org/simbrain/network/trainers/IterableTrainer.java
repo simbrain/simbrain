@@ -16,13 +16,11 @@ package org.simbrain.network.trainers;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Superclass for all types of trainer which can be iterated and which return an

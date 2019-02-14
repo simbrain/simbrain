@@ -11,7 +11,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.threedworld.ThreeDWorld;
 
 import static org.simbrain.world.threedworld.controllers.CameraController.Mapping.*;

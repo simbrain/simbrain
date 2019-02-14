@@ -20,7 +20,7 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

@@ -20,7 +20,7 @@ package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;

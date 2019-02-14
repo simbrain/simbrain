@@ -23,7 +23,7 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;

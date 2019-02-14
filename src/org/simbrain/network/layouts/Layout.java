@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.layouts;
 
-import org.jfree.layout.RadialLayout;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;

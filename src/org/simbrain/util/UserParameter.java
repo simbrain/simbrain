@@ -18,11 +18,7 @@
  */
 package org.simbrain.util;
 
-import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.propertyeditor2.CopyableObject;
 
 import java.lang.annotation.*;
 
@@ -136,7 +132,7 @@ public @interface UserParameter {
 
     /**
      * Whether the parameter represents an object to be edited by
-     * a {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}. Assumes
+     * a {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}. Assumes
      * the relevant object is an abstract class and the user wants to specify
      * the type of that class: examples include NeuronUpdateRules and their types,
      * SynapseUpdateRules and their types, etc.
@@ -150,7 +146,7 @@ public @interface UserParameter {
     boolean showDetails() default true;
 
     /**
-     * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor},
+     * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor.ObjectTypeEditor},
      * e.g. "getTypeMap".  Defaults to "getTypes". This method should be contained in the
      * class whose types are being edited. For example {@link ProbabilityDistribution} has a {@code getTypes()} method that
      * returns a list of the types of its subclasses.

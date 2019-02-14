@@ -21,8 +21,8 @@ package org.simbrain.network.core;
 import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import java.util.List;
 public abstract class SynapseUpdateRule implements CopyableObject, AttributeContainer {
 
     /**
-     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set the learning rule on a synapse.
      */
     public static List<Class> RULE_LIST = Arrays.asList(StaticSynapseRule.class,

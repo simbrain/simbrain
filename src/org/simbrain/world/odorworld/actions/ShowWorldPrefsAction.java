@@ -19,7 +19,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 import javax.swing.*;

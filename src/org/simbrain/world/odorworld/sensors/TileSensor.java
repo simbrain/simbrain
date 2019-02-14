@@ -2,7 +2,7 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -61,7 +61,7 @@ public class TileSensor extends Sensor {
     }
 
     /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
+     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      *
      * NOTE:
      * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.

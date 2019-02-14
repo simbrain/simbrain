@@ -22,11 +22,10 @@ import org.simbrain.util.*;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
-import org.simbrain.util.propertyeditor2.NumericWidget;
-import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
-import org.simbrain.world.imageworld.ImageWorld;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.util.propertyeditor.NumericWidget;
+import org.simbrain.util.propertyeditor.ObjectTypeEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,8 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**

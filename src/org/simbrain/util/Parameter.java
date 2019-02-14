@@ -117,7 +117,7 @@ public class Parameter implements Comparable<Parameter> {
 
     /**
      * Returns true if this is an annotation for an object type field to be
-     * edited by an {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
+     * edited by an {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}.
      */
     public boolean isObjectType() {
         return annotation.isObjectType();

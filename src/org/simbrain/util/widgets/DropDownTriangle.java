@@ -31,7 +31,7 @@ import java.awt.event.MouseListener;
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
  * <p>
- * An example usage is in {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}.
+ * An example usage is in {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}.
  *
  * @author Zoë Tosi
  */

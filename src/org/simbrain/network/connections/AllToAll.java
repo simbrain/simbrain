@@ -18,7 +18,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.ArrayList;
 import java.util.List;

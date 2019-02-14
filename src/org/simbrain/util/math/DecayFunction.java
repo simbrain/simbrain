@@ -6,7 +6,7 @@ import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.DecayFunctions.QuadraticDecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor.CopyableObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ public abstract class DecayFunction implements CopyableObject {
 
     /**
      * Decay functions for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set a type of probability distribution.
      */
     public static List<Class> DECAY_FUNCTIONS_LIST = Arrays.asList(

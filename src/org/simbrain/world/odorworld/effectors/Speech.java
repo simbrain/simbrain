@@ -21,7 +21,7 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
@@ -130,7 +130,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     }
 
     /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
+     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      *
      * NOTE:
      * {@link org.simbrain.world.odorworld.dialogs.AddEffectorDialog} handles the set up of {@link #parent}.

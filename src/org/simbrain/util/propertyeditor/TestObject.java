@@ -1,4 +1,4 @@
-package org.simbrain.util.propertyeditor2;
+package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;

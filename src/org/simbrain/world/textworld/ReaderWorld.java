@@ -21,7 +21,6 @@ package org.simbrain.world.textworld;
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.textworld.TextListener.TextAdapter;
 
@@ -346,34 +345,6 @@ public final class ReaderWorld extends TextWorld {
         String nextOne = matcher.group();
         updateMatcher(); // Return matcher to its previous state
         return nextOne;
-    }
-
-    /**
-     * Returns the current parse style inside a comboboxwrapper. Used by
-     * preference dialog.
-     *
-     * @return the the comboBox
-     */
-    public ComboBoxWrapper getParseStyle() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return parseStyle;
-            }
-
-            public Object[] getObjects() {
-                return ParseStyle.values();
-            }
-        };
-    }
-
-    /**
-     * Set the current parse style. Used by preference dialog.
-     *
-     * @param parseStyle the current style.
-     */
-    public void setParseStyle(ComboBoxWrapper parseStyle) {
-        setTheParseStyle((ParseStyle) parseStyle.getCurrentObject());
-        firePrefsChangedEvent();
     }
 
     /**

@@ -19,7 +19,6 @@
 package org.simbrain.world.threedworld.actions;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;

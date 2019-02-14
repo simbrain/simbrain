@@ -37,7 +37,6 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.Matrices;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import javax.swing.*;
 
@@ -287,33 +286,6 @@ public class LMSOffline extends Trainer {
      */
     public void setSolutionType(SolutionType solutionType) {
         this.solutionType = solutionType;
-    }
-
-    /**
-     * Returns the current solution type inside a comboboxwrapper. Used by
-     * preference dialog.
-     *
-     * @return the the comboBox
-     */
-    public ComboBoxWrapper getSolutionType() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return solutionType;
-            }
-
-            public Object[] getObjects() {
-                return SolutionType.values();
-            }
-        };
-    }
-
-    /**
-     * Set the current parse style. Used by preference dialog.
-     *
-     * @param solutionType the current solution.
-     */
-    public void setSolutionType(ComboBoxWrapper solutionType) {
-        setSolutionType((SolutionType) solutionType.getCurrentObject());
     }
 
     public boolean isRidgeRegression() {

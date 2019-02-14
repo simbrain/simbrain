@@ -22,7 +22,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.textworld.dictionary.DictionarySelector;
 import org.simbrain.world.textworld.dictionary.TokenDictionaryPanel;

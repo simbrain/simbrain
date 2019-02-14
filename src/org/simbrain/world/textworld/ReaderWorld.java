@@ -19,6 +19,7 @@
 package org.simbrain.world.textworld;
 
 import com.thoughtworks.xstream.XStream;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.workspace.Producible;
@@ -79,6 +80,11 @@ public final class ReaderWorld extends TextWorld {
     /**
      * The current parsing style.
      */
+    @UserParameter(
+            label = "Parse Style",
+            description = "The current parsing style.",
+            order = 1
+    )
     private ParseStyle parseStyle = ParseStyle.WORD;
 
     /**
@@ -90,6 +96,11 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Regular expression for matcher.
      */
+    @UserParameter(
+            label = "Regular Expression",
+            description = "Regular expression for matcher.",
+            order = 2
+    )
     private String regularExpression = "(\\S+)";
 
     /**

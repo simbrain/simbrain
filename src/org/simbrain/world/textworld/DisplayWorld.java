@@ -19,6 +19,7 @@
 package org.simbrain.world.textworld;
 
 import com.thoughtworks.xstream.XStream;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
@@ -75,6 +76,11 @@ public class DisplayWorld extends TextWorld {
     /**
      * Threshold for displaying text.
      */
+    @UserParameter(
+            label = "Display Threshold",
+            description = "Threshold for displaying text",
+            order = 1
+    )
     private double displayThreshold = .5;
 
     /**

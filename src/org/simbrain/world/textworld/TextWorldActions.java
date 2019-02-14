@@ -23,6 +23,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
 import org.simbrain.world.textworld.dictionary.DictionarySelector;
 import org.simbrain.world.textworld.dictionary.TokenDictionaryPanel;
 import org.simbrain.world.textworld.dictionary.TokenToVectorPanel;
@@ -236,9 +237,7 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
-                editor.setUseSuperclass(false);
-                editor.setObjectToEdit(world);
+                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(world);
                 JDialog dialog = editor.getDialog();
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();

@@ -2,8 +2,11 @@ package org.simbrain.world.imageworld;
 
 /**
  * A helper class to facilitate easy switching between {@link ImageSource}'s in
- * {@link ImageWorld}. When you switch image sources listeners are updated, etc.
- * Cf. the https://en.wikipedia.org/wiki/Composite_pattern
+ * {@link ImageWorld} (for now just the emitter and static image sources).
+ * When you switch image sources, listeners are updated, etc.
+ * Cf. the https://en.wikipedia.org/wiki/Composite_pattern.
+ *
+ *
  */
 public class CompositeImageSource extends ImageSourceAdapter implements ImageSourceListener {
 

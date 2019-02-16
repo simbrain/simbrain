@@ -20,18 +20,24 @@ import java.util.List;
 /**
  * ImageWorld contains an {@link ImageSource} and a series of {@link SensorMatrix}
  * objects. The image source is what outputs an image of some kind, either a
- * static image or a video or a pixel display, something like that.  The sensor
- * matrices allow the current image in an image source to be in couplings and
- * thereby communicate with other workspace components.
- * that can be used to convert the image into numbers.
+ * static image, or a video or a pixel display.  The sensor
+ * matrices convert the image into numbers and allow the current image in an
+ * image source to be in couplings and thereby communicate with other workspace
+ * components.
  *
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
 public class ImageWorld {
 
+    /**
+     * The static image source, for "Image world" in GUI.
+     */
     private StaticImageSource staticSource;
 
+    /**
+     * The emitter image source for "Pixel display" in GUI.
+     */
     private EmitterMatrix emitterMatrix;
 
     /**
@@ -40,15 +46,15 @@ public class ImageWorld {
     private List<SensorMatrix> sensorMatrices;
 
     /**
+     * Helper so that it's easy to switch between image sources.
+     */
+    private CompositeImageSource compositeSource;
+
+    /**
      * Currently selected sensor matrix.
      */
     private SensorMatrix currentSensorMatrix;
 
-    // Todo: Ask Tim if this is the only use of CompositeImageSource.
-    /**
-     * Helper so that it's easy to switch between image sources.
-     */
-    private CompositeImageSource compositeSource;
 
     public enum SourceType {
         STATIC_SOURCE,

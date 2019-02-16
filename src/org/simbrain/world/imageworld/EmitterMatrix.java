@@ -14,7 +14,7 @@ import java.util.Arrays;
  * another with separate channels for brightness, red, green, and blue.
  * <br>
  * An emitter matrix is a kind of countepart to a {@link SensorMatrix}. Rather
- * than sensing visual locations emitters are like pixels that an "organism" can emits
+ * than sensing visual locations emitters are like pixels that an "organism" can emit
  * cf. a squid's iridiphores.
  *
  * @author Tim Shea

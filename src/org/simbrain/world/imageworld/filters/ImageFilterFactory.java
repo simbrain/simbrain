@@ -52,15 +52,15 @@ public abstract class ImageFilterFactory {
     /**
      * Create an identity image op (no transform). Useful for null object pattern.
      */
-    protected static BufferedImageOp createIdentityOp() {
-        return new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    protected static ImageOperation<AffineTransformOp> createIdentityOp() {
+        return new IdentityOp();
     }
 
     /**
      * Create a BufferedImageOp which converts the input image to a grayscale colorspace
      */
-    protected static BufferedImageOp createGrayOp() {
-        return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+    protected static ImageOperation<ColorConvertOp> createGrayOp() {
+        return new GrayOp();
     }
 
     /**

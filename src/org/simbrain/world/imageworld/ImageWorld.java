@@ -165,6 +165,11 @@ public class ImageWorld {
         fireImageSourceChanged(staticSource);
     }
 
+    public void loadImages(File[] files) {
+        staticSource.loadImages(files);
+        fireImageSourceChanged(staticSource);
+    }
+
     /**
      * Save the current image as the specified filename.
      *
@@ -281,6 +286,22 @@ public class ImageWorld {
         sensorMatrices.add(matrix);
         setCurrentSensorMatrix(matrix);
         fireSensorMatrixAdded(matrix);
+    }
+
+    /**
+     * Update the image source to the next image.
+     */
+    public void nextFrame() {
+        staticSource.nextFrame();
+        fireImageSourceChanged(staticSource);
+    }
+
+    /**
+     * Update the image source to the previous image.
+     */
+    public void previousFrame() {
+        staticSource.previousFrame();
+        fireImageSourceChanged(staticSource);
     }
 
     /**

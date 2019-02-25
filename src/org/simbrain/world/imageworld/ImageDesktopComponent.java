@@ -104,6 +104,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
             JMenuItem loadImage = new JMenuItem("Load Image...");
             loadImage.addActionListener(this::loadImage);
             fileMenu.add(loadImage);
+            JMenuItem loadImages = new JMenuItem("Load Images...");
+            loadImages.addActionListener(this::loadImages);
+            fileMenu.add(loadImages);
         }
         JMenuItem saveImage = new JMenuItem("Save Image...");
         saveImage.addActionListener(this::saveImage);
@@ -175,6 +178,21 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
             loadImageButton.setToolTipText("Load Image");
             loadImageButton.addActionListener(this::loadImage);
             sourceToolbar.add(loadImageButton);
+            JButton loadImagesButton = new JButton();
+            loadImagesButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
+            loadImagesButton.setToolTipText("Load Images");
+            loadImagesButton.addActionListener(this::loadImages);
+            sourceToolbar.add(loadImagesButton);
+            JButton previousImagesButton = new JButton();
+            previousImagesButton.setIcon(ResourceManager.getSmallIcon("LeftTriangle.png"));
+            previousImagesButton.setToolTipText("Previous Image");
+            previousImagesButton.addActionListener(this::previousImage);
+            sourceToolbar.add(previousImagesButton);
+            JButton nextImagesButton = new JButton();
+            nextImagesButton.setIcon(ResourceManager.getSmallIcon("RightTriangle.png"));
+            nextImagesButton.setToolTipText("Next Image");
+            nextImagesButton.addActionListener(this::nextImage);
+            sourceToolbar.add(nextImagesButton);
         }
 
         JButton saveImageButton = new JButton();
@@ -255,6 +273,14 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         }
     }
 
+    private void loadImages(ActionEvent evt) {
+        fileChooser.setDescription("Select an image to load");
+        File[] files = fileChooser.showMultiOpenDialogNative();
+        if (files != null) {
+            component.getWorld().loadImages(files);
+        }
+    }
+
     private void saveImage(ActionEvent evt) {
         fileChooser.setDescription("Select filename to save");
         fileChooser.setUseImagePreview(true);
@@ -266,6 +292,14 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
                 JOptionPane.showMessageDialog(null, "Unable to save file: " + file.toString());
             }
         }
+    }
+
+    private void previousImage(ActionEvent evt) {
+        component.getWorld().previousFrame();
+    }
+
+    private void nextImage(ActionEvent evt) {
+        component.getWorld().nextFrame();
     }
 
     /**

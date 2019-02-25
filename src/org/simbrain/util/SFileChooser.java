@@ -174,6 +174,36 @@ public class SFileChooser {
         FileDialog chooser = new FileDialog(new JFrame(), "Open", FileDialog.LOAD);
         chooser.setDirectory(getCurrentLocation());
 
+        setFileChooserFilter(chooser);
+        chooser.setVisible(true);
+
+        if (chooser.getFile() != null) {
+            currentDirectory = chooser.getDirectory();
+            return new File(chooser.getDirectory() + FS + chooser.getFile());
+        } else {
+            // User canceled
+            return null;
+        }
+    }
+
+    public File[] showMultiOpenDialogNative() {
+        FileDialog chooser = new FileDialog(new JFrame(), "Open", FileDialog.LOAD);
+        chooser.setMultipleMode(true);
+        chooser.setDirectory(getCurrentLocation());
+
+        setFileChooserFilter(chooser);
+        chooser.setVisible(true);
+
+        if (chooser.getFile() != null) {
+            currentDirectory = chooser.getDirectory();
+            return chooser.getFiles();
+        } else {
+            // User canceled
+            return null;
+        }
+    }
+
+    private void setFileChooserFilter(FileDialog chooser) {
         if (exts.size() >= 1) {
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 String file = "";
@@ -184,15 +214,6 @@ public class SFileChooser {
             } else {
                 chooser.setFilenameFilter(new ExtensionSetFileFilter(exts.keySet(), description));
             }
-        }
-        chooser.setVisible(true);
-
-        if (chooser.getFile() != null) {
-            currentDirectory = chooser.getDirectory();
-            return new File(chooser.getDirectory() + FS + chooser.getFile());
-        } else {
-            // User canceled
-            return null;
         }
     }
 

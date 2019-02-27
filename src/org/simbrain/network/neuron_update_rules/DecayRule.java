@@ -66,7 +66,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @UserParameter(
             label = "Decay amount",
             description = "The amount by which the activation is changed each iteration if absolute decay is chosen.",
-            order = 3)
+            increment = .1, order = 3)
     private double decayAmount = .1;
 
     //TODO: disable when ABSOLUTE
@@ -78,7 +78,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             description = "The proportion of the distance between the current value and the base-line value, "
                     + "by which the activation is changed each iteration if relative decay is chosen.",
 
-            order = 4)
+            increment = .1, order = 4)
     private double decayFraction = .1;
 
     /**
@@ -87,7 +87,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @UserParameter(
             label = "Base Line",
             description = "An option to add noise.",
-            order = 2)
+            increment = .1, order = 2)
     private double baseLine = 0;
 
     /**
@@ -217,44 +217,26 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         }
     }
 
-    /**
-     * @return Returns the decayAmount.
-     */
     public double getDecayAmount() {
         return decayAmount;
     }
 
-    /**
-     * @param decayAmount The decayAmount to set.
-     */
     public void setDecayAmount(final double decayAmount) {
         this.decayAmount = decayAmount;
     }
 
-    /**
-     * @return Returns the dedayPercentage.
-     */
     public double getDecayFraction() {
         return decayFraction;
     }
 
-    /**
-     * @param decayFraction The decayFraction to set.
-     */
     public void setDecayFraction(final double decayFraction) {
         this.decayFraction = decayFraction;
     }
 
-    /**
-     * @return Returns the relAbs.
-     */
     public int getRelAbs() {
         return relAbs;
     }
 
-    /**
-     * @param relAbs The relAbs to set.
-     */
     public void setRelAbs(final int relAbs) {
         this.relAbs = relAbs;
     }
@@ -279,16 +261,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the baseLine.
-     */
     public double getBaseLine() {
         return baseLine;
     }
 
-    /**
-     * @param baseLine The baseLine to set.
-     */
     public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
     }

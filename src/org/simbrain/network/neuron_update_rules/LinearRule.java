@@ -52,8 +52,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     @UserParameter(
             label = "Slope",
             description = "Slope of linear rule",
-            minimumValue = -10, maximumValue = 10,
-            defaultValue = "1", order = 2)
+            increment = .1)
     private double slope = 1;
 
     /**
@@ -246,6 +245,5 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     public void setClipped(boolean clipping) {
         this.clipping = clipping;
     }
-
 
 }

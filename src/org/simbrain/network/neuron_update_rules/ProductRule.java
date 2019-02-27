@@ -41,7 +41,8 @@ public class ProductRule extends LinearRule {
             description = "If false, activation is a product of incoming activations. "
                     + "If true, activation is a product of incoming activation / weight products, or "
                     + "(in the case of spiking neurons) post-synaptic-responses.",
-            defaultValue = "flase", order = 0)
+            increment = .1,
+            order = 0)
     private boolean useWeights = DEFAULT_USE_WEIGHTS;
 
     @Override
@@ -85,16 +86,10 @@ public class ProductRule extends LinearRule {
         neuron.setBuffer(val);
     }
 
-    /**
-     * @return the useWeights
-     */
     public boolean getUseWeights() {
         return useWeights;
     }
 
-    /**
-     * @param useWeights the useWeights to set
-     */
     public void setUseWeights(boolean useWeights) {
         this.useWeights = useWeights;
     }

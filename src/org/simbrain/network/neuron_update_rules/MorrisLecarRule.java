@@ -20,7 +20,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "Ca²⁺ Conductance (µS/cm²)",
             description = "Calcium conductance. If higher, voltage pulled more quickly to Ca2+ equilibrium.",
-            defaultValue = "4.0", order = 7, tab = "Ion Properties")
+            increment = .1,
+            order = 7, tab = "Ion Properties")
     private double g_Ca = 4.0;
 
     /**
@@ -29,7 +30,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "K⁺ Conductance (µS/cm²)",
             description = "Potassium conductance. If higher, voltage pulled more quickly to K+ equilibrium.",
-            defaultValue = "8.0", order = 8, tab = "Ion Properties")
+            increment = .1,
+            order = 8, tab = "Ion Properties")
     private double g_K = 8.0;
 
     /**
@@ -38,7 +40,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "Leak Conductance (µS/cm²)",
             description = "Leak conductance. If higher, voltage pulled more quickly to Leak equilibrium.",
-            defaultValue = "2.0", order = 9, tab = "Ion Properties")
+            increment = .1,
+            order = 9, tab = "Ion Properties")
     private double g_L = 2.0;
 
     /**
@@ -47,7 +50,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "Ca²⁺ Equilibrium (mV)",
             description = "Calcium equilibrium.",
-            defaultValue = "120", order = 10, tab = "Ion Properties")
+            increment = .1,
+            order = 10, tab = "Ion Properties")
     private double vRest_Ca = 120;
 
     /**
@@ -56,7 +60,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "K⁺ Equilibrium (mV)",
             description = "An option to add noise.",
-            defaultValue = "-80", order = 11, tab = "Ion Properties")
+            increment = .1,
+            order = 11, tab = "Ion Properties")
     private double vRest_k = -80;
 
     /**
@@ -65,7 +70,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "Leak Equilibrium (mV)",
             description = "An option to add noise.",
-            defaultValue = "-60", order = 12, tab = "Ion Properties")
+            increment = .1,
+            order = 12, tab = "Ion Properties")
     private double vRest_L = -60;
 
     /**
@@ -75,25 +81,28 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
             label = "Capacitance (µF/cm²)",
             description = "Behaves like a time constant. Higher capacitance leads to slower changes "
                     + "in the cell.",
-            defaultValue = "5", order = 1, tab = "Membrane Properties")
+            increment = .1,
+            order = 1, tab = "Membrane Properties")
     private double cMembrane = 5;
 
     /**
      * Membrane voltage constant 1.
      */
     @UserParameter(
-            label = "Voltage const. 1",
+            label = "Voltage Const. 1",
             description = "How does calcium respond to voltage.",
-            defaultValue = "-1.2", order = 2, tab = "Membrane Properties")
+            increment = .1,
+            order = 2, tab = "Membrane Properties")
     private double v_m1 = -1.2;
 
     /**
      * Membrane voltage constant 2.
      */
     @UserParameter(
-            label = "Voltage const. 2",
+            label = "Voltage Const. 2",
             description = "How does calcium respond to voltage.",
-            defaultValue = "18", order = 3, tab = "Membrane Properties")
+            increment = .1,
+            order = 3, tab = "Membrane Properties")
     private double v_m2 = 18;
 
     /**
@@ -103,7 +112,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
             label = "K⁺  Const. 1",
             description = "V3 on the Scholarpedia page, which roughly corresponds to how potassium current "
                     + "responds to membrane voltage.",
-            defaultValue = "2", order = 13, tab = "K\u207A consts.")
+            increment = .1,
+            order = 13, tab = "K\u207A consts.")
     private double v_w1 = 2;
 
     /**
@@ -112,7 +122,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "K⁺  Const. 2",
             description = "V4 on the Scholarpedia page.",
-            defaultValue = "17.4", order = 14, tab = "K\u207A consts.")
+            increment = .1,
+            order = 14, tab = "K\u207A consts.")
     private double v_w2 = 17.4;
 
     /**
@@ -126,16 +137,18 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "K⁺ φ",
             description = "Potassium channel time constant/decay rate. If higher, potassium changes more slowly.",
-            defaultValue = "0.06667", order = 15, tab = "K\u207A consts.")
+            increment = .1,
+            order = 15, tab = "K\u207A consts.")
     private double phi = 0.06667; // 1/15
 
     /**
      * Background current (nA).
      */
     @UserParameter(
-            label = "Background current (nA)",
+            label = "Background Current (nA)",
             description = "A constant level of current that can be set.",
-            defaultValue = "46", order = 5, tab = "Membrane Properties")
+            increment = .1,
+            order = 5, tab = "Membrane Properties")
     private double i_bg = 46;
 
     /**
@@ -144,7 +157,8 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     @UserParameter(
             label = "Threshold (mV)",
             description = "Voltages above this make the neuron spike",
-            defaultValue = "40", order = 4, tab = "Membrane Properties")
+            increment = .1,
+            order = 4, tab = "Membrane Properties")
     private double threshold = 40;
 
     /**
@@ -249,11 +263,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         this.noiseGenerator = noise;
     }
 
-    /**
-     * Convenience method for simulations. Sets the stdev of the randomizer.
-     *
-     * @param amp amplitude of the noise
-     */
     public void setNoiseAmplitude(double amp) {
         ((NormalDistribution) noiseGenerator).setStandardDeviation(amp);
     }

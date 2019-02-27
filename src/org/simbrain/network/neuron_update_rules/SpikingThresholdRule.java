@@ -39,7 +39,8 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     @UserParameter(
             label = "Threshold",
             description = "Input value above which the neuron spikes.",
-            defaultValue = "0.5", order = 1)
+            increment = .1,
+            order = 1)
     private double threshold = .5;
 
     /**

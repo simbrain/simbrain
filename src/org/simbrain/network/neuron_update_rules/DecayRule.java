@@ -66,7 +66,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @UserParameter(
             label = "Decay amount",
             description = "The amount by which the activation is changed each iteration if absolute decay is chosen.",
-            defaultValue = "0.1", order = 3)
+            order = 3)
     private double decayAmount = .1;
 
     //TODO: disable when ABSOLUTE
@@ -77,7 +77,8 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             label = "Decay fraction",
             description = "The proportion of the distance between the current value and the base-line value, "
                     + "by which the activation is changed each iteration if relative decay is chosen.",
-            defaultValue = "0.1", order = 4)
+
+            order = 4)
     private double decayFraction = .1;
 
     /**
@@ -86,7 +87,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @UserParameter(
             label = "Base Line",
             description = "An option to add noise.",
-            defaultValue = "0", order = 2)
+            order = 2)
     private double baseLine = 0;
 
     /**

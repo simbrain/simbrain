@@ -38,8 +38,8 @@ public class ThreeValueRule extends NeuronUpdateRule {
     @UserParameter(
             label = "Bias",
             description = "A fixed amount of input to the node.",
-//            minimumValue = -10, maximumValue = 10,
-            defaultValue = "0", order = 1)
+          // minimumValue = -10, maximumValue = 10,
+             increment = .1, order = 1)
     private double bias = 0;
 
     /**
@@ -49,7 +49,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
             label = "Lower Threshold",
             description = "If the weighted input plus the bias is less than this value, the activation "
                     + "is set to the Lower Value.",
-            defaultValue = "0", order = 2)
+            increment = .1, order = 2)
     private double lowerThreshold = 0;
 
     /**
@@ -59,7 +59,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
             label = "Upper Threshold",
             description = "If the weighted input plus the bias is greater than this value, the activation "
                     + "is set to the Upper Value.",
-            defaultValue = "1", order = 3)
+            increment = .1, order = 3)
     private double upperThreshold = 1;
 
     /**
@@ -69,7 +69,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
             label = "Lower Value",
             description = "The activation is set to this value if the weighted input plus the bias exceeds "
                     + "the Lower Threshold.",
-            defaultValue = "-1", order = 4)
+            increment = .1, order = 4)
     private double lowerValue = -1;
 
     /**
@@ -79,7 +79,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
             label = "Middle Value",
             description = "If the weighted input plus the bias does not exceed the Upper or Lower Thresholds, "
                     + "then the activation is set to this value.",
-            defaultValue = "0", order = 5)
+            increment = .1, order = 5)
     private double middleValue = 0;
 
     /**
@@ -89,7 +89,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
             label = "Upper Value",
             description = "If the weighted input plus the bias is greater than the Upper Threshold, "
                     + "then the activation is set to this value.",
-            defaultValue = "1", order = 6)
+            increment = .1, order = 6)
     private double upperValue = 1;
 
     /**

@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
-import org.simbrain.world.imageworld.filters.OffsetFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
 import javax.imageio.ImageIO;
@@ -33,7 +32,7 @@ public class ImageWorld {
     /**
      * The static image source, for "Image world" in GUI.
      */
-    private StaticImageSource staticSource;
+    private ImageAlbum staticSource;
 
     /**
      * The emitter image source for "Pixel display" in GUI.
@@ -54,7 +53,6 @@ public class ImageWorld {
      * Currently selected sensor matrix.
      */
     private SensorMatrix currentSensorMatrix;
-
 
     public enum SourceType {
         STATIC_SOURCE,
@@ -84,7 +82,7 @@ public class ImageWorld {
     public ImageWorld(SourceType sourceType) {
         this.sourceType = sourceType;
         // Setup ImageSources
-        staticSource = new StaticImageSource();
+        staticSource = new ImageAlbum();
         emitterMatrix = new EmitterMatrix();
         if (sourceType == SourceType.EMITTER_SOURCE) {
             compositeSource = new CompositeImageSource(emitterMatrix);
@@ -131,9 +129,6 @@ public class ImageWorld {
         SensorMatrix threshold250x250 = new SensorMatrix("Threshold 250x250", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 250, 250));
         sensorMatrices.add(threshold250x250);
 
-        SensorMatrix offset100x100 = new SensorMatrix("Offset-25 100x100", OffsetFilterFactory.createOffsetFilter(compositeSource, 25, 25, 100, 100));
-        sensorMatrices.add(offset100x100);
-
         setCurrentSensorMatrix(sensorMatrices.get(0));
 
     }
@@ -155,16 +150,11 @@ public class ImageWorld {
     }
 
     /**
-     * Load image from specified filename.
+     * Load images from an array
      *
-     * @param filename path to image
+     * @param files array of images to load
      * @throws IOException thrown if the requested file is not available
      */
-    public void loadImage(String filename) throws IOException {
-        staticSource.loadImage(filename);
-        fireImageSourceChanged(staticSource);
-    }
-
     public void loadImages(File[] files) {
         staticSource.loadImages(files);
         fireImageSourceChanged(staticSource);
@@ -351,6 +341,7 @@ public class ImageWorld {
         return compositeSource;
     }
 
+
     public List<ImageSource> getImageSources() {
         List<ImageSource> sources = new ArrayList<ImageSource>();
         sources.addAll(Arrays.asList(staticSource, emitterMatrix));
@@ -361,6 +352,9 @@ public class ImageWorld {
         return sources;
     }
 
+    /**
+     * The current image source, pixel display or image world
+     */
     public ImageSource getCurrentImageSource() {
         return compositeSource.getImageSource();
     }

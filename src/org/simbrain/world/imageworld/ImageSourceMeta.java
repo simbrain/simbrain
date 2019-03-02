@@ -6,6 +6,10 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.filters.IdentityOp;
 import org.simbrain.world.imageworld.filters.ImageOperation;
 
+/**
+ * Class to facilituate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
+ * to edit {@link org.simbrain.world.imageworld.filters.FilteredImageSource} objects.
+ */
 public class ImageSourceMeta implements EditableObject, CopyableObject {
 
     @UserParameter(
@@ -24,14 +28,6 @@ public class ImageSourceMeta implements EditableObject, CopyableObject {
             order = 2
     )
     private int height = 20;
-
-    @UserParameter(
-            label = "Use Filter",
-            order = 3
-
-    )
-    private boolean useFilter = true;
-
 
     @UserParameter(
             label = "Filter",
@@ -65,14 +61,6 @@ public class ImageSourceMeta implements EditableObject, CopyableObject {
         this.height = height;
     }
 
-    public boolean isUseFilter() {
-        return useFilter;
-    }
-
-    public void setUseFilter(boolean useFilter) {
-        this.useFilter = useFilter;
-    }
-
     public ImageOperation getColorOp() {
         return colorOp;
     }
@@ -87,7 +75,6 @@ public class ImageSourceMeta implements EditableObject, CopyableObject {
         ret.colorOp = (ImageOperation) colorOp.copy();
         ret.height = height;
         ret.width = width;
-        ret.useFilter = useFilter;
         return ret;
     }
 }

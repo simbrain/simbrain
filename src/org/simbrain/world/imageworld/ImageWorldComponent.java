@@ -99,7 +99,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
     public List<AttributeContainer> getSelectedModels() {
         List<AttributeContainer> models = new ArrayList<>();
         models.add(world.getCurrentSensorMatrix());
-        models.add(world.getCurrentImageSource());
+        //models.add(world.getCurrentImageSource());
         return models;
     }
 

@@ -91,6 +91,7 @@ public class Neuron implements EditableObject, AttributeContainer {
     @UserParameter(
         label = "Increment",
         description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
+        increment = .5,
         order = 6)
     protected double increment = DEFAULT_INCREMENT;
 

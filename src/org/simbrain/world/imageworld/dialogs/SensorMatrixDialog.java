@@ -21,7 +21,6 @@ public class SensorMatrixDialog extends StandardDialog {
     private AnnotatedPropertyEditor editorPanel;
     private ImageSourceMeta imageSourceMeta = new ImageSourceMeta();
 
-
     /**
      * Construct a new SensorMatrixDialog for selecting parameters of a new
      * SensorMatrix.

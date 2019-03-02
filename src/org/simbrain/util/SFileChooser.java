@@ -186,7 +186,13 @@ public class SFileChooser {
         }
     }
 
+    /**
+     * Allows you to select multiple files.
+     *
+     * @return an array of selected files
+     */
     public File[] showMultiOpenDialogNative() {
+
         FileDialog chooser = new FileDialog(new JFrame(), "Open", FileDialog.LOAD);
         chooser.setMultipleMode(true);
         chooser.setDirectory(getCurrentLocation());

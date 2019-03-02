@@ -40,16 +40,34 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
      */
     private ImageWorldComponent component;
 
+    /**
+     * Toolbars.
+     */
     private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    
+
+    /**
+     * Main toolbar with buttons to advance images, etc.
+     */
     private JToolBar sourceToolbar = new JToolBar();
-    
+
+    /**
+     * Toolbar for setting the sensor matrix.
+     */
     private JToolBar sensorToolbar = new JToolBar();
 
-    SFileChooser fileChooser;
-    
+    /**
+     * Custom file chooser for selecting image files.
+     */
+    private SFileChooser fileChooser;
+
+    /**
+     * Context menu.
+     */
     private JPopupMenu contextMenu;
-    
+
+    /**
+     * Coupling menu.
+     */
     private MultiCouplingMenu multiCouplingMenu;
 
     /**
@@ -101,9 +119,6 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         menuBar.add(fileMenu);
 
         if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
-            JMenuItem loadImage = new JMenuItem("Load Image...");
-            loadImage.addActionListener(this::loadImage);
-            fileMenu.add(loadImage);
             JMenuItem loadImages = new JMenuItem("Load Images...");
             loadImages.addActionListener(this::loadImages);
             fileMenu.add(loadImages);
@@ -173,11 +188,6 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         }
 
         if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
-            JButton loadImageButton = new JButton();
-            loadImageButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
-            loadImageButton.setToolTipText("Load Image");
-            loadImageButton.addActionListener(this::loadImage);
-            sourceToolbar.add(loadImageButton);
             JButton loadImagesButton = new JButton();
             loadImagesButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
             loadImagesButton.setToolTipText("Load Images");
@@ -254,23 +264,11 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     private void setupFileChooser() {
         fileChooser = new SFileChooser(SimbrainPreferences.getString("imagesDirectory"), "");
         fileChooser.setUseImagePreview(true);
-        String[] exts = ImageIO.getReaderFileSuffixes();
-        //String[] descriptions = ImageIO.getReaderFormatNames();
-        //for (int i = 0; i < exts.length; ++i) {
+        // String[] exts = ImageIO.getReaderFileSuffixes();
+        // String[] descriptions = ImageIO.getReaderFormatNames();
+        // for (int i = 0; i < exts.length; ++i) {
         //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
-        //}
-    }
-
-    private void loadImage(ActionEvent evt) {
-        fileChooser.setDescription("Select an image to load");
-        File file = fileChooser.showOpenDialog();
-        if (file != null) {
-            try {
-                component.getWorld().loadImage(file.toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Unable to load file: " + file.toString());
-            }
-        }
+        // }
     }
 
     private void loadImages(ActionEvent evt) {

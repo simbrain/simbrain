@@ -130,26 +130,5 @@ public abstract class ImageFilterFactory {
         height = value;
     }
 
-    public LabelledItemPanel getEditorPanel() {
-        LabelledItemPanel panel = new LabelledItemPanel();
-        JFormattedTextField widthField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        widthField.setValue(width);
-        widthField.addPropertyChangeListener("value", (evt) -> {
-            width = ((Number) widthField.getValue()).intValue();
-            width = Math.max(Math.min(width, 10000), 1);
-            widthField.setValue(width);
-        });
-        panel.addItem("Width", widthField);
-        JFormattedTextField heightField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        heightField.setValue(height);
-        heightField.addPropertyChangeListener("value", (evt) -> {
-            height = ((Number) heightField.getValue()).intValue();
-            height = Math.max(Math.min(height, 10000), 1);
-            heightField.setValue(height);
-        });
-        panel.addItem("Height", heightField);
-        return panel;
-    }
-
     public abstract FilteredImageSource create(ImageSource source);
 }

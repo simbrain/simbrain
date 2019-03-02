@@ -80,11 +80,11 @@ public abstract class ImageSourceAdapter implements ImageSource {
     }
 
     /**
-     * @param value The image to assign to the current image.
+     * @param image The image to assign to the current image.
      */
-    protected void setCurrentImage(BufferedImage value) {
-        boolean resized = value.getWidth() != currentImage.getWidth() || value.getHeight() != currentImage.getHeight();
-        currentImage = value;
+    protected void setCurrentImage(BufferedImage image) {
+        boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
+        currentImage = image;
         if (resized) {
             notifyResize();
         }

@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * StaticImageSource allows static images (JPG, BMP, PNG) to be loaded and
- * filtered using the ImageSource interface.
+ * ImageAlbum allows static images (JPG, BMP, PNG) to be loaded and
+ * filtered using the ImageSource interface. Can also be used to display
+ * individual images.
  *
  * @author Tim Shea
  */

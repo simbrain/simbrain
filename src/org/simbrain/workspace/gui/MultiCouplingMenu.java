@@ -18,10 +18,10 @@ public class MultiCouplingMenu {
 
     private List<CouplingMenu> menus;
 
-    public MultiCouplingMenu(Workspace workspace, JPopupMenu parentMenu, int numMenus) {
+    public MultiCouplingMenu(Workspace workspace, JPopupMenu parentMenu, int maxMenus) {
         this.parentMenu = parentMenu;
         menus = new ArrayList<>();
-        for (int i = 0; i < numMenus; ++i) {
+        for (int i = 0; i < maxMenus; ++i) {
             menus.add(new CouplingMenu(workspace));
         }
     }

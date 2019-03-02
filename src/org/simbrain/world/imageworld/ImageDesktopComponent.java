@@ -154,7 +154,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 5);
+        multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 100);
         component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
@@ -167,7 +167,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void showContextMenu(MouseEvent evt) {
-        multiCouplingMenu.setSourceModels(component.getSelectedModels());
+        multiCouplingMenu.setSourceModels(component.getAttributeContainers());
         contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 

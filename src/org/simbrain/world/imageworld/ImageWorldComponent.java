@@ -96,13 +96,6 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return null;
     }
 
-    public List<AttributeContainer> getSelectedModels() {
-        List<AttributeContainer> models = new ArrayList<>();
-        models.add(world.getCurrentSensorMatrix());
-        //models.add(world.getCurrentImageSource());
-        return models;
-    }
-
     @Override
     public void update() {
         if (world.isEmitterMatrixSelected()) {

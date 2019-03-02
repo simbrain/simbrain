@@ -346,7 +346,6 @@ public class ImageWorld {
         List<ImageSource> sources = new ArrayList<ImageSource>();
         sources.addAll(Arrays.asList(staticSource, emitterMatrix));
         for (SensorMatrix sensorMatrix : sensorMatrices) {
-            // Add Composite (unfiltered) and ImageFilters
             sources.add(sensorMatrix.getSource());
         }
         return sources;

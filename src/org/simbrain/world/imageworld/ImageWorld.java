@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.imageworld.filters.FilteredImageSource;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
@@ -30,14 +29,9 @@ import java.util.List;
 public class ImageWorld {
 
     /**
-     * The static image source, for "Image world" in GUI.
+     * The main image being displayed.
      */
-    private ImageAlbum staticSource;
-
-    /**
-     * The emitter image source for "Pixel display" in GUI.
-     */
-    private EmitterMatrix emitterMatrix;
+    private ImageSourceAdapter imageSource;
 
     /**
      * List of sensor matrices associated with this world.
@@ -45,20 +39,21 @@ public class ImageWorld {
     private List<SensorMatrix> sensorMatrices;
 
     /**
-     * Helper so that it's easy to switch between image sources.
-     */
-    private CompositeImageSource compositeSource;
-
-    /**
      * Currently selected sensor matrix.
      */
     private SensorMatrix currentSensorMatrix;
 
+    /**
+     * Whether this is an image world or a "pixel display" world.
+     */
     public enum SourceType {
-        STATIC_SOURCE,
+        IMAGE_ALBUM,
         EMITTER_SOURCE
     }
 
+    /**
+     * The type of this image world.
+     */
     private final SourceType sourceType;
 
     /**
@@ -82,51 +77,31 @@ public class ImageWorld {
     public ImageWorld(SourceType sourceType) {
         this.sourceType = sourceType;
         // Setup ImageSources
-        staticSource = new ImageAlbum();
-        emitterMatrix = new EmitterMatrix();
-        if (sourceType == SourceType.EMITTER_SOURCE) {
-            compositeSource = new CompositeImageSource(emitterMatrix);
+        if (sourceType == SourceType.IMAGE_ALBUM) {
+            imageSource = new ImageAlbum();
+            ((ImageAlbum) imageSource).loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
         } else {
-            compositeSource = new CompositeImageSource(staticSource);
+            imageSource = new  EmitterMatrix();
         }
-        staticSource.loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
         imagePanel = new ImagePanel();
         clipboard = new ImageClipboard(this);
         sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
 
-
-        imagePanel.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-
-                // For testing ImageAlbum
-                //staticSource.step();
-                //staticSource.notifyImageUpdate();
-
-                // For testing image editing
-                //emitterMatrix.setBrightness(e.getLocationOnScreen(), 4);
-                // emitterMatrix.emitImage();
-
-            }
-        });
-
         // Load default sensor matrices
-        SensorMatrix unfiltered = new SensorMatrix("Unfiltered", compositeSource);
+        SensorMatrix unfiltered = new SensorMatrix("Unfiltered", imageSource);
         sensorMatrices.add(unfiltered);
 
-        SensorMatrix gray100x100 = new SensorMatrix("Gray 150x150", ImageFilterFactory.createGrayFilter(compositeSource, 150, 150));
+        SensorMatrix gray100x100 = new SensorMatrix("Gray 150x150", ImageFilterFactory.createGrayFilter(imageSource, 150, 150));
         sensorMatrices.add(gray100x100);
 
-        SensorMatrix color100x100 = new SensorMatrix("Color 100x100", ImageFilterFactory.createColorFilter(compositeSource, 100, 100));
+        SensorMatrix color100x100 = new SensorMatrix("Color 100x100", ImageFilterFactory.createColorFilter(imageSource, 100, 100));
         sensorMatrices.add(color100x100);
 
-        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 10, 10));
+        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(imageSource, 0.5f, 10, 10));
         sensorMatrices.add(threshold10x10);
 
-        SensorMatrix threshold250x250 = new SensorMatrix("Threshold 250x250", ThresholdFilterFactory.createThresholdFilter(compositeSource, 0.5f, 250, 250));
+        SensorMatrix threshold250x250 = new SensorMatrix("Threshold 250x250", ThresholdFilterFactory.createThresholdFilter(imageSource, 0.5f, 250, 250));
         sensorMatrices.add(threshold250x250);
 
         setCurrentSensorMatrix(sensorMatrices.get(0));
@@ -141,7 +116,6 @@ public class ImageWorld {
         listeners = new ArrayList<Listener>();
         currentSensorMatrix.getSource().addListener(imagePanel);
         clipboard = new ImageClipboard(this);
-        compositeSource.notifyImageUpdate();
         return this;
     }
 
@@ -156,8 +130,9 @@ public class ImageWorld {
      * @throws IOException thrown if the requested file is not available
      */
     public void loadImages(File[] files) {
-        staticSource.loadImages(files);
-        fireImageSourceChanged(staticSource);
+        if(sourceType == SourceType.IMAGE_ALBUM) {
+            ((ImageAlbum) imageSource).loadImages(files);
+        }
     }
 
     /**
@@ -178,7 +153,8 @@ public class ImageWorld {
      */
     private void updateToolTipText() {
         if(currentSensorMatrix == null) {
-            imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
+            //TODO
+            //imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
         } else {
             imagePanel.setToolTipText(currentSensorMatrix.getWidth() + " by " +  currentSensorMatrix.getHeight());
         }
@@ -187,84 +163,71 @@ public class ImageWorld {
      * Set an existing buffered image as the current image.
      */
     public void setImage(BufferedImage image) {
-        staticSource.setCurrentImage(image);
+        imageSource.setCurrentImage(image);
     }
 
     /**
      * Clear the current image from the composite image source.
      */
     public void clearImage() {
-        if (isEmitterMatrixSelected()) {
-            emitterMatrix.clear();
-            emitterMatrix.emitImage();
+        if(sourceType == SourceType.EMITTER_SOURCE) {
+            ((EmitterMatrix) imageSource).clear();
+            ((EmitterMatrix) imageSource).emitImage();
         } else {
-            staticSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+            imageSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
         }
-    }
-
-    /**
-     * Switch the CompositeImageSource to the static image.
-     */
-    public void selectStaticSource() {
-        compositeSource.setImageSource(staticSource);
     }
 
     /**
      * Get whether the emitter matrix is using color.
      */
     public boolean getUseColorEmitter() {
-        return emitterMatrix.isUsingRGBColor();
+        if (sourceType == SourceType.IMAGE_ALBUM) {
+            return false;
+        } else {
+            return ((EmitterMatrix) imageSource).isUsingRGBColor();
+        }
     }
 
     /**
      * Set the color mode of the emitter matrix.
      */
     public void setUseColorEmitter(boolean value) {
-        emitterMatrix.setUsingRGBColor(value);
-        fireImageSourceChanged(emitterMatrix);
+        if (sourceType == SourceType.EMITTER_SOURCE) {
+            ((EmitterMatrix) imageSource).isUsingRGBColor();
+        }
     }
 
     /**
      * Get the width of the emitter matrix.
      */
     public int getEmitterWidth() {
-        return emitterMatrix.getWidth();
+        return ((EmitterMatrix) imageSource).getWidth();
     }
 
     /**
      * Get the height of the emitter matrix.
      */
     public int getEmitterHeight() {
-        return emitterMatrix.getHeight();
+        return ((EmitterMatrix) imageSource).getHeight();
     }
 
     /**
      * Set the size of the emitter matrix.
      */
     public void resizeEmitterMatrix(int width, int height) {
-        emitterMatrix.setSize(width, height);
-        fireImageSourceChanged(emitterMatrix);
-    }
-
-    /**
-     * Returns whether the emitter matrix is the current source for the image world.
-     */
-    public boolean isEmitterMatrixSelected() {
-        return compositeSource.getImageSource() == emitterMatrix;
-    }
-
-    /**
-     * Switch the CompositeImageSource to the emitter matrix.
-     */
-    public void selectEmitterMatrix() {
-        compositeSource.setImageSource(emitterMatrix);
+        if (sourceType == SourceType.EMITTER_SOURCE) {
+            ((EmitterMatrix) imageSource).setSize(width, height);
+        }
     }
 
     /**
      * Update the emitter matrix image.
      */
     public void emitImage() {
-        emitterMatrix.emitImage();
+        if (sourceType == SourceType.EMITTER_SOURCE) {
+            ((EmitterMatrix) imageSource).emitImage();
+        }
     }
 
     /**
@@ -282,16 +245,18 @@ public class ImageWorld {
      * Update the image source to the next image.
      */
     public void nextFrame() {
-        staticSource.nextFrame();
-        fireImageSourceChanged(staticSource);
+        if(sourceType == SourceType.IMAGE_ALBUM) {
+            ((ImageAlbum) imageSource).nextFrame();
+        }
     }
 
     /**
      * Update the image source to the previous image.
      */
     public void previousFrame() {
-        staticSource.previousFrame();
-        fireImageSourceChanged(staticSource);
+        if(sourceType == SourceType.IMAGE_ALBUM) {
+            ((ImageAlbum) imageSource).previousFrame();
+        }
     }
 
     /**
@@ -310,10 +275,10 @@ public class ImageWorld {
             setCurrentSensorMatrix(sensorMatrices.get(index - 1));
             sensorMatrices.remove(sensorMatrix);
             // TODO: This is bad and should be handled in SensorMatrix
-            ImageSource source = sensorMatrix.getSource();
-            if (source instanceof FilteredImageSource) {
-                compositeSource.removeListener((FilteredImageSource) source);
-            }
+            // ImageSource source = sensorMatrix.getSource();
+            // if (source instanceof FilteredImageSource) {
+            //     compositeSource.removeListener((FilteredImageSource) source);
+            // }
             sensorMatrix.getSource().removeListener(sensorMatrix);
             fireSensorMatrixRemoved(sensorMatrix);
         }
@@ -333,41 +298,19 @@ public class ImageWorld {
         return clipboard;
     }
 
-    /**
-     * @return Returns a CompositeImageSource which allows sensors to seamlessly switch between
-     * available ImageSources
-     */
-    public ImageSource getCompositeImageSource() {
-        return compositeSource;
-    }
-
-
     public List<ImageSource> getImageSources() {
         List<ImageSource> sources = new ArrayList<ImageSource>();
-        sources.addAll(Arrays.asList(staticSource, emitterMatrix));
+        sources.addAll(Arrays.asList(imageSource));
         for (SensorMatrix sensorMatrix : sensorMatrices) {
             sources.add(sensorMatrix.getSource());
         }
         return sources;
     }
 
-    /**
-     * The current image source, pixel display or image world
-     */
-    public ImageSource getCurrentImageSource() {
-        return compositeSource.getImageSource();
-    }
-
-    /**
-     * @return the currentSensorPanel
-     */
     public SensorMatrix getCurrentSensorMatrix() {
         return currentSensorMatrix;
     }
 
-    /**
-     * @param sensorMatrix the currentSensorMatrix to set
-     */
     public void setCurrentSensorMatrix(SensorMatrix sensorMatrix) {
         if (sensorMatrix == currentSensorMatrix) {
             return;
@@ -380,9 +323,6 @@ public class ImageWorld {
         updateToolTipText();
     }
 
-    /**
-     * @return a list of sensor matrices
-     */
     public List<SensorMatrix> getSensorMatrices() {
         return sensorMatrices;
     }
@@ -408,20 +348,15 @@ public class ImageWorld {
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
+    public ImageSource getImageSource() {
+        return imageSource;
+    }
+
     /**
      * @param listener the listener to add.
      */
     public void addListener(Listener listener) {
         listeners.add(listener);
-    }
-
-    /**
-     * Notify listeners that an image source was changed.
-     */
-    protected void fireImageSourceChanged(ImageSource source) {
-        for (Listener listener : listeners) {
-            listener.imageSourceChanged(source);
-        }
     }
 
     /**

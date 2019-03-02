@@ -77,7 +77,7 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
         putGuiComponentFactory(ReaderComponent.class, ReaderComponentDesktopGui::new);
 
-        putWorkspaceComponentFactory("Image World", () -> new ImageWorldComponent(ImageWorld.SourceType.STATIC_SOURCE));
+        putWorkspaceComponentFactory("Image World", () -> new ImageWorldComponent(ImageWorld.SourceType.IMAGE_ALBUM));
         putGuiComponentFactory(ImageWorldComponent.class, ImageDesktopComponent::new);
 
         putWorkspaceComponentFactory("Pixel Display", () -> new ImageWorldComponent(ImageWorld.SourceType.EMITTER_SOURCE));

@@ -98,7 +98,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        if (world.isEmitterMatrixSelected()) {
+        if (world.getSourceType() == ImageWorld.SourceType.EMITTER_SOURCE) {
             world.emitImage();
         }
     }

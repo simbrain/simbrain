@@ -58,7 +58,7 @@ public class SensorMatrixDialog extends StandardDialog {
         String name = imageSourceMeta.getName();
         // FilteredImageSource filter = filterFactory.create(world.getCompositeImageSource());
         FilteredImageSource filter = new FilteredImageSource(
-                world.getCompositeImageSource(),
+                world.getImageSource(),
                 imageSourceMeta.getColorOp().getName(),
                 imageSourceMeta.getColorOp(),
                 imageSourceMeta.getWidth(),

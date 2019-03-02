@@ -14,7 +14,6 @@ import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -118,7 +117,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenu fileMenu = new JMenu("File  ");
         menuBar.add(fileMenu);
 
-        if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
+        if (component.getWorld().getSourceType() == ImageWorld.SourceType.IMAGE_ALBUM) {
             JMenuItem loadImages = new JMenuItem("Load Images...");
             loadImages.addActionListener(this::loadImages);
             fileMenu.add(loadImages);
@@ -187,7 +186,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
             sourceToolbar.add(editEmitterButton);
         }
 
-        if (component.getWorld().getSourceType() == ImageWorld.SourceType.STATIC_SOURCE) {
+        if (component.getWorld().getSourceType() == ImageWorld.SourceType.IMAGE_ALBUM) {
             JButton loadImagesButton = new JButton();
             loadImagesButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
             loadImagesButton.setToolTipText("Load Images");

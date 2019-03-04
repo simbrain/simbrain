@@ -47,12 +47,12 @@ public class ImageAlbumDesktopComponent extends ImageDesktopComponent<ImageAlbum
         loadImagesButton.addActionListener(this::loadImages);
         returnList.add(loadImagesButton);
         JButton previousImagesButton = new JButton();
-        previousImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("LeftTriangle.png"));
+        previousImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
         previousImagesButton.addActionListener(this::previousImage);
         returnList.add(previousImagesButton);
         JButton nextImagesButton = new JButton();
-        nextImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("RightTriangle.png"));
+        nextImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoNext.png"));
         nextImagesButton.setToolTipText("Next Image");
         nextImagesButton.addActionListener(this::nextImage);
         returnList.add(nextImagesButton);

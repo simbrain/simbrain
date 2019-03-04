@@ -27,9 +27,7 @@ import org.simbrain.world.deviceinteraction.DeviceInteractionComponent;
 import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
 import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
-import org.simbrain.world.imageworld.ImageDesktopComponent;
-import org.simbrain.world.imageworld.ImageWorld;
-import org.simbrain.world.imageworld.ImageWorldComponent;
+import org.simbrain.world.imageworld.*;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.DisplayComponent;
@@ -77,11 +75,11 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
         putGuiComponentFactory(ReaderComponent.class, ReaderComponentDesktopGui::new);
 
-        putWorkspaceComponentFactory("Image World", () -> new ImageWorldComponent(ImageWorld.SourceType.IMAGE_ALBUM));
-        putGuiComponentFactory(ImageWorldComponent.class, ImageDesktopComponent::new);
+        putWorkspaceComponentFactory("Image World", ImageAlbumComponent::new);
+        putGuiComponentFactory(ImageAlbumComponent.class, ImageAlbumDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pixel Display", () -> new ImageWorldComponent(ImageWorld.SourceType.EMITTER_SOURCE));
-        putGuiComponentFactory(ImageWorldComponent.class, ImageDesktopComponent::new);
+        putWorkspaceComponentFactory("Pixel Display", PixelDisplayComponent::new);
+        putGuiComponentFactory(PixelDisplayComponent.class, PixelDisplayDesktopComponent::new);
 
         putWorkspaceComponentFactory("Device Interaction", () -> new DeviceInteractionComponent(""));
         putGuiComponentFactory(DeviceInteractionComponent.class, DeviceInteractionDesktopComponent::new);

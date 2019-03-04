@@ -1,13 +1,10 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,12 +23,7 @@ import java.util.List;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class ImageWorld {
-
-    /**
-     * The main image being displayed.
-     */
-    private ImageSourceAdapter imageSource;
+public abstract class ImageWorld {
 
     /**
      * List of sensor matrices associated with this world.
@@ -42,19 +34,6 @@ public class ImageWorld {
      * Currently selected sensor matrix.
      */
     private SensorMatrix currentSensorMatrix;
-
-    /**
-     * Whether this is an image world or a "pixel display" world.
-     */
-    public enum SourceType {
-        IMAGE_ALBUM,
-        EMITTER_SOURCE
-    }
-
-    /**
-     * The type of this image world.
-     */
-    private final SourceType sourceType;
 
     /**
      * Container for the current image or sensor view.
@@ -74,38 +53,64 @@ public class ImageWorld {
     /**
      * Construct the image world.
      */
-    public ImageWorld(SourceType sourceType) {
-        this.sourceType = sourceType;
-        // Setup ImageSources
-        if (sourceType == SourceType.IMAGE_ALBUM) {
-            imageSource = new ImageAlbum();
-            ((ImageAlbum) imageSource).loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
-        } else {
-            imageSource = new  EmitterMatrix();
-        }
+    public ImageWorld() {
+
         imagePanel = new ImagePanel();
         clipboard = new ImageClipboard(this);
         sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
 
+    }
+
+    /**
+     * Initialize some default filters on world creation.
+     * This should be called on the instantiation of a child of this class after the image source is created.
+     */
+    void initializeDefaultSensorMatrices() {
+
         // Load default sensor matrices
-        SensorMatrix unfiltered = new SensorMatrix("Unfiltered", imageSource);
-        sensorMatrices.add(unfiltered);
+        SensorMatrix unfiltered = new SensorMatrix(
+                        "Unfiltered",
+                        getImageSource()
+                );
+        getSensorMatrices().add(unfiltered);
 
-        SensorMatrix gray100x100 = new SensorMatrix("Gray 150x150", ImageFilterFactory.createGrayFilter(imageSource, 150, 150));
-        sensorMatrices.add(gray100x100);
+        SensorMatrix gray100x100 = new SensorMatrix(
+                        "Gray 150x150",
+                        ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
+                );
+        getSensorMatrices().add(gray100x100);
 
-        SensorMatrix color100x100 = new SensorMatrix("Color 100x100", ImageFilterFactory.createColorFilter(imageSource, 100, 100));
-        sensorMatrices.add(color100x100);
+        SensorMatrix color100x100 = new SensorMatrix(
+                        "Color 100x100",
+                        ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
+                );
+        getSensorMatrices().add(color100x100);
 
-        SensorMatrix threshold10x10 = new SensorMatrix("Threshold 10x10", ThresholdFilterFactory.createThresholdFilter(imageSource, 0.5f, 10, 10));
-        sensorMatrices.add(threshold10x10);
+        SensorMatrix threshold10x10 = new SensorMatrix(
+                        "Threshold 10x10",
+                        ThresholdFilterFactory.createThresholdFilter(
+                                getImageSource(),
+                                0.5f,
+                                10,
+                                10
+                        )
+                );
+        getSensorMatrices().add(threshold10x10);
 
-        SensorMatrix threshold250x250 = new SensorMatrix("Threshold 250x250", ThresholdFilterFactory.createThresholdFilter(imageSource, 0.5f, 250, 250));
-        sensorMatrices.add(threshold250x250);
+        SensorMatrix threshold250x250 = new SensorMatrix(
+                        "Threshold 250x250",
+                        ThresholdFilterFactory.createThresholdFilter(
+                                getImageSource(),
+                                0.5f,
+                                250,
+                                250
+                        )
+                );
 
-        setCurrentSensorMatrix(sensorMatrices.get(0));
+        getSensorMatrices().add(threshold250x250);
 
+        setCurrentSensorMatrix(getSensorMatrices().get(0));
     }
 
     /**
@@ -119,21 +124,6 @@ public class ImageWorld {
         return this;
     }
 
-    public SourceType getSourceType() {
-        return sourceType;
-    }
-
-    /**
-     * Load images from an array
-     *
-     * @param files array of images to load
-     * @throws IOException thrown if the requested file is not available
-     */
-    public void loadImages(File[] files) {
-        if(sourceType == SourceType.IMAGE_ALBUM) {
-            ((ImageAlbum) imageSource).loadImages(files);
-        }
-    }
 
     /**
      * Save the current image as the specified filename.
@@ -163,72 +153,19 @@ public class ImageWorld {
      * Set an existing buffered image as the current image.
      */
     public void setImage(BufferedImage image) {
-        imageSource.setCurrentImage(image);
+        getImageSource().setCurrentImage(image);
     }
 
     /**
      * Clear the current image from the composite image source.
      */
-    public void clearImage() {
-        if(sourceType == SourceType.EMITTER_SOURCE) {
-            ((EmitterMatrix) imageSource).clear();
-            ((EmitterMatrix) imageSource).emitImage();
-        } else {
-            imageSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
-        }
-    }
+    public abstract void clearImage();
 
     /**
      * Get whether the emitter matrix is using color.
      */
-    public boolean getUseColorEmitter() {
-        if (sourceType == SourceType.IMAGE_ALBUM) {
-            return false;
-        } else {
-            return ((EmitterMatrix) imageSource).isUsingRGBColor();
-        }
-    }
+    public abstract boolean getUseColorEmitter();
 
-    /**
-     * Set the color mode of the emitter matrix.
-     */
-    public void setUseColorEmitter(boolean value) {
-        if (sourceType == SourceType.EMITTER_SOURCE) {
-            ((EmitterMatrix) imageSource).isUsingRGBColor();
-        }
-    }
-
-    /**
-     * Get the width of the emitter matrix.
-     */
-    public int getEmitterWidth() {
-        return ((EmitterMatrix) imageSource).getWidth();
-    }
-
-    /**
-     * Get the height of the emitter matrix.
-     */
-    public int getEmitterHeight() {
-        return ((EmitterMatrix) imageSource).getHeight();
-    }
-
-    /**
-     * Set the size of the emitter matrix.
-     */
-    public void resizeEmitterMatrix(int width, int height) {
-        if (sourceType == SourceType.EMITTER_SOURCE) {
-            ((EmitterMatrix) imageSource).setSize(width, height);
-        }
-    }
-
-    /**
-     * Update the emitter matrix image.
-     */
-    public void emitImage() {
-        if (sourceType == SourceType.EMITTER_SOURCE) {
-            ((EmitterMatrix) imageSource).emitImage();
-        }
-    }
 
     /**
      * Add a new matrix to the list.
@@ -241,23 +178,6 @@ public class ImageWorld {
         fireSensorMatrixAdded(matrix);
     }
 
-    /**
-     * Update the image source to the next image.
-     */
-    public void nextFrame() {
-        if(sourceType == SourceType.IMAGE_ALBUM) {
-            ((ImageAlbum) imageSource).nextFrame();
-        }
-    }
-
-    /**
-     * Update the image source to the previous image.
-     */
-    public void previousFrame() {
-        if(sourceType == SourceType.IMAGE_ALBUM) {
-            ((ImageAlbum) imageSource).previousFrame();
-        }
-    }
 
     /**
      * Remove the indicated sensor matrix.
@@ -300,7 +220,7 @@ public class ImageWorld {
 
     public List<ImageSource> getImageSources() {
         List<ImageSource> sources = new ArrayList<ImageSource>();
-        sources.addAll(Arrays.asList(imageSource));
+        sources.addAll(Arrays.asList(getImageSource()));
         for (SensorMatrix sensorMatrix : sensorMatrices) {
             sources.add(sensorMatrix.getSource());
         }
@@ -348,9 +268,17 @@ public class ImageWorld {
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
-    public ImageSource getImageSource() {
-        return imageSource;
-    }
+    /**
+     * Get image source.
+     *
+     * @return the image source
+     */
+    public abstract ImageSourceAdapter getImageSource();
+
+    /**
+     * Update the image source.
+     */
+    public abstract void update();
 
     /**
      * @param listener the listener to add.

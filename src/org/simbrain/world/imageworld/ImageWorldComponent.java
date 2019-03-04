@@ -18,40 +18,14 @@ import java.util.List;
  *
  * @author Tim Shea
  */
-public class ImageWorldComponent extends WorkspaceComponent {
+public abstract class ImageWorldComponent extends WorkspaceComponent {
 
-    /**
-     * The image world this component displays.
-     */
-    private ImageWorld world;
-    
-    /**
-     * Open a saved ImageWorldComponent from an XML input stream.
-     *
-     * @param input  The input stream to read.
-     * @param name   The name of the new world component.
-     * @param format The format of the input stream. Should be xml.
-     * @return A deserialized ImageWorldComponent.
-     */
-    public static ImageWorldComponent open(InputStream input, String name, String format) {
-        ImageWorld world = (ImageWorld) getXStream().fromXML(input);
-        return new ImageWorldComponent(name, world);
-    }
-
-    /**
-     * Construct a new ImageWorldComponent.
-     */
-    public ImageWorldComponent(ImageWorld.SourceType sourceType) {
+    public ImageWorldComponent() {
         super("");
-        world = new ImageWorld(sourceType);
     }
 
-    /**
-     * Deserialize an ImageWorldComponent.
-     */
-    private ImageWorldComponent(String name, ImageWorld world) {
+    public ImageWorldComponent(String name) {
         super(name);
-        this.world = world;
     }
 
     /**
@@ -66,29 +40,31 @@ public class ImageWorldComponent extends WorkspaceComponent {
 
     @Override
     public void save(OutputStream output, String format) {
-        getXStream().toXML(world, output);
+        getXStream().toXML(getWorld(), output);
     }
 
     @Override
     protected void closing() {
     }
 
+    public abstract ImageWorld getWorld();
+
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> models = new ArrayList<>();
-        models.addAll(world.getSensorMatrices());
-        models.addAll(world.getImageSources());
+        models.addAll(getWorld().getSensorMatrices());
+        models.addAll(getWorld().getImageSources());
         return models;
     }
 
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {
-        for (ImageSource source : world.getImageSources()) {
+        for (ImageSource source : getWorld().getImageSources()) {
             if (objectKey.equals(source.getClass().getSimpleName())) {
                 return source;
             }
         }
-        for (SensorMatrix sensor : world.getSensorMatrices()) {
+        for (SensorMatrix sensor : getWorld().getSensorMatrices()) {
             if (objectKey.equals(sensor.getName())) {
                 return sensor;
             }
@@ -98,16 +74,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        if (world.getSourceType() == ImageWorld.SourceType.EMITTER_SOURCE) {
-            world.emitImage();
-        }
-    }
-
-    /**
-     * Return a reference to the world owned by this component.
-     */
-    public ImageWorld getWorld() {
-        return world;
+        getWorld().update();
     }
 
 }

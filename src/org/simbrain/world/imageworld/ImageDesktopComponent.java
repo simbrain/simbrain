@@ -11,7 +11,6 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.MultiCouplingMenu;
-import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 
 import javax.swing.*;
@@ -21,23 +20,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * GUI Interface for vision world.
  *
  * @author Tim Shea, Jeff Yoshimi
  */
-public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
+public abstract class ImageDesktopComponent<IWC extends ImageWorldComponent> extends GuiComponent<IWC> {
 
     /**
      * Combo box for selecting which sensor matrix to view.
      */
     private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<SensorMatrix>();
-
-    /**
-     * The image world component .
-     */
-    private ImageWorldComponent component;
 
     /**
      * Toolbars.
@@ -57,7 +52,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     /**
      * Custom file chooser for selecting image files.
      */
-    private SFileChooser fileChooser;
+    protected SFileChooser fileChooser;
 
     /**
      * Context menu.
@@ -75,9 +70,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
      * @param frame     The frame in which to place GUI elements.
      * @param component The ImageWorldComponent to interact with.
      */
-    public ImageDesktopComponent(GenericFrame frame, ImageWorldComponent component) {
+    ImageDesktopComponent(GenericFrame frame, IWC component) {
         super(frame, component);
-        this.component = component;
+        setComponent(component);
 
         setupMenuBar(frame);
         setupToolbars();
@@ -87,11 +82,11 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         add(toolbars, BorderLayout.NORTH);
         toolbars.add(sourceToolbar);
         toolbars.add(sensorToolbar);
-        add(component.getWorld().getImagePanel(), BorderLayout.CENTER);
-        component.getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
+        add(getComponent().getWorld().getImagePanel(), BorderLayout.CENTER);
+        getComponent().getWorld().getImagePanel().setPreferredSize(new Dimension(640, 480));
 
-        this.component.getWorld().addListener(new ImageWorld.Listener() {
-            
+        this.getComponent().getWorld().addListener(new ImageWorld.Listener() {
+
             @Override
             public void imageSourceChanged(ImageSource changedSource) {
             }
@@ -117,11 +112,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JMenu fileMenu = new JMenu("File  ");
         menuBar.add(fileMenu);
 
-        if (component.getWorld().getSourceType() == ImageWorld.SourceType.IMAGE_ALBUM) {
-            JMenuItem loadImages = new JMenuItem("Load Images...");
-            loadImages.addActionListener(this::loadImages);
-            fileMenu.add(loadImages);
-        }
+        // Add all additional file menu items to file menu
+        getAdditionalFileMenuItems().forEach(fileMenu::add);
+
         JMenuItem saveImage = new JMenuItem("Save Image...");
         saveImage.addActionListener(this::saveImage);
         fileMenu.add(saveImage);
@@ -148,13 +141,21 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         frame.setJMenuBar(menuBar);
     }
 
+    /**
+     * Get a list of additional menu items from sub-class to be added to the file menu.
+     * See {@link ImageDesktopComponent#setupMenuBar(GenericFrame)}.
+     *
+     * @return a list of menu items
+     */
+    public abstract List<JMenuItem> getAdditionalFileMenuItems();
+
     private void setupContextMenu(ImageWorldComponent component) {
         contextMenu = new JPopupMenu();
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 100);
-        component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
+        multiCouplingMenu = new MultiCouplingMenu(getComponent().getWorkspace(), contextMenu, 100);
+        getComponent().getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 super.mouseClicked(evt);
@@ -166,8 +167,8 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void showContextMenu(MouseEvent evt) {
-        multiCouplingMenu.setSourceModels(component.getAttributeContainers());
-        contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
+        multiCouplingMenu.setSourceModels(getComponent().getAttributeContainers());
+        contextMenu.show(getComponent().getWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 
     @Override
@@ -175,34 +176,9 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
     }
 
     private void setupToolbars() {
-        if (component.getWorld().getSourceType() == ImageWorld.SourceType.EMITTER_SOURCE) {
-            JButton editEmitterButton = new JButton();
-            editEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
-            editEmitterButton.setToolTipText("Edit Emitter Matrix");
-            editEmitterButton.addActionListener(evt -> {
-                ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(component.getWorld());
-                dialog.setVisible(true);
-            });
-            sourceToolbar.add(editEmitterButton);
-        }
 
-        if (component.getWorld().getSourceType() == ImageWorld.SourceType.IMAGE_ALBUM) {
-            JButton loadImagesButton = new JButton();
-            loadImagesButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
-            loadImagesButton.setToolTipText("Load Images");
-            loadImagesButton.addActionListener(this::loadImages);
-            sourceToolbar.add(loadImagesButton);
-            JButton previousImagesButton = new JButton();
-            previousImagesButton.setIcon(ResourceManager.getSmallIcon("LeftTriangle.png"));
-            previousImagesButton.setToolTipText("Previous Image");
-            previousImagesButton.addActionListener(this::previousImage);
-            sourceToolbar.add(previousImagesButton);
-            JButton nextImagesButton = new JButton();
-            nextImagesButton.setIcon(ResourceManager.getSmallIcon("RightTriangle.png"));
-            nextImagesButton.setToolTipText("Next Image");
-            nextImagesButton.addActionListener(this::nextImage);
-            sourceToolbar.add(nextImagesButton);
-        }
+        // Add additional buttons to the source toolbar
+        getAdditionalSourceToolbarButtons().forEach(sourceToolbar::add);
 
         JButton saveImageButton = new JButton();
         saveImageButton.setIcon(ResourceManager.getSmallIcon("Save.png"));
@@ -213,7 +189,7 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         JButton clearImageButton = new JButton();
         clearImageButton.setIcon(ResourceManager.getSmallIcon("Eraser.png"));
         clearImageButton.setToolTipText("Clear Image");
-        clearImageButton.addActionListener(evt -> component.getWorld().clearImage());
+        clearImageButton.addActionListener(evt -> getComponent().getWorld().clearImage());
         // sourceToolbar.add(clearImageButton); // Too destructive.  Don't include on toolbar
 
         sensorToolbar.add(new JLabel("Sensors:"));
@@ -225,14 +201,14 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         sensorMatrixCombo.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
             if (selectedSensorMatrix != null) {
-                component.getWorld().setCurrentSensorMatrix(selectedSensorMatrix);
+                getComponent().getWorld().setCurrentSensorMatrix(selectedSensorMatrix);
             }
         });
 
         JButton addSensorMatrix = new JButton(ResourceManager.getImageIcon("plus.png"));
         addSensorMatrix.setToolTipText("Add Sensor Matrix");
         addSensorMatrix.addActionListener(evt -> {
-            SensorMatrixDialog dialog = new SensorMatrixDialog(component.getWorld());
+            SensorMatrixDialog dialog = new SensorMatrixDialog(getComponent().getWorld());
             dialog.setVisible(true);
         });
         sensorToolbar.add(addSensorMatrix);
@@ -241,22 +217,31 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
         deleteSensorMatrix.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
+            getComponent().getWorld().removeSensorMatrix(selectedSensorMatrix);
         });
         sensorToolbar.add(deleteSensorMatrix);
     }
 
+    /**
+     * Get a list of additional button from sub-class to be added to the sensorToolbar.
+     *
+     * See {@link ImageDesktopComponent#setupToolbars()}
+     *
+     * @return the list of buttons to be added
+     */
+    public abstract List<JButton> getAdditionalSourceToolbarButtons();
+
     Action copyAction = new AbstractAction("Copy") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            component.getWorld().getClipboard().copyImage();
+            getComponent().getWorld().getClipboard().copyImage();
         }
     };
 
     Action pasteAction = new AbstractAction("Paste") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            component.getWorld().getClipboard().pasteImage();
+            getComponent().getWorld().getClipboard().pasteImage();
         }
     };
 
@@ -270,46 +255,41 @@ public class ImageDesktopComponent extends GuiComponent<ImageWorldComponent> {
         // }
     }
 
-    private void loadImages(ActionEvent evt) {
-        fileChooser.setDescription("Select an image to load");
-        File[] files = fileChooser.showMultiOpenDialogNative();
-        if (files != null) {
-            component.getWorld().loadImages(files);
-        }
-    }
-
     private void saveImage(ActionEvent evt) {
         fileChooser.setDescription("Select filename to save");
         fileChooser.setUseImagePreview(true);
         File file = fileChooser.showSaveDialog();
         if (file != null) {
             try {
-                component.getWorld().saveImage(file.toString());
+                getComponent().getWorld().saveImage(file.toString());
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Unable to save file: " + file.toString());
             }
         }
     }
 
-    private void previousImage(ActionEvent evt) {
-        component.getWorld().previousFrame();
-    }
-
-    private void nextImage(ActionEvent evt) {
-        component.getWorld().nextFrame();
-    }
 
     /**
      * Reset the combo box for the sensor panels.
      */
     private void updateComboBox() {
         sensorMatrixCombo.removeAllItems();
-        SensorMatrix selectedSensorMatrix = component.getWorld().getCurrentSensorMatrix();
-        for (SensorMatrix sensorMatrix : component.getWorld().getSensorMatrices()) {
+        SensorMatrix selectedSensorMatrix = getComponent().getWorld().getCurrentSensorMatrix();
+        for (SensorMatrix sensorMatrix : getComponent().getWorld().getSensorMatrices()) {
             sensorMatrixCombo.addItem(sensorMatrix);
             if (sensorMatrix.equals(selectedSensorMatrix)) {
                 sensorMatrixCombo.setSelectedItem(sensorMatrix);
             }
         }
     }
+
+    /**
+     * Get the image world component this desktop component holds.
+     *
+     * @return the image world component
+     */
+    public abstract IWC getComponent();
+
+
+    public abstract void setComponent(IWC component);
 }

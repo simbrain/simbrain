@@ -4,6 +4,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageWorld;
+import org.simbrain.world.imageworld.PixelDisplayWorld;
 
 import javax.swing.*;
 import java.text.NumberFormat;
@@ -11,7 +12,7 @@ import java.text.NumberFormat;
 public class ResizeEmitterMatrixDialog extends StandardDialog {
     private static final long serialVersionUID = 1L;
 
-    private ImageWorld world;
+    private PixelDisplayWorld world;
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
     private JCheckBox useColorCheckBox = new JCheckBox();
@@ -23,7 +24,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
      *
      * @param world The ImageWorld which holds the EmitterMatrix.
      */
-    public ResizeEmitterMatrixDialog(ImageWorld world) {
+    public ResizeEmitterMatrixDialog(PixelDisplayWorld world) {
         this.world = world;
         setTitle("Emitter Matrix Settings");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/emitterMatrix.html");

@@ -4,14 +4,20 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * The default "Image World" which allows images to be filtered by sensor
+ * matrices and the resulting vectors to be sent to Neural networks and other
+ * Simbrain components via couplings.
+ */
 public class ImageAlbumWorld extends ImageWorld {
 
-
+    /**
+     * The object which produces the actual images processed by the "album".
+     */
     private ImageAlbum imageSource;
 
     /**
      * Construct the image world.
-     *
      */
     public ImageAlbumWorld() {
         super();
@@ -65,6 +71,5 @@ public class ImageAlbumWorld extends ImageWorld {
     public void update() {
 
     }
-
 
 }

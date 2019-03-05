@@ -1,8 +1,18 @@
 package org.simbrain.world.imageworld;
 
-import java.io.InputStream;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
+import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
 
-public class ImageAlbumComponent extends ImageWorldComponent {
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ImageAlbumComponent extends WorkspaceComponent {
 
     /**
      * The image world this component displays.
@@ -23,12 +33,61 @@ public class ImageAlbumComponent extends ImageWorldComponent {
     }
 
     /**
-     * Create an Image World Component from a Image World.
-     *
+     * Default constructor
      */
     public ImageAlbumComponent() {
-        super();
+        super("");
         this.world = new ImageAlbumWorld();
+    }
+
+
+    /**
+     * Create named component.
+     */
+    public ImageAlbumComponent(String name) {
+        super(name);
+        this.world = new ImageAlbumWorld();
+    }
+
+    @Override
+    public List<AttributeContainer> getAttributeContainers() {
+        List<AttributeContainer> containers = new ArrayList<>();
+        containers.add(world.getCurrentSensorMatrix());
+        return containers;
+    }
+
+    @Override
+    public AttributeContainer getObjectFromKey(String objectKey) {
+        // for (ImageSource source : getWorld().getImageSources()) {
+        //     if (objectKey.equals(source.getClass().getSimpleName())) {
+        //         return source;
+        //     }
+        // }
+        // for (SensorMatrix sensor : getWorld().getSensorMatrices()) {
+        //     if (objectKey.equals(sensor.getName())) {
+        //         return sensor;
+        //     }
+        // }
+        return null;
+    }
+
+    /**
+     * Create an xstream from this class.
+     */
+    public static XStream getXStream() {
+        XStream stream = new XStream(new DomDriver());
+        stream.registerConverter(new BufferedImageConverter());
+        stream.registerConverter(new CouplingArrayConverter());
+        return stream;
+    }
+
+    @Override
+    public void save(OutputStream output, String format) {
+        getXStream().toXML(getWorld(), output);
+    }
+
+    @Override
+    protected void closing() {
     }
 
     /**
@@ -42,7 +101,6 @@ public class ImageAlbumComponent extends ImageWorldComponent {
         this.world = world;
     }
 
-    @Override
     public ImageAlbumWorld getWorld() {
         return world;
     }

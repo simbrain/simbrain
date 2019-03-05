@@ -13,11 +13,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * ImageWorld contains an {@link ImageSource} and a series of {@link SensorMatrix}
- * objects. The image source is what outputs an image of some kind, either a
- * static image, or a video or a pixel display.  The sensor
+ * Sublcasses of ImageWorld contain an {@link ImageSource} and a series of
+ * {@link SensorMatrix} objects. The image source is what outputs an image of
+ * some kind, either a static image, or a video or a pixel display.  The sensor
  * matrices convert the image into numbers and allow the current image in an
  * image source to be in couplings and thereby communicate with other workspace
+ * components.
+ * <br>
+ * Currently there are two subclasses corresponding to the "Image World" ({@link
+ * ImageAlbumWorld}) and "Pixel Display" ({@link PixelDisplayWorld}) in the
+ * GUI.  Broadly speaking ImageAlbumWorld produces pixels to be consumed by
+ * other components and PixelDisplayWorld consumes pixels produced by other
  * components.
  *
  * @author Tim Shea
@@ -63,50 +69,51 @@ public abstract class ImageWorld {
     }
 
     /**
-     * Initialize some default filters on world creation.
-     * This should be called on the instantiation of a child of this class after the image source is created.
+     * Initialize some default filters on world creation. This should be called
+     * on the instantiation of a child of this class after the image source is
+     * created.
      */
     void initializeDefaultSensorMatrices() {
 
         // Load default sensor matrices
         SensorMatrix unfiltered = new SensorMatrix(
-                        "Unfiltered",
-                        getImageSource()
-                );
+            "Unfiltered",
+            getImageSource()
+        );
         getSensorMatrices().add(unfiltered);
 
         SensorMatrix gray100x100 = new SensorMatrix(
-                        "Gray 150x150",
-                        ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
-                );
+            "Gray 150x150",
+            ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
+        );
         getSensorMatrices().add(gray100x100);
 
         SensorMatrix color100x100 = new SensorMatrix(
-                        "Color 100x100",
-                        ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
-                );
+            "Color 100x100",
+            ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
+        );
         getSensorMatrices().add(color100x100);
 
         SensorMatrix threshold10x10 = new SensorMatrix(
-                        "Threshold 10x10",
-                        ThresholdFilterFactory.createThresholdFilter(
-                                getImageSource(),
-                                0.5f,
-                                10,
-                                10
-                        )
-                );
+            "Threshold 10x10",
+            ThresholdFilterFactory.createThresholdFilter(
+                getImageSource(),
+                0.5f,
+                10,
+                10
+            )
+        );
         getSensorMatrices().add(threshold10x10);
 
         SensorMatrix threshold250x250 = new SensorMatrix(
-                        "Threshold 250x250",
-                        ThresholdFilterFactory.createThresholdFilter(
-                                getImageSource(),
-                                0.5f,
-                                250,
-                                250
-                        )
-                );
+            "Threshold 250x250",
+            ThresholdFilterFactory.createThresholdFilter(
+                getImageSource(),
+                0.5f,
+                250,
+                250
+            )
+        );
 
         getSensorMatrices().add(threshold250x250);
 
@@ -142,13 +149,14 @@ public abstract class ImageWorld {
      * Update the current tooltip on the jpanel.
      */
     private void updateToolTipText() {
-        if(currentSensorMatrix == null) {
+        if (currentSensorMatrix == null) {
             //TODO
             //imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
         } else {
-            imagePanel.setToolTipText(currentSensorMatrix.getWidth() + " by " +  currentSensorMatrix.getHeight());
+            imagePanel.setToolTipText(currentSensorMatrix.getWidth() + " by " + currentSensorMatrix.getHeight());
         }
     }
+
     /**
      * Set an existing buffered image as the current image.
      */
@@ -166,7 +174,6 @@ public abstract class ImageWorld {
      */
     public abstract boolean getUseColorEmitter();
 
-
     /**
      * Add a new matrix to the list.
      *
@@ -177,7 +184,6 @@ public abstract class ImageWorld {
         setCurrentSensorMatrix(matrix);
         fireSensorMatrixAdded(matrix);
     }
-
 
     /**
      * Remove the indicated sensor matrix.
@@ -217,16 +223,7 @@ public abstract class ImageWorld {
     public ImageClipboard getClipboard() {
         return clipboard;
     }
-
-    public List<ImageSource> getImageSources() {
-        List<ImageSource> sources = new ArrayList<ImageSource>();
-        sources.addAll(Arrays.asList(getImageSource()));
-        for (SensorMatrix sensorMatrix : sensorMatrices) {
-            sources.add(sensorMatrix.getSource());
-        }
-        return sources;
-    }
-
+    
     public SensorMatrix getCurrentSensorMatrix() {
         return currentSensorMatrix;
     }
@@ -253,11 +250,6 @@ public abstract class ImageWorld {
     public interface Listener {
 
         /**
-         * Called whenever an image source is changed.
-         */
-        void imageSourceChanged(ImageSource changedSource);
-
-        /**
          * Called whenever a sensor matrix is added.
          */
         void sensorMatrixAdded(SensorMatrix addedMatrix);
@@ -268,11 +260,6 @@ public abstract class ImageWorld {
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
-    /**
-     * Get image source.
-     *
-     * @return the image source
-     */
     public abstract ImageSourceAdapter getImageSource();
 
     /**

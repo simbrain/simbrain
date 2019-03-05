@@ -1,8 +1,15 @@
 package org.simbrain.world.imageworld;
 
+/**
+ * The "Pixel display" compnoent which allows data to be received from Neural networks
+ * and other Simbrain components via couplings and rendered in a Buffered "pixel" image.
+ */
 public class PixelDisplayWorld extends ImageWorld {
 
-
+    /**
+     * The BufferedImage that displays whatever pixel pattern is currently being
+     * received from other Simbrain components via couplings.
+     */
     private EmitterMatrix imageSource;
 
     /**
@@ -28,24 +35,14 @@ public class PixelDisplayWorld extends ImageWorld {
         return imageSource.isUsingRGBColor();
     }
 
-
-    /**
-     * Set the color mode of the emitter matrix.
-     */
     public void setUseColorEmitter(boolean value) {
         imageSource.setUsingRGBColor(value);
     }
 
-    /**
-     * Get the width of the emitter matrix.
-     */
     public int getEmitterWidth() {
         return imageSource.getWidth();
     }
 
-    /**
-     * Get the height of the emitter matrix.
-     */
     public int getEmitterHeight() {
         return imageSource.getHeight();
     }

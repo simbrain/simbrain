@@ -24,7 +24,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.*;
 import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.imageworld.ImageWorldComponent;
+import org.simbrain.world.imageworld.ImageAlbumComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import javax.swing.*;
@@ -178,7 +178,7 @@ public class WorkspaceActionManager {
         openWorldActions = Arrays.asList(
                 new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "Table.png", workspace),
                 new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "SwissIcon.png", workspace),
-                new OpenComponentAction<>(ImageWorldComponent.class, "Image Display", "camera.png", workspace));
+                new OpenComponentAction<>(ImageAlbumComponent.class, "Image Display", "camera.png", workspace));
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);

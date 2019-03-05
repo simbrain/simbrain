@@ -264,7 +264,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            CouplingMenu menu = new CouplingMenu(workspace);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
             menu.setSourceModel(neuron);
             contextMenu.add(menu);
         }
@@ -288,7 +288,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getSelectedSynapses().size() == 1) {
             contextMenu.addSeparator();
-            CouplingMenu menu = new CouplingMenu(workspace);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
             menu.setSourceModel(synapse);
             contextMenu.add(menu);
         }
@@ -358,7 +358,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent().getWorkspace());
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
             menu.setSourceModel(neuronGroup);
             return menu;
         }
@@ -373,7 +373,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getSynapseGroupProducerMenu(SynapseGroup synapseGroup) {
         if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent().getWorkspace());
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
             menu.setSourceModel(synapseGroup);
             return menu;
         }

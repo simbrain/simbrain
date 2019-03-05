@@ -142,7 +142,7 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        multiCouplingMenu = new MultiCouplingMenu(component.getWorkspace(), contextMenu, 100);
+        multiCouplingMenu = new MultiCouplingMenu(component, contextMenu, 100);
         component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
@@ -155,7 +155,7 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
     }
 
     private void showContextMenu(MouseEvent evt) {
-        multiCouplingMenu.setSourceModels(component.getAttributeContainers());
+        multiCouplingMenu.setSourceModels();
         contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 

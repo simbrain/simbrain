@@ -70,6 +70,7 @@ public class OdorWorldBuilder {
      * @return reference to the agent
      */
     public OdorWorldEntity addAgent(int x, int y, String type) {
+        // TODO: String type is not used currently
         OdorWorldEntity entity = new OdorWorldEntity(world, EntityType.MOUSE);
         world.addEntity(entity);
         entity.setLocation(x, y);

@@ -23,7 +23,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.TableDataException;
@@ -166,38 +165,38 @@ public class TrainerGuiActions {
         };
     }
 
-    /**
-     * Show properties dialog for the indicated trainer.
-     *
-     * @param trainer the trainer
-     * @return the action
-     */
-    public static AbstractAction getPropertiesDialogAction(final Trainer trainer) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-                putValue(NAME, "Properties");
-                putValue(SHORT_DESCRIPTION, "Edit Properties");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-                editor.setExcludeList(new String[]{"iteration", "updateCompleted"});
-                editor.setObjectToEdit(trainer);
-                JDialog dialog = editor.getDialog();
-                dialog.setModal(true);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-
-        };
-    }
+    // /**
+    //  * Show properties dialog for the indicated trainer.
+    //  *
+    //  * @param trainer the trainer
+    //  * @return the action
+    //  */
+    // public static AbstractAction getPropertiesDialogAction(final Trainer trainer) {
+    //     return new AbstractAction() {
+    //
+    //         // Initialize
+    //         {
+    //             putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+    //             putValue(NAME, "Properties");
+    //             putValue(SHORT_DESCRIPTION, "Edit Properties");
+    //         }
+    //
+    //         /**
+    //          * {@inheritDoc}
+    //          */
+    //         public void actionPerformed(ActionEvent arg0) {
+    //             ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+    //             editor.setExcludeList(new String[]{"iteration", "updateCompleted"});
+    //             editor.setObjectToEdit(trainer);
+    //             JDialog dialog = editor.getDialog();
+    //             dialog.setModal(true);
+    //             dialog.pack();
+    //             dialog.setLocationRelativeTo(null);
+    //             dialog.setVisible(true);
+    //         }
+    //
+    //     };
+    // }
 
     /**
      * Show an error plot for this trainer.

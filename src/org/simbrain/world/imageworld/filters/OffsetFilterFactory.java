@@ -34,28 +34,6 @@ public class OffsetFilterFactory extends ImageFilterFactory {
     }
 
     @Override
-    public LabelledItemPanel getEditorPanel() {
-        LabelledItemPanel panel = super.getEditorPanel();
-        JFormattedTextField xOffsetField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        xOffsetField.setValue(xOffset);
-        xOffsetField.addPropertyChangeListener("value", (evt) -> {
-            xOffset = ((Number) xOffsetField.getValue()).intValue();
-            xOffset = Math.max(Math.min(xOffset, 2048), -2048);
-            xOffsetField.setValue(xOffset);
-        });
-        panel.addItem("X Offset", xOffsetField);
-        JFormattedTextField yOffsetField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        yOffsetField.setValue(yOffset);
-        yOffsetField.addPropertyChangeListener("value", (evt) -> {
-            yOffset = ((Number) yOffsetField.getValue()).intValue();
-            yOffset = Math.max(Math.min(yOffset, 2048), -2048);
-            yOffsetField.setValue(yOffset);
-        });
-        panel.addItem("Y Offset", yOffsetField);
-        return panel;
-    }
-
-    @Override
     public FilteredImageSource create(ImageSource source) {
         return createOffsetFilter(source, xOffset, yOffset, getWidth(), getHeight());
     }

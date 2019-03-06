@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.propertyeditor2;
+package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
@@ -237,6 +237,8 @@ public class ObjectTypeEditor extends JComponent {
         editorPanel.setBorder(padding);
         editorPanelContainer.add(editorPanel);
         editorPanel.setVisible(detailTriangle.isDown());
+
+        updateEditorPanel();
     }
 
     /**
@@ -286,12 +288,13 @@ public class ObjectTypeEditor extends JComponent {
 
             // Create the prototype object and refresh editor panel
             try {
-                Class proto = typeMap.get((String) cbObjectType.getSelectedItem());
-                prototypeObject = (CopyableObject) proto.newInstance();
+                Class<?> proto = typeMap.get((String) cbObjectType.getSelectedItem());
+                prototypeObject = (CopyableObject)
+                    proto.getDeclaredConstructor().newInstance();
                 editorPanel = new AnnotatedPropertyEditor(prototypeObject);
                 editorPanelContainer.removeAll();
                 editorPanelContainer.add(editorPanel);
-
+                updateEditorPanel();
                 syncPanelToTriangle();
 
             } catch (Exception exception) {
@@ -311,6 +314,19 @@ public class ObjectTypeEditor extends JComponent {
             }
 
         });
+    }
+
+    /**
+     * If the editor panel is blank remove everything and make
+     * the detail triangle invisible.
+     */
+    private void updateEditorPanel() {
+        if(editorPanel.widgets.size() == 0) {
+            detailTriangle.setVisible(false);
+            editorPanel.removeAll();
+        } else {
+            detailTriangle.setVisible(true);
+        }
     }
 
     /**

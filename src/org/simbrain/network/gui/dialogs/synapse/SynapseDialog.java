@@ -22,8 +22,8 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor2.ObjectTypeEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.ObjectTypeEditor;
 import org.simbrain.util.widgets.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 

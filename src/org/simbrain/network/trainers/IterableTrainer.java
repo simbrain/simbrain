@@ -16,14 +16,11 @@ package org.simbrain.network.trainers;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Superclass for all types of trainer which can be iterated and which return an
@@ -308,34 +305,6 @@ public abstract class IterableTrainer extends Trainer implements EditableObject 
     public void setIterationsBeforeStopping(int iterationsBeforeStopping) {
         this.iterationsBeforeStopping = iterationsBeforeStopping;
     }
-
-    /**
-     * Returns the current solution type inside a comboboxwrapper. Used by
-     * preference dialog.
-     *
-     * @return the the comboBox
-     */
-    public ComboBoxWrapper getStoppingCond() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return stoppingCondition;
-            }
-
-            public Object[] getObjects() {
-                return StoppingCondition.values();
-            }
-        };
-    }
-
-    /**
-     * Set the current stopping condition. Used by preference dialog.
-     *
-     * @param stoppingConditionWrapper the current solution set up for combo box.
-     */
-    public void setStoppingCond(ComboBoxWrapper stoppingConditionWrapper) {
-        setStoppingCondition((StoppingCondition) stoppingConditionWrapper.getCurrentObject());
-    }
-
 
     /**
      * @return the errorThreshold

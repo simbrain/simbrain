@@ -22,7 +22,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import umontreal.iro.lecuyer.randvar.BinomialGen;
 
 import java.util.*;

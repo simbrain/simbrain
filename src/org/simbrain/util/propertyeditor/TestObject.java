@@ -1,8 +1,7 @@
-package org.simbrain.util.propertyeditor2;
+package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,11 +46,11 @@ public class TestObject implements EditableObject {
 //    short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
+    @UserParameter(label = "Double Array")
     double[] doubleArray = new double[] {.1, .2, .3, 4};
 
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
-    ComboBoxWrapper boxable;
 
     public enum TestEnum {
         ONE("One"), TWO("Two"), THREE("Three"), FOUR("Four"), FIVE("Five");
@@ -86,34 +85,6 @@ public class TestObject implements EditableObject {
             + "The float: " + theFloat + "\n";
 
         //TODO: Longs and shorts
-    }
-
-    /*
-     * Wrap the enum object in a ComboBoxable wrapper
-     *
-     * @return the boxable
-     */
-    public ComboBoxWrapper getEnumeration() {
-        return new ComboBoxWrapper() {
-
-            public Object getCurrentObject() {
-                return theEnum;
-            }
-
-            public Object[] getObjects() {
-                return TestEnum.values();
-            }
-
-        };
-    }
-
-    /**
-     * Sets the enumeration based on a boxable object.
-     *
-     * @param object the boxable to set
-     */
-    public void setEnumeration(ComboBoxWrapper object) {
-        theEnum = (TestEnum) object.getCurrentObject();
     }
 
     /**

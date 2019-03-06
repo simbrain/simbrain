@@ -69,11 +69,11 @@ public class AttributeTypePanel extends JPanel {
 
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
         if (poc == ProducerOrConsumer.Consuming) {
-            setBorder(BorderFactory.createTitledBorder("Consumers"));
+            setBorder(BorderFactory.createTitledBorder("Consumers in " + component.getName()));
             component.getAttributeMethods(Consumable.class)
                     .forEach(a -> model.addRow(a));
         } else {
-            setBorder(BorderFactory.createTitledBorder("Producers"));
+            setBorder(BorderFactory.createTitledBorder("Producers in " + component.getName()));
             component.getAttributeMethods(Producible.class)
                     .forEach(a -> model.addRow(a));
         }

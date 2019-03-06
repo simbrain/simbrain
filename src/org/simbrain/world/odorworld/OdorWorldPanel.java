@@ -375,7 +375,7 @@ public class OdorWorldPanel extends JPanel {
                 contextMenu.addSeparator();
             }
 
-            CouplingMenu couplingMenu = new CouplingMenu(component.getWorkspace());
+            CouplingMenu couplingMenu = new CouplingMenu(component);
             couplingMenu.setSourceModel(entity);
             couplingMenu.setCustomName("Create couplings");
             contextMenu.add(couplingMenu);

@@ -52,15 +52,15 @@ public abstract class ImageFilterFactory {
     /**
      * Create an identity image op (no transform). Useful for null object pattern.
      */
-    protected static BufferedImageOp createIdentityOp() {
-        return new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    protected static ImageOperation<AffineTransformOp> createIdentityOp() {
+        return new IdentityOp();
     }
 
     /**
      * Create a BufferedImageOp which converts the input image to a grayscale colorspace
      */
-    protected static BufferedImageOp createGrayOp() {
-        return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+    protected static ImageOperation<ColorConvertOp> createGrayOp() {
+        return new GrayOp();
     }
 
     /**
@@ -128,27 +128,6 @@ public abstract class ImageFilterFactory {
 
     public void setHeight(int value) {
         height = value;
-    }
-
-    public LabelledItemPanel getEditorPanel() {
-        LabelledItemPanel panel = new LabelledItemPanel();
-        JFormattedTextField widthField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        widthField.setValue(width);
-        widthField.addPropertyChangeListener("value", (evt) -> {
-            width = ((Number) widthField.getValue()).intValue();
-            width = Math.max(Math.min(width, 10000), 1);
-            widthField.setValue(width);
-        });
-        panel.addItem("Width", widthField);
-        JFormattedTextField heightField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        heightField.setValue(height);
-        heightField.addPropertyChangeListener("value", (evt) -> {
-            height = ((Number) heightField.getValue()).intValue();
-            height = Math.max(Math.min(height, 10000), 1);
-            heightField.setValue(height);
-        });
-        panel.addItem("Height", heightField);
-        return panel;
     }
 
     public abstract FilteredImageSource create(ImageSource source);

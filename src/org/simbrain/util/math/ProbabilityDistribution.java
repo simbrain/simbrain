@@ -3,8 +3,8 @@ package org.simbrain.util.math;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
-import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import umontreal.iro.lecuyer.rng.LFSR113;
 import umontreal.iro.lecuyer.rng.RandomStream;
@@ -21,7 +21,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
      * Distributions for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set a type of probability distribution.
      */
     public static List<Class> DIST_LIST = Arrays.asList(ExponentialDistribution.class,
@@ -175,7 +175,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
      * Utility class that encapsulates a probability distribution so that it
-     * can be used in an {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}
+     * can be used in an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
      * so that it's easy to create a property editor to edit a probability distribution.
      */
     public static class Randomizer implements EditableObject {

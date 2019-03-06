@@ -25,7 +25,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.List;
 

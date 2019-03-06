@@ -18,24 +18,22 @@
  */
 package org.simbrain.util.propertyeditor;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * An annotation that can be used to control the order in which fields are
- * displayed in a reflective property editor.
+ * Objects that implement this interface have annotations that can be read
+ * by the {@link AnnotatedPropertyEditor}.
  *
- * @author jeffyoshimi
+ * @author Jeff Yoshimi
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface DisplayOrder {
+public interface EditableObject {
+
+    //TODO: Reconsider default.  Make getname a requirement?
 
     /**
-     * An integer that determines the order in which a field is shown in the
-     * display. Lower numbers first.
+     * Returns the name of this object. Useful as a description in dropdowns.
      */
-    int val() default 1;
+    default String getName() {
+        return "no-name (be sure getName() overridden)";
+    }
+
+
 }

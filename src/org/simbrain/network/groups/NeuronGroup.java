@@ -30,7 +30,7 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
@@ -1562,7 +1562,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
-     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor}.
+     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
     public static class NeuronGroupCreator extends NeuronGroup {
 

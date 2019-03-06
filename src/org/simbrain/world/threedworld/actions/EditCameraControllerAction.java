@@ -19,7 +19,7 @@
 package org.simbrain.world.threedworld.actions;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
@@ -49,8 +49,7 @@ public final class EditCameraControllerAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         ThreeDEngine.State previousState = world.getEngine().getState();
         world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(world.getCameraController());
-        editor.setExcludeList(new String[]{"mouseLookActive"});
+        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(world.getCameraController());
         JDialog dialog = editor.getDialog();
         dialog.addWindowListener(new WindowAdapter() {
             @Override

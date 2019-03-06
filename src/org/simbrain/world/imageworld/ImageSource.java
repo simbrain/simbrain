@@ -5,7 +5,8 @@ import org.simbrain.workspace.AttributeContainer;
 import java.awt.image.BufferedImage;
 
 /**
- * ImageSource produces BufferedImages periodically and notifies listeners of new
+ * ImageSource is basically any visible image in an ImageWorld.
+ * produces BufferedImages periodically and notifies listeners of new
  * images or changes to the image size.
  * <br>
  * Image sources can be enabled or disabled.  E.g. if a webcam is available it can
@@ -15,7 +16,6 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  */
 public interface ImageSource extends AttributeContainer {
-
 
     /**
      * @return Returns whether the source will update the image when updateImage

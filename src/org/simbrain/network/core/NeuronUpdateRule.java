@@ -23,8 +23,8 @@ import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor2.CopyableObject;
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.util.Arrays;
@@ -38,7 +38,7 @@ import java.util.List;
 public abstract class NeuronUpdateRule implements CopyableObject, AttributeContainer {
 
     /**
-     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor2.ObjectTypeEditor}
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set the update rule on a neuron.
      */
     public static List<Class> RULE_LIST = Arrays.asList(AdExIFRule.class,

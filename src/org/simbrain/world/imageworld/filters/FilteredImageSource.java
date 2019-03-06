@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld.filters;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.ImageSourceAdapter;
 import org.simbrain.world.imageworld.ImageSourceListener;
@@ -21,7 +23,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     private String type;
     private int width;
     private int height;
-    private transient BufferedImageOp colorOp;
+    private transient ImageOperation colorOp;
     private transient BufferedImageOp scaleOp;
 
     /**
@@ -33,7 +35,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
      * @param width   the width of the output image
      * @param height  the height of the output image
      */
-    public FilteredImageSource(ImageSource source, String type, BufferedImageOp colorOp, int width, int height) {
+    public FilteredImageSource(ImageSource source, String type, ImageOperation colorOp, int width, int height) {
         wrappedSource = source;
         this.type = type;
         this.colorOp = colorOp;
@@ -45,10 +47,10 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     public Object readResolve() {
         super.readResolve();
         if (type.equals("Gray Filter")) {
-            colorOp = ImageFilterFactory.createGrayOp();
+            colorOp = new GrayOp();
         } else {
             // Default to color filter
-            colorOp = ImageFilterFactory.createIdentityOp();
+            colorOp = new IdentityOp();
         }
         scaleToFit(wrappedSource);
         wrappedSource.addListener(this);
@@ -59,7 +61,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         return type;
     }
 
-    public BufferedImageOp getColorOp() {
+    public ImageOperation getColorOp() {
         return colorOp;
     }
 
@@ -73,7 +75,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     /**
      * @param value The BufferedImageOp to assign to the color op.
      */
-    protected void setColorOp(BufferedImageOp value) {
+    protected void setColorOp(ImageOperation value) {
         colorOp = value;
     }
 
@@ -96,8 +98,9 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
 
     @Override
     public void onImageUpdate(ImageSource source) {
-        BufferedImage image = scaleOp.filter(source.getCurrentImage(), null);
-        image = colorOp.filter(image, null);
+        BufferedImage image = source.getCurrentImage();
+        image = scaleOp.filter(image, null);
+        image = colorOp.getOp().filter(image, null);
         setCurrentImage(image);
     }
 

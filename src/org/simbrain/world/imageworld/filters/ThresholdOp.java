@@ -1,5 +1,8 @@
 package org.simbrain.world.imageworld.filters;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -14,12 +17,18 @@ import java.awt.image.ColorModel;
  *
  * @author Tim Shea
  */
-public class ThresholdOp implements BufferedImageOp {
+public class ThresholdOp extends ImageOperation<ThresholdOp> implements BufferedImageOp {
 
     private static final int white = 0x00FFFFFF;
 
     private static final int black = 0x00000000;
 
+    @UserParameter(
+            label = "Threshold",
+            minimumValue = 0,
+            maximumValue = 1,
+            increment = 0.1
+    )
     private double threshold;
 
     /**
@@ -32,6 +41,10 @@ public class ThresholdOp implements BufferedImageOp {
      */
     public ThresholdOp(double threshold) {
         this.threshold = threshold;
+    }
+
+    public ThresholdOp() {
+
     }
 
     public double getThreshold() {
@@ -90,5 +103,20 @@ public class ThresholdOp implements BufferedImageOp {
     @Override
     public RenderingHints getRenderingHints() {
         return null;
+    }
+
+    @Override
+    ThresholdOp getOp() {
+        return this;
+    }
+
+    @Override
+    public EditableObject copy() {
+        return new ThresholdOp(threshold);
+    }
+
+    @Override
+    public String getName() {
+        return "Threshold";
     }
 }

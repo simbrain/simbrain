@@ -31,8 +31,6 @@ public class TestSim extends RegisteredSimulation {
         super();
     }
 
-    ;
-
     /**
      * @param desktop
      */

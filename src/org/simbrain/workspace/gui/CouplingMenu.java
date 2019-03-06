@@ -5,6 +5,7 @@ import org.simbrain.workspace.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CouplingMenu creates a JMenu containing an entry for every available consumer and producer from
@@ -13,11 +14,11 @@ import java.util.List;
  */
 public class CouplingMenu extends JMenu {
 
-    private Workspace workspace;
+    private WorkspaceComponent sourceComponent;
     private AttributeContainer source;
 
-    public CouplingMenu(Workspace workspace) {
-        this.workspace = workspace;
+    public CouplingMenu(WorkspaceComponent sourceComponent) {
+        this.sourceComponent = sourceComponent;
     }
 
     public void setSourceModel(AttributeContainer source) {
@@ -32,11 +33,17 @@ public class CouplingMenu extends JMenu {
 
     private void updateItems() {
         removeAll();
-        List<Producer<?>> producers = CouplingUtils.getProducersFromContainers(source);
+        List<Producer<?>> producers =
+                sourceComponent.getVisibleProducers().stream()
+                .filter(p -> p.getBaseObject().equals(source))
+                .collect(Collectors.toList());
         for (Producer<?> producer : producers) {
             createProducerSubmenu(producer);
         }
-        List<Consumer<?>> consumers = CouplingUtils.getConsumersFromContainer(source);
+        List<Consumer<?>> consumers =
+                sourceComponent.getVisibleConsumers().stream()
+                .filter(c -> c.getBaseObject().equals(source))
+                .collect(Collectors.toList());
         for (Consumer<?> consumer : consumers) {
             createConsumerSubmenu(consumer);
         }
@@ -46,14 +53,14 @@ public class CouplingMenu extends JMenu {
         // TODO: Verbose description but maybe good enough for now...
         JMenu producerSubmenu = new JMenu(producer.getDescription() + " send " + producer.getTypeName() + " to");
         boolean hasItems = false;
-        for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
+        for (WorkspaceComponent targetComponent : sourceComponent.getWorkspace().getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<>();
             List<Consumer<?>> consumers = targetComponent.getVisibleConsumers();
             for (Consumer<?> consumer : consumers) {
                 if (producer.getType() == consumer.getType()) {
                     couplings.add(
                             new CouplingMenuItem(
-                                    workspace,
+                                    sourceComponent.getWorkspace(),
                                     targetComponent.getName() + "/" + consumer.getDescription(),
                                     producer,
                                     consumer
@@ -77,14 +84,14 @@ public class CouplingMenu extends JMenu {
         // TODO: Verbose but maybe good enough for now...
         JMenu consumerSubmenu = new JMenu(consumer.getDescription() + " receive " + consumer.getTypeName() + " from");
         boolean hasItems = false;
-        for (WorkspaceComponent targetComponent : workspace.getComponentList()) {
+        for (WorkspaceComponent targetComponent : sourceComponent.getWorkspace().getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<>();
             List<Producer<?>> producers = targetComponent.getVisibleProducers();
             for (Producer<?> producer : producers) {
                 if (consumer.getType() == producer.getType()) {
                     couplings.add(
                             new CouplingMenuItem(
-                                    workspace,
+                                    sourceComponent.getWorkspace(),
                                     targetComponent.getName() + "/" + producer.getDescription(),
                                     producer,
                                     consumer

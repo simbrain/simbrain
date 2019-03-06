@@ -1,8 +1,4 @@
-package org.simbrain.util.propertyeditor2;
-
-import org.simbrain.util.BiMap;
-
-import java.util.HashMap;
+package org.simbrain.util.propertyeditor;
 
 /**
  * Indicates that an object can be copied. Used by the {@link ObjectTypeEditor}.

@@ -10,6 +10,8 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.threedworld.ThreeDWorld;
 
 import static org.simbrain.world.threedworld.controllers.CameraController.Mapping.*;
@@ -18,7 +20,7 @@ import static org.simbrain.world.threedworld.controllers.CameraController.Mappin
  * CameraController maps mouse and keyboard inputs to first person-like
  * control of the editor camera in a 3d world.
  */
-public class CameraController implements AnalogListener, ActionListener {
+public class CameraController implements AnalogListener, ActionListener, EditableObject {
     /**
      * The set of input mappings used by this controller.
      */
@@ -36,17 +38,42 @@ public class CameraController implements AnalogListener, ActionListener {
 
     private ThreeDWorld world;
     private transient Camera camera;
+
+    @UserParameter(
+            label = "Mouse Look Active",
+            order = 4
+    )
     private transient boolean mouseLookActive;
     private Vector3f position;
     private float[] rotation;
     private float fieldOfView = 80;
     private float nearClip = 0.1f;
     private float farClip = 100f;
+
+    @UserParameter(
+            label = "Move Speed",
+            order = 1
+    )
     private float moveSpeed = 5f;
+
+    @UserParameter(
+            label = "Rotate Speed",
+            order = 2
+    )
     private float rotateSpeed = 10f;
+
+    @UserParameter(
+            label = "Zoom Speed",
+            order = 3
+    )
     private float zoomSpeed = 1f;
     private Vector3f homePosition = Vector3f.UNIT_Y.mult(2.5f);
     private float[] homeRotation = new float[]{0, 0, 0};
+
+    @UserParameter(
+            label = "Home Zoom",
+            order = 5
+    )
     private float homeZoom = 80;
     private Vector3f yawAxis = Vector3f.UNIT_Y.clone();
     private BoundingBox cameraBounds = new BoundingBox(new Vector3f(0, 17, 0), 64, 16, 64);

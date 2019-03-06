@@ -19,7 +19,6 @@
 package org.simbrain.util.projection;
 
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.DisplayOrder;
 
 import java.awt.*;
 
@@ -194,7 +193,6 @@ public class DataColoringManager {
     /**
      * @return the hotColor
      */
-    @DisplayOrder(val = 10)
     public Color getHotColor() {
         return hotColor;
     }
@@ -202,7 +200,6 @@ public class DataColoringManager {
     /**
      * @return the baseColor
      */
-    @DisplayOrder(val = 20)
     public Color getBaseColor() {
         return baseColor;
     }
@@ -210,7 +207,6 @@ public class DataColoringManager {
     /**
      * @return the floor
      */
-    @DisplayOrder(val = 30)
     public double getFloor() {
         return floor;
     }
@@ -218,7 +214,6 @@ public class DataColoringManager {
     /**
      * @return the ceiling
      */
-    @DisplayOrder(val = 40)
     public double getCeiling() {
         return ceiling;
     }
@@ -226,7 +221,6 @@ public class DataColoringManager {
     /**
      * @return the incrementAmount
      */
-    @DisplayOrder(val = 50)
     public double getIncrementAmount() {
         return incrementAmount;
     }
@@ -234,7 +228,6 @@ public class DataColoringManager {
     /**
      * @return the decrementAmount
      */
-    @DisplayOrder(val = 60)
     public double getDecrementAmount() {
         return decrementAmount;
     }

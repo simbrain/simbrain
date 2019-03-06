@@ -20,7 +20,7 @@ package org.simbrain.network.groups;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor2.CopyableObject;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;

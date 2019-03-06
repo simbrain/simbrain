@@ -22,7 +22,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.textworld.dictionary.DictionarySelector;
 import org.simbrain.world.textworld.dictionary.TokenDictionaryPanel;
 import org.simbrain.world.textworld.dictionary.TokenToVectorPanel;
@@ -32,7 +32,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -236,9 +235,7 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
-                editor.setUseSuperclass(false);
-                editor.setObjectToEdit(world);
+                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(world);
                 JDialog dialog = editor.getDialog();
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();

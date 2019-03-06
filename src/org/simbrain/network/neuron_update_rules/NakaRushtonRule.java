@@ -45,16 +45,18 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     @UserParameter(
             label = "Steepness",
             description = "This value controls the steepness of the sigmoidal-like function S(W).",
-            defaultValue = "2", order = 1)
+            increment = .1,
+            order = 1)
     private double steepness = 2;
 
     /**
      * Semi saturation constant.
      */
     @UserParameter(
-            label = "Semi-saturation constant",
+            label = "Semi-Saturation Constant",
             description = "This value is the point at which S(W) reaches half of its maximum value.",
-            defaultValue = "120", order = 2)
+            increment = .1,
+            order = 2)
     private double semiSaturationConstant = 120;
 
     /**
@@ -64,7 +66,8 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
             label = "Adaptation Time Constant",
             description = "This value controls the rate at which the adaptation variable tends to "
                     + "its minimum value.",
-            defaultValue = "1", order = 7)
+            increment = .1,
+            order = 7)
     private double adaptationTimeConstant = 1;
 
     /**
@@ -73,7 +76,8 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     @UserParameter(
             label = "Adaptation Parameter",
             description = "The parameter of spike rate adaptation.",
-            defaultValue = "0.7", order = 6)
+            increment = .1,
+            order = 6)
     private double adaptationParameter = .7;
 
     /**
@@ -82,17 +86,19 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     @UserParameter(
             label = "Use Adaptation",
             description = "If this is set to true, spike rate adaptation is utilized.",
-            defaultValue = "false", order = 5)
+            increment = .1,
+            order = 5)
     private boolean useAdaptation = false;
 
     /**
      * Time constant.
      */
     @UserParameter(
-            label = "Time constant",
-            description = "This valu controls the rate at which the activation tends to the fixed "
+            label = "Time Constant",
+            description = "This value controls the rate at which the activation tends to the fixed "
                     + "point S(W).",
-            defaultValue = "1", order = 3)
+            increment = .1,
+            order = 3)
     private double timeConstant = 1;
 
     /**
@@ -131,16 +137,12 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     public NakaRushtonRule() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public NakaRushtonRule deepCopy() {
         NakaRushtonRule rn = new NakaRushtonRule();
         rn.setSteepness(getSteepness());
@@ -154,9 +156,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         return rn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
 
         // See Spikes (Hugh Wilson), pp. 20-21
@@ -198,58 +198,34 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         }
     }
 
-    /**
-     * @return Returns the semiSaturationConstant.
-     */
     public double getSemiSaturationConstant() {
         return semiSaturationConstant;
     }
 
-    /**
-     * @param semiSaturationConstant The semiSaturationConstant to set.
-     */
     public void setSemiSaturationConstant(final double semiSaturationConstant) {
         this.semiSaturationConstant = semiSaturationConstant;
     }
 
-    /**
-     * @return Returns the steepness.
-     */
     public double getSteepness() {
         return steepness;
     }
 
-    /**
-     * @param steepness The steepness to set.
-     */
     public void setSteepness(final double steepness) {
         this.steepness = steepness;
     }
 
-    /**
-     * @return Returns the timeConstant.
-     */
     public double getTimeConstant() {
         return timeConstant;
     }
 
-    /**
-     * @param timeConstant The timeConstant to set.
-     */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
@@ -264,34 +240,18 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return the boolean value.
-     */
     public boolean getUseAdaptation() {
         return useAdaptation;
     }
 
-    /**
-     * Sets the boolean use adaptation value.
-     *
-     * @param useAdaptation Value to set use adaptation to
-     */
     public void setUseAdaptation(final boolean useAdaptation) {
         this.useAdaptation = useAdaptation;
     }
 
-    /**
-     * @return the adaptation time constant.
-     */
     public double getAdaptationTimeConstant() {
         return adaptationTimeConstant;
     }
 
-    /**
-     * Sets the adaptation time constant.
-     *
-     * @param adaptationTimeConstant Value to set adaptation time constant
-     */
     public void setAdaptationTimeConstant(final double adaptationTimeConstant) {
         this.adaptationTimeConstant = adaptationTimeConstant;
     }
@@ -312,27 +272,15 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         }
     }
 
-    /**
-     * Return the adaptation parameter.
-     *
-     * @return the adaptation parameter
-     */
     public double getAdaptationParameter() {
         return adaptationParameter;
     }
 
-    /**
-     * Sets the adaptation parameter.
-     *
-     * @param adaptationParameter value to set
-     */
+
     public void setAdaptationParameter(final double adaptationParameter) {
         this.adaptationParameter = adaptationParameter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName() {
         return "Naka-Rushton";

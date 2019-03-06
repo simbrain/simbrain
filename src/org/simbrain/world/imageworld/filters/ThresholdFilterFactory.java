@@ -42,20 +42,6 @@ public class ThresholdFilterFactory extends ImageFilterFactory {
     }
 
     @Override
-    public LabelledItemPanel getEditorPanel() {
-        LabelledItemPanel panel = super.getEditorPanel();
-        JFormattedTextField thresholdField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        thresholdField.setValue(threshold);
-        thresholdField.addPropertyChangeListener("value", (evt) -> {
-            threshold = ((Number) thresholdField.getValue()).doubleValue();
-            threshold = Math.max(Math.min(threshold, 1.0), 0.0);
-            thresholdField.setValue(threshold);
-        });
-        panel.addItem("Threshold", thresholdField);
-        return panel;
-    }
-
-    @Override
     public FilteredImageSource create(ImageSource source) {
         return createThresholdFilter(source, threshold, getWidth(), getHeight());
     }

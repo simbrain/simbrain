@@ -42,7 +42,8 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     @UserParameter(
         label = "Natural frequency",
         description = "todo.",
-        defaultValue = "0.2", order = 1)
+            increment = .1, order = 1)
+
     public double naturalFrequency = 1;
 
     /**
@@ -187,9 +188,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         this.bias = bias;
     }
 
-    /**
-     * @param slope The slope to set.
-     */
     public void setSlope(final double slope) {
         this.naturalFrequency = slope;
     }
@@ -249,9 +247,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         this.clipping = clipping;
     }
 
-    /**
-     * @return Returns the slope.
-     */
     public double getSlope() {
         return naturalFrequency;
     }

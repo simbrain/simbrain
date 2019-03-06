@@ -22,7 +22,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -276,11 +275,5 @@ public class SmellSource {
     //     };
     // }
 
-    /**
-     * @param decayFunctionBox
-     */
-    public void setTheDecayFunction(ComboBoxWrapper decayFunctionBox) {
-        setDecayFunction((DecayFunction) decayFunctionBox.getCurrentObject());
-    }
 
 }

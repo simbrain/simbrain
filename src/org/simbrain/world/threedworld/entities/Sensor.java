@@ -1,6 +1,6 @@
 package org.simbrain.world.threedworld.entities;
 
-import org.simbrain.util.propertyeditor2.EditableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 /**

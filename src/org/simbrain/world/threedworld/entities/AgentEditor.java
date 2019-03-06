@@ -1,7 +1,7 @@
 package org.simbrain.world.threedworld.entities;
 
 import net.miginfocom.swing.MigLayout;
-import org.simbrain.util.propertyeditor2.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 
 import javax.swing.*;

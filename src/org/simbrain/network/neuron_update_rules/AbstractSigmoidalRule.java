@@ -60,7 +60,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
             label = "Bias",
             description = "The bias is a fixed amount of input to the node. This shifts the "
                     + "inflection point to the left or right of the origin.",
-            defaultValue = "0", order = 2)
+             increment=.1, order = 2)
     protected double bias;
 
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     @UserParameter(
             label = "Slope",
             description = "This represents how steep the sigmoidal is.",
-            defaultValue = "1", order = 3)
+            increment=.1, order = 3)
     protected double slope = 1;
 
     /**
@@ -84,7 +84,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
             label = "Add noise",
             description = "If this is set to true, random values are added to the activation via "
                     + "a noise generator.",
-            defaultValue = "false", order = 4)
+             order = 4)
     protected boolean addNoise;
 
     /**
@@ -97,9 +97,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
      */
     protected double lowerBound = DEFAULT_LOWER_BOUND;
 
-    /**
-     *
-     */
     public AbstractSigmoidalRule() {
         super();
         sFunction = DEFAULT_SQUASHING_FUNCTION;
@@ -115,9 +112,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         setLowerBound(sFunction.getDefaultLowerBound());
     }
 
-    /**
-     * @return the type
-     */
     public SquashingFunctionEnum getSquashFunctionType() {
         if (sFunction == null) {
             sFunction = SquashingFunctionEnum.LOGISTIC; // TODO: Explain (backwards compat)
@@ -125,43 +119,24 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         return sFunction;
     }
 
-    /**
-     * @param type the type to set
-     */
     public final void setSquashFunctionType(SquashingFunctionEnum type) {
         this.sFunction = type;
         setUpperBound(type.getDefaultUpperBound());
         setLowerBound(type.getDefaultLowerBound());
     }
 
-    /**
-     * Integer getter for use in property editors.
-     *
-     * @return the index for the squashing function
-     */
     public final int getSquashFunctionInt() {
         return sFunction.ordinal();
     }
 
-    /**
-     * Integer setter for use by property editors.
-     *
-     * @param typeIndex index of the squashing function
-     */
     public void setSquashFunctionInt(Integer typeIndex) {
         this.sFunction = SquashingFunctionEnum.values()[typeIndex];
     }
 
-    /**
-     * @return Returns the inflectionPointSlope.
-     */
     public double getSlope() {
         return slope;
     }
 
-    /**
-     * @param inflectionPointSlope The inflectionPointSlope to set.
-     */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
     }
@@ -176,16 +151,10 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
@@ -204,7 +173,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         sr.noiseGenerator = noiseGenerator.deepCopy();
         return sr;
     }
-
 
     @Override
     public final double getUpperBound() {
@@ -239,9 +207,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         return bias;
     }
 
-    /**
-     * @param inflectionY The inflectionY to set.
-     */
     @Override
     public final void setBias(final double inflectionY) {
         this.bias = inflectionY;

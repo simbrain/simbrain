@@ -54,7 +54,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     @UserParameter(
             label = "Time Constant",
             description = "The time constant controls how quickly the numerical integration occurs.",
-            defaultValue = "" + DEFAULT_TIME_CONSTANT, order = 1)
+            increment=.1,order = 1)
     private double tau = DEFAULT_TIME_CONSTANT;
 
     /**
@@ -65,7 +65,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     @UserParameter(
             label = "Leak Constant",
             description = "An option to add noise.",
-            defaultValue = "" + DEFAULT_LEAK_CONSTANT, order = 2)
+            increment=.1,order = 2)
     private double leak = DEFAULT_LEAK_CONSTANT;
 
     /**
@@ -183,7 +183,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         }
     }
 
-
     @Override
     public final void contextualDecrement(final Neuron n) {
         double act = n.getActivation();
@@ -196,17 +195,12 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
             n.getNetwork().fireNeuronChanged(n);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public double getDerivative(final double val) {
         double up = getUpperBound();
@@ -215,17 +209,10 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         return sFunction.derivVal(val, up, lw, diff);
     }
 
-
-    /**
-     * @return Returns the inflectionPointSlope.
-     */
     public double getSlope() {
         return slope;
     }
 
-    /**
-     * @param inflectionPointSlope The inflectionPointSlope to set.
-     */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
     }
@@ -240,50 +227,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
-
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
-
-    @Override
-    public String getName() {
-        return "Sigmoidal (Continuous)";
-    }
-
-    /**
-     * @return the time constant
-     */
-    public double getTimeConstant() {
-        return tau;
-    }
-
-    public void setTimeConstant(double timeConstant) {
-        this.tau = timeConstant;
-    }
-
-    /**
-     * {@link #leak}
-     *
-     * @return the leak constant for the neuron.
-     */
-    public double getLeakConstant() {
-        return leak;
-    }
-
-    /**
-     * {@link #leak}
-     *
-     * @param leakConstant the leak constant for the neuron.
-     */
     public void setLeakConstant(double leakConstant) {
         this.leak = leakConstant;
     }
@@ -293,5 +236,35 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         super.clear(neuron);
         netActivation = 0;
     }
+
+    public void setTimeConstant(double timeConstant) {
+        this.tau = timeConstant;
+    }
+
+    /**
+     * {@link #leak}
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
+
+    public void setAddNoise(final boolean addNoise) {
+        this.addNoise = addNoise;
+    }
+
+    @Override
+    public String getName() {
+        return "Sigmoidal (Continuous)";
+    }
+
+    public double getTimeConstant() {
+        return tau;
+    }
+
+    public double getLeakConstant() {
+        return leak;
+    }
+
+
 
 }

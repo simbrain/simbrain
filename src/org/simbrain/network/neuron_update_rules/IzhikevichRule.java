@@ -44,7 +44,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "A",
             description = "Parameter for recovery variable.",
-            defaultValue = "0.02", order = 1)
+            increment = .01,
+            order = 1)
     private double a = .02;
 
     /**
@@ -53,7 +54,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "B",
             description = "Parameter for recovery variable.",
-            defaultValue = "0.2", order = 2)
+            increment = .01,
+            order = 2)
     private double b = .2;
 
     /**
@@ -62,7 +64,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "C",
             description = "The value for v which occurs after a spike.",
-            defaultValue = "-65", order = 3)
+            increment = .01,
+            order = 3)
     private double c = -65;
 
     /**
@@ -71,16 +74,18 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "D",
             description = "A constant value added to u after spikes.",
-            defaultValue = "8", order = 4)
+            increment = .01,
+            order = 4)
     private double d = 8;
 
     /**
      * Constant background current.
      */
     @UserParameter(
-            label = "Ibg",
+            label = "I bkgd",
             description = "Constant background current.",
-            defaultValue = "14", order = 5)
+            increment = .1,
+            order = 5)
     private double iBg = 14;
 
     /**
@@ -125,9 +130,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         return in;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(final Neuron neuron) {
         timeStep = neuron.getNetwork().getTimeStep();
@@ -155,9 +157,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         neuron.setBuffer(val);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         // Equal chance of spiking or not spiking, taking on any value between
@@ -165,58 +164,34 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         return 2 * (threshold - c) * Math.random() + c;
     }
 
-    /**
-     * @return Returns the a.
-     */
     public double getA() {
         return a;
     }
 
-    /**
-     * @param a The a to set.
-     */
     public void setA(final double a) {
         this.a = a;
     }
 
-    /**
-     * @return Returns the b.
-     */
     public double getB() {
         return b;
     }
 
-    /**
-     * @param b The b to set.
-     */
     public void setB(final double b) {
         this.b = b;
     }
 
-    /**
-     * @return Returns the c.
-     */
     public double getC() {
         return c;
     }
 
-    /**
-     * @param c The c to set.
-     */
     public void setC(final double c) {
         this.c = c;
     }
 
-    /**
-     * @return Returns the d.
-     */
     public double getD() {
         return d;
     }
 
-    /**
-     * @param d The d to set.
-     */
     public void setD(final double d) {
         this.d = d;
     }
@@ -229,16 +204,10 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         this.iBg = iBg;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
@@ -252,7 +221,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     public void setNoiseGenerator(final ProbabilityDistribution noise) {
         this.noiseGenerator = noise;
     }
-
 
     @Override
     public String getName() {

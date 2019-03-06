@@ -44,7 +44,8 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "Background Current (nA)",
             description = "Background current to the cell.",
-            defaultValue = "1", order = 4)
+            increment = .1,
+            order = 4)
     private double iBg = 1;
 
     /**
@@ -53,7 +54,8 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "Spike threshold",
             description = "Threshold value to signal a spike.",
-            defaultValue = "1.9", order = 5)
+            increment = .1,
+            order = 5)
     private double threshold = 1.9;
 
     /**
@@ -72,7 +74,8 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "A (Recovery Rate)",
             description = "Abstract measure of how much \"resource\" a cell is depleting in response to large changes in voltage.",
-            defaultValue = "0.08", order = 1)
+            increment = .1,
+            order = 1)
     private double a = 0.08;
 
     /**
@@ -81,7 +84,8 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "B (Rec. Voltage Dependence)",
             description = "How much the recovery variable w depends on voltage.",
-            defaultValue = "1", order = 2)
+            increment = .1,
+            order = 2)
     private double b = 1;
 
     /**
@@ -90,7 +94,8 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     @UserParameter(
             label = "C (Rec. Self Dependence)",
             description = "How quickly the recovery variable recovers to its baseline value.",
-            defaultValue = "0.8", order = 3)
+            increment = .1,
+            order = 3)
     private double c = 0.8;
 
     @Override
@@ -106,7 +111,6 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         in.setNoiseGenerator(noiseGenerator.deepCopy());
         return in;
     }
-
 
     @Override
     public void update(final Neuron neuron) {
@@ -138,9 +142,6 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         neuron.setBuffer(v);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         // Equal chance of spiking or not spiking, taking on any value between
@@ -148,30 +149,18 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         return 2 * (threshold - c) * Math.random() + c;
     }
 
-    /**
-     * @return Returns the w.
-     */
     public double getW() {
         return w;
     }
 
-    /**
-     * @param w The w to set.
-     */
     public void setW(final double w) {
         this.w = w;
     }
 
-    /**
-     * @return Returns the v.
-     */
     public double getV() {
         return v;
     }
 
-    /**
-     * @param v The v to set.
-     */
     public void setV(final double v) {
         this.v = v;
     }
@@ -184,16 +173,10 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         this.iBg = iBg;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }

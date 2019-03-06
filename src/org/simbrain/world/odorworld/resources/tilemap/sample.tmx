@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <tileset firstgid="1" name="RoguelikeTileSet" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
-  <image source="roguelikeSheet_transparent.png" width="1936" height="1052"/>
+  <image source="tileset_kenney.png" width="1936" height="1052"/>
   <tile id="5">
    <properties>
     <property name="type" value="Grass"/>

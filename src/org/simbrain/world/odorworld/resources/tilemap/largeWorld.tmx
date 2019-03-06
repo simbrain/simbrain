@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" nextobjectid="1">
  <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
-  <image source="roguelikeSheet_transparent.png" width="1936" height="1052"/>
+  <image source="tileset_kenney.png" width="1936" height="1052"/>
  </tileset>
  <layer name="Tile Layer 1" width="100" height="100">
   <data encoding="csv">

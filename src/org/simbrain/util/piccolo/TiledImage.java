@@ -46,7 +46,8 @@ public class TiledImage {
     public BufferedImage getImage() {
         if (image == null) {
             if (!source.isEmpty()) {
-                image = OdorWorldResourceManager.getBufferedImage("tilemap/" + source);
+                String[] segments = source.split("/");
+                image = OdorWorldResourceManager.getBufferedImage("tilemap/" + segments[segments.length-1]);
             }
         }
         return image;

@@ -30,7 +30,7 @@ import org.simbrain.util.UserParameter;
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
+public class LogisticRule extends ActivityGenerator implements BoundedUpdateRule, ClippableUpdateRule {
 
     /**
      * Growth rate.
@@ -58,26 +58,12 @@ public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule,
         this.growthRate = lr.getGrowthRate();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return the discrete time type
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
-    /**
-     * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
-     * set of neurons, {@link #init(Neuron) init} must be called to
-     * ensure rational behavior for an activity generator. The
-     * {@link RandomNeuronRule#RandomNeuronRule(RandomNeuronRule, Neuron) copy
-     * constructor} is the preferred method of copying because
-     * {@link #init(Neuron) init} is called on the neuron parameter
-     * automatically.
-     *
-     * @return a copy of this node
-     */
+    @Override
     public LogisticRule deepCopy() {
         LogisticRule ln = new LogisticRule();
         ln.setGrowthRate(getGrowthRate());
@@ -86,11 +72,7 @@ public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule,
         return ln;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param neuron
-     */
+    @Override
     public void update(Neuron neuron) {
 
         // TODO: Note that the inputs have to be within the neuron's bounds for
@@ -105,16 +87,10 @@ public class LogisticRule extends NeuronUpdateRule implements BoundedUpdateRule,
         neuron.setBuffer(clip(x));
     }
 
-    /**
-     * @return Returns the firingProbability.
-     */
     public double getGrowthRate() {
         return growthRate;
     }
 
-    /**
-     * @param growthRate The growthRate to set.
-     */
     public void setGrowthRate(final double growthRate) {
         this.growthRate = growthRate;
     }

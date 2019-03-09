@@ -13,8 +13,38 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
+import org.simbrain.util.UserParameter;
+
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Marker interface for activity generators.
+ * Abstract class for activity generators.
  */
-public interface ActivityGenerator {
+public abstract class ActivityGenerator extends SpikingNeuronUpdateRule {
+
+
+    // Extends SpikingNeuronUpdateRule because otherwise there is no way to have StochasticUpdateRule work
+
+    /**
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
+     * to set the update rule on an activity generator
+     */
+    public static List<Class> RULE_LIST = Arrays.asList(LogisticRule.class, StochasticRule.class,
+        SinusoidalRule.class, RandomNeuronRule.class);
+
+    /**
+     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     */
+    public static List<Class> getTypes() {
+        return RULE_LIST;
+    }
+
+
 }

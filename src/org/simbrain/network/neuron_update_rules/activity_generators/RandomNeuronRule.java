@@ -30,7 +30,9 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
+public class RandomNeuronRule extends ActivityGenerator implements BoundedUpdateRule, NoisyUpdateRule {
+
+    // TODO: Make editable
 
     /**
      * Noise source.
@@ -41,9 +43,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
 
     private double floor = -1.0;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
@@ -52,38 +52,22 @@ public class RandomNeuronRule extends NeuronUpdateRule implements BoundedUpdateR
         super();
     }
 
-    public RandomNeuronRule(Neuron n) {
-        super();
-        randomizer.setUpperBound(getUpperBound());
-//        randomizer.setLowerBound(getLowerBound());//TODO
-    }
-
     public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
         super();
         setNoiseGenerator(rn.randomizer.deepCopy());
     }
 
-    /**
-     * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
-     * set of neurons, {@link #init(Neuron) init} must be called to ensure
-     * rational behavior for an activity generator. The
-     * {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy constructor} is
-     * the preferred method of copying because {@link #init(Neuron) init} is
-     * called on the neuron parameter automatically.
-     */
+    @Override
     public RandomNeuronRule deepCopy() {
         RandomNeuronRule rn = new RandomNeuronRule();
         rn.randomizer = randomizer.deepCopy();
         return rn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
         neuron.setBuffer(randomizer.getRandom());
     }
-
 
     @Override
     public String getName() {

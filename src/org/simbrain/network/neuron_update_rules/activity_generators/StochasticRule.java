@@ -31,7 +31,7 @@ import org.simbrain.util.UserParameter;
  * <p>
  * TODO: Separate spiking from non-spiking version?
  */
-public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityGenerator {
+public class StochasticRule extends ActivityGenerator {
 
     /**
      * The default firing probability for the Neuron.
@@ -45,19 +45,15 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityG
             label = "Firing Probability",
             description = "This parameter determines the probability that the generator will fire, "
                     + "causing it to have an activation equal to its upper bound, given an iteration.",
-            defaultValue = "" + DEFAULT_FIRING_PROBABILITY, order = 1)
+            order = 1)
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public StochasticRule deepCopy() {
         StochasticRule sn = new StochasticRule();
         sn.setFiringProbability(getFiringProbability());
@@ -78,16 +74,10 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityG
         }
     }
 
-    /**
-     * @return Returns the firingProbability.
-     */
     public double getFiringProbability() {
         return firingProbability;
     }
 
-    /**
-     * @param firingProbability The firingProbability to set.
-     */
     public void setFiringProbability(final double firingProbability) {
         this.firingProbability = firingProbability;
     }

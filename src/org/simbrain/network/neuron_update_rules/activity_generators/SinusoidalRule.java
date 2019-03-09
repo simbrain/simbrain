@@ -31,7 +31,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
  */
-public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
+public class SinusoidalRule extends ActivityGenerator implements BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * Phase.
@@ -39,7 +39,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
     @UserParameter(
             label = "Phase",
             description = "The phase tells us where we start in a period of the sinusoidal oscillation.",
-            defaultValue = "1", order = 1)
+            order = 1)
     private double phase = 1;
 
     /**
@@ -48,7 +48,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
     @UserParameter(
             label = "Frequency",
             description = "The frequency tells us how frequently the activation oscillates.",
-            defaultValue = "0.1", order = 2)
+            order = 2)
     private double frequency = .1;
 
     /**
@@ -111,44 +111,26 @@ public class SinusoidalRule extends NeuronUpdateRule implements BoundedUpdateRul
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the upperValue.
-     */
     public double getPhase() {
         return phase;
     }
 
-    /**
-     * @param phase The phase to set.
-     */
     public void setPhase(final double phase) {
         this.phase = phase;
     }
 
-    /**
-     * @return Returns the frequency.
-     */
     public double getFrequency() {
         return frequency;
     }
 
-    /**
-     * @param frequency The frequency to set.
-     */
     public void setFrequency(final double frequency) {
         this.frequency = frequency;
     }

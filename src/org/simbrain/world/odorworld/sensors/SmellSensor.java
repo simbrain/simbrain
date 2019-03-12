@@ -113,11 +113,6 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Smell";
-    }
-
-    @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;
     }
@@ -138,7 +133,7 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public String getName() {
-        return "Smell";
+        return "Smell Sensor";
     }
 
 }

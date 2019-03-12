@@ -1,5 +1,7 @@
 package org.simbrain.world.odorworld.entities;
 
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
@@ -10,14 +12,12 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  *
  * @author Jeff Yoshimi
  */
-public interface PeripheralAttribute extends AttributeContainer {
+public interface PeripheralAttribute extends AttributeContainer, EditableObject {
 
 
     public String getId();
 
     public String getLabel();
-
-    public String getTypeDescription();
 
     public OdorWorldEntity getParent();
 
@@ -40,6 +40,6 @@ public interface PeripheralAttribute extends AttributeContainer {
      */
     default String getAttributeDescription() {
         String sensorEffector = (this instanceof Sensor) ? "Sensor" : "Effector";
-        return getParent().getName() + ":" + getTypeDescription() + " " + sensorEffector;
+        return getParent().getName() + ":" + getName() + " " + sensorEffector;
     }
 }

@@ -22,7 +22,7 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.LocationSensor;
+import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -254,7 +254,7 @@ public class ActorCritic extends RegisteredSimulation {
                     double y = (k * tileSize) - i * tileIncrement;
 
                     // Create tile sensor
-                    LocationSensor sensor = new LocationSensor(mouse, (int) x, (int) y, tileSize, tileSize);
+                    GridSensor sensor = new GridSensor(mouse, (int) x, (int) y, tileSize, tileSize);
                     mouse.addSensor(sensor);
 
                     // Create corresponding neuron

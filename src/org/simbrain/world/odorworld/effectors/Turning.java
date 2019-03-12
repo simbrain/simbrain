@@ -151,29 +151,18 @@ public class Turning extends Effector {
 //        this.amount = amount;
 //    }
 
-    /**
-     * @return the direction
-     */
     public double getDirection() {
         return direction;
     }
 
-    /**
-     * @param direction the direction to set
-     */
     public void setDirection(double direction) {
         this.direction = direction;
-    }
-
-    @Override
-    public String getTypeDescription() {
-        return "Turning Movement";
     }
 
 
     @Override
     public String getName() {
-        return "Turning Movement";
+        return "Turning Effector";
     }
 
     @Override

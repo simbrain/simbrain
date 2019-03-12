@@ -88,18 +88,13 @@ public class TileSensor extends Sensor {
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Tile";
-    }
-
-    @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;
     }
 
     @Override
     public String getName() {
-        return "Tile";
+        return "Tile Sensor";
     }
 
     @Override

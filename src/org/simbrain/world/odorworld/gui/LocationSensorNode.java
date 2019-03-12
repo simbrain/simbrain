@@ -1,7 +1,7 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.nodes.PPath;
-import org.simbrain.world.odorworld.sensors.LocationSensor;
+import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.geom.GeneralPath;
 
@@ -15,14 +15,14 @@ public class LocationSensorNode extends EntityAttributeNode {
     /**
      * Reference to the sensor this node is representing
      */
-    private LocationSensor sensor;
+    private GridSensor sensor;
 
     /**
      * The shape of this node
      */
     private PPath shape;
 
-    public LocationSensorNode(LocationSensor sensor) {
+    public LocationSensorNode(GridSensor sensor) {
         this.sensor = sensor;
         GeneralPath crossPath = new GeneralPath();
         crossPath.moveTo(-SENSOR_RADIUS, 0);

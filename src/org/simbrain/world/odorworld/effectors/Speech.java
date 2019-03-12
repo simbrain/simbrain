@@ -210,18 +210,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Speech";
-    }
-
-    @Override
     public EditableObject copy() {
         return new Speech(this);
     }
 
     @Override
     public String getName() {
-        return "Speech";
+        return "Speech Effector";
     }
 
     public int getCharactersPerRow() {

@@ -29,7 +29,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  *
  * @author jyoshimi
  */
-public class LocationSensor extends Sensor implements VisualizableEntityAttribute {
+public class GridSensor extends Sensor implements VisualizableEntityAttribute {
 
     /**
      * Default Activation Amount.
@@ -73,7 +73,7 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
     /**
      * Upper left corner.
      */
-    @UserParameter(label = "X",
+    @UserParameter(label = "Start X",
             description = "x coordinates for the location of the top-left corner of the tile sensor.",
             order = 4)
     private int x;
@@ -82,40 +82,40 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
     /**
      * Upper left corner.
      */
-    @UserParameter(label = "Y",
+    @UserParameter(label = "Start Y",
             description = "y coordinates for the location of the top-left corner of the tile sensor.",
             order = 5)
     private int y;
-    /**
-     * Width of the sensor.
-     */
-    @UserParameter(label = "Width",
-            description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
-            order = 6)
-    private int width = DEFAULT_WIDTH;
-
-    /**
-     * Height of the sensor.
-     */
-    @UserParameter(label = "Height",
-            description = "Determines the size of the tile. Height specifies the vertical length.",
-            order = 7)
-    private int height = DEFAULT_HEIGHT;
 
     @UserParameter(
-            label = "Columns",
+            label = "Num Columns",
             description = "Number of columns of the sensor grid",
             order = 8
     )
     private int columns = 5;
 
     @UserParameter(
-            label = "Rows",
+            label = "Num Rows",
             description = "Number of columns of the sensor grid",
             order = 9
     )
     private int rows = 5;
 
+    /**
+     * Width of the sensor.
+     */
+    @UserParameter(label = "Cell Width",
+        description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
+        order = 11)
+    private int width = DEFAULT_WIDTH;
+
+    /**
+     * Height of the sensor.
+     */
+    @UserParameter(label = "Cell Height",
+        description = "Determines the size of the tile. Height specifies the vertical length.",
+        order = 12)
+    private int height = DEFAULT_HEIGHT;
     /**
      * Construct a tile sensor.
      *
@@ -125,7 +125,7 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
      * @param width  width in pixels
      * @param height height
      */
-    public LocationSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
+    public GridSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
         super(parent, "Tile (" + x + "," + y + "):" + width + "x" + height);
         this.x = x;
         this.y = y;
@@ -138,7 +138,7 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
      *
      * @param locationSensor the location sensor to copy
      */
-    public LocationSensor(LocationSensor locationSensor) {
+    public GridSensor(GridSensor locationSensor) {
         super(locationSensor);
         this.activationAmount = locationSensor.activationAmount;
         this.x = locationSensor.x;
@@ -156,7 +156,7 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
      * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
      * When calling this directly, remember to set up the required field {@link #parent} accordingly.
      */
-    public LocationSensor() {
+    public GridSensor() {
         super();
     }
 
@@ -257,22 +257,17 @@ public class LocationSensor extends Sensor implements VisualizableEntityAttribut
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Location";
-    }
-
-    @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;
     }
 
     @Override
     public EditableObject copy() {
-        return new LocationSensor(this);
+        return new GridSensor(this);
     }
 
     @Override
     public String getName() {
-        return "Location";
+        return "Grid Sensor";
     }
 }

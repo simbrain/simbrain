@@ -35,7 +35,8 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     /**
      * Decay function
      */
-    @UserParameter(label = "Decay Function", isObjectType = true, order = 5)
+    @UserParameter(label = "Decay Function", isObjectType = true,
+        showDetails = false, order = 5)
     DecayFunction decayFunction = LinearDecayFunction.create();
 
     /**
@@ -129,11 +130,6 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     }
 
     @Override
-    public String getTypeDescription() {
-        return objectType.toString();
-    }
-
-    @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;
     }
@@ -145,7 +141,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
 
     @Override
     public String getName() {
-        return "ObjectSensor";
+        return "Object Sensor";
     }
 
     public double getBaseValue() {

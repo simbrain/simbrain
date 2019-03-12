@@ -30,9 +30,9 @@ import org.simbrain.world.odorworld.RectangleCollisionBound;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.LocationSensor;
+import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
@@ -569,7 +569,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         int tileHeight = parentWorld.getHeight() / numTilesY;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new LocationSensor(this, ((i * tileWidth) + offset), ((j * tileHeight) + offset), tileWidth, tileHeight));
+                addSensor(new GridSensor(this, ((i * tileWidth) + offset), ((j * tileHeight) + offset), tileWidth, tileHeight));
             }
         }
     }
@@ -1031,11 +1031,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             Turning.RIGHT));
 
         // Add default sensors
-        addSensor(new SmellSensor(this, "Smell-Left", Math.PI / 8,
+        addSensor(new ObjectSensor(this,  EntityType.SWISS, Math.PI / 8,
             50));
-        addSensor(new SmellSensor(this, "Smell-Center", 0, 0));
-        addSensor(new SmellSensor(this, "Smell-Right",
-            -Math.PI / 8, 50));
+        addSensor(new ObjectSensor(this,  EntityType.SWISS, 0, 0));
+        addSensor(new ObjectSensor(this,  EntityType.SWISS, -Math.PI / 8,
+            50));
+
+        //TODO: Add more defaults
 
     }
 

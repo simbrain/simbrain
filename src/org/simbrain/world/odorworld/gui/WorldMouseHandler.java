@@ -126,7 +126,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
 
         // Show context menu for right click
-        if (mouseEvent.isPopupTrigger()) {
+        if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
             if (pickedNode.getParent() instanceof EntityNode) {
                 JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode) pickedNode.getParent()).getEntity());
                 menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
@@ -162,15 +162,18 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else {
-                Tile tile = odorWorldPanel.getTile(event.getPosition());
-                if (tile == null) {
-                    return;
-                }
-                AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
-                StandardDialog dialog = ape.getDialog();
-                dialog.setLocationRelativeTo(null);
-                dialog.pack();
-                dialog.setVisible(true);
+                // Later expand below to allow within-Simbrain editing of tiles.
+                // For now, editing must be done using the Tiled app
+
+                // Tile tile = odorWorldPanel.getTile(event.getPosition());
+                // if (tile == null) {
+                //     return;
+                // }
+                // AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
+                // StandardDialog dialog = ape.getDialog();
+                // dialog.setLocationRelativeTo(null);
+                // dialog.pack();
+                // dialog.setVisible(true);
             }
             return;
         }

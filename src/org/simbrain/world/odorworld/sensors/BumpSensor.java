@@ -144,11 +144,6 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Bump";
-    }
-
-    @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;
     }
@@ -160,7 +155,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public String getName() {
-        return "Bump";
+        return "Bump Sensor";
     }
 
     @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")

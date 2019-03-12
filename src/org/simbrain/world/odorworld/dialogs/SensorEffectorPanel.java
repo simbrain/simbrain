@@ -331,7 +331,7 @@ public class SensorEffectorPanel extends JPanel {
             case 1:
                 return data.get(row).getLabel();
             case 2:
-                return data.get(row).getTypeDescription();
+                return data.get(row).getName();
             default:
                 return null;
             }

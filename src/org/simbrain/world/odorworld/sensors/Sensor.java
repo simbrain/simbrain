@@ -38,7 +38,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
             Arrays.asList(
                     SmellSensor.class,
                     Hearing.class,
-                    LocationSensor.class,
+                    GridSensor.class,
                     ObjectSensor.class,
                     BumpSensor.class,
                     TileSensor.class
@@ -65,7 +65,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
         + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
         + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
-        defaultValue = "" + (Math.PI / 4), order = 3)
+        order = 3)
     protected double theta = DEFAULT_THETA;
 
     /**
@@ -73,8 +73,8 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      */
     @UserParameter(label = "Sensor length",
         description = "The distance from the center of the entity to which the smell sensor is to be added."
-            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent.",
-        defaultValue = "" + DEFAULT_RADIUS, order = 4)
+            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent."
+        , order = 4)
     protected double radius = DEFAULT_RADIUS;
 
     /**
@@ -98,8 +98,8 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      * Public label of this sensor.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this sensor",
-            defaultValue = "", order = 1)
-    private String label;
+            order = 1)
+    private String label = "";
 
     /**
      * Construct the sensor.
@@ -163,9 +163,6 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     public void setLabel(String label) {
         this.label = label;
     }
-
-    @Override
-    public abstract String getTypeDescription();
 
     public double getTheta() {
         return theta;

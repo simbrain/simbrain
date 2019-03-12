@@ -176,13 +176,8 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public String getTypeDescription() {
-        return "Hearing";
-    }
-
-    @Override
     public String getName() {
-        return "Hearing";
+        return "Hearing Sensor";
     }
 
     @Override

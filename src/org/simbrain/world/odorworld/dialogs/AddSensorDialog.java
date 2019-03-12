@@ -29,7 +29,6 @@ import javax.swing.*;
 
 public class AddSensorDialog extends StandardDialog {
 
-
     /**
      * Entity to which sensor is being added.
      */

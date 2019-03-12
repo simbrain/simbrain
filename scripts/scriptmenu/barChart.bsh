@@ -48,7 +48,7 @@ import java.awt.Color;
     network.fireSynapsesUpdated();
 
     //MAKE BARCHART
-    BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network", numNeurons);
+    BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");
     barChart.getModel().setBarColor(Color.blue);
     barChart.getModel().setAutoRange(false);
     barChart.getModel().setUpperBound(10);

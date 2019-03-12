@@ -113,6 +113,12 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         this.label = label;
     }
 
+    // todo
+    public Sensor(OdorWorldEntity parent) {
+        super();
+        this.parent = parent;
+    }
+
     /**
      * Construct a copy of a sensor.
      *
@@ -164,10 +170,16 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         this.label = label;
     }
 
+    /**
+     * Returns angle in radians
+     */
     public double getTheta() {
         return theta;
     }
 
+    /**
+     * Sets angle in radians
+     */
     public void setTheta(double theta) {
         this.theta = theta;
     }

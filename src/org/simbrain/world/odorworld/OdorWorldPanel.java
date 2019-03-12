@@ -689,7 +689,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("start turning left", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setManualMovementState("a", true);
-                OdorWorldEntity entity = getFirstSelectedEntityModel();
+                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.setManualMode(true);
                     entity.turnLeft();
@@ -701,7 +701,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("stopTurningLeft", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setManualMovementState("a", false);
-                OdorWorldEntity entity = getFirstSelectedEntityModel();
+                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where a and d are both being pressed
                     if (getManualMovementState("d")) {
@@ -722,7 +722,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("start turning right", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setManualMovementState("d", true);
-                OdorWorldEntity entity = getFirstSelectedEntityModel();
+                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.setManualMode(true);
                     entity.turnRight();
@@ -734,7 +734,7 @@ public class OdorWorldPanel extends JPanel {
         canvas.getActionMap().put("stopTurningRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setManualMovementState("d", false);
-                OdorWorldEntity entity = getFirstSelectedEntityModel();
+                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where a and d are both being pressed
                     if (getManualMovementState("a")) {

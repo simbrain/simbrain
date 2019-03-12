@@ -29,14 +29,14 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @UserParameter(
             label = "Base Value",
             description = "Base value of the output before decay function applies",
-            defaultValue = "1", order = 4)
+            defaultValue = "1", order = 10)
     private double baseValue = 1;
 
     /**
      * Decay function
      */
     @UserParameter(label = "Decay Function", isObjectType = true,
-        showDetails = false, order = 5)
+        showDetails = false, order = 15)
     DecayFunction decayFunction = LinearDecayFunction.create();
 
     /**
@@ -62,7 +62,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      * @param objectType the type (e.g. Swiss.gif)
      */
     public ObjectSensor(OdorWorldEntity parent, EntityType objectType) {
-        super(parent, objectType.toString());
+        super(parent);
         this.objectType = objectType;
     }
 
@@ -72,7 +72,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      * @param parent parent entity
      */
     public ObjectSensor(OdorWorldEntity parent) {
-        super(parent, "Object Sensor");
+        super(parent);
     }
 
     /**
@@ -150,5 +150,26 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
 
     public boolean isShowLabel() {
         return showLabel;
+    }
+
+    //todo
+    public String getDirectionString() {
+        if (super.getTheta() < 0 && super.getTheta() > - Math.PI ) {
+            return "Right ";
+        } else if (super.getTheta() > 0 && super.getTheta() < Math.PI ) {
+            return "Left ";
+        } else {
+            return "";
+        }
+
+    }
+
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return getDirectionString() + objectType.getDescription() + " Detector";
+        } else {
+            return super.getLabel();
+        }
     }
 }

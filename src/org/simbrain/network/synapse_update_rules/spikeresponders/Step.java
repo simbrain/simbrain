@@ -37,13 +37,14 @@ public class Step extends SpikeResponder {
      */
     @UserParameter(label = "Response height", description = "This value is multiplied by"
     		+ " the strength to determine the total instantaneous rise in a post-synaptic"
-    		+ " response to an action potential or spike.", defaultValue = "1", order = 1)
+    		+ " response to an action potential or spike.",
+            increment = .1, order = 1)
     private double responseHeight = 1;
 
     /**
      * Response duration (ms).
      */
-    @UserParameter(label = "Response time", description = "Response duration (ms)", defaultValue = "1", order = 1)
+    @UserParameter(label = "Response time", description = "Response duration (ms)", increment = .1, order = 1)
     private double responseDuration = 1;
 
     @Override

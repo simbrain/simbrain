@@ -36,14 +36,14 @@ public class UDF extends SpikeResponder {
      * Use constant.
      */
     @UserParameter(label = "Mean Use ", description = "Baseline use and strength of facilitation.",
-             minimumValue = 0, defaultValue = "0.5", order = 1)
+             minimumValue = 0, increment = .1, order = 1)
     private double U = 0.5;
 
     /**
      * Depression constant.
      */
     @UserParameter(label = "Mean Depression ", description = "Time constant for neurotransmitter depression.",
-            minimumValue = 0, defaultValue = "1100", order = 1)
+            minimumValue = 0, increment = .1, order = 1)
     private double D = 1100;
 
     /**

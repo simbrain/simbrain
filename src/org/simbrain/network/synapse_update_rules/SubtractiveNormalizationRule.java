@@ -31,7 +31,7 @@ public class SubtractiveNormalizationRule extends SynapseUpdateRule {
     /**
      * Momentum.
      */
-    @UserParameter(label = "Learning rate", description = "Momentum", defaultValue = "1", order = 1)
+    @UserParameter(label = "Learning rate", description = "Momentum", increment = .1, order = 1)
     private double learningRate;
 
     @Override
@@ -60,16 +60,10 @@ public class SubtractiveNormalizationRule extends SynapseUpdateRule {
 
     }
 
-    /**
-     * @return Returns the momentum.
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param momentum The momentum to set.
-     */
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }

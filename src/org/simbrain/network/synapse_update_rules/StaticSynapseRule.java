@@ -63,9 +63,6 @@ public class StaticSynapseRule extends SynapseUpdateRule {
         return clipped;
     }
 
-    /**
-     * @param clipped value to set
-     */
     public void setClipped(boolean clipped) {
         this.clipped = clipped;
     }

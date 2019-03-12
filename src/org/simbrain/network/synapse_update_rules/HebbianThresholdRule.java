@@ -31,25 +31,25 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
     /**
      * Learning rate.
      */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb threshold rule", defaultValue = ".1", order = 1)
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb threshold rule", increment = .1, order = 1)
     private double learningRate;
 
     /**
      * Output threshold.
      */
-    @UserParameter(label = "Threshold", description = "Output threshold for Hebb threshold rule", defaultValue = ".5", order = 1)
+    @UserParameter(label = "Threshold", description = "Output threshold for Hebb threshold rule", increment = .1, order = 1)
     private double outputThreshold = .5;
 
     /**
      * Output threshold momentum.
      */
-    @UserParameter(label = "Threshold Momentum", description = "Output threshold momentum for Hebb threshold rule", defaultValue = ".1", order = 1)
+    @UserParameter(label = "Threshold Momentum", description = "Output threshold momentum for Hebb threshold rule", increment = .1, order = 1)
     private double outputThresholdMomentum = .1;
 
     /**
      * Use sliding output threshold.
      */
-    @UserParameter(label = "Sliding Threshold", description = "Use sliding output threshold for Hebb threshold rule", defaultValue = "false", order = 1)
+    @UserParameter(label = "Sliding Threshold", description = "Use sliding output threshold for Hebb threshold rule", order = 1)
     private boolean useSlidingOutputThreshold = false;
 
     @Override
@@ -83,58 +83,34 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
         synapse.setStrength(synapse.clip(strength));
     }
 
-    /**
-     * @return Returns the momentum.
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param momentum The momentum to set.
-     */
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }
 
-    /**
-     * @return Returns the outputThreshold.
-     */
     public double getOutputThreshold() {
         return outputThreshold;
     }
 
-    /**
-     * @param outputThreshold The outputThreshold to set.
-     */
     public void setOutputThreshold(final double outputThreshold) {
         this.outputThreshold = outputThreshold;
     }
 
-    /**
-     * @return Returns the useSlidingOutputThreshold.
-     */
     public boolean getUseSlidingOutputThreshold() {
         return useSlidingOutputThreshold;
     }
 
-    /**
-     * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
-     */
     public void setUseSlidingOutputThreshold(final boolean useSlidingOutputThreshold) {
         this.useSlidingOutputThreshold = useSlidingOutputThreshold;
     }
 
-    /**
-     * @return Returns the outputThresholdMomentum.
-     */
     public double getOutputThresholdMomentum() {
         return outputThresholdMomentum;
     }
 
-    /**
-     * @param outputThresholdMomentum The outputThresholdMomentum to set.
-     */
     public void setOutputThresholdMomentum(final double outputThresholdMomentum) {
         this.outputThresholdMomentum = outputThresholdMomentum;
     }

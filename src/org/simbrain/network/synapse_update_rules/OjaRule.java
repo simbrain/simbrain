@@ -31,14 +31,14 @@ public class OjaRule extends SynapseUpdateRule {
     /**
      * Learning rate.
      */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", defaultValue = ".1", order = 1)
+    @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, order = 1)
     private double learningRate;
 
     // TODO: check description
     /**
      * Normalization factor.
      */
-    @UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", defaultValue = "1", order = 1)
+    @UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", increment = .1, order = 1)
     private double normalizationFactor = 1;
 
     @Override
@@ -67,30 +67,18 @@ public class OjaRule extends SynapseUpdateRule {
         synapse.setStrength(synapse.clip(strength));
     }
 
-    /**
-     * @return Returns the momentum.
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param momentum The momentum to set.
-     */
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }
 
-    /**
-     * @return Returns the normalizationFactor.
-     */
     public double getNormalizationFactor() {
         return normalizationFactor;
     }
 
-    /**
-     * @param normalizationFactor The normalizationFactor to set.
-     */
     public void setNormalizationFactor(final double normalizationFactor) {
         this.normalizationFactor = normalizationFactor;
     }

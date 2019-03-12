@@ -21,6 +21,7 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.UserParameter;
 
 /**
  * <b>ShortTermPlasticitySynapse</b>.
@@ -72,36 +73,43 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     /**
      * Plasticity type.
      */
+    @UserParameter(label = "Plasticity Type", description = "Plasticity Type", increment = 1.0, order = 1)
     private int plasticityType = STD;
 
     /**
      * Pseudo spike threshold.
      */
+    @UserParameter(label = "Spike Threshold", description = "Pseudo Spike Threshold", increment = .1, order = 2)
     private double firingThreshold = DEFAULT_FIRING_THRESHOLD;
 
     /**
      * Base line strength.
      */
+    @UserParameter(label = "Line Strength", description = "Base line strength", increment = .1, order = 3)
     private double baseLineStrength = DEFAULT_BASE_LINE_STRENGTH;
 
     /**
      * Input threshold.
      */
+    @UserParameter(label = "Input Threshold", description = "Input threshold", increment = .1, order = 4)
     private double inputThreshold = DEFAULT_INPUT_THRESHOLD;
 
     /**
      * Bump rate.
      */
+    @UserParameter(label = "Bump rate", description = "Bump Rate", increment = .1, order = 5)
     private double bumpRate = DEFAULT_BUMP_RATE;
 
     /**
      * Rate at which the synapse will decay.
      */
+    @UserParameter(label = "Decay Rate", description = "Rate at which the synapse will decay", increment = .1, order = 6)
     private double decayRate = DEFAULT_DECAY_RATE;
 
     /**
      * Activated.
      */
+    @UserParameter(label = "Activated", description = "Activated", increment = .1, order = 7)
     private boolean activated = DEFAULT_ACTIVATED;
 
     @Override
@@ -154,86 +162,50 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
         synapse.setStrength(synapse.clip(strength));
     }
 
-    /**
-     * @return Returns the baseLineStrength.
-     */
     public double getBaseLineStrength() {
         return baseLineStrength;
     }
 
-    /**
-     * @param baseLineStrength The baseLineStrength to set.
-     */
     public void setBaseLineStrength(final double baseLineStrength) {
         this.baseLineStrength = baseLineStrength;
     }
 
-    /**
-     * @return Returns the decayRate.
-     */
     public double getDecayRate() {
         return decayRate;
     }
 
-    /**
-     * @param decayRate The decayRate to set.
-     */
     public void setDecayRate(final double decayRate) {
         this.decayRate = decayRate;
     }
 
-    /**
-     * @return Returns the growthRate.
-     */
     public double getBumpRate() {
         return bumpRate;
     }
 
-    /**
-     * @param growthRate The growthRate to set.
-     */
     public void setBumpRate(final double growthRate) {
         this.bumpRate = growthRate;
     }
 
-    /**
-     * @return Returns the inputThreshold.
-     */
     public double getInputThreshold() {
         return inputThreshold;
     }
 
-    /**
-     * @param inputThreshold The inputThreshold to set.
-     */
     public void setInputThreshold(final double inputThreshold) {
         this.inputThreshold = inputThreshold;
     }
 
-    /**
-     * @return Returns the plasticityType.
-     */
     public int getPlasticityType() {
         return plasticityType;
     }
 
-    /**
-     * @param plasticityType The plasticityType to set.
-     */
     public void setPlasticityType(final int plasticityType) {
         this.plasticityType = plasticityType;
     }
 
-    /**
-     * @return the firing threshold.
-     */
     public double getFiringThreshold() {
         return firingThreshold;
     }
 
-    /**
-     * @param firingThreshold The firingThreshold to set.
-     */
     public void setFiringThreshold(final double firingThreshold) {
         this.firingThreshold = firingThreshold;
     }

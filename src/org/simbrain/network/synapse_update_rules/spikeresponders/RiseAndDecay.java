@@ -30,14 +30,14 @@ public class RiseAndDecay extends SpikeResponder {
      * Maximum response value.
      */
     @UserParameter(label = "Maximum Response", description = "Maximum response value.",
-            defaultValue = "1", order = 1)
+            increment = .1, order = 1)
     private double maximumResponse = 1;
 
     /**
      * The time constant of decay and recovery (ms).
      */
     @UserParameter(label = "Time constant", description = "Rate at which synapse will decay (ms)",
-            defaultValue = "3", order = 1)
+            increment = .1, order = 1)
     private double timeConstant = 3;
 
     /**

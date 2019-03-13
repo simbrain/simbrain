@@ -14,7 +14,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     @UserParameter(label = "Jump Height",
             description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
                     + " post-synaptic response to an action potential or spike.",
-            defaultValue = "1", order = 1)
+            increment = .1, order = 1)
     private double jumpHeight = 1;
 
     /**
@@ -23,7 +23,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     @UserParameter(label = "Base-Line",
             description = "The post-synaptic response value when no spike have occurred. Alternatively, the "
                     + "post synaptic response to which decays to over time.",
-            defaultValue = "0.0001", order = 1)
+            increment = .1, order = 1)
     private double baseLine = .0001;
 
     /**
@@ -31,7 +31,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
      */
     @UserParameter(label = "Time Constant",
             description = "The time constant of decay and recovery (ms).",
-            defaultValue = "3", order = 1)
+            increment = .1, order = 1)
     private double timeConstant = 3;
 
     public ConvolvedJumpAndDecay(){

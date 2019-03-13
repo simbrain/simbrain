@@ -56,16 +56,10 @@ public class HebbianRule extends SynapseUpdateRule {
         synapse.setStrength(strength);
     }
 
-    /**
-     * @return Returns the momentum.
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param rate The rate to set.
-     */
     public void setLearningRate(final double rate) {
         this.learningRate = rate;
     }

@@ -50,7 +50,8 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     @UserParameter(
             label = "Decay Rate",
             description = "The rate at which activation decays to its resting value.",
-            defaultValue = "0.05", order = 1)
+            increment = .1,
+            order = 1)
     private double decay = 0.05;
 
     /**
@@ -59,7 +60,8 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     @UserParameter(
             label = "Rest",
             description = "The resting value which the activation decays to.",
-            defaultValue = "0.1", order = 2)
+            increment = .1,
+            order = 2)
     private double rest = .1;
 
     /**
@@ -92,16 +94,12 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
      */
     private double effect, netInput, act;
 
-    /**
-     * @return {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
-    /**
-     * @return {@inheritDoc}
-     */
+    @Override
     public IACRule deepCopy() {
         IACRule iac = new IACRule();
         iac.setDecay(getDecay());
@@ -150,9 +148,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         neuron.setBuffer(act);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double clip(double val) {
         if (val > getUpperBound()) {
@@ -164,9 +159,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
@@ -183,9 +175,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
@@ -202,44 +191,26 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         }
     }
 
-    /**
-     * @return Returns the decay.
-     */
     public double getDecay() {
         return decay;
     }
 
-    /**
-     * @param decay The decay to set.
-     */
     public void setDecay(final double decay) {
         this.decay = decay;
     }
 
-    /**
-     * @return Returns the rest.
-     */
     public double getRest() {
         return rest;
     }
 
-    /**
-     * @param rest The rest to set.
-     */
     public void setRest(final double rest) {
         this.rest = rest;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }

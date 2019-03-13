@@ -33,10 +33,10 @@ public class TestAnnotatedRule extends PfisterGerstner2006Rule {
     @UserParameter(label = "test string", description = "Test string parameter.", order = -1)
     protected String ts;
 
-    @UserParameter(label = "test bool", description = "Test boolean parameter.", order = -1, defaultValue = "true")
+    @UserParameter(label = "test bool", description = "Test boolean parameter.", order = -1)
     protected boolean tb;
 
-    @UserParameter(label = "test int def", description = "Test int parameter with default.", order = -1, defaultValue = "2")
+    @UserParameter(label = "test int def", description = "Test int parameter with default.", order = -1, increment = .1)
     protected int ti;
 
     @UserParameter(label = "test int min", description = "Test int parameter with minimum.", order = -1, minimumValue = 1)

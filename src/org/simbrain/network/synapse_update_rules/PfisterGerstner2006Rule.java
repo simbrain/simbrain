@@ -33,32 +33,33 @@ import org.simbrain.util.UserParameter;
  */
 public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Cloneable {
 
-    @UserParameter(label = "Tau+", description = "Decay rate for r1 trace", minimumValue = 1, maximumValue = 100, defaultValue = "16.8", order = 0)
+    @UserParameter(label = "Tau+", description = "Decay rate for r1 trace", minimumValue = 1, maximumValue = 100, increment = .1, order = 0)
     protected double tauPlus = 16.8;
 
-    @UserParameter(label = "Tau x", description = "Decay rate for r2 trace", minimumValue = 1, maximumValue = 100, defaultValue = "1.0", order = 1)
+    @UserParameter(label = "Tau x", description = "Decay rate for r2 trace", minimumValue = 1, maximumValue = 100, increment = .1, order = 1)
     protected double tauX = 1.0;
 
-    @UserParameter(label = "Tau-", description = "Decay rate for o1 trace", minimumValue = 1, maximumValue = 100, defaultValue = "33.7", order = 2)
+    @UserParameter(label = "Tau-", description = "Decay rate for o1 trace", minimumValue = 1, maximumValue = 100, increment = .1, order = 2)
     protected double tauNeg = 33.7;
 
-    @UserParameter(label = "Tau y", description = "Decay rate for o2 trace", minimumValue = 1, maximumValue = 100, defaultValue = "48.0", order = 3)
+    @UserParameter(label = "Tau y", description = "Decay rate for o2 trace", minimumValue = 1, maximumValue = 100, increment = .1, order = 3)
     protected double tauY = 48.0;
 
-    @UserParameter(label = "A2+", description = "Amplitude of the weight change for a pre-post spike pair.", minimumValue = 0, maximumValue = 0.1, defaultValue = "0.003", order = 4)
+    @UserParameter(label = "A2+", description = "Amplitude of the weight change for a pre-post spike pair.", minimumValue = 0, maximumValue = 0.1, increment = .1, order = 4)
     protected double a2P = 0.0046;
 
-    @UserParameter(label = "A2-", description = "Amplitude of the weight change for a post-pre spike pair.", minimumValue = 0, maximumValue = 0.1, defaultValue = "0.003", order = 5)
+    @UserParameter(label = "A2-", description = "Amplitude of the weight change for a post-pre spike pair.", minimumValue = 0, maximumValue = 0.1, increment = .1, order = 5)
     protected double a2N = 0.003;
 
-    @UserParameter(label = "A3+", description = "Amplitude of the triplet term for potentiation.", minimumValue = 0, maximumValue = 0.1, defaultValue = "0.0091", order = 6)
+    @UserParameter(label = "A3+", description = "Amplitude of the triplet term for potentiation.", minimumValue = 0, maximumValue = 0.1, increment = .1, order = 6)
     protected double a3P = 0.0091;
 
-    @UserParameter(label = "A3-", description = "Amplitude of the triplet term for depression.", minimumValue = 0, maximumValue = 0.1, defaultValue = "0.0", order = 7)
+    @UserParameter(label = "A3-", description = "Amplitude of the triplet term for depression.", minimumValue = 0, maximumValue = 0.1, increment = .1, order = 7)
     protected double a3N = 0;
 
     // Spike traces.
     private double r1, r2, o1, o2;
+
     // Cached multipliers for trace decays.
     private double tauPlusMult, tauXMult, tauNegMult, tauYMult;
 

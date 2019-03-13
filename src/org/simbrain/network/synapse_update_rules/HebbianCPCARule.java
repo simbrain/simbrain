@@ -36,25 +36,25 @@ public class HebbianCPCARule extends SynapseUpdateRule {
     /**
      * Learning rate.
      */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb CPCA", minimumValue = 0, maximumValue = DEFAULT_M, defaultValue = ".005", order = 1)
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb CPCA", minimumValue = 0, maximumValue = DEFAULT_M, increment = .1, order = 1)
     private double learningRate;
 
     /**
      * Max Weight Value.
      */
-    @UserParameter(label = "m", description = "Max Weight", minimumValue = -10, maximumValue = 10, defaultValue = "" + DEFAULT_M, order = 1)
+    @UserParameter(label = "m", description = "Max Weight", minimumValue = -10, maximumValue = 10, increment = .1, order = 1)
     private double m;
 
     /**
      * Weight offset.
      */
-    @UserParameter(label = "Theta", description = "Weight Offset value", minimumValue = -10, maximumValue = 10, defaultValue = "1", order = 1)
+    @UserParameter(label = "Theta", description = "Weight Offset value", minimumValue = -10, maximumValue = 10, increment = .1, order = 1)
     private double theta;
 
     /**
      * Lambda.
      */
-    @UserParameter(label = "Lambda", description = "Sigmomid Function", minimumValue = -1, maximumValue = 10, defaultValue = "1", order = 1)
+    @UserParameter(label = "Lambda", description = "Sigmomid Function", minimumValue = -1, maximumValue = 10, increment = .1, order = 1)
     private double lambda;
 
     @Override
@@ -102,58 +102,34 @@ public class HebbianCPCARule extends SynapseUpdateRule {
         return 1 / (1 + Math.pow(theta * (arg / (1 - arg)), -lambda));
     }
 
-    /**
-     * @return Returns the momentum.
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @return Returns the maximum weight.
-     */
     public double getM() {
         return m;
     }
 
-    /**
-     * @return Returns the weight offset.
-     */
     public double getTheta() {
         return theta;
     }
 
-    /**
-     * @return Returns sigmoidal function.
-     */
     public double getLambda() {
         return lambda;
     }
 
-    /**
-     * @param momentum The momentum to set.
-     */
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }
 
-    /**
-     * @param m is maximum weight The maximum weight to set
-     */
     public void setM(final double m) {
         this.m = m;
     }
 
-    /**
-     * @param theta is weight offset The weight offset to set.
-     */
     public void setTheta(final double theta) {
         this.theta = theta;
     }
 
-    /**
-     * @param lambda is The sigmoidal to set.
-     */
     public void setLambda(final double lambda) {
         this.lambda = lambda;
     }

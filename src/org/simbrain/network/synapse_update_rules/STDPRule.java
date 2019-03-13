@@ -38,37 +38,37 @@ public class STDPRule extends SynapseUpdateRule {
     /**
      * Time constant for LTD.
      */
-    @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", defaultValue = "60", order = 0)
+    @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", increment = .1, order = 0)
     protected double tau_minus = 60;
 
     /**
      * Time constant for LTP.
      */
-    @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", defaultValue = "30", order = 1)
+    @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", increment = .1, order = 1)
     protected double tau_plus = 30;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTP changes.
      */
-    @UserParameter(label = "W+", description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.", defaultValue = "10", order = 2)
+    @UserParameter(label = "W+", description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.", increment = .1, order = 2)
     protected double W_plus = 10;
 
     /**
      * Learning rate for LTP case. Controls magnitude of LTD changes.
      */
-    @UserParameter(label = "W-", description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.", defaultValue = "10", order = 3)
+    @UserParameter(label = "W-", description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.", increment = .1, order = 3)
     protected double W_minus = 10;
 
     /**
      * General learning rate.
      */
-    @UserParameter(label = "Learning rate", description = "General learning " + "rate.", defaultValue = ".01", order = 4)
+    @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
     protected double learningRate = 0.01;
 
     /**
      * Sets whether or not STDP acts directly on W or dW/dt
      */
-    @UserParameter(label = "Smooth STDP", description = "Whether STDP acts directly on weight or on its derivative instead", defaultValue = "false", order = 5)
+    @UserParameter(label = "Smooth STDP", description = "Whether STDP acts directly on weight or on its derivative instead", order = 5)
     protected boolean continuous = false;
 
     @Override
@@ -148,72 +148,42 @@ public class STDPRule extends SynapseUpdateRule {
         }
     }
 
-    /**
-     * @return the tau_plus
-     */
     public double getTau_plus() {
         return tau_plus;
     }
 
-    /**
-     * @param tauPlus the tau_plus to set
-     */
     public void setTau_plus(double tauPlus) {
         tau_plus = tauPlus;
     }
 
-    /**
-     * @return the tau_minus
-     */
     public double getTau_minus() {
         return tau_minus;
     }
 
-    /**
-     * @param tauMinus the tau_minus to set
-     */
     public void setTau_minus(double tauMinus) {
         tau_minus = tauMinus;
     }
 
-    /**
-     * @return the w_plus
-     */
     public double getW_plus() {
         return W_plus;
     }
 
-    /**
-     * @param wPlus the w_plus to set
-     */
     public void setW_plus(double wPlus) {
         W_plus = wPlus;
     }
 
-    /**
-     * @return the w_minus
-     */
     public double getW_minus() {
         return W_minus;
     }
 
-    /**
-     * @param wMinus the w_minus to set
-     */
     public void setW_minus(double wMinus) {
         W_minus = wMinus;
     }
 
-    /**
-     * @return the learningRate
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param learningRate the learningRate to set
-     */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }

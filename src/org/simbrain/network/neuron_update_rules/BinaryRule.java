@@ -40,19 +40,19 @@ public class BinaryRule extends NeuronUpdateRule {
     @UserParameter(
             label = "Threshold",
             description = "Threshold for binary neurons.",
-            defaultValue = "0.5", order = 1)
+            increment = .1, order = 1)
     private double threshold = .5;
 
     @UserParameter(
             label = "On Value",
             description = "The value that turns on neuron.",
-            defaultValue = "1.0", order = 2)
+            increment=.1, order = 2)
     private double ceiling = DEFAULT_CEILING;
 
     @UserParameter(
             label = "Off Value",
             description = "The value that turns off neuron.",
-            defaultValue = "-1.0", order = 3)
+            increment=.1, order = 3)
     private double floor = DEFAULT_FLOOR;
 
     /**
@@ -61,15 +61,9 @@ public class BinaryRule extends NeuronUpdateRule {
     @UserParameter(
             label = "Bias",
             description = "Bias for binary neurons.",
-            defaultValue = "0", order = 4)
+            increment = .1, order = 4)
     private double bias = 0;
 
-    /**
-     * {@inheritDoc}
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
 
     public BinaryRule() {
     }
@@ -80,9 +74,7 @@ public class BinaryRule extends NeuronUpdateRule {
         this.threshold = threshold;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public BinaryRule deepCopy() {
         BinaryRule bn = new BinaryRule();
         bn.setThreshold(getThreshold());
@@ -91,9 +83,7 @@ public class BinaryRule extends NeuronUpdateRule {
         return bn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
         double wtdInput = neuron.getInput() + bias;
 
@@ -110,30 +100,10 @@ public class BinaryRule extends NeuronUpdateRule {
         return rand.nextBoolean() ? getUpperBound() : getLowerBound();
     }
 
-    /**
-     * @return Returns the threshold.
-     */
-    public double getThreshold() {
-        return threshold;
-    }
-
-    /**
-     * @param threshold The threshold to set.
-     */
     public void setThreshold(final double threshold) {
         this.threshold = threshold;
     }
 
-    /**
-     * @return the bias of the neuron.
-     */
-    public double getBias() {
-        return bias;
-    }
-
-    /**
-     * @param bias sets the bias of the neuron.
-     */
     public void setBias(final double bias) {
         this.bias = bias;
     }
@@ -190,6 +160,19 @@ public class BinaryRule extends NeuronUpdateRule {
     @Override
     public double getGraphicalUpperBound() {
         return ceiling + 1;
+    }
+
+    @Override
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public double getThreshold() {
+        return threshold;
     }
 
 }

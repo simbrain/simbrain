@@ -54,16 +54,12 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
      */
     private boolean addNoise = false;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public AdditiveRule deepCopy() {
         AdditiveRule an = new AdditiveRule();
         an.setLambda(getLambda());
@@ -73,9 +69,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
         return an;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
 
         // Update buffer of additive neuron using Euler's method.
@@ -108,30 +102,18 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
         return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
     }
 
-    /**
-     * @return Returns the lambda.
-     */
     public double getLambda() {
         return lambda;
     }
 
-    /**
-     * @param lambda The lambda to set.
-     */
     public void setLambda(final double lambda) {
         this.lambda = lambda;
     }
 
-    /**
-     * @return Returns the resistance.
-     */
     public double getResistance() {
         return resistance;
     }
 
-    /**
-     * @param resistance The resistance to set.
-     */
     public void setResistance(final double resistance) {
         this.resistance = resistance;
     }
@@ -146,16 +128,10 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
         this.noiseGenerator = noise;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }

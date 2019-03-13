@@ -1023,12 +1023,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public void addDefaultSensorsEffectors() {
 
         // Add default effectors
-        addEffector(new StraightMovement(this,
-            "Go-straight"));
-        addEffector(new Turning(this, "Go-left",
-            Turning.LEFT));
-        addEffector(new Turning(this, "Go-right",
-            Turning.RIGHT));
+        addEffector(new StraightMovement(this));
+        addEffector(new Turning(this, Turning.LEFT));
+        addEffector(new Turning(this, Turning.RIGHT));
 
         // Add default sensors
         addSensor(new ObjectSensor(this,  EntityType.SWISS, Math.PI / 8,

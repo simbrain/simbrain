@@ -3,9 +3,10 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 
-public class LocationSensorNode extends EntityAttributeNode {
+public class GridSensorNode extends EntityAttributeNode {
 
     /**
      * Sensor diameter
@@ -22,7 +23,7 @@ public class LocationSensorNode extends EntityAttributeNode {
      */
     private PPath shape;
 
-    public LocationSensorNode(GridSensor sensor) {
+    public GridSensorNode(GridSensor sensor) {
         this.sensor = sensor;
         GeneralPath crossPath = new GeneralPath();
         crossPath.moveTo(-SENSOR_RADIUS, 0);
@@ -30,6 +31,7 @@ public class LocationSensorNode extends EntityAttributeNode {
         crossPath.moveTo(0, -SENSOR_RADIUS);
         crossPath.lineTo(0, SENSOR_RADIUS);
         this.shape = new PPath.Float(crossPath);
+        shape.setStroke(new BasicStroke(2f));
 
         setPickable(false);
         shape.setPickable(false);

@@ -33,7 +33,7 @@ public class Turning extends Effector {
     /**
      * Default direction.
      */
-    public static final double DEFAULT_DIRECTION = 0;
+    public static final double DEFAULT_DIRECTION = 1;
 
     /**
      * Direction value to turn left.
@@ -49,10 +49,10 @@ public class Turning extends Effector {
      * Turn by amount times direction, which encodes direction: 1 for left, -1
      * for right.
      */
-    @UserParameter(label = "Turning Direction",
+    @UserParameter(label = "Turning Direction and Weight",
             description = "Turn by amount times direction, which encodes direction: 1 for left, -1 for right.",
             order = 4)
-    private double direction;
+    private double direction = DEFAULT_DIRECTION;
 
     /**
      * Default amount.
@@ -65,7 +65,7 @@ public class Turning extends Effector {
     @UserParameter(label = "Turning Amount",
             description = "Amount to turn in radians.",
             order = 5)
-    private double amount = 0;
+    private double amount = DEFAULT_AMOUNT;
 
     /**
      * Default label.
@@ -76,11 +76,10 @@ public class Turning extends Effector {
      * Construct a turning effector.
      *
      * @param parent    parent entity.
-     * @param label     descriptive label
      * @param direction amount turn in radians.
      */
-    public Turning(OdorWorldEntity parent, String label, double direction) {
-        super(parent, label);
+    public Turning(OdorWorldEntity parent, double direction) {
+        super(parent);
         this.direction = direction;
     }
 
@@ -139,17 +138,22 @@ public class Turning extends Effector {
      */
     public String getTurningDescription() {
         String dirString = (direction == 1) ? "Left" : "Right";
-        return getParent().getName() + ":" + "Turn " + dirString;
+        return getParent().getName() + ":" + "Turn " + getDirectionString();
     }
 
-    // TODO: Is a straight set needed?
-//    /**
-//     * @param amount the amount to set
-//     */
-//    @Consumable(idMethod = "getMixedId", customDescriptionMethod = "getEffectorDescription")
-//    public void setAmount(double amount) {
-//        this.amount = amount;
-//    }
+    /**
+     * Return
+     * @return
+     */
+    public String getDirectionString() {
+        if (direction < 0) {
+            return "Right";
+        } else if (direction > 0) {
+            return "Left";
+        } else {
+            return "Nowhere";
+        }
+    }
 
     public double getDirection() {
         return direction;
@@ -159,6 +163,14 @@ public class Turning extends Effector {
         this.direction = direction;
     }
 
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return "Turn " + getDirectionString();
+        } else {
+            return super.getLabel();
+        }
+    }
 
     @Override
     public String getName() {

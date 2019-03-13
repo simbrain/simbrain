@@ -49,11 +49,6 @@ public class StraightMovement extends Effector {
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
     /**
-     * Default label.
-     */
-    public static final String DEFAULT_LABEL = "Go-Straight";
-
-    /**
      * Construct the straight movement effector.
      *
      * @param parent parent entity.
@@ -69,7 +64,7 @@ public class StraightMovement extends Effector {
      * @param parent parent entity.
      */
     public StraightMovement(OdorWorldEntity parent) {
-        super(parent, DEFAULT_LABEL);
+        super(parent);
     }
 
     /**
@@ -144,6 +139,16 @@ public class StraightMovement extends Effector {
     public void setScalingFactor(double scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
+
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return "Move Straight";
+        } else {
+            return super.getLabel();
+        }
+    }
+
 
     @Override
     public String getName() {

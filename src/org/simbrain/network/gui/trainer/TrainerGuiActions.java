@@ -143,9 +143,7 @@ public class TrainerGuiActions {
                 putValue(SHORT_DESCRIPTION, "Open .csv data...");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(getDataDirectory(), "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
@@ -215,9 +213,7 @@ public class TrainerGuiActions {
                 putValue(SHORT_DESCRIPTION, "Show error plot");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 ErrorPlotPanel errorPanel = new ErrorPlotPanel(trainer);
                 panel.displayPanel(errorPanel, "Error plot");

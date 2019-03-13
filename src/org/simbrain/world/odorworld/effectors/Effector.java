@@ -65,16 +65,27 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
      * Public label of this effector.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this effector",
-            defaultValue = "", order = 2)
-    private String label;
+            order = 2)
+    private String label = "";
 
     /**
-     * Construct the effector.
+     * Construct an effector.
      *
      * @param parent the parent entity
      * @param label  a label for this effector
      */
     public Effector(OdorWorldEntity parent, String label) {
+        super();
+        this.parent = parent;
+        this.label = label;
+    }
+
+    /**
+     * Construct an effector.
+     *
+     * @param parent the parent entity
+     */
+    public Effector(OdorWorldEntity parent) {
         super();
         this.parent = parent;
         this.label = label;

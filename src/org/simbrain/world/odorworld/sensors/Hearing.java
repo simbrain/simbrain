@@ -176,6 +176,16 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return "Hear " + phrase;
+        } else {
+            return super.getLabel();
+        }
+    }
+
+
+    @Override
     public String getName() {
         return "Hearing Sensor";
     }

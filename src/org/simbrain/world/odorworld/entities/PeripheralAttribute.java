@@ -27,7 +27,6 @@ public interface PeripheralAttribute extends AttributeContainer, EditableObject 
 
     /**
      * Called by reflection by some attributes.
-     * @return
      */
     default String getMixedId() {
         return this.getParent().getId() + ":" + this.getId();
@@ -39,7 +38,6 @@ public interface PeripheralAttribute extends AttributeContainer, EditableObject 
      * corresponding to object sensors and effectors.
      */
     default String getAttributeDescription() {
-        String sensorEffector = (this instanceof Sensor) ? "Sensor" : "Effector";
-        return getParent().getName() + ":" + getName() + " " + sensorEffector;
+        return getParent().getName() + ":" + getId() + ":" + getLabel();
     }
 }

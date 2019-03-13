@@ -203,6 +203,7 @@ public class Creature {
         brain.copyLabels(verbs, decisions);
 
         // Coupling some decision lobe cells to agent effectors
+        // TODO: Labelling has changed; fix below
         parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
         parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
         parentSim.getSim().couple(decisions.getNeuronByLabel("Forward"), agent.getEffector("Go-straight"));

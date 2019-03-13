@@ -167,4 +167,12 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         return sensorSize;
     }
 
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return getDirectionString() + "Bump Sensor";
+        } else {
+            return super.getLabel();
+        }
+    }
 }

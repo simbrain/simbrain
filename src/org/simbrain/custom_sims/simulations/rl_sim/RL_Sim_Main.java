@@ -220,12 +220,9 @@ public class RL_Sim_Main extends RegisteredSimulation {
         mouse = worldBuilder.addAgent(43, 110, "Mouse");
         mouse.setHeading(0);
         // Add default effectors
-        mouse.addEffector(new StraightMovement(mouse,
-            "Go-straight"));
-        mouse.addEffector(new Turning(mouse, "Go-left",
-            Turning.LEFT));
-        mouse.addEffector(new Turning(mouse, "Go-right",
-            Turning.RIGHT));
+        mouse.addEffector(new StraightMovement(mouse));
+        mouse.addEffector(new Turning(mouse, Turning.LEFT));
+        mouse.addEffector(new Turning(mouse, Turning.RIGHT));
 
         leftSmell = new SmellSensor(mouse, "Smell-Left", -Math.PI / 8,
             50);

@@ -226,4 +226,14 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     public void setCharactersPerRow(int charactersPerRow) {
         this.charactersPerRow = charactersPerRow;
     }
+
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return "Say " + phrase;
+        } else {
+            return super.getLabel();
+        }
+    }
+
 }

@@ -102,7 +102,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     private String label = "";
 
     /**
-     * Construct the sensor.
+     * Construct a sensor.
      *
      * @param parent the parent entity
      * @param label  a label for this sensor
@@ -113,7 +113,11 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         this.label = label;
     }
 
-    // todo
+    /**
+     * Construct a sensor.
+     *
+     * @param parent the parent entity
+     */
     public Sensor(OdorWorldEntity parent) {
         super();
         this.parent = parent;
@@ -158,6 +162,21 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     @Override
     public String getId() {
         return id;
+    }
+
+    /**
+     * Return String direction (left / right) based on angle of the sensor
+     */
+    public String getDirectionString() {
+        if (getTheta() < 0 && getTheta() > - Math.PI /2  ) {
+            return "Right ";
+        } else if (getTheta() > 0 && getTheta() < Math.PI/2 ) {
+            return "Left ";
+        } else {
+            return "";
+        }
+        // TODO: Maybe add front, back, left-back and right-back
+        // With length = 0 can also have center
     }
 
     @Override

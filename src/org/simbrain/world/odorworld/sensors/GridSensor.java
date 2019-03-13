@@ -131,6 +131,8 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.y = y;
         this.width = width;
         this.height = height;
+        super.setTheta(0);
+        super.setRadius(25);
     }
 
     /**
@@ -266,6 +268,14 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         return new GridSensor(this);
     }
 
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return getDirectionString() + "Grid Sensor";
+        } else {
+            return super.getLabel();
+        }
+    }
     @Override
     public String getName() {
         return "Grid Sensor";

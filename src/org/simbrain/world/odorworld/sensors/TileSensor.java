@@ -101,4 +101,13 @@ public class TileSensor extends Sensor {
     public EditableObject copy() {
         return new TileSensor(this);
     }
+
+    @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return "Sense tile id " + tileIdToSense;
+        } else {
+            return super.getLabel();
+        }
+    }
 }

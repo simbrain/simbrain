@@ -152,18 +152,6 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         return showLabel;
     }
 
-    //todo
-    public String getDirectionString() {
-        if (super.getTheta() < 0 && super.getTheta() > - Math.PI ) {
-            return "Right ";
-        } else if (super.getTheta() > 0 && super.getTheta() < Math.PI ) {
-            return "Left ";
-        } else {
-            return "";
-        }
-
-    }
-
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {

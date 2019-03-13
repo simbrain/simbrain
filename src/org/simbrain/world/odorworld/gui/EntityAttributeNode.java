@@ -44,7 +44,7 @@ public abstract class EntityAttributeNode extends PNode {
             return new ObjectSensorNode((ObjectSensor) visualizableEntityAttribute);
         }
         if (visualizableEntityAttribute instanceof GridSensor) {
-            return new LocationSensorNode((GridSensor) visualizableEntityAttribute);
+            return new GridSensorNode((GridSensor) visualizableEntityAttribute);
         }
         return null;
     }

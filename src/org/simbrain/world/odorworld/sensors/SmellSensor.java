@@ -127,6 +127,15 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
+    public String getLabel() {
+        if (super.getLabel().isEmpty()) {
+            return getDirectionString() + "Smell Sensor";
+        } else {
+            return super.getLabel();
+        }
+    }
+
+    @Override
     public EditableObject copy() {
         return new SmellSensor(this);
     }

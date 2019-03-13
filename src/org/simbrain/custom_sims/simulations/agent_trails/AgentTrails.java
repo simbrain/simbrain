@@ -138,6 +138,7 @@ public class AgentTrails extends RegisteredSimulation {
         worldBuilder.getWorld().update();
 
         // Couple network to agent
+        // TODO: Labelling has changed; fix below
         sim.couple(straightNeuron, mouse.getEffector("Go-straight"));
         sim.couple(rightNeuron, mouse.getEffector("Go-left"));
         sim.couple(leftNeuron, mouse.getEffector("Go-right"));

@@ -594,6 +594,7 @@ public class Utils {
         return Utils.getOSMatches("Mac OS X");
     }
 
+    //TODO: Redo all this with streams?
     /**
      * Reimplementation of same method from
      * org.apache.commons.collections.CollectionUtils.

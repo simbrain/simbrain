@@ -370,7 +370,8 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             return "Edit " + firstObject;
         } else {
             String lastObject = names.get(names.size()-1);
-            return "Edit " + firstObject + "..." + lastObject;
+            return "Edit " + names.size() + " " +
+                editedObjects.get(0).getClass().getSimpleName() + "s";
         }
     }
 
@@ -424,6 +425,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     public EditorDialog getDialog() {
 
         final EditorDialog ret = new EditorDialog();
+        ret.setTitle(getTitleString());
         ret.setContentPane(this);
         return ret;
     }

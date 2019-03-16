@@ -214,10 +214,20 @@ public class KeyBindings {
             }
         });
 
+        // Select neurons in neuron group
+        inputMap.put(KeyStroke.getKeyStroke("S"), "selectNeuronsNG");
+        panel.getActionMap().put("selectNeuronsNG",
+            new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    panel.selectNeuronsInNeuronGroups();
+                }
+            });
+
         // Selection Mode
-        inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");
-        panel.getActionMap().put("selectionMode",
-                panel.getActionManager().getSelectionEditModeAction());
+        // inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");
+        // panel.getActionMap().put("selectionMode",
+        //         panel.getActionManager().getSelectionEditModeAction());
 
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");

@@ -478,9 +478,6 @@ public class SynapseGroup extends Group {
         }
     }
 
-    /**
-     *
-     */
     private void updateExcitatorySynapses() {
         for (Synapse synapse : exSynapseSet) {
             synapse.update();

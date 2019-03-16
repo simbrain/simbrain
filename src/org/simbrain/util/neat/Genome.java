@@ -1,9 +1,7 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,21 +10,15 @@ import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
 
-import org.simbrain.custom_sims.simulations.neat.NodeGene.NodeType;
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
+import org.simbrain.util.neat.NodeGene.NodeType;
 
-import static org.simbrain.custom_sims.simulations.neat.util.Math.clipping;
+import static org.simbrain.util.neat.NeatUtils.clipping;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.BiMap;
 
 /**
@@ -115,6 +107,7 @@ public class Genome implements Comparable<Genome> {
      * the argument of pool
      */
     public static class Builder {
+
         /**
          * The genome to build on.
          */

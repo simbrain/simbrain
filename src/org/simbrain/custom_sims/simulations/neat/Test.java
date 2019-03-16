@@ -1,31 +1,28 @@
 package org.simbrain.custom_sims.simulations.neat;
 
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
+import org.simbrain.util.neat.NEATRandomizer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.*;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
+import org.simbrain.util.neat.Agent;
+import org.simbrain.util.neat.Genome;
+import org.simbrain.util.neat.Pool;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Test {
 
-    public static void evaluationMethod(Agent agent) {
+    public static void xorTest(Agent agent) {
         // initializing fitness score
         // TODO: it is easy to forget to initialize fitness. make default fitness configurable in pool.
         agent.setFitness(0);
@@ -366,11 +363,12 @@ public class Test {
 
         long startTime = System.currentTimeMillis();
 
-        // construct a pool of genomes with 2 inputs and 1 output
-        Pool pool = new Pool(2, 1, 500, Test::evaluationMethod);
+        // Construct a pool of genomes with 2 inputs and 1 output
+        Pool pool = new Pool(2, 1, 5, Test::xorTest);
 
         // Run the evolutionary algorithm
         Genome topGenome = pool.evolve(1000, -.01);
+
         Agent topAgent = new Agent(topGenome);
 
         long endTime = System.currentTimeMillis();

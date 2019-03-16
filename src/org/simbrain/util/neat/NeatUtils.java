@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.neat.util;
+package org.simbrain.util.neat;
 
 /**
  * Some math utility for NEAT use.
@@ -8,7 +8,7 @@ package org.simbrain.custom_sims.simulations.neat.util;
  * @author LeoYulinLi
  *
  */
-public class Math {
+public class NeatUtils {
 
     /**
      * Check that the specified pair of value is a valid bound.

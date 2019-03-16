@@ -21,6 +21,7 @@ package org.simbrain.util;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
+import java.security.Key;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -200,7 +201,10 @@ public class StandardDialog extends GenericJDialog {
 
         addWindowListener(windowAdapter);
 
-        this.getRootPane().registerKeyboardAction(actionListener, KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 0);
+        this.getRootPane().registerKeyboardAction(actionListener,
+            KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK), 0);
+        this.getRootPane().registerKeyboardAction(actionListener,
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 0);
 
         // this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();

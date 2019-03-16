@@ -1,7 +1,7 @@
-package org.simbrain.custom_sims.simulations.neat.util;
+package org.simbrain.util.neat;
 
 import java.util.Random;
-import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
+import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
  * Java Random with extra method for NEAT use.
@@ -9,6 +9,7 @@ import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
  *
  */
 public class NEATRandomizer extends Random {
+
     private static final long serialVersionUID = -3217013262668966634L;
 
     /**

@@ -124,6 +124,9 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
      * @return true if collided with an entity, false otherwise
      */
     public boolean collided() {
+        if (world == null) {
+            world = parent.getParentWorld();
+        }
         for (OdorWorldEntity e : world.getEntityList()) {
             if (e != parent && e.getCollisionBound().collide(this.collisionBound)) {
                 return true;

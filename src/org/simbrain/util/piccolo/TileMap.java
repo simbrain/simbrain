@@ -160,7 +160,9 @@ public class TileMap {
      * @return true if the given tile exists in the tile stack
      */
     public boolean hasTileIdAtPixel(int id, double x, double y) {
-        return getTileStackAtPixel(x, y).stream().anyMatch(t -> t.getId() == id);
+        return getTileStackAtPixel(x, y).stream()
+                .filter(Objects::nonNull)
+                .anyMatch(t -> t.getId() == id);
     }
 
     /**

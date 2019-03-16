@@ -161,7 +161,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         return "Bump Sensor";
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
+    @Producible( customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

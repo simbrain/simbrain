@@ -26,13 +26,6 @@ public interface PeripheralAttribute extends AttributeContainer, EditableObject 
     public void setLabel(String label);
 
     /**
-     * Called by reflection by some attributes.
-     */
-    default String getMixedId() {
-        return this.getParent().getId() + ":" + this.getId();
-    }
-
-    /**
      * Called by reflection to return a custom description for the {@link
      * org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer}
      * corresponding to object sensors and effectors.

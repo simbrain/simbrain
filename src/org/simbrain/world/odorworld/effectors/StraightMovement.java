@@ -99,21 +99,14 @@ public class StraightMovement extends Effector {
         this.parent = parent;
     }
 
-    /**
-     * @return the amount
-     */
     public double getAmount() {
         return amount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
-    @Consumable(idMethod = "getMixedId",customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }
-
 
     /**
      * Add an amount to go straight. Allows for multiple "moves" to be
@@ -121,21 +114,20 @@ public class StraightMovement extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod = "getMixedId")
+    @Consumable(customDescriptionMethod = "getAddAmountDescription",
+        defaultVisibility = false)
     public void addAmount(double amount) {
         this.amount += amount;
     }
 
-    /**
-     * @return the scalingFactor
-     */
+    public String getAddAmountDescription() {
+        return getAttributeDescription() + " (Add)";
+    }
+
     public double getScalingFactor() {
         return scalingFactor;
     }
 
-    /**
-     * @param scalingFactor the scalingFactor to set
-     */
     public void setScalingFactor(double scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
@@ -148,7 +140,6 @@ public class StraightMovement extends Effector {
             return super.getLabel();
         }
     }
-
 
     @Override
     public String getName() {

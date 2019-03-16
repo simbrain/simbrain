@@ -52,7 +52,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Utterance",
             description = "The thing this speech effector says.",
-            defaultValue = DEFAULT_PHRASE, order = 3)
+            order = 3)
     private String phrase = DEFAULT_PHRASE;
 
     /**
@@ -61,7 +61,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     @UserParameter(label = "Characters per Row",
             description = "The maximum number of characters that can be displayed in one row in the speech bubble. "
                         + "This setting only affects visual representation.",
-            defaultValue = "32", order = 4)
+            order = 4)
     private int charactersPerRow = 32;
 
     /**
@@ -74,7 +74,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Threshold",
             description = "Threshold above which to \"the message\".",
-            defaultValue = "" + DEFAULT_THRESHOLD, order = 5)
+            order = 5)
     private double threshold = DEFAULT_THRESHOLD;
 
     @UserParameter(label = "Decay Function", isObjectType = true, order = 10, tab = "Dispersion")
@@ -176,7 +176,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         return phrase;
     }
 
-    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -192,7 +192,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.activated = activated;
     }
 
-    @Consumable(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }

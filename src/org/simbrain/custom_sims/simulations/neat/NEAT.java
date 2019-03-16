@@ -1,26 +1,21 @@
 package org.simbrain.custom_sims.simulations.neat;
 
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.simulations.neat.NodeGene.NodeType;
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
-import org.simbrain.custom_sims.simulations.simpleNeuroevolution.EvolveNet;
+import org.simbrain.util.neat.NEATRandomizer;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
+import org.simbrain.util.neat.Agent;
+import org.simbrain.util.neat.Genome;
+import org.simbrain.util.neat.Pool;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 public class NEAT extends RegisteredSimulation {
     Agent agent;

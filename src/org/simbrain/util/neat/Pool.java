@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
-
 import static java.util.Objects.requireNonNull;
-import static org.simbrain.custom_sims.simulations.neat.util.Math.probClipping;
-import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
+import static org.simbrain.util.neat.NeatUtils.probClipping;
+import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
  * This class consists of the config for evolution, status of the evolution, and

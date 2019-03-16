@@ -1,6 +1,7 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import static java.util.Objects.requireNonNull;
+
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.util.Utils;

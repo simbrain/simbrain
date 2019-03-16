@@ -1,7 +1,6 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
 import org.simbrain.network.core.Network;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;

@@ -206,16 +206,12 @@ public final class NeuronGroupDialog extends StandardDialog {
         }
 
         // Set up help button
-        Action helpAction;
-        helpAction = new ShowHelpAction("Pages/Network/groups.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/groups/NeuronGroup.html");
+        if (specificNeuronGroupPanel != null) {
+            System.out.println("here");
+            helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
+        }
         addButton(new JButton(helpAction));
-        //TODO
-        // if (specificNeuronGroupPanel != null) {
-        //     helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
-        // } else {
-        //     helpAction = new ShowHelpAction(this.getHelpPath());
-        // }
-        // ((StandardDialog) parent).addButton(new JButton(helpAction));
 
         // Tab-change events
         tabbedPane.addChangeListener(new ChangeListener() {

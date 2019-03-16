@@ -284,7 +284,7 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Set up help button
         Action helpAction;
-        helpAction = new ShowHelpAction("Pages/Network/groups.html");
+        helpAction = new ShowHelpAction("Pages/Network/groups/SynapseGroup.html");
         addButton(new JButton(helpAction));
 
         // Tab-change events

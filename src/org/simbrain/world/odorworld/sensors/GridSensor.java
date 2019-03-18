@@ -67,7 +67,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(label = "Activation amount",
             description = "Amount of activation that a neuron coupled with the tile sensor receives "
                     + "when the tile sensor is activated. ",
-            defaultValue = "" + DEFAULT_ACTIVATION, order = 3)
+            order = 3)
     private double activationAmount = DEFAULT_ACTIVATION;
 
     /**
@@ -195,65 +195,38 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         return activationAmount;
     }
 
-    /**
-     * @return the x
-     */
     public int getX() {
         return x;
     }
 
-    /**
-     * @param x the x to set
-     */
     public void setX(int x) {
         this.x = x;
     }
 
-    /**
-     * @return the y
-     */
     public int getY() {
         return y;
     }
 
-    /**
-     * @param y the y to set
-     */
     public void setY(int y) {
         this.y = y;
     }
 
-    /**
-     * @return the width
-     */
     public int getWidth() {
         return width;
     }
 
-    /**
-     * @param width the width to set
-     */
     public void setWidth(int width) {
         this.width = width;
     }
 
-    /**
-     * @return the height
-     */
     public int getHeight() {
         return height;
     }
 
-    /**
-     * @param height the height to set
-     */
     public void setHeight(int height) {
         this.height = height;
     }
 
-    /**
-     * @param amount the activation amount to set
-     */
     public void setActivationAmount(double amount) {
         activationAmount = amount;
     }

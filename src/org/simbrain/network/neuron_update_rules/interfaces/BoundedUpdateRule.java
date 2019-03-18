@@ -46,7 +46,7 @@ public interface BoundedUpdateRule {
     @UserParameter(
         label = "Upper Bound",
         description = "Upper bound that determines the maximum level of activity of a node.",
-        defaultValue = "1.0", order = -2)
+        order = -2)
     double getUpperBound();
 
     /**
@@ -57,7 +57,6 @@ public interface BoundedUpdateRule {
     @UserParameter(
             label = "Lower Bound",
             description = "Lower bound that determines the minimum level of activity of a node.",
-            defaultValue = "-1.0", order = -1)
+            order = -1)
     double getLowerBound();
-
 }

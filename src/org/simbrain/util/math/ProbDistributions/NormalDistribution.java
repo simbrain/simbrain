@@ -13,14 +13,14 @@ public class NormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Mean (\u03BC)",
             description = "The expected value of the distribution.",
-            defaultValue = "1.0", order = 1)
+            order = 1)
     private double mean = 1.0;
 
 
     @UserParameter(
             label = "Std. Dev. (\u03C3)",
             description = "The average squared distance from the mean.",
-            defaultValue = "0.5", order = 2)
+            order = 2)
     private double standardDeviation = 0.5;
 
 
@@ -32,7 +32,7 @@ public class NormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.NEGATIVE_INFINITY, order = 3)
+            order = 3)
     private double floor = Double.NEGATIVE_INFINITY;
 
     /**
@@ -43,13 +43,13 @@ public class NormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.POSITIVE_INFINITY, order = 4)
+            order = 4)
     private double ceil = Double.POSITIVE_INFINITY;
 
     @UserParameter(
             label = "Clipping",
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
-            defaultValue = "false", order = 5)
+            order = 5)
     private boolean clipping = false;
 
     private Polarity polarity = Polarity.BOTH;

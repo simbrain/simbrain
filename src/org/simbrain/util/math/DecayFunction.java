@@ -39,7 +39,7 @@ public abstract class DecayFunction implements CopyableObject {
     @UserParameter(
             label = "Dispersion",
             description = "If outside of this radius the object has no affect on the network.",
-            defaultValue = "70", order = 1)
+            order = 1)
     private double dispersion = 70;
 
     /**
@@ -48,7 +48,7 @@ public abstract class DecayFunction implements CopyableObject {
     @UserParameter(
             label = "Peak Distance",
             description = "Peak value",
-            defaultValue = "0", order = 2)
+            order = 2)
     private double peakDistance = 0;
 
     /**
@@ -63,7 +63,7 @@ public abstract class DecayFunction implements CopyableObject {
     @UserParameter(
             label = "Add noise",
             description = "If true, add noise to object's stimulus vector.",
-            defaultValue = "false", order = 99, tab = "Noise")
+            order = 99, tab = "Noise")
     private boolean addNoise = false;
 
     public double getDispersion() {

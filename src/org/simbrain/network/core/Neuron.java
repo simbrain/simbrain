@@ -165,7 +165,7 @@ public class Neuron implements EditableObject, AttributeContainer {
             label = "Clamped",
             description = "In general, a clamped neuron will not change over time; it is \"clamped\" "
                     + "to its current value.",
-            defaultValue = "false", order = 3)
+            order = 3)
     private boolean clamped;
 
     /**

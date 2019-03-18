@@ -45,7 +45,7 @@ public class StraightMovement extends Effector {
      */
     @UserParameter(label = "Base Movement Amount",
             description = "Effector moves agent ahead by scaling factor times amount.",
-            defaultValue = "" + DEFAULT_SCALING_FACTOR, order = 4)
+            order = 4)
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
     /**
@@ -99,16 +99,10 @@ public class StraightMovement extends Effector {
         this.parent = parent;
     }
 
-    /**
-     * @return the amount
-     */
     public double getAmount() {
         return amount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
     @Consumable(idMethod = "getMixedId",customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
@@ -126,16 +120,10 @@ public class StraightMovement extends Effector {
         this.amount += amount;
     }
 
-    /**
-     * @return the scalingFactor
-     */
     public double getScalingFactor() {
         return scalingFactor;
     }
 
-    /**
-     * @param scalingFactor the scalingFactor to set
-     */
     public void setScalingFactor(double scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
@@ -148,7 +136,6 @@ public class StraightMovement extends Effector {
             return super.getLabel();
         }
     }
-
 
     @Override
     public String getName() {

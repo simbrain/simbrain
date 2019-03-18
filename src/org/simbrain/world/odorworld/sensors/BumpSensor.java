@@ -47,7 +47,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(
             label = "Base Value",
             description = "The value to output when the sensor is bumped",
-            defaultValue = "1", order = 4)
+            order = 4)
     private double baseValue = 1;
 
     /**

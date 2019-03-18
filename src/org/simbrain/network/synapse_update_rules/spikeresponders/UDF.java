@@ -50,14 +50,14 @@ public class UDF extends SpikeResponder {
      * Facilitation constant.
      */
     @UserParameter(label = "Mean Facilitation ", description = "Time constant for facilitating effects.",
-            defaultValue = "50", order = 1)
+            order = 1)
     private double F = 50;
 
     /**
      * Psr decay time constant
      */
     @UserParameter(label = "PSR Decay Constant", description = "Time constant for facilitating effects.",
-            defaultValue = "50", order = 1)
+            order = 1)
     private double tau = 3;
 
     /**

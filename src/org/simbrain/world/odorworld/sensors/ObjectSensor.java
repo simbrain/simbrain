@@ -29,7 +29,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @UserParameter(
             label = "Base Value",
             description = "Base value of the output before decay function applies",
-            defaultValue = "1", order = 10)
+            order = 10)
     private double baseValue = 1;
 
     /**
@@ -52,7 +52,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      */
     @UserParameter(label = "Show Label",
             description = "Show label on top of the sensor node",
-            order = 4, defaultValue = "false")
+            order = 4)
     private boolean showLabel = false;
 
     /**

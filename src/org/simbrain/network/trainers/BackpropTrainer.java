@@ -176,7 +176,7 @@ public class BackpropTrainer extends IterableTrainer {
         label = "Learning Rate",
         description = "Learning Rate",
         minimumValue = 0, maximumValue = 10,
-        defaultValue = ".01", order = 2)
+        order = 2)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
@@ -186,7 +186,7 @@ public class BackpropTrainer extends IterableTrainer {
         label = "Momentum",
         description = "Momentum",
         minimumValue = 0, maximumValue = 10,
-        defaultValue = ".25", order = 2)
+        order = 2)
     private double momentum = DEFAULT_MOMENTUM;
 
     /**
@@ -234,7 +234,6 @@ public class BackpropTrainer extends IterableTrainer {
         setLearningRate(DEFAULT_LEARNING_RATE);
         setMomentum(DEFAULT_MOMENTUM);
     }
-
 
     //TODO: Here to appease SRNTrainer.  Not yet re-implemented.
     /**
@@ -580,30 +579,18 @@ public class BackpropTrainer extends IterableTrainer {
         }
     }
 
-    /**
-     * @return the learningRate
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param learningRate the learningRate to set
-     */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }
 
-    /**
-     * @return the momentum
-     */
     public double getMomentum() {
         return momentum;
     }
 
-    /**
-     * @param momentum the momentum to set
-     */
     public void setMomentum(double momentum) {
         this.momentum = momentum;
     }
@@ -612,40 +599,24 @@ public class BackpropTrainer extends IterableTrainer {
     // TODO: Temporarily exposing this stuff for quick testing
     //
 
-    /**
-     * @return the weightMatrices
-     */
     public List<DoubleMatrix> getWeightMatrices() {
         return weightMatrices;
     }
 
-    /**
-     * @param weightMatrices the weightMatrices to set
-     */
     public void setWeightMatrices(List<DoubleMatrix> weightMatrices) {
         this.weightMatrices = weightMatrices;
     }
 
-    /**
-     * @return the biases
-     */
     public List<DoubleMatrix> getBiases() {
         return biases;
     }
 
-    /**
-     * @param biases the biases to set
-     */
     public void setBiases(List<DoubleMatrix> biases) {
         this.biases = biases;
     }
 
-    /**
-     * @param updateMethod the updateMethod to set
-     */
     public void setUpdateMethod(UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
     }
-
 
 }

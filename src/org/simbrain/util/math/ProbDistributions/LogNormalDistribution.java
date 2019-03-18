@@ -10,13 +10,13 @@ public class LogNormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Location (\u03BC)",
             description = "The mean of the logarithm of this distribution.",
-            defaultValue = "1.0", order = 1)
+            order = 1)
     private double location = 1.0;
 
     @UserParameter(
             label = "Scale (\u03C3)",
             description = "The standard deviation of the logarithm of this distribution.",
-            defaultValue = "0.5", order = 2)
+            order = 2)
     private double scale = 0.5;
 
     /**
@@ -27,7 +27,7 @@ public class LogNormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "0.0", order = 3)
+            order = 3)
     private double floor = 0.0;
 
     /**
@@ -38,13 +38,13 @@ public class LogNormalDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.POSITIVE_INFINITY, order = 4)
+            order = 4)
     private double ceil = Double.POSITIVE_INFINITY;
 
     @UserParameter(
             label = "Clipping",
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
-            defaultValue = "false", order = 5)
+            order = 5)
     private boolean clipping = false;
 
     private Polarity polarity = Polarity.BOTH;

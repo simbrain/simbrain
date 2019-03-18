@@ -119,7 +119,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * neurons with no polarity.
      */
     @UserParameter(label = "Exc. Probability", description = "Probability connections will be made to neighbor excitatory (or non-polar) neurons ",
-            minimumValue = 0, defaultValue = "0.8", order = 5)
+            minimumValue = 0, order = 5)
     private double excitatoryProbability = .8;
 
     /**
@@ -128,14 +128,14 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * will be how many connections are made.
      */
     @UserParameter(label = "Num. Exc. Connections", description = "Maximum # of connections with exc. neurons",
-            minimumValue = 0, defaultValue = "5", order = 7)
+            minimumValue = 0, order = 7)
     private int excCons = 5;
 
     /**
      * Radius within which to connect excitatory excNeurons.
      */
     @UserParameter(label = "Exc. Radius", description = "Distance to search for excitatory neurons to connect to",
-            minimumValue = 0, defaultValue = "100", order = 3)
+            minimumValue = 0, order = 3)
     private double excitatoryRadius = 100;
 
     /**
@@ -147,7 +147,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * Radius within which to connect inhibitory excNeurons.
      */
     @UserParameter(label = "Inh. Radius", description = "Distance to search for inhibitory neurons to connect to",
-            minimumValue = 0, defaultValue = "80", order = 4)
+            minimumValue = 0, order = 4)
     private double inhibitoryRadius = 80;
 
     /**
@@ -155,7 +155,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * inhibitory.
      */
     @UserParameter(label = "Inh. Probability", description = "Probability connections will be made to neighbor inhibitory neurons ",
-            minimumValue = 0, defaultValue = "0.8", order = 6)
+            minimumValue = 0, order = 6)
     private double inhibitoryProbability = .8;
 
     /**
@@ -164,7 +164,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * will be how many connections are made.
      */
     @UserParameter(label = "Num. Inh. Connections", description = "Maximum # of connections with inh. neurons",
-            minimumValue = 0, defaultValue = "5", order = 8)
+            minimumValue = 0, order = 8)
     private int inhCons = 5;
 
     /**
@@ -210,7 +210,6 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         inhNeurons = neurons.stream().filter(neuron -> neuron.getPolarity()
                 == SimbrainConstants.Polarity.INHIBITORY).collect(Collectors.toList());
     }
-
 
     /**
      * Make the connections.
@@ -361,7 +360,6 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         }
     }
 
-
     @Override
     public void connectNeurons(SynapseGroup synGroup) {
         // No implementation yet.
@@ -424,100 +422,58 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         return ret;
     }
 
-    /**
-     * @return the allowSelfConnections
-     */
     public boolean isAllowSelfConnections() {
         return allowSelfConnections;
     }
 
-    /**
-     * @param allowSelfConnections the allowSelfConnections to set
-     */
     public void setAllowSelfConnections(final boolean allowSelfConnections) {
         this.allowSelfConnections = allowSelfConnections;
     }
 
-    /**
-     * @return the excitatoryProbability
-     */
     public double getExcitatoryProbability() {
         return excitatoryProbability;
     }
 
-    /**
-     * @param excitatoryProbability the excitatoryProbability to set
-     */
     public void setExcitatoryProbability(final double excitatoryProbability) {
         this.excitatoryProbability = excitatoryProbability;
     }
 
-    /**
-     * @return the excitatoryRadius
-     */
     public double getExcitatoryRadius() {
         return excitatoryRadius;
     }
 
-    /**
-     * @param excitatoryRadius the excitatoryRadius to set
-     */
     public void setExcitatoryRadius(final double excitatoryRadius) {
         this.excitatoryRadius = excitatoryRadius;
     }
 
-    /**
-     * @return the inhibitoryRadius
-     */
     public double getInhibitoryRadius() {
         return inhibitoryRadius;
     }
 
-    /**
-     * @param inhibitoryRadius the inhibitoryRadius to set
-     */
     public void setInhibitoryRadius(final double inhibitoryRadius) {
         this.inhibitoryRadius = inhibitoryRadius;
     }
 
-    /**
-     * @return the inhibitoryProbability
-     */
     public double getInhibitoryProbability() {
         return inhibitoryProbability;
     }
 
-    /**
-     * @param inhibitoryProbability the inhibitoryProbability to set
-     */
     public void setInhibitoryProbability(final double inhibitoryProbability) {
         this.inhibitoryProbability = inhibitoryProbability;
     }
 
-    /**
-     * @return the baseExcitatorySynapse
-     */
     public Synapse getBaseExcitatorySynapse() {
         return baseExcitatorySynapse;
     }
 
-    /**
-     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
-     */
     public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
         this.baseExcitatorySynapse = baseExcitatorySynapse;
     }
 
-    /**
-     * @return the baseInhibitorySynapse
-     */
     public Synapse getBaseInhibitorySynapse() {
         return baseInhibitorySynapse;
     }
 
-    /**
-     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
-     */
     public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
         this.baseInhibitorySynapse = baseInhibitorySynapse;
     }
@@ -537,7 +493,6 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
     public void setInhCons(int inhCons) {
         this.inhCons = inhCons;
     }
-
 
     public SelectionStyle getSelectMethod() {
         return selectMethod;

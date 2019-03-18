@@ -125,18 +125,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         // Set picked node
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
 
-        // Show context menu for right click
-        System.out.println(mouseEvent);
-        if (mouseEvent.isPopupTrigger() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            if (pickedNode.getParent() instanceof EntityNode) {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode) pickedNode.getParent()).getEntity());
-                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
-            } else {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(null);
-                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
-            }
-        }
-
         // Set pressed position for use in double clicking
         if (pickedNode instanceof PCamera) {
             odorWorldPanel.setBeginPosition(mouseEvent.getPosition());

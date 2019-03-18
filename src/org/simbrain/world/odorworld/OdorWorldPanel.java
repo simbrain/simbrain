@@ -33,10 +33,7 @@ import org.simbrain.util.piccolo.Tile;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.world.odorworld.actions.*;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.gui.EntityNode;
-import org.simbrain.world.odorworld.gui.WorldMouseHandler;
-import org.simbrain.world.odorworld.gui.WorldSelectionEvent;
-import org.simbrain.world.odorworld.gui.WorldSelectionModel;
+import org.simbrain.world.odorworld.gui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -159,6 +156,7 @@ public class OdorWorldPanel extends JPanel {
 
         // Mouse events
         canvas.addInputEventListener(new WorldMouseHandler(this, world));
+        canvas.addInputEventListener(new WorldContextMenuEventHandler(this, world));
 
         // PCamera camera = canvas.getCamera();
 

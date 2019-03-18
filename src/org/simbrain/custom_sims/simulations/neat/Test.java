@@ -11,7 +11,7 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.util.neat.Agent;
 import org.simbrain.util.neat.Genome;
-import org.simbrain.util.neat.Pool;
+import org.simbrain.util.neat.NEATSimulation;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -364,7 +364,7 @@ public class Test {
         long startTime = System.currentTimeMillis();
 
         // Construct a pool of genomes with 2 inputs and 1 output
-        Pool pool = new Pool(2, 1, 5, Test::xorTest);
+        NEATSimulation pool = new NEATSimulation(2, 1, 5, Test::xorTest);
 
         // Run the evolutionary algorithm
         Genome topGenome = pool.evolve(1000, -.01);

@@ -11,7 +11,7 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.util.neat.Agent;
 import org.simbrain.util.neat.Genome;
-import org.simbrain.util.neat.Pool;
+import org.simbrain.util.neat.NEATSimulation;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -60,7 +60,7 @@ public class NEAT extends RegisteredSimulation {
 
       // construct a pool of genomes with 2 inputs and 1 output
 //      Pool pool = new Pool(protoGene, 2, Test::worldTestingMethod);
-        Pool pool = new Pool(24, 9, 1525711735340L, 250, Test::worldTestingMethod);
+        NEATSimulation pool = new NEATSimulation(24, 9, 1525711735340L, 250, Test::worldTestingMethod);
         
         // run the pretrain (one mouse getting as many cheese as possible), max 40 generation
         pool.evolve(40, 20);

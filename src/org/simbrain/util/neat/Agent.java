@@ -4,6 +4,9 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.Network;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.entities.EntityType;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.threedworld.entities.Entity;
 
 import static java.util.Objects.requireNonNull;
 
@@ -12,10 +15,9 @@ import static java.util.Objects.requireNonNull;
  * Provides a convenient abstraction for describing an agent in an environment
  * and tracking its fitness.
  *
- * May add world references here in which case possibly rename to "embodied agent".
+ * The agents do not have to be embedded in a world.
  *
- * May even add mutliple networks, using the same genome, to support evolution of
- * coupled behaviors.
+ * This is the phenotype expressed by a given genome / genotype.
  *
  * @author LeoYulinLi
  *
@@ -32,8 +34,23 @@ public class Agent implements Comparable<Agent> {
      */
     private Network net;
 
+    // TODO: For now this is tied to odorworld but in the future the environment
+    // should be abstracted
+
+    /**
+     * Reference to parent world.
+     * TODO: Move this to a separate class.
+     */
     private OdorWorld world = new OdorWorldBuilder(new OdorWorldComponent("Hi")).getWorld();
 
+    /**
+     * Reference to an agent in an odor world.
+     */
+    private OdorWorldEntity odorWorldAgent = new OdorWorldEntity(world, EntityType.MOUSE);
+
+    /**
+     * NEAT randomizer.
+     */
     private NEATRandomizer rand;
 
     /**

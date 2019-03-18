@@ -24,6 +24,8 @@ import org.simbrain.util.BiMap;
 /**
  * This class consists of the list of node genes, connection genes to build a
  * network, and the implementation of genome mutation.
+ * <br>
+ * Contains at least two chromosomes, one for nodes, one for connections.
  *
  * @author LeoYulinLi
  */
@@ -36,7 +38,7 @@ public class Genome implements Comparable<Genome> {
 
     /**
      * List of all node genes. Positions in this list correspond to indices in
-     * {@link ConnectionGene}.
+     * {@link ConnectionGene}. Think of this as a "chromosome" for node genes.
      */
     public List<NodeGene> nodeGenes = new ArrayList<>();
 
@@ -69,7 +71,8 @@ public class Genome implements Comparable<Genome> {
     private List<Integer> potentialTargetNodes = new ArrayList<>();
 
     /**
-     * List of all connection genes.
+     * List of all connection genes. Think of this as a "chromosome" for
+     * connection genes.
      */
     public ArrayList<ConnectionGene> connectionGenes = new ArrayList<>();
 
@@ -97,7 +100,7 @@ public class Genome implements Comparable<Genome> {
     /**
      * The pool this genome belongs.
      */
-    private Pool pool;
+    private NEATSimulation pool;
 
     /**
      * Builder for Genome. This builder builds only prototypes for now
@@ -178,7 +181,7 @@ public class Genome implements Comparable<Genome> {
      * @param seed        Seed for randomizer used in mutation
      * @param pool        The pool this genome belongs to
      */
-    public Genome(int inputCount, int outputCount, long seed, Pool pool) {
+    public Genome(int inputCount, int outputCount, long seed, NEATSimulation pool) {
         // Create input node genes
         for (int i = 0; i < inputCount; i++) {
             NodeGene nodeGene = new NodeGene(NodeType.input);
@@ -601,11 +604,11 @@ public class Genome implements Comparable<Genome> {
         return fitness;
     }
 
-    public Pool getPool() {
+    public NEATSimulation getPool() {
         return pool;
     }
 
-    public void setPool(Pool pool) {
+    public void setPool(NEATSimulation pool) {
         this.pool = requireNonNull(pool);
     }
 

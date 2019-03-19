@@ -154,7 +154,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     /**
      * Select the neurons in this group.
      */
-    private void selectNeurons() {
+    public void selectNeurons() {
         List<NeuronNode> nodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : neuronGroup.getNeuronList()) {
             nodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));

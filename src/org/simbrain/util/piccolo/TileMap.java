@@ -11,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
@@ -67,7 +68,9 @@ public class TileMap {
     /**
      * The tile set this map uses
      */
-    private TileSet tileset;
+    @XStreamImplicit
+    @XStreamAlias("tileset")
+    private List<TileSet> tilesets = new ArrayList<>();
 
     /**
      * The layers of this map.
@@ -116,11 +119,8 @@ public class TileMap {
     public ArrayList<PImage> createImageList() {
         if (renderedLayers == null) {
             renderedLayers = new ArrayList<>();
-            if (tileset == null) {
-                tileset = new TileSet();
-            }
             for (TileMapLayer l : layers) {
-                renderedLayers.add(l.renderImage(tileset));
+                renderedLayers.add(l.renderImage(tilesets));
             }
         }
         return renderedLayers;
@@ -137,8 +137,13 @@ public class TileMap {
      */
     public boolean hasTileIdAt(int id, int x, int y) {
 
+        int firstID =
+                tilesets.stream()
+                        .map(TileSet::getFirstgid)
+                        .reduce(Integer::compareTo)
+                        .orElse(Integer.MAX_VALUE);
         // if id is less than first gid, the id could be a empty tile, so those should not be check.
-        if (id < tileset.getFirstgid()) {
+        if (id < firstID) {
             return false;
         }
 
@@ -155,7 +160,9 @@ public class TileMap {
      * @return true if the given tile exists in the tile stack
      */
     public boolean hasTileIdAtPixel(int id, double x, double y) {
-        return getTileStackAtPixel(x, y).stream().anyMatch(t -> t.getId() == id);
+        return getTileStackAtPixel(x, y).stream()
+                .filter(Objects::nonNull)
+                .anyMatch(t -> t.getId() == id);
     }
 
     /**
@@ -186,7 +193,12 @@ public class TileMap {
         }
 
         for (TileMapLayer l : layers) {
-            stack.add(tileset.getTile(l.getTileIdAt(x, y)));
+            Tile tile = tilesets.stream()
+                    .map(t -> t.getTile(l.getTileIdAt(x, y)))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+            stack.add(tile);
         }
 
         return stack;

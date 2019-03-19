@@ -28,7 +28,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Set all node activations to zero.
+ * Set all node activations to zero and leave nodes selected.
  */
 public final class ClearNodeActivationsAction extends AbstractAction {
 
@@ -55,10 +55,7 @@ public final class ClearNodeActivationsAction extends AbstractAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         networkPanel.clearNeurons();
     }

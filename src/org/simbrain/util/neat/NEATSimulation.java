@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,20 +8,21 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.simbrain.custom_sims.simulations.neat.util.NEATRandomizer;
-
 import static java.util.Objects.requireNonNull;
-import static org.simbrain.custom_sims.simulations.neat.util.Math.probClipping;
-import static org.simbrain.custom_sims.simulations.neat.util.Math.assertBound;
+import static org.simbrain.util.neat.NeatUtils.probClipping;
+import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
  * This class consists of the config for evolution, status of the evolution, and
- * the implementation of the evolution process after evaluation in {@code
- * Environment}.
+ * the implementation of the evolution. Currently maintains the pool of genomes
+ * and manages evaluation of the fitness function.  Genomes are expressed into
+ * agents that can be placed in worlds, and fitness assessed.
+ * <br>
+ * The main action of this class begins in {@link #evolve(int, double)}
  *
  * @author LeoYulinLi
  */
-public class Pool {
+public class NEATSimulation {
 
     /**
      * Pool State. Used to check before the execution of some method. Will be
@@ -140,7 +141,7 @@ public class Pool {
      * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(Genome protogene, long seed, int instanceCount, Consumer<Agent> evaluationMethod) {
+    public NEATSimulation(Genome protogene, long seed, int instanceCount, Consumer<Agent> evaluationMethod) {
         System.out.println("Seed: " + seed);
         rand = new NEATRandomizer(seed);
         this.instanceCount = instanceCount;
@@ -159,7 +160,7 @@ public class Pool {
         setEvaluationMethod(evaluationMethod);
     }
 
-    public Pool(Genome protogene, int instanceCount, Consumer<Agent> evaluationMethod) {
+    public NEATSimulation(Genome protogene, int instanceCount, Consumer<Agent> evaluationMethod) {
         this(protogene, System.currentTimeMillis(), instanceCount, evaluationMethod);
     }
 
@@ -174,10 +175,10 @@ public class Pool {
      * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(int inputCount, int inputGroupCount,
-                int outputCount, int outputGroupCount,
-                long seed, int instanceCount,
-                Consumer<Agent> evaluationMethod) {
+    public NEATSimulation(int inputCount, int inputGroupCount,
+                          int outputCount, int outputGroupCount,
+                          long seed, int instanceCount,
+                          Consumer<Agent> evaluationMethod) {
         rand = new NEATRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>();
@@ -202,8 +203,8 @@ public class Pool {
      * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(int inputCount, int outputCount, long seed, int instanceCount,
-            Consumer<Agent> evaluationMethod) {
+    public NEATSimulation(int inputCount, int outputCount, long seed, int instanceCount,
+                          Consumer<Agent> evaluationMethod) {
         this(inputCount, 1, outputCount, 1, seed, instanceCount, evaluationMethod);
     }
 
@@ -216,8 +217,8 @@ public class Pool {
      * @param instanceCount    Number of genomes
      * @param evaluationMethod The method to set the fitness score
      */
-    public Pool(int inputCount, int outputCount, int instanceCount,
-                Consumer<Agent> evaluationMethod) {
+    public NEATSimulation(int inputCount, int outputCount, int instanceCount,
+                          Consumer<Agent> evaluationMethod) {
         this(inputCount, outputCount, System.currentTimeMillis(), instanceCount, evaluationMethod);
     }
 

@@ -175,22 +175,11 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * @return value associated with this sensor, 0 if occupied,
      */
-    @Producible(idMethod = "getMixedId")
+    @Producible(customDescriptionMethod = "getAttributeDescription")
     public double[] getValues() {
         return values;
     }
 
-    // /**
-    //  * @param values the value to set
-    //  */
-    // @Consumable(idMethod = "getMixedId")
-    // public void setValue(double[] values) {
-    //     this.values = values;
-    // }
-
-    /**
-     * @return the activationAmount
-     */
     public double getActivationAmount() {
         return activationAmount;
     }

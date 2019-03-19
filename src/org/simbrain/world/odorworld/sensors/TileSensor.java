@@ -82,7 +82,7 @@ public class TileSensor extends Sensor {
         }
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
+    @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

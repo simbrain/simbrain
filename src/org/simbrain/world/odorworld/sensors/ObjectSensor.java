@@ -124,7 +124,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         }
     }
 
-    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
+    @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

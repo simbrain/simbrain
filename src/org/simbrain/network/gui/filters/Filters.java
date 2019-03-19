@@ -27,6 +27,12 @@ import org.simbrain.network.gui.nodes.*;
 public final class Filters {
 
     /**
+     * Private constructor.
+     */
+    private Filters() {
+    }
+
+    /**
      * Neuron node filter.
      */
     private static final AbstractFilter NEURON_NODE_FILTER = new AbstractFilter() {
@@ -119,72 +125,30 @@ public final class Filters {
         }
     };
 
-    /**
-     * Private constructor.
-     */
-    private Filters() {
-        // empty
-    }
-
-    /**
-     * Return the neuron node filter.
-     *
-     * @return the neuron node filter
-     */
     public static AbstractFilter getNeuronNodeFilter() {
         return NEURON_NODE_FILTER;
     }
 
-    /**
-     * Return the neuron or synapse node filter.
-     *
-     * @return the neuron or synapse node filter
-     */
     public static AbstractFilter getNeuronOrSynapseNodeFilter() {
         return NEURON_OR_SYNAPSE_NODE_FILTER;
     }
 
-    /**
-     * Return the synapse node filter.
-     *
-     * @return the synapse node filter
-     */
     public static AbstractFilter getSynapseNodeFilter() {
         return SYNAPSE_NODE_FILTER;
     }
 
-    /**
-     * Return the model group node filter.
-     *
-     * @return the model group node filter
-     */
     public static AbstractFilter getModelGroupNodeFilter() {
         return MODEL_GROUP_NODE_FILTER;
     }
 
-    /**
-     * Return the parent node filter.
-     *
-     * @return the parent node filter
-     */
     public static AbstractFilter getParentNodeFilter() {
         return PARENT_NODE_FILTER;
     }
 
-    /**
-     * Return the parent node filter.
-     *
-     * @return the parent node filter
-     */
     public static AbstractFilter getSelectableFilter() {
         return SELECTABLE_FILTER;
     }
 
-    /**
-     * Return the text node filter.
-     *
-     * @return the text node filter
-     */
     public static AbstractFilter getTextNodeFilter() {
         return TEXT_NODE_FILTER;
     }
@@ -192,4 +156,5 @@ public final class Filters {
     public static AbstractFilter getNeuronGroupNodeFilter() {
         return NEURON_GROUP_NODE_FILTER;
     }
+
 }

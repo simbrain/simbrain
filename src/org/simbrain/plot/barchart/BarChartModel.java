@@ -174,4 +174,8 @@ public class BarChartModel implements AttributeContainer, EditableObject {
         this.barNames = names;
     }
 
+    @Override
+    public String getName() {
+        return "Bar chart";
+    }
 }

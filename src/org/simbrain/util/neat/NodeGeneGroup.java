@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import java.util.ArrayList;
 import java.util.Arrays;

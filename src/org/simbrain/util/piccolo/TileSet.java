@@ -81,7 +81,7 @@ public class TileSet {
     private TiledImage image;
 
     /**
-     * Texture to indicate when something went wrong. Not used for now.
+     * Texture to indicate when something went wrong.
      */
     private transient BufferedImage missingTexture = null;
 
@@ -103,6 +103,10 @@ public class TileSet {
      */
     private transient Map<Integer, Tile> idTileMap;
 
+    public static Image getMissingTexture() {
+        return OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png");
+    }
+
     /**
      * Get the corresponding tile image from the tileset.
      * @param index index of the tile
@@ -118,8 +122,12 @@ public class TileSet {
 
         index -= firstgid;
 
-        if (index < 0 || index >= tilecount) {
+        if (index < 0) {
             return transparentTexture;
+        }
+
+        if (index >= tilecount) {
+            return null;
         }
 
         if (columns > 0) {

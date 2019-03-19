@@ -876,7 +876,9 @@ public class Synapse implements EditableObject, AttributeContainer {
      * @return the template synapse.
      */
     public static Synapse getTemplateSynapse() {
-        return new Synapse(null, null, new StaticSynapseRule(), (Network) null);
+        Synapse s = new Synapse(null, null, new StaticSynapseRule(), (Network) null);
+        s.setSpikeResponder(new NonResponder());
+        return s;
     }
 
     /**
@@ -890,19 +892,6 @@ public class Synapse implements EditableObject, AttributeContainer {
         synapse.setLearningRule(rule);
         return synapse;
     }
-
-    // /**
-    // * Returns a template synapse with a (string) specified learning rule.
-    // *
-    // * @param rule the learning rule.
-    // * @return the template synapse
-    // * @see instantiateTemplateSynapse
-    // */
-    // public static Synapse getTemplateSynapse(String rule) {
-    // Synapse synapse = getTemplateSynapse();
-    // synapse.setLearningRule(rule);
-    // return synapse;
-    // }
 
     /**
      * A method which takes in a collection of synapses and returns a list of

@@ -55,10 +55,7 @@ public final class SelectAllAction extends AbstractAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         networkPanel.selectAll();
     }

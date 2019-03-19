@@ -7,6 +7,7 @@ import org.piccolo2d.nodes.PImage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 @XStreamAlias("layer")
 public class TileMapLayer {
@@ -46,12 +47,12 @@ public class TileMapLayer {
      * @param tileSet the tileset to use on this layer
      * @return the image of this layer
      */
-    public PImage renderImage(TileSet tileSet) {
+    public PImage renderImage(List<TileSet> tileSet) {
         if (layer == null) {
             BufferedImage layerImage =
                     new BufferedImage(
-                            tileSet.getTilewidth() * width,
-                            tileSet.getTileheight() * height,
+                            tileSet.get(0).getTilewidth() * width,
+                            tileSet.get(0).getTileheight() * height,
                             BufferedImage.TYPE_INT_ARGB
                     );
             Graphics2D graphics = layerImage.createGraphics();
@@ -60,8 +61,17 @@ public class TileMapLayer {
             List<Integer> gid = data.getGid();
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
-                    Image image = tileSet.getTileImage(gid.get(i * width + j));
-                    graphics.drawImage(image, j * tileSet.getTilewidth(), i * tileSet.getTileheight(), null);
+                    final int streamI = i;
+                    final int streamJ = j;
+                    Image image =
+                            tileSet.stream()
+                            .map(t -> t.getTileImage(gid.get(streamI * width + streamJ)))
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(TileSet.getMissingTexture());
+
+                            // getTileImage(gid.get(i * width + j));
+                    graphics.drawImage(image, j * tileSet.get(0).getTilewidth(), i * tileSet.get(0).getTileheight(), null);
                 }
             }
             graphics.dispose();

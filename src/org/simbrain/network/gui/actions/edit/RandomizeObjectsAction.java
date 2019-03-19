@@ -18,14 +18,19 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
 
 import javax.swing.*;
+import javax.swing.text.html.Option;
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 /**
  * Randomize screen elements action.
@@ -48,18 +53,21 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-        // TODO: Consider just updating the nodes while we have them
-        //  (though this breaks model-view separation)
         for (NeuronNode node : networkPanel.getSelectedNeurons()) {
             node.getNeuron().randomize();
         }
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().randomize();
+        }
+        for (NeuronGroupNode node : networkPanel.getSelectedNeuronGroups()) {
+            node.getNeuronGroup().randomize();
+        }
+        // Show Synapse Group Randomization dialog for one synapse group only
+        Optional<SynapseGroupNode> sg = networkPanel.getSelectedSynapseGroups().stream().findFirst();
+        if(sg.isPresent()) {
+            sg.get().showRandomizationDialog();
         }
         networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModelNeurons());
         networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModelSynapses());

@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.neat;
+package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -29,8 +29,9 @@ public class NodeGene {
      */
     private int nodeIndex;
 
-    //TODO: Discuss. If used could replace updateRule.  Eitehr way be clear
+    //TODO: Discuss. If used could replace updateRule.  Either way be clear
     // that these are prototype objects from which copies should be made
+    // Prototype neuron for this gene
     public Neuron neuron;
 
     /**

@@ -103,11 +103,10 @@ public class StraightMovement extends Effector {
         return amount;
     }
 
-    @Consumable(idMethod = "getMixedId",customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }
-
 
     /**
      * Add an amount to go straight. Allows for multiple "moves" to be
@@ -115,9 +114,14 @@ public class StraightMovement extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(idMethod = "getMixedId")
+    @Consumable(customDescriptionMethod = "getAddAmountDescription",
+        defaultVisibility = false)
     public void addAmount(double amount) {
         this.amount += amount;
+    }
+
+    public String getAddAmountDescription() {
+        return getAttributeDescription() + " (Add)";
     }
 
     public double getScalingFactor() {

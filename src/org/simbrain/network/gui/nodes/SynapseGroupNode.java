@@ -21,6 +21,8 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
+import org.simbrain.util.StandardDialog;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -130,6 +132,18 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
     @Override
     public List<InteractionBox> getInteractionBoxes() {
         return Collections.singletonList((InteractionBox) interactionBox);
+    }
+
+    /**
+     * Show randomization dialog
+     */
+    public void showRandomizationDialog() {
+        StandardDialog dialog = new StandardDialog();
+        dialog.setContentPane(
+            SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(dialog, this.getSynapseGroup()));
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
 }

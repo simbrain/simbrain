@@ -75,6 +75,7 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the
@@ -1854,7 +1855,6 @@ public class NetworkPanel extends JPanel {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
     }
 
     /**
@@ -2016,8 +2016,20 @@ public class NetworkPanel extends JPanel {
         return Utils.select(getSelection(), Filters.getSynapseNodeFilter());
     }
 
-    public Collection<PNode> getSelectedNeuronGroups() {
-        return Utils.select(getSelection(), Filters.getNeuronGroupNodeFilter());
+    public Collection<NeuronGroupNode> getSelectedNeuronGroups() {
+        return getSelection().stream()
+            .filter(n -> n.getParent() instanceof NeuronGroupNode)
+            .map(PNode::getParent)
+            .map(n -> (NeuronGroupNode)n)
+            .collect(Collectors.toList());
+    }
+
+    public Collection<SynapseGroupNode> getSelectedSynapseGroups() {
+        return getSelection().stream()
+            .filter(n -> n.getParent() instanceof SynapseGroupNode)
+            .map(PNode::getParent)
+            .map(n -> (SynapseGroupNode)n)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2704,9 +2716,9 @@ public class NetworkPanel extends JPanel {
             sourceElements.add(node);
             SourceHandle.addSourceHandleTo(node);
         }
-        for (PNode node : this.getSelectedNeuronGroups()) {
-            sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
+        for (NeuronGroupNode node : this.getSelectedNeuronGroups()) {
+            sourceElements.add(node.getInteractionBox());
+            SourceHandle.addSourceHandleTo(node.getInteractionBox());
         }
         selectionModel.fireSelectionChanged();
     }
@@ -3328,6 +3340,9 @@ public class NetworkPanel extends JPanel {
      * Set all selected items (nodes / weights) to 0. Dangerous for weights!
      */
     public void clearSelectedObjects() {
+        for (NeuronGroupNode node : getSelectedNeuronGroups()) {
+            node.getNeuronGroup().clearActivations();
+        }
         for (NeuronNode node : getSelectedNeurons()) {
             node.getNeuron().clear();
         }
@@ -3336,7 +3351,15 @@ public class NetworkPanel extends JPanel {
         }
         network.fireSynapsesUpdated(
             getSelectedModelSynapses());
-        network.fireNeuronsUpdated(
-            getSelectedModelNeurons());
+        network.fireNeuronsUpdated();
+    }
+
+    /**
+     * Select nodes in selected neuron groups.
+     */
+    public void selectNeuronsInNeuronGroups() {
+        for(NeuronGroupNode ng : getSelectedNeuronGroups()) {
+            ng.selectNeurons();
+        }
     }
 }

@@ -54,7 +54,7 @@ public interface NoisyUpdateRule {
             label = "Add noise",
             description = "If this is set to true, random values are added to the activation via "
                     + "a noise generator.",
-            defaultValue = "false", order = 99, tab="Noise")
+            order = 99, tab="Noise")
     boolean getAddNoise();
 
     /**

@@ -67,7 +67,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(label = "Activation amount",
             description = "Amount of activation that a neuron coupled with the tile sensor receives "
                     + "when the tile sensor is activated. ",
-        order = 3)
+            order = 3)
     private double activationAmount = DEFAULT_ACTIVATION;
 
     /**

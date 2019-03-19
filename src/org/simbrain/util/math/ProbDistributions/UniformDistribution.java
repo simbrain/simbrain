@@ -17,7 +17,7 @@ public class UniformDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "0", order = 1)
+            order = 1)
     private double floor = 0;
 
     /**
@@ -28,7 +28,7 @@ public class UniformDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "1", order = 2)
+            order = 2)
     private double ceil = 1;
 
     private Polarity polarity = Polarity.BOTH;
@@ -51,7 +51,6 @@ public class UniformDistribution extends ProbabilityDistribution {
     public UniformDist getBestFit(double[] observations, int numObs) {
         return UniformDist.getInstanceFromMLE(observations, numObs);
     }
-
 
     public double[] getBestFitParams(double[] observations, int numObs) {
         return UniformDist.getMLE(observations, numObs);

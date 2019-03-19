@@ -47,13 +47,13 @@ public class BarChartModel implements AttributeContainer, EditableObject {
     /**
      * Auto range bar chart.
      */
-    @UserParameter(label = "Auto Range", order = 3, defaultValue = "true")
+    @UserParameter(label = "Auto Range", order = 3)
     private boolean autoRange = true;
 
     /**
      * Maximum range.
      */
-    @UserParameter(label = "Upper Bound", defaultValue = "10", order = 2)
+    @UserParameter(label = "Upper Bound", order = 2)
     private double upperBound = 10;
 
     /**

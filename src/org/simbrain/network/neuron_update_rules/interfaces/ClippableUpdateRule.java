@@ -43,7 +43,7 @@ public interface ClippableUpdateRule {
     @UserParameter(
         label = "Clipping",
         description = " If a neuron uses clipping, then if its activation exceeds its upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength",
-        defaultValue = "true", order = -1)
+        order = -1)
     boolean isClipped();
 
     /**
@@ -52,5 +52,4 @@ public interface ClippableUpdateRule {
      * @param clipping true if clipping should be on; false otherwise
      */
     void setClipped(boolean clipping);
-
 }

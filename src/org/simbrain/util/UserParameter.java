@@ -53,12 +53,6 @@ public @interface UserParameter {
      */
     String description() default "";
 
-    //TODO: Remove when all uses of this are removed
-    /**
-     * A default value for the parameter.
-     */
-    String defaultValue() default "";
-
 
     /**
      * An optional parameter which prevents the dialog from accepting values

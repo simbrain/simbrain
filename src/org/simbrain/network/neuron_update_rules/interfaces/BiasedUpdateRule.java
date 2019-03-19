@@ -27,18 +27,13 @@ import org.simbrain.util.UserParameter;
  * TODO: Add upper and lower bound parameters? Add randomize option?
  */
 public interface BiasedUpdateRule {
-    /**
-     * @return the neuron's bias
-     */
+
     @UserParameter(
             label = "Bias",
             description = "A fixed amount of input to this node.",
-            defaultValue = "0", order = 2)
+            order = 2)
     double getBias();
 
-    /**
-     * @param bias the bias to set.
-     */
     void setBias(double bias);
 
 }

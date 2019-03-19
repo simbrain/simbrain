@@ -40,7 +40,7 @@ public class LogisticRule extends ActivityGenerator implements BoundedUpdateRule
             description = "A number that determines the exact form of the quadratic function. "
                     + "It must be between 0 and 4.",
             minimumValue = 0.0, maximumValue = 4.0,
-            defaultValue = "3.9", order = 1)
+            order = 1)
     private double growthRate = 3.9;
 
     private double ceiling = 10.0;

@@ -130,25 +130,25 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Amount to increment the neuron.
      */
-    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0, maximumValue = 100, defaultValue = "1", order = 2)
+    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0, maximumValue = 100, order = 2)
     private double increment = 1;
 
     /**
      * Upper limit of synapse.
      */
-    @UserParameter(label = "Upper bound", description = "Upper bound", minimumValue = 0, maximumValue = 100, defaultValue = "10", order = 3)
+    @UserParameter(label = "Upper bound", description = "Upper bound", minimumValue = 0, maximumValue = 100, order = 3)
     private double upperBound = DEFAULT_UPPER_BOUND;
 
     /**
      * Lower limit of synapse.
      */
-    @UserParameter(label = "Lower bound", description = "Lower bound", minimumValue = -100, maximumValue = 0, defaultValue = "10", order = 4)
+    @UserParameter(label = "Lower bound", description = "Lower bound", minimumValue = -100, maximumValue = 0, order = 4)
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * Time to delay sending activation to target neuron.
      */
-    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, maximumValue = 100, defaultValue = "0", order = 5)
+    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, maximumValue = 100, order = 5)
     private int delay;
 
     /**
@@ -160,14 +160,14 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Boolean flag, indicating whether this type of synapse participates in the
      * computation of weighted input. Set to a default value of true.
      */
-    @UserParameter(label = "Enabled", description = "Synapse is enabled. If disabled, it won't pass activation through", defaultValue = "True", order = 6)
+    @UserParameter(label = "Enabled", description = "Synapse is enabled. If disabled, it won't pass activation through", order = 6)
     private boolean enabled = true;
 
     /**
      * Boolean flag, indicating whether or not this synapse's strength can be
      * changed by any means other than direct user intervention.
      */
-    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", defaultValue = "False", order = 6)
+    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", order = 6)
     private boolean frozen;
 
     /**
@@ -674,9 +674,6 @@ public class Synapse implements EditableObject, AttributeContainer {
         return val;
     }
 
-    /**
-     * @return Returns the id.
-     */
     public String getId() {
         if (id != null) {
             return id;
@@ -685,9 +682,6 @@ public class Synapse implements EditableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @param id The id to set.
-     */
     public void setId(final String id) {
         this.id = id;
     }
@@ -936,16 +930,10 @@ public class Synapse implements EditableObject, AttributeContainer {
         return new Synapse(this);
     }
 
-    /**
-     * @return the parentGroup
-     */
     public SynapseGroup getParentGroup() {
         return parentGroup;
     }
 
-    /**
-     * @param parentGroup the parentGroup to set
-     */
     public void setParentGroup(SynapseGroup parentGroup) {
         this.parentGroup = parentGroup;
     }

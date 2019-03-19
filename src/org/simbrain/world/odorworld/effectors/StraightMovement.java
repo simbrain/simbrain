@@ -45,7 +45,7 @@ public class StraightMovement extends Effector {
      */
     @UserParameter(label = "Base Movement Amount",
             description = "Effector moves agent ahead by scaling factor times amount.",
-            defaultValue = "" + DEFAULT_SCALING_FACTOR, order = 4)
+            order = 4)
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
     /**

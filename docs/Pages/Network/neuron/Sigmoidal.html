@@ -25,7 +25,7 @@
         <h1>Sigmoidal Neuron</h1>
         <p>The sigmoidal update rule is the classic S-shaped <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoidal function</a> used in backprop and familiar throughout the biological sciences.  They approximate a linear function at their inflection point and approach their upper and lower bounds non-linearly away from that point.They are sometimes called squashing functions because they squash values in to a certain range non-linearly. In the neuroscience literature, sigmoidal rules are used to represent the saturation of firing rate: neurons can only fire at some maximum or minimum rate, no more, no less. They have the advantage of being differentiable and are thus in certain gradient descent algorithms like backprop.</p>
 
-        <p>This page covers two types of sigmoidal update rule, labeled "Sigmoidal (Discrete)" and "Sigmoidal (Continuous)" in the application.The continuous sigmoidal is a generalization of the discrete case to continuous time.  The inputs are numerically integrated and there is some dependence on the previous state.  In the discrete case the sigmoid function is applied at a  time and that's it.  In the continuous case it represents a combination of what inputs it received at previous time steps and what inputs it's receiving now.  That is, the discrete case is "memory-less", while in the continuous case there is an internal variable that is being numerically integrated through time.</p>
+        <p>This page covers two types of sigmoidal update rules, labeled "Sigmoidal (Discrete)" and "Sigmoidal (Continuous)" in the application.The continuous sigmoidal is a generalization of the discrete case to continuous time.  The inputs are numerically integrated and there is some dependence on the previous state.  In the discrete case the sigmoid function is applied at a  time and that's it.  In the continuous case it represents a combination of what inputs it received at previous time steps and what inputs it's receiving now.  That is, the discrete case is "memory-less", while in the continuous case there is an internal variable that is being numerically integrated through time.</p>
 
         <p><span class="heading">Implementation</span>
         </p>
@@ -62,11 +62,11 @@
         </blockquote>
         <p class="heading">Time Constant ($\tau$)</p>
         <blockquote>
-            <p>The time constant controls how quickly the numerical integration occurs.  Larger values for the time constant produce slower, smoother changes.   Smaller values produce faster, more discrete changes. If $ a \cdot dt = \tau $ this is equivalent to the discrete case</p>
+            <p>The time constant controls how quickly the numerical integration occurs.  Larger values for the time constant produce slower, smoother changes.   Smaller values produce faster, more discrete changes. $ a \cdot dt = \tau $ is equivalent to the discrete case</p>
         </blockquote>
         <p class="heading">Leak Constant ($a$)</p>
         <blockquote>
-            <p>Absent input the activation will tend towards its base value.  The leak constant determines how strongly the neuron will be attracted to its base activation. If $ a \cdot dt = \tau $ this is equivalent to the discrete case</p>
+            <p>An absent input means the activation will tend towards its base value.  The leak constant determines how strongly the neuron will be attracted to its base activation. $ a \cdot dt = \tau $ is equivalent to the discrete case.</p>
         </blockquote>
         <p class="heading">Bias ($b$)
         </p>
@@ -79,7 +79,7 @@
         </blockquote>
         <p class="heading">Add Noise ($\zeta$)</p>
         <blockquote>
-            <p>If this is set to true, random values are added to the activation via a noise generator. The random values are added after the sigmoidal activation function is applied. For details how the noise generator works, click <a href="../../Utils/Randomizers/Randomizers.html">here</a>. </p>
+            <p>If this is set to true, random values are added to the activation via a noise generator. The random values are added after the sigmoidal activation function is applied. For details on how the noise generator works, click <a href="../../Utils/Randomizers/Randomizers.html">here</a>. </p>
         </blockquote>
     </div>
 </body>

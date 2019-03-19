@@ -11,14 +11,14 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @UserParameter(
             label = "Slope (\u03B1)",
             description = "The power of the distribution.",
-            defaultValue = "2.0", order = 1)
+            order = 1)
     private double slope = 2.0;
 
     @UserParameter(
             label = "Minimum",
             description = "The minimum value the distribution will produce. "
                     + "Note that floor should never be lower than minimum.",
-            defaultValue = "1.0", order = 2)
+            order = 2)
     private double min = 1.0;
     
     /**
@@ -29,7 +29,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "1.0", order = 3)
+            order = 3)
     private double floor = 1.0; // TODO: Note that floor should never be lower than minimum.
 
     /**
@@ -40,13 +40,13 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.POSITIVE_INFINITY, order = 4)
+            order = 4)
     private double ceil = Double.POSITIVE_INFINITY;
 
     @UserParameter(
             label = "Clipping",
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
-            defaultValue = "false", order = 5)
+            order = 5)
     private boolean clipping = false;
 
     private Polarity polarity = Polarity.BOTH;

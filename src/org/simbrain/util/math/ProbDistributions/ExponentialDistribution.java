@@ -13,7 +13,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Rate (\u03BB)",
             description = "The rate of exponential decay; higher rate parameters will produce more small values.",
-            defaultValue = "1.0", order = 1)
+            order = 1)
     private double lambda = 1.0;
 
     /**
@@ -24,7 +24,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "0.0", order = 3)
+            order = 3)
     private double floor = 0.0;
 
     /**
@@ -35,13 +35,13 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            defaultValue = "" + Double.POSITIVE_INFINITY, order = 4)
+            order = 4)
     private double ceil = Double.POSITIVE_INFINITY;
 
     @UserParameter(
             label = "Clipping",
             description = "When clipping is enabled, the randomizer will reject outside the floor and ceiling values.",
-            defaultValue = "false", order = 5)
+            order = 5)
     private boolean clipping = false;
 
     private Polarity polarity = Polarity.BOTH;

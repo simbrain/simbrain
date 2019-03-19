@@ -41,7 +41,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Sodium Channels",
             description = "Sodium Channels",
-            defaultValue = "100", order = 1)
+            order = 1)
     private float perNaChannels = 100f;
 
     /**
@@ -50,7 +50,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Potassium Channels",
             description = "Sodium Channels",
-            defaultValue = "100", order = 2)
+            order = 2)
     private float perKChannels = 100f;
 
     /**
@@ -191,9 +191,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }

@@ -18,7 +18,7 @@ public class TileSensor extends Sensor {
      */
     @UserParameter(label = "Output Amount",
             description = "The amount of activation to be sent to a neuron coupled with this sensor.",
-            defaultValue = "1", order = 3)
+            order = 3)
     private double outputAmount = 1;
 
     /**
@@ -26,7 +26,7 @@ public class TileSensor extends Sensor {
      */
     @UserParameter(label = "Tile ID",
             description = "The ID of the tile this sensor should sense.",
-            defaultValue = "0", order = 4)
+            order = 4)
     private int tileIdToSense = 0;
 
     /**

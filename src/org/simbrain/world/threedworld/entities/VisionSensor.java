@@ -52,9 +52,9 @@ public class VisionSensor extends SensorMatrix implements Sensor {
 
     private Agent agent;
     private Vector3f headOffset = Vector3f.UNIT_Z.clone();
-    @UserParameter(label = "Width", defaultValue = "10", minimumValue = 1, maximumValue = 2048)
+    @UserParameter(label = "Width", minimumValue = 1, maximumValue = 2048)
     private int width = 10;
-    @UserParameter(label = "Height", defaultValue = "10", minimumValue = 1, maximumValue = 2048)
+    @UserParameter(label = "Height", minimumValue = 1, maximumValue = 2048)
     private int height = 10;
     private FilterType filterType = FilterType.COLOR;
     private double threshold = 0.5;

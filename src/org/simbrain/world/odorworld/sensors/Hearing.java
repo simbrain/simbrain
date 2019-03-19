@@ -50,7 +50,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(label = "Utterance",
             description = "The string or phrase associated with this sensor. Hearing sensors get activated "
                     + "when it senses a speech effectors of the same utterance.",
-            defaultValue = DEFAULT_PHRASE,
             order = 3)
     private String phrase = DEFAULT_PHRASE;
 
@@ -59,8 +58,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Characters per Row",
             description = "The maximum number of characters that can be displayed in one row in the hearing bubble. "
-                    + "This setting only affects visual representation.",
-            defaultValue = "32", order = 4)
+                    + "This setting only affects visual representation.", order = 4)
     private int charactersPerRow = 32;
 
     /**
@@ -73,7 +71,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
      */
     @UserParameter(label = "Output Amount",
             description = "The amount of activation to be sent to a neuron coupled with this sensor.",
-            defaultValue = "" + DEFAULT_OUTPUT_AMOUNT, order = 5)
+            order = 5)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
 

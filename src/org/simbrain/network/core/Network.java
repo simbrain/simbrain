@@ -544,11 +544,12 @@ public class Network {
     }
 
     /**
-     * Deletes a neuron from the network.
+     * Remove a neuron.
      *
-     * @param toDelete neuron to delete
+     * @param toDelete the neuron to remove
+     * @param fireEvent whether to fire an event
      */
-    public void removeNeuron(final Neuron toDelete) {
+    public void removeNeuron(final Neuron toDelete, boolean fireEvent) {
 
         // Update priority list
         updatePriorityList();
@@ -568,8 +569,18 @@ public class Network {
         }
 
         // Notify listeners that this neuron has been deleted
-        fireNeuronRemoved(toDelete);
+        if(fireEvent) {
+            fireNeuronRemoved(toDelete);
+        }
+    }
 
+    /**
+     * Deletes a neuron from the network.
+     *
+     * @param toDelete neuron to delete
+     */
+    public void removeNeuron(final Neuron toDelete) {
+       removeNeuron(toDelete, true);
     }
 
     /**

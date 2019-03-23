@@ -1672,21 +1672,19 @@ public class NetworkPanel extends JPanel {
      */
     public void deleteSelectedObjects() {
 
-        final List<Object> deletedObjects = new ArrayList<Object>();
         for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 final Neuron neuron = selectedNeuronNode.getNeuron();
-                network.removeNeuron(neuron);
-                deletedObjects.add(neuron);
+                // TODO: Refactor events.  Added the flag below but there is currently
+                // no way to update the network after removing all the neurons.
+                network.removeNeuron(neuron, false);
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.removeSynapse(selectedSynapseNode.getSynapse());
-                deletedObjects.add(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());
-                deletedObjects.add(selectedTextNode.getTextObject());
             } else if (selectedNode instanceof InteractionBox) {
                 if (selectedNode.getParent() instanceof NeuronGroupNode) {
                     network.removeGroup(((NeuronGroupNode) selectedNode.getParent()).getNeuronGroup());
@@ -1697,6 +1695,7 @@ public class NetworkPanel extends JPanel {
                 }
             }
         }
+
         // undoManager.addUndoableAction(new UndoableAction() {
         //
         // @Override

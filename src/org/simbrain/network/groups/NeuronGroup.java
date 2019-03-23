@@ -275,7 +275,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         }
         for (Neuron neuron : neuronList) {
             neuron.setParentGroup(null);
-            neuron.getNetwork().removeNeuron(neuron);
+            neuron.getNetwork().removeNeuron(neuron, false);
         }
         if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {

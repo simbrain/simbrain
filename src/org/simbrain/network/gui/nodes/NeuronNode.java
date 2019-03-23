@@ -203,7 +203,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         labelBackground.addChild(labelText);
         addChild(labelBackground);
 
-        updateTextVisibility();
         resetColors();
         update();
 

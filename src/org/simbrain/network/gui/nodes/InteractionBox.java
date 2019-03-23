@@ -20,6 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.NetworkPanel;
 
 import javax.swing.*;
@@ -65,6 +66,8 @@ public class InteractionBox extends ScreenElement {
      */
     private final PropertyChangeListener zoomListener;
 
+    Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
     /**
      * Create a new tab node.
      *
@@ -72,7 +75,8 @@ public class InteractionBox extends ScreenElement {
      */
     public InteractionBox(final NetworkPanel net) {
         super(net);
-        this.append(new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT), false);
+
+        this.append(rect, false);
         Color color = new Color(248, 252, 184);
         setPaint(color);
         // setTransparency(.2f);

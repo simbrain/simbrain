@@ -108,11 +108,20 @@ public final class SelectionHandle extends PHandle {
      */
     private void updateBounds(float extendFactor) {
         PNode parentNode = ((PNodeLocator) getLocator()).getNode();
+        // Different extension factor depending on whether the node being decorated is a neuron group node or not
+        float ef;
+        if (parentNode instanceof InteractionBox) {
+            // TODO: This is a hack because current interaction boxes are rescaled improperly in neuron group nodes.
+            // The problem is that NeuronGroupNode.layoutChildren uses full bounds, which includes the selection box bounds
+            ef = .01f;
+        } else {
+            ef = DEFAULT_EXTEND_FACTOR;
+        }
 
-        double x = 0.0f - (parentNode.getBounds().getWidth() * extendFactor);
-        double y = 0.0f - (parentNode.getBounds().getHeight() * extendFactor);
-        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * extendFactor);
-        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * extendFactor);
+        double x = 0.0f - (parentNode.getBounds().getWidth() * ef);
+        double y = 0.0f - (parentNode.getBounds().getHeight() * ef);
+        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * ef);
+        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * ef);
 
         this.reset(); // TODO: Check with Heuer
         append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);
@@ -185,16 +194,10 @@ public final class SelectionHandle extends PHandle {
         node.removeChildren(handlesToRemove);
     }
 
-    /**
-     * @return Returns the selectionColor.
-     */
     public static Color getSelectionColor() {
         return selectionColor;
     }
 
-    /**
-     * @param selectionColor The selectionColor to set.
-     */
     public static void setSelectionColor(final Color selectionColor) {
         SelectionHandle.selectionColor = selectionColor;
     }

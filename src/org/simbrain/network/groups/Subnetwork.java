@@ -78,6 +78,7 @@ public abstract class Subnetwork extends Group {
         for (SynapseGroup synapseGroup : synapseGroupList) {
             getParentNetwork().removeGroup(synapseGroup);
         }
+        changeSupport.firePropertyChange("delete", this, null);
     }
 
     @Override

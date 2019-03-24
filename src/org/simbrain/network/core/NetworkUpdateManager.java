@@ -19,10 +19,10 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.listeners.GroupAdapter;
-import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.*;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -115,23 +115,23 @@ public class NetworkUpdateManager {
 
     /**
      * Update manager listen for relevant changes in network. In particular
-     * group update actions are added or removed as groups are added or removed.
+     * group update actions are added or removed as groups are added or
+     * removed.
      */
     private void addListeners() {
-        network.addGroupListener(new GroupAdapter() {
-
-            public void groupAdded(NetworkEvent<Group> e) {
-                if (e.getObject().isTopLevelGroup()) {
-                    addAction(new UpdateGroup(e.getObject()));
+        network.addPropertyChangeListener(
+            evt -> {
+                if ("groupAdded".equals(evt.getPropertyName())) {
+                    Group group = (Group) evt.getNewValue();
+                    if (group.isTopLevelGroup()) {
+                        addAction(new UpdateGroup(group));
+                    }
+                } else if ("groupRemoved".equals(evt.getPropertyName())) {
+                    Group group = (Group) evt.getOldValue();
+                    removeGroupAction(group);
                 }
-            }
+            });
 
-            public void groupRemoved(NetworkEvent<Group> e) {
-                // Find corresponding group update action and remove it
-                removeGroupAction(e.getObject());
-            }
-
-        });
     }
 
     /**

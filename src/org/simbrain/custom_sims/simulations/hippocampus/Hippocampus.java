@@ -15,6 +15,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 
@@ -293,10 +294,11 @@ public class Hippocampus extends RegisteredSimulation {
      * Initialize weights randomly and uniformly between 0 and .02.
      */
     private void initWeights() {
-        for (Synapse synapse : network.getFlatSynapseList()) {
+        List<Synapse> synapses = network.getFlatSynapseList();
+        for (Synapse synapse : synapses) {
             synapse.setStrength(.2 * Math.random());
         }
-        network.fireSynapsesUpdated();
+        network.fireSynapsesUpdated(synapses);
     }
 
     /**

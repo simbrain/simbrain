@@ -80,7 +80,8 @@ public class HopfieldTrainer extends Trainer {
         revalidateSynapseGroups();
 
         // Update GUI
-        hopfield.getParentNetwork().fireGroupUpdated(hopfield);
+        //TODO
+        //hopfield.getParentNetwork().fireGroupUpdated(hopfield);
     }
 
 }

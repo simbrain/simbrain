@@ -121,9 +121,7 @@ public class GridLayout implements Layout {
     public GridLayout() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void layoutNeurons(final List<Neuron> neurons) {
         int numCols = numColumns;
         if (!manualColumns) {
@@ -196,44 +194,26 @@ public class GridLayout implements Layout {
         return "Grid";
     }
 
-    /**
-     * @return the numColumns
-     */
     public int getNumColumns() {
         return numColumns;
     }
 
-    /**
-     * @param numColumns the numColumns to set
-     */
     public void setNumColumns(final int numColumns) {
         this.numColumns = numColumns;
     }
 
-    /**
-     * @return the hSpacing
-     */
     public double getHSpacing() {
         return hSpacing;
     }
 
-    /**
-     * @param spacing the hSpacing to set
-     */
     public void setHSpacing(final double spacing) {
         hSpacing = spacing;
     }
 
-    /**
-     * @return the vSpacing
-     */
     public double getVSpacing() {
         return vSpacing;
     }
 
-    /**
-     * @param spacing the vSpacing to set
-     */
     public void setVSpacing(final double spacing) {
         vSpacing = spacing;
     }
@@ -243,16 +223,10 @@ public class GridLayout implements Layout {
         return "Grid Layout";
     }
 
-    /**
-     * @return the manualColumns
-     */
     public boolean isManualColumns() {
         return manualColumns;
     }
 
-    /**
-     * @param manualColumns the manualColumns to set
-     */
     public void setManualColumns(boolean manualColumns) {
         this.manualColumns = manualColumns;
     }

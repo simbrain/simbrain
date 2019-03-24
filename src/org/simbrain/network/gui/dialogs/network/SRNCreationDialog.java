@@ -194,7 +194,6 @@ public class SRNCreationDialog extends StandardDialog {
             SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputs.getText()), Integer.parseInt(tfNumHidden.getText()), Integer.parseInt(tfNumOutputs.getText()), hidType, outType, panel.getWhereToAdd());
 
             srn.getParentNetwork().addGroup(srn);
-            srn.getParentNetwork().fireGroupUpdated(srn);
             dispose();
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Inappropriate Field Values:" + "\nNetwork construction failed.", "Error", JOptionPane.ERROR_MESSAGE);

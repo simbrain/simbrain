@@ -25,6 +25,9 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
  * representation is {@link org.simbrain.network.gui.nodes.GroupNode}.
@@ -65,6 +68,11 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * have a hierarchy of groups.
      */
     private Group parentGroup;
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * Construct a model group with a reference to its root network.
@@ -133,36 +141,22 @@ public abstract class Group implements CopyableObject, AttributeContainer {
 
     @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(String label) {
+        changeSupport.firePropertyChange("label", this.label , label);
         this.label = label;
-        if (parentNetwork != null) {
-            parentNetwork.fireGroupParametersChanged(this);
-        }
     }
 
-    /**
-     * @return the stateInfo
-     */
     public String getStateInfo() {
         return stateInfo;
     }
 
-    /**
-     * @param stateInfo the stateInfo to set
-     */
     public void setStateInfo(String stateInfo) {
         this.stateInfo = stateInfo;
     }
 
-    /**
-     * @return the parentGroup
-     */
     public Group getParentGroup() {
         return parentGroup;
     }
 
-    /**
-     * @param parentGroup the parentGroup to set
-     */
     protected void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
     }
@@ -195,16 +189,10 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @return the markedForDeletion
-     */
     public boolean isMarkedForDeletion() {
         return markedForDeletion;
     }
 
-    /**
-     * @param markedForDeletion the markedForDeletion to set
-     */
     protected void setMarkedForDeletion(boolean markedForDeletion) {
         this.markedForDeletion = markedForDeletion;
     }
@@ -215,11 +203,25 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * {@link Subnetwork} so that sub-groups also are given ids.
      */
     public void initializeId() {
-
         id = getParentNetwork().getGroupIdGenerator().getId();
-        // Create a default label based on the id
-        setLabel(id.replaceAll("_", " "));
+        if (label.isEmpty()) {
+            setLabel(id.replaceAll("_", " "));
+        }
+    }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Label update needs to be reflected in GUI.
+     */
+    public void fireLabelUpdated() {
+        changeSupport.firePropertyChange("label", null , null);
     }
 
 }

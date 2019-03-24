@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.core;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * <b>NetworkTextObject</b> is a string of text in a neural network, typically
  * used to label elements of a neural network simulation. Contains basic text
@@ -66,6 +69,11 @@ public class NetworkTextObject {
     private boolean bold;
 
     /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
      * Construct the text object.
      *
      * @param parent root network
@@ -108,112 +116,79 @@ public class NetworkTextObject {
         this.italic = text.isItalic();
     }
 
-    /**
-     * @return the x
-     */
     public double getX() {
         return x;
     }
 
-    /**
-     * @param x the x to set
-     */
     public void setX(double x) {
         this.x = x;
     }
 
-    /**
-     * @return the y
-     */
     public double getY() {
         return y;
     }
 
-    /**
-     * @param y the y to set
-     */
     public void setY(double y) {
         this.y = y;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return "(" + Math.round(x) + "," + Math.round(y) + "):" + text;
     }
 
-    /**
-     * @return the text
-     */
     public String getText() {
         return text;
     }
 
-    /**
-     * @param text the text to set
-     */
     public void setText(String text) {
         this.text = text;
     }
 
-    /**
-     * @return the fontName
-     */
     public String getFontName() {
         return fontName;
     }
 
-    /**
-     * @param fontName the fontName to set
-     */
     public void setFontName(String fontName) {
         this.fontName = fontName;
     }
 
-    /**
-     * @return the fontSize
-     */
     public int getFontSize() {
         return fontSize;
     }
 
-    /**
-     * @param fontSize the fontSize to set
-     */
     public void setFontSize(int fontSize) {
         this.fontSize = fontSize;
     }
 
-    /**
-     * @return the italic
-     */
     public boolean isItalic() {
         return italic;
     }
 
-    /**
-     * @param italic the italic to set
-     */
     public void setItalic(boolean italic) {
         this.italic = italic;
     }
 
-    /**
-     * @return the bold
-     */
     public boolean isBold() {
         return bold;
     }
 
-    /**
-     * @param bold the bold to set
-     */
     public void setBold(boolean bold) {
         this.bold = bold;
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Notify listeners that this object has been deleted.
+     */
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", this, null);
+    }
 }

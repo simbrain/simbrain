@@ -86,7 +86,6 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
                 act = getUpperBound();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -99,7 +98,6 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
                 act = getLowerBound();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 

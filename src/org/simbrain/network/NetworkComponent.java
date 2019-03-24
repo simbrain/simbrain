@@ -18,9 +18,9 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.*;
-import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.network.listeners.NeuronListener;
-import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronArrayNode;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -66,57 +66,38 @@ public final class NetworkComponent extends WorkspaceComponent {
      * Initialize attribute types and listeners.
      */
     private void init() {
-        network.addNeuronListener(new NeuronListener() {
-            public void neuronAdded(NetworkEvent<Neuron> e) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerAdded(e.getObject());
-            }
 
-            public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerChanged(e.getObject());
+        network.addPropertyChangeListener(
+            evt -> {
+                if ("neuronAdded".equals(evt.getPropertyName())) {
+                     setChangedSinceLastSave(true);
+                     fireAttributeContainerAdded((Neuron) evt.getNewValue());
+                } else if ("neuronRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((Neuron) evt.getNewValue());
+                } else if ("neuronsUpdated".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                } else if ("synapseAdded".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerAdded((Synapse) evt.getNewValue());
+                } else if ("synapseRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((Synapse) evt.getNewValue());
+                } else if ("textAdded".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                } else if ("textRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                } else if ("groupAdded".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerAdded((Group) evt.getNewValue());
+                } else if ("groupRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((Group) evt.getNewValue());
+                } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
+                }
             }
+        );
 
-            public void neuronMoved(NetworkEvent<Neuron> e) {
-                setChangedSinceLastSave(true);
-            }
-
-            public void neuronRemoved(NetworkEvent<Neuron> e) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerRemoved(e.getObject());
-            }
-
-            public void neuronChanged(NetworkEvent<Neuron> e) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerChanged(e.getObject());
-            }
-
-            public void labelChanged(NetworkEvent<Neuron> e) {
-                setChangedSinceLastSave(true);
-            }
-        });
-
-        network.addSynapseListener(new SynapseListener() {
-            public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerAdded(networkEvent.getObject());
-            }
-
-            public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerChanged(networkEvent.getObject());
-            }
-
-            public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerRemoved(networkEvent.getObject());
-            }
-
-            public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
-                setChangedSinceLastSave(true);
-                fireAttributeContainerChanged(networkEvent.getObject());
-            }
-        });
     }
 
     @Override
@@ -176,11 +157,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         network.setOneOffRun(!running);
     }
 
-    /**
-     * Returns the root network.
-     *
-     * @return the root network
-     */
     public Network getNetwork() {
         return network;
     }

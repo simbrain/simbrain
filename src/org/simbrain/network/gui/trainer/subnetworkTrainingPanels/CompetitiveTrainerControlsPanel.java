@@ -171,7 +171,8 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
                 // Stop running
                 trainer.setUpdateCompleted(true);
                 update();
-                panel.getNetwork().fireGroupUpdated(network);
+                //TODO
+                //panel.getNetwork().fireGroupUpdated(network);
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             }
 
@@ -201,7 +202,8 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
             try {
                 trainer.apply();
                 update();
-                panel.getNetwork().fireGroupUpdated(network);
+                //TODO
+                //panel.getNetwork().fireGroupUpdated(network);
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
@@ -221,13 +223,12 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Reset network");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             network.getCompetitive().randomize();
             trainer.setIteration(0);
-            panel.getNetwork().fireGroupUpdated(network);
+            //TODO
+            //panel.getNetwork().fireGroupUpdated(network);
         }
     };
     /**
@@ -242,13 +243,12 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Randomize network");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             network.getCompetitive().randomize();
             update();
-            panel.getNetwork().fireGroupUpdated(network);
+            //TODO
+            //panel.getNetwork().fireGroupUpdated(network);
         }
     };
 

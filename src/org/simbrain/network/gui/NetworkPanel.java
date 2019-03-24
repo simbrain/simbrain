@@ -51,7 +51,6 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.subnetworkNodes.*;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.listeners.*;
 import org.simbrain.network.subnetworks.*;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
@@ -431,20 +430,11 @@ public class NetworkPanel extends JPanel {
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
 
-        // Set up network hierarchy panel
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("showNetworkHierarchyPanel")) {
-            showNetworkHierarchyPanel = Boolean.parseBoolean(properties.getProperty("showNetworkHierarchyPanel"));
-        }
-        // networkHierarchyPanel = new NetworkHierarchyPanel(this);
-        // splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        // splitPane.setDividerLocation(.2);
-        // splitPane.setLeftComponent(networkHierarchyPanel);
-        // splitPane.setRightComponent(canvas);
+        // Add the main Canvas
         this.add("Center", canvas);
 
+        // Initialize priority text
         setPrioritiesVisible(prioritiesVisible);
-        // setHierarchyPanelVisible(showNetworkHierarchyPanel);
 
         // Event listeners
         removeDefaultEventListeners();
@@ -457,6 +447,7 @@ public class NetworkPanel extends JPanel {
         textHandle = new TextEventHandler(this);
         canvas.addInputEventListener(textHandle);
 
+        // Init network change listeners
         addNetworkListeners();
 
         // Don't show text when the canvas is sufficiently zoomed in
@@ -515,258 +506,35 @@ public class NetworkPanel extends JPanel {
 
         network.addPropertyChangeListener(
             evt -> {
-                if ("neuronArrayAdded".equals(evt.getPropertyName())) {
+                if ("neuronAdded".equals(evt.getPropertyName())) {
+                    addNeuron((Neuron) evt.getNewValue());
+                } else if ("neuronRemoved".equals(evt.getPropertyName())) {
+                    ((Neuron)evt.getOldValue()).fireDeleted();
+                } else if ("neuronsUpdated".equals(evt.getPropertyName())) {
+                    if (!isGuiOn()) {
+                        return;
+                    }
+                    NetworkPanel.this.updateNeuronNodes((List<Neuron>)evt.getNewValue());
+                } else if ("synapseAdded".equals(evt.getPropertyName())) {
+                    addSynapse((Synapse) evt.getNewValue());
+                } else if ("synapseRemoved".equals(evt.getPropertyName())) {
+                    ((Synapse)evt.getOldValue()).fireDeleted();
+                } else if ("textAdded".equals(evt.getPropertyName())) {
+                    addTextObject((NetworkTextObject) evt.getNewValue());
+                } else if ("textRemoved".equals(evt.getPropertyName())) {
+                    ((NetworkTextObject)evt.getOldValue()).fireDeleted();
+                } else if ("groupAdded".equals(evt.getPropertyName())) {
+                    addGroup((Group) evt.getNewValue());
+                } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     NeuronArrayNode nad = new NeuronArrayNode(this, (NeuronArray) evt.getNewValue());
                     canvas.getLayer().addChild(nad);
+                } else if ("updateTimeDisplay".equals(evt.getPropertyName())) {
+                    updateTime();
+                } else if ("updateCompleted".equals(evt.getPropertyName())) {
+                    NetworkPanel.this.setUpdateComplete((Boolean) evt.getNewValue());
                 }
             }
         );
-
-        // Handle general network events
-        network.addNetworkListener(new NetworkListener() {
-
-            @Override
-            public void updateNeurons() {
-                if (!isGuiOn()) {
-                    return;
-                }
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        NetworkPanel.this.updateNeuronNodes();
-                    }
-                });
-            }
-
-            @Override
-            public void updateNeurons(final Collection<Neuron> neurons) {
-                if (!isGuiOn()) {
-                    return;
-                }
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        NetworkPanel.this.updateNeuronNodes(neurons);
-                    }
-                });
-            }
-
-            @Override
-            public void updateSynapses() {
-                if (!isGuiOn()) {
-                    return;
-                }
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        NetworkPanel.this.updateSynapseNodes();
-                    }
-                });
-            }
-
-            @Override
-            public void updateSynapses(final Collection<Synapse> synapses) {
-                if (!isGuiOn()) {
-                    return;
-                }
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        NetworkPanel.this.updateSynapseNodes(synapses);
-                    }
-                });
-            }
-
-            @Override
-            public void setUpdateComplete(boolean updateComplete) {
-                NetworkPanel.this.setUpdateComplete(updateComplete);
-
-            }
-        });
-
-        // Handle Neuron Events
-        network.addNeuronListener(new NeuronListener() {
-
-            @Override
-            public void neuronAdded(final NetworkEvent<Neuron> e) {
-                addNeuron(e.getObject());
-            }
-
-            @Override
-            public void neuronRemoved(final NetworkEvent<Neuron> e) {
-                Neuron neuron = e.getObject();
-                removeNeuron(neuron);
-            }
-
-            @Override
-            public void neuronChanged(final NetworkEvent<Neuron> e) {
-                NeuronNode node = (NeuronNode) objectNodeMap.get(e.getObject());
-                if (node != null) {
-                    node.update();
-                }
-            }
-
-            @Override
-            public void neuronTypeChanged(final NetworkEvent<NeuronUpdateRule> e) {
-                // Can use this to allow activity generators to become neurons
-                // or vice
-                // versa. Must add a method that changes the shape object on the
-                // neuron node
-                // and then removes and adds the appropriate pnode to the
-                // NeuronNode
-                // NeuronNode node = (NeuronNode)
-                // objectNodeMap.get(e.getObjectToEdit());
-                // if (node != null) {
-                // node.updateShape();
-                // }
-            }
-
-            @Override
-            public void neuronMoved(final NetworkEvent<Neuron> e) {
-                NeuronNode node = (NeuronNode) objectNodeMap.get(e.getSource());
-                // In previous versions checked NeuronNode.isMoving == false.
-                // See NeuronNode isMoving comments
-                if (node != null) {
-                    node.pullViewPositionFromModel();
-                }
-            }
-
-            @Override
-            public void labelChanged(NetworkEvent<Neuron> e) {
-                NeuronNode node = (NeuronNode) objectNodeMap.get(e.getObject());
-                if (node != null) {
-                    node.updateTextLabel();
-                }
-            }
-
-        });
-
-        // Handle Synapse Events
-        network.addSynapseListener(new SynapseListener() {
-
-            @Override
-            public void synapseChanged(final NetworkEvent<Synapse> e) {
-                //SynapseNode node = (SynapseNode) objectNodeMap
-                //        .get(e.getObjectToEdit());
-                // node.updateClampStatus();
-            }
-
-            @Override
-            public void synapseTypeChanged(final NetworkEvent<SynapseUpdateRule> e) {
-            }
-
-            @Override
-            public void synapseAdded(final NetworkEvent<Synapse> e) {
-                NetworkPanel.this.addSynapse(e.getObject());
-            }
-
-            @Override
-            public void synapseRemoved(final NetworkEvent<Synapse> e) {
-                final Synapse synapse = e.getObject();
-                removeSynapse(synapse);
-            }
-        });
-
-        // Handle Text Events
-        network.addTextListener(new TextListener() {
-
-            @Override
-            public void textRemoved(NetworkTextObject removedText) {
-                TextNode node = (TextNode) objectNodeMap.get(removedText);
-                canvas.getLayer().removeChild(node);
-                objectNodeMap.remove(removedText);
-            }
-
-            @Override
-            public void textAdded(NetworkTextObject newText) {
-                NetworkPanel.this.addTextObject(newText);
-            }
-
-            @Override
-            public void textChanged(NetworkTextObject changedText) {
-                TextNode node = (TextNode) objectNodeMap.get(changedText);
-                node.update();
-            }
-
-        });
-
-        // Handle Group Events
-        network.addGroupListener(new GroupListener() {
-
-            @Override
-            public void groupAdded(final NetworkEvent<Group> e) {
-                addGroup(e.getObject());
-            }
-
-            @Override
-            public void groupChanged(final NetworkEvent<Group> e, final String description) {
-                Group group = e.getObject();
-                PNode groupNode = objectNodeMap.get(group);
-                if (groupNode != null) {
-                    updateComplete.incrementAndGet();
-                    NetworkPanel.this.setRunning(true);
-                    ((GroupNode) groupNode).updateConstituentNodes();
-                    NetworkPanel.this.setRunning(false);
-                    updateComplete.decrementAndGet();
-                }
-                if (description.equals(SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED)) {
-                    if (group instanceof SynapseGroup) {
-                        toggleSynapseVisibility(((SynapseGroup) group));
-                    }
-                }
-            }
-
-            @Override
-            public void groupRemoved(final NetworkEvent<Group> event) {
-                Group group = event.getObject();
-                removeGroup(group);
-            }
-
-            @Override
-            public void groupParameterChanged(NetworkEvent<Group> event) {
-                if (!isGuiOn()) {
-                    return;
-                }
-                Group group = event.getObject();
-                PNode groupNode = objectNodeMap.get(group);
-                if (groupNode != null) {
-                    updateComplete.incrementAndGet();
-                    NetworkPanel.this.setRunning(true);
-                    ((GroupNode) groupNode).updateConstituentNodes();
-                    NetworkPanel.this.setRunning(false);
-                    updateComplete.decrementAndGet();
-                }
-                if (group instanceof NeuronGroup) {
-                    NeuronGroupNode node = (NeuronGroupNode) objectNodeMap.get(event.getObject());
-                    if (node != null) {
-                        node.updateText();
-                    }
-                } else if (group instanceof SynapseGroup) {
-                    // TODO: Address the whole snyapse group arrow situation
-                    Object node = objectNodeMap.get(event.getObject());
-                    if (node != null) {
-                        if (node instanceof SynapseGroupNode) {
-                            ((SynapseGroupNode) node).updateText();
-                        } else {
-                            ((SynapseGroupNodeBidirectional) node).updateText();
-                        }
-                    }
-                } else if (group instanceof Subnetwork) {
-                    SubnetworkNode node = (SubnetworkNode) objectNodeMap.get(group);
-                    if (node != null) {
-                        node.updateText();
-                    }
-                }
-            }
-
-            @Override
-            public void groupUpdated(Group group) {
-                if (!isGuiOn()) {
-                    return;
-                }
-                PNode groupNode = objectNodeMap.get(group);
-                if (groupNode != null) {
-                    ((GroupNode) groupNode).updateConstituentNodes();
-                }
-            }
-
-        });
 
     }
 
@@ -785,6 +553,9 @@ public class NetworkPanel extends JPanel {
         updateComplete.decrementAndGet();
     }
 
+    /**
+     * Update the time label.
+     */
     public void updateTime() {
         timeLabel.update();
     }
@@ -795,12 +566,11 @@ public class NetworkPanel extends JPanel {
      * @param neurons the neurons whose corresponding pnode should be updated.
      */
     private void updateNeuronNodes(Collection<Neuron> neurons) {
-        // System.out.println("In update neuron nodes. Updating " +
-        // neurons.size() + " neurons");
+        // TODO: Refactor or remove this
         for (Neuron neuron : neurons) {
             NeuronNode neuronNode = ((NeuronNode) objectNodeMap.get(neuron));
             if (neuronNode != null) {
-                neuronNode.update();
+                neuronNode.pullViewPositionFromModel();
             }
         }
         timeLabel.update();
@@ -1101,7 +871,6 @@ public class NetworkPanel extends JPanel {
                 whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING, whereToAdd.getY() + DEFAULT_SPACING);
             }
         } else if (group instanceof SynapseGroup) {
-
             addSynapseGroup((SynapseGroup) group);
         } else if (group instanceof Subnetwork) {
             addSubnetwork((Subnetwork) group);
@@ -1219,15 +988,19 @@ public class NetworkPanel extends JPanel {
         for (Synapse synapse : synapseGroup.getExcitatorySynapses()) {
             addSynapse(synapse);
             SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-            canvas.getLayer().addChild(node);
-            nodes.add(node);
+            if (node!= null) {
+                canvas.getLayer().addChild(node);
+                nodes.add(node);
+            }
         }
         // Add inhibitory synapse nodes to canvas
         for (Synapse synapse : synapseGroup.getInhibitorySynapses()) {
             addSynapse(synapse);
             SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-            canvas.getLayer().addChild(node);
-            nodes.add(node);
+            if (node!= null) {
+                canvas.getLayer().addChild(node);
+                nodes.add(node);
+            }
         }
         // Add synapse nodes to group node
         SynapseGroupNodeVisible synapseGroupNode = new SynapseGroupNodeVisible(this, synapseGroup);
@@ -1324,6 +1097,7 @@ public class NetworkPanel extends JPanel {
      * @param subnet the group to add.
      */
     private void addSubnetwork(Subnetwork subnet) {
+
         Set<PNode> nodes = new HashSet<PNode>();
         // Add neuron groups
         for (NeuronGroup neuronGroup : ((Subnetwork) subnet).getNeuronGroupList()) {
@@ -1331,6 +1105,10 @@ public class NetworkPanel extends JPanel {
             NeuronGroupNode neuronGroupNode = (NeuronGroupNode) objectNodeMap.get(neuronGroup);
             nodes.add(neuronGroupNode);
         }
+
+        // Update neuron positions. Must do this before synapse groups so neurons
+        // are properly positioned
+        network.fireNeuronsUpdated(subnet.getFlatNeuronList());
 
         // Add synapse groups
         for (SynapseGroup synapseGroup : ((Subnetwork) subnet).getSynapseGroupList()) {
@@ -1350,6 +1128,8 @@ public class NetworkPanel extends JPanel {
         // Add subnetwork node to canvas
         canvas.getLayer().addChild(subnetNode);
         objectNodeMap.put(subnet, subnetNode);
+
+        subnet.fireLabelUpdated();
 
         // Update canvas
         repaint();
@@ -1421,7 +1201,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param synapseGroup the synapse group whose visibility should be toggled.
      */
-    private void toggleSynapseVisibility(SynapseGroup synapseGroup) {
+    public void toggleSynapseVisibility(SynapseGroup synapseGroup) {
 
         // Remove existing synapsegroup nodes and synapsenodes
         removeGroup(synapseGroup);
@@ -1671,14 +1451,13 @@ public class NetworkPanel extends JPanel {
      * Delete selected items.
      */
     public void deleteSelectedObjects() {
-
         for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 final Neuron neuron = selectedNeuronNode.getNeuron();
                 // TODO: Refactor events.  Added the flag below but there is currently
                 // no way to update the network after removing all the neurons.
-                network.removeNeuron(neuron, false);
+                network.removeNeuron(neuron, true);
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.removeSynapse(selectedSynapseNode.getSynapse());
@@ -1882,7 +1661,6 @@ public class NetworkPanel extends JPanel {
      */
     public void clearSelection() {
         selectionModel.clear();
-        // TODO: Fire Network changed
     }
 
     /**
@@ -2318,14 +2096,6 @@ public class NetworkPanel extends JPanel {
     // click, but condition not fulfilled....
     // public boolean resetPasteTrail = false;
 
-    /**
-     * @param e
-     * @see NetworkListener
-     */
-
-    public void modelCleared(final NetworkEvent e) {
-        // empty
-    }
 
     /**
      * Synchronize model and view.
@@ -2483,51 +2253,30 @@ public class NetworkPanel extends JPanel {
         repaint();
     }
 
-    /**
-     * @return Returns the in out mode.
-     */
     public boolean getInOutMode() {
         return inOutMode;
     }
 
-    /**
-     * @return Returns the numberOfPastes.
-     */
     public double getNumberOfPastes() {
         return numberOfPastes;
     }
 
-    /**
-     * @param numberOfPastes The numberOfPastes to set.
-     */
     public void setNumberOfPastes(final double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
     }
 
-    /**
-     * @return Returns show subnet outline.
-     */
     public boolean getShowSubnetOutline() {
         return showSubnetOutline;
     }
 
-    /**
-     * @param showSubnetOutline Sets Show subnet outline.
-     */
     public void setShowSubnetOutline(final boolean showSubnetOutline) {
         this.showSubnetOutline = showSubnetOutline;
     }
 
-    /**
-     * @return Returns Show time.
-     */
     public boolean getShowTime() {
         return showTime;
     }
 
-    /**
-     * @param showTime Sets the show time.
-     */
     public void setShowTime(final boolean showTime) {
         this.showTime = showTime;
         timeLabel.setVisible(showTime);
@@ -3332,7 +3081,6 @@ public class NetworkPanel extends JPanel {
             node.getNeuron().clear();
         }
         this.setSelection(getNeuronNodes());
-        network.fireNeuronsUpdated();
     }
 
     /**
@@ -3348,9 +3096,6 @@ public class NetworkPanel extends JPanel {
         for (SynapseNode node : getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
         }
-        network.fireSynapsesUpdated(
-            getSelectedModelSynapses());
-        network.fireNeuronsUpdated();
     }
 
     /**

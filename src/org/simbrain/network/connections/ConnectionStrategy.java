@@ -95,7 +95,6 @@ public abstract class ConnectionStrategy implements EditableObject {
      */
     public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
 
-
     public boolean isUseExcitatoryRandomization() {
         return useExcitatoryRandomization;
     }

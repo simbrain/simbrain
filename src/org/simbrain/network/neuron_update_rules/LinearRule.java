@@ -142,7 +142,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
                 act = act + n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -158,7 +157,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
                 act = act - n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 

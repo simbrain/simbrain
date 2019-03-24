@@ -132,7 +132,8 @@ public class MpfsSOM extends RegisteredSimulation {
                     e.printStackTrace();
                 }
             }
-            network.fireGroupUpdated(som);
+            // TODO
+            //network.fireGroupUpdated(som);
             netWrapper.getNetworkComponent().update();
         });
 
@@ -190,7 +191,8 @@ public class MpfsSOM extends RegisteredSimulation {
                 }
 
             }
-            netWrapper.getNetwork().fireGroupUpdated(som);
+            //TODO
+            //netWrapper.getNetwork().fireGroupUpdated(som);
             netWrapper.getNetworkComponent().update();
         });
 

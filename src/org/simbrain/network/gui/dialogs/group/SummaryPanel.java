@@ -408,9 +408,6 @@ public class SummaryPanel extends EditablePanel {
         outgoingField.setText(sg.getTargetNeuronGroup().getLabel());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean commitChanges() {
         group.setLabel(nameField.getText());
@@ -427,6 +424,8 @@ public class SummaryPanel extends EditablePanel {
                 inputMode.setSelected(false);
             }
         }
+
+        group.fireLabelUpdated();
 
         return true; // Always Successful: the only field it makes sense to
         // commit from here cannot fail as a result of user action.

@@ -23,8 +23,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -36,7 +34,7 @@ import java.util.Random;
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener, BiasedUpdateRule {
+public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRule {
 
     /**
      * Excitatory inputs for connected Synapses.
@@ -189,7 +187,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
          * function.
          */
         LINEAR {
-            /** {@inheritDoc} */
             @Override
             public String toString() {
                 return "Linear";
@@ -202,7 +199,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
          * to represent saturation or a max and min firing rate.
          */
         RATE_CODE {
-            /** {@inheritDoc} */
             @Override
             public String toString() {
                 return "Rate Code";
@@ -213,7 +209,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
          * TODO: No implementation.
          */
         NOISY_RATE_CODE {
-            /** {@inheritDoc} */
             @Override
             public String toString() {
                 return "Noisy Rate Code";
@@ -224,7 +219,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
          * The membrane potential is the output.
          */
         NONE {
-            /** {@inheritDoc} */
             @Override
             public String toString() {
                 return "Membrane Potential";
@@ -238,19 +232,8 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
 
     }
 
-    ;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param neuron
-     */
     public void init(Neuron neuron) {
         setInputLists(neuron);
-        if (neuron.getNetwork() != null) {
-            neuron.getNetwork().addSynapseListener(this);
-        }
-
     }
 
     /**
@@ -287,16 +270,12 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public PointNeuronRule deepCopy() {
         PointNeuronRule cn = new PointNeuronRule();
         cn.setBias(bias);
@@ -320,9 +299,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         // updated by pressing "clear"
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
 
         // Calculate the excitatory conductance (p. 44, eq. 2.16)
@@ -372,9 +349,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         // printState(neuron);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         Random rand = new Random();
@@ -484,320 +458,189 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         }
     }
 
-    /**
-     * @return the netTimeConstant
-     */
     public double getNetTimeConstant() {
         return netTimeConstant;
     }
 
-    /**
-     * @param netTimeConstant the netTimeConstant to set
-     */
     public void setNetTimeConstant(double netTimeConstant) {
         this.netTimeConstant = netTimeConstant;
     }
 
-    /**
-     * @return the excitatoryMaxConductance
-     */
     public double getExcitatoryMaxConductance() {
         return excitatoryMaxConductance;
     }
 
-    /**
-     * @param excitatoryMaxConductance the excitatoryMaxConductance to set
-     */
     public void setExcitatoryMaxConductance(double excitatoryMaxConductance) {
         this.excitatoryMaxConductance = excitatoryMaxConductance;
     }
 
-    /**
-     * @return the excitatoryConductance
-     */
     public double getExcitatoryConductance() {
         return excitatoryConductance;
     }
 
-    /**
-     * @param excitatoryConductance the excitatoryConductance to set
-     */
     public void setExcitatoryConductance(double excitatoryConductance) {
         this.excitatoryConductance = excitatoryConductance;
     }
 
-    /**
-     * @return the membranePotential
-     */
     public double getMembranePotential() {
         return membranePotential;
     }
 
-    /**
-     * @param membranePotential the membranePotential to set
-     */
     public void setMembranePotential(double membranePotential) {
         this.membranePotential = membranePotential;
     }
 
-    /**
-     * @return the excitatoryReversal
-     */
     public double getExcitatoryReversal() {
         return excitatoryReversal;
     }
 
-    /**
-     * @param excitatoryReversal the excitatoryReversal to set
-     */
     public void setExcitatoryReversal(double excitatoryReversal) {
         this.excitatoryReversal = excitatoryReversal;
     }
 
-    /**
-     * @return the leakReversal
-     */
     public double getLeakReversal() {
         return leakReversal;
     }
 
-    /**
-     * @param leakReversal the leakReversal to set
-     */
     public void setLeakReversal(double leakReversal) {
         this.leakReversal = leakReversal;
     }
 
-    /**
-     * @return the leakMaxConductance
-     */
     public double getLeakMaxConductance() {
         return leakMaxConductance;
     }
 
-    /**
-     * @param leakMaxConductance the leakMaxConductance to set
-     */
     public void setLeakMaxConductance(double leakMaxConductance) {
         this.leakMaxConductance = leakMaxConductance;
     }
 
-    /**
-     * @return the leakConductance
-     */
     public double getLeakConductance() {
         return leakConductance;
     }
 
-    /**
-     * @param leakConductance the leakConductance to set
-     */
     public void setLeakConductance(double leakConductance) {
         this.leakConductance = leakConductance;
     }
 
-    /**
-     * @return the potentialTimeConstant
-     */
     public double getPotentialTimeConstant() {
         return potentialTimeConstant;
     }
 
-    /**
-     * @param potentialTimeConstant the potentialTimeConstant to set
-     */
     public void setPotentialTimeConstant(double potentialTimeConstant) {
         this.potentialTimeConstant = potentialTimeConstant;
     }
 
-    /**
-     * @return the currentOutputFunction
-     */
     public OutputFunction getOutputFunction() {
         return outputFunction;
     }
 
-    /**
-     * @param currentOutputFunction the currentOutputFunction to set
-     */
     public void setOutputFunction(OutputFunction currentOutputFunction) {
         this.outputFunction = currentOutputFunction;
     }
 
-    /**
-     * @return the gain
-     */
     public double getGain() {
         return gain;
     }
 
-    /**
-     * @param gain the gain to set
-     */
     public void setGain(double gain) {
         this.gain = gain;
     }
 
-    /**
-     * @return the threshold
-     */
     public double getThresholdPotential() {
         return thresholdPotential;
     }
 
-    /**
-     * @param threshold the threshold to set
-     */
     public void setThresholdPotential(double threshold) {
         this.thresholdPotential = threshold;
     }
 
-    /**
-     * @return the refractoryPotential
-     */
     public double getRefractoryPotential() {
         return refractoryPotential;
     }
 
-    /**
-     * @param refractoryPotential the refractoryPotential to set
-     */
     public void setRefractoryPotential(double refractoryPotential) {
         this.refractoryPotential = refractoryPotential;
     }
 
-    /**
-     * @param excitatoryInputs the excitatoryInputs to set
-     */
     public void setExcitatoryInputs(ArrayList<Synapse> excitatoryInputs) {
         this.excitatoryInputs = excitatoryInputs;
     }
 
-    /**
-     * @return the inhibitoryReversal
-     */
     public double getInhibitoryReversal() {
         return inhibitoryReversal;
     }
 
-    /**
-     * @param inhibitoryReversal the inhibitoryReversal to set
-     */
     public void setInhibitoryReversal(double inhibitoryReversal) {
         this.inhibitoryReversal = inhibitoryReversal;
     }
 
-    /**
-     * @return the excitatoryCurrent
-     */
     public double getExcitatoryCurrent() {
         return excitatoryCurrent;
     }
 
-    /**
-     * @param excitatoryCurrent the excitatoryCurrent to set
-     */
     public void setExcitatoryCurrent(double excitatoryCurrent) {
         this.excitatoryCurrent = excitatoryCurrent;
     }
 
-    /**
-     * @return the duration
-     */
     public int getDuration() {
         return duration;
     }
 
-    /**
-     * @param duration the duration to set
-     */
     public void setDuration(int duration) {
         this.duration = duration;
     }
 
-    /**
-     * @return the inhibitoryConductance
-     */
     public double getInhibitoryConductance() {
         return inhibitoryConductance;
     }
 
-    /**
-     * @param inhibitoryConductance the inhibitoryConductance to set
-     */
     public void setInhibitoryConductance(double inhibitoryConductance) {
         this.inhibitoryConductance = inhibitoryConductance;
     }
 
-    /**
-     * @return the inhibitoryMaxConductance
-     */
     public double getInhibitoryMaxConductance() {
         return inhibitoryMaxConductance;
     }
 
-    /**
-     * @param inhibitoryMaxConductance the inhibitoryMaxConductance to set
-     */
     public void setInhibitoryMaxConductance(double inhibitoryMaxConductance) {
         this.inhibitoryMaxConductance = inhibitoryMaxConductance;
     }
 
-    /**
-     * @return the bias
-     */
     public double getBias() {
         return bias;
     }
 
-    /**
-     * @param bias the bias to set
-     */
     public void setBias(double bias) {
         this.bias = bias;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
-        Synapse synapse = networkEvent.getObject();
-        if (synapse.getTarget().getUpdateRule() == this) {
-            addSynapseToList(synapse);
-        }
-    }
+    // TODO
+    // public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+    //     Synapse synapse = networkEvent.getObject();
+    //     if (synapse.getTarget().getUpdateRule() == this) {
+    //         addSynapseToList(synapse);
+    //     }
+    // }
+    //
+    // public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+    //     Synapse synapse = networkEvent.getObject();
+    //     if (synapse.getTarget().getUpdateRule() == this) {
+    //         addSynapseToList(synapse);
+    //     }
+    // }
+    //
+    // public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+    //     Synapse synapse = networkEvent.getObject();
+    //     if (synapse.getTarget().getUpdateRule() == this) {
+    //         if (excitatoryInputs.contains(synapse)) {
+    //             excitatoryInputs.remove(synapse);
+    //         }
+    //         if (inhibitoryInputs.contains(synapse)) {
+    //             inhibitoryInputs.remove(synapse);
+    //         }
+    //     }
+    // }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
-        Synapse synapse = networkEvent.getObject();
-        if (synapse.getTarget().getUpdateRule() == this) {
-            addSynapseToList(synapse);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
-        Synapse synapse = networkEvent.getObject();
-        if (synapse.getTarget().getUpdateRule() == this) {
-            if (excitatoryInputs.contains(synapse)) {
-                excitatoryInputs.remove(synapse);
-            }
-            if (inhibitoryInputs.contains(synapse)) {
-                inhibitoryInputs.remove(synapse);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
-        // No implementation
-    }
 
     @Override
     public String getName() {

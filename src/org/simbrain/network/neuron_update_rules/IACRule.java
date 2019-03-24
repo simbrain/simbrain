@@ -171,7 +171,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
                 act = act + n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -187,7 +186,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
                 act = act - n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 

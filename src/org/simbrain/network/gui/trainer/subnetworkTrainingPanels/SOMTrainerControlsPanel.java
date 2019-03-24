@@ -194,7 +194,8 @@ public class SOMTrainerControlsPanel extends JPanel {
             } else {
                 // Stop running
                 trainer.setUpdateCompleted(true);
-                panel.getNetwork().fireGroupUpdated(network);
+                //TODO
+                //panel.getNetwork().fireGroupUpdated(network);
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             }
 
@@ -214,9 +215,7 @@ public class SOMTrainerControlsPanel extends JPanel {
             // putValue(SHORT_DESCRIPTION, "Import table from .csv");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (trainer == null) {
                 return;
@@ -224,7 +223,8 @@ public class SOMTrainerControlsPanel extends JPanel {
             try {
                 trainer.apply();
                 updatePanel();
-                panel.getNetwork().fireGroupUpdated(network);
+                //TODO
+                // panel.getNetwork().fireGroupUpdated(network);
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
@@ -244,13 +244,12 @@ public class SOMTrainerControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Reset network");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             network.getSom().reset();
             trainer.setIteration(0);
-            panel.getNetwork().fireGroupUpdated(network);
+            //TODO
+            // panel.getNetwork().fireGroupUpdated(network);
             updatePanel();
         }
     };
@@ -266,13 +265,12 @@ public class SOMTrainerControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Randomize network");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             network.getSom().randomizeIncomingWeights();
             updatePanel();
-            panel.getNetwork().fireGroupUpdated(network.getSynapseGroup());
+            //TODO
+            //panel.getNetwork().fireGroupUpdated(network.getSynapseGroup());
         }
     };
 

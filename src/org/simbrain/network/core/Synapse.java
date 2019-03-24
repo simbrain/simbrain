@@ -30,6 +30,8 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -67,7 +69,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Strength of synapse.
      */
-    @UserParameter(label = "Strength", description = "Weight Strength", minimumValue = -10, maximumValue = 10, order = 1)
+    @UserParameter(label = "Strength", useSetter =  true, description = "Weight Strength", minimumValue = -10, maximumValue = 10, order = 1)
     private double strength = 0;
 
     @Override
@@ -196,6 +198,11 @@ public class Synapse implements EditableObject, AttributeContainer {
      * target neuron before allowing certain changes.
      */
     private final boolean isTemplate;
+
+    /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /** Initialize properties */
     static {
@@ -488,7 +495,7 @@ public class Synapse implements EditableObject, AttributeContainer {
             return;
         }
         if (!isFrozen()) {
-            strength = clip(source.getPolarity().clip(wt));
+            forceSetStrength(clip(source.getPolarity().clip(wt)));
         }
     }
 
@@ -496,7 +503,9 @@ public class Synapse implements EditableObject, AttributeContainer {
      * @param wt the value to set the strength of the synapse to
      */
     public void forceSetStrength(final double wt) {
+        double oldweight = strength;
         strength = wt;
+        fireStrengthUpdated();
     }
 
     /**
@@ -552,11 +561,8 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     public void incrementWeight() {
         if (strength < upperBound) {
-            strength += increment;
+            forceSetStrength(strength + increment);
         }
-        // target.weightChanged(this); // Maybe?
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -564,10 +570,9 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     public void decrementWeight() {
         if (strength > lowerBound) {
+            forceSetStrength(strength - increment);
             strength -= increment;
         }
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -579,10 +584,8 @@ public class Synapse implements EditableObject, AttributeContainer {
         } else if (strength < 0) {
             decrementWeight();
         } else if (strength == 0) {
-            strength = 0;
+            forceSetStrength(0);
         }
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -594,10 +597,8 @@ public class Synapse implements EditableObject, AttributeContainer {
         } else if (strength < 0) {
             incrementWeight();
         } else if (strength == 0) {
-            strength = 0;
+            forceSetStrength(0);
         }
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -611,8 +612,6 @@ public class Synapse implements EditableObject, AttributeContainer {
         if (symmetric != null) {
             symmetric.setStrength(strength);
         }
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -637,9 +636,8 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Randomize this weight to a value between its upper and lower bounds.
      */
     public void randomize() {
-        strength = (getUpperBound() - getLowerBound()) * Math.random() + getLowerBound();
-        if (getNetwork() != null && !isTemplate)
-            getNetwork().fireSynapseChanged(this);
+        double newStrength = (getUpperBound() - getLowerBound()) * Math.random() + getLowerBound();
+        forceSetStrength(newStrength);
     }
 
     /**
@@ -863,11 +861,7 @@ public class Synapse implements EditableObject, AttributeContainer {
         SynapseUpdateRule oldRule = learningRule;
         this.learningRule = newLearningRule;
         initSpikeResponder();
-        if (parentNetwork != null) {
-            getNetwork().fireSynapseTypeChanged(oldRule, learningRule);
-            // getNetwork().Network.updateTimeType();
-            // Currently synapses don't have a time type
-        }
+        changeSupport.firePropertyChange("rule", oldRule, newLearningRule);
     }
 
     /**
@@ -1063,6 +1057,28 @@ public class Synapse implements EditableObject, AttributeContainer {
         if(delayManager != null) {
             Arrays.fill(delayManager, 0);
         }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Notify listeners that this object has been deleted.
+     */
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", this, null);
+    }
+
+    /**
+     * Label update needs to be reflected in GUI.
+     */
+    public void fireStrengthUpdated() {
+        changeSupport.firePropertyChange("strength", null , null);
     }
 
 }

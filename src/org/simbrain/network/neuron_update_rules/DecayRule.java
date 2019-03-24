@@ -197,7 +197,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
                 act = act + n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -213,7 +212,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
                 act = act - n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 

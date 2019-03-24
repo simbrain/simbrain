@@ -270,7 +270,6 @@ public class KeyBindings {
                     panel.getQuickConnector().applyCurrentConnection(panel.getNetwork(),
                             panel.getSourceModelNeurons(),
                             panel.getSelectedModelNeurons());
-                    panel.getNetwork().fireSynapsesUpdated();
                 }
             }
         });

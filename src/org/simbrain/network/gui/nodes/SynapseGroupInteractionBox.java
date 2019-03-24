@@ -25,7 +25,6 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;

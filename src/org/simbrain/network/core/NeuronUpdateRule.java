@@ -89,7 +89,6 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
      */
     public final void incrementActivation(Neuron n) {
         n.forceSetActivation(n.getActivation() + n.getIncrement());
-        n.getNetwork().fireNeuronChanged(n);
     }
 
     /**
@@ -99,7 +98,6 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
      */
     public final void decrementActivation(Neuron n) {
         n.forceSetActivation(n.getActivation() - n.getIncrement());
-        n.getNetwork().fireNeuronChanged(n);
     }
 
     /**

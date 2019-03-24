@@ -65,7 +65,8 @@ public class SOMNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.update();
-                net.getParentNetwork().fireGroupUpdated(net);
+                //TODO
+                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
@@ -74,7 +75,8 @@ public class SOMNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.getSom().randomizeIncomingWeights();
-                net.getParentNetwork().fireGroupUpdated(net);
+                //TODO
+                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(randomizeNet);

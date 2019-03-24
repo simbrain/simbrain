@@ -254,7 +254,8 @@ public class IterativeControlsPanel extends JPanel {
     private void randomizeNetwork() {
         initTrainer(true);
         trainer.randomize();
-        panel.getNetwork().fireGroupUpdated(trainer.getTrainableNetwork().getNetwork());
+        //TODO
+        //panel.getNetwork().fireGroupUpdated(trainer.getTrainableNetwork().getNetwork());
     }
 
     private void editTrainerProperties() {

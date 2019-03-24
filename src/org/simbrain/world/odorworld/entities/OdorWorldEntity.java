@@ -240,7 +240,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             updateHeadingBasedOnVelocity();
         }
 
-        changeSupport.firePropertyChange("updated", null, this);
+        changeSupport.firePropertyChange("update", null, this);
 
     }
 

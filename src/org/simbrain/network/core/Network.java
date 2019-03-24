@@ -23,7 +23,6 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.listeners.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
@@ -128,31 +127,6 @@ public class Network {
     private TimeType timeType = TimeType.DISCRETE;
 
     /**
-     * List of objects registered to observe general network events.
-     */
-    private transient List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
-
-    /**
-     * List of objects registered to observe neuron-related network events.
-     */
-    private transient List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
-
-    /**
-     * List of objects registered to observe synapse-related network events.
-     */
-    private transient List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
-
-    /**
-     * List of objects registered to observe group-related network events.
-     */
-    private transient List<GroupListener> groupListeners = new ArrayList<GroupListener>();
-
-    /**
-     * List of objects registered to observe text-related network events.
-     */
-    private transient List<TextListener> textListeners = new ArrayList<TextListener>();
-
-    /**
      * Whether network has been updated yet; used by thread.
      */
     private transient AtomicBoolean updateCompleted = new AtomicBoolean(false);
@@ -237,25 +211,18 @@ public class Network {
      * bounds.
      */
     public void update() {
-        networkListeners.forEach(l -> l.setUpdateComplete(false));
+
+        changeSupport.firePropertyChange("updatedCompleted", null, false);
+
+        // Main update
         updateManager.invokeAllUpdates();
 
-        if (fireUpdates) {
-            // Fire update events for GUI update. Loose items, then groups.
-            // Todo: fireSynapsesUpdated(synapseList) is a performance drain,
-            // but needed e.g. to view Hebbian dynamics
-            fireSynapsesUpdated(looseSynapses); // Loose synapses
-            fireNeuronsUpdated(looseNeurons); // Loose neurons
-            for (Group group : groupList) {
-                fireGroupUpdated(group);
-            }
-        }
-        // Clear input nodes
         clearInputs();
-        // Update Time
         updateTime();
+        changeSupport.firePropertyChange("updateTimeDisplay", null, false);
         iterCount++;
         setUpdateCompleted(true);
+
     }
 
     /**
@@ -570,7 +537,7 @@ public class Network {
 
         // Notify listeners that this neuron has been deleted
         if(fireEvent) {
-            fireNeuronRemoved(toDelete);
+            changeSupport.firePropertyChange("neuronRemoved", toDelete, null);
         }
     }
 
@@ -667,7 +634,8 @@ public class Network {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             }
         }
-        fireNeuronsUpdated(getFlatNeuronList());
+        changeSupport.firePropertyChange("neuronsUpdated", null, this.getFlatNeuronList());
+
     }
 
     /**
@@ -677,9 +645,9 @@ public class Network {
      */
     public void setActivations(final double value) {
         for (Neuron neuron : this.getFlatNeuronList()) {
+            //TODO
             neuron.setActivation(value);
         }
-        fireNeuronsUpdated(getFlatNeuronList());
     }
 
     /**
@@ -1016,13 +984,6 @@ public class Network {
 
         changeSupport = new PropertyChangeSupport(this);
 
-        // Initialize listener lists
-        networkListeners = new ArrayList<NetworkListener>();
-        neuronListeners = new ArrayList<NeuronListener>();
-        synapseListeners = new ArrayList<SynapseListener>();
-        textListeners = new ArrayList<TextListener>();
-        groupListeners = new ArrayList<GroupListener>();
-
         // Initialize update manager
         updateManager.postUnmarshallingInit();
 
@@ -1187,14 +1148,12 @@ public class Network {
     }
 
     /**
-     * Fire a neuron deleted event to all registered model listeners.
+     * Fire a neuron added event to all registered model listeners.
      *
-     * @param deleted neuron which has been deleted
+     * @param added neuron which was added
      */
-    public void fireNeuronRemoved(final Neuron deleted) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
-        }
+    public void fireNeuronAdded(final Neuron added) {
+        changeSupport.firePropertyChange("neuronAdded", null, added);
     }
 
     /**
@@ -1202,9 +1161,7 @@ public class Network {
      * has been changed and this should be reflected in the GUI.
      */
     public void fireNeuronsUpdated() {
-        for (NetworkListener listener : networkListeners) {
-            listener.updateNeurons();
-        }
+        changeSupport.firePropertyChange("neuronsUpdated", null, getNeuronList());
     }
 
     /**
@@ -1215,19 +1172,32 @@ public class Network {
      * @param neurons the neurons whose state has changed
      */
     public void fireNeuronsUpdated(Collection<Neuron> neurons) {
-        for (int i = 0, n = networkListeners.size(); i < n; i++) {
-            networkListeners.get(i).updateNeurons(neurons);
-        }
+        changeSupport.firePropertyChange("neuronsUpdated", null, neurons);
     }
 
+    /**
+     * Fire a synapse added event to all registered model listeners.
+     *
+     * @param added synapse which was added
+     */
+    public void fireSynapseAdded(final Synapse added) {
+        changeSupport.firePropertyChange("synapseAdded", null, added);
+    }
+
+    /**
+     * Fire a synapse deleted event to all registered model listeners.
+     *
+     * @param deleted synapse which was deleted
+     */
+    public void fireSynapseRemoved(final Synapse deleted) {
+        changeSupport.firePropertyChange("synapseRemoved", deleted, null);
+    }
     /**
      * Fire this event when the visible state of a synapse (e.g. its strength)
      * has been changed and this should be reflected in the GUI.
      */
     public void fireSynapsesUpdated() {
-        for (NetworkListener listener : networkListeners) {
-            listener.updateSynapses();
-        }
+        changeSupport.firePropertyChange("synapsesUpdated", null, getSynapseList());
     }
 
     /**
@@ -1238,110 +1208,7 @@ public class Network {
      * @param synapses the synapses whose state has changed
      */
     public void fireSynapsesUpdated(Collection<Synapse> synapses) {
-        for (int i = 0, n = networkListeners.size(); i < n; i++) {
-            networkListeners.get(i).updateSynapses(synapses);
-        }
-    }
-
-    /**
-     * Fire a network changed event to all registered model listeners.
-     *
-     * @param moved Neuron that has been moved
-     */
-    public void fireNeuronMoved(final Neuron moved) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.neuronMoved(new NetworkEvent<Neuron>(this, moved));
-        }
-    }
-
-    /**
-     * Fire a neuron added event to all registered model listeners.
-     *
-     * @param added neuron which was added
-     */
-    public void fireNeuronAdded(final Neuron added) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.neuronAdded(new NetworkEvent<Neuron>(this, added));
-        }
-    }
-
-    /**
-     * Fire a neuron type changed event to all registered model listeners.
-     *
-     * @param old     the old update rule
-     * @param changed the new update rule
-     */
-    public void fireNeuronTypeChanged(final NeuronUpdateRule old, final NeuronUpdateRule changed) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this, old, changed));
-        }
-    }
-
-    /**
-     * Fire a neuron changed event to all registered model listeners.
-     *
-     * @param changed neuron
-     */
-    public void fireNeuronChanged(final Neuron changed) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.neuronChanged(new NetworkEvent<Neuron>(this, changed));
-        }
-    }
-
-    /**
-     * Fire a label changed event to all registered model listeners.
-     *
-     * @param changed neuron
-     */
-    public void fireNeuronLabelChanged(final Neuron changed) {
-        for (NeuronListener listener : neuronListeners) {
-            listener.labelChanged(new NetworkEvent<Neuron>(this, changed));
-        }
-    }
-
-    /**
-     * Fire a synapse added event to all registered model listeners.
-     *
-     * @param added synapse which was added
-     */
-    public void fireSynapseAdded(final Synapse added) {
-        for (SynapseListener listener : synapseListeners) {
-            listener.synapseAdded(new NetworkEvent<Synapse>(this, added));
-        }
-    }
-
-    /**
-     * Fire a synapse deleted event to all registered model listeners.
-     *
-     * @param deleted synapse which was deleted
-     */
-    public void fireSynapseRemoved(final Synapse deleted) {
-        for (SynapseListener listener : synapseListeners) {
-            listener.synapseRemoved(new NetworkEvent<Synapse>(this, deleted));
-        }
-    }
-
-    /**
-     * Fire a synapse changed event to all registered model listeners.
-     *
-     * @param changed new, changed synapse
-     */
-    public void fireSynapseChanged(final Synapse changed) {
-        for (SynapseListener listener : synapseListeners) {
-            listener.synapseChanged(new NetworkEvent<Synapse>(this, changed));
-        }
-    }
-
-    /**
-     * Fire a synapse type changed event to all registered model listeners.
-     *
-     * @param oldRule      old synapse, before the change
-     * @param learningRule new, changed synapse
-     */
-    public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule, final SynapseUpdateRule learningRule) {
-        for (SynapseListener listener : synapseListeners) {
-            listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(this, oldRule, learningRule));
-        }
+        changeSupport.firePropertyChange("synapsesUpdated", null, synapses);
     }
 
     /**
@@ -1350,9 +1217,7 @@ public class Network {
      * @param added text which was deleted
      */
     public void fireTextAdded(final NetworkTextObject added) {
-        for (TextListener listener : textListeners) {
-            listener.textAdded(added);
-        }
+        changeSupport.firePropertyChange("textAdded", null, added);
     }
 
     /**
@@ -1361,22 +1226,25 @@ public class Network {
      * @param deleted text which was deleted
      */
     public void fireTextRemoved(final NetworkTextObject deleted) {
-        for (TextListener listener : textListeners) {
-            listener.textRemoved(deleted);
-        }
+        changeSupport.firePropertyChange("textRemoved", deleted, null);
     }
 
     /**
-     * Fire a text changed event to all registered model listeners.
-     * <p>
-     * TODO: Not currently used.
+     * Fire a group added event to all registered model listeners.
      *
-     * @param changed text which was changed
+     * @param added Group that has been added
      */
-    public void fireTextChanged(final NetworkTextObject changed) {
-        for (TextListener listener : textListeners) {
-            listener.textRemoved(changed);
-        }
+    public void fireGroupAdded(final Group added) {
+        changeSupport.firePropertyChange("groupAdded", null, added);
+    }
+
+    /**
+     * Fire a group deleted event to all registered model listeners.
+     *
+     * @param deleted Group to be deleted
+     */
+    public void fireGroupRemoved(final Group deleted) {
+        changeSupport.firePropertyChange("groupRemoved", deleted, null);
     }
 
     /**
@@ -1397,89 +1265,6 @@ public class Network {
      */
     public void setUpdateCompleted(final boolean b) {
         updateCompleted.set(b);
-    }
-
-    /**
-     * Fire a group added event to all registered model listeners.
-     *
-     * @param added Group that has been added
-     */
-    public void fireGroupAdded(final Group added) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupAdded(new NetworkEvent<Group>(this, added));
-        }
-    }
-
-    /**
-     * Fire a group deleted event to all registered model listeners.
-     *
-     * @param deleted Group to be deleted
-     */
-    public void fireGroupRemoved(final Group deleted) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
-        }
-    }
-
-    /**
-     * Fire a group changed event to all registered model listeners. A string
-     * desription describes the change and is used by listeners to handle the
-     * event. Old group is not currently used but may be in the future.
-     *
-     * @param old               Old group
-     * @param changed           New changed group
-     * @param changeDescription A description of the
-     */
-    public void fireGroupChanged(final Group old, final Group changed, final String changeDescription) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupChanged(new NetworkEvent<Group>(this, old, changed), changeDescription);
-        }
-    }
-
-    /**
-     * This version of fireGroupChanged fires a pre-set event, which may have an
-     * auxiliary object set.
-     *
-     * @param event             the network changed event.
-     * @param changeDescription A description of the
-     */
-    public void fireGroupChanged(final NetworkEvent<Group> event, final String changeDescription) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupChanged(event, changeDescription);
-        }
-    }
-
-    /**
-     * @param group             reference to the group whose parameters are
-     *                          being changed
-     * @param changeDescription A change of description for the group
-     */
-    public void fireGroupChanged(final Group group, final String changeDescription) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupChanged(new NetworkEvent<Group>(this, group), changeDescription);
-        }
-    }
-
-    /**
-     * Fire a group parameters changed event.
-     *
-     * @param group reference to group whose parameters changed
-     */
-    public void fireGroupParametersChanged(final Group group) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupParameterChanged(new NetworkEvent<Group>(this, group, group));
-        }
-    }
-
-    /**
-     * Fire a group update event event.
-     *
-     * @param group reference to group that has been updated.
-     */
-    public void fireGroupUpdated(final Group group) {
-        for (int i = 0, n = groupListeners.size(); i < n; i++) {
-            groupListeners.get(i).groupUpdated(group);
-        }
     }
 
     @Override
@@ -1527,78 +1312,6 @@ public class Network {
      */
     public SimpleId getSynapseIdGenerator() {
         return synapseIdGenerator;
-    }
-
-    /**
-     * Register a network listener.
-     *
-     * @param listener the observer to register
-     */
-    public void addNetworkListener(final NetworkListener listener) {
-        networkListeners.add(listener);
-    }
-
-    /**
-     * Remove a network listener.
-     *
-     * @param networkListener the observer to remove
-     */
-    public void removeNetworkListener(NetworkListener networkListener) {
-        networkListeners.remove(networkListener);
-    }
-
-    /**
-     * Register a neuron listener.
-     *
-     * @param listener the observer to register
-     */
-    public void addNeuronListener(final NeuronListener listener) {
-        neuronListeners.add(listener);
-    }
-
-    /**
-     * Register a synapse listener.
-     *
-     * @param listener the observer to register
-     */
-    public void addSynapseListener(final SynapseListener listener) {
-        synapseListeners.add(listener);
-    }
-
-    /**
-     * Register a text listener.
-     *
-     * @param listener the observer to register
-     */
-    public void addTextListener(final TextListener listener) {
-        textListeners.add(listener);
-    }
-
-    /**
-     * Remove a synapse listener.
-     *
-     * @param synapseListener the observer to remove
-     */
-    public void removeSynapseListener(SynapseListener synapseListener) {
-        synapseListeners.remove(synapseListener);
-    }
-
-    /**
-     * Register a group listener.
-     *
-     * @param listener the observer to register
-     */
-    public void addGroupListener(final GroupListener listener) {
-        groupListeners.add(listener);
-    }
-
-    /**
-     * Remove a group listener.
-     *
-     * @param listener the observer to remove
-     */
-    public void removeGroupListener(final GroupListener listener) {
-        groupListeners.remove(listener);
     }
 
     /**
@@ -1728,7 +1441,6 @@ public class Network {
      * @param connection conection object
      */
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
-
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
         addGroup(group);
     }
@@ -1838,7 +1550,6 @@ public class Network {
     public boolean isOneOffRun() {
         return oneOffRun;
     }
-
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);

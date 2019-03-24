@@ -135,16 +135,10 @@ public class FeedForward extends Subnetwork {
         }
     }
 
-    /**
-     * @return the betweenLayerInterval
-     */
     public int getBetweenLayerInterval() {
         return betweenLayerInterval;
     }
 
-    /**
-     * @param betweenLayerInterval the betweenLayerInterval to set
-     */
     public void setBetweenLayerInterval(int betweenLayerInterval) {
         this.betweenLayerInterval = betweenLayerInterval;
     }
@@ -155,20 +149,10 @@ public class FeedForward extends Subnetwork {
         group.setLabel("Layer " + getNeuronGroupCount());
     }
 
-    /**
-     * Returns the input layer.
-     *
-     * @return the input layer
-     */
     public NeuronGroup getInputLayer() {
         return getNeuronGroup(0);
     }
 
-    /**
-     * Returns the hidden layer of a 3 layer network (or just the second layer).
-     *
-     * @return the hidden layer
-     */
     public NeuronGroup getHiddenLayer() {
         return getHiddenLayer(0);
     }
@@ -183,11 +167,6 @@ public class FeedForward extends Subnetwork {
         return getNeuronGroup(index + 1);
     }
 
-    /**
-     * Returns the output layer.
-     *
-     * @return the output layer
-     */
     public NeuronGroup getOutputLayer() {
         return getNeuronGroup(getNeuronGroupCount() - 1);
     }

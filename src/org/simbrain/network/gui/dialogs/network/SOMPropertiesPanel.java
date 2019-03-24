@@ -166,17 +166,25 @@ public class SOMPropertiesPanel extends GroupPropertiesPanel {
         // For creation panels use an "empty" som network to harvest
         // default values
         if (panelType == SOMPropsPanelType.CREATE_GROUP) {
-            som = new SOMGroup(null, 1);
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
-            fillSOMGroupFieldValues();
+            fillSOMDefaultValues();
         } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-            som = new SOMNetwork(null, 1, 1, networkPanel.getWhereToAdd());
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);
-            fillSOMNetworkFieldValues();
+            fillSOMDefaultValues();
         } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
             fillSOMGroupFieldValues();
         }
+    }
+
+    /**
+     * Fill fields to default values for SOM Groups.
+     */
+    private void fillSOMDefaultValues() {
+        tfAlpha.setText("" + SOMGroup.DEFAULT_ALPHA);
+        tfInitNeighborhoodSize.setText("" + SOMGroup.DEFAULT_INIT_NSIZE);
+        tfAlphaDecayRate.setText("" + SOMGroup.DEFAULT_DECAY_RATE);
+        tfNeigborhoodDecayAmount.setText("" + SOMGroup.DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT);
     }
 
     /**
@@ -187,7 +195,6 @@ public class SOMPropertiesPanel extends GroupPropertiesPanel {
         tfInitNeighborhoodSize.setText(Double.toString(((SOMGroup) som).getInitNeighborhoodSize()));
         tfAlphaDecayRate.setText(Double.toString(((SOMGroup) som).getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Double.toString(((SOMGroup) som).getNeighborhoodDecayAmount()));
-
     }
 
     /**
@@ -201,9 +208,6 @@ public class SOMPropertiesPanel extends GroupPropertiesPanel {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean commitChanges() {
         try {

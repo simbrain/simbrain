@@ -25,6 +25,9 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.layouts.HexagonalGridLayout;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -49,6 +52,12 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public static final int DEFAULT_NUM_UNITS = 36;
 
+
+    /**
+     * The update function used by this Hopfield network.
+     */
+    public static final boolean DEFAULT_PRIORITY = false;
+
     /**
      * Number of neurons.
      */
@@ -59,11 +68,12 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
 
+
     /**
      * If true, if the network's update order is sequential, it will update in
      * order of priority.
      */
-    private boolean byPriority = false;
+    private boolean byPriority = DEFAULT_PRIORITY;
 
     /**
      * The set of neurons... here as a hack while the priority update within
@@ -75,6 +85,11 @@ public class Hopfield extends Subnetwork implements Trainable {
      * Training set.
      */
     private final TrainingSet trainingSet = new TrainingSet();
+
+    /**
+     * Default layout for Hopfield nets.
+     */
+    public static final Layout DEFAULT_LAYOUT = new GridLayout(50, 50);
 
     /**
      * Creates a new Hopfield network.
@@ -94,8 +109,10 @@ public class Hopfield extends Subnetwork implements Trainable {
 
         // Create main neuron group
         NeuronGroup neuronGroup = new NeuronGroup(root, numNeurons);
+        neuronGroup.setLayout(DEFAULT_LAYOUT);
+        neuronGroup.setLabel("The Neurons");
+        neuronGroup.applyLayout();
         addNeuronGroup(neuronGroup);
-        getNeuronGroup().setLabel("Neurons");
 
         // Set neuron rule
         BinaryRule binary = new BinaryRule();
@@ -139,19 +156,11 @@ public class Hopfield extends Subnetwork implements Trainable {
                 }
             }
         }
-        getParentNetwork().fireGroupUpdated(this.getSynapseGroup());
     }
 
     @Override
     public void update() {
         updateFunc.update(this);
-    }
-
-    /**
-     * @return The number of neurons.
-     */
-    public int getNumUnits() {
-        return numUnits;
     }
 
     @Override
@@ -189,7 +198,8 @@ public class Hopfield extends Subnetwork implements Trainable {
             Neuron tar = w.getTarget();
             getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
         }
-        getParentNetwork().fireGroupUpdated(getSynapseGroup());
+        //TODO
+        //getParentNetwork().fireGroupUpdated(getSynapseGroup());
     }
 
     /**
@@ -203,44 +213,26 @@ public class Hopfield extends Subnetwork implements Trainable {
         return in == 0 ? -1 : in;
     }
 
-    /**
-     * @return the updateFunc
-     */
     public HopfieldUpdate getUpdateFunc() {
         return updateFunc;
     }
 
-    /**
-     * @param updateFunc the updateFunc to set
-     */
     public void setUpdateFunc(HopfieldUpdate updateFunc) {
         this.updateFunc = updateFunc;
     }
 
-    /**
-     * @return the neuronSet
-     */
     public HashSet<Neuron> getNeuronSet() {
         return neuronSet;
     }
 
-    /**
-     * @param neuronSet the neuronSet to set
-     */
     public void setNeuronSet(HashSet<Neuron> neuronSet) {
         this.neuronSet = neuronSet;
     }
 
-    /**
-     * @return the byPriority
-     */
     public boolean isByPriority() {
         return byPriority;
     }
 
-    /**
-     * @param byPriority the byPriority to set
-     */
     public void setByPriority(boolean byPriority) {
         this.byPriority = byPriority;
     }

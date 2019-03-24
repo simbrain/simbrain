@@ -63,6 +63,14 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         this.addChild(pStyledText);
         this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+        text.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("delete".equals(evt.getPropertyName())) {
+                    TextNode.this.removeFromParent();
+                }
+            }
+        });
         update();
     }
 
@@ -93,7 +101,6 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
     @Override
     protected boolean hasContextMenu() {
-        // TODO Auto-generated method stub
         return true;
     }
 
@@ -138,9 +145,6 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         setBounds(pStyledText.getBounds());
     }
 
-    /**
-     * @return the pStyledText
-     */
     public PStyledText getPStyledText() {
         return pStyledText;
     }

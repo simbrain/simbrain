@@ -32,6 +32,8 @@ import org.simbrain.workspace.Producible;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -205,6 +207,11 @@ public class Neuron implements EditableObject, AttributeContainer {
     private double auxValue;
 
     /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
      * Construct a neuron with all default values in the specified network.
      * Sometimes used as the basis for a template neuron which will be edited
      * and then copied. Also used in scripts.
@@ -345,7 +352,7 @@ public class Neuron implements EditableObject, AttributeContainer {
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
-            getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
+            changeSupport.firePropertyChange("updateRule", oldRule, updateRule);
         }
     }
 
@@ -375,6 +382,7 @@ public class Neuron implements EditableObject, AttributeContainer {
         } else {
             activation = act;
         }
+        changeSupport.firePropertyChange("activation", lastActivation, act);
     }
 
     /**
@@ -400,28 +408,18 @@ public class Neuron implements EditableObject, AttributeContainer {
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
+        changeSupport.firePropertyChange("activation", lastActivation, act);
     }
 
-    /**
-     * @return the level of activation.
-     */
     @Producible(idMethod = "getId")
     public double getActivation() {
         return activation;
     }
 
-    /**
-     * @return ID of neuron.
-     */
     public String getId() {
         return id;
     }
 
-    /**
-     * Sets the id of the neuron.
-     *
-     * @param theName Neuron id
-     */
     public void setId(final String theName) {
         id = theName;
     }
@@ -623,7 +621,6 @@ public class Neuron implements EditableObject, AttributeContainer {
      */
     public void randomize() {
         forceSetActivation(this.getUpdateRule().getRandomValue());
-        getNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -775,57 +772,31 @@ public class Neuron implements EditableObject, AttributeContainer {
         return (fanIn.contains(s) || fanOut.get(s.getTarget()) != null);
     }
 
-    /**
-     * @return Returns the x coordinate.
-     */
     public double getX() {
         return x;
     }
 
-    /**
-     * @return Returns the y coordinate.
-     */
     public double getY() {
         return y;
     }
 
-    /**
-     * @return Returns the z coordinate.
-     */
     public double getZ() {
         return z;
     }
 
-    /**
-     * @param x The x coordinate to set.
-     */
     public void setX(final double x) {
+        //changeSupport.firePropertyChange("moved", this.x, x);
         this.x = x;
-        if (this.getNetwork() != null) {
-            if (this.getNetwork() != null) {
-                this.getNetwork().fireNeuronMoved(this);
-            }
-        }
     }
 
-    /**
-     * @param y The y coordinate to set.
-     */
     public void setY(final double y) {
+        //changeSupport.firePropertyChange("moved", this.y, y);
         this.y = y;
-        if (this.getNetwork() != null) {
-            this.getNetwork().fireNeuronMoved(this);
-        }
     }
 
-    /**
-     * @param z The z coordinate to set.
-     */
     public void setZ(final double z) {
+        //changeSupport.firePropertyChange("moved", this.z, z);
         this.z = z;
-        if (this.getNetwork() != null) {
-            this.getNetwork().fireNeuronMoved(this);
-        }
     }
 
     /**
@@ -939,18 +910,10 @@ public class Neuron implements EditableObject, AttributeContainer {
         return updateRule.getToolTipText(this);
     }
 
-    /**
-     * @return the targetValue
-     */
     public double getTargetValue() {
         return targetValue;
     }
 
-    /**
-     * Set target value.
-     *
-     * @param targetValue value to set.
-     */
     public void setTargetValue(final double targetValue) {
         this.targetValue = targetValue;
     }
@@ -974,9 +937,6 @@ public class Neuron implements EditableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @return the clamped
-     */
     public boolean isClamped() {
         return clamped;
     }
@@ -988,7 +948,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      */
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
-        this.getNetwork().fireNeuronChanged(this);
+        changeSupport.firePropertyChange("clamped", null, clamped);
     }
 
     @Producible(idMethod = "getId", defaultVisibility = false)
@@ -998,8 +958,8 @@ public class Neuron implements EditableObject, AttributeContainer {
 
     @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(final String label) {
+        changeSupport.firePropertyChange("label", this.label , label);
         this.label = label;
-        this.getNetwork().fireNeuronLabelChanged(this);
     }
 
     /**
@@ -1067,16 +1027,11 @@ public class Neuron implements EditableObject, AttributeContainer {
 
     /**
      * TODO: Possibly make this be a NeuronGroup. See design notes.
-     *
-     * @return the parentGroup
      */
     public Group getParentGroup() {
         return parentGroup;
     }
 
-    /**
-     * @param parentGroup the parentGroup to set
-     */
     public void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
     }
@@ -1243,5 +1198,35 @@ public class Neuron implements EditableObject, AttributeContainer {
     @Override
     public String getName() {
         return getId();
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Notify listeners that this object has been deleted.
+     */
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", this, null);
+    }
+
+    /**
+     * Label update needs to be reflected in GUI.
+     */
+    public void fireActivationUpdated() {
+        changeSupport.firePropertyChange("activation", null , null);
+    }
+
+    /**
+     * Neuron position changed and GUI should be notified of this.
+     */
+    public void firePositionChanged() {
+        changeSupport.firePropertyChange("moved", null, null);
     }
 }

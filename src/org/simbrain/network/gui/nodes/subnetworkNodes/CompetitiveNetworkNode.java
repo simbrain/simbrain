@@ -66,7 +66,8 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
                 net.update();
-                net.getParentNetwork().fireGroupUpdated(net);
+                //TODO
+                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
@@ -75,7 +76,8 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
                 net.getCompetitive().randomize();
-                net.getParentNetwork().fireGroupUpdated(net.getSynapseGroup());
+                //TODO
+                // net.getParentNetwork().fireGroupUpdated(net.getSynapseGroup());
             }
         };
         menu.add(randomizeNet);

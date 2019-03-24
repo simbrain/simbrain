@@ -54,7 +54,10 @@ public class HopfieldCreationDialog extends StandardDialog {
      */
     private HopfieldPropertiesPanel hopPropertiesPanel;
 
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+    /**
+     * Layout to use in property editor.
+     */
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject(Hopfield.DEFAULT_LAYOUT);
 
     /**
      * Layout panel.
@@ -105,9 +108,6 @@ public class HopfieldCreationDialog extends StandardDialog {
 
     }
 
-    /**
-     * Called when dialog closes.
-     */
     @Override
     protected void closeDialogOk() {
         hopPropertiesPanel.commitChanges();

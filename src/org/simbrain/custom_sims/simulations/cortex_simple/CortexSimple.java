@@ -19,6 +19,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +159,8 @@ public class CortexSimple extends RegisteredSimulation {
             sg.setLabel(sgn);
         }
 
-        network.fireGroupChanged(layer_4, "");
+        //TODO
+        //layer_4.fireGroupUpdated();
         // Todo; Add labels
 
         // Use concurrent buffered update
@@ -192,7 +194,7 @@ public class CortexSimple extends RegisteredSimulation {
         NeuronGroup ng = new NeuronGroup(network, neurons);
         network.addGroup(ng);
         ng.setLayout(layout);
-        //ng.applyLayout(new Point2D.Double(x, y));
+        ng.applyLayout();
         return ng;
     }
 

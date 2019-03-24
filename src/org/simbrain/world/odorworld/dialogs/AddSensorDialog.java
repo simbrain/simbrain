@@ -49,7 +49,6 @@ public class AddSensorDialog extends StandardDialog {
      */
     private Box mainPanel = Box.createVerticalBox();
 
-
     /**
      * Sensor Dialog add sensor constructor.
      *

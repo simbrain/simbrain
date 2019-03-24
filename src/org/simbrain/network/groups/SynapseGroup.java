@@ -524,6 +524,7 @@ public class SynapseGroup extends Group {
             sourceNeuronGroup.removeOutgoingSg(this);
         }
         Runtime.getRuntime().gc();
+        changeSupport.firePropertyChange("delete", this, null);
     }
 
     @Override
@@ -557,8 +558,7 @@ public class SynapseGroup extends Group {
 
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
-        // getParentNetwork().fireGroupChanged(new NetworkEvent<Group>(getParentNetwork(), this, this),
-        //     SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+        changeSupport.firePropertyChange("synapseVisibilityChanged", null, this);
     }
 
     public boolean isDisplaySynapses() {
@@ -580,7 +580,7 @@ public class SynapseGroup extends Group {
         if (isDisplaySynapses()) {
             toDelete.getNetwork().fireSynapseRemoved(toDelete);
         }
-        getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
+        // TODO: Fire event to just update this synapse
         if (isEmpty()) {
             delete();
         }
@@ -656,7 +656,6 @@ public class SynapseGroup extends Group {
      *                of this group.
      */
     public void addNewExcitatorySynapse(final Synapse synapse) {
-        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapse.setParentGroup(this);
         if (exciteRand != null) {
@@ -673,6 +672,7 @@ public class SynapseGroup extends Group {
         synapse.setLowerBound(excitatoryPrototype.getLowerBound());
         synapse.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
         exSynapseSet.add(synapse);
+        // TODO: Fire event to just update this synapse
     }
 
     /**
@@ -681,7 +681,6 @@ public class SynapseGroup extends Group {
      *                of this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
-        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapse.setParentGroup(this);
         if (inhibRand != null) {
@@ -698,6 +697,7 @@ public class SynapseGroup extends Group {
         synapse.setLowerBound(inhibitoryPrototype.getLowerBound());
         synapse.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
         inSynapseSet.add(synapse);
+        // TODO: Fire event to just update this synapse
     }
 
     /**
@@ -1782,9 +1782,9 @@ public class SynapseGroup extends Group {
         }
     }
 
-    //TODO
     @Override
     public EditableObject copy() {
         return this.copy();
     }
+
 }

@@ -179,7 +179,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
                 act = getUpperBound();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -192,9 +191,9 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
                 act = getLowerBound();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
+
     @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;

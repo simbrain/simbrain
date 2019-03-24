@@ -118,6 +118,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
      * @param group        the neuron group
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
+
         this.networkPanel = networkPanel;
         this.neuronGroup = group;
 
@@ -137,6 +138,23 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
             }
         }
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+        group.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+
+                if ("delete".equals(evt.getPropertyName())) {
+                    NeuronGroupNode.this.removeFromParent();
+                } else if ("label".equals(evt.getPropertyName())) {
+                    NeuronGroupNode.this.updateText();
+                } else if ("recordingStarted".equals(evt.getPropertyName())) {
+                    NeuronGroupNode.this.updateText();
+                } else if ("recordingStopped".equals(evt.getPropertyName())) {
+                    NeuronGroupNode.this.updateText();
+                } else if ("moved".equals(evt.getPropertyName())) {
+                    NeuronGroupNode.this.syncToModel();
+                }
+            }
+        });
 
     }
 
@@ -164,9 +182,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         getNetworkPanel().setSelection(nodes);
     }
 
-    /**
-     * @return the networkPanel
-     */
     public NetworkPanel getNetworkPanel() {
         return networkPanel;
     }
@@ -209,6 +224,15 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         }
         for (Object node : outlinedObjects.getChildrenReference()) {
             ((NeuronNode) node).updateSynapseNodePositions();
+        }
+    }
+
+    /**
+     * Sync all neuron nodes in the group to the model.
+     */
+    public void syncToModel() {
+        for (Object object : outlinedObjects.getChildrenReference()) {
+            ((NeuronNode) object).pullViewPositionFromModel();
         }
     }
 
@@ -917,5 +941,4 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     public List<InteractionBox> getInteractionBoxes() {
         return Collections.singletonList((InteractionBox) interactionBox);
     }
-
 }

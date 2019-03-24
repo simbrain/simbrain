@@ -214,6 +214,24 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         PBounds bounds = mainShape.getBounds();
         setBounds(bounds);
 
+        neuron.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("delete".equals(evt.getPropertyName())) {
+                    NeuronNode.this.removeFromParent();
+                } else if ("activation".equals(evt.getPropertyName())) {
+                    NeuronNode.this.updateColor();
+                    NeuronNode.this.updateText();
+                } else if ("label".equals(evt.getPropertyName())) {
+                    NeuronNode.this.updateTextLabel();
+                } else if ("clamped".equals(evt.getPropertyName())) {
+                    NeuronNode.this.updateClampStatus();
+                } else if ("moved".equals(evt.getPropertyName())) {
+                    NeuronNode.this.pullViewPositionFromModel();
+                }
+            }
+        });
+
     }
 
     /**

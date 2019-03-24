@@ -147,7 +147,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
                 act = act + n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 
@@ -163,7 +162,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
                 act = act - n.getIncrement();
             }
             n.setActivation(act);
-            n.getNetwork().fireNeuronChanged(n);
         }
     }
 

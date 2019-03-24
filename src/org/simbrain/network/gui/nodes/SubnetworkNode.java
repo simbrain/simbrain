@@ -87,7 +87,16 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         setContextMenu(this.getDefaultContextMenu());
 
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-
+        group.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("delete".equals(evt.getPropertyName())) {
+                    SubnetworkNode.this.removeFromParent();
+                } else if ("label".equals(evt.getPropertyName())) {
+                    SubnetworkNode.this.updateText();
+                }
+            }
+        });
     }
 
     /**
@@ -123,7 +132,6 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         updateText();
     }
 
-
     /**
      * Update the text in the interaction box.
      */
@@ -131,8 +139,6 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         interactionBox.setText(subnetwork.getLabel());
         interactionBox.updateText();
     }
-
-    ;
 
     /**
      * @return the networkPanel

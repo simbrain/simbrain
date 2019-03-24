@@ -61,12 +61,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
     protected SynapseGroupInteractionBox interactionBox;
 
     /**
-     * Constant for use in group changed events, indicating that the visibility
-     * of synpases in a synapse group has changed.
-     */
-    public static final String SYNAPSE_VISIBILITY_CHANGED = "synapseVisibilityChanged";
-
-    /**
      * Create a Synapse Group PNode.
      *
      * @param networkPanel parent panel
@@ -85,6 +79,19 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         addChild(interactionBox);
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
+        group.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("delete".equals(evt.getPropertyName())) {
+                    SynapseGroupNode.this.removeFromParent();
+                } else if ("label".equals(evt.getPropertyName())) {
+                    SynapseGroupNode.this.updateText();
+                } else if ("synapseVisibilityChanged".equals(evt.getPropertyName())) {
+                    SynapseGroupNode.this.getNetworkPanel().
+                        toggleSynapseVisibility((SynapseGroup) evt.getNewValue());
+                }
+            }
+        });
     }
 
     @Override
@@ -94,23 +101,14 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         layoutChildren();
     }
 
-    /**
-     * @return the networkPanel
-     */
     public NetworkPanel getNetworkPanel() {
         return networkPanel;
     }
 
-    /**
-     * @return the interactionBox
-     */
     public SynapseGroupInteractionBox getInteractionBox() {
         return interactionBox;
     }
 
-    /**
-     * @return the synapseGroup
-     */
     public SynapseGroup getSynapseGroup() {
         return synapseGroup;
     }

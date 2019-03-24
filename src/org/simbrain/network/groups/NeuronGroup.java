@@ -192,7 +192,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     /**
      * Construct a new neuron group with a specified number of neurons.
      *
-     * @param net        parent network
+     * @param net parent network
      * @param numNeurons how many neurons it will have
      */
     public NeuronGroup(final Network net, final int numNeurons) {
@@ -288,6 +288,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         stopRecording();
         neuronList.clear();
         Runtime.getRuntime().gc();
+        changeSupport.firePropertyChange("delete", this, null);
     }
 
     /**
@@ -310,6 +311,15 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         if (isRecording()) {
             writeActsToFile();
         }
+        fireLabelUpdated();
+    }
+
+    /**
+     * Node positions within group changed and GUI should be notified of this
+     * change.
+     */
+    public void firePositionChanged() {
+        changeSupport.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -389,8 +399,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.getParentNetwork().fireGroupParametersChanged(this);
-        this.getParentNetwork().fireGroupChanged(this, "Recording Started");
+        changeSupport.firePropertyChange("recordingStarted", null, null);
     }
 
     /**
@@ -402,8 +411,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             valueWriter = null;
         }
         recording = false;
-        this.getParentNetwork().fireGroupParametersChanged(this);
-        this.getParentNetwork().fireGroupChanged(this, "Recording Stopped");
+        changeSupport.firePropertyChange("recordingStopped", null, null);
     }
 
     /**
@@ -1041,6 +1049,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
         }
+        firePositionChanged();
     }
 
     /**
@@ -1190,6 +1199,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     public void applyLayout() {
         layout.getLayout().setInitialLocation(getPosition());
         layout.getLayout().layoutNeurons(getNeuronList());
+        firePositionChanged();
     }
 
     /**
@@ -1201,6 +1211,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     public void applyLayout(Point2D initialPosition) {
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(getNeuronList());
+        firePositionChanged();
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {
@@ -1475,7 +1486,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
         }
         this.inputMode = inputMode;
-        this.getParentNetwork().fireGroupChanged(this, getLabel() + " input mode " + inputMode);
+        fireLabelUpdated();
     }
 
     public boolean isSpikingNeuronGroup() {
@@ -1615,4 +1626,5 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
             subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
         }
     }
+
 }

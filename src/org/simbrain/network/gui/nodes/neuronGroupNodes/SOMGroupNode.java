@@ -87,21 +87,24 @@ public class SOMGroupNode extends NeuronGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.reset();
-                group.getParentNetwork().fireGroupUpdated(group);
+                //TODO
+                //group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction("Recall SOM Memory") {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.recall();
-                group.getParentNetwork().fireGroupUpdated(group);
+                //TODO
+                // group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction("Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.randomizeIncomingWeights();
-                group.getParentNetwork().fireGroupUpdated(group);
+                //TODO
+                // group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
     }

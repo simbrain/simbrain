@@ -172,24 +172,17 @@ public class HopfieldPropertiesPanel extends GroupPropertiesPanel {
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void fillFieldValues() {
         if (isCreationPanel) {
-            hopfield = new Hopfield(null, hopfield.DEFAULT_NUM_UNITS);
-            tfNumNeurons.setText("" + hopfield.DEFAULT_NUM_UNITS);
+            tfNumNeurons.setText("" + Hopfield.DEFAULT_NUM_UNITS);
         }
-        cbUpdateOrder.setSelectedItem(hopfield.getUpdateFunc().getName());
-        priorityChkBx.setSelected(hopfield.isByPriority());
-        shuffleUpdateOrder.setEnabled(!hopfield.isByPriority());
+        cbUpdateOrder.setSelectedItem(Hopfield.DEFAULT_UPDATE);
+        priorityChkBx.setSelected(Hopfield.DEFAULT_PRIORITY);
+        shuffleUpdateOrder.setEnabled(!Hopfield.DEFAULT_PRIORITY);
         shuffleUpdateOrder.setSelected(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean commitChanges() {
         try {

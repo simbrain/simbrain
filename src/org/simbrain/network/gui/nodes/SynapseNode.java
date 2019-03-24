@@ -29,6 +29,8 @@ import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -147,6 +149,18 @@ public final class SynapseNode extends ScreenElement {
         setPickable(true);
         circle.setPickable(true);
         line.setPickable(false);
+
+        synapse.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("delete".equals(evt.getPropertyName())) {
+                    SynapseNode.this.removeFromParent();
+                } else if ("strength".equals(evt.getPropertyName())) {
+                    SynapseNode.this.updateColor();
+                    SynapseNode.this.updateDiameter();
+                }
+            }
+        });
     }
 
     /**

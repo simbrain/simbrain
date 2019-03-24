@@ -463,8 +463,9 @@ public class Cerebellum extends RegisteredSimulation {
 
         sim.couple(net.getNetworkComponent(),
             dopamine, plot.getTimeSeriesComponent(), 0);
-        sim.couple(net.getNetworkComponent(), output,
-            plot.getTimeSeriesComponent(), 1);
+        // TODO: Update plotbuilder to support multiple time series
+        // sim.couple(net.getNetworkComponent(), output,
+        //     plot.getTimeSeriesComponent(), 1);
 
     }
 

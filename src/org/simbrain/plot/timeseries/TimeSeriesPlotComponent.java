@@ -139,7 +139,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public void closing() {
     }
 
-
     @Override
     public String getXML() {
         return TimeSeriesModel.getXStream().toXML(model);

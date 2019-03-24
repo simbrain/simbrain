@@ -24,44 +24,26 @@ public class PlotBuilder {
         projectionModel = proj.getProjectionModel();
     }
 
-    /**
-     * @return the timeSeriesComponent
-     */
     public TimeSeriesPlotComponent getTimeSeriesComponent() {
         return timeSeriesComponent;
     }
 
-    /**
-     * @return the model
-     */
     public TimeSeriesModel getTimeSeriesModel() {
         return model;
     }
 
-    /**
-     * @return the projectionPlotComponent
-     */
     public ProjectionComponent getProjectionPlotComponent() {
         return projectionPlotComponent;
     }
 
-    /**
-     * @param projectionPlotComponent the projectionPlotComponent to set
-     */
     public void setProjectionPlotComponent(ProjectionComponent projectionPlotComponent) {
         this.projectionPlotComponent = projectionPlotComponent;
     }
 
-    /**
-     * @return the projectionModel
-     */
     public ProjectionModel getProjectionModel() {
         return projectionModel;
     }
 
-    /**
-     * @param projectionModel the projectionModel to set
-     */
     public void setProjectionModel(ProjectionModel projectionModel) {
         this.projectionModel = projectionModel;
     }

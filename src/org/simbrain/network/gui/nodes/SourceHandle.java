@@ -50,7 +50,7 @@ public final class SourceHandle extends PHandle {
     /**
      * Extend factor.
      */
-    private static final double EXTEND_FACTOR = 0.2d;
+    private static final float DEFAULT_EXTEND_FACTOR= 0.2f;
 
     /**
      * Color of selection boxes.
@@ -94,13 +94,21 @@ public final class SourceHandle extends PHandle {
      */
     private void updateBounds() {
         PNode parentNode = ((PNodeLocator) getLocator()).getNode();
+        // Different extension factor depending on whether the node being decorated is a neuron group node or not
+        float ef;
+        if (parentNode instanceof InteractionBox) {
+            // TODO: This is a hack because current interaction boxes are rescaled improperly in neuron group nodes.
+            // The problem is that NeuronGroupNode.layoutChildren uses full bounds, which includes the selection box bounds
+            ef = .09f;
+        } else {
+            ef = DEFAULT_EXTEND_FACTOR;
+        }
 
-        double x = 0.0d - (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
-        double y = 0.0d - (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
-        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
-        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
-        append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);
-    }
+        double x = 0.0d - (parentNode.getBounds().getWidth() * ef);
+        double y = 0.0d - (parentNode.getBounds().getHeight() * ef);
+        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * ef);
+        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * ef);
+        append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);    }
 
     /**
      * Return true if the specified node has a selection handle as a child.

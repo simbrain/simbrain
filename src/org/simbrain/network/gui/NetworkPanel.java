@@ -789,7 +789,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param synapse the synapse to add
      */
-    private void addSynapse(final Synapse synapse) {
+    public void addSynapse(final Synapse synapse) {
         if (objectNodeMap.get(synapse) != null) {
             return;
         }
@@ -818,7 +818,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param synapse the model synapse to remove.
      */
-    private void removeSynapse(final Synapse synapse) {
+    public void removeSynapse(final Synapse synapse) {
         SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(synapse);
         if (synapseNode != null) {
             selectionModel.remove(synapseNode);

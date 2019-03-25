@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
@@ -89,6 +90,10 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
                 } else if ("synapseVisibilityChanged".equals(evt.getPropertyName())) {
                     SynapseGroupNode.this.getNetworkPanel().
                         toggleSynapseVisibility((SynapseGroup) evt.getNewValue());
+                } else if ("synapseAdded".equals(evt.getPropertyName())) {
+                    SynapseGroupNode.this.getNetworkPanel().addSynapse(((Synapse) evt.getNewValue()));
+                } else if ("synapseRemoved".equals(evt.getPropertyName())) {
+                    SynapseGroupNode.this.getNetworkPanel().removeSynapse((Synapse) evt.getOldValue());
                 }
             }
         });

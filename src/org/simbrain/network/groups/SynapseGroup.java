@@ -578,7 +578,7 @@ public class SynapseGroup extends Group {
         toDelete.getTarget().removeAfferent(toDelete);
         this.excitatoryRatio = getExcitatoryRatioPrecise();
         if (isDisplaySynapses()) {
-            toDelete.getNetwork().fireSynapseRemoved(toDelete);
+            fireSynapseRemoved(toDelete);
         }
         // TODO: Fire event to just update this synapse
         if (isEmpty()) {
@@ -648,6 +648,7 @@ public class SynapseGroup extends Group {
                 addNewInhibitorySynapse(synapse);
             }
         }
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -672,7 +673,7 @@ public class SynapseGroup extends Group {
         synapse.setLowerBound(excitatoryPrototype.getLowerBound());
         synapse.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
         exSynapseSet.add(synapse);
-        // TODO: Fire event to just update this synapse
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -697,7 +698,7 @@ public class SynapseGroup extends Group {
         synapse.setLowerBound(inhibitoryPrototype.getLowerBound());
         synapse.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
         inSynapseSet.add(synapse);
-        // TODO: Fire event to just update this synapse
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -740,6 +741,7 @@ public class SynapseGroup extends Group {
             synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
             synapse.setParentGroup(this);
         }
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -756,6 +758,7 @@ public class SynapseGroup extends Group {
             synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
             synapse.setParentGroup(this);
         }
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -1785,6 +1788,24 @@ public class SynapseGroup extends Group {
     @Override
     public EditableObject copy() {
         return this.copy();
+    }
+
+    /**
+     * Notify listeners that a synapse has been added.
+     *
+     * @param synapse synapse to add
+     */
+    private void fireSynapseAdded(Synapse synapse) {
+        changeSupport.firePropertyChange("synapseAdded", this, synapse);
+    }
+
+    /**
+     * Notify listeners that a synapse has been removed.
+     *
+     * @param synapse synapse to remove
+     */
+    private void fireSynapseRemoved(Synapse synapse) {
+        changeSupport.firePropertyChange("synapseRemoved", synapse, null);
     }
 
 }

@@ -87,7 +87,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * The connection constant for connections between 2 excitatory neurons.
      */
     @UserParameter(label = "Exc. \u2192 Exc. Constant",
-            minimumValue = 0, maximumValue = 1, order = 2 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 2 )
     private double eeDistConst = DEFAULT_EE_CONST;
 
     /**
@@ -95,7 +95,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * inhibitory neuron.
      */
     @UserParameter(label = "Exc. \u2192 Inh. Constant",
-            minimumValue = 0, maximumValue = 1, order = 3 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 3 )
     private double eiDistConst = DEFAULT_EI_CONST;
 
     /**
@@ -103,14 +103,14 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * excitatory neuron.
      */
     @UserParameter(label = "Inh. \u2192 Exc. Constant",
-            minimumValue = 0, maximumValue = 1, order = 4 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 4 )
     private double ieDistConst = DEFAULT_IE_CONST;
 
     /**
      * The connection constant for connections between 2 inhibitory neurons.
      */
     @UserParameter(label = "Inh. \u2192 Inh. Constant",
-            minimumValue = 0, maximumValue = 1, order = 5 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 5 )
     private double iiDistConst = DEFAULT_II_CONST;
 
     /**

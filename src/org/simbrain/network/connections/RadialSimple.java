@@ -119,8 +119,16 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      * neurons with no polarity.
      */
     @UserParameter(label = "Exc. Probability", description = "Probability connections will be made to neighbor excitatory (or non-polar) neurons ",
-            minimumValue = 0, order = 5)
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 5)
     private double excitatoryProbability = .8;
+
+    /**
+     * Probability of designating a given synapse excitatory. If not, it's
+     * inhibitory.
+     */
+    @UserParameter(label = "Inh. Probability", description = "Probability connections will be made to neighbor inhibitory neurons ",
+        minimumValue = 0, maximumValue = 1, increment = .1, order = 6)
+    private double inhibitoryProbability = .8;
 
     /**
      * The number of connections allowed with excitatory (or non-polar) neurons. If there
@@ -149,14 +157,6 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
     @UserParameter(label = "Inh. Radius", description = "Distance to search for inhibitory neurons to connect to",
             minimumValue = 0, order = 4)
     private double inhibitoryRadius = 80;
-
-    /**
-     * Probability of designating a given synapse excitatory. If not, it's
-     * inhibitory.
-     */
-    @UserParameter(label = "Inh. Probability", description = "Probability connections will be made to neighbor inhibitory neurons ",
-            minimumValue = 0, order = 6)
-    private double inhibitoryProbability = .8;
 
     /**
      * The number of connections allowed with inhibitory neurons. If there
@@ -349,15 +349,15 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                     if (syns != null)
                         syns.add(synapse);
                 }
-                degreeCounter++;
-                if(degreeCounter >= excCons) {
-                    network.fireSynapsesUpdated();
-                    break;
-                }
+                // degreeCounter++;
+                // if(degreeCounter >= excCons) {
+                //     network.fireSynapsesUpdated();
+                //     break;
+                // }
             }
-            if (network != null) {
-                network.fireSynapsesUpdated();
-            }
+            // if (network != null) {
+            //     network.fireSynapsesUpdated();
+            // }
         }
     }
 

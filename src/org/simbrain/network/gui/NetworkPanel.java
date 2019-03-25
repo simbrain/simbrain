@@ -1452,6 +1452,8 @@ public class NetworkPanel extends JPanel {
                     network.removeGroup(((SubnetworkNode) selectedNode.getParent()).getSubnetwork());
                 }
             }
+            // Zoom events are costly so only zoom after main deletion events
+            zoomToFitPage(true);
         }
 
         // undoManager.addUndoableAction(new UndoableAction() {

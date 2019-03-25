@@ -160,6 +160,7 @@ public final class ConnectionPanel extends JPanel {
     private void syncPanelToTriangle() {
         connectionStrategyProperties.setVisible(detailTriangle.isDown());
         parentFrame.pack();
+        //parentFrame.setLocationRelativeTo(null);
     }
 
     /**

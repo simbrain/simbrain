@@ -714,29 +714,8 @@ public class NetworkPanel extends JPanel {
         // New objects are added to the right of the last group of
         // neurons added.
         whereToAdd.setLocation(neurons.get(neurons.size() - 1).getX() + DEFAULT_SPACING + 10, whereToAdd.getY());
+        network.fireNeuronsUpdated(getSelectedModelNeurons());
         repaint();
-
-        // No Implementation
-        // getUndoManager().addUndoableAction(
-        // new UndoableAction() {
-        //
-        // @Override
-        // public void undo() {
-        // for (Neuron neuron : neurons) {
-        // getNetwork().removeNeuron(neuron);
-        // }
-        // // System.out.println("AddNeurons:undo. - Remove List");
-        // }
-        //
-        // @Override
-        // public void redo() {
-        // for (Neuron neuron : neurons) {
-        // getNetwork().addNeuron(neuron);
-        // }
-        // // System.out.println("AddNeurons:red. - Re-add List");
-        // }
-        //
-        // });
 
     }
 

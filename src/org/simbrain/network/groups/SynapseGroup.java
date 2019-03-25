@@ -411,7 +411,7 @@ public class SynapseGroup extends Group {
     public void preAllocateSynapses(int expectedNumSynapses) throws IllegalStateException {
         if (!exSynapseSet.isEmpty() || !inSynapseSet.isEmpty()) {
             throw new IllegalArgumentException("Cannot pre-allocate space for"
-                + " some expected number of synapses when the synapse"
+                + " some expected number of synapses"
                 + " when one or both synapse sets are already populated."
                 + " Pre-allocations can only occur before connections"
                 + " have been initialized.");
@@ -574,8 +574,11 @@ public class SynapseGroup extends Group {
     public Synapse removeSynapse(Synapse toDelete) {
         exSynapseSet.remove(toDelete);
         inSynapseSet.remove(toDelete);
-        toDelete.getSource().removeEfferent(toDelete);
-        toDelete.getTarget().removeAfferent(toDelete);
+        if (toDelete != null) {
+            // TODO: Discuss np check with Zoë
+            toDelete.getSource().removeEfferent(toDelete);
+            toDelete.getTarget().removeAfferent(toDelete);
+        }
         this.excitatoryRatio = getExcitatoryRatioPrecise();
         if (isDisplaySynapses()) {
             fireSynapseRemoved(toDelete);
@@ -648,7 +651,6 @@ public class SynapseGroup extends Group {
                 addNewInhibitorySynapse(synapse);
             }
         }
-        fireSynapseAdded(synapse);
     }
 
     /**

@@ -543,16 +543,10 @@ public class SparseConnectionPanel extends EditablePanel {
         return null;
     }
 
-    /**
-     * @return
-     */
     public boolean isAllowSelfConnect() {
         return allowSelfConnect;
     }
 
-    /**
-     * @param allowSelfConnect
-     */
     public void setAllowSelfConnect(boolean allowSelfConnect) {
         this.allowSelfConnect = allowSelfConnect;
         int nt = allowSelfConnect ? numTargs : numTargs - 1;
@@ -571,16 +565,10 @@ public class SparseConnectionPanel extends EditablePanel {
         }
     }
 
-    /**
-     * @return the number of target neurons.
-     */
     public int getNumTargs() {
         return numTargs;
     }
 
-    /**
-     * @param numTargs
-     */
     public void setNumTargs(int numTargs) {
         this.numTargs = numTargs;
         int nt = allowSelfConnect ? numTargs : numTargs - 1;
@@ -597,9 +585,6 @@ public class SparseConnectionPanel extends EditablePanel {
         allowSelfConnectChkBx.setEnabled(enabled);
     }
 
-    /**
-     * @param density
-     */
     public void setDensity(double density) {
         densityTf.setText(Double.toString(density));
         sliderListener.enable();

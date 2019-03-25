@@ -321,6 +321,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
     private void connectRandom(SynapseGroup synapseGroup) {
         currentOrderingIndices = new int[sourceNeurons.length];
         int numTars = synapseGroup.isRecurrent() && !selfConnectionAllowed ? (sourceNeurons.length - 1) : targetNeurons.length;
+        synapseGroup.clear(); // TODO: Zoe?
         synapseGroup.preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
         for (int i = 0, n = sourceNeurons.length; i < n; i++) {
             currentOrderingIndices[i] = BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity);

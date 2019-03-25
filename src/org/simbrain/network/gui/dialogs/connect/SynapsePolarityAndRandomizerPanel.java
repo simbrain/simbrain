@@ -161,12 +161,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     }
 
-
-    /**
-     * @param parent
-     * @param randState
-     * @return
-     */
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final RandBehavior randState) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, randState);
         prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.EXCITATORY);
@@ -179,12 +173,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return prPanel;
     }
 
-    /**
-     * @param parent
-     * @param randState
-     * @param synGrp
-     * @return
-     */
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final RandBehavior randState, final SynapseGroup synGrp) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, synGrp, randState);
         if (synGrp.isEmpty()) {
@@ -233,19 +221,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return prPanel;
     }
 
-    /**
-     * @param parent
-     * @return
-     */
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent) {
         return SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parent, RandBehavior.DEFAULT);
     }
 
-    /**
-     * @param parent
-     * @param synGrp
-     * @return
-     */
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final SynapseGroup synGrp) {
         return SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parent, RandBehavior.DEFAULT, synGrp);
     }

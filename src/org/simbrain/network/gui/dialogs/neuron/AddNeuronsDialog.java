@@ -37,10 +37,6 @@ import java.util.List;
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
  * neuron type and a layout.
- * <p>
- * TODO: Merge this and NeuronDialog? They're almost the same class and we could
- * just add a Creation/Editing enum to tell it whether or not to display certain
- * fields.
  *
  * @author ztosi
  * @author jyoshimi
@@ -104,6 +100,9 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private AnnotatedPropertyEditor combinedNeuronInfoPanel;
 
+    /**
+     * Layout object.
+     */
     private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
 
     /**
@@ -179,6 +178,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         addNeuronsPanel.add(Box.createVerticalStrut(10));
 
+        layoutObject.setLayout(DEFAULT_LAYOUT);
         selectLayout = new AnnotatedPropertyEditor(layoutObject);
         selectLayout.setAlignmentX(CENTER_ALIGNMENT);
         addNeuronsPanel.add(selectLayout);
@@ -221,9 +221,7 @@ public class AddNeuronsDialog extends StandardDialog {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         combinedNeuronInfoPanel.commitChanges();
@@ -236,9 +234,7 @@ public class AddNeuronsDialog extends StandardDialog {
         dispose();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void closeDialogCancel() {
         super.closeDialogCancel();
         dispose();
@@ -299,19 +295,11 @@ public class AddNeuronsDialog extends StandardDialog {
          * Adds (internal) listeners to the panel.
          */
         private void addListeners() {
-            addToGroup.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-
-                    tfGroupName.setEnabled(addToGroup.isSelected());
-                    String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
-                    tfGroupName.setText(dName);
-
-                }
-
+            addToGroup.addActionListener(evt -> {
+                tfGroupName.setEnabled(addToGroup.isSelected());
+                String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
+                tfGroupName.setText(dName);
             });
-
         }
 
         /**
@@ -319,7 +307,7 @@ public class AddNeuronsDialog extends StandardDialog {
          * Returns null if the {@link #addToGroup addToGroup} check-box is not
          * selected.
          *
-         * @return
+         * @return the new neuron group
          */
         public NeuronGroup generateNeuronGroup() {
             if (addToGroup.isSelected()) {
@@ -331,9 +319,6 @@ public class AddNeuronsDialog extends StandardDialog {
             }
         }
 
-        /**
-         * @return the addToGroup check-box
-         */
         public JCheckBox getAddToGroup() {
             return addToGroup;
         }

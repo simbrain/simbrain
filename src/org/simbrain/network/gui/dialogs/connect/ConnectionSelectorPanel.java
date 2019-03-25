@@ -120,26 +120,28 @@ public class ConnectionSelectorPanel extends EditablePanel {
      */
     private void init() {
 
+        // Combo Box
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.fill = GridBagConstraints.VERTICAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(24, 15, 15, 5);
+        gbc.insets = new Insets(20, 15, 15, 5);
         add(new JLabel("Connection Manager:"), gbc);
         gbc.gridx = 1;
         gbc.insets = new Insets(20, 5, 15, 5);
         add(cbConnectionType, gbc);
-
-        updatePanel();
-
         cbConnectionType.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 updatePanel();
             }
         });
+
+        // Main panel
+        updatePanel();
+
     }
 
     /**
@@ -172,6 +174,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
         add(currentConnectionPanel, gbc);
         repaint();
         parentFrame.pack();
+        parentFrame.setLocationRelativeTo(null);
     }
 
     /**

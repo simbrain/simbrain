@@ -191,9 +191,10 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      */
     private List<Neuron> nonPolarNeurons;
 
-    //TODO
+    /**
+     * Default constructor.
+     */
     public RadialSimple() {
-
     }
 
     /**

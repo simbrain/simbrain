@@ -17,6 +17,7 @@ import org.simbrain.network.connections.*;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -119,26 +120,17 @@ public class ConnectionSelectorPanel extends EditablePanel {
      */
     private void init() {
 
-
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(20, 15, 20, 5);
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(24, 15, 15, 5);
         add(new JLabel("Connection Manager:"), gbc);
         gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(20, 5, 20, 5);
+        gbc.insets = new Insets(20, 5, 15, 5);
         add(cbConnectionType, gbc);
-
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(0, 5, 0, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         updatePanel();
 
@@ -168,6 +160,15 @@ public class ConnectionSelectorPanel extends EditablePanel {
         currentConnectionPanel = new ConnectionPanel(parentFrame,
                 (ConnectionStrategy) cbConnectionType.getSelectedItem(),
                 noTar, recurrent, isCreation);
+
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = .8;
+        gbc.gridwidth = 2; // to span the label and the combo box
+        gbc.insets = new Insets(0, 5, 0, 5);
+        // Useful for debugging
+        //currentConnectionPanel.setBorder(new LineBorder(Color.red));
         add(currentConnectionPanel, gbc);
         repaint();
         parentFrame.pack();

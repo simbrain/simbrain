@@ -553,23 +553,14 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return percentExcitatory / 100;
     }
 
-    /**
-     * @param percentExcitatory
-     */
     public void setPercentExcitatory(double percentExcitatory) {
         ratioSlider.setValue((int) (100 * percentExcitatory));
     }
 
-    /**
-     * @return
-     */
     public EditableRandomizerPanel getExcitatoryRandomizerPanel() {
         return excitatoryRandomizerPanel;
     }
 
-    /**
-     * @return
-     */
     public EditableRandomizerPanel getInhibitoryRandomizerPanel() {
         return inhibitoryRandomizerPanel;
     }

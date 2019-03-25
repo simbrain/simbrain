@@ -102,7 +102,9 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
 
-    //TODO.
+    /**
+     * See {@link SynapseGroup#useGroupLevelSettings}.
+     */
     private boolean setUseGroupLevelSettings;
 
     /**

@@ -20,19 +20,25 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.ObjectTypeEditor;
+import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * Panel for editing connection managers.
+ * Panel for editing connection manager, the ratio of inhibition to excitation
+ * and the randomization of synapses.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
@@ -43,11 +49,6 @@ public final class ConnectionPanel extends JPanel {
      * Parent frame so pack can be called when combo box changed.
      */
     private final Window parentFrame;
-
-    /**
-     * Template synapse properties
-     */
-    private SynapsePropertiesPanel synapseProperties;
 
     /**
      * The excitatory-inhibitory ratio and randomizer panel.
@@ -73,6 +74,11 @@ public final class ConnectionPanel extends JPanel {
      * Whether or not the the connections would be recurrent.
      */
     private boolean rec;
+
+    /**
+     * For showing/hiding the connection properties.
+     */
+    private DropDownTriangle detailTriangle;
 
     /**
      * Whether or not this is a creation panel or an edit panel.
@@ -102,16 +108,8 @@ public final class ConnectionPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 3;
-        gbc.weighty = 3;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.anchor = GridBagConstraints.CENTER;
         if (connectionStrategy.getClass() != Sparse.class) {
             connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
-
         } else {
             if (((Sparse) connectionStrategy).getSynapseGroup() != null) {
                 connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
@@ -120,6 +118,32 @@ public final class ConnectionPanel extends JPanel {
                         (Sparse) connectionStrategy, noTar, rec);
             }
         }
+
+        // Set up detail triangle and connection strategy
+        boolean dropDownOpen= true;
+        if (connectionStrategy.getClass() == RadialSimple.class) {
+            dropDownOpen = false;
+        }
+        detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.LEFT,
+            dropDownOpen, "Show", "Hide", parentFrame);
+        detailTriangle.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                syncPanelToTriangle();
+            }
+
+        });
+        syncPanelToTriangle();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(2,0,7,7);
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        connectionContainer.add(detailTriangle, gbc);
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.PAGE_START;
+        gbc.insets = new Insets(0,0,0,0);
         connectionContainer.add(connectionStrategyProperties, gbc);
         add(connectionContainer);
 
@@ -128,6 +152,14 @@ public final class ConnectionPanel extends JPanel {
             polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
             add(polarityPanel);
         }
+    }
+
+    /**
+     * If detail triangle is down, show the panel; if not hide the panel.
+     */
+    private void syncPanelToTriangle() {
+        connectionStrategyProperties.setVisible(detailTriangle.isDown());
+        parentFrame.pack();
     }
 
     /**
@@ -152,9 +184,7 @@ public final class ConnectionPanel extends JPanel {
     }
 
     /**
-     * Commit changes made in this panel to a loose network.
-     *
-     * @param networkPanel
+     * Commit changes made in this panel to loose  synapses.
      */
     public void commitChanges(NetworkPanel networkPanel) {
 
@@ -208,14 +238,6 @@ public final class ConnectionPanel extends JPanel {
             synapseGroup.setExcitatoryRatio(polarityPanel.getPercentExcitatory());
         }
         synapseGroup.setConnectionManager(connectionStrategy);
-    }
-
-    public SynapsePropertiesPanel getSynapseProperties() {
-        return synapseProperties;
-    }
-
-    public SynapsePolarityAndRandomizerPanel getPolarityPanel() {
-        return polarityPanel;
     }
 
     public ConnectionStrategy getConnectionStrategy() {

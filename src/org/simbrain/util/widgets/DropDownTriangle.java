@@ -24,6 +24,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A drop down triangle that can be used to hide information that is only
@@ -37,6 +39,8 @@ import java.awt.event.MouseListener;
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
+    //TODO: Some wrappers would be nice here, like a panel where you add a
+    // component and the triangle is already there ready to be used
     /**
      * Direction the triangle faces when it is "up".
      */
@@ -154,20 +158,14 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void mousePressed(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

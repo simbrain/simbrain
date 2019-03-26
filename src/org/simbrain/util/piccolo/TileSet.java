@@ -91,6 +91,11 @@ public class TileSet {
     private transient BufferedImage transparentTexture = null;
 
     /**
+     * A globally accessible transparent texture.
+     */
+    private static transient BufferedImage transparentTextureGlobal = null;
+
+    /**
      * List of tile explicitly defined in the tmx/tsx. This is used only when parsing.
      * It is complicated to directly parse the tile info into a map, so first the tiles are store in this list,
      * and later when the tiles are access, they will be store into the {@link #idTileMap}.
@@ -102,6 +107,13 @@ public class TileSet {
      * A map of tile id to tile for fast lookup.
      */
     private transient Map<Integer, Tile> idTileMap;
+
+    public static BufferedImage getTransparentTexture() {
+        if (transparentTextureGlobal == null) {
+            transparentTextureGlobal = OdorWorldResourceManager.getBufferedImage("tilemap/transparent32x32.png");
+        }
+        return transparentTextureGlobal;
+    }
 
     public static Image getMissingTexture() {
         return OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png");

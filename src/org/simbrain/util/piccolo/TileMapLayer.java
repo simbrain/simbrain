@@ -50,11 +50,11 @@ public class TileMapLayer {
     public PImage renderImage(List<TileSet> tileSet) {
         if (layer == null) {
             BufferedImage layerImage =
-                    new BufferedImage(
+                    tileSet != null && tileSet.size() > 0 ? new BufferedImage(
                             tileSet.get(0).getTilewidth() * width,
                             tileSet.get(0).getTileheight() * height,
                             BufferedImage.TYPE_INT_ARGB
-                    );
+                    ) : new BufferedImage(32 * width, 32 * height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = layerImage.createGraphics();
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
@@ -63,15 +63,17 @@ public class TileMapLayer {
                 for (int j = 0; j < height; j++) {
                     final int streamI = i;
                     final int streamJ = j;
-                    Image image =
-                            tileSet.stream()
+                    Image image = tileSet != null ? tileSet.stream()
                             .map(t -> t.getTileImage(gid.get(streamI * width + streamJ)))
                             .filter(Objects::nonNull)
                             .findFirst()
-                            .orElse(TileSet.getMissingTexture());
+                            .orElse(TileSet.getMissingTexture())
+                            : TileSet.getTransparentTexture();
 
                             // getTileImage(gid.get(i * width + j));
-                    graphics.drawImage(image, j * tileSet.get(0).getTilewidth(), i * tileSet.get(0).getTileheight(), null);
+                    int tileWidth = tileSet != null && tileSet.size() > 0 ? tileSet.get(0).getTilewidth() : 32;
+                    int tileHeight = tileSet != null && tileSet.size() > 0 ? tileSet.get(0).getTileheight() : 32;
+                    graphics.drawImage(image, j * tileWidth, i * tileHeight, null);
                 }
             }
             graphics.dispose();

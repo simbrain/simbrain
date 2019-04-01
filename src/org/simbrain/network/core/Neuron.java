@@ -438,9 +438,19 @@ public class Neuron implements EditableObject, AttributeContainer {
         return Collections.unmodifiableMap(fanOut);
     }
 
+    /**
+     * @return the fan out map. Unsafe because the fan out map and the returned map are the same and thus modifications
+     * to one will affect the other. Here for performance reasons.
+     */
     public Map<Neuron, Synapse> getFanOutUnsafe() {
         return fanOut;
     }
+
+    /**
+     * @return the fan in list. Unsafe because the fan in list and the returned list are the same and thus modifications
+     * to one will affect the other. Here for performance reasons.
+     */
+    public List<Synapse> getFanInUnsafe() { return fanIn; }
 
     /**
      * Adds an efferent synapse to this neuron, i.e. adds a synapse to

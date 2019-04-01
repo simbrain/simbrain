@@ -151,9 +151,9 @@ public class TestSim extends RegisteredSimulation {
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, null, 1.0, exRand, inRand);
         sg.setLabel("Recurrent Synapses");
         network.addGroup(sg);
-        for (Neuron n : ng1.getNeuronList()) {
-            ((TimedAccumulatorRule) n.getUpdateRule()).init(n);
-        }
+//        for (Neuron n : ng1.getNeuronList()) {
+//            ((TimedAccumulatorRule) n.getUpdateRule()).init(n);
+//        }
 
         // print(sg.size());
 

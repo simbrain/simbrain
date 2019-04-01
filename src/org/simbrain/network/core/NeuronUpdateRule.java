@@ -46,7 +46,7 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
         IntegrateAndFireRule.class, IzhikevichRule.class, KuramotoRule.class,
         LinearRule.class, MorrisLecarRule.class, NakaRushtonRule.class,
         ProductRule.class, ContinuousSigmoidalRule.class, SigmoidalRule.class,
-        SpikingThresholdRule.class, ThreeValueRule.class);
+        SpikingThresholdRule.class, ThreeValueRule.class, TimedAccumulatorRule.class);
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.

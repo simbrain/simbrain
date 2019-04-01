@@ -207,4 +207,9 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
         this.b = b;
     }
 
+    @Override
+    public String getName() {
+        return "Timed Accumulator";
+    }
+
 }

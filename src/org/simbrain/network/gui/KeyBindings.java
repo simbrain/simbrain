@@ -240,15 +240,15 @@ public class KeyBindings {
             panel.getActionManager().getWandEditModeAction());
 
         // TODO: (Temporary) Add neuron array
-        inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
-        panel.getActionMap().put("neuronArray", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                NeuronArray na = new NeuronArray(panel.getNetwork());
-                na.setX(panel.getLastClickedPosition().getX());
-                na.setY(panel.getLastClickedPosition().getY());
-                panel.getNetwork().addNeuronArray(na);
-            }
-        });
+        // inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
+        // panel.getActionMap().put("neuronArray", new AbstractAction() {
+        //     public void actionPerformed(ActionEvent e) {
+        //         NeuronArray na = new NeuronArray(panel.getNetwork());
+        //         na.setX(panel.getLastClickedPosition().getX());
+        //         na.setY(panel.getLastClickedPosition().getY());
+        //         panel.getNetwork().addNeuronArray(na);
+        //     }
+        // });
 
         // Number keys
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");

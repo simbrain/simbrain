@@ -188,7 +188,7 @@ public class TileMap {
         ArrayList<Tile> stack = new ArrayList<>();
 
         // return empty if out of bound
-        if (x < 0 || x > width || y < 0 || y > height) {
+        if (x < 0 || x > width || y < 0 || y > height || tilesets == null) {
             return stack;
         }
 

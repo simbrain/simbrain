@@ -167,7 +167,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         values = new double[columns * rows];
         int gridX = (int) (getLocation()[0] / width - x);
         int gridY = (int) (getLocation()[1] / height - y);
-        if (gridX < columns && gridY < rows && gridX > 0 && gridY > 0) {
+        if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
             values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
         }
     }

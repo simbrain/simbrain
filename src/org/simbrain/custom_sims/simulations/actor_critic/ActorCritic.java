@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
@@ -76,7 +77,7 @@ public class ActorCritic extends RegisteredSimulation {
     boolean goalAchieved = false;
     OdorWorld world;
     OdorWorldBuilder ob;
-    NetBuilder net;
+    NetBuilder netBuilder;
     PlotBuilder plot;
 
     /**
@@ -147,24 +148,24 @@ public class ActorCritic extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Create the network builder
-        net = sim.addNetwork(236, 4, 522, 595, "Neural Network");
-        network = net.getNetwork();
+        netBuilder = sim.addNetwork(236, 4, 522, 595, "Neural Network");
+        network = netBuilder.getNetwork();
 
         // Set up the control panel and tabbed pane
         makeControlPanel();
         controlPanel.addBottomComponent(tabbedPane);
 
         // Set up the main input-output network that is trained via RL
-        setUpInputOutputNetwork(net);
+        setUpInputOutputNetwork(netBuilder);
 
         // Set up the reward and td error nodes
-        setUpRLNodes(net);
+        setUpRLNodes(netBuilder);
 
         // Set up the tile world
-        setUpWorld();
+        setUpWorldAndNetwork();
 
         // Set up the time series plot
-        setUpPlot(net);
+        setUpPlot(netBuilder);
 
         // Set custom network update
         network.getUpdateManager().clear();
@@ -209,7 +210,7 @@ public class ActorCritic extends RegisteredSimulation {
                 sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
-                net.getNetworkComponent().update();
+                netBuilder.getNetworkComponent().update();
 
                 // TODO: Why don't we have to call plot update?
             }
@@ -222,7 +223,8 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Set up the "grid world" and tile sensors.
      */
-    void setUpWorld() {
+    void setUpWorldAndNetwork() {
+
         // TODO: Why can't I use worldwidth and worldheight below? I had to
         // manually set size.
         ob = sim.addOdorWorldTMX(761, 8, 347, 390, "empty.tmx");
@@ -241,49 +243,28 @@ public class ActorCritic extends RegisteredSimulation {
         world.addEntity(cheese);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();
-        NetworkComponent nc = net.getNetworkComponent();
+        NetworkComponent nc = netBuilder.getNetworkComponent();
 
         tileNeurons = new ArrayList<Neuron>();
         sensorCouplings = new ArrayList<Coupling<?>>();
-        for (int i = 0; i < tileSets; i++) {
-            for (int j = 0; j < numTiles; j++) {
-                for (int k = 0; k < numTiles; k++) {
 
-                    // Set location of tile
-                    double x = (j * tileSize) - i * tileIncrement;
-                    double y = (k * tileSize) - i * tileIncrement;
+        // TODO: Use tilesets later. Right now just use 1 tileset
 
-                    // Create tile sensor
-                    GridSensor sensor = new GridSensor(mouse, (int) x, (int) y, tileSize, tileSize);
-                    mouse.addSensor(sensor);
+        // Create grid sensor
+        GridSensor sensor = new GridSensor(mouse, (int) 0, (int) 0, tileSize, tileSize);
+        mouse.addSensor(sensor);
 
-                    // Create corresponding neuron
-                    Neuron tileNeuron = new Neuron(network, "LinearRule");
-                    tileNeurons.add(tileNeuron);
-                    tileNeuron.setX(initTilesX + x);
-                    tileNeuron.setY(initTilesY + y);
-                    network.addNeuron(tileNeuron);
+        // Set up location sensor neurons
+        NeuronGroup sensorNeurons = netBuilder.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
+        netBuilder.connectAllToAll(sensorNeurons, value);
+        netBuilder.connectAllToAll(sensorNeurons, outputs);
 
-                    Producer tileProducer = sim.getProducer(sensor, "getValue");
-                    tileProducer.setDescription(sensor.getLabel());
-                    Consumer neuronConsumer = sim.getConsumer(tileNeuron, "setActivation");
-                    neuronConsumer.setDescription(tileNeuron.getId());
-                    Coupling tileCoupling = sim.tryCoupling(tileProducer, neuronConsumer);
-                    sensorCouplings.add(tileCoupling);
-
-                    // TODO: Put in group and use sim.connectAllToAll
-                    // why does using 0 make weights non-existent
-                    // Connect tile neuron to output / action neurons
-                    for (Neuron actionNeuron : outputs.getNeuronList()) {
-                        net.connect(tileNeuron, actionNeuron, 0);
-                    }
-
-                    // Connect tile neuron to value neuron
-                    net.connect(tileNeuron, value, 0);
-                }
-            }
-
-        }
+        // Set up couplings
+        Producer gridProducer = sim.getProducer(sensor, "getValues");
+        gridProducer.setDescription(sensor.getLabel());
+        Consumer ngConsumer = sim.getConsumer(sensorNeurons, "setInputValues");
+        Coupling gridCoupling = sim.tryCoupling(gridProducer, ngConsumer);
+        sensorCouplings.add(gridCoupling);
         setCouplings(oc, nc);
 
     }

@@ -59,13 +59,13 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
-        network = net.getNetwork();
+        NetBuilder netBuilder = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
+        network = netBuilder.getNetwork();
         buildNetwork();
 
         // Projection plot
-        PlotBuilder plot = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(net.getNetworkComponent(), reservoir, plot.getProjectionPlotComponent());
+        PlotBuilder plotBuilder = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
+        sim.couple(netBuilder.getNetworkComponent(), reservoir, plotBuilder.getProjectionPlotComponent());
 
         // Odor world sim
         buildOdorWorld();
@@ -233,6 +233,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     private void buildOdorWorld() {
 
         // Create the odor world
+
         world = sim.addOdorWorld(440, 9, 413, 248, "Two Objects");
         world.getWorld().setObjectsBlockMovement(false);
         mouse = world.addAgent(165, 110, "Mouse");
@@ -260,7 +261,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
         flower3.getSmellSource().setDecayFunction(StepDecayFunction.create());
 
         // Couple agent to cheese and flower nodes
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), sensorNodes);
+        SmellSensor smellSensor = new SmellSensor(mouse);
+        mouse.addSensor(smellSensor);
+        sim.couple(smellSensor, sensorNodes);
     }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {

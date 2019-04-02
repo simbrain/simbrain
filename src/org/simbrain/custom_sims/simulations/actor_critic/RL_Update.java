@@ -73,6 +73,7 @@ public class RL_Update implements NetworkUpdateAction {
         Network.updateNeurons(Collections.singletonList(sim.value));
         Network.updateNeurons(Collections.singletonList(sim.reward));
         sim.outputs.update();
+        sim.sensorNeurons.update();
 
         // System.out.println("td error:" + value.getActivation() + " + " +
         // reward.getActivation() + " - " + value.getLastActivation());

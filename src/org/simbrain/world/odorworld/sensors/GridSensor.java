@@ -24,8 +24,8 @@ import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * A sensor which detects whether the entity is in a given sector or "tile" of
- * the world. Broadly inspired by "place cells".
+ * A grid of sensors which detects whether the entity is in a given cell of
+ * this grid. Broadly inspired by "place cells" (https://en.wikipedia.org/wiki/Place_cell)
  *
  * @author jyoshimi
  */
@@ -126,7 +126,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
      * @param height height
      */
     public GridSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
-        super(parent, "Tile (" + x + "," + y + "):" + width + "x" + height);
+        super(parent, "Grid (" + x + "," + y + "):" + width + "x" + height);
         this.x = x;
         this.y = y;
         this.width = width;

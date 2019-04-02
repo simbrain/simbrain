@@ -795,18 +795,21 @@ public class Neuron implements EditableObject, AttributeContainer {
     }
 
     public void setX(final double x) {
-        //changeSupport.firePropertyChange("moved", this.x, x);
+        double old_x = this.x;
         this.x = x;
+        changeSupport.firePropertyChange("moved", old_x, x);
     }
 
     public void setY(final double y) {
-        //changeSupport.firePropertyChange("moved", this.y, y);
+        double old_y = this.y;
         this.y = y;
+        changeSupport.firePropertyChange("moved", old_y, y);
     }
 
     public void setZ(final double z) {
-        //changeSupport.firePropertyChange("moved", this.z, z);
+        double old_z = this.z;
         this.z = z;
+        changeSupport.firePropertyChange("moved", old_z, z);
     }
 
     /**

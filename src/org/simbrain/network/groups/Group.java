@@ -141,8 +141,9 @@ public abstract class Group implements CopyableObject, AttributeContainer {
 
     @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(String label) {
-        changeSupport.firePropertyChange("label", this.label , label);
+        String oldLabel = this.label;
         this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
     }
 
     public String getStateInfo() {

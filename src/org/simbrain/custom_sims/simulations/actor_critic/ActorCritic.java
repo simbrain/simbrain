@@ -116,6 +116,7 @@ public class ActorCritic extends RegisteredSimulation {
     Neuron reward;
     Neuron value;
     Neuron tdError;
+    NeuronGroup sensorNeurons;
     double preditionError; // used to set "confidence interval" on plot halo
     WinnerTakeAll outputs;
     JTextField trialField = new JTextField();
@@ -230,7 +231,7 @@ public class ActorCritic extends RegisteredSimulation {
         ob = sim.addOdorWorldTMX(761, 8, 347, 390, "empty.tmx");
         world = ob.getWorld();
         world.setObjectsBlockMovement(true);
-        world.setWrapAround(false);
+        world.setWrapAround(true); //TODO: Hack because it's currently going out of the world
 
         mouse = new OdorWorldEntity(world, EntityType.MOUSE);
         world.addEntity(mouse);
@@ -255,7 +256,7 @@ public class ActorCritic extends RegisteredSimulation {
         mouse.addSensor(sensor);
 
         // Set up location sensor neurons
-        NeuronGroup sensorNeurons = netBuilder.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
+        sensorNeurons = netBuilder.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
         netBuilder.connectAllToAll(sensorNeurons, value);
         netBuilder.connectAllToAll(sensorNeurons, outputs);
 

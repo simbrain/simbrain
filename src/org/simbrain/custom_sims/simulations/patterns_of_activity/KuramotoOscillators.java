@@ -92,9 +92,10 @@ public class KuramotoOscillators extends RegisteredSimulation {
             neuronList.add(n);
         }
         reservoirNet = new NeuronGroup(network, neuronList);
-        HexagonalGridLayout.layoutNeurons(reservoirNet.getNeuronListUnsafe(), spacing, spacing);
         reservoirNet.setLocation(150,-242);
+        reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
         network.addGroup(reservoirNet);
+        reservoirNet.applyLayout();
         reservoirNet.setLabel("Recurrent Layer");
 
         // Set up recurrent synapses

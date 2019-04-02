@@ -30,7 +30,9 @@ import org.simbrain.workspace.Consumable;
 import java.util.function.Supplier;
 
 /**
- * Data model for a time series plot.
+ * Data model for a time series plot. A time series consumes an array of doubles, with
+ * one component for each member of the time series. There is no support currently
+ * for representing separate scalar values in a single time series.
  */
 public class TimeSeriesModel implements AttributeContainer, EditableObject {
 

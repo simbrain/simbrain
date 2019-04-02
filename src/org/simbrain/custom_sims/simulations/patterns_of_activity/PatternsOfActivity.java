@@ -161,10 +161,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
             neuronList.add(n);
         }
         recNeurons = new NeuronGroup(network, neuronList);
-        new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
-            .layoutNeurons(recNeurons.getNeuronListUnsafe());
-        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
-        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
+        HexagonalGridLayout layout = new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize));
+        recNeurons.setLayout(layout);
 
         // Set up recurrent synapses
         SynapseGroup recSyns = new SynapseGroup(recNeurons, recNeurons);
@@ -225,7 +223,6 @@ public class PatternsOfActivity extends RegisteredSimulation {
         lfNeuron = outGroup.getNeuron(1);
         dwNeuron = outGroup.getNeuron(2);
         upNeuron = outGroup.getNeuron(3);
-        outGroup.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 800);
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
@@ -278,7 +275,6 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
         NeuronGroup readGroup = new NeuronGroup(network, 2);
-        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
         for (Neuron n : readGroup.getNeuronList()) {
             n.setUpdateRule(new SigmoidalRule());
             ((SigmoidalRule) n.getUpdateRule()).setLowerBound(-4);
@@ -308,26 +304,39 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
+        //
         // Add everything to the network
+        //
         network.addGroup(recNeurons);
+        recNeurons.applyLayout();
         recNeurons.setLabel("Recurrent Layer");
+
         network.addGroup(inpSynGL);
         inpSynGL.setLabel("L. Sensor \u2192  Res.");
         network.addGroup(inpSynGR);
         inpSynGR.setLabel("R. Sensor \u2192  Res.");
         network.addGroup(recSyns);
         recSyns.setLabel("Recurrent");
+
         network.addGroup(outGroup);
+        outGroup.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 800);
         outGroup.setLabel("Read Out");
+
         network.addGroup(rec2out);
         rec2out.setLabel("Rec. \u2192 Read Out");
+
         network.addGroup(readGroup);
+        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
         readGroup.setLabel("Affectors");
+
         network.addGroup(out2read);
         out2read.setLabel("Read Out \u2192 Affectors");
+
         network.addGroup(sensoryNetL);
-        sensoryNetL.setLabel("Sensory Left");
         network.addGroup(sensoryNetR);
+        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 50);
+        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() - 50);
+        sensoryNetL.setLabel("Sensory Left");
         sensoryNetR.setLabel("Sensory Right");
 
         // Set up concurrent buffered update

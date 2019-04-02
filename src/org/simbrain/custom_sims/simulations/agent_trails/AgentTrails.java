@@ -126,6 +126,8 @@ public class AgentTrails extends RegisteredSimulation {
         mouse = worldBuilder.addAgent(204, 343, "Mouse");
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
+        SmellSensor smellSensor = new SmellSensor(mouse);
+        mouse.addSensor(smellSensor);
         mouse.setManualStraightMovementIncrement(2);
         mouse.setManualMotionTurnIncrement(2);
 
@@ -139,12 +141,12 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Couple network to agent
         // TODO: Labelling has changed; fix below
-        sim.couple(straightNeuron, mouse.getEffector("Go-straight"));
-        sim.couple(rightNeuron, mouse.getEffector("Go-left"));
-        sim.couple(leftNeuron, mouse.getEffector("Go-right"));
+        sim.couple(straightNeuron, mouse.getEffector("Move straight"));
+        sim.couple(rightNeuron, mouse.getEffector("Turn left"));
+        sim.couple(leftNeuron, mouse.getEffector("Turn right"));
 
         // Couple agent to network
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"),sensoryNet);
+        sim.couple(smellSensor,sensoryNet);
     }
 
     private void setUpPlot() {
@@ -176,7 +178,6 @@ public class AgentTrails extends RegisteredSimulation {
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
-            netBuilder.getNetwork().fireNeuronsUpdated();
         });
 
         // Move past Fish

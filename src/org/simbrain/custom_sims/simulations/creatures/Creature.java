@@ -204,9 +204,9 @@ public class Creature {
 
         // Coupling some decision lobe cells to agent effectors
         // TODO: Labelling has changed; fix below
-        parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Go-left"));
-        parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Go-right"));
-        parentSim.getSim().couple(decisions.getNeuronByLabel("Forward"), agent.getEffector("Go-straight"));
+        parentSim.getSim().couple(decisions.getNeuronByLabel("Left"), agent.getEffector("Move left"));
+        parentSim.getSim().couple(decisions.getNeuronByLabel("Right"), agent.getEffector("Turn right"));
+        parentSim.getSim().couple(decisions.getNeuronByLabel("Forward"), agent.getEffector("Turn straight"));
         // TODO: Is there a way to couple the "Backward" node to the Go-straight
         // effector in such a way that the inverse of the Backward node's activation is
         // what the Go-straight effector gets?

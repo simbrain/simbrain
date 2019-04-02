@@ -79,8 +79,9 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
      * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      *
      * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
+     * When used, {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
      * When calling this directly, remember to set up the required field {@link #parent} accordingly.
+     * If possible call {@link SmellSensor#SmellSensor(OdorWorldEntity)} instead.
      */
     public SmellSensor() {
         super();

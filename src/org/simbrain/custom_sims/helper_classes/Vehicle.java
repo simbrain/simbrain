@@ -124,9 +124,9 @@ public class Vehicle {
         sim.couple(leftSensor, leftInput);
         sim.couple(rightSensor, rightInput);
         // TODO: Labelling has changed; fix below
-        sim.couple(straight, agent.getEffector("Go-straight"));
-        sim.couple(leftTurn, agent.getEffector("Go-left"));
-        sim.couple(rightTurn, agent.getEffector("Go-right"));
+        sim.couple(straight, agent.getEffector("Move straight"));
+        sim.couple(leftTurn, agent.getEffector("Turn left"));
+        sim.couple(rightTurn, agent.getEffector("Turn right"));
 
         return vehicle;
     }

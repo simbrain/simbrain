@@ -97,6 +97,11 @@ public class EntityNode extends PNode {
                 this.removeFromParent();
             } else if ("moved".equals(evt.getPropertyName())) {
                 updateFlag = true;
+                // TODO: The call below makes the updateFlag redundant.
+                // leave it here for now until there is time for a good
+                // performance tuning.  If the call below is removed some
+                // simulations like agent trails fail to update properly
+                update();
             } else if ("updated".equals(evt.getPropertyName())) {
                 update();
             } else if ("sensorAdded".equals(evt.getPropertyName()) || "effectorAdded".equals(evt.getPropertyName())) {

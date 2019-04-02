@@ -403,6 +403,11 @@ public class SynapseGroup extends Group {
      * synapses to be added to this synapse group without the synapse list
      * having to perform any operations related to expanding the list size.
      *
+     * Sets initial capacity of hashsets, so that when you add new synapses
+     * you reduce the chances of it rehashing, resizing etc when creating a large
+     * synapse group.
+     *
+     *
      * @param expectedNumSynapses the number of synapses the connection manager
      *                            predicts will be created.
      * @throws IllegalStateException if the synapse group has already been

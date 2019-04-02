@@ -69,7 +69,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
 
     /**
      * A tag for whether or not this sparse connector supports density editing
-     * (changing the number of connecitions) after construction.
+     * (changing the number of connections after construction).
      */
     private boolean permitDensityEditing = true;
 
@@ -79,6 +79,9 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * neuron. Maps which index of target neuron will be the next to be given a
      * connection, or in what order connections are removed for each source
      * neuron if density is lowered.
+     * <br>
+     * This is the thing that allows permitDensityEditing.  This is what makes it
+     * expensive.
      */
     private transient int[][] sparseOrdering;
 
@@ -242,6 +245,8 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
     }
 
     /**
+     * Should only be called for initialization.
+     *
      * @param synapseGroup The synapse group that the connections this class
      *                     will generate will be added to.
      */
@@ -253,6 +258,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
         setPermitDensityEditing(numSrc * numTar < 10E8);
         sourceNeurons = synapseGroup.getSourceNeurons().toArray(new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup.getTargetNeurons().toArray(new Neuron[numTar]);
+        // Are you initializing with the intention of editing later on?
         if (isPermitDensityEditing()) {
             generateSparseOrdering(recurrent);
             if (equalizeEfferents) {
@@ -315,13 +321,18 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * strength. The number of efferent synapses assigned to each source neuron
      * is drawn from a binomial distribution with a mean of
      * NumberOfTargetNeurons * sparsity
+     * <br>
+     * Assumes {@link #permitDensityEditing} is true.  Uses machinery for that.
+     * This is for _initialization_ (of a connection that will allow permitdensity
+     * editing), not re-editing.
+     *
      *
      * @param synapseGroup
      */
     private void connectRandom(SynapseGroup synapseGroup) {
         currentOrderingIndices = new int[sourceNeurons.length];
         int numTars = synapseGroup.isRecurrent() && !selfConnectionAllowed ? (sourceNeurons.length - 1) : targetNeurons.length;
-        synapseGroup.clear(); // TODO: Zoe?
+        synapseGroup.clear(); // TODO: Zoe? Make
         synapseGroup.preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
         for (int i = 0, n = sourceNeurons.length; i < n; i++) {
             currentOrderingIndices[i] = BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity);

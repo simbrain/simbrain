@@ -117,8 +117,9 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * The connection constant for general connections. Used in cases where
      * neurons have no explicit polarity.
      */
-    @UserParameter(label = "No Polarity Constant",
-            minimumValue = 0, maximumValue = 1, order = 6 )
+    @UserParameter(label = "No Polarity Constant", description = "Connection probability for" +
+        "non-polar synapses", minimumValue = 0, maximumValue = 1, increment = .1,
+        order = 6 )
     private double distConst = DEFAULT_DIST_CONST;
 
     /**
@@ -126,7 +127,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * create denser connections. Lambda can be thought of as the average
      * connection distance in pixels.
      */
-    @UserParameter(label = "Distance Drop-off",
+    @UserParameter(label = "Distance Drop-off", increment = 5,
             minimumValue = 0.01, order = 1 )
     private double lambda = DEFAULT_LAMBDA;
 

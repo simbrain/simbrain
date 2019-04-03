@@ -130,36 +130,34 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.add(new SaveAsAction(parent));
         fileMenu.addSeparator();
 
+        JMenu loadTileMapMenu = new JMenu("Load Tile Map...");
         JMenuItem loadTileMapItem = new JMenuItem(new LoadTileMapAction(parent.getWorldPanel()));
+        loadTileMapMenu.add(loadTileMapItem);
+        loadTileMapMenu.addSeparator();
 
-        JMenuItem loadEmptyMapItem = new JMenuItem(new AbstractAction("Load Empty Map") {
+        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Empty World") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.getWorldPanel().getWorld().setTileMap(TileMap.create("empty.tmx"));
             }
-        });
+        }));
 
-        JMenuItem loadSampleMapItem = new JMenuItem(new AbstractAction("Load Sample Map") {
+
+        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Ari's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("sample.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("aris_world.tmx"));
             }
-        });
+        }));
 
-        JMenuItem loadLargeMapItem = new JMenuItem(new AbstractAction("Load Large Map") {
+        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Yulin's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("largeWorld.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("yulins_world.tmx"));
             }
-        });
+        }));
 
-        JMenu loadTileMapMenu = new JMenu("Load Tile Map");
-        loadTileMapMenu.add(loadTileMapItem);
-        loadTileMapMenu.addSeparator();
-        loadTileMapMenu.add(loadSampleMapItem);
-        loadTileMapMenu.add(loadLargeMapItem);
-        loadTileMapMenu.add(loadEmptyMapItem);
-        
+
         fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));

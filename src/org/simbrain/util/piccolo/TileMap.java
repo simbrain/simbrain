@@ -20,7 +20,7 @@ import java.util.Objects;
  * A tilemap contains a list of {@link TileMapLayer} objects and a {@link TileSet}
  * object. Each layer is basically a grid of tiles, each of which points to a
  * member of a tileset, which is like a sprite sheet. To get a sense of
- * this see a sample tmx file like <code>sample.tmx</code>.
+ * this see a sample tmx file like <code>aris_world.tmx</code>.
  *
  * The map returns a list of PImages, one per layer, which can be rendered in a
  * Piccolo canvas.

@@ -157,11 +157,13 @@ public class Simulation {
      * @param width  width of component
      * @param height height of component
      * @param name   title to display at top of panel
+     * @param seriesName  names of the time series
      * @return the component the plot builder
      */
-    public PlotBuilder addTimeSeriesPlot(int x, int y, int width, int height, String name) {
+    public PlotBuilder addTimeSeriesPlot(int x, int y, int width, int height,
+                                         String name, String seriesName) {
         TimeSeriesPlotComponent timeSeriesComponent = new TimeSeriesPlotComponent(name);
-        timeSeriesComponent.getModel().addTimeSeries(name); //TODO: Allow for multiple named series
+        timeSeriesComponent.getModel().addTimeSeries(seriesName);
         workspace.addWorkspaceComponent(timeSeriesComponent);
         desktop.getDesktopComponent(timeSeriesComponent).getParentFrame().setBounds(x, y, width, height);
         return new PlotBuilder(timeSeriesComponent);
@@ -282,16 +284,13 @@ public class Simulation {
      * Couple a specific neuron to a specific time series in a time series
      * plot.
      *
-     * @param network the network with the neuron
      * @param neuron  the neuron to couple
      * @param plot    the plot component
-     * @param index   the index of the time series to write to
      * @return the coupling
      */
-    public Coupling<?> couple(NetworkComponent network, Neuron neuron, TimeSeriesPlotComponent plot, int index) {
+    public Coupling<?> couple(Neuron neuron, TimeSeriesPlotComponent plot) {
         Producer neuronProducer = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = plot.getConsumers().get(index);
-        timeSeriesConsumer.setDescription("Time series " + index);
+        Consumer timeSeriesConsumer = plot.getConsumers().get(0);
         return tryCoupling(neuronProducer, timeSeriesConsumer);
     }
 

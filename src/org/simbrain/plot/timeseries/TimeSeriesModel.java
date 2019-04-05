@@ -102,7 +102,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Add data to this model.
+     * Add scalar data to a specified time series.
      *
      * @param dataSourceIndex index of data source to use
      * @param time            data for x axis
@@ -116,7 +116,29 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Called by coupling producers via reflection.
+     * Manually added data to a specified time series.
+     *
+     * @param scalar value to add
+     * @param index time series to add it to
+     */
+    public void addValue(double scalar, int index) {
+        addData(index, timeSupplier.get(), scalar);
+    }
+
+    /**
+     * Allows scalar couplings to be used. Values are added to first
+     * time series.
+     *
+     * @param scalar
+     */
+    @Consumable()
+    public void addValue(double scalar) {
+        addValue(scalar, 0);
+    }
+
+    /**
+     * Called by coupling producers via reflection.  Each component
+     * of a vector is applied to a separate time series.
      */
     @Consumable()
     public void addValues(double[] vector) {

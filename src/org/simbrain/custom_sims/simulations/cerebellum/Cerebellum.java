@@ -458,15 +458,13 @@ public class Cerebellum extends RegisteredSimulation {
     //
     void addTimeSeries() {
 
-        PlotBuilder plot = sim.addTimeSeriesPlot(768, 9, 363, 285,
-            "dopamine, output");
-
-        sim.couple(net.getNetworkComponent(),
-            dopamine, plot.getTimeSeriesComponent(), 0);
-        // TODO: Update plotbuilder to support multiple time series
-        // sim.couple(net.getNetworkComponent(), output,
-        //     plot.getTimeSeriesComponent(), 1);
-
+        PlotBuilder pb = sim.addTimeSeriesPlot(768, 9, 363, 285,
+            "Time Series", "Dopamine");
+        sim.couple(dopamine, pb.getTimeSeriesComponent());
+        // PlotBuilder plot2 = sim.addTimeSeriesPlot(768, 9, 363, 285,
+        //     "dopamine");
+        // sim.couple(net.getNetworkComponent(),
+        //     dopamine, plot.getTimeSeriesComponent(), 0);
     }
 
     @Override

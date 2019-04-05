@@ -79,9 +79,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return containers;
     }
 
-    /**
-     * @return the model.
-     */
     public TimeSeriesModel getModel() {
         return model;
     }

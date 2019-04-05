@@ -583,10 +583,10 @@ public class RL_Sim_Main extends RegisteredSimulation {
      */
     private void setUpTimeSeries(NetBuilder net) {
         // Create a time series plot
-        PlotBuilder plot = sim.addTimeSeriesPlot(0, 328, 293, 332, "Reward, TD Error");
-        sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
-        sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
-        plot.getTimeSeriesModel().setAutoRange(false);
+        PlotBuilder plot = sim.addTimeSeriesPlot(0, 328, 293, 332, "Reward, TD Error", null);
+        // sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
+        // sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
+        // plot.getTimeSeriesModel().setAutoRange(false);
         plot.getTimeSeriesModel().setRangeUpperBound(2);
         plot.getTimeSeriesModel().setRangeLowerBound(-1);
     }

@@ -50,7 +50,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Basic tilemap that determines the size and basic features of the world.
      */
-    private TileMap tileMap = TileMap.create("yulins_world.tmx");
+    private TileMap tileMap = TileMap.create("empty.tmx");
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.

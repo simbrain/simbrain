@@ -136,7 +136,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        PlotBuilder ts = sim.addTimeSeriesPlot(609, 11, 363, 285, "Difference");
+        PlotBuilder ts = sim.addTimeSeriesPlot(609, 11, 363, 285, "Difference", "Difference");
         sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update time series") {
             @Override
             public void invoke() {

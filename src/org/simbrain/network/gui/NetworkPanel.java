@@ -570,7 +570,9 @@ public class NetworkPanel extends JPanel {
         for (Neuron neuron : neurons) {
             NeuronNode neuronNode = ((NeuronNode) objectNodeMap.get(neuron));
             if (neuronNode != null) {
+                // TODO: Possibly separate color update from position update
                 neuronNode.pullViewPositionFromModel();
+                neuronNode.update();
             }
         }
         timeLabel.update();

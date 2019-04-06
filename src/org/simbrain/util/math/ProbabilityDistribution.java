@@ -1,5 +1,6 @@
 package org.simbrain.util.math;
 
+import org.nd4j.linalg.api.ops.impl.transforms.Exp;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
@@ -20,8 +21,7 @@ import java.util.List;
 public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
-     * Distributions for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
+     * Distributions for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set a type of probability distribution.
      */
     public static List<Class> DIST_LIST = Arrays.asList(ExponentialDistribution.class,
@@ -39,12 +39,14 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
      * Get a random double number from a probability distribution
+     *
      * @return a random number
      */
     public abstract double nextRand();
 
     /**
      * Get a random integer number from a probability distribution
+     *
      * @return a random number
      */
     public abstract int nextRandInt();
@@ -70,7 +72,8 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     /**
      * Static utility method to get a bounded value.
-     * @param value the value to be clipped
+     *
+     * @param value      the value to be clipped
      * @param lowerBound lower bound
      * @param upperBound upper bound
      * @return the vlipped value
@@ -87,47 +90,85 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         return result;
     }
 
-    //TODO
+    /**
+     * Return the next sampled value from this probability distribution.
+     */
     public double getRandom() {
         return getPolarity().value(nextRand());
     }
 
+    /**
+     * Helper class to return a builder for a specified type of distribution.
+     *
+     * @param distType a string description of the distribution type.
+     *                 Options are: "Uniform", "Normal", "LogNormal","Pareto", and "Exponential".
+     * @param param1 The first parameter of the distribution.  For normal this is mean, for lognormal
+     *               location, for pareto it is slope, for exponential it is lambda.
+     * @param param2 The second parameter of the distribution.  For normal this is stdev, for lognormal
+     *               scale, for pareto it is min.
+     * @return the builder, ready to use
+     */
+    public static ProbabilityDistributionBuilder getBuilder(String distType, double param1, double param2) {
+        switch (distType) {
+        case "Uniform":
+            return UniformDistribution.builder();
+        case "Normal":
+            return  NormalDistribution.builder().mean(param1).standardDeviation(param2);
+        case "LogNormal":
+            return LogNormalDistribution.builder().location(param1).scale(param2);
+        case "Pareto":
+            return ParetoDistribution.builder().slope(param1).min(param2);
+        case "Exponential":
+            return ExponentialDistribution.builder().lambda(param1);
+        default:
+            return UniformDistribution.builder();
+        }
+    }
+
 
     /**
-     * Base builder for all {@link ProbabilityDistribution} instances.
-     * Create custom instances of the specific implementation of {@link ProbabilityDistribution} by using
-     * the setter methods on this class.
-     * After zero or more of these,
-     * use the build() method to create a specific {@link ProbabilityDistribution} instance.
-     * These can all be chained. For example, create a custom excitatory {@link LogNormalDistribution}
-     * of which has a location of 2.5:
+     * @see #getBuilder(String, double, double).
+     * Param 1 is set to 0, param 2 to 1.
+     */
+    public static ProbabilityDistributionBuilder getBuilder(String distType) {
+        return getBuilder(distType, 0, 1);
+    }
+
+    /**
+     * Base builder for all {@link ProbabilityDistribution} instances. Create
+     * custom instances of the specific implementation of {@link
+     * ProbabilityDistribution} by using the setter methods on this class. After
+     * zero or more of these, use the build() method to create a specific {@link
+     * ProbabilityDistribution} instance. These can all be chained. For example,
+     * create a custom excitatory {@link LogNormalDistribution} of which has a
+     * location of 2.5:
      * <code>
-     *     ProbabilityDistribution randomizer =
-     *      UniformDistribution.builder()
-     *          .polarity(Polarity.EXCITATORY)
-     *          .location(2.5)
-     *          .build();
+     * ProbabilityDistribution randomizer = UniformDistribution.builder()
+     * .polarity(Polarity.EXCITATORY) .location(2.5) .build();
      * </code>
-     *
+     * <p>
      * If no special set-up is needed, just use LogNormalDistribution.builder().build()
      * or the short-cut equivalent LogNormalDistribution.create().
+     *
      * @param <B> The type of the builder to return when building
      * @param <T> The type of the final product to return when finish building.
      */
     public abstract static class ProbabilityDistributionBuilder<
-            B extends ProbabilityDistributionBuilder,
-            T extends ProbabilityDistribution
-            > {
+        B extends ProbabilityDistributionBuilder,
+        T extends ProbabilityDistribution
+        > {
 
         /**
-         * Uniform access to the product being build. Only used in this abstract class
-         * where the product cannot be instantiate yet.
+         * Uniform access to the product being build. Only used in this abstract
+         * class where the product cannot be instantiate yet.
+         *
          * @return the product being build
          */
         protected abstract T product();
 
         /**
          * Sets the upper bound of the probability distribution when clipped.
+         *
          * @param upperBound the highest value of the interval for clipping
          * @return the Builder instance (for use in chained initialization)
          */
@@ -138,6 +179,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
         /**
          * Sets the lower bound of the probability distribution when clipped.
+         *
          * @param lowerBound the lowest value of the interval for clipping
          * @return the Builder instance (for use in chained initialization)
          */
@@ -148,6 +190,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
         /**
          * Sets if the random number generated should be clip or not.
+         *
          * @param clipping if the random number should be clip
          * @return the Builder instance (for use in chained initialization)
          */
@@ -157,7 +200,9 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         }
 
         /**
-         * Sets if the random number generated should be only positive, negative, or both.
+         * Sets if the random number generated should be only positive,
+         * negative, or both.
+         *
          * @param polarity the polarity
          * @return the Builder instance (for use in chained initialization)
          */
@@ -167,21 +212,31 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         }
 
         /**
-         * Builds a instance of specific {@link ProbabilityDistribution} of given states.
+         * Builds a instance of specific {@link ProbabilityDistribution} of
+         * given states.
+         *
          * @return the final product
          */
         public abstract T build();
     }
 
     /**
-     * Utility class that encapsulates a probability distribution so that it
-     * can be used in an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
-     * so that it's easy to create a property editor to edit a probability distribution.
+     * Utility class that encapsulates a probability distribution so that it can
+     * be used in an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
+     * so that it's easy to create a property editor to edit a probability
+     * distribution.
      */
     public static class Randomizer implements EditableObject {
 
         @UserParameter(label = "Randomizer", isObjectType = true)
         private ProbabilityDistribution probabilityDistribution = UniformDistribution.create();
+
+        public Randomizer() {
+        }
+
+        public Randomizer(ProbabilityDistribution probabilityDistribution) {
+            this.probabilityDistribution = probabilityDistribution;
+        }
 
         public ProbabilityDistribution getProbabilityDistribution() {
             return probabilityDistribution;
@@ -199,6 +254,11 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          */
         public double getRandom() {
             return probabilityDistribution.nextRand();
+        }
+
+        @Override
+        public String getName() {
+            return "Randomizer";
         }
     }
 }

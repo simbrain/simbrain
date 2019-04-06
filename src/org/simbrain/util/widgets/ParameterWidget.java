@@ -140,25 +140,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             //     System.out.println(SimbrainPreferences.getDouble(parameter.getAnnotation().preferenceKey()));
             // }
 
-            // Set up randomizer, if there is one
-            ProbabilityDistribution pd = null;
-            String distName = parameter.getAnnotation().probDist();
-            if (!distName.isEmpty()) {
-                switch (distName) {
-                case "Uniform":
-                    pd = UniformDistribution.builder().build();
-                    break;
-                case "Normal":
-                    double mean = parameter.getAnnotation().probMean();
-                    double std = parameter.getAnnotation().probStdDev();
-                    pd = NormalDistribution.builder()
-                        .standardDeviation(std)
-                        .mean(mean)
-                        .build();
-                    break;
-                }
-            }
-
             SpinnerNumberModelWithNull spinnerModel;
 
             Double minValue = parameter.hasMinValue() ? parameter.getAnnotation().minimumValue() : null;
@@ -179,7 +160,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             Runnable setNull = () -> setWidgetValue(null);
 
-            NumericWidget ret = new NumericWidget(editableObjects, parameter, spinnerModel, pd, setNull);
+            NumericWidget ret = new NumericWidget(editableObjects, parameter, spinnerModel, setNull);
             return ret;
         }
 

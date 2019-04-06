@@ -94,21 +94,23 @@ public @interface UserParameter {
 
     /**
      * The probability distribution to use when generating random values for
-     * this parameter. Current opions are "Normal" and "Uniform".
+     * this parameter. For options see {@link ProbabilityDistribution#getBuilder(String)}
      */
     String probDist() default "";
 
     /**
-     * The standard deviation to use when generating random values for this
-     * parameter. Optional. NOT IMPLEMENTED YET.
+     * The default "first parameter" to use when when opening the randomizer panel for this field.
+     * Corresponds to the mean of a normal distribution. For other cases see
+     * {@link ProbabilityDistribution#getBuilder(String, double, double)}
      */
-    double probMean() default 0;
+    double probParam1() default 0;
 
     /**
-     * The standard deviation to use when generating random values for this
-     * parameter
+     * The default "second parameter" to use when when opening the randomizer panel for this field.
+     * Corresponds to the standard deviation of a normal distribution. For other cases see
+     * {@link ProbabilityDistribution#getBuilder(String, double, double)}
      */
-    double probStdDev() default 1.0;
+    double probParam2() default 1.0;
 
     /**
      * Used to determine the order of parameters when displayed to a user.

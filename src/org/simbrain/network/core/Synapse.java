@@ -69,7 +69,9 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Strength of synapse.
      */
-    @UserParameter(label = "Strength", useSetter =  true, description = "Weight Strength", minimumValue = -10, maximumValue = 10, order = 1)
+    @UserParameter(label = "Strength", useSetter =  true, description = "Weight Strength",
+        minimumValue = -10, maximumValue = 10, probDist = "Normal", probParam1 = .1, probParam2 = .5,
+        order = 1)
     private double strength = 0;
 
     @Override

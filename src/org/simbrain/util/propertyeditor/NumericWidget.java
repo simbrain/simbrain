@@ -1,6 +1,7 @@
 package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.Parameter;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.widgets.JNumberSpinnerWithNull;
 import org.simbrain.util.widgets.SpinnerNumberModelWithNull;
@@ -32,37 +33,61 @@ public class NumericWidget extends JPanel {
      * @param editableObjects the objects being edited
      * @param parameter       the parameter field
      * @param spinnerModel    the spinner model
-     * @param pd              an optional randomizer for edited object (null if
-     *                        not used)
      * @param setNull         a function to set the field to null (inconsistent) when the randomize button is clicked
      */
     public NumericWidget(
             List<? extends EditableObject> editableObjects,
             Parameter parameter,
             SpinnerNumberModelWithNull spinnerModel,
-            ProbabilityDistribution pd,
             Runnable setNull
     ) {
         super();
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+
         spinner = new JNumberSpinnerWithNull(spinnerModel);
         gridBagConstraints.weightx = 10;
         add(spinner, gridBagConstraints);
-        if (pd != null) {
+
+        randomizeButton.setToolTipText("Randomize this parameter. Note that upon pressing OK the value" +
+            " will be updated immediately.");
+        String probDist =parameter.getAnnotation().probDist();
+
+        // Handle randomizer button
+        if (!probDist.isEmpty()) {
             randomizeButton.addActionListener((evt) -> {
-                editableObjects.forEach(o -> {
-                    if (parameter.isNumericInteger()) {
-                        parameter.setFieldValue(o, pd.nextRandInt());
-                    } else {
-                        parameter.setFieldValue(o, pd.nextRand());
+
+                double param1 = parameter.getAnnotation().probParam1();
+                double param2 = parameter.getAnnotation().probParam2();
+                ProbabilityDistribution.ProbabilityDistributionBuilder pb =
+                    ProbabilityDistribution.getBuilder(probDist, param1, param2);
+                ProbabilityDistribution pd = pb.build();
+
+                AnnotatedPropertyEditor randEditor = new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(pd));
+                StandardDialog dialog = new StandardDialog();
+                dialog.setContentPane(randEditor);
+                dialog.pack();
+
+                dialog.addClosingTask(() -> {
+                    editableObjects.forEach(o -> {
+                        if (parameter.isNumericInteger()) {
+                            parameter.setFieldValue(o, pd.nextRandInt());
+                        } else {
+                            parameter.setFieldValue(o, pd.nextRand());
+                        }
+                    });
+                    // Provides some indication that fields have been mutated
+                    if (setNull != null) {
+                        setNull.run();
                     }
-                    // TODO: Check consistency for null
                 });
-                if (setNull != null) {
-                    setNull.run();
-                }
+
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                dialog.isAlwaysOnTop();
+
+
             });
             gridBagConstraints.weightx = 2;
             add(randomizeButton, gridBagConstraints);

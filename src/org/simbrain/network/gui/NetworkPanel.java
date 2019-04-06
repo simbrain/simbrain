@@ -791,6 +791,8 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());
+
+        // TODO: Call below is expensive
         node.lowerToBottom();
     }
 

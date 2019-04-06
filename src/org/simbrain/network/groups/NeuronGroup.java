@@ -181,7 +181,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
         super(net);
         neuronList = new ArrayList<Neuron>(neurons.size());
         for (Neuron neuron : neurons) {
-            addNeuron(neuron);
+            addNeuron(neuron, false);
         }
         // Very slow to add to a copy on write array list so do it this way
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);

@@ -142,9 +142,13 @@ public class OdorWorldPanel extends JPanel {
         canvas.removeInputEventListener(panEventHandler);
         canvas.removeInputEventListener(zoomEventHandler);
 
-        PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
-        zoomHandler.zoomAboutMouse();
-        canvas.addInputEventListener(zoomHandler);
+        // TODO: Currently disabling zoom
+        // because zooming is acting wonky, esp. when you select an entity.
+        // When reimplement also disallow zooming that makes the world smaller than the parent panel
+
+        // PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
+        // zoomHandler.zoomAboutMouse();
+        // canvas.addInputEventListener(zoomHandler);
 
         selectionModel = new WorldSelectionModel(this);
         selectionModel.addSelectionListener((e) -> {

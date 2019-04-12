@@ -24,6 +24,25 @@ public class ImagePanel extends JPanel implements ImageSourceListener {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         graphics.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
+        if (getWidth() > currentImage.getWidth() * 10 && getHeight() > currentImage.getHeight() * 10) {
+            graphics.setColor(Color.GRAY);
+            for (int i = 0; i < currentImage.getWidth(); i++) {
+                graphics.drawLine(
+                        (int) ((double) i / currentImage.getWidth() * getWidth()),
+                        0,
+                        (int) ((double) i / currentImage.getWidth() * getWidth()),
+                        getHeight()
+                );
+            }
+            for (int i = 0; i < currentImage.getHeight(); i++) {
+                graphics.drawLine(
+                        0,
+                        (int) ((double) i / currentImage.getHeight() * getHeight()),
+                        getWidth(),
+                        (int) ((double) i / currentImage.getHeight() * getHeight())
+                );
+            }
+        }
     }
 
     @Override

@@ -20,6 +20,9 @@ import java.util.List;
  * image source to be in couplings and thereby communicate with other workspace
  * components.
  * <br>
+ * The world contains a single {@link ImagePanel} which all {@link ImageSource}'s
+ * draw to.
+ * <br>
  * Currently there are two subclasses corresponding to the "Image World" ({@link
  * ImageAlbumWorld}) and "Pixel Display" ({@link PixelDisplayWorld}) in the
  * GUI.  Broadly speaking ImageAlbumWorld produces pixels to be consumed by
@@ -42,9 +45,9 @@ public abstract class ImageWorld {
     private SensorMatrix currentSensorMatrix;
 
     /**
-     * Container for the current image or sensor view.
+     * Current image and sensor matrices draw to this JPanel
      */
-    private transient ImagePanel imagePanel;
+    protected transient ImagePanel imagePanel;
 
     /**
      * Clipboard for the image world.
@@ -60,12 +63,9 @@ public abstract class ImageWorld {
      * Construct the image world.
      */
     public ImageWorld() {
-
-        imagePanel = new ImagePanel();
         clipboard = new ImageClipboard(this);
         sensorMatrices = new ArrayList<SensorMatrix>();
         listeners = new ArrayList<Listener>();
-
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class ImageWorld {
      * Returns a deserialized ImageWorld.
      */
     public Object readResolve() {
-        imagePanel = new ImagePanel();
+        imagePanel = new ImagePanel(true);
         listeners = new ArrayList<Listener>();
         currentSensorMatrix.getSource().addListener(imagePanel);
         clipboard = new ImageClipboard(this);

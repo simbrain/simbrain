@@ -21,7 +21,7 @@ public class ImageAlbumWorld extends ImageWorld {
      */
     public ImageAlbumWorld() {
         super();
-
+        imagePanel = new ImagePanel(false);
         imageSource = new ImageAlbum();
         imageSource.loadImage(org.simbrain.resource.ResourceManager.getImageIcon("bobcat.jpg"));
 

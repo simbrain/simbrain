@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PShape;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.*;
@@ -24,6 +25,7 @@ public class GridSensorNode extends EntityAttributeNode {
     private PPath shape;
 
     public GridSensorNode(GridSensor sensor) {
+
         this.sensor = sensor;
         GeneralPath crossPath = new GeneralPath();
         crossPath.moveTo(-SENSOR_RADIUS, 0);
@@ -41,6 +43,10 @@ public class GridSensorNode extends EntityAttributeNode {
 
     @Override
     public void update() {
+
         shape.setOffset(sensor.getRelativeLocation());
+        // Began testing Grid drawing but getparent, getroot, etc. are returning null
+        // PPath sensorGrid = PPath.createRectangle(10,10,100,100);
+        //this.getRoot().addChild(sensorGrid);
     }
 }

@@ -116,6 +116,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         description = "Determines the size of the tile. Height specifies the vertical length.",
         order = 12)
     private int height = DEFAULT_HEIGHT;
+
     /**
      * Construct a tile sensor.
      *
@@ -138,17 +139,17 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct a copy of a location sensor.
      *
-     * @param locationSensor the location sensor to copy
+     * @param gridSensor the location sensor to copy
      */
-    public GridSensor(GridSensor locationSensor) {
-        super(locationSensor);
-        this.activationAmount = locationSensor.activationAmount;
-        this.x = locationSensor.x;
-        this.y = locationSensor.y;
-        this.width = locationSensor.width;
-        this.height = locationSensor.height;
-        this.rows = locationSensor.rows;
-        this.columns = locationSensor.columns;
+    public GridSensor(GridSensor gridSensor) {
+        super(gridSensor);
+        this.activationAmount = gridSensor.activationAmount;
+        this.x = gridSensor.x;
+        this.y = gridSensor.y;
+        this.width = gridSensor.width;
+        this.height = gridSensor.height;
+        this.rows = gridSensor.rows;
+        this.columns = gridSensor.columns;
     }
 
     /**

@@ -52,7 +52,9 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             label = "Reset voltage (mV)",
             description = "This represents the voltage to which the membrane potential will be reset after "
                     + "an action potential has fired.",
-            increment=.1, order = 3, tab = "Membrane Voltage")
+            increment=.1, order = 3, tab = "Membrane Voltage",
+            minimumValue = -70, maximumValue = -35,
+            probDist = "Normal", probParam1 = -50, probParam2 = 5)
     private double v_Reset = -47.7;
 
     /**
@@ -151,7 +153,8 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Reset (nA)",
             description = "Adaptation reset parameter (nA)",
-            increment=.1, order = 12, tab = "Adaptation")
+            increment=.1, order = 12, tab = "Adaptation",
+            probDist = "Uniform", probParam1 = 0.01, probParam2 = .3)
     private double b = 0.0805;
 
     /**
@@ -189,7 +192,10 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     @UserParameter(
             label = "Capacitance (μF)",
             description = "A paramter designating the overall ability of the neuron's membrane to retain a charge.",
-            increment=.1, order = 4, tab = "Membrane Voltage")
+            increment=.1, order = 4, tab = "Membrane Voltage",
+            minimumValue = 181,
+            maximumValue = 381,
+            probDist =  "Normal", probParam1 = 281, probParam2 = 28.1)
     private double memCapacitance = 281;
 
     /**

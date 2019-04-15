@@ -59,7 +59,9 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
             description = "How quickly/slowly the neuron responds to external change and returns to its "
                     + "resting potential.",
             increment = .1,
-            order = 6)
+            order = 6,
+            minimumValue = 1,
+            probDist = "Normal", probParam1 = 30, probParam2 = 2.5)
     private double timeConstant = 30;
 
     /**
@@ -71,7 +73,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
                     + "action-potential as well as the onset of the refractory period.",
             increment = .1,
             order = 1)
-    private double threshold = 15;
+    private double threshold = -50;
 
     /**
      * Reset potential (mV)
@@ -81,7 +83,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
             description = "The value of the membrane potential to which it is set and held at immediately "
                     + "after firing an action potential.",
             order = 2)
-    private double resetPotential = 13.5;
+    private double resetPotential = -55;
 
     /**
      * Resting potential (mV) Default: 0.0
@@ -92,7 +94,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
                     + "to this value.",
             increment = .1,
             order = 3)
-    private double restingPotential = 0.0;
+    private double restingPotential =-70;
 
     /**
      * Background Current (nA) .
@@ -102,7 +104,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
             description = "A constant background current to the neuron.",
             increment = .1,
             order = 5)
-    private double backgroundCurrent = 13.5;
+    private double backgroundCurrent = 17.5;
 
     /**
      * Refractory Period (ms) .

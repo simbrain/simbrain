@@ -45,7 +45,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
             label = "A",
             description = "Parameter for recovery variable.",
             increment = .01,
-            order = 1)
+            order = 1,
+            probDist = "Uniform", probParam1 = .01, probParam2 = .12)
     private double a = .02;
 
     /**
@@ -55,7 +56,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
             label = "B",
             description = "Parameter for recovery variable.",
             increment = .01,
-            order = 2)
+            order = 2, useSetter = true,
+            probDist = "Uniform", probParam1 = .15, probParam2 = .3)
     private double b = .2;
 
     /**
@@ -65,7 +67,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
             label = "C",
             description = "The value for v which occurs after a spike.",
             increment = .01,
-            order = 3)
+            order = 3,
+            probDist = "Uniform", probParam1 = -70, probParam2 = -45)
     private double c = -65;
 
     /**
@@ -75,7 +78,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
             label = "D",
             description = "A constant value added to u after spikes.",
             increment = .01,
-            order = 4)
+            order = 4,
+            probDist = "Uniform", probParam1 = 0.02, probParam2 = 10)
     private double d = 8;
 
     /**

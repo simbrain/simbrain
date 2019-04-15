@@ -60,8 +60,16 @@ public class NumericWidget extends JPanel {
 
                 double param1 = parameter.getAnnotation().probParam1();
                 double param2 = parameter.getAnnotation().probParam2();
-                ProbabilityDistribution.ProbabilityDistributionBuilder pb =
-                    ProbabilityDistribution.getBuilder(probDist, param1, param2);
+                ProbabilityDistribution.ProbabilityDistributionBuilder pb;
+                if(parameter.hasMaxValue() || parameter.hasMinValue()) {
+                    double upBound = parameter.hasMaxValue() ?
+                            parameter.getAnnotation().maximumValue() : Double.POSITIVE_INFINITY;
+                    double lowBound = parameter.hasMinValue() ?
+                            parameter.getAnnotation().minimumValue() : Double.NEGATIVE_INFINITY;
+                    pb = ProbabilityDistribution.getBuilder(probDist, param1,param2, lowBound, upBound);
+                } else {
+                    pb = ProbabilityDistribution.getBuilder(probDist, param1, param2);
+                }
                 ProbabilityDistribution pd = pb.build();
 
                 AnnotatedPropertyEditor randEditor = new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(pd));

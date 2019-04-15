@@ -60,6 +60,8 @@ public class UniformDistribution extends ProbabilityDistribution {
         return "Uniform";
     }
 
+    public String toString() { return "Uniform"; }
+
     @Override
     public UniformDistribution deepCopy() {
         UniformDistribution cpy = new UniformDistribution();
@@ -116,6 +118,17 @@ public class UniformDistribution extends ProbabilityDistribution {
         protected UniformDistribution product() {
             return product;
         }
+
+        public UniformDistributionBuilder floor(double floor) {
+            product.floor = floor;
+            return this;
+        }
+
+        public UniformDistributionBuilder ceil(double ceil) {
+            product.ceil = ceil;
+            return this;
+        }
+
     }
 
 }

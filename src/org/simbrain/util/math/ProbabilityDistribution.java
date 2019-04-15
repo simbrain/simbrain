@@ -61,6 +61,10 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     public abstract void setLowerBound(double floor);
 
+    public void setCeil(double ceiling) {setUpperBound(ceiling);} // Here for APE
+
+    public void setFloor(double floor) {setLowerBound(floor);} // Ditto
+
     public abstract void setPolarity(Polarity polarity);
 
     public abstract Polarity getPolarity();
@@ -71,22 +75,41 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     }
 
     /**
-     * Static utility method to get a bounded value.
+     * Static utility method to get a bounded value. Attempts to re-draw
+     * the value from the distribution until the drawn value falls within the
+     * specified bounds, so as to maintain the relative probabilities
+     * dictated by the PDF in that interval. If too many attempts are made
+     * and none fall in the bounds, assigns lower or upper bound to the value
+     * depending upon which is closer and returns it. If the value is already
+     * within the interval, does nothing, returns the value.
      *
      * @param value      the value to be clipped
-     * @param lowerBound lower bound
-     * @param upperBound upper bound
-     * @return the vlipped value
+     * @param lowerBound lower bound of the interval
+     * @param upperBound upper bound of the interval
+     * @return the clipped value
      */
-    protected static double clipping(double value, double lowerBound, double upperBound) {
-        double result = value;
-
-        if (result > upperBound) {
-            result = upperBound;
-        } else if (result < lowerBound) {
-            result = lowerBound;
+    protected static double clipping(ProbabilityDistribution dist, double value,
+                                     double lowerBound, double upperBound) {
+        if(value >= lowerBound && value <= upperBound) {
+            return value;
         }
+        int cnt = 0;
+        double result = value;
+        do {
+            //TODO: Parameterize 20, so it's not a magic number
+            if (cnt >= 20)
+                break;
+            result = dist.nextRand();
+            cnt++;
+        } while(result < lowerBound || result > upperBound);
 
+        if (cnt >= 20) { // Failed to re-draw a value that fell within the bounds
+            if (value > upperBound) {
+                return upperBound;
+            } else if (value < lowerBound) {
+                return lowerBound;
+            }
+        }
         return result;
     }
 
@@ -111,7 +134,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     public static ProbabilityDistributionBuilder getBuilder(String distType, double param1, double param2) {
         switch (distType) {
         case "Uniform":
-            return UniformDistribution.builder();
+            return UniformDistribution.builder().floor(param1).ceil(param2);
         case "Normal":
             return  NormalDistribution.builder().mean(param1).standardDeviation(param2);
         case "LogNormal":
@@ -121,10 +144,36 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         case "Exponential":
             return ExponentialDistribution.builder().lambda(param1);
         default:
-            return UniformDistribution.builder();
+            return UniformDistribution.builder().floor(param1).ceil(param2);
         }
     }
 
+    /**
+     * Returns a specified distribution with parameters 1 & 2 (e.g. mean & std for a
+     * normal distribution, shape & scale for gamma and so on), where the random generator
+     * using that distribution will only draw values in the range [lowerBound, upperBound].
+     * Clipping is set to true automatically. The domains constraints on the PDF will
+     * still be respected
+     * @param distType a string description of the distribution type.
+     *                 Options are: "Uniform", "Normal", "LogNormal","Pareto", and "Exponential".
+     * @param param1 The first parameter of the distribution.  For normal this is mean, for lognormal
+     *               location, for pareto it is slope, for exponential it is lambda.
+     * @param param2 The second parameter of the distribution.  For normal this is stdev, for lognormal
+     *               scale, for pareto it is min.
+     * @param lowerBound the lower boundary from which random values can be drawn. No values
+     *                   will be generated below this value, relative probabilities within the
+     *                   interval as dictated by the PDF will be respected.
+     * @param upperBound the upper boundary from which random values can be drawn. No values
+     *                   will be generated above this value, relative probabilities within the
+     *                   interval as dictated by the PDF will be respected.
+     * @return A probability distribution builder using the specified PDF, with the specified parameters
+     * which only generates values in the given range. Ready to use.
+     */
+    public static ProbabilityDistributionBuilder getBuilder(String distType, double param1, double param2,
+                                                            double lowerBound, double upperBound) {
+        return getBuilder(distType, param1, param2)
+                .clipping(true).lowerBound(lowerBound).upperBound(upperBound);
+    }
 
     /**
      * @see #getBuilder(String, double, double).

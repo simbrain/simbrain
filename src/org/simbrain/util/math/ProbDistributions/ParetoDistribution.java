@@ -29,7 +29,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @UserParameter(
             label = "Floor",
             description = "An artificial minimum value set by the user.",
-            order = 3)
+            order = 3, useSetter = true)
     private double floor = 1.0; // TODO: Note that floor should never be lower than minimum.
 
     /**
@@ -40,7 +40,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @UserParameter(
             label = "Ceiling",
             description = "An artificial minimum value set by the user.",
-            order = 4)
+            order = 4, useSetter = true)
     private double ceil = Double.POSITIVE_INFINITY;
 
     @UserParameter(
@@ -60,7 +60,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
     @Override
     public double nextRand() {
-        return clipping(
+        return clipping(this,
                 ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min),
                 floor,
                 ceil
@@ -111,12 +111,14 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
     @Override
     public void setUpperBound(double ceiling) {
-        this.ceil = ceiling;
+        if(ceiling > min)
+            this.ceil = ceiling;
     }
 
     @Override
     public void setLowerBound(double floor) {
-        this.floor = floor;
+        if(floor >= min)
+            this.floor = floor;
     }
 
     @Override

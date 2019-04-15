@@ -62,7 +62,7 @@ public class NormalDistribution extends ProbabilityDistribution {
     }
 
     public double nextRand() {
-        return clipping(
+        return clipping(this,
                 (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,
                 floor,
                 ceil

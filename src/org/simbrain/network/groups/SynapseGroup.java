@@ -31,6 +31,7 @@ import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
 
+import java.beans.PropertyChangeSupport;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -1706,6 +1707,8 @@ public class SynapseGroup extends Group {
      * Perform operations required after opening a synapse group.
      */
     public void postUnmarshallingInit() {
+
+        changeSupport = new PropertyChangeSupport(this);
 
         // Rebuild weight matrix if needed.
         if (this.isUseGroupLevelSettings() && compressedMatrixRep != null) {

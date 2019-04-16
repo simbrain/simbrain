@@ -281,6 +281,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      * parent network has been added.
      */
     public void postUnmarshallingInit() {
+        changeSupport = new PropertyChangeSupport(this);
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
         if (polarity == null) {

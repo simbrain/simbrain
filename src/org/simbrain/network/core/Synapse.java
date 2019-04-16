@@ -1027,6 +1027,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      * lists.
      */
     public void postUnmarshallingInit() {
+        changeSupport = new PropertyChangeSupport(this);
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {
                 getTarget().addAfferent(this);

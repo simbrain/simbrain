@@ -863,6 +863,12 @@ public class Synapse implements EditableObject, AttributeContainer {
         SynapseUpdateRule oldRule = learningRule;
         this.learningRule = newLearningRule;
         initSpikeResponder();
+        // TODO: Needed for calls to SynapseGroup.postUnmashallingInit, which calls
+        // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
+        // change support initialized.
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
         changeSupport.firePropertyChange("rule", oldRule, newLearningRule);
     }
 

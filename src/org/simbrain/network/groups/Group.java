@@ -211,6 +211,9 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
         changeSupport.addPropertyChangeListener(listener);
     }
 

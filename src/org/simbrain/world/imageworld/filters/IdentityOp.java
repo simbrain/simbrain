@@ -8,7 +8,7 @@ import java.awt.image.AffineTransformOp;
 
 public class IdentityOp extends ImageOperation<AffineTransformOp> {
 
-    private AffineTransformOp op = new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    private transient AffineTransformOp op = new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
     public AffineTransformOp getOp() {
         return op;
@@ -22,5 +22,10 @@ public class IdentityOp extends ImageOperation<AffineTransformOp> {
     @Override
     public String getName() {
         return "Color";
+    }
+
+    public Object readResolve() {
+        op = new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        return this;
     }
 }

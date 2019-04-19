@@ -1,5 +1,7 @@
 package org.simbrain.workspace;
 
+import org.simbrain.util.Utils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -136,7 +138,37 @@ public abstract class Attribute {
 
         // The default description format
         return getId() + ":" + method.getName();
-        //return getId() + ":" + readableMethodname + " (" + getTypeName() + ")";
+    }
+
+
+    /**
+     * Return a simple description of an attribute where the methodname portion
+     * has the "get" or "set" removed and it's all lower case.  Example:
+     * "Neuron1:getActivation" becomes "Neuron1:activation".
+     *
+     * @return the simplified description
+     */
+    public String getSimpleDescription() {
+        String customDesc = getCustomDescription();
+        if (customDesc != null) {
+            return customDesc;
+        }
+        if (!description.isEmpty()) {
+            return description;
+        }
+
+        // Get rid of get and set, add spaces, and capitalize first letter
+        String simpleMethodName = method.getName();
+        if (method.getName().startsWith("get")) {
+            simpleMethodName = simpleMethodName.replaceFirst("get", "");
+        } else if (method.getName().startsWith("set")) {
+            simpleMethodName = simpleMethodName.replaceFirst("set", "");
+        }
+        simpleMethodName = Utils.splitCamelCase(simpleMethodName);
+        simpleMethodName = Utils.upperCaseFirstLetter(simpleMethodName);
+
+        // The default description format
+        return getId() + ":" + simpleMethodName;
     }
 
     private String getCustomDescription() {

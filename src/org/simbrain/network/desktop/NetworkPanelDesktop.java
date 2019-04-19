@@ -264,8 +264,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
-            menu.setSourceModel(neuron);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuron);
             contextMenu.add(menu);
         }
         return contextMenu;
@@ -288,8 +287,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getSelectedSynapses().size() == 1) {
             contextMenu.addSeparator();
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
-            menu.setSourceModel(synapse);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), synapse);
             contextMenu.add(menu);
         }
         return contextMenu;
@@ -358,8 +356,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
-            menu.setSourceModel(neuronGroup);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuronGroup);
             return menu;
         }
         return null;
@@ -373,8 +370,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     @Override
     public JMenu getSynapseGroupProducerMenu(SynapseGroup synapseGroup) {
         if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent());
-            menu.setSourceModel(synapseGroup);
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), synapseGroup);
             return menu;
         }
         return null;

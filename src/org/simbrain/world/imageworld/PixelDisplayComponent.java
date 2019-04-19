@@ -59,9 +59,24 @@ public class PixelDisplayComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
+        // Main Consumer to display pixels
         containers.add(world.getImageSource());
-        containers.add(world.getCurrentSensorMatrix());
+        // Producers to read out transformed pixels
+        containers.addAll(world.getSensorMatrices());
         return containers;
+    }
+
+    @Override
+    public AttributeContainer getObjectFromKey(String objectKey) {
+        if (objectKey.equalsIgnoreCase("EmitterMatrix")) {
+            return world.getImageSource();
+        }
+        for (SensorMatrix sensor : world.getSensorMatrices()) {
+            if (objectKey.equals(sensor.getName())) {
+                return sensor;
+            }
+        }
+        return null;
     }
 
     /**

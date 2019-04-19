@@ -85,7 +85,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      */
     public CouplingListPanel(SimbrainDesktop desktop, List<Coupling<?>> couplingList) {
         super(new BorderLayout());
-        System.out.println("CouplingListPanel.CouplingListPanel");
 
         // Reference to the simbrain desktop
         this.desktop = desktop;

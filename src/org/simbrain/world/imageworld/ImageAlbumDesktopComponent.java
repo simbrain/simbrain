@@ -8,8 +8,8 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.workspace.gui.MultiCouplingMenu;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 
 import javax.swing.*;
@@ -60,11 +60,6 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
     private JPopupMenu contextMenu;
 
     /**
-     * Coupling menu.
-     */
-    private MultiCouplingMenu multiCouplingMenu;
-
-    /**
      * Construct a new ImageDesktopComponent GUI.
      *
      * @param frame     The frame in which to place GUI elements.
@@ -97,7 +92,17 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
             }
         });
 
-        setupContextMenu(component);
+        // Set up context menu
+        component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                super.mouseClicked(evt);
+                if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
+                    showContextMenu(evt);
+                }
+            }
+        });
+
         setupFileChooser();
     }
 
@@ -136,26 +141,17 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
 
         frame.setJMenuBar(menuBar);
     }
-    
-    private void setupContextMenu(ImageAlbumComponent component) {
+
+    /**
+     * Create and display the context menu.
+     */
+    private void showContextMenu(MouseEvent evt) {
         contextMenu = new JPopupMenu();
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        multiCouplingMenu = new MultiCouplingMenu(component, contextMenu, 100);
-        component.getWorld().getImagePanel().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                super.mouseClicked(evt);
-                if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
-                    showContextMenu(evt);
-                }
-            }
-        });
-    }
-
-    private void showContextMenu(MouseEvent evt) {
-        multiCouplingMenu.setSourceModels();
+        CouplingMenu sensorMatrixMenu = new CouplingMenu(getWorkspaceComponent(), component.getWorld().getCurrentSensorMatrix());
+        contextMenu.add(sensorMatrixMenu);
         contextMenu.show(component.getWorld().getImagePanel(), evt.getX(), evt.getY());
     }
 

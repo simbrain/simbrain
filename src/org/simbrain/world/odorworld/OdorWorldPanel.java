@@ -22,7 +22,6 @@ import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
-import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
@@ -381,8 +380,7 @@ public class OdorWorldPanel extends JPanel {
                 contextMenu.addSeparator();
             }
 
-            CouplingMenu couplingMenu = new CouplingMenu(component);
-            couplingMenu.setSourceModel(entity);
+            CouplingMenu couplingMenu = new CouplingMenu(component, entity);
             couplingMenu.setCustomName("Create couplings");
             contextMenu.add(couplingMenu);
             contextMenu.addSeparator();

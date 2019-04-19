@@ -8,50 +8,60 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * CouplingMenu creates a JMenu containing an entry for every available consumer and producer from
- * a given model object.
- * TODO: Limit the total number of entries in the coupling menus.
+ * A JMenu that appears relative to some object (an {@link AttributeContainer}) in
+ * a workspace component. The menu allows you to create a coupling from that object
+ * to any other attribute container of the same data type in Simbrain.
  */
 public class CouplingMenu extends JMenu {
 
+    /**
+     * The workspace component where this menu will be shown.
+     */
     private WorkspaceComponent sourceComponent;
+
+    /**
+     * The source object that will be the producer in whatever coupling is created
+     * using this menu.
+     */
     private AttributeContainer source;
 
-    public CouplingMenu(WorkspaceComponent sourceComponent) {
+    /**
+     * Construct the menu.
+     *
+     * @param sourceComponent parent workspace component
+     * @param source the source object
+     */
+    public CouplingMenu(WorkspaceComponent sourceComponent, AttributeContainer source) {
         this.sourceComponent = sourceComponent;
-    }
-
-    public void setSourceModel(AttributeContainer source) {
         this.source = source;
         setText("Create " + source.getClass().getSimpleName() + " Coupling");
-        updateItems();
-    }
-
-    public void setCustomName(String name) {
-        this.setText(name);
-    }
-
-    private void updateItems() {
         removeAll();
         List<Producer<?>> producers =
-                sourceComponent.getVisibleProducers().stream()
+            sourceComponent.getVisibleProducers().stream()
                 .filter(p -> p.getBaseObject().equals(source))
                 .collect(Collectors.toList());
         for (Producer<?> producer : producers) {
             createProducerSubmenu(producer);
         }
-        List<Consumer<?>> consumers =
-                sourceComponent.getVisibleConsumers().stream()
-                .filter(c -> c.getBaseObject().equals(source))
-                .collect(Collectors.toList());
-        for (Consumer<?> consumer : consumers) {
-            createConsumerSubmenu(consumer);
-        }
     }
 
+    /**
+     * Create a custom name for this menu besides the default "Create X coupling".
+     *
+     * @param name the custom name.
+     */
+    public void setCustomName(String name) {
+        this.setText(name);
+    }
+
+    /**
+     * Create a submenu for a specific producer, that will "send" to a consumer
+     * to create a coupling.
+     *
+     * @param producer the producer to make a menu for
+     */
     private void createProducerSubmenu(Producer<?> producer) {
-        // TODO: Verbose description but maybe good enough for now...
-        JMenu producerSubmenu = new JMenu(producer.getDescription() + " send " + producer.getTypeName() + " to");
+        JMenu producerSubmenu = new JMenu(producer.getSimpleDescription() + " send to");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : sourceComponent.getWorkspace().getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<>();
@@ -61,7 +71,7 @@ public class CouplingMenu extends JMenu {
                     couplings.add(
                             new CouplingMenuItem(
                                     sourceComponent.getWorkspace(),
-                                    targetComponent.getName() + "/" + consumer.getDescription(),
+                                    targetComponent.getName() + "/" + consumer.getSimpleDescription(),
                                     producer,
                                     consumer
                             )
@@ -80,8 +90,9 @@ public class CouplingMenu extends JMenu {
         }
     }
 
+    // Note: this is not currently used.  It is enough to build all couplings using a producer / "send" menu.
+    // However, if it is reinvoked it should be updated to be similar to the createProducerMenu
     private void createConsumerSubmenu(Consumer<?> consumer) {
-        // TODO: Verbose but maybe good enough for now...
         JMenu consumerSubmenu = new JMenu(consumer.getDescription() + " receive " + consumer.getTypeName() + " from");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : sourceComponent.getWorkspace().getComponentList()) {

@@ -7,7 +7,7 @@ import org.simbrain.world.imageworld.filters.IdentityOp;
 import org.simbrain.world.imageworld.filters.ImageOperation;
 
 /**
- * Class to facilituate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
+ * Class to facilitate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
  * to edit {@link org.simbrain.world.imageworld.filters.FilteredImageSource} objects.
  */
 public class ImageSourceMeta implements EditableObject, CopyableObject {

@@ -23,7 +23,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     private String type;
     private int width;
     private int height;
-    private transient ImageOperation colorOp;
+    private ImageOperation colorOp;
     private transient BufferedImageOp scaleOp;
 
     /**
@@ -46,12 +46,6 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
 
     public Object readResolve() {
         super.readResolve();
-        if (type.equals("Gray Filter")) {
-            colorOp = new GrayOp();
-        } else {
-            // Default to color filter
-            colorOp = new IdentityOp();
-        }
         scaleToFit(wrappedSource);
         wrappedSource.addListener(this);
         return this;

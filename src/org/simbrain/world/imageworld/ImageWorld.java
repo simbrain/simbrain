@@ -45,7 +45,7 @@ public abstract class ImageWorld {
     private SensorMatrix currentSensorMatrix;
 
     /**
-     * Current image and sensor matrices draw to this JPanel
+     * Current image and sensor matrices draw to this JPanel.
      */
     protected transient ImagePanel imagePanel;
 
@@ -131,7 +131,6 @@ public abstract class ImageWorld {
         return this;
     }
 
-
     /**
      * Save the current image as the specified filename.
      *
@@ -153,7 +152,8 @@ public abstract class ImageWorld {
             //TODO
             //imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
         } else {
-            imagePanel.setToolTipText(currentSensorMatrix.getWidth() + " by " + currentSensorMatrix.getHeight());
+            imagePanel.setToolTipText(currentSensorMatrix.getWidth() +
+                " by " + currentSensorMatrix.getHeight());
         }
     }
 
@@ -169,6 +169,8 @@ public abstract class ImageWorld {
      */
     public abstract void clearImage();
 
+
+    //TODO: Move this and all emitter stuff..
     /**
      * Get whether the emitter matrix is using color.
      */
@@ -211,7 +213,7 @@ public abstract class ImageWorld {
     }
 
     /**
-     * Return the image panel
+     * Return the image panel.
      */
     public ImagePanel getImagePanel() {
         return imagePanel;
@@ -260,6 +262,9 @@ public abstract class ImageWorld {
         void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
+    /**
+     * Return the main {@link ImageSource} associated with this component.
+     */
     public abstract ImageSourceAdapter getImageSource();
 
     /**

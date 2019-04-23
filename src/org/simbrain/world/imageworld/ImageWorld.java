@@ -128,6 +128,8 @@ public abstract class ImageWorld {
         listeners = new ArrayList<Listener>();
         currentSensorMatrix.getSource().addListener(imagePanel);
         clipboard = new ImageClipboard(this);
+        getImageSource().notifyResize();
+        getImageSource().notifyImageUpdate();
         return this;
     }
 

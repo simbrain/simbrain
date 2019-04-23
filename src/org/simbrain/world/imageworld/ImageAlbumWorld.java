@@ -21,10 +21,10 @@ public class ImageAlbumWorld extends ImageWorld {
      */
     public ImageAlbumWorld() {
         super();
-        imagePanel = new ImagePanel(false);
+        showGridLines = false;
+        imagePanel = new ImagePanel(showGridLines);
         imageSource = new ImageAlbum();
         imageSource.loadImage(org.simbrain.resource.ResourceManager.getImageIcon("bobcat.jpg"));
-
         initializeDefaultSensorMatrices();
     }
 

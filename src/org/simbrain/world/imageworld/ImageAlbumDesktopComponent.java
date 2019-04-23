@@ -202,6 +202,15 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
         });
         sensorToolbar.add(addSensorMatrix);
 
+        // Delete sensor matrix
+        JButton deleteSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("minus.png"));
+        deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
+        deleteSensorMatrix.addActionListener(evt -> {
+            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
+            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
+        });
+        sensorToolbar.add(deleteSensorMatrix);
+
         // Editor Sensor Matrix
         JButton editSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("Prefs.png"));
         editSensorMatrix.setToolTipText("Edit Sensor Matrix");
@@ -242,14 +251,6 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
         });
         sensorToolbar.add(editSensorMatrix);
 
-        // Delete sensor matrix
-        JButton deleteSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("minus.png"));
-        deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
-        deleteSensorMatrix.addActionListener(evt -> {
-            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            component.getWorld().removeSensorMatrix(selectedSensorMatrix);
-        });
-        sensorToolbar.add(deleteSensorMatrix);
     }
 
     Action copyAction = new AbstractAction("Copy") {

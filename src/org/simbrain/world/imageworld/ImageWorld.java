@@ -60,6 +60,12 @@ public abstract class ImageWorld {
     private transient List<Listener> listeners;
 
     /**
+     * If true show grid lines.
+     */
+     // TODO: Expose this in a preferences dialog
+    protected boolean showGridLines;
+
+    /**
      * Construct the image world.
      */
     public ImageWorld() {
@@ -124,7 +130,7 @@ public abstract class ImageWorld {
      * Returns a deserialized ImageWorld.
      */
     public Object readResolve() {
-        imagePanel = new ImagePanel(true);
+        imagePanel = new ImagePanel(showGridLines);
         listeners = new ArrayList<Listener>();
         currentSensorMatrix.getSource().addListener(imagePanel);
         clipboard = new ImageClipboard(this);

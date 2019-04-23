@@ -18,7 +18,8 @@ public class PixelDisplayWorld extends ImageWorld {
      */
     public PixelDisplayWorld() {
         super();
-        imagePanel = new ImagePanel(true);
+        showGridLines = true;
+        imagePanel = new ImagePanel(showGridLines);
         emitterMatrix = new  EmitterMatrix();
         initializeDefaultSensorMatrices();
     }

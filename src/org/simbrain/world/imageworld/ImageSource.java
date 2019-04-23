@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.awt.image.BufferedImage;
@@ -15,7 +16,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Tim Shea
  */
-public interface ImageSource extends AttributeContainer {
+public interface ImageSource extends AttributeContainer, EditableObject {
 
     /**
      * @return Returns whether the source will update the image when updateImage

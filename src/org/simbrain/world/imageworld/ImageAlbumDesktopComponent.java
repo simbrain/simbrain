@@ -2,7 +2,9 @@ package org.simbrain.world.imageworld;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -11,6 +13,7 @@ import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
+import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -196,6 +199,40 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
             dialog.setVisible(true);
         });
         sensorToolbar.add(addSensorMatrix);
+
+        JButton editSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("Prefs.png"));
+        editSensorMatrix.setToolTipText("Edit Sensor Matrix");
+
+        editSensorMatrix.addActionListener(evt -> {
+            SensorMatrix sensorMatrix = component.getWorld().getCurrentSensorMatrix();
+
+            // Only allow dimension/filter edit if the sensor source is a FilteredImageSource
+            // Otherwise, edit only the name in the SensorMatrix
+            if (sensorMatrix.getSource() instanceof FilteredImageSource) {
+                FilteredImageSource imageSource = (FilteredImageSource) sensorMatrix.getSource();
+                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(imageSource);
+                StandardDialog dialog = editor.getDialog();
+
+                dialog.addClosingTask(() -> {
+                    // Since the name is set in the imageSource, but items in the combo box use the name in SensorMatrix
+                    // So get the name from imageSource
+                    sensorMatrix.setName(imageSource.getName());
+
+                    // Update the image based on the image source
+                    component.getWorld().getImageSource().notifyResize();
+                    component.getWorld().getImageSource().notifyImageUpdate();
+                    sensorMatrixCombo.updateUI();
+                });
+                dialog.setVisible(true);
+                dialog.pack();
+            } else {
+                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(sensorMatrix);
+                StandardDialog dialog = editor.getDialog();
+                dialog.setVisible(true);
+                dialog.pack();
+            }
+        });
+        sensorToolbar.add(editSensorMatrix);
 
         JButton deleteSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("minus.png"));
         deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");

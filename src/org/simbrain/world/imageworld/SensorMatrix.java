@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
@@ -19,11 +21,14 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class SensorMatrix implements ImageSourceListener, AttributeContainer {
+public class SensorMatrix implements ImageSourceListener, AttributeContainer, EditableObject {
 
     /**
      * Name of this matrix.
      */
+    @UserParameter(
+            label = "Name"
+    )
     private String name;
 
     /**
@@ -75,6 +80,10 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public ImageSource getSource() {

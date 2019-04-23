@@ -66,7 +66,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
     /**
      * Notify ImageSourceListeners that a new image is available.
      */
-    protected void notifyImageUpdate() {
+    public void notifyImageUpdate() {
         if (isEnabled()) {
             for (ImageSourceListener listener : listeners) {
                 listener.onImageUpdate(this);

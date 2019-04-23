@@ -17,12 +17,33 @@ import java.awt.image.BufferedImageOp;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class FilteredImageSource extends ImageSourceAdapter implements ImageSourceListener {
+public class FilteredImageSource extends ImageSourceAdapter implements ImageSourceListener, EditableObject {
 
     private ImageSource wrappedSource;
+
+    @UserParameter(
+            label = "Name",
+            order = 0
+    )
     private String type;
-    private int width;
+
+    @UserParameter(
+            label = "Width",
+            order = 1
+    )
+    private int width = 10;
+
+    @UserParameter(
+            label = "Height",
+            order = 2
+    )
     private int height;
+
+    @UserParameter(
+            label = "Color Filter",
+            order = 3,
+            isObjectType = true
+    )
     private ImageOperation colorOp;
     private transient BufferedImageOp scaleOp;
 
@@ -78,6 +99,11 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
      */
     protected void setScaleOp(BufferedImageOp value) {
         scaleOp = value;
+    }
+
+    @Override
+    public String getName() {
+        return type;
     }
 
     @Override

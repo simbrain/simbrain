@@ -183,7 +183,7 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
         sensorToolbar.add(sensorMatrixCombo);
         sensorMatrixCombo.setToolTipText("Which Sensor Matrix to View");
         updateComboBox();
-        sensorMatrixCombo.setSelectedIndex(0);
+        sensorMatrixCombo.setSelectedItem(component.getWorld().getCurrentSensorMatrix());
         sensorMatrixCombo.setMaximumSize(new java.awt.Dimension(200, 100));
         sensorMatrixCombo.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();

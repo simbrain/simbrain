@@ -15,6 +15,9 @@ import java.text.NumberFormat;
  */
 public class OffsetFilterFactory extends ImageFilterFactory {
 
+    //TODO: Not currently visible in the GUI.  Wait to expose it until some viable use caes are found
+    // or replace with convolutional layers
+
     private int xOffset;
     private int yOffset;
 
@@ -43,7 +46,7 @@ public class OffsetFilterFactory extends ImageFilterFactory {
         private int yOffset;
 
         OffsetFilterSource(ImageSource source, int xOffset, int yOffset, int width, int height) {
-            super(source, "Offset Filter", ImageFilterFactory.createIdentityOp(), width, height);
+            super(source, ImageFilterFactory.createIdentityOp(), width, height);
             this.xOffset = xOffset;
             this.yOffset = yOffset;
             onImageUpdate(source);

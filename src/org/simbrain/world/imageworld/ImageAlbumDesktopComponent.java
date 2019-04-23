@@ -192,48 +192,57 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
             }
         });
 
+        // Add Sensor Matrix
         JButton addSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("plus.png"));
         addSensorMatrix.setToolTipText("Add Sensor Matrix");
         addSensorMatrix.addActionListener(evt -> {
             SensorMatrixDialog dialog = new SensorMatrixDialog(component.getWorld());
+            dialog.setLocationRelativeTo(this);
             dialog.setVisible(true);
         });
         sensorToolbar.add(addSensorMatrix);
 
+        // Editor Sensor Matrix
         JButton editSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("Prefs.png"));
         editSensorMatrix.setToolTipText("Edit Sensor Matrix");
-
         editSensorMatrix.addActionListener(evt -> {
-            SensorMatrix sensorMatrix = component.getWorld().getCurrentSensorMatrix();
 
-            // Only allow dimension/filter edit if the sensor source is a FilteredImageSource
-            // Otherwise, edit only the name in the SensorMatrix
+            // Create a dialog to edit to sensor matrix and filtered image source, if any
+            StandardDialog filterEditorDialog = new StandardDialog();
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            filterEditorDialog.setContentPane(dialogPanel);
+
+            // Edit the top level sensor matrix, basically just a name
+            SensorMatrix sensorMatrix = component.getWorld().getCurrentSensorMatrix();
+            AnnotatedPropertyEditor sensorEditor = new AnnotatedPropertyEditor(sensorMatrix);
+            dialogPanel.add(sensorEditor);
+            filterEditorDialog.addClosingTask(() -> {
+                sensorEditor.commitChanges();
+            });
+
+            // If the sensor matrix has a filtered image source, edit it too
             if (sensorMatrix.getSource() instanceof FilteredImageSource) {
                 FilteredImageSource imageSource = (FilteredImageSource) sensorMatrix.getSource();
-                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(imageSource);
-                StandardDialog dialog = editor.getDialog();
-
-                dialog.addClosingTask(() -> {
-                    // Since the name is set in the imageSource, but items in the combo box use the name in SensorMatrix
-                    // So get the name from imageSource
-                    sensorMatrix.setName(imageSource.getName());
-
+                AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor(imageSource);
+                dialogPanel.add(filterEditor);
+                filterEditorDialog.addClosingTask(() -> {
+                    filterEditor.commitChanges();
                     // Update the image based on the image source
                     component.getWorld().getImageSource().notifyResize();
                     component.getWorld().getImageSource().notifyImageUpdate();
                     sensorMatrixCombo.updateUI();
                 });
-                dialog.setVisible(true);
-                dialog.pack();
-            } else {
-                AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(sensorMatrix);
-                StandardDialog dialog = editor.getDialog();
-                dialog.setVisible(true);
-                dialog.pack();
             }
+
+            filterEditorDialog.pack();
+            filterEditorDialog.setLocationRelativeTo(this);
+            filterEditorDialog.setVisible(true);
+
         });
         sensorToolbar.add(editSensorMatrix);
 
+        // Delete sensor matrix
         JButton deleteSensorMatrix = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("minus.png"));
         deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
         deleteSensorMatrix.addActionListener(evt -> {
@@ -323,7 +332,6 @@ public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent
         returnList.add(nextImagesButton);
         return returnList;
     }
-
 
 
     private void loadImages(ActionEvent evt) {

@@ -6,6 +6,10 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 
+
+/**
+ * Basically the color operation.
+ */
 public class IdentityOp extends ImageOperation<AffineTransformOp> {
 
     private transient AffineTransformOp op = new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);

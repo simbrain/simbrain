@@ -19,13 +19,10 @@ import java.awt.image.BufferedImageOp;
  */
 public class FilteredImageSource extends ImageSourceAdapter implements ImageSourceListener, EditableObject {
 
+    /**
+     * The parent image source being filtered.
+     */
     private ImageSource wrappedSource;
-
-    @UserParameter(
-            label = "Name",
-            order = 0
-    )
-    private String type;
 
     @UserParameter(
             label = "Width",
@@ -40,26 +37,25 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     private int height;
 
     @UserParameter(
-            label = "Color Filter",
+            label = "Filter",
             order = 3,
             isObjectType = true
     )
-    private ImageOperation colorOp;
+    private ImageOperation imageOp;
+
     private transient BufferedImageOp scaleOp;
 
     /**
      * Construct a new FilteredImageSource.
      *
      * @param source  the ImageSource to be filtered
-     * @param type    the type of this filter
      * @param colorOp the color filter to apply
      * @param width   the width of the output image
      * @param height  the height of the output image
      */
-    public FilteredImageSource(ImageSource source, String type, ImageOperation colorOp, int width, int height) {
+    public FilteredImageSource(ImageSource source,  ImageOperation colorOp, int width, int height) {
         wrappedSource = source;
-        this.type = type;
-        this.colorOp = colorOp;
+        this.imageOp = colorOp;
         this.width = width;
         this.height = height;
         wrappedSource.addListener(this);
@@ -72,14 +68,6 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         return this;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public ImageOperation getColorOp() {
-        return colorOp;
-    }
-
     /**
      * @return the current unfiltered image
      */
@@ -90,8 +78,8 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     /**
      * @param value The BufferedImageOp to assign to the color op.
      */
-    protected void setColorOp(ImageOperation value) {
-        colorOp = value;
+    protected void setImageOp(ImageOperation value) {
+        imageOp = value;
     }
 
     /**
@@ -103,7 +91,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
 
     @Override
     public String getName() {
-        return type;
+        return imageOp.getName();
     }
 
     @Override
@@ -120,7 +108,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
     public void onImageUpdate(ImageSource source) {
         BufferedImage image = source.getCurrentImage();
         image = scaleOp.filter(image, null);
-        image = colorOp.getOp().filter(image, null);
+        image = imageOp.getOp().filter(image, null);
         setCurrentImage(image);
     }
 

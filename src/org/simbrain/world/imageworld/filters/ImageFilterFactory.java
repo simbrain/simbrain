@@ -42,11 +42,11 @@ public abstract class ImageFilterFactory {
     }
 
     public static FilteredImageSource createColorFilter(ImageSource source, int width, int height) {
-        return new FilteredImageSource(source, "Color Filter", createIdentityOp(), width, height);
+        return new FilteredImageSource(source,  createIdentityOp(), width, height);
     }
 
     public static FilteredImageSource createGrayFilter(ImageSource source, int width, int height) {
-        return new FilteredImageSource(source, "Gray Filter", createGrayOp(), width, height);
+        return new FilteredImageSource(source, createGrayOp(), width, height);
     }
 
     /**

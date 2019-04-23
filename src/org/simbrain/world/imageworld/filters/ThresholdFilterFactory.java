@@ -1,10 +1,6 @@
 package org.simbrain.world.imageworld.filters;
 
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.imageworld.ImageSource;
-
-import javax.swing.*;
-import java.text.NumberFormat;
 
 public class ThresholdFilterFactory extends ImageFilterFactory {
 
@@ -13,14 +9,14 @@ public class ThresholdFilterFactory extends ImageFilterFactory {
         private double threshold;
 
         ThresholdFilterSource(ImageSource source, double threshold, int width, int height) {
-            super(source, "Threshold Filter", new ThresholdOp(threshold), width, height);
+            super(source, new ThresholdOp(threshold), width, height);
             this.threshold = threshold;
         }
 
         @Override
         public Object readResolve() {
             super.readResolve();
-            setColorOp(new ThresholdOp(threshold));
+            setImageOp(new ThresholdOp(threshold));
             return this;
         }
     }

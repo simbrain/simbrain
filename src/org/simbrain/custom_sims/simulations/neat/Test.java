@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.neat;
 
-import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.neat.*;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -9,16 +9,15 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
-import org.simbrain.util.neat.Agent;
-import org.simbrain.util.neat.Genome;
-import org.simbrain.util.neat.NEATSimulation;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
+import java.util.Random;
 
 public class Test {
 
@@ -92,27 +91,24 @@ public class Test {
 
         // 8 is the stimulus vector dimension this simulation will be using
 
-//        // Theses for loops are substitutes to coupling.
-//        // input neuron 0 - 7 receive coupling from mouse 1 left sensor
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValue(j)
-//            );
-//        }
-//
-//        // input neuron 8 - 15 receive coupling from mouse 1 left sensor
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValue(j)
-//            );
-//        }
-//
-//        // input neuron 16 - 24 receive coupling from mouse 1 left sensor
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValue(j)
-//            );
-//        }
+       // Theses for loops are substitutes to coupling.
+       // input neuron 0 - 7 receive coupling from mouse 1 left sensor
+
+        double[] smellLeftValues = ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i).forceSetActivation(smellLeftValues[i]);
+        }
+
+        double[] smellCenterValues = ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i + 8).forceSetActivation(smellCenterValues[i]);
+        }
+
+        double[] smellRightValues = ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i + 16).forceSetActivation(smellRightValues[i]);
+        }
+
 
         // "coupling" output node 3 - 8 to the smell stimulus vector of mouse 1
         double[] newStim = new double[8];
@@ -125,13 +121,17 @@ public class Test {
         n.bufferedUpdateAllNeurons();
         n.update();
 
+
         // coupling output node 0 - 2 to move straight, turn left (maybe, not sure, check later), and turn right effector
-        ((StraightMovement) newEntity.getEffectors().get(0)).setAmount(n.getNeuronGroups().get(1).getNeuron(0).getActivation());
+        ((StraightMovement) newEntity.getEffector("Move Straight")).setAmount(n.getNeuronGroups().get(1).getNeuron(0).getActivation());
         ((Turning) newEntity.getEffectors().get(1)).addAmount(n.getNeuronGroups().get(1).getNeuron(1).getActivation());
         ((Turning) newEntity.getEffectors().get(2)).addAmount(n.getNeuronGroups().get(1).getNeuron(2).getActivation());
 
+        newEntity.setManualMode(false);
+        w.setObjectsBlockMovement(false);
         // update world
         w.update();
+
 
         // compute fitness score
 
@@ -141,24 +141,32 @@ public class Test {
 
         // if distance is less than \sqrt(1000) (about 31), which means the mouse got the cheese
         if (dx * dx + dy * dy < 1000) {
-//            Random rand = new Random(1L);
-//            cheese.setLocation(
-//                    Math.abs(450 - (cheese.getCenterX() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)),
-//                    Math.abs(450 - (cheese.getCenterY() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)));
-//            agent.setFitness(agent.getFitness() + 1);
+           Random rand = new Random(1L);
+           cheese.setLocation(
+                   Math.abs(
+                           450 - (cheese.getCenterX() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)
+                   ),
+                   Math.abs(
+                           450 - (cheese.getCenterY() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)
+                   )
+           );
+           agent.setFitness(agent.getFitness() + 1);
 
             // move the cheese to a new location. in this case, base on 2 sin function
             cheese.setLocation(450 / 2 + 450 / 2 * Math.sin(6 * agent.getFitness() * Math.PI / 47),
                     450 / 2 + 60 * Math.sin((1 + agent.getFitness()) * Math.PI / 4));
             agent.setFitness(agent.getFitness() + 1);
+        } else {
+            agent.setFitness(agent.getFitness() + (3000 - (dx * dx + dy * dy)) / 10000 / 400);
         }
-
+        // agent.setFitness(agent.getFitness() + Math.log(agent.getGenome().connectionGenes.size()) / agent.getGenome().connectionGenes.size() / 400);
         // deduct energy penalty from fitness score
-        double energyPenalty = n.getNeuronGroups().get(1).getNeuron(0).getActivation() / 128 / 400  // movement
-                + n.getNeuronGroups().get(1).getNeuron(0).getActivation() / 1 / 400  // rotating
-                + n.getNeuronGroups().get(1).getNeuron(2).getActivation() / 8 / 400; // rotating
-        agent.setFitness(agent.getFitness() - energyPenalty);
-//        agent.setFitness(agent.getFitness() + (1000 - dx * dx + dy * dy) / 10000 / 400);
+       //  double energyPenalty = n.getNeuronGroups().get(1).getNeuron(0).getActivation() / 128 / 400  // movement
+       //          + n.getNeuronGroups().get(1).getNeuron(0).getActivation() / 1 / 400  // rotating
+       //          + n.getNeuronGroups().get(1).getNeuron(2).getActivation() / 8 / 400; // rotating
+       //  agent.setFitness(agent.getFitness() - energyPenalty);
+       // agent.setFitness(agent.getFitness() + (1000 - dx * dx + dy * dy) / 10000 / 400);
+
     }
 
     // same as the previous one but with 2 mice
@@ -180,45 +188,37 @@ public class Test {
             nr.setLowerBound(0);
         }
 
-//        // 8 is the stimulus vector dimension this simulation will be using
-//
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValue(j)
-//            );
-//        }
-//
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValue(j)
-//            );
-//        }
-//
-//        for (int j = 0; j < 8; j++) {
-//            n.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
-//                    ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValue(j)
-//            );
-//        }
-//
-//        // n2
-//
-//        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getLooseNeuron(j).forceSetActivation(
-//                    ((SmellSensor) pinnedMouse.getSensor("Smell-Left")).getCurrentValue(j)
-//            );
-//        }
-//
-//        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getLooseNeuron(j + 8).forceSetActivation(
-//                    ((SmellSensor) pinnedMouse.getSensor("Smell-Center")).getCurrentValue(j)
-//            );
-//        }
-//
-//        for (int j = 0; j < 8; j++) {
-//            n2.getNeuronGroups().get(0).getLooseNeuron(j + 16).forceSetActivation(
-//                    ((SmellSensor) pinnedMouse.getSensor("Smell-Right")).getCurrentValue(j)
-//            );
-//        }
+
+        double[] smellLeftValues = ((SmellSensor) newEntity.getSensor("Smell-Left")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i).forceSetActivation(smellLeftValues[i]);
+        }
+
+        double[] smellCenterValues = ((SmellSensor) newEntity.getSensor("Smell-Center")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i + 8).forceSetActivation(smellCenterValues[i]);
+        }
+
+        double[] smellRightValues = ((SmellSensor) newEntity.getSensor("Smell-Right")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues.length; i++) {
+            n.getNeuronGroups().get(0).getNeuron(i + 16).forceSetActivation(smellRightValues[i]);
+        }
+
+       // n2 (pinned mouse)
+        double[] smellLeftValues2 = ((SmellSensor) pinnedMouse.getSensor("Smell-Left")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues2.length; i++) {
+            n2.getNeuronGroups().get(0).getNeuron(i).forceSetActivation(smellLeftValues2[i]);
+        }
+
+        double[] smellCenterValues2 = ((SmellSensor) pinnedMouse.getSensor("Smell-Center")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues2.length; i++) {
+            n2.getNeuronGroups().get(0).getNeuron(i + 8).forceSetActivation(smellCenterValues2[i]);
+        }
+
+        double[] smellRightValues2 = ((SmellSensor) pinnedMouse.getSensor("Smell-Right")).getCurrentValues();
+        for (int i = 0; i < smellLeftValues2.length; i++) {
+            n2.getNeuronGroups().get(0).getNeuron(i + 16).forceSetActivation(smellRightValues2[i]);
+        }
 
         n.bufferedUpdateAllNeurons();
         n.update();
@@ -251,16 +251,18 @@ public class Test {
             double dx = newEntity.getCenterX() - cheese.getCenterX();
             double dy = newEntity.getCenterY() - cheese.getCenterY();
             if (dx * dx + dy * dy < 1000) {
-//                NEATRandomizer rand = agent.getRandomizer();
-//                cheese.setLocation(
-//                        Math.abs(450 - (cheese.getCenterX() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)),
-//                        Math.abs(450 - (cheese.getCenterY() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)));
-//                agent.setFitness(agent.getFitness() + 1);
+               NEATRandomizer rand = agent.getRandomizer();
+               cheese.setLocation(
+                       Math.abs(450 - (cheese.getCenterX() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)),
+                       Math.abs(450 - (cheese.getCenterY() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)));
+               agent.setFitness(agent.getFitness() + 1);
 
-//                cheese.setLocation(450 / 2 + 450 / 2 * Math.sin(6 * agent.getFitness() * Math.PI / 47),
-//                        450 / 2 + 60 * Math.sin((1 + agent.getFitness()) * Math.PI / 4));
+               cheese.setLocation(450 / 2 + 450 / 2 * Math.sin(6 * agent.getFitness() * Math.PI / 47),
+                       450 / 2 + 60 * Math.sin((1 + agent.getFitness()) * Math.PI / 4));
                 w.deleteEntity(cheese);
                 agent.setFitness(agent.getFitness() + 3);
+            } else {
+                agent.setFitness(agent.getFitness() + (1000 - dx * dx + dy * dy) / 10000 / 400);
             }
             double energyPenalty = n.getNeuronGroups().get(1).getNeuron(0).getActivation() / 32 / 400  // movement
                     + n.getNeuronGroups().get(1).getNeuron(1).getActivation() / 12 / 400               // rotation
@@ -272,7 +274,7 @@ public class Test {
                     + n.getNeuronGroups().get(1).getNeuron(7).getActivation() / 32 / 400;              // "articulation"
             agent.setFitness(agent.getFitness() - energyPenalty);
         }
-//        agent.setFitness(agent.getFitness() + (1000 - dx * dx + dy * dy) / 10000 / 400);
+       // agent.setFitness(agent.getFitness() + (1000 - dx * dx + dy * dy) / 10000 / 400);
     }
 
     public static void worldTestingMethod(Agent agent) {
@@ -283,10 +285,9 @@ public class Test {
 
         // create cheese with smell
         OdorWorldEntity cheese = new OdorWorldEntity(w);
-        double[] smellVector = {1, 0.2};
+        double[] smellVector = {1, 0.2, 0, 0, 0, 0, 0, 0};
         SmellSource smell = new SmellSource(smellVector);
-        smell.setDispersion(240);
-        smell.setDecayFunction(GaussianDecayFunction.create());
+        smell.setDecayFunction(GaussianDecayFunction.builder().dispersion(450).build());
         cheese.setSmellSource(smell);
 
         // create mouse with smell vector
@@ -295,6 +296,18 @@ public class Test {
         mouse1Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse1Smell.setStimulusVector(new double[8]);
         OdorWorldEntity newEntity = new OdorWorldEntity(w, EntityType.MOUSE);
+        SmellSensor leftSmellSensor = new SmellSensor(newEntity, "Smell-Left", 0.785, 32);
+        SmellSensor centerSmellSensor = new SmellSensor(newEntity, "Smell-Center", 0, 0);
+        SmellSensor rightSmellSensor = new SmellSensor(newEntity, "Smell-Right", -0.785, 32);
+        StraightMovement straightMovement = new StraightMovement(newEntity);
+        Turning turnLeft = new Turning(newEntity, Turning.LEFT);
+        Turning turnRight = new Turning(newEntity, Turning.RIGHT);
+        newEntity.addSensor(leftSmellSensor);
+        newEntity.addSensor(centerSmellSensor);
+        newEntity.addSensor(rightSmellSensor);
+        newEntity.addEffector(straightMovement);
+        newEntity.addEffector(turnLeft);
+        newEntity.addEffector(turnRight);
         newEntity.setSmellSource(mouse1Smell);
 
         w.addEntity(newEntity);
@@ -305,7 +318,7 @@ public class Test {
         cheese.setLocation(450 / 8 + 40, 450 / 2);
 
         // run the actual evaluation
-        for (int i = 0; i < 400; i++) {
+        for (int i = 0; i < 800; i++) {
             worldTestingIteration(agent, cheese, newEntity);
         }
 //        agent.setFitness(agent.getFitness() + ((200 - Math.abs(newEntity.getCenterX() - cheese.getCenterX())) / 200));
@@ -323,8 +336,7 @@ public class Test {
 
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);
-        smell.setDispersion(240);
-        smell.setDecayFunction(GaussianDecayFunction.create());
+        smell.setDecayFunction(GaussianDecayFunction.builder().dispersion(240).build());
         cheese.setSmellSource(smell);
 
         SmellSource mouse1Smell = new SmellSource();
@@ -332,6 +344,18 @@ public class Test {
         mouse1Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse1Smell.setStimulusVector(new double[8]);
         OdorWorldEntity newEntity = new OdorWorldEntity(w, EntityType.MOUSE);
+        SmellSensor leftSmellSensor = new SmellSensor(newEntity, "Smell-Left", 0.785, 32);
+        SmellSensor centerSmellSensor = new SmellSensor(newEntity, "Smell-Center", 0, 0);
+        SmellSensor rightSmellSensor = new SmellSensor(newEntity, "Smell-Right", -0.785, 32);
+        StraightMovement straightMovement = new StraightMovement(newEntity);
+        Turning turnLeft = new Turning(newEntity, Turning.LEFT);
+        Turning turnRight = new Turning(newEntity, Turning.RIGHT);
+        newEntity.addSensor(leftSmellSensor);
+        newEntity.addSensor(centerSmellSensor);
+        newEntity.addSensor(rightSmellSensor);
+        newEntity.addEffector(straightMovement);
+        newEntity.addEffector(turnLeft);
+        newEntity.addEffector(turnRight);
         newEntity.setSmellSource(mouse1Smell);
 
         SmellSource mouse2Smell = new SmellSource();
@@ -339,6 +363,18 @@ public class Test {
         mouse2Smell.setDecayFunction(GaussianDecayFunction.create());
         mouse2Smell.setStimulusVector(new double[8]);
         OdorWorldEntity pinnedMouse = new OdorWorldEntity(w, EntityType.MOUSE);
+        SmellSensor leftSmellSensor2 = new SmellSensor(newEntity, "Smell-Left", 0.785, 32);
+        SmellSensor centerSmellSensor2 = new SmellSensor(newEntity, "Smell-Center", 0, 0);
+        SmellSensor rightSmellSensor2 = new SmellSensor(newEntity, "Smell-Right", -0.785, 32);
+        StraightMovement straightMovement2 = new StraightMovement(newEntity);
+        Turning turnLeft2 = new Turning(newEntity, Turning.LEFT);
+        Turning turnRight2 = new Turning(newEntity, Turning.RIGHT);
+        pinnedMouse.addSensor(leftSmellSensor2);
+        pinnedMouse.addSensor(centerSmellSensor2);
+        pinnedMouse.addSensor(rightSmellSensor2);
+        pinnedMouse.addEffector(straightMovement2);
+        pinnedMouse.addEffector(turnLeft2);
+        pinnedMouse.addEffector(turnRight2);
         pinnedMouse.setSmellSource(mouse2Smell);
 
         w.addEntity(newEntity);
@@ -359,15 +395,43 @@ public class Test {
 
     }
 
+    public static NEATSimulation twoMouseSimulation2PoolSetup() {
+        Genome protoGene = Genome.builder()
+                .ofInputNodeGenesOfGroups(
+                        NodeGeneGroup.of("LeftSensor",
+                                new NodeGene(NodeGene.NodeType.input, new LinearRule(), 2.0, false), 3),
+                        NodeGeneGroup.of("MiddleSensor",
+                                new NodeGene(NodeGene.NodeType.input, new LinearRule(), 1.0, false), 3),
+                        NodeGeneGroup.of("RightSensor",
+                                new NodeGene(NodeGene.NodeType.input, new LinearRule(), 1.0, false), 3)
+                )
+                .ofOutputNodeGenesOfGroups(
+                        NodeGeneGroup.of("MoveStraight", new NodeGene(NodeGene.NodeType.output, new LinearRule())),
+                        NodeGeneGroup.of("TurnRight",    new NodeGene(NodeGene.NodeType.output, new LinearRule())),
+                        NodeGeneGroup.of("TurnLeft",     new NodeGene(NodeGene.NodeType.output, new LinearRule()))
+                )
+                .build();
+
+        // construct a pool of genomes with 2 inputs and 1 output
+        return new NEATSimulation(protoGene, 2, Test::worldTestingMethod2);
+    }
+
+    public static NEATSimulation twoMouseSimulationPoolSetup() {
+        return new NEATSimulation(24, 9, 1525711735340L, 250, Test::worldTestingMethod);
+    }
+
     public static void main(String arg0[]) {
 
         long startTime = System.currentTimeMillis();
 
-        // Construct a pool of genomes with 2 inputs and 1 output
-        NEATSimulation pool = new NEATSimulation(2, 1, 5, Test::xorTest);
+        // Construct a pool of genomes with 2 inputs and 1 output. This is the xor test
+        // NEATSimulation pool = new NEATSimulation(2, 1, 100, Test::xorTest);
+
+        // Construct a pool fro two mouse simulation.
+        NEATSimulation pool = twoMouseSimulationPoolSetup();
 
         // Run the evolutionary algorithm
-        Genome topGenome = pool.evolve(1000, -.01);
+        Genome topGenome = pool.evolve(5, 10);
 
         Agent topAgent = new Agent(topGenome);
 
@@ -386,7 +450,7 @@ public class Test {
         JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
         dialog.setSize(500, 500);
         // TODO: Pack should work. Override preferred size in netpanel?
-        // dialog.pack();
+        dialog.pack();
 
     }
 

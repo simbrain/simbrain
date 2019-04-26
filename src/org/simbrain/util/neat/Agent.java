@@ -56,7 +56,7 @@ public class Agent implements Comparable<Agent> {
     /**
      * The fitness to be evaluated from the evaluation method.
      */
-    private Double fitness;
+    private Double fitness = null;
 
     public Agent(Genome genome, long seed) {
         this(genome);

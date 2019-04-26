@@ -240,6 +240,7 @@ public class NEATSimulation {
             System.out.println("Generation: " + i);
             System.out.println(getTopGenome().getFitness());
             System.out.println("size: " + getTopGenome().connectionGenes.size());
+            System.out.println("Sum Size" + genomes.stream().map(g -> g.connectionGenes.size()).reduce(Integer::sum).orElse(0));
             // Early termination if fitness is above threshold
             if (getTopGenome().getFitness() > threshold) {
                 // TODO: make a evolution report. avoid printing in pool.

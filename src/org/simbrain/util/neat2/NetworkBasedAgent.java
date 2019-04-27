@@ -5,7 +5,7 @@ import org.simbrain.network.core.Network;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class NetworkPhenotype extends Phenotype<Network, NetworkGenotype> {
+public class NetworkBasedAgent extends Agent<Network, NetworkGenome> {
 
     /**
      * A network to be run in the simulation
@@ -17,18 +17,14 @@ public class NetworkPhenotype extends Phenotype<Network, NetworkGenotype> {
      */
     private Double fitness = null;
 
-    public NetworkPhenotype(NetworkGenotype genotype, Supplier<Double> fitnessFunction) {
+    public NetworkBasedAgent(NetworkGenome genotype, Supplier<Double> fitnessFunction) {
         super(genotype, fitnessFunction);
-    }
-
-    @Override
-    public void assemble() {
-        agent = getGenotype().assemble();
+        agent = getGenotype().build();
     }
 
     @Override
     public void computeFitness() {
-         fitness = getFitnessFunction().get();
+        fitness = getFitnessFunction().get();
         ArrayList[] g = new ArrayList[100];
     }
 
@@ -38,7 +34,7 @@ public class NetworkPhenotype extends Phenotype<Network, NetworkGenotype> {
     }
 
     @Override
-    public Phenotype<Network, NetworkGenotype> copy() {
-        return new NetworkPhenotype(getGenotype(), getFitnessFunction());
+    public Agent<Network, NetworkGenome> copy() {
+        return new NetworkBasedAgent(getGenotype(), getFitnessFunction());
     }
 }

@@ -1,7 +1,16 @@
 package org.simbrain.util.neat2;
 
+/**
+ * A template that encodes information about an object used in an evolutionary
+ * simulation.
+ *
+ * @param <T> The type of the object expressed by this gene.
+ */
 public abstract class Gene<T> {
 
+    /**
+     * Some genes should not be mutated, e.g. "input node" genes.
+     */
     private boolean mutable = true;
 
     /**
@@ -12,30 +21,30 @@ public abstract class Gene<T> {
     public abstract Gene<T> copy();
 
     /**
-     * Crossing over where this gene is the dominant gene and the parameter gene is the gene with less fitness.
+     * This is an object that holds the information related to this gene. It is
+     * agnostic between simple and more complex genes.
+     * <br>
+     * A simple example is a DoubleObject that can then return double values
+     * <br>
+     * A more complex example is a Neuron "prototype" , that encodes information about a
+     * neuron type (like upper bound, update rule, etc), and that can then return instances
+     * of itself.
      *
-     * @param other the other gene to cross over with
-     * @return A offspring of this gene and the other gene.
-     */
-    public abstract Gene crossOver(Gene<T> other);
-
-    /**
-     * Get the prototype that encodes/defines this gene.
-     *
-     * @return the prototype
+     * @return the prototype object
      */
     public abstract T getPrototype();
-
-    public boolean isMutable() {
-        return mutable;
-    }
 
     /**
      * Add random mutation to this gene.
      */
     public abstract void mutate();
 
+    public boolean isMutable() {
+        return mutable;
+    }
+
     public void setMutable(boolean mutable) {
         this.mutable = mutable;
+
     }
 }

@@ -2,18 +2,17 @@ package org.simbrain.util.neat2;
 
 import java.util.function.Supplier;
 
-public abstract class Phenotype<T, G extends Genotype<T, G>> implements Comparable<Phenotype> {
+
+public abstract class Agent<T, G extends Genome<T, G>> implements Comparable<Agent> {
 
     private G genotype;
 
     private Supplier<Double> fitnessFunction;
 
-    public Phenotype(G genotype, Supplier<Double> fitnessFunction) {
+    public Agent(G genotype, Supplier<Double> fitnessFunction) {
         this.genotype = genotype;
         this.fitnessFunction = fitnessFunction;
     }
-
-    public abstract void assemble();
 
     /**
      * Evaluate the fitness score of this agent.
@@ -26,6 +25,7 @@ public abstract class Phenotype<T, G extends Genotype<T, G>> implements Comparab
      * @return the computed fitness score.
      */
     public abstract Double getCurrentFitness();
+    // TODO: Re-implement using current fitness score
 
     public Supplier<Double> getFitnessFunction() {
         return fitnessFunction;
@@ -35,10 +35,10 @@ public abstract class Phenotype<T, G extends Genotype<T, G>> implements Comparab
         return genotype;
     }
 
-    public abstract Phenotype<T, G> copy();
+    public abstract Agent<T, G> copy();
 
     @Override
-    public int compareTo(Phenotype o) {
+    public int compareTo(Agent o) {
         return getCurrentFitness().compareTo(o.getCurrentFitness());
     }
 }

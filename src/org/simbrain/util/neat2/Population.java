@@ -5,29 +5,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Population<P extends Phenotype> {
+/**
+ * A agentList has multiple agents
+ *   Each agent has a genome, as well as a fitness function
+ *     The genome has chromosomes (which enforce compatability of gene in cross-over)
+ *     The chromosomes have genes
+ */
+public class Population<P extends Agent> {
 
     private int size;
 
-    private List<Phenotype> population;
+    private List<Agent> agentList;
 
     public Population(int size) {
         this.size = size;
     }
 
     public void populate(P prototype) {
-        population = new ArrayList<>();
+        agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            population.add(prototype.copy());
+            agentList.add(prototype.copy());
         }
-        population.forEach(Phenotype::assemble);
     }
 
     public Double computeNewFitness() {
-        population.forEach(Phenotype::computeFitness);
-        Collections.reverse(population);
-        population = population.stream().limit(population.size() / 2).collect(Collectors.toList());
-        return population.get(0).getCurrentFitness();
+        agentList.forEach(Agent::computeFitness);
+        Collections.reverse(agentList);
+        agentList = agentList.stream().limit(agentList.size() / 2).collect(Collectors.toList());
+        return agentList.get(0).getCurrentFitness();
     }
 
 }

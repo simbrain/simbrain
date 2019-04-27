@@ -10,7 +10,9 @@ import org.simbrain.util.neat.NEATRandomizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NetworkGenotype extends Genotype<Network, NetworkGenotype> {
+public class NetworkGenome extends Genome<Network, NetworkGenome> {
+
+    //TODO: Redo below using chromsomes
 
     /**
      * A genome of NodeGene
@@ -24,12 +26,9 @@ public class NetworkGenotype extends Genotype<Network, NetworkGenotype> {
 
     private NEATRandomizer randomizer;
 
-    /**
-     * Creating a network from this genotype.
-     *
-     * @return The network this genotype encodes
-     */
-    public Network assemble() {
+
+    @Override
+    public Network build() {
         Network ret = new Network();
         List<Neuron> neurons = new ArrayList<>();
 
@@ -66,9 +65,11 @@ public class NetworkGenotype extends Genotype<Network, NetworkGenotype> {
         return ret;
     }
 
-    public NetworkGenotype crossOver(NetworkGenotype other) {
 
-        NetworkGenotype ret = new NetworkGenotype();
+
+    public NetworkGenome crossOver(NetworkGenome other) {
+
+        NetworkGenome ret = new NetworkGenome();
 
         Set<NodeGene> newNodeGeneSet = new HashSet<>();
         newNodeGeneSet.addAll(nodeGenes);
@@ -94,13 +95,13 @@ public class NetworkGenotype extends Genotype<Network, NetworkGenotype> {
             }
         }
 
-
         return ret;
     }
 
+
     @Override
-    public NetworkGenotype copy() {
-        NetworkGenotype ret = new NetworkGenotype();
+    public NetworkGenome copy() {
+        NetworkGenome ret = new NetworkGenome();
         ret.nodeGenes = nodeGenes.stream()
                         .map(NodeGene::copy)
                         .collect(Collectors.toList());

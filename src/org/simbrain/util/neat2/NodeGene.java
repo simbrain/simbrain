@@ -66,8 +66,4 @@ public class NodeGene extends Gene<Neuron> {
         return ret;
     }
 
-    @Override
-    public NodeGene crossOver(Gene<Neuron> other) {
-        return null;
-    }
 }

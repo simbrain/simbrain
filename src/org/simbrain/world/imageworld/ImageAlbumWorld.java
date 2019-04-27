@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.world.imageworld.gui.ImagePanel;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +16,7 @@ public class ImageAlbumWorld extends ImageWorld {
     /**
      * The object which produces the actual images processed by the "album".
      */
-    private ImageAlbum imageSource;
+    private ImageAlbumSource imageSource;
 
     /**
      * Construct the image world.
@@ -23,7 +25,7 @@ public class ImageAlbumWorld extends ImageWorld {
         super();
         showGridLines = false;
         imagePanel = new ImagePanel(showGridLines);
-        imageSource = new ImageAlbum();
+        imageSource = new ImageAlbumSource();
         imageSource.loadImage(org.simbrain.resource.ResourceManager.getImageIcon("bobcat.jpg"));
         initializeDefaultSensorMatrices();
     }

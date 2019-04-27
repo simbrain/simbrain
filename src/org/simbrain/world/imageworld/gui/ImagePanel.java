@@ -1,4 +1,7 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld.gui;
+
+import org.simbrain.world.imageworld.ImageSource;
+import org.simbrain.world.imageworld.ImageSourceListener;
 
 import javax.swing.*;
 import java.awt.*;

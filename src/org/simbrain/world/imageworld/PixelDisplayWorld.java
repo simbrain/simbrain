@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.world.imageworld.gui.ImagePanel;
+
 /**
  * The "Pixel display" component which allows data to be received from Neural networks
  * and other Simbrain components via couplings and rendered in a Buffered "pixel" image.
@@ -10,7 +12,7 @@ public class PixelDisplayWorld extends ImageWorld {
      * The BufferedImage that displays whatever pixel pattern is currently being
      * received from other Simbrain components via couplings.
      */
-    private EmitterMatrix emitterMatrix;
+    private PixelDisplaySource emitterMatrix;
 
     /**
      * Construct the image world.
@@ -20,7 +22,7 @@ public class PixelDisplayWorld extends ImageWorld {
         super();
         showGridLines = true;
         imagePanel = new ImagePanel(showGridLines);
-        emitterMatrix = new  EmitterMatrix();
+        emitterMatrix = new PixelDisplaySource();
         initializeDefaultSensorMatrices();
     }
 

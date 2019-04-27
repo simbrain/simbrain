@@ -13,6 +13,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The interface between image world and the desktop level.
+ * Manages couplings and persistence.
+ */
 public class ImageAlbumComponent extends WorkspaceComponent {
 
     /**

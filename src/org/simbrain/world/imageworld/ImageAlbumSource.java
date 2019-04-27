@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Tim Shea
  */
-public class ImageAlbum extends ImageSourceAdapter {
+public class ImageAlbumSource extends ImageSourceAdapter {
 
     /**
      * A list of buffered images that can be stepped through.
@@ -36,11 +36,11 @@ public class ImageAlbum extends ImageSourceAdapter {
     /**
      * Construct a new StaticImageSource.
      */
-    public ImageAlbum() {
+    public ImageAlbumSource() {
         super();
     }
 
-    public ImageAlbum(String filename, BufferedImage currentImage) {
+    public ImageAlbumSource(String filename, BufferedImage currentImage) {
         super(currentImage);
     }
 

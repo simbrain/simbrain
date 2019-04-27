@@ -1,7 +1,8 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.imageworld.PixelDisplayComponent;
 
 public class PixelDisplayDesktopComponent extends GuiComponent<PixelDisplayComponent> {
 

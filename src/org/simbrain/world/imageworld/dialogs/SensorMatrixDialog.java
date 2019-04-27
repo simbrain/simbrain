@@ -1,14 +1,12 @@
 package org.simbrain.world.imageworld.dialogs;
 
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.world.imageworld.ImageSourceMeta;
+import org.simbrain.world.imageworld.ImageSourceProperties;
 import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
-import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 
 import javax.swing.*;
 
@@ -19,7 +17,7 @@ public class SensorMatrixDialog extends StandardDialog {
 
     private ImageWorld world;
     private AnnotatedPropertyEditor editorPanel;
-    private ImageSourceMeta imageSourceMeta = new ImageSourceMeta();
+    private ImageSourceProperties imageSourceMeta = new ImageSourceProperties();
 
     /**
      * Construct a new SensorMatrixDialog for selecting parameters of a new

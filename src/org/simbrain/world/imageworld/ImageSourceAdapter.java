@@ -116,7 +116,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
     /**
      * Notify ImageSourceListeners that a resize has occurred.
      */
-    protected void notifyResize() {
+    public void notifyResize() {
         if (isEnabled()) {
             for (ImageSourceListener listener : listeners) {
                 listener.onResize(this);

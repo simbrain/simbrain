@@ -12,6 +12,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The interface between pixel display world and the desktop level.
+ * Manages couplings and persistence.
+ */
 public class PixelDisplayComponent extends WorkspaceComponent {
 
     /**

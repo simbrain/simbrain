@@ -1,4 +1,4 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -12,6 +12,10 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.imageworld.ImageAlbumWorld;
+import org.simbrain.world.imageworld.ImageWorld;
+import org.simbrain.world.imageworld.PixelDisplayWorld;
+import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
@@ -214,7 +218,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         clearImageButton.addActionListener(evt -> world.clearImage());
         // sourceToolbar.add(clearImageButton); // Too destructive.  Don't include on toolbar
 
-        sensorToolbar.add(new JLabel("Sensors:"));
+        sensorToolbar.add(new JLabel("Filters:"));
         sensorToolbar.add(sensorMatrixCombo);
         sensorMatrixCombo.setToolTipText("Which Sensor Matrix to View");
         updateComboBox();

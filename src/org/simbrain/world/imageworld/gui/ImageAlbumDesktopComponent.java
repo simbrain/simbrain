@@ -1,9 +1,8 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
-
-import java.awt.*;
+import org.simbrain.world.imageworld.ImageAlbumComponent;
 
 public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent> {
 

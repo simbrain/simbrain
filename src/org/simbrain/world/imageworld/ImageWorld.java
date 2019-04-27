@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld;
 
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
+import org.simbrain.world.imageworld.gui.ImagePanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

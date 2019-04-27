@@ -28,6 +28,8 @@ import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
 import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.imageworld.*;
+import org.simbrain.world.imageworld.gui.ImageAlbumDesktopComponent;
+import org.simbrain.world.imageworld.gui.PixelDisplayDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.DisplayComponent;

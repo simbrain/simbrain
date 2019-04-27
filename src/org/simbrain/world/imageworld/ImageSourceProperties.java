@@ -7,10 +7,11 @@ import org.simbrain.world.imageworld.filters.IdentityOp;
 import org.simbrain.world.imageworld.filters.ImageOperation;
 
 /**
- * Class to facilitate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
- * to edit {@link org.simbrain.world.imageworld.filters.FilteredImageSource} objects.
+ * Properties used by a {@link org.simbrain.world.imageworld.filters.FilteredImageSource}
+ * to facilitate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
+ * to edit filter objects.
  */
-public class ImageSourceMeta implements EditableObject, CopyableObject {
+public class ImageSourceProperties implements EditableObject, CopyableObject {
 
     @UserParameter(
             label ="Name"
@@ -71,7 +72,7 @@ public class ImageSourceMeta implements EditableObject, CopyableObject {
 
     @Override
     public EditableObject copy() {
-        ImageSourceMeta ret = new ImageSourceMeta();
+        ImageSourceProperties ret = new ImageSourceProperties();
         ret.colorOp = (ImageOperation) colorOp.copy();
         ret.height = height;
         ret.width = width;

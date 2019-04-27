@@ -6,6 +6,7 @@ import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 
 public class GridSensorNode extends EntityAttributeNode {
 
@@ -35,18 +36,23 @@ public class GridSensorNode extends EntityAttributeNode {
         this.shape = new PPath.Float(crossPath);
         shape.setStroke(new BasicStroke(2f));
 
+
         setPickable(false);
         shape.setPickable(false);
         addChild(shape);
+    }
 
+    /**
+     * Set the location of the visible representation in the grid.
+     */
+    public void setGridLocation() {
+        shape.setGlobalTranslation(new Point2D.Double(10.0,10.0));
     }
 
     @Override
     public void update() {
 
-        shape.setOffset(sensor.getRelativeLocation());
-        // Began testing Grid drawing but getparent, getroot, etc. are returning null
-        // PPath sensorGrid = PPath.createRectangle(10,10,100,100);
-        //this.getRoot().addChild(sensorGrid);
+        setGridLocation();
+
     }
 }

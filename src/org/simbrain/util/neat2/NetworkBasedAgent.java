@@ -5,7 +5,7 @@ import org.simbrain.network.core.Network;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class NetworkBasedAgent extends Agent<Network, NetworkGenome> {
+public class NetworkBasedAgent extends Agent<NetworkGenome> {
 
     /**
      * A network to be run in the simulation
@@ -19,7 +19,7 @@ public class NetworkBasedAgent extends Agent<Network, NetworkGenome> {
 
     public NetworkBasedAgent(NetworkGenome genotype, Supplier<Double> fitnessFunction) {
         super(genotype, fitnessFunction);
-        agent = getGenotype().build();
+        agent = getGenome().build();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class NetworkBasedAgent extends Agent<Network, NetworkGenome> {
     }
 
     @Override
-    public Agent<Network, NetworkGenome> copy() {
-        return new NetworkBasedAgent(getGenotype(), getFitnessFunction());
+    public Agent<NetworkGenome> copy() {
+        return new NetworkBasedAgent(getGenome(), getFitnessFunction());
     }
 }

@@ -10,9 +10,9 @@ import org.simbrain.util.neat.NEATRandomizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NetworkGenome extends Genome<Network, NetworkGenome> {
+public class NetworkGenome extends Genome<Network> {
 
-    //TODO: Redo below using chromsomes
+    //TODO: Redo below using chromosomes
 
     /**
      * A genome of NodeGene
@@ -65,33 +65,34 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
         return ret;
     }
 
+    @Override
+    public Genome<Network> crossOver(Genome<Network> otherGenome) {
 
-
-    public NetworkGenome crossOver(NetworkGenome other) {
+        NetworkGenome networkGenome = (NetworkGenome)otherGenome;
 
         NetworkGenome ret = new NetworkGenome();
 
         Set<NodeGene> newNodeGeneSet = new HashSet<>();
         newNodeGeneSet.addAll(nodeGenes);
-        newNodeGeneSet.addAll(other.nodeGenes);
+        newNodeGeneSet.addAll(networkGenome.nodeGenes);
 
         ret.nodeGenes = new ArrayList<>(newNodeGeneSet);
 
         Set<Integer> allInnovationNumbers = new TreeSet<>(this.connectionGenes.keySet());
-        allInnovationNumbers.addAll(other.connectionGenes.keySet());
+        allInnovationNumbers.addAll(networkGenome.connectionGenes.keySet());
 
         for (Integer i : allInnovationNumbers) {
-            if (this.connectionGenes.containsKey(i) && other.connectionGenes.containsKey(i)) {
+            if (this.connectionGenes.containsKey(i) && networkGenome.connectionGenes.containsKey(i)) {
                 double decision = randomizer.nextDouble(0, 1);
                 if (decision < 0.5) {
                     ret.connectionGenes.put(i, this.connectionGenes.get(i));
                 } else {
-                    ret.connectionGenes.put(i, other.connectionGenes.get(i));
+                    ret.connectionGenes.put(i, networkGenome.connectionGenes.get(i));
                 }
             } else if (this.connectionGenes.containsKey(i)) {
                 ret.connectionGenes.put(i, this.connectionGenes.get(i));
             } else {
-                ret.connectionGenes.put(i, other.connectionGenes.get(i));
+                ret.connectionGenes.put(i, networkGenome.connectionGenes.get(i));
             }
         }
 

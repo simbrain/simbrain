@@ -2,15 +2,22 @@ package org.simbrain.util.neat2;
 
 import java.util.function.Supplier;
 
+/**
+ * An agent based on a genome.  The main thing added at this level
+ * is a fitness function used to determine how well an expression of the
+ * genome (e.g. an Agent based on a neural network) does in an environment.
+ * Any environment is currently maintained at the Population level.
+ *
+ * @param <G> The genome, e.g. NeuralNetwork, this agent is based on.
+ */
+public abstract class Agent<G extends Genome> implements Comparable<Agent> {
 
-public abstract class Agent<T, G extends Genome<T, G>> implements Comparable<Agent> {
-
-    private G genotype;
+    private G genome;
 
     private Supplier<Double> fitnessFunction;
 
-    public Agent(G genotype, Supplier<Double> fitnessFunction) {
-        this.genotype = genotype;
+    public Agent(G genome, Supplier<Double> fitnessFunction) {
+        this.genome = genome;
         this.fitnessFunction = fitnessFunction;
     }
 
@@ -31,11 +38,11 @@ public abstract class Agent<T, G extends Genome<T, G>> implements Comparable<Age
         return fitnessFunction;
     }
 
-    public G getGenotype() {
-        return genotype;
+    public G getGenome() {
+        return genome;
     }
 
-    public abstract Agent<T, G> copy();
+    public abstract Agent<G> copy();
 
     @Override
     public int compareTo(Agent o) {

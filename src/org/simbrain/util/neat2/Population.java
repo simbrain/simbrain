@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
  *   Each agent has a genome, as well as a fitness function
  *     The genome has chromosomes (which enforce compatability of gene in cross-over)
  *     The chromosomes have genes
+ *
+ * Environments are currently handled at this level.
  */
 public class Population<P extends Agent> {
 

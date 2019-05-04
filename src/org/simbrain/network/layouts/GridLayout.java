@@ -53,7 +53,7 @@ public class GridLayout implements Layout {
     /**
      * The default allowed state for manual cols.
      */
-    public static final boolean DEFAULT_MANUAL_COLS = false;
+    public static final boolean DEFAULT_AUTO_COLS = true;
 
     /**
      * Initial x position of line of neurons.
@@ -64,12 +64,6 @@ public class GridLayout implements Layout {
      * Initial y position of line of neurons.
      */
     private double initialY;
-
-    /**
-     * Number of columns in the layout.
-     */
-    @UserParameter(label = "Number of Columns", description = "Number of columns in the grid")
-    private int numColumns = DEFAULT_NUM_COLUMNS;
 
     /**
      * Horizontal spacing between neurons.
@@ -86,20 +80,23 @@ public class GridLayout implements Layout {
     /**
      * Manually set number of columns in grid.
      */
-    private boolean manualColumns = DEFAULT_MANUAL_COLS;
+    @UserParameter(label = "Auto Columns",
+        description = "If true, set the number of columns automatically to get a square or nearly-square grid",
+        order = 10)
+    private boolean autoColumns = DEFAULT_AUTO_COLS;
 
     /**
-     * Create a grid layout with a specific number of columns.
-     *
-     * @param hSpacing   horizontal spacing between neurons
-     * @param vSpacing   vertical spacing between neurons
-     * @param numColumns number of columns of neurons
+     * Number of columns in the layout, when auto columns is false.
      */
-    public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
-        this.hSpacing = hSpacing;
-        this.vSpacing = vSpacing;
-        this.numColumns = numColumns;
-        this.manualColumns = true; // else why set numColumns?
+    @UserParameter(label = "Number of Columns",
+        description = "Number of columns in the grid",
+        order = 20)
+    private int numColumns = DEFAULT_NUM_COLUMNS;
+
+    /**
+     * Default constructor.
+     */
+    public GridLayout() {
     }
 
     /**
@@ -112,19 +109,30 @@ public class GridLayout implements Layout {
     public GridLayout(final double hSpacing, final double vSpacing) {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
-        this.manualColumns = false;
+        this.autoColumns = true;
     }
 
     /**
-     * Default constructor.
+     * Create a grid layout with a specific number of columns.
+     *
+     * @param hSpacing   horizontal spacing between neurons
+     * @param vSpacing   vertical spacing between neurons
+     * @param numColumns number of columns of neurons
      */
-    public GridLayout() {
+    public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.numColumns = numColumns;
+        this.autoColumns = false; //TODO else why set numColumns?
     }
 
     @Override
     public void layoutNeurons(final List<Neuron> neurons) {
+
         int numCols = numColumns;
-        if (!manualColumns) {
+
+        // If auto-columns set numcolumns automatically
+        if (autoColumns) {
             if (neurons.size() > 3) {
                 numCols = (int) Math.sqrt(neurons.size());
             } else {
@@ -218,22 +226,24 @@ public class GridLayout implements Layout {
         vSpacing = spacing;
     }
 
+    public boolean isAutoColumns() {
+        return autoColumns;
+    }
+
+    public void setAutoColumns(boolean autoColumns) {
+        this.autoColumns = autoColumns;
+    }
+
     @Override
     public String toString() {
         return "Grid Layout";
     }
 
-    public boolean isManualColumns() {
-        return manualColumns;
-    }
-
-    public void setManualColumns(boolean manualColumns) {
-        this.manualColumns = manualColumns;
-    }
-
     @Override
     public EditableObject copy() {
-        return new GridLayout(hSpacing, vSpacing, numColumns);
+        GridLayout layout = new GridLayout(hSpacing, vSpacing, numColumns);
+        layout.setAutoColumns(autoColumns);
+        return layout;
     }
 
 

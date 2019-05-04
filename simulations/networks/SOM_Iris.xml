@@ -131,7 +131,7 @@
               <numColumns>5</numColumns>
               <hSpacing>50.0</hSpacing>
               <vSpacing>50.0</vSpacing>
-              <manualColumns>false</manualColumns>
+              <autoColumns>false</autoColumns>
             </layout>
             <incomingSgs>
               <org.simbrain.network.groups.SynapseGroup>

@@ -53,7 +53,6 @@ public @interface UserParameter {
      */
     String description() default "";
 
-
     /**
      * An optional parameter which prevents the dialog from accepting values
      * smaller than this.  Distinct from model code which enforces upper or lower

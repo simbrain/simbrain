@@ -126,8 +126,8 @@ public class ObjectTypeEditor extends JComponent {
     private String cbStartState;
 
     /**
-     * The prototype object that is used to set the values of the object list
-     * whe committing.
+     * The object used to set the properties of all the edited objects.  This is
+     * why edited objects must have a copy function.
      */
     private CopyableObject prototypeObject;
 

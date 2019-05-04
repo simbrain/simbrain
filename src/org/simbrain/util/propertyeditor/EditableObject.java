@@ -19,21 +19,22 @@
 package org.simbrain.util.propertyeditor;
 
 /**
- * Objects that implement this interface have annotations that can be read
- * by the {@link AnnotatedPropertyEditor}.
+ * Serves as a marker interface for objects that can be edited in an
+ * {@link AnnotatedPropertyEditor}.  Also provides a getName function
+ * that retursn a name used in combo boxes (for objects edited by
+ * an  {@link ObjectTypeEditor}) and dialog box titles.
  *
  * @author Jeff Yoshimi
  */
 public interface EditableObject {
 
-    //TODO: Reconsider default.  Make getname a requirement?
-
     /**
-     * Returns the name of this object. Useful as a description in dropdowns.
+     * Returns the name of this object.
      */
     default String getName() {
-        return "no-name (be sure getName() overridden)";
+        return "No-name (be sure getName() is overridden)";
     }
+    // See ParameterWidget#getTypeMap
 
 
 }

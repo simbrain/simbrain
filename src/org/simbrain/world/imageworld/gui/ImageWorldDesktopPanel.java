@@ -153,7 +153,9 @@ public class ImageWorldDesktopPanel extends JPanel {
         JMenuItem saveImage = new JMenuItem("Save Image...");
         saveImage.addActionListener(e -> {
             saveImage();
-        });        fileMenu.add(saveImage);
+        });
+
+        fileMenu.add(saveImage);
 
         fileMenu.addSeparator();
         fileMenu.add(copyAction);
@@ -197,7 +199,6 @@ public class ImageWorldDesktopPanel extends JPanel {
      */
     private void setupToolbars() {
 
-        // Add additional buttons to the source toolbar
         if (world instanceof ImageAlbumWorld) {
             getImageAlbumButtons().forEach(sourceToolbar::add);
         } else if (world instanceof PixelDisplayWorld) {
@@ -318,7 +319,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     private void saveImage() {
         fileChooser.setDescription("Save image");
         fileChooser.setUseImagePreview(true);
-        File file = fileChooser.showSaveDialog();
+        File file = fileChooser.showSaveDialog(guiComponent.getWorkspaceComponent().getName() + ".png");
         if (file != null) {
             try {
                 world.saveImage(file.toString());
@@ -349,13 +350,7 @@ public class ImageWorldDesktopPanel extends JPanel {
      */
     public List<JButton> getImageAlbumButtons() {
         List<JButton> returnList = new LinkedList<>();
-        JButton loadImagesButton = new JButton();
-        loadImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("photo.png"));
-        loadImagesButton.setToolTipText("Load Images");
-        loadImagesButton.addActionListener(e -> {
-            loadImages();
-        });
-        returnList.add(loadImagesButton);
+
         JButton previousImagesButton = new JButton();
         previousImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
@@ -363,6 +358,7 @@ public class ImageWorldDesktopPanel extends JPanel {
             ((ImageAlbumWorld)world).previousFrame();
         });
         returnList.add(previousImagesButton);
+
         JButton nextImagesButton = new JButton();
         nextImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoNext.png"));
         nextImagesButton.setToolTipText("Next Image");
@@ -370,6 +366,15 @@ public class ImageWorldDesktopPanel extends JPanel {
             ((ImageAlbumWorld)world).nextFrame();
         });
         returnList.add(nextImagesButton);
+
+        JButton loadImagesButton = new JButton();
+        loadImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("photo.png"));
+        loadImagesButton.setToolTipText("Load Images");
+        loadImagesButton.addActionListener(e -> {
+            loadImages();
+        });
+        returnList.add(loadImagesButton);
+
         return returnList;
     }
 

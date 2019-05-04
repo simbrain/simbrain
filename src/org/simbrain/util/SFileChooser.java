@@ -365,11 +365,11 @@ public class SFileChooser {
     /**
      * Shows the save dialog for the given string name.
      *
-     * @param file the name of the file
+     * @param fileName the name of the file
      * @return the file name to save to
      */
-    public File showSaveDialog(final String file) {
-        return showSaveDialog(new File(file));
+    public File showSaveDialog(final String fileName) {
+        return showSaveDialog(new File(fileName));
     }
 
     /**

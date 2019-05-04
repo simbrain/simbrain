@@ -126,7 +126,7 @@ public class SensorEffectorPanel extends JPanel {
         });
         table.addMouseListener(new MouseAdapter() {
             public void mouseReleased(final MouseEvent e) {
-                if (e.getClickCount() == 2 && table.columnAtPoint(e.getPoint()) != 1) {
+                if (e.getClickCount() == 2) {
                     final int row = table.rowAtPoint(e.getPoint());
                     table.setRowSelectionInterval(row, row);
                     final PeripheralAttribute sensor = model.getAttribute(row);

@@ -176,7 +176,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * If true, show peripheral attributes.
      */
-    @UserParameter(label = "Show Attributes", description = "Show Attributes (Sensors and Effectors)", order = 30)
+    @UserParameter(label = "Show Sensors / Effectors", description = "Show Attributes (Sensors and Effectors)", order = 30)
     private boolean showSensors = true;
 
     /**

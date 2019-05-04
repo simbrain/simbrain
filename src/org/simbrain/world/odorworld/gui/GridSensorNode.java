@@ -1,12 +1,12 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.nodes.PShape;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GridSensorNode extends EntityAttributeNode {
 
@@ -21,9 +21,36 @@ public class GridSensorNode extends EntityAttributeNode {
     private GridSensor sensor;
 
     /**
+     * A cached grid width for comparision to see if the graphics need to be updated.
+     */
+    private int gridWidth;
+
+    /**
+     * A cached grid height for comparision to see if the graphics need to be updated.
+     */
+    private int gridHeight;
+
+    /**
+     * A cached grid column count for comparision to see if the graphics need to be updated.
+     */
+    private int gridColumns;
+
+    /**
+     * A cached grid row count for comparision to see if the graphics need to be updated.
+     */
+    private int gridRows;
+
+    /**
+     * A cached visibility value for comparision to see if the graphics need to be updated.
+     */
+    private boolean gridVisibility;
+
+    /**
      * The shape of this node
      */
     private PPath shape;
+
+    private List<PPath> highlightedGrids = new ArrayList<>();
 
     public GridSensorNode(GridSensor sensor) {
 
@@ -36,23 +63,83 @@ public class GridSensorNode extends EntityAttributeNode {
         this.shape = new PPath.Float(crossPath);
         shape.setStroke(new BasicStroke(2f));
 
-
+        redrawGrid();
+        updateGridSizeInfo();
         setPickable(false);
         shape.setPickable(false);
         addChild(shape);
     }
 
     /**
-     * Set the location of the visible representation in the grid.
+     * Update the cached grid size info
      */
-    public void setGridLocation() {
-        shape.setGlobalTranslation(new Point2D.Double(10.0,10.0));
+    private void updateGridSizeInfo() {
+        this.gridWidth = sensor.getWidth();
+        this.gridHeight = sensor.getHeight();
+        this.gridColumns = sensor.getColumns();
+        this.gridRows = sensor.getRows();
+        this.gridVisibility = sensor.getGridVisibility();
+    }
+
+    /**
+     * Check if the grid size was updated
+     *
+     * @return true if not updated
+     */
+    private boolean checkGridSizeConsistency() {
+        return this.gridWidth == sensor.getWidth()
+            && this.gridHeight == sensor.getHeight()
+            && this.gridColumns == sensor.getColumns()
+            && this.gridRows == sensor.getRows()
+            && this.gridVisibility == sensor.getGridVisibility();
+    }
+
+    /**
+     * Redraw the highlighted
+     */
+    private void redrawGrid() {
+        highlightedGrids.forEach(this::removeChild);
+        if (sensor.getGridVisibility()) {
+            highlightedGrids = new ArrayList<>();
+            for (int i = 0; i < sensor.getColumns() * sensor.getRows(); i++) {
+                int x = (i % sensor.getColumns()) * sensor.getWidth();
+                int y = (i / sensor.getRows()) * sensor.getHeight();
+                PPath newGrid = PPath.createRectangle(x, y, sensor.getWidth(), sensor.getHeight());
+                highlightedGrids.add(newGrid);
+                addChild(newGrid);
+                newGrid.setPickable(false);
+                lowerToBottom(newGrid);
+            }
+        }
     }
 
     @Override
     public void update() {
 
-        setGridLocation();
+        if (!checkGridSizeConsistency()) {
+            redrawGrid();
+        }
+        updateGridSizeInfo();
 
+        shape.setOffset(sensor.getRelativeLocation());
+
+        if (sensor.getGridVisibility()) {
+            double dx = sensor.getX() - sensor.getParent().getX();
+            double dy = sensor.getY() - sensor.getParent().getY();
+
+            for (int i = 0; i < sensor.getColumns() * sensor.getRows(); i++) {
+                PPath highlightedGrid = highlightedGrids.get(i);
+                highlightedGrid.setOffset(dx, dy);
+                Color paint;
+
+                if (i < sensor.getValues().length && sensor.getValues()[i] == sensor.getActivationAmount()) {
+                    paint = new Color(255, 0, 0, 128);
+                } else {
+                    paint = new Color(0, 0, 0, 0);
+                }
+
+                highlightedGrid.setPaint(paint);
+            }
+        }
     }
 }

@@ -118,6 +118,16 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     private int height = DEFAULT_HEIGHT;
 
     /**
+     * Whether to draw the sensor grid in GridSensorNode.
+     */
+    @UserParameter(
+            label = "Grid Visibility",
+            description = "Show sensor grid when this is set to true, hide when set to false false",
+            order = 13
+    )
+    private boolean gridVisibility = true;
+
+    /**
      * Construct a tile sensor.
      *
      * @param parent parent entity
@@ -132,6 +142,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.values = new double[columns * rows];
         super.setTheta(0);
         super.setRadius(25);
     }
@@ -217,6 +228,22 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.height = height;
     }
 
+    public int getColumns() {
+        return columns;
+    }
+
+    public void setColumns(int columns) {
+        this.columns = columns;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
+
     public void setActivationAmount(double amount) {
         activationAmount = amount;
     }
@@ -239,6 +266,11 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
             return super.getLabel();
         }
     }
+
+    public boolean getGridVisibility() {
+        return gridVisibility;
+    }
+
     @Override
     public String getName() {
         return "Grid Sensor";

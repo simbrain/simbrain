@@ -34,14 +34,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A panel for editing collections of objects based on {@link UserParameter}
- * annotations. Each annotated field is represented by an appropriate java
- * JComponent (often a text field but also special drop downs for booleans,
- * etc), via the {@link ParameterWidget} class. When all the objects in the
- * edited collection have the same value, it is shown in the widget.  When they
- * have different values it a null value "..." is shown.  Null values are
- * ignored when the panel is closed, and any values in the panel are written to
- * it.
+ * Annotated property editor (or APE) is panel for editing collections of
+ * objects based on {@link UserParameter} annotations. Each annotated field is
+ * represented by an appropriate java JComponent (often a text field but also
+ * special drop downs for booleans, etc), via the {@link ParameterWidget} class.
+ * When all the objects in the edited collection have the same value, it is
+ * shown in the widget.  When they have different values it a null value "..."
+ * is shown.  Null values are ignored when the panel is closed, and any values
+ * in the panel are written to it.
  * <p>
  * To use simply initialize with a single object or list of objects to edit,
  * which contain the {@link UserParameter} annotation. When ready to write the
@@ -265,7 +265,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         }
     }
 
-
     //TODO: Below not currently throwing an exception, while still testing.
     // But once everything is working better make it throw an exception!
     // Also again we are not checking all to all, but all to one.
@@ -366,10 +365,10 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         Collections.sort(names);
 
         String firstObject = names.get(0);
-        if(editedObjects.size() == 1) {
+        if (editedObjects.size() == 1) {
             return "Edit " + firstObject;
         } else {
-            String lastObject = names.get(names.size()-1);
+            String lastObject = names.get(names.size() - 1);
             return "Edit " + names.size() + " " +
                 editedObjects.get(0).getClass().getSimpleName() + "s";
         }

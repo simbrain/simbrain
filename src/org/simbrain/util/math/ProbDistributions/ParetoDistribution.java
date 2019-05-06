@@ -121,6 +121,10 @@ public class ParetoDistribution extends ProbabilityDistribution{
             this.floor = floor;
     }
 
+    public void setCeil(double ceiling) {setUpperBound(ceiling);} // For APE
+
+    public void setFloor(double floor) {setLowerBound(floor);} // For APE
+
     @Override
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;

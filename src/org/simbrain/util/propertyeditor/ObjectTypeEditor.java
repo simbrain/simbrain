@@ -111,11 +111,6 @@ public class ObjectTypeEditor extends JComponent {
     private Window parent;
 
     /**
-     * True if the combo box is changed from its initial state.
-     */
-    private boolean cbChanged;
-
-    /**
      * Container for editor panel used to clear the panel on updates.
      */
     private JPanel editorPanelContainer;
@@ -132,9 +127,12 @@ public class ObjectTypeEditor extends JComponent {
     private CopyableObject prototypeObject;
 
     /**
-     * If true, when closing the dialog and calling {@link #commitChanges()}, a
-     * prototype object, which is also a {@link CopyableObject}, is used to set
-     * the types of all objects in edited list.
+     * Prototype mode is set to true as soon  as the combo box is changed. In
+     * this mode when committing changes the prototype object is used (via
+     * {@link CopyableObject#copy()}) to set the types of all objects in the
+     * edited list. If the combo box is not changed, a prototype object is not
+     * needed. The types of the objects all stay the same and only their
+     * parameters are changed.
      */
     private boolean prototypeMode = false;
 
@@ -282,8 +280,7 @@ public class ObjectTypeEditor extends JComponent {
         cbObjectType.addActionListener(e -> {
 
             // As soon as the dropdown is changed once, it's in prototype mode. User
-            // should cancel to get out of it.
-
+            // must cancel to stop prototype mode
             prototypeMode = true;
 
             // Create the prototype object and refresh editor panel
@@ -340,7 +337,6 @@ public class ObjectTypeEditor extends JComponent {
         }
         parent.pack();
     }
-
 
     /**
      * Returns the dropdown box. Not sure it's a good idea to expose this, but it's helpful.

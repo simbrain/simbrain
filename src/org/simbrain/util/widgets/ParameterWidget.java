@@ -249,6 +249,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 ((ChoicesWithNull) component).setSelectedItem(value);
             }
         } else {
+            // String
             ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
         }
     }

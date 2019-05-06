@@ -808,4 +808,16 @@ public class Utils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    /**
+     * https://stackoverflow.com/questions/7324991/see-if-field-exists-in-class
+     *
+     * @param object object class
+     * @param fieldName field name
+     * @return true if the class contains the field, false otherwise
+     */
+    public static boolean containsField(Object object, String fieldName) {
+        return Arrays.stream(object.getClass().getFields())
+            .anyMatch(f -> f.getName().equals(fieldName));
+    }
+
 }

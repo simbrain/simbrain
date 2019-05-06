@@ -61,10 +61,6 @@ public abstract class ProbabilityDistribution implements CopyableObject {
 
     public abstract void setLowerBound(double floor);
 
-    public void setCeil(double ceiling) {setUpperBound(ceiling);} // Here for APE
-
-    public void setFloor(double floor) {setLowerBound(floor);} // Ditto
-
     public abstract void setPolarity(Polarity polarity);
 
     public abstract Polarity getPolarity();

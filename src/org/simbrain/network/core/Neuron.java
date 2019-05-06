@@ -972,8 +972,9 @@ public class Neuron implements EditableObject, AttributeContainer {
 
     @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(final String label) {
-        changeSupport.firePropertyChange("label", this.label , label);
+        String oldLabel = this.label;
         this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
     }
 
     /**

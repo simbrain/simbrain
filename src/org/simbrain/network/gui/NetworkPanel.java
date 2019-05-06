@@ -532,6 +532,7 @@ public class NetworkPanel extends JPanel {
                     updateTime();
                 } else if ("updateCompleted".equals(evt.getPropertyName())) {
                     NetworkPanel.this.setUpdateComplete((Boolean) evt.getNewValue());
+                    repaint();
                 }
             }
         );

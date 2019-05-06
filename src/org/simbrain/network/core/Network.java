@@ -212,7 +212,7 @@ public class Network {
      */
     public void update() {
 
-        changeSupport.firePropertyChange("updatedCompleted", null, false);
+        changeSupport.firePropertyChange("updateCompleted", null, false);
 
         // Main update
         updateManager.invokeAllUpdates();

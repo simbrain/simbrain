@@ -164,7 +164,11 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ret;
         }
 
-        return new JTextField();
+        if (parameter.isString()) {
+            return new TextWithNull();
+        }
+
+        throw new IllegalArgumentException("You have annotated a field type that is not yet supported");
     }
 
     /**
@@ -248,9 +252,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 ((ChoicesWithNull) component).setSelectedItem(value);
             }
-        } else {
-            // String
-            ((JTextField) component).setText(value == null ? SimbrainConstants.NULL_STRING : value.toString());
+        } else if (parameter.isString()){
+            if (value == null) {
+                ((TextWithNull) component).setNull();
+            } else {
+                ((TextWithNull) component).setText(value.toString());
+            }
         }
     }
 
@@ -285,8 +292,12 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (parameter.isEnum()) {
             return ((ChoicesWithNull) component).isNull() ? null : ((ChoicesWithNull) component).getSelectedItem();
         }
+        if (parameter.isString()) {
+            return ((TextWithNull) component).isNull() ? null : ((TextWithNull) component).getText();
+        }
 
-        return ((JTextField) component).getText();
+        throw new IllegalArgumentException("Trying to retrieve a value from an unsupported widget type");
+
     }
 
 
@@ -343,7 +354,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         }
         if (parameter.isString()) {
-            if (((JTextField) component).getText().equalsIgnoreCase(SimbrainConstants.NULL_STRING)) {
+            if (((TextWithNull) component).isNull()) {
                 return true;
             }
         }

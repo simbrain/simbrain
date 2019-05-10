@@ -60,7 +60,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public void setWorkspace(Workspace workspace) {
-        // This is a bit of a hack because the workspace is not available in the constructor.
+        // Workspace object is not available in the constructor.
         super.setWorkspace(workspace);
         getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
             @Override

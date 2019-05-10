@@ -186,15 +186,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     public void closing() {
     }
 
-    /**
-     * @see javax.swing.JFrame
-     */
-    public void pack() {
-        getParentFrame().pack();
-        // Set max size somehow?
-        repaint();
-    }
-
     @Override
     public void postAddInit() {
         if (this.getParentFrame().getJMenuBar() == null) {
@@ -209,17 +200,10 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private void resizePanel() {
         scroller.resize();
         if (getParentFrame() != null) {
-            // getParentFrame()
-            // .setMaximumSize(getParentFrame().getPreferredSize());
             getParentFrame().pack();
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.simbrain.workspace.gui.GuiComponent#update()
-     */
     @Override
     protected void update() {
         super.update();

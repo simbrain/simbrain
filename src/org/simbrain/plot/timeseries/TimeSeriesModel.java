@@ -145,6 +145,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
         // Take care of size mismatches
         if (vector.length != dataset.getSeriesCount()) {
+            // TODO This gets repeatedly called if there is a manually added series
+            // which seems to trigger TimeSeriesPlotComponent line 65
             clearData();
             for (int i = 0; i < vector.length; i++) {
                 if (i < seriesNames.length) {

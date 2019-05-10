@@ -20,16 +20,14 @@ package org.simbrain.world.dataworld;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.table.NumericTable;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.*;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,6 +40,15 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
      * The static logger for this class.
      */
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
+
+    /**
+     * Table model.
+     */
+    private NumericTable dataTable;
+
+    // Note this class used to contain code for scalar valued column couplings.
+    // It would not be hard to get back.
+    // See revision 765ac647917d0859e98da47a6a1d0c54b238a7bc
 
     /**
      * Recreates an instance of this class from a saved component.
@@ -70,15 +77,19 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         return component;
     }
 
-    /**
-     * Table model.
-     */
-    private NumericTable dataTable;
-
-    /**
-     * List of columns in the table.
-     */
-    private List<TableColumn> columns = new ArrayList<>();
+    @Override
+    public void setWorkspace(Workspace workspace) {
+        // Workspace object is not available in the constructor.
+        super.setWorkspace(workspace);
+        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
+            @Override
+            public void couplingAdded(Coupling<?> coupling) {
+                if (coupling.getConsumer().getBaseObject() == DataWorldComponent.this) {
+                    dataTable.setColumnHeadings(Arrays.asList(coupling.getProducer().getLabelArray()));
+                }
+            }
+        });
+    }
 
     /**
      * Construct data world from a model. Used (for example) in deserializing.
@@ -98,25 +109,9 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         dataTable.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent evt) {
-                // TODO. Below is intended to capture column inserts and
-                // deletes, though it captures other stuff too.
-                if (dataTable.getColumnCount() != columns.size()) {
-                    updateColumns();
-                }
                 setChangedSinceLastSave(true);
             }
         });
-    }
-
-    private void updateColumns() {
-        while (dataTable.getColumnCount() < columns.size()) {
-            TableColumn column = columns.remove(columns.size() - 1);
-            fireAttributeContainerRemoved(column);
-        }
-        while (dataTable.getColumnCount() > columns.size()) {
-            TableColumn column = new TableColumn(columns.size());
-            columns.add(column);
-        }
     }
 
     /**
@@ -130,7 +125,6 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> models = new ArrayList<>();
         models.add(this);
-        models.addAll(columns);
         return models;
     }
 
@@ -150,9 +144,6 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.equals("DataTable")) {
             return this;
-        } else if (objectKey.contains("Column")) {
-            int index = Integer.parseInt(objectKey.substring(6));
-            return columns.get(index);
         } else {
             return null;
         }
@@ -183,54 +174,4 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         return dataTable.getVectorCurrentRow();
     }
 
-    /**
-     * TableColumn writes to a specific column of the outer DataWorld.
-     */
-    public class TableColumn implements AttributeContainer {
-
-        /**
-         * The index of the column.
-         */
-        private int index;
-
-        /**
-         * Construct a TableColumn.
-         *
-         * @param index index of the column to set.
-         */
-        public TableColumn(int index) {
-            this.index = index;
-        }
-
-        /**
-         * Return the id of the column.
-         */
-        public String getId() {
-            return "Column" + index;
-        }
-
-        /**
-         * Return the index of the column.
-         */
-        public int getIndex() {
-            return index;
-        }
-
-        /**
-         * Return the value of the current cell of the column.
-         */
-        @Producible(idMethod = "getId")
-        public double getValue() {
-            return dataTable.getValueCurrentRow(index);
-        }
-
-        /**
-         * Set the value of the current cell of the column.
-         */
-        @Consumable(idMethod = "getId")
-        public void setValue(double value) {
-            dataTable.setValueCurrentRow(index, value);
-        }
-
-    }
 }

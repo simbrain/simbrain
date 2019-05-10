@@ -20,6 +20,7 @@ package org.simbrain.world.dataworld;
 
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.workspace.gui.CouplingMenu;
 
 import javax.swing.*;
 
@@ -53,26 +54,13 @@ public class DesktopJTable extends SimbrainJTable {
      * @return The context menu.
      */
     protected JPopupMenu buildPopupMenu() {
+
         JPopupMenu ret = super.buildPopupMenu();
-        //        ret.addSeparator();
-        //        String producerDescription = component.getProducingColumnType()
-        //                .getDescription("Column " + getSelectedColumn());
-        //        Producer producer = component.getAttributeManager().createPotentialProducer(
-        //                        component.getObjectFromKey("producerList:" + getSelectedColumn()),
-        //                        component.getProducingColumnType());
-        //        producer.setDescription(producerDescription);
-        //        JMenu producerMenu = new CouplingMenuProducer("Send coupling to",
-        //                component.getWorkspace(), producer);
-        //        ret.add(producerMenu);
-        //        String consumerDescription = component.getConsumingColumnType()
-        //                .getDescription("Column " + getSelectedColumn());
-        //        Consumer consumer = component.getAttributeManager().createPotentialConsumer(
-        //                        component.getObjectFromKey("consumerList:" + getSelectedColumn()),
-        //                        component.getConsumingColumnType());
-        //        consumer.setDescription(consumerDescription);
-        //        JMenu consumerMenu = new CouplingMenuConsumer("Receive coupling from",
-        //                component.getWorkspace(), consumer);
-        //        ret.add(consumerMenu);
+
+        CouplingMenu couplingMenu = new CouplingMenu(component, component);
+        couplingMenu.setCustomName("Create Row Coupling");
+        ret.addSeparator();
+        ret.add(couplingMenu);
         return ret;
     }
 }

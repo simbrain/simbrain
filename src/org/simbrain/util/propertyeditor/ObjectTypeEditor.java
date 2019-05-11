@@ -121,8 +121,8 @@ public class ObjectTypeEditor extends JComponent {
     private String cbStartState;
 
     /**
-     * The object used to set the properties of all the edited objects.  This is
-     * why edited objects must have a copy function.
+     * The object used to set the type of all edited objects, when their type
+     * is changed.  This is why edited objects must have a copy function.
      */
     private CopyableObject prototypeObject;
 
@@ -130,8 +130,8 @@ public class ObjectTypeEditor extends JComponent {
      * Prototype mode is set to true as soon  as the combo box is changed. In
      * this mode when committing changes the prototype object is used (via
      * {@link CopyableObject#copy()}) to set the types of all objects in the
-     * edited list. If the combo box is not changed, a prototype object is not
-     * needed. The types of the objects all stay the same and only their
+     * edited list. If the combo box is not changed, the prototype object is not
+     * used. The types of the objects all stay the same and only their
      * parameters are changed.
      */
     private boolean prototypeMode = false;
@@ -314,10 +314,20 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * If the editor panel is blank remove everything and make
-     * the detail triangle invisible.
+     * Update the graphical state of the editor panel.  Called when
+     * changing the combo box.
      */
     private void updateEditorPanel() {
+
+        // This occurs when the object type is inconsistent, i
+        // i.e.  "..." in the combo box
+        if (editorPanel.widgets == null) {
+            return;
+        }
+
+        // In the case where the object has no properties at all to edit, and
+        // the type editor is just being used to set a type, just remove
+        // everything from the panel, and hide the detail triangle.
         if(editorPanel.widgets.size() == 0) {
             detailTriangle.setVisible(false);
             editorPanel.removeAll();

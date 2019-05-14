@@ -47,7 +47,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
+public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     /**
      * The default for how often {@link #writeActsToFile()} should flush
@@ -492,7 +492,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
     }
 
     /**
-     * @return the neurons in this group.
+     * @return a copy of the list neurons in this group as an unmodifiable list.
      */
     public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
@@ -502,7 +502,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>  {
      * Returns a modifiable list of neuron list. Modifications made to this list
      * change the group because this is the underlying list of the group.
      *
-     * @return the neurons in this group.
+     * @return a _reference_ to the list of neurons underlying this object.
      */
     public List<Neuron> getNeuronListUnsafe() {
         return neuronList;

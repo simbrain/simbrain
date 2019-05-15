@@ -24,14 +24,14 @@ public class Xor {
         List<Neuron> inputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("inputs"))).getNeuronList();
         List<Neuron> outputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("outputs"))).getNeuronList();
         double sse = 0.0;
-        for (int t = 0; t < TRAINING_SET.size(); t++) {
-            for (int i = 0; i < inputs.size(); i++) {
-                inputs.get(i).forceSetActivation(TRAINING_SET.get(t).getInput().get(i));
+        for (TrainingEntry trainingEntry : TRAINING_SET) {
+            for (int i = 0; i < trainingEntry.getInput().size(); i++) {
+                inputs.get(i).forceSetActivation(trainingEntry.getInput().get(i));
             }
             for (int i = 0; i < 50; i++) {
                 agent.getAgent().update();
-                for (int n = 0; n < outputs.size(); n++) {
-                    double error = outputs.get(n).getActivation() - TRAINING_SET.get(t).getOutput().get(n);
+                for (int n = 0; n < trainingEntry.getOutput().size(); n++) {
+                    double error = outputs.get(n).getActivation() - trainingEntry.getOutput().get(n);
                     sse += error * error;
                 }
             }

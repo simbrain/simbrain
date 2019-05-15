@@ -45,7 +45,9 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
         for (int i = 0; i < reproduceSize; i++) {
             A agent1 = agentList.get(randomizer.nextInt(remainingPopulation));
             A agent2 = agentList.get(randomizer.nextInt(remainingPopulation));
-            agentList.add(agent1.crossover(agent2));
+            A newAgent = agent1.crossover(agent2);
+            newAgent.mutate();
+            agentList.add(newAgent);
         }
     }
 

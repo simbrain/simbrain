@@ -2,6 +2,7 @@ package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.neat2.testsims.Xor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,6 +40,17 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
     }
 
     @Override
+    public void mutate() {
+        for (ConnectionGene connectionGene : connectionGenes.values()) {
+            connectionGene.mutate();
+        }
+    }
+
+    public void addGene(int innovationNumber, ConnectionGene newGene) {
+        connectionGenes.put(innovationNumber, newGene);
+    }
+
+    @Override
     public Collection<ConnectionGene> getGenes() {
         return connectionGenes.values();
     }
@@ -48,5 +60,13 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
         ret.connectionGenes = connectionGenes.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         return ret;
+    }
+
+    public void setRandomizer(NEATRandomizer randomizer) {
+        this.randomizer = randomizer;
+    }
+
+    public NEATRandomizer getRandomizer() {
+        return randomizer;
     }
 }

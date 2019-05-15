@@ -1,6 +1,7 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.neat.ConnectionGene;
 
 import java.awt.geom.Point2D;
@@ -39,6 +40,7 @@ public class NodeGene extends Gene<Neuron> {
 
     public NodeGene() {
         this(NodeType.hidden);
+        this.prototype.setUpdateRule(new SigmoidalRule());
     }
 
     @Override
@@ -51,14 +53,6 @@ public class NodeGene extends Gene<Neuron> {
 
     }
 
-    public String getNeuronGroupName() {
-        return neuronGroupName;
-    }
-
-    public void setNeuronGroupName(String neuronGroupName) {
-        this.neuronGroupName = neuronGroupName;
-    }
-
     @Override
     public NodeGene copy() {
         NodeGene ret = new NodeGene();
@@ -68,4 +62,19 @@ public class NodeGene extends Gene<Neuron> {
         return ret;
     }
 
+    public String getNeuronGroupName() {
+        return neuronGroupName;
+    }
+
+    public void setNeuronGroupName(String neuronGroupName) {
+        this.neuronGroupName = neuronGroupName;
+    }
+
+    public NodeType getType() {
+        return type;
+    }
+
+    public void setType(NodeType type) {
+        this.type = type;
+    }
 }

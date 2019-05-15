@@ -6,11 +6,14 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.neat2.testsims.Xor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class NetworkGenome extends Genome<Network, NetworkGenome> {
+
+    private static Map<ConnectionGene, Integer> innovationNumberMap = new HashMap<>();
 
     //TODO: Redo below using chromosomes
 
@@ -73,33 +76,89 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
             NodeGene nodeGene = new NodeGene();
             nodeGene.setNeuronGroupName(name);
             nodeGene.setMutable(mutable);
+            if ("inputs".equals(name)) {
+                nodeGene.setType(NodeGene.NodeType.input);
+            }
+            if ("outputs".equals(name)) {
+                nodeGene.setType(NodeGene.NodeType.output);
+            }
             toAdd.add(nodeGene);
         }
-        nodeGenes.getGenes().addAll(toAdd);
+        nodeGenes.addGenes(toAdd);
 
         return this;
     }
-
-
 
     @Override
     public NetworkGenome crossOver(NetworkGenome otherGenome) {
 
         NetworkGenome ret = new NetworkGenome();
 
+        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+
         ret.nodeGenes = nodeGenes.crossOver(otherGenome.nodeGenes);
 
         ret.connectionGenes = connectionGenes.crossOver(otherGenome.connectionGenes);
+        ret.connectionGenes.setRandomizer(ret.randomizer);
 
         return ret;
     }
 
 
+
+    @Override
+    public void mutate() {
+
+        // new node mutation
+        if (randomizer.nextDouble(0, 1) < Xor.NEW_NODE_MUTATION_PROBABILITY) {
+            nodeGenes.addGenes(Collections.singleton(new NodeGene()));
+        }
+
+        // connection weight mutation
+        connectionGenes.mutate();
+
+        // new connection mutation
+        // needs to be done here because it has dependency on the node genes
+        if (randomizer.nextDouble(0, 1) < Xor.NEW_CONNECTION_MUTATION_PROBABILITY) {
+            int sourceNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+            while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
+                sourceNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+            }
+            int destinationNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+            while (!nodeGenes.contains(destinationNodeID) || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input) {
+                destinationNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+            }
+            ConnectionGene newConnectionGene =
+                    new ConnectionGene(
+                            sourceNodeID,
+                            destinationNodeID,
+                            randomizer.nextDouble(
+                                    Xor.MIN_CONNECTION_STRENGTH,
+                                    Xor.MAX_CONNECTION_STRENGTH
+                            ));
+            if (!innovationNumberMap.containsKey(newConnectionGene)) {
+                innovationNumberMap.put(newConnectionGene, innovationNumberMap.size());
+            }
+            newConnectionGene.setRandomizer(connectionGenes.getRandomizer());
+            connectionGenes.addGene(innovationNumberMap.get(newConnectionGene), newConnectionGene);
+        }
+    }
+
     @Override
     public NetworkGenome copy() {
         NetworkGenome ret = new NetworkGenome();
+
+        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+
         ret.nodeGenes = nodeGenes.copy();
+
         ret.connectionGenes = connectionGenes.copy();
+        ret.connectionGenes.setRandomizer(ret.randomizer);
+
         return ret;
+    }
+
+    public void setRandomizer(NEATRandomizer randomizer) {
+        this.randomizer = randomizer;
     }
 }

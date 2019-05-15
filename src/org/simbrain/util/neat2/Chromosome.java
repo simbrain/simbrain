@@ -13,5 +13,7 @@ public abstract class Chromosome<T, C extends Chromosome<T, C>> {
 
     public abstract C crossOver(C other);
 
+    public abstract void mutate();
+
     public abstract Collection<? extends Gene<T>> getGenes();
 }

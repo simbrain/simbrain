@@ -2,6 +2,7 @@ package org.simbrain.util.neat2.testsims;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.neat.NEATRandomizer;
 import org.simbrain.util.neat2.NetworkGenome;
 import org.simbrain.util.neat2.NetworkBasedAgent;
 import org.simbrain.util.neat2.Population;
@@ -10,7 +11,29 @@ import java.util.List;
 
 public class Xor {
 
+    public static final double NEW_CONNECTION_MUTATION_PROBABILITY = 0.05;
+    public static final double NEW_NODE_MUTATION_PROBABILITY = 0.05;
+    public static final double MAX_CONNECTION_STRENGTH = 10;
+    public static final double MIN_CONNECTION_STRENGTH = -10;
+    public static final double MAX_CONNECTION_MUTATION = 1;
+
     private Population<NetworkGenome, NetworkBasedAgent> networks;
+
+    public NEATRandomizer randomizer;
+
+    public int popuation;
+
+    public int maxIteration;
+
+    public Xor(long seed, int popuation, int maxIteration) {
+        this.randomizer = new NEATRandomizer(seed);
+        this.popuation = popuation;
+        this.maxIteration = maxIteration;
+    }
+
+    public Xor() {
+        this(System.nanoTime(), 1000, 1000);
+    }
 
     public static final List<TrainingEntry> TRAINING_SET = List.of(
         new TrainingEntry(List.of(0.0, 0.0), List.of(0.0)),
@@ -45,13 +68,19 @@ public class Xor {
         NetworkGenome networkPrototype = new NetworkGenome();
         networkPrototype.addGroup("inputs", 2, false);
         networkPrototype.addGroup("outputs", 1, false);
+        networkPrototype.setRandomizer(randomizer);
 
         NetworkBasedAgent prototype = new NetworkBasedAgent(networkPrototype, Xor::eval);
         networks.populate(prototype);
     }
 
     public void run() {
-        for (int i = 0; i < 1000 && networks.computeNewFitness() < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
+            double bestFitness = networks.computeNewFitness();
+            if (bestFitness > -10) {
+                break;
+            }
+            System.out.printf("Fitness %.2f\n", bestFitness);
             networks.replenish();
         }
     }

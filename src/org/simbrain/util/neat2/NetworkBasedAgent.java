@@ -29,6 +29,11 @@ public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
         return new NetworkBasedAgent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
     }
 
+    @Override
+    public void mutate() {
+        getGenome().mutate();
+    }
+
     public Network getAgent() {
         return agent;
     }

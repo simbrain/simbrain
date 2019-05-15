@@ -24,6 +24,8 @@ public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements 
 
     public abstract A crossover(A other);
 
+    public abstract void mutate();
+
     /**
      * Evaluate the fitness score of this agent.
      */

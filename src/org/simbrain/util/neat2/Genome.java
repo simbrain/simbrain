@@ -17,6 +17,8 @@ public abstract class Genome<T, G extends Genome<T, G>> {
 
     public abstract G crossOver(G other);
 
+    public abstract void mutate();
+
     public abstract G copy();
 
     /**

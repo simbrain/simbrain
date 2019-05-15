@@ -3,6 +3,8 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.neat2.testsims.Xor;
 
 public class ConnectionGene extends Gene<Synapse> {
 
@@ -25,6 +27,8 @@ public class ConnectionGene extends Gene<Synapse> {
      * If false, the synapse will be calculated.
      */
     private boolean enabled;
+
+    private NEATRandomizer randomizer;
 
     private Synapse prototype = new Synapse(null, null, 1.0);
 
@@ -77,12 +81,20 @@ public class ConnectionGene extends Gene<Synapse> {
 
     @Override
     public void mutate() {
-
+        double dw = randomizer.nextDouble(-Xor.MAX_CONNECTION_MUTATION, Xor.MAX_CONNECTION_MUTATION);
+        prototype.setStrength(prototype.getStrength() + dw);
     }
 
     @Override
     public ConnectionGene copy() {
-        return null;
+        ConnectionGene ret = new ConnectionGene(sourceIndex, targetIndex, prototype.getStrength(), prototype.getLearningRule());
+        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+        ret.enabled = enabled;
+        return ret;
+    }
+
+    public void setRandomizer(NEATRandomizer randomizer) {
+        this.randomizer = randomizer;
     }
 
     @Override
@@ -101,7 +113,6 @@ public class ConnectionGene extends Gene<Synapse> {
     public int hashCode() {
         int result = sourceIndex;
         result = 31 * result + targetIndex;
-        result = 31 * result + (prototype != null ? prototype.hashCode() : 0);
         return result;
     }
 }

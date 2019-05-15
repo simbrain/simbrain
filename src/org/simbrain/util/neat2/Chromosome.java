@@ -1,5 +1,6 @@
 package org.simbrain.util.neat2;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -8,10 +9,9 @@ import java.util.List;
  *
  * @param <T> the type of the genes in this chromosome
  */
-public abstract class Chromosome<T> {
+public abstract class Chromosome<T, C extends Chromosome<T, C>> {
 
-    private List<Gene<T>> genes;
+    public abstract C crossOver(C other);
 
-    public abstract Chromosome<T> crossOver(Chromosome<T> other);
-
+    public abstract Collection<? extends Gene<T>> getGenes();
 }

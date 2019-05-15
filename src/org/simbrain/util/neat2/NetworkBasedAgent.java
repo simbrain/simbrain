@@ -3,9 +3,11 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Network;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class NetworkBasedAgent extends Agent<NetworkGenome> {
+public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
 
     /**
      * A network to be run in the simulation
@@ -17,15 +19,23 @@ public class NetworkBasedAgent extends Agent<NetworkGenome> {
      */
     private Double fitness = null;
 
-    public NetworkBasedAgent(NetworkGenome genotype, Supplier<Double> fitnessFunction) {
+    public NetworkBasedAgent(NetworkGenome genotype, Function<NetworkBasedAgent, Double> fitnessFunction) {
         super(genotype, fitnessFunction);
         agent = getGenome().build();
     }
 
     @Override
+    public NetworkBasedAgent crossover(NetworkBasedAgent other) {
+        return new NetworkBasedAgent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
+    }
+
+    public Network getAgent() {
+        return agent;
+    }
+
+    @Override
     public void computeFitness() {
-        fitness = getFitnessFunction().get();
-        ArrayList[] g = new ArrayList[100];
+        fitness = getFitnessFunction().apply(this);
     }
 
     @Override
@@ -34,7 +44,7 @@ public class NetworkBasedAgent extends Agent<NetworkGenome> {
     }
 
     @Override
-    public Agent<NetworkGenome> copy() {
-        return new NetworkBasedAgent(getGenome(), getFitnessFunction());
+    public NetworkBasedAgent copy() {
+        return new NetworkBasedAgent(getGenome().copy(), getFitnessFunction());
     }
 }

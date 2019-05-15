@@ -10,19 +10,19 @@ import org.simbrain.util.neat.NEATRandomizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NetworkGenome extends Genome<Network> {
+public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
     //TODO: Redo below using chromosomes
 
     /**
      * A genome of NodeGene
      */
-    private List<NodeGene> nodeGenes;
+    private NodeChromosome nodeGenes = new NodeChromosome();
 
     /**
      * A map of innovation numbers to connections genes
      */
-    private Map<Integer, ConnectionGene> connectionGenes = new TreeMap<>();
+    private ConnectionChromosome connectionGenes = new ConnectionChromosome();
 
     private NEATRandomizer randomizer;
 
@@ -32,16 +32,17 @@ public class NetworkGenome extends Genome<Network> {
         Network ret = new Network();
         List<Neuron> neurons = new ArrayList<>();
 
-        nodeGenes.forEach(n -> {
+        nodeGenes.getGenes().forEach(n -> {
             Neuron neuron = new Neuron(ret, n.getPrototype());
             neurons.add(neuron);
 
             if (n.getNeuronGroupName() != null && !n.getNeuronGroupName().isEmpty()) {
-                Group group = ret.getGroup(n.getNeuronGroupName());
+                Group group = ret.getGroupByLabel(n.getNeuronGroupName());
                 if (group == null) {
                     NeuronGroup neuronGroup = new NeuronGroup(ret);
                     neuronGroup.setLabel(n.getNeuronGroupName());
                     ret.addGroup(neuronGroup);
+                    neuronGroup.addNeuron(neuron);
                 } else {
                     if (group instanceof NeuronGroup) {
                         ((NeuronGroup) group).addNeuron(neuron);
@@ -51,7 +52,7 @@ public class NetworkGenome extends Genome<Network> {
             ret.addNeuron(neuron);
         });
 
-        connectionGenes.values().forEach(c -> {
+        connectionGenes.getGenes().forEach(c -> {
             Synapse synapse = new Synapse(
                     ret,
                     neurons.get(c.getSourceIndex()),
@@ -65,36 +66,30 @@ public class NetworkGenome extends Genome<Network> {
         return ret;
     }
 
-    @Override
-    public Genome<Network> crossOver(Genome<Network> otherGenome) {
+    public NetworkGenome addGroup(String name, int size, boolean mutable) {
 
-        NetworkGenome networkGenome = (NetworkGenome)otherGenome;
+        List<NodeGene> toAdd = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            NodeGene nodeGene = new NodeGene();
+            nodeGene.setNeuronGroupName(name);
+            nodeGene.setMutable(mutable);
+            toAdd.add(nodeGene);
+        }
+        nodeGenes.getGenes().addAll(toAdd);
+
+        return this;
+    }
+
+
+
+    @Override
+    public NetworkGenome crossOver(NetworkGenome otherGenome) {
 
         NetworkGenome ret = new NetworkGenome();
 
-        Set<NodeGene> newNodeGeneSet = new HashSet<>();
-        newNodeGeneSet.addAll(nodeGenes);
-        newNodeGeneSet.addAll(networkGenome.nodeGenes);
+        ret.nodeGenes = nodeGenes.crossOver(otherGenome.nodeGenes);
 
-        ret.nodeGenes = new ArrayList<>(newNodeGeneSet);
-
-        Set<Integer> allInnovationNumbers = new TreeSet<>(this.connectionGenes.keySet());
-        allInnovationNumbers.addAll(networkGenome.connectionGenes.keySet());
-
-        for (Integer i : allInnovationNumbers) {
-            if (this.connectionGenes.containsKey(i) && networkGenome.connectionGenes.containsKey(i)) {
-                double decision = randomizer.nextDouble(0, 1);
-                if (decision < 0.5) {
-                    ret.connectionGenes.put(i, this.connectionGenes.get(i));
-                } else {
-                    ret.connectionGenes.put(i, networkGenome.connectionGenes.get(i));
-                }
-            } else if (this.connectionGenes.containsKey(i)) {
-                ret.connectionGenes.put(i, this.connectionGenes.get(i));
-            } else {
-                ret.connectionGenes.put(i, networkGenome.connectionGenes.get(i));
-            }
-        }
+        ret.connectionGenes = connectionGenes.crossOver(otherGenome.connectionGenes);
 
         return ret;
     }
@@ -103,11 +98,8 @@ public class NetworkGenome extends Genome<Network> {
     @Override
     public NetworkGenome copy() {
         NetworkGenome ret = new NetworkGenome();
-        ret.nodeGenes = nodeGenes.stream()
-                        .map(NodeGene::copy)
-                        .collect(Collectors.toList());
-        ret.connectionGenes = connectionGenes.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
+        ret.nodeGenes = nodeGenes.copy();
+        ret.connectionGenes = connectionGenes.copy();
         return ret;
     }
 }

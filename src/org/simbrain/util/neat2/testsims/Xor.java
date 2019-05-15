@@ -1,27 +1,59 @@
 package org.simbrain.util.neat2.testsims;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.neat2.NetworkGenome;
 import org.simbrain.util.neat2.NetworkBasedAgent;
 import org.simbrain.util.neat2.Population;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Xor {
 
-    List<NetworkBasedAgent> networkPhenotypes = new ArrayList<>();
+    private Population<NetworkGenome, NetworkBasedAgent> networks;
 
-    Population<NetworkBasedAgent> networks;
+    public static final List<TrainingEntry> TRAINING_SET = List.of(
+        new TrainingEntry(List.of(0.0, 0.0), List.of(0.0)),
+        new TrainingEntry(List.of(0.0, 1.0), List.of(1.0)),
+        new TrainingEntry(List.of(1.0, 0.0), List.of(1.0)),
+        new TrainingEntry(List.of(1.0, 1.0), List.of(0.0))
+    );
+
+    public static Double eval(NetworkBasedAgent agent) {
+
+        List<Neuron> inputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("inputs"))).getNeuronList();
+        List<Neuron> outputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("outputs"))).getNeuronList();
+        double sse = 0.0;
+        for (int t = 0; t < TRAINING_SET.size(); t++) {
+            for (int i = 0; i < inputs.size(); i++) {
+                inputs.get(i).forceSetActivation(TRAINING_SET.get(t).getInput().get(i));
+            }
+            for (int i = 0; i < 50; i++) {
+                agent.getAgent().update();
+                for (int n = 0; n < outputs.size(); n++) {
+                    double error = outputs.get(n).getActivation() - TRAINING_SET.get(t).getOutput().get(n);
+                    sse += error * error;
+                }
+            }
+        }
+        return -sse;
+    }
 
     public void init() {
         networks = new Population<>(1000);
         // TODO: the NetworkGenotype and the fitnessFunction is empty. populate.
-        NetworkBasedAgent prototype = new NetworkBasedAgent(new NetworkGenome(), () -> 0.0);
+        NetworkGenome networkPrototype = new NetworkGenome();
+        networkPrototype.addGroup("inputs", 2, false);
+        networkPrototype.addGroup("outputs", 1, false);
+
+        NetworkBasedAgent prototype = new NetworkBasedAgent(networkPrototype, Xor::eval);
         networks.populate(prototype);
     }
 
     public void run() {
-        for (int i = 0; i < 1000 && networks.computeNewFitness() < 10; i++);
+        for (int i = 0; i < 1000 && networks.computeNewFitness() < 10; i++) {
+            networks.replenish();
+        }
     }
 
     public static void main(String[] args) {
@@ -30,4 +62,22 @@ public class Xor {
         test.run();
     }
 
+    public static class TrainingEntry {
+        private List<Double> input;
+
+        private List<Double> output;
+
+        public TrainingEntry(List<Double> input, List<Double> output) {
+            this.input = input;
+            this.output = output;
+        }
+
+        public List<Double> getInput() {
+            return input;
+        }
+
+        public List<Double> getOutput() {
+            return output;
+        }
+    }
 }

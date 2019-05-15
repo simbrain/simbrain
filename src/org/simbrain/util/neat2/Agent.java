@@ -1,5 +1,6 @@
 package org.simbrain.util.neat2;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -10,16 +11,18 @@ import java.util.function.Supplier;
  *
  * @param <G> The genome, e.g. NeuralNetwork, this agent is based on.
  */
-public abstract class Agent<G extends Genome> implements Comparable<Agent> {
+public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements Comparable<Agent> {
 
     private G genome;
 
-    private Supplier<Double> fitnessFunction;
+    private Function<A, Double> fitnessFunction;
 
-    public Agent(G genome, Supplier<Double> fitnessFunction) {
+    public Agent(G genome, Function<A, Double> fitnessFunction) {
         this.genome = genome;
         this.fitnessFunction = fitnessFunction;
     }
+
+    public abstract A crossover(A other);
 
     /**
      * Evaluate the fitness score of this agent.
@@ -34,7 +37,7 @@ public abstract class Agent<G extends Genome> implements Comparable<Agent> {
     public abstract Double getCurrentFitness();
     // TODO: Re-implement using current fitness score
 
-    public Supplier<Double> getFitnessFunction() {
+    public Function<A, Double> getFitnessFunction() {
         return fitnessFunction;
     }
 
@@ -42,7 +45,7 @@ public abstract class Agent<G extends Genome> implements Comparable<Agent> {
         return genome;
     }
 
-    public abstract Agent<G> copy();
+    public abstract A copy();
 
     @Override
     public int compareTo(Agent o) {

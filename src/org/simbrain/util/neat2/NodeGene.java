@@ -34,6 +34,7 @@ public class NodeGene extends Gene<Neuron> {
 
     public NodeGene(NodeType type) {
         this.type = type;
+        this.prototype = new Neuron(null);
     }
 
     public NodeGene() {
@@ -62,6 +63,7 @@ public class NodeGene extends Gene<Neuron> {
     public NodeGene copy() {
         NodeGene ret = new NodeGene();
         ret.type = this.type;
+        ret.neuronGroupName = this.neuronGroupName;
         ret.prototype = this.prototype.deepCopy();
         return ret;
     }

@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
 
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat.NodeGene.NodeType;
 
 import static org.simbrain.util.neat.NeatUtils.clipping;
@@ -34,7 +35,7 @@ public class Genome implements Comparable<Genome> {
     /**
      * Randomizer for mutation
      */
-    private NEATRandomizer rand;
+    private SimbrainRandomizer rand;
 
     /**
      * List of all node genes. Positions in this list correspond to indices in
@@ -200,7 +201,7 @@ public class Genome implements Comparable<Genome> {
             potentialTargets.add(nodeGene); // NEW
         }
 
-        rand = new NEATRandomizer(seed);
+        rand = new SimbrainRandomizer(seed);
         this.pool = requireNonNull(pool);
 
         // TODO: Discuss. Why is this the default starting state?
@@ -240,7 +241,7 @@ public class Genome implements Comparable<Genome> {
             potentialTargetNodes.add(on);
         }
 
-        this.rand = new NEATRandomizer(cpy.rand.nextLong());
+        this.rand = new SimbrainRandomizer(cpy.rand.nextLong());
         this.pool = cpy.pool;
     }
 
@@ -282,7 +283,7 @@ public class Genome implements Comparable<Genome> {
             potentialTargetNodes.add(on);
         }
 
-        this.rand = new NEATRandomizer(g1.rand.nextLong());
+        this.rand = new SimbrainRandomizer(g1.rand.nextLong());
         this.pool = g1.pool;
 
         Set<Integer> allInnovationNumber = new TreeSet<>(g1.connectionGeneMap.keySet());
@@ -613,7 +614,7 @@ public class Genome implements Comparable<Genome> {
     }
 
     public void setSeed(long seed) {
-        this.rand = new NEATRandomizer(seed);
+        this.rand = new SimbrainRandomizer(seed);
     }
 
     public void setFitness(double fitness) {

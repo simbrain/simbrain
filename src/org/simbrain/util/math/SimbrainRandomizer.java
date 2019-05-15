@@ -1,14 +1,18 @@
-package org.simbrain.util.neat;
+package org.simbrain.util.math;
 
 import java.util.Random;
 import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
- * Java Random with extra method for NEAT use.
+ * Extends java randomizer with convenience functions, e.g.
+ * getting a number in a range.
+ *
  * @author LeoYulinLi
  *
  */
-public class NEATRandomizer extends Random {
+public class SimbrainRandomizer extends Random {
+
+    //TODO: Move to Simbrain Math or somewhre else genetic
 
     private static final long serialVersionUID = -3217013262668966634L;
 
@@ -16,7 +20,7 @@ public class NEATRandomizer extends Random {
      * Creates a new random number generator using a single long seed.
      * @param seed the initial seed
      */
-    public NEATRandomizer(long seed) {
+    public SimbrainRandomizer(long seed) {
         super(seed);
     }
 

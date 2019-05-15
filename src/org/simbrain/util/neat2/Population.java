@@ -1,6 +1,6 @@
 package org.simbrain.util.neat2;
 
-import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,15 +21,17 @@ import java.util.stream.Collectors;
  */
 public class Population<G extends Genome, A extends Agent<G, A>> {
 
+    //TODO: Pull this, chromosome, genome, and gene to a separate simbrain GA package.
+
     private int size;
 
     private List<A> agentList;
 
-    private NEATRandomizer randomizer;
+    private SimbrainRandomizer randomizer;
 
     public Population(int size) {
         this.size = size;
-        this.randomizer = new NEATRandomizer(System.nanoTime());
+        this.randomizer = new SimbrainRandomizer(System.nanoTime());
     }
 
     public void populate(A prototype) {

@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.neat;
 
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat.*;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -251,7 +252,7 @@ public class Test {
             double dx = newEntity.getCenterX() - cheese.getCenterX();
             double dy = newEntity.getCenterY() - cheese.getCenterY();
             if (dx * dx + dy * dy < 1000) {
-               NEATRandomizer rand = agent.getRandomizer();
+               SimbrainRandomizer rand = agent.getRandomizer();
                cheese.setLocation(
                        Math.abs(450 - (cheese.getCenterX() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)),
                        Math.abs(450 - (cheese.getCenterY() + (rand.nextBoolean() ? 1 : -1) * (rand.nextDouble() + 0.2) * 20)));
@@ -332,7 +333,7 @@ public class Test {
         Network n = agent.getNet();
         OdorWorld w = agent.getWorld();
         OdorWorldEntity cheese = new OdorWorldEntity(w);
-        NEATRandomizer rand = agent.getRandomizer();
+        SimbrainRandomizer rand = agent.getRandomizer();
 
         double[] smellVector = {1, 0.2};
         SmellSource smell = new SmellSource(smellVector);

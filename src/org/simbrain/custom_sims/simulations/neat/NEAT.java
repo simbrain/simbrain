@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat.*;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -77,7 +77,7 @@ public class NEAT extends RegisteredSimulation {
         w = topAgent.getWorld();
         n = topAgent.getNet();
         // Network n2 = topAgent.getGenome().buildNetwork();
-        NEATRandomizer rand = topAgent.getRandomizer();
+        SimbrainRandomizer rand = topAgent.getRandomizer();
 
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);

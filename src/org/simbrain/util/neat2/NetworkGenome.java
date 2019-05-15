@@ -5,17 +5,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.testsims.Xor;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
     private static Map<ConnectionGene, Integer> innovationNumberMap = new HashMap<>();
-
-    //TODO: Redo below using chromosomes
 
     /**
      * A genome of NodeGene
@@ -27,7 +24,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
      */
     private ConnectionChromosome connectionGenes = new ConnectionChromosome();
 
-    private NEATRandomizer randomizer;
+    private SimbrainRandomizer randomizer;
 
 
     @Override
@@ -94,7 +91,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
         NetworkGenome ret = new NetworkGenome();
 
-        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
 
         ret.nodeGenes = nodeGenes.crossOver(otherGenome.nodeGenes);
 
@@ -148,7 +145,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
     public NetworkGenome copy() {
         NetworkGenome ret = new NetworkGenome();
 
-        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
 
         ret.nodeGenes = nodeGenes.copy();
 
@@ -158,7 +155,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
         return ret;
     }
 
-    public void setRandomizer(NEATRandomizer randomizer) {
+    public void setRandomizer(SimbrainRandomizer randomizer) {
         this.randomizer = randomizer;
     }
 }

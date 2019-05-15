@@ -1,5 +1,7 @@
 package org.simbrain.util.neat;
 
+import org.simbrain.util.math.SimbrainRandomizer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +39,7 @@ public class NEATSimulation {
     /**
      * Randomizer for mutation
      */
-    private NEATRandomizer rand;
+    private SimbrainRandomizer rand;
 
     /**
      * The current generation number of this pool.
@@ -143,7 +145,7 @@ public class NEATSimulation {
      */
     public NEATSimulation(Genome protogene, long seed, int instanceCount, Consumer<Agent> evaluationMethod) {
         System.out.println("Seed: " + seed);
-        rand = new NEATRandomizer(seed);
+        rand = new SimbrainRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>(); // TODO: initialize in field
         innovationNumber = 1;  // TODO: initialize in field
@@ -179,7 +181,7 @@ public class NEATSimulation {
                           int outputCount, int outputGroupCount,
                           long seed, int instanceCount,
                           Consumer<Agent> evaluationMethod) {
-        rand = new NEATRandomizer(seed);
+        rand = new SimbrainRandomizer(seed);
         this.instanceCount = instanceCount;
         genomes = new ArrayList<>();
         innovationNumber = 1;

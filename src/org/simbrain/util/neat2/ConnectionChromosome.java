@@ -1,15 +1,14 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.util.neat.NEATRandomizer;
-import org.simbrain.util.neat2.testsims.Xor;
+import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromosome> {
 
-    private NEATRandomizer randomizer;
+    private SimbrainRandomizer randomizer;
 
     private Map<Integer, ConnectionGene> connectionGenes = new TreeMap<>();
 
@@ -62,11 +61,11 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
         return ret;
     }
 
-    public void setRandomizer(NEATRandomizer randomizer) {
+    public void setRandomizer(SimbrainRandomizer randomizer) {
         this.randomizer = randomizer;
     }
 
-    public NEATRandomizer getRandomizer() {
+    public SimbrainRandomizer getRandomizer() {
         return randomizer;
     }
 }

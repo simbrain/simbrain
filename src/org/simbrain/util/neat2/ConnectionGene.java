@@ -3,7 +3,7 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.util.neat.NEATRandomizer;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.testsims.Xor;
 
 public class ConnectionGene extends Gene<Synapse> {
@@ -28,7 +28,7 @@ public class ConnectionGene extends Gene<Synapse> {
      */
     private boolean enabled;
 
-    private NEATRandomizer randomizer;
+    private SimbrainRandomizer randomizer;
 
     private Synapse prototype = new Synapse(null, null, 1.0);
 
@@ -88,12 +88,12 @@ public class ConnectionGene extends Gene<Synapse> {
     @Override
     public ConnectionGene copy() {
         ConnectionGene ret = new ConnectionGene(sourceIndex, targetIndex, prototype.getStrength(), prototype.getLearningRule());
-        ret.randomizer = new NEATRandomizer(randomizer.nextLong());
+        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
         ret.enabled = enabled;
         return ret;
     }
 
-    public void setRandomizer(NEATRandomizer randomizer) {
+    public void setRandomizer(SimbrainRandomizer randomizer) {
         this.randomizer = randomizer;
     }
 

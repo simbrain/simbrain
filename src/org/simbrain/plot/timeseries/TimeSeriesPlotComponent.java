@@ -58,6 +58,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         model.setTimeSupplier(() -> getWorkspace().getTime());
     }
 
+    Coupling<?> currentCoupling;
+
     @Override
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
@@ -65,11 +67,27 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
             @Override
             public void couplingAdded(Coupling<?> coupling) {
+
+                // A new coupling is being added to this time series
                 if (coupling.getConsumer().getBaseObject() == model) {
+
+                    // if(currentCoupling != null) {
+                    //     fireAttributeContainerRemoved(currentCoupling.);
+                    // }
+
+                    // TODO: remove any existing couplings
+                    //
+
                     model.setSeriesNames(coupling.getProducer().getLabelArray());
                 }
             }
         });
+    }
+
+
+    @Override
+    public void update() {
+        model.getDataset().removeAllSeries();
     }
 
     @Override

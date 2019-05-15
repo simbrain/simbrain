@@ -2,11 +2,11 @@ package org.simbrain.util.neat;
 
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.core.Network;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.threedworld.entities.Entity;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,7 +51,7 @@ public class Agent implements Comparable<Agent> {
     /**
      * NEAT randomizer.
      */
-    private NEATRandomizer rand;
+    private SimbrainRandomizer rand;
 
     /**
      * The fitness to be evaluated from the evaluation method.
@@ -60,7 +60,7 @@ public class Agent implements Comparable<Agent> {
 
     public Agent(Genome genome, long seed) {
         this(genome);
-        rand = new NEATRandomizer(seed);
+        rand = new SimbrainRandomizer(seed);
     }
 
     /**
@@ -102,7 +102,7 @@ public class Agent implements Comparable<Agent> {
         return fitness;
     }
     
-    public NEATRandomizer getRandomizer() {
+    public SimbrainRandomizer getRandomizer() {
         return rand;
     }
 

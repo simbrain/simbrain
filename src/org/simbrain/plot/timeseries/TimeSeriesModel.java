@@ -82,6 +82,10 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         this.timeSupplier = timeSupplier;
     }
 
+    {
+        addTimeSeries("Test");
+    }
+
     /**
      * Clears the plot.
      */
@@ -143,11 +147,11 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     @Consumable()
     public void addValues(double[] vector) {
 
-        // Take care of size mismatches
+        // If there is a size mismatch (for example, after removing neurons from
+        // a neuron group sending activations, clear and start over.)
+        // This will reset labels for all time series
         if (vector.length != dataset.getSeriesCount()) {
-            // TODO This gets repeatedly called if there is a manually added series
-            // which seems to trigger TimeSeriesPlotComponent line 65
-            clearData();
+            dataset.removeAllSeries();
             for (int i = 0; i < vector.length; i++) {
                 if (i < seriesNames.length) {
                     addTimeSeries(seriesNames[i]);
@@ -162,6 +166,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
             dataset.getSeries(i).add(timeSupplier.get(), (Double) vector[i]);
         }
     }
+
+
 
     public void setSeriesNames(String[] names) {
         this.seriesNames = names;

@@ -118,4 +118,14 @@ public class ImageAlbumSource extends ImageSourceAdapter {
         }
     }
 
+    /**
+     * Returns number of frames in the album
+     */
+    public int getNumFrames() {
+        if (frames == null) {
+            return 0;
+        }
+        return frames.size();
+    }
+
 }

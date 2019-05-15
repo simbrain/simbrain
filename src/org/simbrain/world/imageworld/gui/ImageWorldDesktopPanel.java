@@ -71,11 +71,20 @@ public class ImageWorldDesktopPanel extends JPanel {
      */
     private ImageWorld world;
 
-
     /**
      * Parent GUI Component
      */
     private GuiComponent guiComponent;
+
+    /**
+     * Button to advance to the next images.
+     */
+    private JButton nextImagesButton;
+
+    /**
+     * Button to go to the previous images.
+     */
+    private JButton previousImagesButton;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
@@ -132,6 +141,10 @@ public class ImageWorldDesktopPanel extends JPanel {
         // for (int i = 0; i < exts.length; ++i) {
         //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
         // }
+
+        // Update status of buttons
+        updateButtons();
+
     }
 
 
@@ -351,7 +364,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     public List<JButton> getImageAlbumButtons() {
         List<JButton> returnList = new LinkedList<>();
 
-        JButton previousImagesButton = new JButton();
+        previousImagesButton = new JButton();
         previousImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
         previousImagesButton.addActionListener(e -> {
@@ -359,7 +372,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
         returnList.add(previousImagesButton);
 
-        JButton nextImagesButton = new JButton();
+        nextImagesButton = new JButton();
         nextImagesButton.setIcon(org.simbrain.resource.ResourceManager.getSmallIcon("TangoIcons-GoNext.png"));
         nextImagesButton.setToolTipText("Next Image");
         nextImagesButton.addActionListener(e -> {
@@ -404,8 +417,33 @@ public class ImageWorldDesktopPanel extends JPanel {
         fileChooser.setDescription("Select images to load");
         File[] files = fileChooser.showMultiOpenDialogNative();
         if (files != null) {
+
+            // Load the images
             ((ImageAlbumWorld) world).loadImages(files);
+
+            // Update status of buttons
+            updateButtons();
+
+            // Save preferences
+            SimbrainPreferences.putString("imagesDirectory", fileChooser.getCurrentLocation());
         }
+    }
+
+    /**
+     * Update whether buttons are enabled or not based on the status of the
+     * image world.
+     */
+    public void updateButtons() {
+        // Disable next / previous buttons when there is less than two images
+        if (((ImageAlbumWorld) world).getNumImages() < 2) {
+            nextImagesButton.setEnabled(false);
+            previousImagesButton.setEnabled(false);
+        } else {
+            nextImagesButton.setEnabled(true);
+            previousImagesButton.setEnabled(true);
+
+        }
+
     }
 
 

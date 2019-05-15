@@ -51,6 +51,13 @@ public class ImageAlbumWorld extends ImageWorld {
     }
 
     /**
+     * Returns number of frames in album
+     */
+    public int getNumImages() {
+        return imageSource.getNumFrames();
+    }
+
+    /**
      * Update the image source to the next image.
      */
     public void nextFrame() {

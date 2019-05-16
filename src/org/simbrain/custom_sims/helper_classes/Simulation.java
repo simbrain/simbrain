@@ -291,7 +291,7 @@ public class Simulation {
      */
     public Coupling<?> couple(Neuron neuron, TimeSeriesPlotComponent plot) {
         Producer neuronProducer = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = plot.getConsumers().get(0);
+        Consumer timeSeriesConsumer = CouplingUtils.getConsumer(plot.getModel().getTimeSeriesList().get(0), "setValue");
         return tryCoupling(neuronProducer, timeSeriesConsumer);
     }
 
@@ -303,7 +303,6 @@ public class Simulation {
         Consumer projConsumer = CouplingUtils.getConsumer(plot, "addPoint");
         tryCoupling(ngProducer, projConsumer);
     }
-
 
     public void couple(ObjectSensor sensor, Neuron neuron) {
         Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValue");

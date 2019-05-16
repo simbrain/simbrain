@@ -1034,9 +1034,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         addSensor(new ObjectSensor(this,  EntityType.SWISS, -Math.PI / 8,
             50));
 
-        // Temporary for testing grid sensors
-        addSensor(new GridSensor(this, 0, 0, 40, 40));
-
         //TODO: Add more defaults
 
     }

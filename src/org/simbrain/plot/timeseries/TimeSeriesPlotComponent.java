@@ -58,8 +58,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         model.setTimeSupplier(() -> getWorkspace().getTime());
     }
 
-    Coupling<?> currentCoupling;
-
     @Override
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
@@ -68,32 +66,33 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             @Override
             public void couplingAdded(Coupling<?> coupling) {
 
-                // A new coupling is being added to this time series
+                // A new array coupling is being added to this time series
+                // Creating an array coupling wipes out any existing scalar time series
                 if (coupling.getConsumer().getBaseObject() == model) {
+                    for (TimeSeriesModel.ScalarTimeSeries series : model.getTimeSeriesList()) {
+                        fireAttributeContainerRemoved(series);
+                    }
+                    model.removeAllScalarTimeSeries();
 
-                    // if(currentCoupling != null) {
-                    //     fireAttributeContainerRemoved(currentCoupling.);
-                    // }
-
-                    // TODO: remove any existing couplings
-                    //
-
-                    model.setSeriesNames(coupling.getProducer().getLabelArray());
+                    // Initialize series with provided names, e.g neuron labels
+                    model.initializeArrayMode(coupling.getProducer().getLabelArray());
                 }
+            }
+        });
+
+        model.addPropertyChangeListener(evt -> {
+            if ("removeArrayCouplings".equals(evt.getPropertyName())) {
+                fireAttributeContainerRemoved(model);
             }
         });
     }
 
 
     @Override
-    public void update() {
-        model.getDataset().removeAllSeries();
-    }
-
-    @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
         containers.add(model);
+        containers.addAll(model.getTimeSeriesList());
         return containers;
     }
 

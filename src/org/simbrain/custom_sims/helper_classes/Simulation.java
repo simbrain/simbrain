@@ -163,7 +163,8 @@ public class Simulation {
     public PlotBuilder addTimeSeriesPlot(int x, int y, int width, int height,
                                          String name, String seriesName) {
         TimeSeriesPlotComponent timeSeriesComponent = new TimeSeriesPlotComponent(name);
-        timeSeriesComponent.getModel().addTimeSeries(seriesName);
+        timeSeriesComponent.getModel().removeAllScalarTimeSeries();
+        timeSeriesComponent.getModel().addScalarTimeSeries(seriesName);
         workspace.addWorkspaceComponent(timeSeriesComponent);
         desktop.getDesktopComponent(timeSeriesComponent).getParentFrame().setBounds(x, y, width, height);
         return new PlotBuilder(timeSeriesComponent);

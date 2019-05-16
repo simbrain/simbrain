@@ -71,5 +71,50 @@ public class TimeSeriesPlotActions {
         };
     }
 
+    /**
+     * Add a data source.
+     *
+     * @param timeSeriesPanel reference to time series plot panel
+     * @return the action
+     */
+    public static Action getAddSourceAction(TimeSeriesPlotPanel timeSeriesPanel) {
+        return new AbstractAction() {
+            // Initialize
+            {
+                putValue(NAME, "Add");
+                putValue(SHORT_DESCRIPTION, "Add a data source");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                timeSeriesPanel.getTimeSeriesModel().addScalarTimeSeries();
+            }
+        };
+    }
+
+    /**
+     * Add a data source.
+     *
+     * @param timeSeriesPanel reference to time series plot panel
+     * @return the action
+     */
+    public static Action getRemoveSourceAction(
+        final TimeSeriesPlotPanel timeSeriesPanel) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(NAME, "Remove");
+                putValue(SHORT_DESCRIPTION, "Remove a data source");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                timeSeriesPanel.getTimeSeriesModel().removeLastScalarTimeSeries();
+            }
+
+        };
+    }
+
 
 }

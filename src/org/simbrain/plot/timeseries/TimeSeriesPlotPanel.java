@@ -31,9 +31,6 @@ import java.awt.*;
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the
  * time series workspace component.
- * <p>
- * TODO: Make a version that extends this, like network panel case. Then
- * document in UML
  */
 public class TimeSeriesPlotPanel extends JPanel {
 
@@ -74,6 +71,7 @@ public class TimeSeriesPlotPanel extends JPanel {
 
         addClearGraphDataButton();
         addPreferencesButton();
+        addAddDeleteButtons();
 
         add("Center", chartPanel);
         add("South", buttonPanel);
@@ -117,11 +115,21 @@ public class TimeSeriesPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
-     *
-     * @return
      */
     public JPanel getButtonPanel() {
         return buttonPanel;
+    }
+
+    /**
+     * Add buttons for adding and deleting {@link TimeSeriesModel.ScalarTimeSeries} objects.
+     */
+    public void addAddDeleteButtons() {
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
+        JButton addButton = new JButton("Add");
+        addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
     }
 
     /**
@@ -158,16 +166,10 @@ public class TimeSeriesPlotPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * @return the chartPanel
-     */
     public ChartPanel getChartPanel() {
         return chartPanel;
     }
 
-    /**
-     * @return the model
-     */
     public TimeSeriesModel getTimeSeriesModel() {
         return model;
     }

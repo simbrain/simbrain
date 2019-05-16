@@ -80,7 +80,7 @@ public class ErrorPlotPanel extends JPanel {
         mainPanel.add(graphPanel);
         add(mainPanel);
 
-        model.addTimeSeries("Error");
+        model.addScalarTimeSeries("Error");
         trainer.addErrorListener(new ErrorListener() {
             @Override
             public void errorUpdated() {

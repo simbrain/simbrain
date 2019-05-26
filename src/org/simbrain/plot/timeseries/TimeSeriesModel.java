@@ -30,6 +30,7 @@ import org.simbrain.workspace.Consumable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -74,6 +75,20 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     @UserParameter(label = "Max Points", increment = 10, minimumValue = 1, order = 40)
     private int maxDataPoints = 100;
+
+    /**
+     * Whether this chart if fixed width or not.
+     */
+    @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
+            "extends beyond a fixed with", order = 50)
+    private boolean fixedWidth = false;
+
+    /**
+     * Size of window when fixed width is being used.
+     */
+    @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
+            "when fixedWidth is turned on", minimumValue = 10, increment = 50, order = 60)
+    private int windowSize = 100;
 
     /**
      * Names for the time series.  Set via coupling events.
@@ -134,10 +149,10 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     /**
      * Add scalar data to a specified time series. Called by scripts.
      *
-     * @param seriesIndex     index of data source to use
-     * @param time            data for x axis
-     * @param value           data for y axis Adds a data source to the chart
-     *                        with the specified description.
+     * @param seriesIndex index of data source to use
+     * @param time        data for x axis
+     * @param value       data for y axis Adds a data source to the chart
+     *                    with the specified description.
      */
     public void addData(int seriesIndex, double time, double value) {
         disableArrayMode();
@@ -238,7 +253,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * Remove all {@link ScalarTimeSeries} objects.
      */
     public void removeAllScalarTimeSeries() {
-        for(ScalarTimeSeries ts : timeSeriesList) {
+        for (ScalarTimeSeries ts : timeSeriesList) {
             dataset.removeSeries(ts.getSeries());
         }
         timeSeriesList.clear();
@@ -250,7 +265,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     public void removeLastScalarTimeSeries() {
         disableArrayMode();
         if (timeSeriesList.size() > 0) {
-            ScalarTimeSeries lastSeries= timeSeriesList.get(timeSeriesList.size()-1);
+            ScalarTimeSeries lastSeries = timeSeriesList.get(timeSeriesList.size() - 1);
             dataset.removeSeries(lastSeries.getSeries());
             timeSeriesList.remove(lastSeries);
         }
@@ -302,6 +317,29 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
     public void setRangeLowerBound(final double lowerRangeBoundary) {
         this.rangeLowerBound = lowerRangeBoundary;
+    }
+
+    /**
+     * Update the model; currently used to remove unused data when in
+     * "fixed width" mode.
+     */
+    public void update() {
+
+        // Trim appropriately if fixed width
+        if (fixedWidth) {
+
+            for (int i = 0; i < getDataset().getSeriesCount(); i++) {
+                XYSeries series = getDataset().getSeries(i);
+                if (series.getItemCount() > windowSize) {
+                    int diff = Math.abs(series.getItemCount() - windowSize);
+                    // System.out.println("diff:" + diff);
+                    for (int j = 0; i < diff; i++) {
+                        series.remove(j);
+                    }
+                }
+            }
+        }
+
     }
 
     /**

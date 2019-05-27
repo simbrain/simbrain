@@ -366,7 +366,7 @@ public class Synapse implements EditableObject, AttributeContainer {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
                 if (spikeResponder instanceof NonResponder) {
-                    spikeResponder = DEFAULT_SPIKE_RESPONDER;
+                    spikeResponder = DEFAULT_SPIKE_RESPONDER.deepCopy();
                 }
             } else {
                 spikeResponder = new NonResponder();
@@ -691,7 +691,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     public void setSpikeResponder(final SpikeResponder sr) {
-        this.spikeResponder = sr;
+        this.spikeResponder = sr.deepCopy();
     }
 
     /**
@@ -861,7 +861,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     public void setLearningRule(SynapseUpdateRule newLearningRule) {
         SynapseUpdateRule oldRule = learningRule;
-        this.learningRule = newLearningRule;
+        this.learningRule = newLearningRule.deepCopy();
         initSpikeResponder();
         // TODO: Needed for calls to SynapseGroup.postUnmashallingInit, which calls
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have

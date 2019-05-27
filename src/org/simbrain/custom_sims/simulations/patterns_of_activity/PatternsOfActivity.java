@@ -29,6 +29,9 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -103,22 +106,26 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5);
-        sensoryNetL.setNeuronType(new IntegrateAndFireRule());
+        sensoryNetL.setNeuronType(new IntegrateAndFireRule(0.005));
         sensoryNetL.setPolarity(Polarity.EXCITATORY);
+        sensoryNetL.setLabel("Sensory Left");
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetR = net.addNeuronGroup(-9.25, 155.93, 5);
-        sensoryNetR.setNeuronType(new IntegrateAndFireRule());
+        sensoryNetR.setNeuronType(new IntegrateAndFireRule(0.005));
         sensoryNetR.setPolarity(Polarity.EXCITATORY);
+        sensoryNetR.setLabel("Sensory Right");
+
+
 
         // Set up odor world
         OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 45));
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 45));
         mouse.setUpdateHeadingBasedOnVelocity(true);
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 40));
+        mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 40));
         mouse.setHeading(90);
         OdorWorldEntity cheese = world.addEntity(92, 220, EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
@@ -156,26 +163,31 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 ((IntegrateAndFireRule) n.getUpdateRule()).setRefractoryPeriod(2);
             }
             ((IntegrateAndFireRule) n.getUpdateRule()).setAddNoise(true);
+            ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(18);
             ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
                 .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
         recNeurons = new NeuronGroup(network, neuronList);
-        HexagonalGridLayout layout = new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize));
-        recNeurons.setLayout(layout);
+        new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
+            .layoutNeurons(recNeurons.getNeuronListUnsafe());
+        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
+        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
 
         // Set up recurrent synapses
         SynapseGroup recSyns = new SynapseGroup(recNeurons, recNeurons);
         new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
             200).connectNeurons(recSyns);
+//        new Sparse(0.10, false, false)
+//                .connectNeurons(recSyns);
         initializeSynParameters(recSyns);
         recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
         for (Neuron n : neuronList) {
             for (Neuron m : neuronList) {
                 if (Math.random() < 0.002 && n != m) {
                     Synapse s = new Synapse(n, m);
-                    s.setStrength(n.getPolarity().value(10));
+                    s.setStrength(n.getPolarity().value(20));
                     recSyns.addNewSynapse(s);
                     // Delays based on distance
                 }
@@ -190,18 +202,24 @@ public class PatternsOfActivity extends RegisteredSimulation {
         SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recNeurons,
             new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGL);
-        inpSynGL.setStrength(40, Polarity.EXCITATORY);
+        inpSynGL.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
         for (Synapse s : inpSynGL.getAllSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
+            if(s.getTarget().getPolarity() == Polarity.INHIBITORY) {
+                inpSynGL.removeSynapse(s);
+            }
         }
         SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recNeurons,
                 new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGR);
-        inpSynGR.setStrength(40, Polarity.EXCITATORY);
+        inpSynGR.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
         for (Synapse s : inpSynGR.getAllSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
+            if(s.getTarget().getPolarity() == Polarity.INHIBITORY) {
+                inpSynGR.removeSynapse(s);
+            }
         }
 
         // Set up the first out group (comprised of LIF neurons to allow for STDP)
@@ -215,14 +233,15 @@ public class PatternsOfActivity extends RegisteredSimulation {
             }
             n.setUpdateRule(new NormIFRule(netSize + tmp));
 //            ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-//                    .mean(0).standardDeviation(0.2).build());
-            ((IntegrateAndFireRule) (n.getUpdateRule())).setBackgroundCurrent(14.99);
+//                    .ofMean(0).ofStandardDeviation(0.2).build());
+            ((IntegrateAndFireRule) (n.getUpdateRule())).setBackgroundCurrent(19.9);
             tmp++;
         }
         rtNeuron = outGroup.getNeuron(0);
         lfNeuron = outGroup.getNeuron(1);
         dwNeuron = outGroup.getNeuron(2);
         upNeuron = outGroup.getNeuron(3);
+        outGroup.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 800);
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
@@ -275,6 +294,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
         NeuronGroup readGroup = new NeuronGroup(network, 2);
+        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
         for (Neuron n : readGroup.getNeuronList()) {
             n.setUpdateRule(new SigmoidalRule());
             ((SigmoidalRule) n.getUpdateRule()).setLowerBound(-4);
@@ -304,40 +324,17 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
-        //
         // Add everything to the network
-        //
         network.addGroup(recNeurons);
-        recNeurons.applyLayout();
-        recNeurons.setLabel("Recurrent Layer");
-
         network.addGroup(inpSynGL);
-        inpSynGL.setLabel("L. Sensor \u2192  Res.");
         network.addGroup(inpSynGR);
-        inpSynGR.setLabel("R. Sensor \u2192  Res.");
         network.addGroup(recSyns);
-        recSyns.setLabel("Recurrent");
-
         network.addGroup(outGroup);
-        outGroup.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 800);
-        outGroup.setLabel("Read Out");
-
         network.addGroup(rec2out);
-        rec2out.setLabel("Rec. \u2192 Read Out");
-
         network.addGroup(readGroup);
-        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
-        readGroup.setLabel("Affectors");
-
         network.addGroup(out2read);
-        out2read.setLabel("Read Out \u2192 Affectors");
-
         network.addGroup(sensoryNetL);
         network.addGroup(sensoryNetR);
-        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 50);
-        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() - 50);
-        sensoryNetL.setLabel("Sensory Left");
-        sensoryNetR.setLabel("Sensory Right");
 
         // Set up concurrent buffered update
         network.getUpdateManager().clear();
@@ -353,8 +350,10 @@ public class PatternsOfActivity extends RegisteredSimulation {
         synG.setLearningRule(ruleEx, Polarity.EXCITATORY);
         synG.setLearningRule(ruleIn, Polarity.INHIBITORY);
         synG.setSpikeResponder(spkR, Polarity.BOTH);
-        synG.setUpperBound(200, Polarity.BOTH);
-        synG.setLowerBound(-200, Polarity.BOTH);
+        synG.setUpperBound(200, Polarity.EXCITATORY);
+        synG.setLowerBound(0, Polarity.EXCITATORY);
+        synG.setLowerBound(-200, Polarity.INHIBITORY);
+        synG.setUpperBound(0, Polarity.INHIBITORY);
         synG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
             NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         synG.randomizeConnectionWeights();
@@ -387,7 +386,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
      */
     private class NormIFRule extends IntegrateAndFireRule {
 
-        public int index;
+        public final int index;
 
         private double totalTimeS = 0.0;
 
@@ -395,10 +394,24 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         private double saturation = 3000;
 
+        @Override
+        public NormIFRule deepCopy() {
+            NormIFRule ifn = new NormIFRule(index);
+            ifn.setRestingPotential(getRestingPotential());
+            ifn.setResetPotential(getResetPotential());
+            ifn.setThreshold(getThreshold());
+            ifn.setBackgroundCurrent(getBackgroundCurrent());
+            ifn.setTimeConstant(getTimeConstant());
+            ifn.setResistance(getResistance());
+            ifn.setAddNoise(getAddNoise());
+            ifn.setNoiseGenerator(getNoiseGenerator().deepCopy());
+            return ifn;
+        }
         //
         public NormIFRule(int index) {
+            super();
             this.index = index;
-
+            frEsts[index] = 0.01;
         }
 
         @Override

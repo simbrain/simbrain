@@ -691,6 +691,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     public void setSpikeResponder(final SpikeResponder sr) {
+
+        // Note that a copy of the spike responder is set. Impacts of this not known yet
         this.spikeResponder = sr.deepCopy();
     }
 

@@ -71,12 +71,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private double rangeLowerBound = 0;
 
     /**
-     * Set the maximum number of data points per series to plot.
-     */
-    @UserParameter(label = "Max Points", increment = 10, minimumValue = 1, order = 40)
-    private int maxDataPoints = 100;
-
-    /**
      * Whether this chart if fixed width or not.
      */
     @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
@@ -243,7 +237,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     private XYSeries addXYSeries(String description) {
         XYSeries xy = new XYSeries(description);
-        xy.setMaximumItemCount(maxDataPoints);
+        xy.setMaximumItemCount(windowSize);
         xy.setDescription(description);
         dataset.addSeries(xy);
         return xy;
@@ -275,8 +269,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * Set the maximum number of data points to (corresponds to time steps) to
      * plot for each time series.
      */
-    public void setMaximumDataPoints(int value) {
-        maxDataPoints = value;
+    public void setWindowSize(int value) {
+        windowSize = value;
         for (Object s : dataset.getSeries()) {
             ((XYSeries) s).setMaximumItemCount(value);
         }

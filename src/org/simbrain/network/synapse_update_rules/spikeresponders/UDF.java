@@ -28,6 +28,8 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
  * stop gap implementation. UDF isn't really a spike responder, as it determines
  * the jump-height of a convolved jump and decay spike responder.
  *
+ * See http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
+ *
  * @author Zoë Tosi
  */
 public class UDF extends SpikeResponder {

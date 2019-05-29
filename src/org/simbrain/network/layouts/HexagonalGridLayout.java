@@ -52,7 +52,7 @@ public class HexagonalGridLayout implements Layout {
     /**
      * The default allowed state for manual cols.
      */
-    public static final boolean DEFAULT_MANUAL_COLS = false;
+    public static final boolean DEFAULT_AUTO_COLS = true;
 
     /**
      * Initial x position of line of neurons.
@@ -65,27 +65,30 @@ public class HexagonalGridLayout implements Layout {
     private double initialY;
 
     /**
-     * Number of columns in the layout.
-     */
-    @UserParameter(label = "Number of Columns", description = "Number of columns in the grid")
-    private int numColumns = DEFAULT_NUM_COLUMNS;
-
-    /**
      * Horizontal spacing between neurons.
      */
-    @UserParameter(label = "Horizontal Spacing", description = "Horizontal spacing between neurons")
+    @UserParameter(label = "Horizontal Spacing", description = "Horizontal spacing between neurons", order = 10)
     private double hSpacing = DEFAULT_H_SPACING;
 
     /**
      * Vertical spacing between neurons.
      */
-    @UserParameter(label = "Vertical Spacing", description = "Vertical spacing between neurons")
+    @UserParameter(label = "Vertical Spacing", description = "Vertical spacing between neurons", order = 20)
     private double vSpacing = DEFAULT_V_SPACING;
 
     /**
      * Manually set number of columns in grid.
      */
-    private boolean manualColumns = DEFAULT_MANUAL_COLS;
+    @UserParameter(label = "Auto Columns",
+        description = "If true, set the number of columns automatically to get a square or nearly-square grid",
+        order = 30)
+    private boolean autoColumns = DEFAULT_AUTO_COLS;
+
+    /**
+     * Number of columns in the layout.
+     */
+    @UserParameter(label = "Number of Columns", description = "Number of columns in the grid", order = 40)
+    private int numColumns = DEFAULT_NUM_COLUMNS;
 
     /**
      * Create a layout.
@@ -108,20 +111,19 @@ public class HexagonalGridLayout implements Layout {
 
     @Override
     public void layoutNeurons(final List<Neuron> neurons) {
-        int numCols = numColumns;
-        if (!manualColumns) {
-            numCols = (int) Math.sqrt(neurons.size());
+        if (autoColumns) {
+            numColumns = (int) Math.sqrt(neurons.size());
         }
         int rowNum = -1;
         for (int i = 0; i < neurons.size(); i++) {
             Neuron neuron = neurons.get(i);
-            if (i % numCols == 0) {
+            if (i % numColumns == 0) {
                 rowNum++;
             }
             if (rowNum % 2 == 0) {
-                neuron.setX(initialX + hSpacing / 2 + (i % numCols) * hSpacing);
+                neuron.setX(initialX + hSpacing / 2 + (i % numColumns) * hSpacing);
             } else {
-                neuron.setX(initialX + (i % numCols) * hSpacing);
+                neuron.setX(initialX + (i % numColumns) * hSpacing);
             }
             neuron.setY(initialY + rowNum * vSpacing);
         }
@@ -173,22 +175,24 @@ public class HexagonalGridLayout implements Layout {
         vSpacing = spacing;
     }
 
+    public boolean isAutoColumns() {
+        return autoColumns;
+    }
+
+    public void setAutoColumns(boolean autoColumns) {
+        this.autoColumns = autoColumns;
+    }
+
     @Override
     public String toString() {
         return "Hexagonal Grid Layout";
     }
 
-    public boolean isManualColumns() {
-        return manualColumns;
-    }
-
-    public void setManualColumns(boolean manualColumns) {
-        this.manualColumns = manualColumns;
-    }
-
     @Override
     public EditableObject copy() {
-        return new HexagonalGridLayout(hSpacing, vSpacing, numColumns);
+        HexagonalGridLayout layout = new HexagonalGridLayout(hSpacing, vSpacing, numColumns);
+        layout.setAutoColumns(this.autoColumns);
+        return layout;
     }
 
 }

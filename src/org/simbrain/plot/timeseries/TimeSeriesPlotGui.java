@@ -50,7 +50,6 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
      */
     public TimeSeriesPlotGui(GenericFrame frame, TimeSeriesPlotComponent component) {
         super(frame, component);
-
         actionManager = new PlotActionManager(this);
         timeSeriesPanel = new TimeSeriesPlotPanel(component.getModel());
         createAttachMenuBar();

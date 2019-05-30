@@ -74,14 +74,14 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * Whether this chart if fixed width or not.
      */
     @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
-            "extends beyond a fixed with", order = 50)
+        "extends beyond a fixed with", order = 50)
     private boolean fixedWidth = false;
 
     /**
      * Size of window when fixed width is being used.
      */
     @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
-            "when fixedWidth is turned on", minimumValue = 10, increment = 50, order = 60)
+        "when fixedWidth is turned on", minimumValue = 10, increment = 50, order = 60)
     private int windowSize = 100;
 
     /**
@@ -101,9 +101,9 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
     /**
      * If true, the plot is receiving an array coupling.  If false, scalar
-     * couplings are being used, via {@link ScalarTimeSeries} objects. When a time
-     * series is added or removed (e.g. from the GUI or a script) array mode
-     * ceases and array couplings are removed. When an array coupling is
+     * couplings are being used, via {@link ScalarTimeSeries} objects. When a
+     * time series is added or removed (e.g. from the GUI or a script) array
+     * mode ceases and array couplings are removed. When an array coupling is
      * created, all time series objects are removed and array mode is true.
      */
     private boolean isArrayMode = false;
@@ -145,11 +145,10 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      *
      * @param seriesIndex index of data source to use
      * @param time        data for x axis
-     * @param value       data for y axis Adds a data source to the chart
-     *                    with the specified description.
+     * @param value       data for y axis Adds a data source to the chart with
+     *                    the specified description.
      */
     public void addData(int seriesIndex, double time, double value) {
-        disableArrayMode();
         if (seriesIndex < dataset.getSeriesCount()) {
             dataset.getSeries(seriesIndex).add(time, value);
         }
@@ -164,12 +163,15 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Adds a {@link ScalarTimeSeries} to the chart with a specified description.
+     * Adds a {@link ScalarTimeSeries} to the chart with a specified
+     * description.
      *
      * @param description description for the time series
      */
     public void addScalarTimeSeries(String description) {
-        disableArrayMode();
+        if (isArrayMode) {
+            return;
+        }
         ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
         timeSeriesList.add(sts);
     }
@@ -221,15 +223,23 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     /**
      * Turn off array mode. Remove all scalar time series.
      */
-    private void disableArrayMode() {
-        // If a scalar coupling is added when an array coupling is in place,
-        // remove all lingering aspects of the array coupling
+    public void setArrayMode(boolean isArrayMode) {
+        this.isArrayMode = isArrayMode;
+        dataset.removeAllSeries();
+        removeAllScalarTimeSeries();
+        changeSupport.firePropertyChange("changeArrayMode", null, null);
         if (isArrayMode) {
-            isArrayMode = false;
-            timeSeriesList.clear();
-            dataset.removeAllSeries();
-            changeSupport.firePropertyChange("removeArrayCouplings", null, null);
+            // No action
+        } else {
+            addScalarTimeSeries(3); // Add default time series
+            // If a scalar coupling is added when an array coupling is in place,
+            // remove all lingering aspects of the array coupling
         }
+
+    }
+
+    public boolean isArrayMode() {
+        return isArrayMode;
     }
 
     /**
@@ -243,25 +253,35 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         return xy;
     }
 
+
     /**
      * Remove all {@link ScalarTimeSeries} objects.
      */
     public void removeAllScalarTimeSeries() {
         for (ScalarTimeSeries ts : timeSeriesList) {
             dataset.removeSeries(ts.getSeries());
+            changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
         }
         timeSeriesList.clear();
     }
 
     /**
-     * Removes a data source from the chart.
+     * Remove a specific scalar time series.
+     *
+     * @param ts the time series to remove.
+     */
+    private void removeTimeSeries(ScalarTimeSeries ts) {
+            dataset.removeSeries(ts.getSeries());
+            timeSeriesList.remove(ts);
+            changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+    }
+
+    /**
+     * Removes the last data source from the chart.
      */
     public void removeLastScalarTimeSeries() {
-        disableArrayMode();
         if (timeSeriesList.size() > 0) {
-            ScalarTimeSeries lastSeries = timeSeriesList.get(timeSeriesList.size() - 1);
-            dataset.removeSeries(lastSeries.getSeries());
-            timeSeriesList.remove(lastSeries);
+            removeTimeSeries(timeSeriesList.get(timeSeriesList.size() - 1));
         }
     }
 
@@ -314,8 +334,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Update the model; currently used to remove unused data when in
-     * "fixed width" mode.
+     * Update the model; currently used to remove unused data when in "fixed
+     * width" mode.
      */
     public void update() {
 
@@ -374,8 +394,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Encapsulates a single time series for scalar couplings to
-     * attach to.
+     * Encapsulates a single time series for scalar couplings to attach to.
      */
     public class ScalarTimeSeries implements AttributeContainer {
 

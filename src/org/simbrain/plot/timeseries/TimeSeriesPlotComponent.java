@@ -81,8 +81,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         });
 
         model.addPropertyChangeListener(evt -> {
-            if ("removeArrayCouplings".equals(evt.getPropertyName())) {
-                fireAttributeContainerRemoved(model);
+            if ("changeArrayMode".equals(evt.getPropertyName())) {
+                if (model.isArrayMode()) {
+                    // Changed from scalar to array mode
+                    // No action
+                } else {
+                    // Changed from array to scalar mode
+                    fireAttributeContainerRemoved(model);
+                }
+            } else if ("scalarTimeSeriesRemoved".equals(evt.getPropertyName())) {
+                fireAttributeContainerRemoved((AttributeContainer) evt.getOldValue());
             }
         });
     }
@@ -91,8 +99,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.add(model);
-        containers.addAll(model.getTimeSeriesList());
+        if (model.isArrayMode()) {
+            containers.add(model);
+        } else {
+            containers.addAll(model.getTimeSeriesList());
+        }
         return containers;
     }
 

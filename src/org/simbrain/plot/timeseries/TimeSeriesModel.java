@@ -74,14 +74,14 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * Whether this chart if fixed width or not.
      */
     @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
-        "extends beyond a fixed with", order = 50)
+            "extends beyond a fixed with", useSetter = true, order = 50)
     private boolean fixedWidth = false;
 
     /**
      * Size of window when fixed width is being used.
      */
     @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
-        "when fixedWidth is turned on", minimumValue = 10, increment = 50, order = 60)
+            "when fixedWidth is turned on", minimumValue = 10, useSetter = true, increment = 10, order = 60)
     private int windowSize = 100;
 
     /**
@@ -116,6 +116,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     public TimeSeriesModel(Supplier<Integer> timeSupplier) {
         this.timeSupplier = timeSupplier;
         addScalarTimeSeries(3);
+        setFixedWidth(fixedWidth); // Force update
     }
 
 
@@ -271,9 +272,9 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * @param ts the time series to remove.
      */
     private void removeTimeSeries(ScalarTimeSeries ts) {
-            dataset.removeSeries(ts.getSeries());
-            timeSeriesList.remove(ts);
-            changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+        dataset.removeSeries(ts.getSeries());
+        timeSeriesList.remove(ts);
+        changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
     }
 
     /**
@@ -291,11 +292,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     public void setWindowSize(int value) {
         windowSize = value;
-        for (Object s : dataset.getSeries()) {
-            ((XYSeries) s).setMaximumItemCount(value);
-        }
+        setFixedWidth(fixedWidth);
     }
-
 
     public XYSeriesCollection getDataset() {
         return dataset;
@@ -333,27 +331,21 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         this.rangeLowerBound = lowerRangeBoundary;
     }
 
-    /**
-     * Update the model; currently used to remove unused data when in "fixed
-     * width" mode.
-     */
-    public void update() {
+    public boolean isFixedWidth() {
+        return fixedWidth;
+    }
 
-        // Trim appropriately if fixed width
-        if (fixedWidth) {
-
-            for (int i = 0; i < getDataset().getSeriesCount(); i++) {
-                XYSeries series = getDataset().getSeries(i);
-                if (series.getItemCount() > windowSize) {
-                    int diff = Math.abs(series.getItemCount() - windowSize);
-                    // System.out.println("diff:" + diff);
-                    for (int j = 0; i < diff; i++) {
-                        series.remove(j);
-                    }
-                }
+    public void setFixedWidth(boolean fixedWidth) {
+        this.fixedWidth = fixedWidth;
+        if(fixedWidth) {
+            for (Object s : dataset.getSeries()) {
+                ((XYSeries) s).setMaximumItemCount(windowSize);
+            }
+        } else {
+            for (Object s : dataset.getSeries()) {
+                ((XYSeries) s).setMaximumItemCount(Integer.MAX_VALUE);
             }
         }
-
     }
 
     /**

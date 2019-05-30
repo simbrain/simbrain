@@ -67,12 +67,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             public void couplingAdded(Coupling<?> coupling) {
 
                 // A new array coupling is being added to this time series
-                // Creating an array coupling wipes out any existing scalar time series
                 if (coupling.getConsumer().getBaseObject() == model) {
-                    for (TimeSeriesModel.ScalarTimeSeries series : model.getTimeSeriesList()) {
-                        fireAttributeContainerRemoved(series);
-                    }
-                    model.removeAllScalarTimeSeries();
 
                     // Initialize series with provided names, e.g neuron labels
                     model.initializeArrayMode(coupling.getProducer().getLabelArray());
@@ -94,7 +89,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             }
         });
     }
-
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
@@ -169,9 +163,5 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return TimeSeriesModel.getXStream().toXML(model);
     }
 
-    @Override
-    public void update() {
-        model.update();
-    }
 
 }

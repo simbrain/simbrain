@@ -115,6 +115,8 @@ public final class NeuronDialog extends StandardDialog {
 
         if (selection == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+        } else if (selection == null) {
+            helpButton.setEnabled(false);
         } else {
 
             // Use combo box label (with spaces removed) for doc page.

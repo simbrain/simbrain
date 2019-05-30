@@ -31,9 +31,6 @@ import java.awt.*;
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the
  * time series workspace component.
- * <p>
- * TODO: Make a version that extends this, like network panel case. Then
- * document in UML
  */
 public class TimeSeriesPlotPanel extends JPanel {
 
@@ -63,6 +60,21 @@ public class TimeSeriesPlotPanel extends JPanel {
     private JPanel buttonPanel = new JPanel();
 
     /**
+     * Combo box to select coupling mode (array or scalar).
+     */
+    private JComboBox couplingModeComboBox;
+
+    /**
+     * Button to delete scalar time series.
+     */
+    private JButton deleteButton;
+
+    /**
+     * Button to add scalar time series
+     */
+    private JButton addButton;
+
+    /**
      * Construct a time series panel.
      *
      * @param timeSeriesModel model underlying model
@@ -72,13 +84,44 @@ public class TimeSeriesPlotPanel extends JPanel {
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
 
+
+        // Set up coupling mode
+        couplingModeComboBox = new JComboBox();
+        couplingModeComboBox.addItem("Scalar Mode");
+        couplingModeComboBox.addItem("Array Mode");
+        buttonPanel.add(couplingModeComboBox);
+        couplingModeComboBox.addActionListener(e -> changeMode());
+
         addClearGraphDataButton();
         addPreferencesButton();
+        addAddDeleteButtons();
 
         add("Center", chartPanel);
         add("South", buttonPanel);
 
         init();
+
+    }
+
+    /**
+     * Update the panel and the time series model (to array or scalar mode)
+     * based on combo box.
+     */
+    private void changeMode() {
+        // TODO: Let the combo box change the mode of the model, and then
+        // have an event update the whether add and delete buttons are
+        // enabled or not.
+        if (couplingModeComboBox.getSelectedIndex() == 0) {
+            // scalar mode
+            model.setArrayMode(false);
+            addButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+        } else {
+            // array mode
+            model.setArrayMode(true);
+            addButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+        }
     }
 
     /**
@@ -117,11 +160,21 @@ public class TimeSeriesPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
-     *
-     * @return
      */
     public JPanel getButtonPanel() {
         return buttonPanel;
+    }
+
+    /**
+     * Add buttons for adding and deleting {@link TimeSeriesModel.ScalarTimeSeries} objects.
+     */
+    public void addAddDeleteButtons() {
+        deleteButton = new JButton("Delete");
+        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
+        addButton = new JButton("Add");
+        addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
     }
 
     /**
@@ -158,16 +211,10 @@ public class TimeSeriesPlotPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * @return the chartPanel
-     */
     public ChartPanel getChartPanel() {
         return chartPanel;
     }
 
-    /**
-     * @return the model
-     */
     public TimeSeriesModel getTimeSeriesModel() {
         return model;
     }

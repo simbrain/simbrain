@@ -58,8 +58,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         model.setTimeSupplier(() -> getWorkspace().getTime());
     }
 
-    Coupling<?> currentCoupling;
-
     @Override
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
@@ -68,32 +66,38 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             @Override
             public void couplingAdded(Coupling<?> coupling) {
 
-                // A new coupling is being added to this time series
+                // A new array coupling is being added to this time series
                 if (coupling.getConsumer().getBaseObject() == model) {
 
-                    // if(currentCoupling != null) {
-                    //     fireAttributeContainerRemoved(currentCoupling.);
-                    // }
-
-                    // TODO: remove any existing couplings
-                    //
-
-                    model.setSeriesNames(coupling.getProducer().getLabelArray());
+                    // Initialize series with provided names, e.g neuron labels
+                    model.initializeArrayMode(coupling.getProducer().getLabelArray());
                 }
             }
         });
-    }
 
-
-    @Override
-    public void update() {
-        model.getDataset().removeAllSeries();
+        model.addPropertyChangeListener(evt -> {
+            if ("changeArrayMode".equals(evt.getPropertyName())) {
+                if (model.isArrayMode()) {
+                    // Changed from scalar to array mode
+                    // No action
+                } else {
+                    // Changed from array to scalar mode
+                    fireAttributeContainerRemoved(model);
+                }
+            } else if ("scalarTimeSeriesRemoved".equals(evt.getPropertyName())) {
+                fireAttributeContainerRemoved((AttributeContainer) evt.getOldValue());
+            }
+        });
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.add(model);
+        if (model.isArrayMode()) {
+            containers.add(model);
+        } else {
+            containers.addAll(model.getTimeSeriesList());
+        }
         return containers;
     }
 
@@ -158,5 +162,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public String getXML() {
         return TimeSeriesModel.getXStream().toXML(model);
     }
+
 
 }

@@ -27,12 +27,18 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Data model for a time series plot. A time series consumes an array of doubles, with
- * one component for each member of the time series. There is no support currently
- * for representing separate scalar values in a single time series.
+ * Data model for a time series plot. A time series consumes an array of
+ * doubles, with one component for each member of the time series. There is no
+ * support currently for representing separate scalar values in a single time
+ * series.
  */
 public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
@@ -65,10 +71,18 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private double rangeLowerBound = 0;
 
     /**
-     * Set the maximum number of data points per series to plot.
+     * Whether this chart if fixed width or not.
      */
-    @UserParameter(label = "Max Points", increment = 100, minimumValue = 1, order = 40)
-    private int maxDataPoints = 1000;
+    @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
+            "extends beyond a fixed with", useSetter = true, order = 50)
+    private boolean fixedWidth = false;
+
+    /**
+     * Size of window when fixed width is being used.
+     */
+    @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
+            "when fixedWidth is turned on", minimumValue = 10, useSetter = true, increment = 10, order = 60)
+    private int windowSize = 100;
 
     /**
      * Names for the time series.  Set via coupling events.
@@ -76,14 +90,45 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private String[] seriesNames = {};
 
     /**
-     * Time series model constructor.
+     * List of time series objects which can be coupled to.
+     */
+    private List<ScalarTimeSeries> timeSeriesList = new ArrayList<ScalarTimeSeries>();
+
+    /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
+     * If true, the plot is receiving an array coupling.  If false, scalar
+     * couplings are being used, via {@link ScalarTimeSeries} objects. When a
+     * time series is added or removed (e.g. from the GUI or a script) array
+     * mode ceases and array couplings are removed. When an array coupling is
+     * created, all time series objects are removed and array mode is true.
+     */
+    private boolean isArrayMode = false;
+
+    /**
+     * Construct a time series model.
+     *
+     * @param timeSupplier the supplier for the x-axis of the graph
      */
     public TimeSeriesModel(Supplier<Integer> timeSupplier) {
         this.timeSupplier = timeSupplier;
+        addScalarTimeSeries(3);
+        setFixedWidth(fixedWidth); // Force update
     }
 
-    {
-        addTimeSeries("Test");
+
+    /**
+     * Create specified number of data sources.
+     *
+     * @param numSeries number of data sources to add to the plot.
+     */
+    public void addScalarTimeSeries(int numSeries) {
+        for (int i = 0; i < numSeries; i++) {
+            addScalarTimeSeries();
+        }
     }
 
     /**
@@ -97,66 +142,59 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Adds a data source to the chart with the specified description.
-     */
-    public void addTimeSeries(String description) {
-        XYSeries xy = new XYSeries(description);
-        xy.setMaximumItemCount(maxDataPoints);
-        dataset.addSeries(xy);
-    }
-
-    /**
-     * Add scalar data to a specified time series.
+     * Add scalar data to a specified time series. Called by scripts.
      *
-     * @param dataSourceIndex index of data source to use
-     * @param time            data for x axis
-     * @param value           data for y axis
-     * Adds a data source to the chart with the specified description.
+     * @param seriesIndex index of data source to use
+     * @param time        data for x axis
+     * @param value       data for y axis Adds a data source to the chart with
+     *                    the specified description.
      */
-    public void addData(int dataSourceIndex, double time, double value) {
-        if(dataSourceIndex < dataset.getSeriesCount()) {
-            dataset.getSeries(dataSourceIndex).add(time, value);
+    public void addData(int seriesIndex, double time, double value) {
+        if (seriesIndex < dataset.getSeriesCount()) {
+            dataset.getSeries(seriesIndex).add(time, value);
         }
     }
 
     /**
-     * Manually added data to a specified time series.
-     *
-     * @param scalar value to add
-     * @param index time series to add it to
+     * Adds a {@link ScalarTimeSeries} with a default description.
      */
-    public void addValue(double scalar, int index) {
-        addData(index, timeSupplier.get(), scalar);
+    public void addScalarTimeSeries() {
+        String description = "Series " + (timeSeriesList.size() + 1);
+        addScalarTimeSeries(description);
     }
 
     /**
-     * Allows scalar couplings to be used. Values are added to first
-     * time series.
+     * Adds a {@link ScalarTimeSeries} to the chart with a specified
+     * description.
      *
-     * @param scalar
+     * @param description description for the time series
      */
-    @Consumable()
-    public void addValue(double scalar) {
-        addValue(scalar, 0);
+    public void addScalarTimeSeries(String description) {
+        if (isArrayMode) {
+            return;
+        }
+        ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
+        timeSeriesList.add(sts);
     }
 
     /**
-     * Called by coupling producers via reflection.  Each component
-     * of a vector is applied to a separate time series.
+     * Called by coupling producers via reflection.  Each component of a vector
+     * is applied to a separate time series.
      */
     @Consumable()
     public void addValues(double[] vector) {
 
         // If there is a size mismatch (for example, after removing neurons from
-        // a neuron group sending activations, clear and start over.)
-        // This will reset labels for all time series
+        // a neuron group sending activations), clear and start over.
+        // Resets labels for all time series
         if (vector.length != dataset.getSeriesCount()) {
             dataset.removeAllSeries();
+            timeSeriesList.clear();
             for (int i = 0; i < vector.length; i++) {
                 if (i < seriesNames.length) {
-                    addTimeSeries(seriesNames[i]);
+                    addXYSeries(seriesNames[i]);
                 } else {
-                    addTimeSeries("" + i);
+                    addXYSeries("" + i);
                 }
             }
         }
@@ -167,21 +205,106 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         }
     }
 
-
-
-    public void setSeriesNames(String[] names) {
+    /**
+     * Initialize array mode.
+     *
+     * @param names names for new series
+     */
+    public void initializeArrayMode(String[] names) {
+        isArrayMode = true;
+        dataset.removeAllSeries();
         this.seriesNames = names;
+        int i = 0;
+        for (String name : names) {
+            addXYSeries(names[i] + 1);
+            i++;
+        }
+    }
+
+    /**
+     * Turn off array mode. Remove all scalar time series.
+     */
+    public void setArrayMode(boolean isArrayMode) {
+        this.isArrayMode = isArrayMode;
+        dataset.removeAllSeries();
+        removeAllScalarTimeSeries();
+        changeSupport.firePropertyChange("changeArrayMode", null, null);
+        if (isArrayMode) {
+            // No action
+        } else {
+            addScalarTimeSeries(3); // Add default time series
+            // If a scalar coupling is added when an array coupling is in place,
+            // remove all lingering aspects of the array coupling
+        }
+
+    }
+
+    public boolean isArrayMode() {
+        return isArrayMode;
+    }
+
+    /**
+     * Adds an xy series to the chart with the specified description.
+     */
+    private XYSeries addXYSeries(String description) {
+        XYSeries xy = new XYSeries(description);
+        xy.setMaximumItemCount(windowSize);
+        xy.setDescription(description);
+        dataset.addSeries(xy);
+        return xy;
+    }
+
+
+    /**
+     * Remove all {@link ScalarTimeSeries} objects.
+     */
+    public void removeAllScalarTimeSeries() {
+        for (ScalarTimeSeries ts : timeSeriesList) {
+            dataset.removeSeries(ts.getSeries());
+            changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+        }
+        timeSeriesList.clear();
+    }
+
+    /**
+     * Remove a specific scalar time series.
+     *
+     * @param ts the time series to remove.
+     */
+    private void removeTimeSeries(ScalarTimeSeries ts) {
+        dataset.removeSeries(ts.getSeries());
+        timeSeriesList.remove(ts);
+        changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+    }
+
+    /**
+     * Removes the last data source from the chart.
+     */
+    public void removeLastScalarTimeSeries() {
+        if (timeSeriesList.size() > 0) {
+            removeTimeSeries(timeSeriesList.get(timeSeriesList.size() - 1));
+        }
+    }
+
+    /**
+     * Set the maximum number of data points to (corresponds to time steps) to
+     * plot for each time series.
+     */
+    public void setWindowSize(int value) {
+        windowSize = value;
+        setFixedWidth(fixedWidth);
+    }
+
+    public XYSeriesCollection getDataset() {
+        return dataset;
+    }
+
+    public List<ScalarTimeSeries> getTimeSeriesList() {
+        return timeSeriesList;
     }
 
     public void setTimeSupplier(Supplier<Integer> timeSupplier) {
         this.timeSupplier = timeSupplier;
-    }
-
-    /**
-     * Return the name to use for this model in coupling descriptions.
-     */
-    public String getName() {
-        return "TimeSeriesPlot";
     }
 
     public boolean isAutoRange() {
@@ -208,8 +331,21 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         this.rangeLowerBound = lowerRangeBoundary;
     }
 
-    public XYSeriesCollection getDataset() {
-        return dataset;
+    public boolean isFixedWidth() {
+        return fixedWidth;
+    }
+
+    public void setFixedWidth(boolean fixedWidth) {
+        this.fixedWidth = fixedWidth;
+        if(fixedWidth) {
+            for (Object s : dataset.getSeries()) {
+                ((XYSeries) s).setMaximumItemCount(windowSize);
+            }
+        } else {
+            for (Object s : dataset.getSeries()) {
+                ((XYSeries) s).setMaximumItemCount(Integer.MAX_VALUE);
+            }
+        }
     }
 
     /**
@@ -223,6 +359,13 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
+     * The name to used in coupling descriptions.
+     */
+    public String getName() {
+        return "TimeSeriesPlot";
+    }
+
+    /**
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
@@ -230,20 +373,49 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * @return Initialized object.
      */
     private Object readResolve() {
+        changeSupport = new PropertyChangeSupport(this);
         return this;
     }
 
-    public int getMaximumDataPoints() {
-        return maxDataPoints;
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
     }
 
     /**
-     * Set the maximum number of data points to (corresponds to time steps) to plot for each time series.
+     * Encapsulates a single time series for scalar couplings to attach to.
      */
-    public void setMaximumDataPoints(int value) {
-        maxDataPoints = value;
-        for (Object s : dataset.getSeries()) {
-            ((XYSeries) s).setMaximumItemCount(value);
+    public class ScalarTimeSeries implements AttributeContainer {
+
+        /**
+         * The represented time series
+         */
+        XYSeries series;
+
+        /**
+         * Construct the time series.
+         */
+        public ScalarTimeSeries(XYSeries xy) {
+            series = xy;
+        }
+
+        public XYSeries getSeries() {
+            return series;
+        }
+
+        /**
+         * Get the description.
+         */
+        public String getDescription() {
+            return series.getDescription();
+        }
+
+        @Consumable(idMethod = "getDescription")
+        public void setValue(double value) {
+            series.add(timeSupplier.get(), (Number) value);
         }
     }
 }

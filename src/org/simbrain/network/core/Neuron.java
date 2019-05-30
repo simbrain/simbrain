@@ -342,7 +342,7 @@ public class Neuron implements EditableObject, AttributeContainer {
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
 
         NeuronUpdateRule oldRule = this.updateRule;
-        this.updateRule = updateRule;
+        this.updateRule = updateRule.deepCopy();
 
         // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
         // But this check caused problems so commented out for null

@@ -25,6 +25,8 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Linear <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
  * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
@@ -131,6 +133,17 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
      */
     private double memPotential = 0;
 
+    private double randSpkChance = 0;
+
+    public IntegrateAndFireRule() {
+        super();
+    }
+
+    public IntegrateAndFireRule(double randSpkChance) {
+        this();
+        this.randSpkChance = randSpkChance;
+    }
+
     @Override
     public IntegrateAndFireRule deepCopy() {
         IntegrateAndFireRule ifn = new IntegrateAndFireRule();
@@ -142,6 +155,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         ifn.setResistance(getResistance());
         ifn.setAddNoise(getAddNoise());
         ifn.noiseGenerator = noiseGenerator.deepCopy();
+        ifn.randSpkChance = randSpkChance;
         return ifn;
     }
 
@@ -174,6 +188,10 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         double dVm = timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant;
 
         memPotential += dVm;
+
+        if(ThreadLocalRandom.current().nextDouble() < randSpkChance*neuron.getNetwork().getTimeStep()) {
+            memPotential = threshold+1;
+        }
 
         if ((memPotential >= threshold) && (neuron.getNetwork().getTime() > (getLastSpikeTime() + refractoryPeriod))) {
             neuron.setSpkBuffer(true);

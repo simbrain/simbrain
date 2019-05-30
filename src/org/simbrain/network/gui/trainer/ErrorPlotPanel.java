@@ -63,7 +63,6 @@ public class ErrorPlotPanel extends JPanel {
         model.setRangeLowerBound(0);
         model.setRangeUpperBound(1);
         model.setAutoRange(false);
-        model.setMaximumDataPoints(Integer.MAX_VALUE);
         TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
         graphPanel.getChartPanel().getChart().setTitle("");
         graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis().setLabel("Iterations");
@@ -80,7 +79,7 @@ public class ErrorPlotPanel extends JPanel {
         mainPanel.add(graphPanel);
         add(mainPanel);
 
-        model.addTimeSeries("Error");
+        model.addScalarTimeSeries("Error");
         trainer.addErrorListener(new ErrorListener() {
             @Override
             public void errorUpdated() {

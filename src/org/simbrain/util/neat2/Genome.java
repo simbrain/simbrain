@@ -1,5 +1,7 @@
 package org.simbrain.util.neat2;
 
+import org.simbrain.util.math.SimbrainRandomizer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,8 @@ public abstract class Genome<T, G extends Genome<T, G>> {
      */
     // private Map<String, Chromosome<?>> chromosomes = new HashMap<>();
 
+    private SimbrainRandomizer randomizer;
+
     public abstract G crossOver(G other);
 
     public abstract void mutate();
@@ -25,6 +29,23 @@ public abstract class Genome<T, G extends Genome<T, G>> {
      * Create an object using this genome. In a sense, create a phenotype.
      */
     public abstract T build();
+
+    public SimbrainRandomizer getRandomizer() {
+        return randomizer;
+    }
+
+    public void setRandomizer(SimbrainRandomizer randomizer) {
+        this.randomizer = randomizer;
+    }
+
+    /**
+     * Make a new randomizer based on the state of the parent's randomizer.
+     *
+     * @param randomizer the randomizer of the parent
+     */
+    public void inheritRandomizer(SimbrainRandomizer randomizer) {
+        this.randomizer = new SimbrainRandomizer(randomizer.nextLong());
+    }
 
     // public Map<String, Chromosome<?>> getChromosomes() {
     //     return chromosomes;

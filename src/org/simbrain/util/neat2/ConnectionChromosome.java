@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromosome> {
 
-    private SimbrainRandomizer randomizer;
-
     private Map<Integer, ConnectionGene> connectionGenes = new TreeMap<>();
 
     @Override
@@ -22,7 +20,7 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
 
         for (Integer i : allInnovationNumbers) {
             if (this.connectionGenes.containsKey(i) && other.connectionGenes.containsKey(i)) {
-                double decision = randomizer.nextDouble(0, 1);
+                double decision = getRandomizer().nextDouble(0, 1);
                 if (decision < 0.5) {
                     ret.connectionGenes.put(i, this.connectionGenes.get(i));
                 } else {
@@ -59,13 +57,5 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
         ret.connectionGenes = connectionGenes.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         return ret;
-    }
-
-    public void setRandomizer(SimbrainRandomizer randomizer) {
-        this.randomizer = randomizer;
-    }
-
-    public SimbrainRandomizer getRandomizer() {
-        return randomizer;
     }
 }

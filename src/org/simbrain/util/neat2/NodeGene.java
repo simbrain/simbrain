@@ -1,6 +1,7 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.neat.ConnectionGene;
 
@@ -76,5 +77,8 @@ public class NodeGene extends Gene<Neuron> {
 
     public void setType(NodeType type) {
         this.type = type;
+        if (type != NodeType.hidden) {
+            this.prototype.setUpdateRule(new LinearRule());
+        }
     }
 }

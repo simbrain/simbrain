@@ -81,8 +81,15 @@ public class ConnectionGene extends Gene<Synapse> {
 
     @Override
     public void mutate() {
-        double dw = randomizer.nextDouble(-Xor.MAX_CONNECTION_MUTATION, Xor.MAX_CONNECTION_MUTATION);
-        prototype.setStrength(prototype.getStrength() + dw);
+        double newStrength =
+                randomizer.nextDouble(-Xor.MAX_CONNECTION_MUTATION, Xor.MAX_CONNECTION_MUTATION)
+                        + prototype.getStrength();
+        if (newStrength > prototype.getUpperBound()) {
+            newStrength = prototype.getUpperBound();
+        } else if (newStrength < prototype.getLowerBound()) {
+            newStrength = prototype.getLowerBound();
+        }
+        prototype.setStrength(newStrength);
     }
 
     @Override
@@ -105,8 +112,7 @@ public class ConnectionGene extends Gene<Synapse> {
         ConnectionGene that = (ConnectionGene) o;
 
         if (sourceIndex != that.sourceIndex) return false;
-        if (targetIndex != that.targetIndex) return false;
-        return prototype != null ? prototype.equals(that.prototype) : that.prototype == null;
+        return targetIndex == that.targetIndex;
     }
 
     @Override

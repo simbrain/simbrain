@@ -24,8 +24,6 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
      */
     private ConnectionChromosome connectionGenes = new ConnectionChromosome();
 
-    private SimbrainRandomizer randomizer;
-
 
     @Override
     public Network build() {
@@ -75,6 +73,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
             nodeGene.setMutable(mutable);
             if ("inputs".equals(name)) {
                 nodeGene.setType(NodeGene.NodeType.input);
+                nodeGene.getPrototype().setClamped(true);
             }
             if ("outputs".equals(name)) {
                 nodeGene.setType(NodeGene.NodeType.output);
@@ -91,12 +90,12 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
         NetworkGenome ret = new NetworkGenome();
 
-        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
+        ret.inheritRandomizer(getRandomizer());
 
         ret.nodeGenes = nodeGenes.crossOver(otherGenome.nodeGenes);
 
         ret.connectionGenes = connectionGenes.crossOver(otherGenome.connectionGenes);
-        ret.connectionGenes.setRandomizer(ret.randomizer);
+        ret.connectionGenes.setRandomizer(ret.getRandomizer());
 
         return ret;
     }
@@ -107,7 +106,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
     public void mutate() {
 
         // new node mutation
-        if (randomizer.nextDouble(0, 1) < Xor.NEW_NODE_MUTATION_PROBABILITY) {
+        if (getRandomizer().nextDouble(0, 1) < Xor.NEW_NODE_MUTATION_PROBABILITY) {
             nodeGenes.addGenes(Collections.singleton(new NodeGene()));
         }
 
@@ -116,20 +115,20 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
         // new connection mutation
         // needs to be done here because it has dependency on the node genes
-        if (randomizer.nextDouble(0, 1) < Xor.NEW_CONNECTION_MUTATION_PROBABILITY) {
-            int sourceNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+        if (getRandomizer().nextDouble(0, 1) < Xor.NEW_CONNECTION_MUTATION_PROBABILITY) {
+            int sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
-                sourceNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+                sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             }
-            int destinationNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+            int destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             while (!nodeGenes.contains(destinationNodeID) || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input) {
-                destinationNodeID = randomizer.nextInt(nodeGenes.getMaxNodeID() + 1);
+                destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             }
             ConnectionGene newConnectionGene =
                     new ConnectionGene(
                             sourceNodeID,
                             destinationNodeID,
-                            randomizer.nextDouble(
+                            getRandomizer().nextDouble(
                                     Xor.MIN_CONNECTION_STRENGTH,
                                     Xor.MAX_CONNECTION_STRENGTH
                             ));
@@ -145,17 +144,13 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
     public NetworkGenome copy() {
         NetworkGenome ret = new NetworkGenome();
 
-        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
+        ret.inheritRandomizer(getRandomizer());
 
         ret.nodeGenes = nodeGenes.copy();
 
         ret.connectionGenes = connectionGenes.copy();
-        ret.connectionGenes.setRandomizer(ret.randomizer);
+        ret.connectionGenes.setRandomizer(ret.getRandomizer());
 
         return ret;
-    }
-
-    public void setRandomizer(SimbrainRandomizer randomizer) {
-        this.randomizer = randomizer;
     }
 }

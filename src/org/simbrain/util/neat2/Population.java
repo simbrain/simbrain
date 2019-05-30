@@ -45,8 +45,13 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
         int remainingPopulation = agentList.size();
         int reproduceSize = size - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
-            A agent1 = agentList.get(randomizer.nextInt(remainingPopulation));
-            A agent2 = agentList.get(randomizer.nextInt(remainingPopulation));
+            int index1 = randomizer.nextInt(remainingPopulation);
+            int index2 = randomizer.nextInt(remainingPopulation);
+            while (index2 == index1) {
+                index2 = randomizer.nextInt(remainingPopulation);
+            }
+            A agent1 = agentList.get(index1);
+            A agent2 = agentList.get(index2);
             A newAgent = agent1.crossover(agent2);
             newAgent.mutate();
             agentList.add(newAgent);
@@ -55,9 +60,13 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
 
     public Double computeNewFitness() {
         agentList.forEach(Agent::computeFitness);
+        Collections.sort(agentList);
         Collections.reverse(agentList);
         agentList = agentList.stream().limit(agentList.size() / 2).collect(Collectors.toList());
-        return agentList.get(0).getCurrentFitness();
+        return agentList.get(0).getFitness();
     }
 
+    public List<A> getAgentList() {
+        return agentList;
+    }
 }

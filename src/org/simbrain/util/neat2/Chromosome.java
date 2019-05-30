@@ -1,5 +1,7 @@
 package org.simbrain.util.neat2;
 
+import org.simbrain.util.math.SimbrainRandomizer;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -11,9 +13,19 @@ import java.util.List;
  */
 public abstract class Chromosome<T, C extends Chromosome<T, C>> {
 
+    private SimbrainRandomizer randomizer;
+
     public abstract C crossOver(C other);
 
     public abstract void mutate();
 
     public abstract Collection<? extends Gene<T>> getGenes();
+
+    public void setRandomizer(SimbrainRandomizer randomizer) {
+        this.randomizer = randomizer;
+    }
+
+    public SimbrainRandomizer getRandomizer() {
+        return randomizer;
+    }
 }

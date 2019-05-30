@@ -17,6 +17,11 @@ public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements 
 
     private Function<A, Double> fitnessFunction;
 
+    /**
+     * The fitness score of this agent. null if this agent has not been evaluate yet.
+     */
+    private Double fitness = null;
+
     public Agent(G genome, Function<A, Double> fitnessFunction) {
         this.genome = genome;
         this.fitnessFunction = fitnessFunction;
@@ -31,12 +36,10 @@ public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements 
      */
     public abstract void computeFitness();
 
-    /**
-     * Get the computed fitness score of this agent. Null if the fitness score has not been computed yet.
-     *
-     * @return the computed fitness score.
-     */
-    public abstract Double getCurrentFitness();
+    protected void computeFitness(A agent) {
+        fitness = fitnessFunction.apply(agent);
+    }
+
     // TODO: Re-implement using current fitness score
 
     public Function<A, Double> getFitnessFunction() {
@@ -51,6 +54,14 @@ public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements 
 
     @Override
     public int compareTo(Agent o) {
-        return getCurrentFitness().compareTo(o.getCurrentFitness());
+        return fitness.compareTo(o.fitness);
+    }
+
+    public Double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(Double fitness) {
+        this.fitness = fitness;
     }
 }

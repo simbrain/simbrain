@@ -32,7 +32,7 @@ public class Xor {
     }
 
     public Xor() {
-        this(System.nanoTime(), 1000, 1000);
+        this(System.nanoTime(), 200, 1000);
     }
 
     public static final List<TrainingExample> TRAINING_SET = List.of(
@@ -47,16 +47,28 @@ public class Xor {
         List<Neuron> inputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("inputs"))).getNeuronList();
         List<Neuron> outputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("outputs"))).getNeuronList();
         double sse = 0.0;
+        agent.activationRecoding.add("New Generation");
         for (TrainingExample trainingEntry : TRAINING_SET) {
+            String inputValues = "input: ";
             for (int i = 0; i < trainingEntry.getInput().size(); i++) {
                 inputs.get(i).forceSetActivation(trainingEntry.getInput().get(i));
+                inputValues = inputValues + trainingEntry.getInput().get(i) + " ";
+            }
+            agent.activationRecoding.add("Wait for network to stabilize");
+            String output = "output/expected: ";
+            // for the network to stabilize
+            for (int i = 0; i < 10; i++) {
+                agent.getAgent().update();
             }
             for (int i = 0; i < 50; i++) {
                 agent.getAgent().update();
+                String outputValues = output + "";
                 for (int n = 0; n < trainingEntry.getOutput().size(); n++) {
                     double error = outputs.get(n).getActivation() - trainingEntry.getOutput().get(n);
+                    outputValues += outputs.get(n).getActivation() + "/" + trainingEntry.getOutput().get(n);
                     sse += error * error;
                 }
+                agent.activationRecoding.add(outputValues);
             }
         }
         return -sse;
@@ -77,10 +89,10 @@ public class Xor {
     public void run() {
         for (int i = 0; i < 1000; i++) {
             double bestFitness = agentPopulation.computeNewFitness();
-            if (bestFitness > -10) {
+            System.out.printf("Fitness %.2f\n", bestFitness);
+            if (bestFitness > -5) {
                 break;
             }
-            System.out.printf("Fitness %.2f\n", bestFitness);
             agentPopulation.replenish();
         }
     }

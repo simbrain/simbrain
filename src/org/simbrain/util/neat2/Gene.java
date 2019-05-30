@@ -1,5 +1,7 @@
 package org.simbrain.util.neat2;
 
+import org.simbrain.util.math.SimbrainRandomizer;
+
 /**
  * A template that encodes information about an object used in an evolutionary
  * simulation.
@@ -12,6 +14,9 @@ public abstract class Gene<T> {
      * Some genes should not be mutated, e.g. "input node" genes.
      */
     private boolean mutable = true;
+
+
+    private SimbrainRandomizer randomizer;
 
     /**
      * Return a deep copy of this gene.
@@ -45,6 +50,14 @@ public abstract class Gene<T> {
 
     public void setMutable(boolean mutable) {
         this.mutable = mutable;
+    }
 
+
+    public SimbrainRandomizer getRandomizer() {
+        return randomizer;
+    }
+
+    public void setRandomizer(SimbrainRandomizer randomizer) {
+        this.randomizer = randomizer;
     }
 }

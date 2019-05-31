@@ -28,7 +28,7 @@ package org.simbrain.workspace.gui;
  * This software is in the public domain.
  */
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;

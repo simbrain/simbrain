@@ -19,10 +19,7 @@
 package org.simbrain.network.gui.actions.edit;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

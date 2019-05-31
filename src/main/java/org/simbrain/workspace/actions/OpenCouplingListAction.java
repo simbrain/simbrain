@@ -18,12 +18,11 @@
  */
 package org.simbrain.workspace.actions;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**

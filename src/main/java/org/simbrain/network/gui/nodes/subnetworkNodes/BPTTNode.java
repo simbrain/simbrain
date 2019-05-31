@@ -24,7 +24,7 @@ import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.trainers.BPTTTrainer;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

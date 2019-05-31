@@ -1,6 +1,6 @@
 package org.simbrain.util.widgets;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.*;

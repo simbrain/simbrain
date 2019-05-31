@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.actions;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 

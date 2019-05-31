@@ -18,14 +18,12 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A drop down triangle that can be used to hide information that is only

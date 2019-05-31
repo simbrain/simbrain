@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;

@@ -19,11 +19,9 @@
 package org.simbrain.network.gui.actions.edit;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 /**
  * Toggle auto zoom mode on double click, fit objects to screen on single click.

@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.table;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;

@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.propertyeditor;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.StandardDialog;

@@ -22,7 +22,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.trainers.CompetitiveTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 
 import javax.swing.*;

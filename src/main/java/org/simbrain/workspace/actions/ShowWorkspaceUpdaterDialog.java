@@ -19,7 +19,7 @@
 package org.simbrain.workspace.actions;
 
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.WorkspaceUpdateManagerPanel;

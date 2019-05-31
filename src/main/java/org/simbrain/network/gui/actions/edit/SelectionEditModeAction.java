@@ -20,7 +20,7 @@ package org.simbrain.network.gui.actions.edit;
 
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 /**
  * Selection edit mode action.

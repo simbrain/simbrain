@@ -19,7 +19,7 @@
 package org.simbrain.workspace.actions;
 
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.Workspace;

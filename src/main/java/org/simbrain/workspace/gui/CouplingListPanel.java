@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.gui;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;

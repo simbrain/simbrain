@@ -18,7 +18,7 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

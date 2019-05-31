@@ -19,19 +19,14 @@
 package org.simbrain.plot.projection;
 
 import org.jfree.chart.*;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.labels.XYItemLabelGenerator;
-import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRendererState;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -47,7 +42,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 

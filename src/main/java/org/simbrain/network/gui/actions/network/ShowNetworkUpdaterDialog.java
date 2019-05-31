@@ -20,7 +20,7 @@ package org.simbrain.network.gui.actions.network;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkUpdateManagerPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;

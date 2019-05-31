@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.textworld.dictionary;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;

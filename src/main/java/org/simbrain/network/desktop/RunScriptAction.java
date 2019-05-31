@@ -21,7 +21,7 @@ package org.simbrain.network.desktop;
 import bsh.EvalError;
 import bsh.Interpreter;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 
 import javax.swing.*;

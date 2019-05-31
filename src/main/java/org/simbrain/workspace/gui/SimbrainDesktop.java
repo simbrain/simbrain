@@ -23,7 +23,7 @@ import bsh.util.JConsole;
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;

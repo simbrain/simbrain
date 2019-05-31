@@ -25,7 +25,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.trainers.Trainable;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;

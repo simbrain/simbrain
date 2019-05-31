@@ -17,7 +17,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.Listener;
 import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;

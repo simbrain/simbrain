@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.EditableObject;

@@ -21,7 +21,7 @@ package org.simbrain.network.gui.trainer;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

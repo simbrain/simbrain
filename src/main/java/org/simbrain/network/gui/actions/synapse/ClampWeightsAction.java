@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.actions.synapse;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

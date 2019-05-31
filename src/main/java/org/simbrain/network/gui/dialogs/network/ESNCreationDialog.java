@@ -26,7 +26,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.CondensedConnectionPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunctionEnum;

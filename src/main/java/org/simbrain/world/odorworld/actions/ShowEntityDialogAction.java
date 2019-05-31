@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.world.odorworld.dialogs.EntityDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

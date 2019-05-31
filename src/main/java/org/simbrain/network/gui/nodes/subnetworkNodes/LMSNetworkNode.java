@@ -27,7 +27,7 @@ import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.LMSOfflineTrain
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;

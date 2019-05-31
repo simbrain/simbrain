@@ -20,7 +20,7 @@ package org.simbrain.workspace.gui;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;

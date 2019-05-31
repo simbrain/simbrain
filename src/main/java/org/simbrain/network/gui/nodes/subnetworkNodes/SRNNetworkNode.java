@@ -25,7 +25,7 @@ import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.trainers.SRNTrainer;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;

@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

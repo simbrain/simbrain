@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.component_actions;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
 
 import javax.swing.*;

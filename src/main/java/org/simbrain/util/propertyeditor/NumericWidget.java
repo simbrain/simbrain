@@ -1,6 +1,7 @@
 package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.Parameter;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.widgets.JNumberSpinnerWithNull;
@@ -25,7 +26,7 @@ public class NumericWidget extends JPanel {
     /**
      * The randomization button.
      */
-    private JButton randomizeButton = new JButton(org.simbrain.resource.ResourceManager.getImageIcon("Rand.png"));
+    private JButton randomizeButton = new JButton(ResourceManager.getImageIcon("Rand.png"));
 
     /**
      * Construct a numeric widget.

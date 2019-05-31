@@ -20,7 +20,7 @@ package org.simbrain.network.gui.actions;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ResourceManager;
 
 import java.awt.event.ActionEvent;
 

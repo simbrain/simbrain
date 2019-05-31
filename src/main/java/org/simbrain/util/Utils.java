@@ -22,9 +22,7 @@ import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.security.*;
 import org.apache.log4j.Logger;
-import org.simbrain.resource.ResourceManager;
 
 import javax.swing.*;
 import java.awt.*;

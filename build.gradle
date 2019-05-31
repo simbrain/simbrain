@@ -12,84 +12,11 @@ mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
 sourceCompatibility = 1.9
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
-        resources {
-            srcDirs 'src/org/simbrain/resource',
-                    'src/org/simbrain/world/odorworld/resources',
-                    'src/org/simbrain/world/threedworld/threedassets/',
-                    'src/org/simbrain/custom_sims/resources/'
-            exclude '**/*.java'
-        }
-    }
-}
-
-compileJava {
-    // https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
-    options.compilerArgs += '-proc:none'
-    options.encoding = 'UTF-8'
-}
-
-task pathingJar(type: Jar) {
-    dependsOn configurations.runtime
-    appendix = 'pathing'
-
-    doFirst {
-        manifest {
-            attributes "Class-Path": configurations.runtime.files.collect {
-                it.toURL().toString().replaceFirst(/file:\/+/ , '/' )
-            }.join(' ')
-            attributes (
-                'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
-            )
-        }
-
-    }
-}
-
-run {
-    dependsOn pathingJar
-    doFirst {
-        classpath = files(sourceSets.main.output.files, pathingJar.archivePath)
-    }
-}
-
-checkstyle{
-    configFile rootProject.file('etc/checkstyle.xml')
-}
-
-
-// Define a custom simbrain distribution task. Invoke with <code>gradle sb_distZip</code>
-distributions {
-    sb_ {
-        description 
-        baseName = versionName
-        contents {
-            from {
-                uberJar
-            }
-            from {projectDir} {
-                include 'scripts/**'
-                include 'etc/Readme.txt'
-                include 'etc/ReleaseNotes.txt'
-                include 'etc/License.txt'
-                include 'etc/config.properties'
-                include 'simulations/**'
-                include 'utils/**'
-                include 'docs/**'
-            }
-        }
-    }
-
-}
-
 repositories {
     mavenCentral()
     jcenter()
 }
+
 dependencies {
 
     // TODO: Remove these dependencies
@@ -159,21 +86,97 @@ dependencies {
 
 }
 
-// TODO: Create a custom distribution that loads up this together with other stuff
-task uberJar(type: Jar) {
+// TODO: Add docs to these as they are uncommented
 
-    archivesBaseName = versionName
-    manifest {
-        attributes(
-                'Main-Class': mainClassName
-        )
-    }
+// sourceSets {
+//     main {
+//         java {
+//             srcDir 'src'
+//         }
+//         resources {
+//             srcDirs 'src/org/simbrain/resource',
+//                     'src/org/simbrain/world/odorworld/resources',
+//                     'src/org/simbrain/world/threedworld/threedassets/',
+//                     'src/org/simbrain/custom_sims/resources/'
+//             exclude '**/*.java'
+//         }
+//     }
+// }
 
-    from sourceSets.main.output
-    from configurations.runtimeClasspath.
-            findAll { it.name.endsWith('jar') }.
-            collect { zipTree(it) }
-}
+// compileJava {
+//     // https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
+//     options.compilerArgs += '-proc:none'
+//     options.encoding = 'UTF-8'
+// }
+
+// task pathingJar(type: Jar) {
+//     dependsOn configurations.runtime
+//     appendix = 'pathing'
+
+//     doFirst {
+//         manifest {
+//             attributes "Class-Path": configurations.runtime.files.collect {
+//                 it.toURL().toString().replaceFirst(/file:\/+/ , '/' )
+//             }.join(' ')
+//             attributes (
+//                 'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
+//             )
+//         }
+
+//     }
+// }
+
+// run {
+//     dependsOn pathingJar
+//     doFirst {
+//         classpath = files(sourceSets.main.output.files, pathingJar.archivePath)
+//     }
+// }
+
+// checkstyle{
+//     configFile rootProject.file('etc/checkstyle.xml')
+// }
+
+
+// // Define a custom simbrain distribution task. Invoke with <code>gradle sb_distZip</code>
+// distributions {
+//     sb_ {
+//         description 
+//         baseName = versionName
+//         contents {
+//             from {
+//                 uberJar
+//             }
+//             from {projectDir} {
+//                 include 'scripts/**'
+//                 include 'etc/Readme.txt'
+//                 include 'etc/ReleaseNotes.txt'
+//                 include 'etc/License.txt'
+//                 include 'etc/config.properties'
+//                 include 'simulations/**'
+//                 include 'utils/**'
+//                 include 'docs/**'
+//             }
+//         }
+//     }
+
+// }
+
+// // TODO: Create a custom distribution that loads up this together with other stuff
+// task uberJar(type: Jar) {
+
+//     archivesBaseName = versionName
+//     manifest {
+//         attributes(
+//                 'Main-Class': mainClassName
+//         )
+//     }
+
+//     from sourceSets.main.output
+//     from configurations.runtimeClasspath.
+//             findAll { it.name.endsWith('jar') }.
+//             collect { zipTree(it) }
+// }
 
 task printStuff {
     group 'Misc'

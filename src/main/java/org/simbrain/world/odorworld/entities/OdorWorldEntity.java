@@ -25,6 +25,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import org.simbrain.world.odorworld.CollisionBound;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.RectangleCollisionBound;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -34,11 +35,13 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -1120,6 +1123,15 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 }
             }
         }
+        Point tileCoordinate = parentWorld.getTileMap().pixelToTileCoordinate(getCenterX(), getCenterY());
+        int tileX = (int) tileCoordinate.getX();
+        int tileY = (int) tileCoordinate.getY();
+        for (RectangleCollisionBound cb : parentWorld.getTileCollision().getBounds(tileX, tileY)) {
+            if (collisionBound.collide(direction, cb)) {
+                return true;
+            }
+        }
+
         return !parentWorld.getWrapAround() && collisionBound.collide(direction, parentWorld.getWorldBoundary());
     }
 

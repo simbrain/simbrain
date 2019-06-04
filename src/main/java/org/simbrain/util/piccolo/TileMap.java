@@ -8,10 +8,12 @@ import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
@@ -203,6 +205,35 @@ public class TileMap {
         }
 
         return stack;
+    }
+
+    public boolean hasCollisionTile(int x, int y) {
+        for (TileMapLayer l : layers.stream().filter(l -> l.getName().contains("c_")).collect(Collectors.toList())) {
+            if (tilesets.stream()
+                    .map(t -> t.getTile(l.getTileIdAt(x, y)))
+                    .filter(Objects::nonNull)
+                    .anyMatch(t -> t.getId() != 0)
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasCollisionTileAtPixel(double x, double y) {
+        Point tileCoordinate = pixelToTileCoordinate(x, y);
+        int tileCoordinateX = (int) tileCoordinate.getX();
+        int tileCoordinateY = (int) tileCoordinate.getY();
+        return hasCollisionTile(tileCoordinateX, tileCoordinateY);
+    }
+
+    public Rectangle2D.Double getTileBound(int x, int y) {
+        return new Rectangle2D.Double(
+                x * tilewidth,
+                y * tileheight,
+                tilewidth,
+                tileheight
+        );
     }
 
     /**

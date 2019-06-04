@@ -101,8 +101,6 @@ public class OdorWorld implements EditableObject {
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
 
-    private TileCollision tileCollision = new TileCollision();
-
     private RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
             0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
     ));
@@ -578,10 +576,6 @@ public class OdorWorld implements EditableObject {
         changeSupport.firePropertyChange("tileMapChanged", null, null);
     }
 
-    public TileCollision getTileCollision() {
-        return tileCollision;
-    }
-
     public void start() {
         changeSupport.firePropertyChange("worldStarted", null, null);
     }
@@ -599,28 +593,5 @@ public class OdorWorld implements EditableObject {
         return worldBoundary;
     }
 
-    public class TileCollision {
-        private int x;
 
-        private int y;
-
-        private List<RectangleCollisionBound> eightNeighborCollisionBounds = null;
-
-        public List<RectangleCollisionBound> getBounds(int x, int y) {
-            if (this.x == x && this.y == y && eightNeighborCollisionBounds != null) {
-                return eightNeighborCollisionBounds;
-            }
-            this.x = x;
-            this.y = y;
-            this.eightNeighborCollisionBounds = new ArrayList<>();
-            for (int i = 0; i < 9; i++) {
-                int tileX = x + (i % 3) - 1;
-                int tileY = y + (i / 3) - 1;
-                if (tileX >= 0 && tileY >= 0 && tileMap.hasCollisionTile(tileX, tileY)) {
-                    eightNeighborCollisionBounds.add(new RectangleCollisionBound(tileMap.getTileBound(tileX, tileY)));
-                }
-            }
-            return eightNeighborCollisionBounds;
-        }
-    }
 }

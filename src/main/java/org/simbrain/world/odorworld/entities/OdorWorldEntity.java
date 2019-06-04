@@ -194,6 +194,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     private boolean updateHeadingBasedOnVelocity = false;
 
     /**
+     * Collision boxes of the tile map
+     */
+    private TileCollision tileCollision = new TileCollision();
+
+    /**
      * Construct an entity.
      *
      * @param world parent world of entity
@@ -1126,7 +1131,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         Point tileCoordinate = parentWorld.getTileMap().pixelToTileCoordinate(getCenterX(), getCenterY());
         int tileX = (int) tileCoordinate.getX();
         int tileY = (int) tileCoordinate.getY();
-        for (RectangleCollisionBound cb : parentWorld.getTileCollision().getBounds(tileX, tileY)) {
+        for (RectangleCollisionBound cb : tileCollision.getBounds(tileX, tileY)) {
             if (collisionBound.collide(direction, cb)) {
                 return true;
             }
@@ -1208,5 +1213,34 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
     public void setUpdateHeadingBasedOnVelocity(boolean updateHeadingBasedOnVelocity) {
         this.updateHeadingBasedOnVelocity = updateHeadingBasedOnVelocity;
+    }
+
+    /**
+     * A class representing the tile map collision boxes.
+     */
+    public class TileCollision {
+
+        private int x;
+
+        private int y;
+
+        private List<RectangleCollisionBound> eightNeighborCollisionBounds = null;
+
+        public List<RectangleCollisionBound> getBounds(int x, int y) {
+            if (this.x == x && this.y == y && eightNeighborCollisionBounds != null) {
+                return eightNeighborCollisionBounds;
+            }
+            this.x = x;
+            this.y = y;
+            this.eightNeighborCollisionBounds = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                int tileX = x + (i % 3) - 1;
+                int tileY = y + (i / 3) - 1;
+                if (tileX >= 0 && tileY >= 0 && parentWorld.getTileMap().hasCollisionTile(tileX, tileY)) {
+                    eightNeighborCollisionBounds.add(new RectangleCollisionBound(parentWorld.getTileMap().getTileBound(tileX, tileY)));
+                }
+            }
+            return eightNeighborCollisionBounds;
+        }
     }
 }

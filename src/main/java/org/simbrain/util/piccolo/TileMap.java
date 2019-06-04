@@ -207,6 +207,13 @@ public class TileMap {
         return stack;
     }
 
+    /**
+     * Check if a give tile location contains any tiles in a collision layer (layer that contains "c_").
+     *
+     * @param x x in tile coordinate
+     * @param y y in tile coordinate
+     * @return true if the given location has a collision tile
+     */
     public boolean hasCollisionTile(int x, int y) {
         for (TileMapLayer l : layers.stream().filter(l -> l.getName().contains("c_")).collect(Collectors.toList())) {
             if (tilesets.stream()
@@ -220,13 +227,13 @@ public class TileMap {
         return false;
     }
 
-    public boolean hasCollisionTileAtPixel(double x, double y) {
-        Point tileCoordinate = pixelToTileCoordinate(x, y);
-        int tileCoordinateX = (int) tileCoordinate.getX();
-        int tileCoordinateY = (int) tileCoordinate.getY();
-        return hasCollisionTile(tileCoordinateX, tileCoordinateY);
-    }
-
+    /**
+     * Get a Rectangle2D region of a given tile
+     *
+     * @param x x in tile coordinate
+     * @param y y in tile coordinate
+     * @return a Rectangle2D region representing the area of the tile
+     */
     public Rectangle2D.Double getTileBound(int x, int y) {
         return new Rectangle2D.Double(
                 x * tilewidth,

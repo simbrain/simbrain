@@ -1,9 +1,6 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm;
 
 import org.simbrain.util.math.SimbrainRandomizer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Contains a set of chromosomes, each of which contains a set of genes.

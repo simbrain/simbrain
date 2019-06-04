@@ -1,4 +1,6 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm.numerical;
+
+import org.simbrain.util.geneticalgorithm.Genome;
 
 import java.util.List;
 import java.util.stream.Collectors;

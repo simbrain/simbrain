@@ -1,9 +1,8 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm;
 
 import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A list of genes that can be crossed with genes from another chromosome of the same type.

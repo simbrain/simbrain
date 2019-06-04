@@ -3,6 +3,7 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.testsims.Xor;
 

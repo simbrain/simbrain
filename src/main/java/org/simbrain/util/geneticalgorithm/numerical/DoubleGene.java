@@ -1,11 +1,7 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm.numerical;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat.ConnectionGene;
-import org.simbrain.util.neat2.testsims.NumberMatching;
-
-import java.awt.geom.Point2D;
+import org.simbrain.util.geneticalgorithm.Gene;
+import org.simbrain.util.geneticalgorithm.testsims.NumberMatching;
 
 public class DoubleGene extends Gene<Double> {
 

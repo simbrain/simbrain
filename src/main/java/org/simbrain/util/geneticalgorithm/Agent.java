@@ -1,7 +1,6 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * An agent based on a genome.  The main thing added at this level

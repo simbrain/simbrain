@@ -1,13 +1,11 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm.numerical;
 
-import org.simbrain.util.Pair;
-import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.util.geneticalgorithm.Chromosome;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {

@@ -5,7 +5,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.NetworkGenome;
 import org.simbrain.util.neat2.NetworkBasedAgent;
-import org.simbrain.util.neat2.Population;
+import org.simbrain.util.geneticalgorithm.Population;
 
 import java.util.List;
 

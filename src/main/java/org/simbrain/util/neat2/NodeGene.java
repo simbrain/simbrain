@@ -3,6 +3,7 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.neat.ConnectionGene;
 
 import java.awt.geom.Point2D;

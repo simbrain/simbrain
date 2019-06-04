@@ -1,9 +1,9 @@
-package org.simbrain.util.neat2.testsims;
+package org.simbrain.util.geneticalgorithm.testsims;
 
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat2.DoubleAgent;
-import org.simbrain.util.neat2.DoubleGenome;
-import org.simbrain.util.neat2.Population;
+import org.simbrain.util.geneticalgorithm.numerical.DoubleAgent;
+import org.simbrain.util.geneticalgorithm.numerical.DoubleGenome;
+import org.simbrain.util.geneticalgorithm.Population;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,24 +34,30 @@ public class NumberMatching {
      */
     public SimbrainRandomizer randomizer;
 
-    public int populationSize;
+    /**
+     * Default population size at each generation.
+     */
+    public int populationSize = 2000;
 
     /**
      * The maximum number of generation. Simulation will terminate after this many iterations regardless of the result.
+     *  the maximum of iteration/generation to run before forcing the simulation to stop.
      */
-    public int maxIteration;
+    public int maxIteration = 10_000;
+
+    /**
+     * Simulation stops if the error is above this.  Error is SSE between {@link #TARGET} output and what
+     * {@link #eval(DoubleAgent)} produces.
+     */
+    public double maxErrorThreshold = -.005;
 
     /**
      * Create a number matching simulation with a specific seed, population size, and the max generations limit.
      * @param seed a seed for the randomizer. If the seed is the same, the result of the simulation will also be the
      *             same.
-     * @param population the population size
-     * @param maxIteration the maximum of iteration/generation to run before forcing the simulation to stop.
      */
-    public NumberMatching(long seed, int population, int maxIteration) {
+    public NumberMatching(long seed) {
         this.randomizer = new SimbrainRandomizer(seed);
-        this.populationSize = population;
-        this.maxIteration = maxIteration;
     }
 
     /**
@@ -59,7 +65,7 @@ public class NumberMatching {
      * iteration: 1000.
      */
     public NumberMatching() {
-        this(System.nanoTime(), 200, 1000);
+        this(System.nanoTime());
     }
 
     /**
@@ -117,8 +123,8 @@ public class NumberMatching {
             System.out.println("Phenotype: " + population.getAgentList().get(0).getAgent()
                     .stream().map(a -> String.format("%.2f", a)).collect(Collectors.joining(", ")));
 
-            // if the SSE is less than 0.05, the simulation can stop.
-            if (bestFitness > -0.05) {
+            // if the SSE is less than maxErrorThreshold, the simulation should stop.
+            if (bestFitness > maxErrorThreshold) {
                 break;
             }
 

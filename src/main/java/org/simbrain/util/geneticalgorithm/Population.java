@@ -1,4 +1,4 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.geneticalgorithm;
 
 import org.simbrain.util.math.SimbrainRandomizer;
 

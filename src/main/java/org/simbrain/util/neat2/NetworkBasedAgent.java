@@ -1,10 +1,10 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.util.geneticalgorithm.Agent;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
 

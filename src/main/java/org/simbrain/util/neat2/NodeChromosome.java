@@ -1,6 +1,7 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.geneticalgorithm.Chromosome;
 
 import java.util.*;
 import java.util.function.Function;

@@ -21,3 +21,4 @@ out/*
 *.dll
 *.ipr
 *.iws
+.DS_Store

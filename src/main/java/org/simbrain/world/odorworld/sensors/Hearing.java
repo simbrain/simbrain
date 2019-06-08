@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld.sensors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import java.beans.PropertyChangeListener;
@@ -160,14 +161,14 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return activated;
     }
 
-//    @Producible(idMethod = "getId")
-//    public double getValue() {
-//        if (activated) {
-//            return outputAmount;
-//        } else {
-//            return 0;
-//        }
-//    }
+    @Producible(idMethod = "getId")
+    public double getValue() {
+        if (activated) {
+            return outputAmount;
+        } else {
+            return 0;
+        }
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);

@@ -1,12 +1,14 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
- * Creatures have a list of chemicals (see CreaturesBiochem) that evolve over
- * time, with a decay dynamic. They never disappear they just go to zero. When
- * reactions happen pre-existing chemicals increase their value. Value
- * represents how much is in the system.
+ * Creatures have a list of chemicals (see {@link CreaturesBiochem}) that evolve over
+ * time with a decay dynamic. They never disappear; they just go to zero. When
+ * reactions happen pre-existing chemicals increase their value, which
+ * represents how much  of that chemical is in their system.
  * <p>
  * There are (roughly) four lists of things "inside" the creature
  * <p>
@@ -62,10 +64,12 @@ public class CreaturesChem implements AttributeContainer {
         return (id);
     }
 
+    @Producible
     public double getAmount() {
         return (amount);
     }
 
+    @Consumable
     public void setAmount(double newAmount) {
         this.amount = newAmount;
     }

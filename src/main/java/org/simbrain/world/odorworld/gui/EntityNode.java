@@ -197,34 +197,43 @@ public class EntityNode extends PNode {
         removeChild(sprite);
 
         switch (entity.getEntityType()) {
-        case SWISS:
-            sprite = new Sprite(OdorWorldResourceManager.getStaticImage(DEFAULT_IMAGE));
-            break;
-        case FLOWER:
-            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
-            break;
-        case CANDLE:
-            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"));
-            break;
-        case FISH:
-            sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Fish.gif"));
-            break;
-        case MOUSE:
-            sprite = new RotatingSprite(RotatingEntityManager.getMouse());
-            break;
-        case AMY:
-        case ARNO:
-        case BOY:
-        case COW:
-        case GIRL:
-        case JAKE:
-        case LION:
-        case STEVE:
-        case SUSI:
-            sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset(entity.getEntityType().name()));
-            break;
-        default:
-            break;
+            case SWISS:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Swiss.gif"));
+                break;
+            case FLOWER:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
+                break;
+            case CANDLE:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"));
+                break;
+            case POISON:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Poison.gif"));
+                break;
+            case BELL:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Bell.gif"));
+                break;
+            case PANSY:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
+                break;
+            case FISH:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Fish.gif"));
+                break;
+            case MOUSE:
+                sprite = new RotatingSprite(RotatingEntityManager.getMouse());
+                break;
+            case AMY:
+            case ARNO:
+            case BOY:
+            case COW:
+            case GIRL:
+            case JAKE:
+            case LION:
+            case STEVE:
+            case SUSI:
+                sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset(entity.getEntityType().name()));
+                break;
+            default:
+                break;
         }
 
         addChild(sprite);
@@ -241,7 +250,7 @@ public class EntityNode extends PNode {
         //TODO: Make sure this is only called once per workspace update
 
         if (updateFlag) {
-            if(entity.isRotating()) {
+            if (entity.isRotating()) {
                 ((RotatingSprite) sprite).updateHeading(entity.getHeading());
             }
             setOffset(entity.getX(), entity.getY());

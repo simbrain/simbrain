@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A helper class of Creatures for filling in networks, from either a base
+ * A helper class for filling in networks, from either a base
  * template or from genetic code.
  *
  * @author Sharai
@@ -39,9 +39,6 @@ public class CreaturesBrain {
      */
     private NetworkComponent netComponent;
 
-    //TODO: Needed?
-    private NetworkDesktopComponent netDesktopComponent;
-
     /**
      * Reference to parent sim.
      */
@@ -53,7 +50,6 @@ public class CreaturesBrain {
      * @param component
      */
     public CreaturesBrain(NetworkDesktopComponent component, CreaturesSim parentSim) {
-        this.netDesktopComponent = component;
         this.netWrapper = new NetworkWrapper(component);
         this.netComponent = netWrapper.getNetworkComponent();
         this.parentSim = parentSim;
@@ -72,17 +68,6 @@ public class CreaturesBrain {
 
     // Helper methods
 
-    /**
-     * Creates a new lobe.
-     *
-     * @param x
-     * @param y
-     * @param numNeurons
-     * @param layoutName Valid input includes "line", "vertical line", and "grid".
-     * @param lobeName
-     * @param neuronRule (optional)
-     * @return
-     */
     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName, CreaturesNeuronRule neuronRule) {
         NeuronGroup lobe = netWrapper.addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
         lobe.setLabel(lobeName);
@@ -90,28 +75,10 @@ public class CreaturesBrain {
         return lobe;
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param numNeurons
-     * @param layoutName
-     * @param lobeName
-     * @return
-     */
     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
         return createLobe(x, y, numNeurons, layoutName, lobeName, new CreaturesNeuronRule());
     }
 
-    /**
-     * Creates a WTA lobe
-     *
-     * @param x
-     * @param y
-     * @param numNeurons
-     * @param layoutName
-     * @param lobeName
-     * @return
-     */
     public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
         WinnerTakeAll lobe = netWrapper.addWTAGroup(x, y, numNeurons);
         lobe.setLabel(lobeName);
@@ -125,13 +92,6 @@ public class CreaturesBrain {
         return lobe;
     }
 
-    /**
-     * Names a neuron.
-     *
-     * @param lobe
-     * @param neuronIndex
-     * @param name
-     */
     public void nameNeuron(NeuronGroup lobe, int neuronIndex, String name) {
         lobe.getNeuronList().get(neuronIndex).setLabel(name);
     }
@@ -139,10 +99,6 @@ public class CreaturesBrain {
     /**
      * Copies neuron labels from one neuron group to another if they are the same
      * size.
-     *
-     * @param lobeToCopy
-     * @param lobeToPasteTo
-     * @param startPasteIndex
      */
     public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo, int startPasteIndex) {
 
@@ -170,11 +126,6 @@ public class CreaturesBrain {
     /**
      * A method for coupling the activation of nodes from one lobe to the activation
      * of the nodes of another lobe.
-     *
-     * @param producerLobe
-     * @param consumerLobe
-     * @param index
-     * @param list
      */
     private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling<?>> list) {
         // Check to see if the sizes are in safe parameters
@@ -200,9 +151,6 @@ public class CreaturesBrain {
 
     /**
      * Manually gives a grid layout with a set number of columns to a certain lobe.
-     *
-     * @param lobe
-     * @param numColumns
      */
     public void setLobeColumns(NeuronGroup lobe, int numColumns, double gridSpace) {
         GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
@@ -210,12 +158,6 @@ public class CreaturesBrain {
         lobe.applyLayout();
     }
 
-    /**
-     * @param sourceLobe
-     * @param targetLobe
-     * @param groupName
-     * @return
-     */
     public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
         // TODO: Modify this method to take in a CreaturesSynapseRule, and maybe
         // have it

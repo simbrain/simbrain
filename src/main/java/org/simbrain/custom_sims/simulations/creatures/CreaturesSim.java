@@ -8,7 +8,9 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.effectors.Speech;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.threedworld.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,7 +86,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
     private void setUpNPC() {
         // Create a 'non-player character' that talks randomly
-        npc = world.addAgent(350, 250, "Cow");
+        npc = world.addEntity(350, 250, EntityType.COW);
         npc.setName("Cow");
         npc.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0}));
 
@@ -106,37 +108,40 @@ public class CreaturesSim extends RegisteredSimulation {
     }
 
     private void setUpWorld() {
+
         // Create odor world
         world = sim.addOdorWorld(601, 0, 456, 597, "World");
         world.getWorld().setObjectsBlockMovement(false);
 
+        // TODO: May be able to remove smell sources below since we are new using object sensors
+
         // Create static odor world entities
-        toy = world.addEntity(395, 590, "Bell.gif");
+        toy = world.addEntity(395, 590, EntityType.BELL);
         toy.setName("Bell");
         toy.setId("Toy");
         toy.setSmellSource(new SmellSource(new double[]{5, 0, 0, 0, 0, 0, 0}));
 
-        fish = world.addEntity(140, 165, "Fish.gif");
+        fish = world.addEntity(140, 165, EntityType.FISH);
         fish.setName("Fish");
         fish.setId("Fish");
         fish.setSmellSource(new SmellSource(new double[]{0, 5, 0, 0, 0, 0, 0}));
 
-        cheese = world.addEntity(200, 200, "Swiss.gif");
+        cheese = world.addEntity(200, 200, EntityType.SWISS);
         cheese.setName("Fish");
         cheese.setId("Cheese");
         cheese.setSmellSource(new SmellSource(new double[]{0, 0, 5, 0, 0, 0, 0}));
 
-        poison = world.addEntity(320, 20, "Poison.gif");
+        poison = world.addEntity(320, 20, EntityType.POISON);
         poison.setName("Poison");
         poison.setId("Poison");
         poison.setSmellSource(new SmellSource(new double[]{0, 0, 0, 5, 0, 0, 0}));
 
-        hazard = world.addEntity(25, 200, "Candle.png");
+        hazard = world.addEntity(25, 200, EntityType.CANDLE);
         hazard.setName("Candle");
         hazard.setId("Hazard");
         hazard.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 5, 0, 0}));
 
-        flower = world.addEntity(200, 100, "Pansy.gif");
+        flower = world.createEntity(200, 100, EntityType.PANSY);
         flower.setName("Pansy");
         flower.setId("Flower");
         flower.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 0, 5, 0}));
@@ -191,7 +196,7 @@ public class CreaturesSim extends RegisteredSimulation {
         // net.getNetworkPanel().setAutoZoomMode(false);
         // net.getNetworkPanel().zoomToFitPage(true);
 
-        OdorWorldEntity agent = world.addAgent(250, 250, "Mouse");
+        OdorWorldEntity agent = world.createEntity(250, 250, EntityType.MOUSE);
         Creature creature = new Creature(this, name, net, agent);
         creatureList.add(creature);
 

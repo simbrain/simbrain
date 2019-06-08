@@ -20,8 +20,6 @@ public class CreaturesSynapseRule extends StaticSynapseRule {
         TYPE1, TYPE2
     }
 
-    ;
-
     /**
      * Short Term Weight.
      */

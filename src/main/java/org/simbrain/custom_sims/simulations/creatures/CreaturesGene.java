@@ -17,8 +17,6 @@ public class CreaturesGene {
         Both, Male, Female
     }
 
-    ;
-
     /**
      * LifeStage defines the life stage at which a gene will start to be expressed.
      * Note that switching to another lifestage will not un-express the gene -
@@ -27,8 +25,6 @@ public class CreaturesGene {
     public static enum LifeStage {
         Embryo, Child, Adolescent, Youth, Adult, Senile
     }
-
-    ;
 
     /**
      * GeneType defines the way the gene will be expressed. A BrainLobe gene will

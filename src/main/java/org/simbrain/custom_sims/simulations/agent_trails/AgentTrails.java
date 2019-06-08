@@ -123,7 +123,7 @@ public class AgentTrails extends RegisteredSimulation {
         worldBuilder = sim.addOdorWorldTMX(629, 9, "empty.tmx");
         worldBuilder.getWorld().setObjectsBlockMovement(false);
 
-        mouse = worldBuilder.addAgent(204, 343, "Mouse");
+        mouse = worldBuilder.addEntity(204, 343, EntityType.MOUSE);
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
         SmellSensor smellSensor = new SmellSensor(mouse);

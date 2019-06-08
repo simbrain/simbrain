@@ -7,6 +7,7 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -264,11 +265,11 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
             int worldWidth = currentWorld.getWorld().getWidth();
             //			int worldHeight = 133; // TODO: use real value
             //			int worldWidth  = 164;
-            cheese.set(worldIndex, currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 - (imageSize / 2), "Swiss.gif", new double[]{1, 0.1, 0.2}));
+            cheese.set(worldIndex, currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 - (imageSize / 2), EntityType.SWISS, new double[]{1, 0.1, 0.2}));
 
-            poison.set(worldIndex, currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 * 2 - (imageSize / 2), "Poison.gif", new double[]{0.2, 0, 1}));
+            poison.set(worldIndex, currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 * 2 - (imageSize / 2),  EntityType.POISON, new double[]{0.2, 0, 1}));
 
-            mouse.set(worldIndex, currentWorld.addAgent(worldWidth / 6 - (imageSize / 2), worldHeight / 2 - (imageSize / 2), "Mouse"));
+            mouse.set(worldIndex, currentWorld.addEntity(worldWidth / 6 - (imageSize / 2), worldHeight / 2 - (imageSize / 2), EntityType.MOUSE));
             // Print world size for debug
             System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
         } else {
@@ -280,11 +281,11 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
             //			int worldHeight = 133; // TODO: use real value
             //			int worldWidth  = 164;
             // TODO: Make configurable
-            cheese.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 - (imageSize / 2), "Swiss.gif", new double[]{1, 0.1, 0.2}));
+            cheese.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 - (imageSize / 2), EntityType.SWISS, new double[]{1, 0.1, 0.2}));
 
-            poison.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 * 2 - (imageSize / 2), "Poison.gif", new double[]{0.2, 0, 1}));
+            poison.add(currentWorld.addEntity(worldWidth / 6 * 5 - (imageSize / 2), worldHeight / 3 * 2 - (imageSize / 2), EntityType.POISON, new double[]{0.2, 0, 1}));
 
-            mouse.add(currentWorld.addAgent(worldWidth / 6 - (imageSize / 2), worldHeight / 2 - (imageSize / 2), "Mouse"));
+            mouse.add(currentWorld.addEntity(worldWidth / 6 - (imageSize / 2), worldHeight / 2 - (imageSize / 2),EntityType.MOUSE));
             // Print world size for debug
             System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
         }

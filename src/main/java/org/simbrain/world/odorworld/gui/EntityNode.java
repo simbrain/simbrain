@@ -198,25 +198,19 @@ public class EntityNode extends PNode {
 
         switch (entity.getEntityType()) {
             case SWISS:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Swiss.gif"));
-                break;
-            case FLOWER:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
-                break;
+            case GOUDA:
             case CANDLE:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"));
-                break;
             case POISON:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Poison.gif"));
-                break;
             case BELL:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Bell.gif"));
-                break;
+            case FLOWER:
+            case TULIP:
             case PANSY:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Pansy.gif"));
-                break;
+            case FLAX:
             case FISH:
-                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Fish.gif"));
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage(entity.getEntityType().getDescription() + ".gif"));
+                break;
+            case BLUECHEESE:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Bluecheese.gif"));
                 break;
             case MOUSE:
                 sprite = new RotatingSprite(RotatingEntityManager.getMouse());

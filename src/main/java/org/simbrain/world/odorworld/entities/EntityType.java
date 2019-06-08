@@ -23,14 +23,16 @@ package org.simbrain.world.odorworld.entities;
  */
 public enum EntityType {
 
-    // TODO: Put in all missing static objects
-
     SWISS("Swiss", false, false, false, 32, 32),
+    GOUDA("Gouda", false, false, false, 32, 32),
+    BLUECHEESE("Blue Cheese", false, false, false, 32, 32),
     BELL("Bell", false, false, false, 32, 32),
     POISON("Poison", false, false, false, 32, 32),
     CANDLE("Candle", false, false, false, 32, 32),
     FISH("Fish", false, false, false, 32, 32),
     FLOWER("Flower", false, false, false, 32, 32),
+    TULIP("Tulip", false, false, false, 32, 32),
+    FLAX("Flax", false, false, false, 32, 32),
     PANSY("Pansy", false, false, false, 32, 32),
     MOUSE("Mouse", true, true, true, 40, 40),
     AMY("Amy", true, true, true, 96, 96),

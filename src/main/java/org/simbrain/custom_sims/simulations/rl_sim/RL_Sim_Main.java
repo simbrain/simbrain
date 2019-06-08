@@ -217,7 +217,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
      */
     private void initializeWorldObjects() {
 
-        mouse = worldBuilder.addAgent(43, 110, "Mouse");
+        mouse = worldBuilder.addEntity(43, 110, EntityType.MOUSE);
         mouse.setHeading(0);
         // Add default effectors
         mouse.addEffector(new StraightMovement(mouse));

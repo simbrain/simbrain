@@ -19,6 +19,7 @@ import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -236,17 +237,17 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         world = sim.addOdorWorld(440, 9, 413, 248, "Two Objects");
         world.getWorld().setObjectsBlockMovement(false);
-        mouse = world.addAgent(165, 110, "Mouse");
+        mouse = world.addEntity(165, 110, EntityType.MOUSE);
         mouse.setHeading(90);
 
         // Set up world
         double dispersion = 65;
-        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif", new double[] {1, 0, 0, 0, 0, 0});
-        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif", new double[] {0, 1, 0, 0, 0, 0});
-        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif", new double[] {1, 0, 1, 0, 0, 0});
-        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif", new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif", new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif", new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity cheese1 = world.addEntity(40, 40,EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 0});
+        OdorWorldEntity cheese2 = world.addEntity(60, 40,EntityType.GOUDA, new double[] {0, 1, 0, 0, 0, 0});
+        OdorWorldEntity cheese3 = world.addEntity(80, 40, EntityType.BLUECHEESE, new double[] {1, 0, 1, 0, 0, 0});
+        OdorWorldEntity flower1 = world.addEntity(290, 40,EntityType.PANSY, new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = world.addEntity(310, 40,EntityType.FLAX, new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower3 = world.addEntity(330, 40,EntityType.TULIP, new double[] {0, 0, 0, 0, 0, 1});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);

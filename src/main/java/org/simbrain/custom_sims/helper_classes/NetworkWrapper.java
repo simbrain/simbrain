@@ -39,9 +39,6 @@ public class NetworkWrapper {
 
     //// NEW STUFF  ////
 
-    /**
-     * @param networkComponent
-     */
     public NetworkWrapper(NetworkDesktopComponent desktopComponent) {
         this.desktopComponent = desktopComponent;
         this.networkComponent = desktopComponent.getWorkspaceComponent();

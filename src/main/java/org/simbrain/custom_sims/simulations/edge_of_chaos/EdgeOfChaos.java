@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -14,6 +13,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
@@ -65,8 +65,8 @@ public class EdgeOfChaos extends RegisteredSimulation {
         buildNetwork();
 
         // Projection plot
-        PlotBuilder plotBuilder = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(netBuilder.getNetworkComponent(), reservoir, plotBuilder.getProjectionPlotComponent());
+        ProjectionComponent pc = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
+        sim.couple(netBuilder.getNetworkComponent(), reservoir, pc);
 
         // Odor world sim
         buildOdorWorld();

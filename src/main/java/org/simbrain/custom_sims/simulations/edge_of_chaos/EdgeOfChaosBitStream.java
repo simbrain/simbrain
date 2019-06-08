@@ -3,13 +3,14 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
@@ -136,12 +137,14 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        PlotBuilder ts = sim.addTimeSeriesPlot(609, 11, 363, 285, "Difference", "Difference");
+        TimeSeriesPlotComponent ts = sim.addTimeSeriesPlot(609, 11, 363, 285, "Time Series");
+        TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
+
         sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update time series") {
             @Override
             public void invoke() {
                 double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
-                ts.getTimeSeriesModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
+                ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
             }
         });
     }

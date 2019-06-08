@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -18,7 +17,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
-import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -41,7 +40,6 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     // References
     Network network;
     NetBuilder netBuilder;
-    PlotBuilder plotBuilder;
     NeuronGroup sensory, motor, inputGroup;
     OdorWorldEntity mouse;
     List<OdorWorldEntity> worldEntities = new ArrayList<>();
@@ -210,19 +208,19 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance) {
 
         // Create projection component
-        plotBuilder = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
-        plotBuilder.getProjectionModel().init(toPlot.size());
-        plotBuilder.getProjectionModel().getProjector().setTolerance(tolerance);
+        ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
+        pc.getProjectionModel().init(toPlot.size());
+        pc.getProjectionModel().getProjector().setTolerance(tolerance);
         //plot.getProjectionModel().getProjector().useColorManager = false;
 
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, "getActivations");
-        Consumer plotConsumer = sim.getConsumer(plotBuilder.getProjectionPlotComponent(), "addPoint");
+        Consumer plotConsumer = sim.getConsumer(pc, "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);
 
         //text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getConsumer(plotBuilder.getProjectionPlotComponent(), "setLabel");
+        Consumer plotText = sim.getConsumer(pc, "setLabel");
         sim.tryCoupling(currentObject, plotText);
 
     }

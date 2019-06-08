@@ -3,10 +3,11 @@ package org.simbrain.custom_sims.simulations.cerebellum;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -71,7 +72,7 @@ public class Cerebellum extends RegisteredSimulation {
         setUpControlPanel();
 
         // Add docviewer
-        sim.addDocViewer(0, 279, 261, 325, "Information", "cerebellum.html");
+        //sim.addDocViewer(0, 279, 261, 325, "Information", "cerebellum.html");
 
     }
 
@@ -458,13 +459,14 @@ public class Cerebellum extends RegisteredSimulation {
     //
     void addTimeSeries() {
 
-        PlotBuilder pb = sim.addTimeSeriesPlot(768, 9, 363, 285,
-            "Time Series", "Dopamine");
-        sim.couple(dopamine, pb.getTimeSeriesComponent());
-        // PlotBuilder plot2 = sim.addTimeSeriesPlot(768, 9, 363, 285,
-        //     "dopamine");
-        // sim.couple(net.getNetworkComponent(),
-        //     dopamine, plot.getTimeSeriesComponent(), 0);
+        TimeSeriesPlotComponent ts = sim.addTimeSeriesPlot(768, 9, 363, 285,
+            "Time Series");
+        ts.getModel().setFixedWidth(true);
+        ts.getModel().setWindowSize(1000);
+        TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Dopamine");
+        sim.couple(dopamine, sts1);
+        TimeSeriesModel.ScalarTimeSeries sts2 = ts.getModel().addScalarTimeSeries("Output");
+        sim.couple(output, sts2);
     }
 
     @Override

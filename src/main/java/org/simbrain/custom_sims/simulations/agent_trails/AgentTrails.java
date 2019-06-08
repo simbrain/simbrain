@@ -4,9 +4,9 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -32,7 +32,7 @@ public class AgentTrails extends RegisteredSimulation {
     Neuron errorNeuron;
     Path csvFile;
     List<String> activationList = new ArrayList<String>();
-    PlotBuilder plot;
+    ProjectionComponent plot;
     OdorWorldBuilder worldBuilder;
 
     // Default values for these used by buttons
@@ -151,8 +151,8 @@ public class AgentTrails extends RegisteredSimulation {
 
     private void setUpPlot() {
         plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states + Predictions");
-        plot.getProjectionModel().getProjector().setTolerance(.001);
-        sim.couple(netBuilder.getNetworkComponent(), sensoryNet, plot.getProjectionPlotComponent());
+        plot.getProjector().setTolerance(.001);
+        sim.couple(netBuilder.getNetworkComponent(), sensoryNet, plot);
 
         // Uncomment for prediction halo
         plot.getProjectionModel().getProjector().setUseColorManager(false);

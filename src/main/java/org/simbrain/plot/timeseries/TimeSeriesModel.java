@@ -119,7 +119,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         setFixedWidth(fixedWidth); // Force update
     }
 
-
     /**
      * Create specified number of data sources.
      *
@@ -168,13 +167,15 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * description.
      *
      * @param description description for the time series
+     * @return a reference to the series, or null if the model is in scalar mode
      */
-    public void addScalarTimeSeries(String description) {
+    public ScalarTimeSeries addScalarTimeSeries(String description) {
         if (isArrayMode) {
-            return;
+            return null;
         }
         ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
         timeSeriesList.add(sts);
+        return sts;
     }
 
     /**

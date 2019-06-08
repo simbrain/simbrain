@@ -9,6 +9,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.Consumer;
@@ -99,7 +102,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     boolean goalAchieved = false;
     OdorWorld world;
     OdorWorldBuilder worldBuilder;
-    PlotBuilder plot;
+    ProjectionComponent plot;
 
     SmellSensor leftSmell, rightSmell;
     ObjectSensor flowerLeft, flowerRight, cheeseLeft, cheeseRight, candleLeft, candleRight;
@@ -583,12 +586,13 @@ public class RL_Sim_Main extends RegisteredSimulation {
      */
     private void setUpTimeSeries(NetBuilder net) {
         // Create a time series plot
-        PlotBuilder plot = sim.addTimeSeriesPlot(0, 328, 293, 332, "Reward, TD Error", null);
-        // sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
-        // sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
-        // plot.getTimeSeriesModel().setAutoRange(false);
-        plot.getTimeSeriesModel().setRangeUpperBound(2);
-        plot.getTimeSeriesModel().setRangeLowerBound(-1);
+        TimeSeriesPlotComponent ts= sim.addTimeSeriesPlot(0, 328, 293, 332, "Time Series");
+        TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Reward");
+        sim.couple(reward, sts1);
+        TimeSeriesModel.ScalarTimeSeries sts2 = ts.getModel().addScalarTimeSeries("TD Error");
+        sim.couple(tdError, sts2);
+        ts.getModel().setRangeUpperBound(2);
+        ts.getModel().setRangeLowerBound(-1);
     }
 
     private void setUpProjectionPlot() {
@@ -596,13 +600,13 @@ public class RL_Sim_Main extends RegisteredSimulation {
         plot.getProjectionModel().getProjector().setUseColorManager(false);
         plot.getProjectionModel().getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
-        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
+        Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);
         sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
         // Label PCA points based on closest object
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
+        Consumer plotText = sim.getConsumer(plot, "setLabel");
         sim.tryCoupling(currentObject, plotText);
     }
 

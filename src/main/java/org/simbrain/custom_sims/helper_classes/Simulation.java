@@ -8,6 +8,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.*;
@@ -55,9 +56,6 @@ public class Simulation {
     private transient Hashtable<Network, NetworkComponent> netMap = new Hashtable();
     private transient Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
-    /**
-     * @param desktop
-     */
     public Simulation(SimbrainDesktop desktop) {
         super();
         this.desktop = desktop;
@@ -67,7 +65,6 @@ public class Simulation {
 
     // TODO: NEW STUFF USING NET WRAPPER. Work towards replacing netbuilder
     // entirely.
-
     public NetworkWrapper addNetwork2(int x, int y, int width, int height, String name) {
         NetworkComponent networkComponent = new NetworkComponent(name);
         workspace.addWorkspaceComponent(networkComponent);
@@ -77,32 +74,16 @@ public class Simulation {
         return new NetworkWrapper(ndc);
     }
 
-    //// NEW STUFF END ///
-
-
-    /**
-     * @return the desktop
-     */
     public SimbrainDesktop getDesktop() {
         return desktop;
     }
 
-    /**
-     * @return the workspace
-     */
     public Workspace getWorkspace() {
         return workspace;
     }
 
     /**
      * Add a network and return a network builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param name   title to display at top of panel
-     * @return the component the network builder
      */
     public NetBuilder addNetwork(int x, int y, int width, int height, String name) {
         NetworkComponent networkComponent = new NetworkComponent(name);
@@ -113,14 +94,7 @@ public class Simulation {
     }
 
     /**
-     * Add an existing network and return a network builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param nc     network component to add
-     * @return the component the network builder
+     * Add a network and return a network builder.
      */
     public NetBuilder addNetwork(int x, int y, int width, int height, NetworkComponent nc) {
         workspace.addWorkspaceComponent(nc);
@@ -157,17 +131,15 @@ public class Simulation {
      * @param width  width of component
      * @param height height of component
      * @param name   title to display at top of panel
-     * @param seriesName  names of the time series
      * @return the component the plot builder
      */
-    public PlotBuilder addTimeSeriesPlot(int x, int y, int width, int height,
-                                         String name, String seriesName) {
+    public TimeSeriesPlotComponent addTimeSeriesPlot(int x, int y, int width, int height,
+                                             String name) {
         TimeSeriesPlotComponent timeSeriesComponent = new TimeSeriesPlotComponent(name);
         timeSeriesComponent.getModel().removeAllScalarTimeSeries();
-        timeSeriesComponent.getModel().addScalarTimeSeries(seriesName);
         workspace.addWorkspaceComponent(timeSeriesComponent);
         desktop.getDesktopComponent(timeSeriesComponent).getParentFrame().setBounds(x, y, width, height);
-        return new PlotBuilder(timeSeriesComponent);
+        return timeSeriesComponent;
     }
 
     /**
@@ -180,22 +152,15 @@ public class Simulation {
      * @param name   title to display at top of panel
      * @return the component the plot builder
      */
-    public PlotBuilder addProjectionPlot(int x, int y, int width, int height, String name) {
+    public ProjectionComponent addProjectionPlot(int x, int y, int width, int height, String name) {
         ProjectionComponent projectionComponent = new ProjectionComponent(name);
         workspace.addWorkspaceComponent(projectionComponent);
         desktop.getDesktopComponent(projectionComponent).getParentFrame().setBounds(x, y, width, height);
-        return new PlotBuilder(projectionComponent);
+        return projectionComponent;
     }
 
     /**
-     * Add an odor world and return an odor world builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param name   title to display at top of panel
-     * @return the component the odor world builder
+     * Add an odor world component.
      */
     public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name);
@@ -207,15 +172,7 @@ public class Simulation {
     }
 
     /**
-     * Add an existing odor world and return an odor world builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param name   title to display at top of panel
-     * @param world  the odor world to add
-     * @return the component the odor world builder
+     * Add an odor world component.
      */
     public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name, OdorWorld world) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name, world);
@@ -225,6 +182,9 @@ public class Simulation {
         return new OdorWorldBuilder(odorWorldComponent);
     }
 
+    /**
+     * Add an odor world component using a Tiled tmx file.
+     */
     public OdorWorldBuilder addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
         OdorWorldBuilder ob = this.addOdorWorldTMX(x,y,tmxFile);
         desktop.getDesktopComponent(ob.getOdorWorldComponent()).getParentFrame().setBounds(x, y,
@@ -232,8 +192,10 @@ public class Simulation {
         return ob;
     }
 
+    /**
+     * Add an odor world component using a Tiled tmx file.
+     */
     public OdorWorldBuilder addOdorWorldTMX(int x, int y, String tmxFile) {
-
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
         odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
@@ -282,21 +244,17 @@ public class Simulation {
     }
 
     /**
-     * Couple a specific neuron to a specific time series in a time series
+     * Couple a neuron to a specific scalar time series in a time series
      * plot.
-     *
-     * @param neuron  the neuron to couple
-     * @param plot    the plot component
-     * @return the coupling
      */
-    public Coupling<?> couple(Neuron neuron, TimeSeriesPlotComponent plot) {
+    public Coupling<?> couple(Neuron neuron, TimeSeriesModel.ScalarTimeSeries sts) {
         Producer neuronProducer = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = CouplingUtils.getConsumer(plot.getModel().getTimeSeriesList().get(0), "setValue");
+        Consumer timeSeriesConsumer = CouplingUtils.getConsumer(sts, "setValue");
         return tryCoupling(neuronProducer, timeSeriesConsumer);
     }
 
     /**
-     * Coupling a neuron group to a projection plot.
+     * Couple a neuron group to a projection plot.
      */
     public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
         Producer ngProducer = CouplingUtils.getProducer(ng, "getActivations");
@@ -304,6 +262,9 @@ public class Simulation {
         tryCoupling(ngProducer, projConsumer);
     }
 
+    /**
+     * Couple an object sensor to a neuron.
+     */
     public void couple(ObjectSensor sensor, Neuron neuron) {
         Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValue");
         Consumer sensoryConsumer = CouplingUtils.getConsumer(neuron, "forceSetActivation");
@@ -311,10 +272,7 @@ public class Simulation {
     }
 
     /**
-     * Create a coupling from a smell sensor to a neuron group.
-     *
-     * @param sensor The smell sensor
-     * @param ng     The neuron group
+     * Couple a smell sensor to a neuron group.
      */
     public void couple(SmellSensor sensor, NeuronGroup ng) {
         Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValues");
@@ -329,25 +287,8 @@ public class Simulation {
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
 
-    //TODO: Redo everything that uses this
-
     /**
-     * Make a coupling from a smell sensor to a neuron. Couples the provided
-     * smell sensor one the indicated dimension to the provided neuron.
-     *
-     * @param producingSensor   The smell sensor. Takes a scalar value.
-     * @param stimulusDimension Which component of the smell vector on the agent
-     *                          to "smell", beginning at index "0"
-     * @param consumingNeuron   The neuron to write the values to
-     */
-    public void couple(SmellSensor producingSensor, int stimulusDimension, Neuron consumingNeuron) {
-        Producer agentSensor = CouplingUtils.getProducer(producingSensor, "getCurrentValues");
-        Consumer sensoryNeuron = CouplingUtils.getConsumer(consumingNeuron, "setInputValue");
-        tryCoupling(agentSensor, sensoryNeuron);
-    }
-
-    /**
-     * Coupled a neuron to an effector on an odor world agent.
+     * Couple a neuron to an effector on an odor world agent.
      */
     public void couple(Neuron neuron, Effector effector) {
         Producer effectorNeuron = CouplingUtils.getProducer(neuron, "getActivation");
@@ -356,10 +297,7 @@ public class Simulation {
     }
 
     /**
-     * Creates a coupling from a hearing sensor to a neuron.
-     *
-     * @param sensor The hearing sensor
-     * @param neuron The neuron
+     * Couple a hearing sensor to a neuron
      */
     public void couple(Hearing sensor, Neuron neuron) {
         Producer agentSensor = CouplingUtils.getProducer(sensor, "getValue");

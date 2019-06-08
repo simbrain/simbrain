@@ -3,8 +3,6 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -14,6 +12,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.piccolo.TileMap;
@@ -37,7 +36,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
 
     // References
     Network network;
-    PlotBuilder plot;
+    ProjectionComponent plot;
     NeuronGroup reservoirNet, predictionRes, inputNetwork;
     SynapseGroup predictionSg;
     Neuron errorNeuron;
@@ -186,12 +185,12 @@ public class KuramotoOscillators extends RegisteredSimulation {
         plot.getProjectionModel().getProjector().setTolerance(1);
         //plot.getProjectionModel().getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
-        Consumer plotConsumer = sim.getConsumer(plot.getProjectionPlotComponent(), "addPoint");
+        Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.tryCoupling(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getConsumer(plot.getProjectionPlotComponent(), "setLabel");
+        Consumer plotText = sim.getConsumer(plot, "setLabel");
         sim.tryCoupling(currentObject, plotText);
 
     }

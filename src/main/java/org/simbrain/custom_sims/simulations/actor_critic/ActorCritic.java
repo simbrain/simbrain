@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -78,7 +77,6 @@ public class ActorCritic extends RegisteredSimulation {
     OdorWorld world;
     OdorWorldBuilder ob;
     NetBuilder netBuilder;
-    PlotBuilder plot;
 
     /**
      * Tile World.
@@ -174,8 +172,8 @@ public class ActorCritic extends RegisteredSimulation {
         network.addUpdateAction(updateMethod);
 
         // Add docviewer
-        sim.addDocViewer(0, 301, 253, 313, "Information",
-                "ActorCritic.html");
+        //sim.addDocViewer(0, 301, 253, 313, "Information",
+        //        "ActorCritic.html");
 
         // Add method for custom update
         addCustomWorkspaceUpdate();

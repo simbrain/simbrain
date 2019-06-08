@@ -6,8 +6,6 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
-// TODO: Rename this?  VehicleBuilder?  VehicleHelper?
-
 /**
  * A custom class that makes it easy to add Braitenberg vehicles to a
  * simulation. A vehicle network is added to a network and it is coupled to a
@@ -78,7 +76,7 @@ public class Vehicle {
      * @return a reference to the resulting neuron group
      */
     public NeuronGroup addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, EntityType objectType,
-        ObjectSensor leftSensor, ObjectSensor rightSensor) {
+                                  ObjectSensor leftSensor, ObjectSensor rightSensor) {
 
         // Create the network
         NeuronGroup vehicle = new NeuronGroup(net.getNetwork());
@@ -155,20 +153,6 @@ public class Vehicle {
         neuron.setLowerBound(-100);
         neuron.setUpperBound(200);
         ng.addNeuron(neuron);
-    }
-
-    /**
-     * @return the weightSize
-     */
-    public int getWeightSize() {
-        return weightSize;
-    }
-
-    /**
-     * @param weightSize the weightSize to set
-     */
-    public void setWeightSize(int weightSize) {
-        this.weightSize = weightSize;
     }
 
 }

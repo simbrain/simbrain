@@ -29,7 +29,6 @@ public class OdorWorldBuilder {
         world = odorWorldComponent.getWorld();
     }
 
-
     /**
      * Helper to create entities
      */

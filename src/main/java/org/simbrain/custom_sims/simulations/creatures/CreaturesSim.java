@@ -141,7 +141,7 @@ public class CreaturesSim extends RegisteredSimulation {
         hazard.setId("Hazard");
         hazard.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 5, 0, 0}));
 
-        flower = world.createEntity(200, 100, EntityType.PANSY);
+        flower = world.addEntity(200, 100, EntityType.PANSY);
         flower.setName("Pansy");
         flower.setId("Flower");
         flower.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 0, 5, 0}));
@@ -196,7 +196,7 @@ public class CreaturesSim extends RegisteredSimulation {
         // net.getNetworkPanel().setAutoZoomMode(false);
         // net.getNetworkPanel().zoomToFitPage(true);
 
-        OdorWorldEntity agent = world.createEntity(250, 250, EntityType.MOUSE);
+        OdorWorldEntity agent = world.addEntity(250, 250, EntityType.MOUSE);
         Creature creature = new Creature(this, name, net, agent);
         creatureList.add(creature);
 

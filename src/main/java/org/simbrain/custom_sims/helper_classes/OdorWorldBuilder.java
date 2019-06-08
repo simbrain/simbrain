@@ -32,13 +32,7 @@ public class OdorWorldBuilder {
 
     /// NEW STUFF ///
 
-    public OdorWorldEntity addEntity(int x, int y, EntityType type) {
-        OdorWorldEntity entity = createEntity(x,y, type);
-        world.addEntity(entity);
-        return entity;
-    }
-
-    public OdorWorldEntity createEntity(int x, int y, EntityType type) {
+    private OdorWorldEntity createEntity(int x, int y, EntityType type) {
         OdorWorldEntity entity = new OdorWorldEntity(world, type);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
@@ -46,14 +40,15 @@ public class OdorWorldBuilder {
         return entity;
     }
 
-    public OdorWorldEntity createEntity(int x, int y, EntityType type, double[] stimulus) {
+    public OdorWorldEntity addEntity(int x, int y, EntityType type) {
         OdorWorldEntity entity = createEntity(x, y, type);
-        entity.setSmellSource(new SmellSource(stimulus));
+        world.addEntity(entity);
         return entity;
     }
 
     public OdorWorldEntity addEntity(int x, int y, EntityType type, double[] stimulus) {
-        OdorWorldEntity entity = createEntity(x,y,type,stimulus);
+        OdorWorldEntity entity = createEntity(x,y,type);
+        entity.setSmellSource(new SmellSource(stimulus));
         world.addEntity(entity);
         return entity;
     }

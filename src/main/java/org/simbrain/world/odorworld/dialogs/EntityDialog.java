@@ -25,6 +25,8 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
 
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
@@ -89,7 +91,8 @@ public class EntityDialog extends StandardDialog {
             tabbedPane.addTab("Effectors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Effector, this));
         }
 
-        setContentPane(tabbedPane);
+        JScrollPane sp = new JScrollPane(tabbedPane);
+        setContentPane(sp);
 
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
         addButton(new JButton(helpAction));

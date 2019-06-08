@@ -732,7 +732,7 @@ public class Utils {
      *
      * @param name Name to display in menus, etc.
      * @param description tooltip
-     * @param iconFile name of icon. Must exist in {@link org.simbrain.resource}
+     * @param iconFile name of icon.
      * @param runnable the code to execute with this action
      * @return the formatted action
      */
@@ -761,10 +761,7 @@ public class Utils {
     public static XStream getSimbrainXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
         xstream.ignoreUnknownElements();
-        // Trying to suppress xstream warnings. Not working yet...
-        xstream.allowTypesByWildcard(new String[] {
-            "org.simbrain.**",
-        });
+        XStream.setupDefaultSecurity(xstream);
         return xstream;
     }
 

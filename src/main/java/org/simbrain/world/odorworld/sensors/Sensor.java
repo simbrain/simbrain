@@ -51,12 +51,12 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     /**
      * Angle of sensor in radians.
      */
-    public static double DEFAULT_THETA = Math.PI / 4;
+    public static double DEFAULT_THETA = 0;
 
     /**
      * Initial length of mouse whisker.
      */
-    public static final double DEFAULT_RADIUS = 23;
+    public static final double DEFAULT_RADIUS = 0;
 
     /**
      * Relative location of the sensor in polar coordinates.

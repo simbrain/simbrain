@@ -181,9 +181,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.phrase = phrase;
     }
 
-    /**
-     * @return the activated
-     */
     public boolean isActivated() {
         return activated;
     }

@@ -8,6 +8,8 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.world.odorworld.effectors.Speech;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
@@ -155,7 +157,10 @@ public class Creature {
         agent.setName(name);
         agent.setId("Mouse");
         agent.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0})); // TODO: Still used?
-        agent.addDefaultSensorsEffectors();
+
+        agent.addEffector(new StraightMovement(agent));
+        agent.addEffector(new Turning(agent, Turning.LEFT));
+        agent.addEffector(new Turning(agent, Turning.RIGHT));
 
         // Add object sensors (Todo)
         swissSensor = new ObjectSensor(agent, EntityType.SWISS);

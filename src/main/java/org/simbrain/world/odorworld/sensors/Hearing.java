@@ -161,7 +161,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         return activated;
     }
 
-    @Producible(idMethod = "getId")
+    @Producible(idMethod = "getId", customDescriptionMethod = "getAttributeDescription")
     public double getValue() {
         if (activated) {
             return outputAmount;

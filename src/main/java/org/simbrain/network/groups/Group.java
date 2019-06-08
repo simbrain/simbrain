@@ -205,9 +205,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public void initializeId() {
         id = getParentNetwork().getGroupIdGenerator().getId();
-        if (label.isEmpty()) {
-            setLabel(id.replaceAll("_", " "));
-        }
+        setLabel(id.replaceAll("_", " "));
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

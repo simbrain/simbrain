@@ -132,7 +132,6 @@ public class AddNeuronsDialog extends StandardDialog {
         addND.combinedNeuronInfoPanel = new AnnotatedPropertyEditor(Collections.singletonList(addND.baseNeuron));
         addND.combinedNeuronInfoPanel.setBorder(BorderFactory.createTitledBorder("Neuron Type"));
         addND.init();
-
         return addND;
     }
 
@@ -151,8 +150,10 @@ public class AddNeuronsDialog extends StandardDialog {
      * Initializes the add neurons panel with default settings.
      */
     private void init() {
+
         setTitle("Add Neurons...");
 
+        // Basics Sub-Panel
         JPanel basicsPanel = new JPanel(new GridBagLayout());
         basicsPanel.setBorder(BorderFactory.createTitledBorder("Quantity"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -164,7 +165,6 @@ public class AddNeuronsDialog extends StandardDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         basicsPanel.add(new JLabel("Number of Neurons:"), gbc);
-
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 3, 0, 0);
         gbc.weightx = 0.2;
@@ -172,23 +172,20 @@ public class AddNeuronsDialog extends StandardDialog {
         basicsPanel.add(numNeurons, gbc);
         addNeuronsPanel.add(basicsPanel);
 
-        addNeuronsPanel.add(Box.createVerticalStrut(10));
-
+        // Neuron Properties Panel
         addNeuronsPanel.add(combinedNeuronInfoPanel);
 
-        addNeuronsPanel.add(Box.createVerticalStrut(10));
-
+        // Layout Panel
         layoutObject.setLayout(DEFAULT_LAYOUT);
         selectLayout = new AnnotatedPropertyEditor(layoutObject);
-        selectLayout.setAlignmentX(CENTER_ALIGNMENT);
         addNeuronsPanel.add(selectLayout);
 
-        addNeuronsPanel.add(Box.createVerticalStrut(10));
+        // Group Panel
         groupPanel = new NeuronGroupPanelLite(networkPanel);
-        groupPanel.setAlignmentX(CENTER_ALIGNMENT);
         addNeuronsPanel.add(groupPanel);
 
-        setContentPane(addNeuronsPanel);
+        // Final setup
+        setContentPane(new JScrollPane(addNeuronsPanel));
         this.addButton(helpButton);
     }
 
@@ -276,17 +273,17 @@ public class AddNeuronsDialog extends StandardDialog {
             setLayout(new BorderLayout());
             addToGroup.setSelected(true);
 
-            JPanel subPanel = new JPanel();
-            subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.X_AXIS));
-            subPanel.add(addToGroup);
-            subPanel.add(Box.createHorizontalStrut(20));
-            subPanel.add(tfNameLabel);
+            JPanel groupPanel = new JPanel();
+            groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.X_AXIS));
+            groupPanel.add(addToGroup);
+            groupPanel.add(Box.createHorizontalStrut(20));
+            groupPanel.add(tfNameLabel);
             tfGroupName.setEnabled(addToGroup.isSelected());
             String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
             tfGroupName.setText(dName);
-            subPanel.add(tfGroupName);
-            subPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            this.add(subPanel, BorderLayout.CENTER);
+            groupPanel.add(tfGroupName);
+            groupPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            this.add(groupPanel, BorderLayout.CENTER);
             setBorder(BorderFactory.createTitledBorder("Group"));
 
         }

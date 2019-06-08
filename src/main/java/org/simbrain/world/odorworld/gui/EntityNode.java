@@ -199,7 +199,6 @@ public class EntityNode extends PNode {
         switch (entity.getEntityType()) {
             case SWISS:
             case GOUDA:
-            case CANDLE:
             case POISON:
             case BELL:
             case FLOWER:
@@ -208,6 +207,9 @@ public class EntityNode extends PNode {
             case FLAX:
             case FISH:
                 sprite = new Sprite(OdorWorldResourceManager.getStaticImage(entity.getEntityType().getDescription() + ".gif"));
+                break;
+            case CANDLE:
+                sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"));
                 break;
             case BLUECHEESE:
                 sprite = new Sprite(OdorWorldResourceManager.getStaticImage("Bluecheese.gif"));

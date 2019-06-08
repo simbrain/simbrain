@@ -15,7 +15,6 @@ public abstract class Gene<T> {
      */
     private boolean mutable = true;
 
-
     private SimbrainRandomizer randomizer;
 
     /**
@@ -51,7 +50,6 @@ public abstract class Gene<T> {
     public void setMutable(boolean mutable) {
         this.mutable = mutable;
     }
-
 
     public SimbrainRandomizer getRandomizer() {
         return randomizer;

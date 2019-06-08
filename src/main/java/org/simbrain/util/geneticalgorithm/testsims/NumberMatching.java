@@ -15,24 +15,19 @@ import java.util.stream.Collectors;
 public class NumberMatching {
 
     /**
-     * The maximum amount a double gene is allowed to alter within a generation
-     */
-    public static final double MAX_MUTATION = 0.1;
-
-    /**
-     * The population to be evolve
-     */
-    private Population<DoubleGenome, DoubleAgent> population;
-
-    /**
      * The desired agent phenotype
      */
     private static final List<Double> TARGET = List.of(1.0, 1.0, 1.0);
 
     /**
-     * A randomizer for this simulation
+     * The maximum amount a double gene is allowed to alter within a generation
      */
-    public SimbrainRandomizer randomizer;
+    public static final double MAX_MUTATION = 0.1;
+
+    /**
+     * The population to be evolved.
+     */
+    private Population<DoubleGenome, DoubleAgent> population;
 
     /**
      * Default population size at each generation.
@@ -52,26 +47,36 @@ public class NumberMatching {
     public double maxErrorThreshold = -.005;
 
     /**
-     * Create a number matching simulation with a specific seed, population size, and the max generations limit.
-     * @param seed a seed for the randomizer. If the seed is the same, the result of the simulation will also be the
-     *             same.
-     */
-    public NumberMatching(long seed) {
-        this.randomizer = new SimbrainRandomizer(seed);
-    }
-
-    /**
-     * Create a number matching simulation with the default parameters. Seed: current time, population size: 200, max
-     * iteration: 1000.
+     * Create a number matching simulation.
      */
     public NumberMatching() {
-        this(System.nanoTime());
     }
 
     /**
-     * The evaluation function / fitness function.
-     *
-     * The fitness score is calculated based on the SSE of the agent generated numbers and the {@link #TARGET} numbers.
+     * Initialize the simulation. Must call before {@link #run()}.
+     * See {@link #main(String[])} for an example.
+     */
+    public void init() {
+
+        // Create a new population
+        population = new Population<>(this.populationSize);
+
+        // Create a double genome prototype, basically a list of doubles
+        DoubleGenome doubleGenomePrototype = new DoubleGenome();
+
+        // The prototype will share the same randomizer as this simulation
+        doubleGenomePrototype.setRandomizer(new SimbrainRandomizer(System.nanoTime()));
+
+        // Create an initial agent prototype
+        DoubleAgent doubleAgent = new DoubleAgent(doubleGenomePrototype, NumberMatching::eval);
+
+        // Populate the pool using the prototype
+        population.populate(doubleAgent);
+    }
+
+
+    /**
+     * Fitness is based on the SSE of the agent generated numbers and the {@link #TARGET} numbers.
      *
      * @param agent The agent to be evaluate
      * @return a fitness score
@@ -86,49 +91,23 @@ public class NumberMatching {
     }
 
     /**
-     * Initialize the simulation. Must call before {@link #run()}.
-     * See {@link #main(String[])} for an example.
-     */
-    public void init() {
-
-        // create a new population according to the configured size
-        population = new Population<>(this.populationSize);
-
-        // create a genome that will be used in the agent prototype.
-        DoubleGenome doubleGenomePrototype = new DoubleGenome();
-        // the prototype will share the same randomizer of this simulation
-        doubleGenomePrototype.setRandomizer(randomizer);
-
-        // crate an agent prototype / template to be copied upon the initial populating process
-        DoubleAgent prototype = new DoubleAgent(doubleGenomePrototype, NumberMatching::eval);
-
-        // populate the pool using the prototype
-        population.populate(prototype);
-    }
-
-    /**
      * Core of the simulation. Must call {@link #init()} before executing.
      *  See {@link #main(String[])} for an example.
      */
     public void run() {
 
-        // run the simulation for at most maxIteration times
         for (int i = 0; i < maxIteration; i++) {
 
-            // compute the fitness score, eliminate the bottom half, and get the top score
-            // TODO: break into individual steps.
             double bestFitness = population.computeNewFitness();
 
-            System.out.printf("[%d]Fitness %.2f | ", i, bestFitness);
-            System.out.println("Phenotype: " + population.getAgentList().get(0).getAgent()
-                    .stream().map(a -> String.format("%.2f", a)).collect(Collectors.joining(", ")));
+            System.out.printf("[%d] Fitness %.2f | ", i, bestFitness);
+            System.out.println("Phenotype: " + population.getAgentList().get(0).getAgent());
 
-            // if the SSE is less than maxErrorThreshold, the simulation should stop.
+            // If the SSE is less than maxErrorThreshold, the simulation should stop.
             if (bestFitness > maxErrorThreshold) {
                 break;
             }
 
-            // replenish the pool
             population.replenish();
         }
     }

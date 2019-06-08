@@ -8,17 +8,34 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A list of double genes.
+ *
+ * Currently uses single point crossover. See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)#Single-point_crossover
+ */
 public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
-    
+
+    /**
+     * The list of genes.
+     */
     private List<DoubleGene> genes;
 
+    /**
+     * Default implementation with three double genes.
+     */
+    public DoubleChromosome() {
+        this(3);
+    }
+
+    /**
+     * Create a new double chromosome with a specified number of {@link DoubleGene}s.
+     *
+     * @param size number of genes
+     */
     public DoubleChromosome(int size) {
         genes = Stream.generate(DoubleGene::new).limit(size).collect(Collectors.toList());
     }
 
-    public DoubleChromosome() {
-        this(3);
-    }
 
     @Override
     public DoubleChromosome crossOver(DoubleChromosome other) {
@@ -26,7 +43,7 @@ public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
         DoubleChromosome ret = new DoubleChromosome();
         ret.genes = new ArrayList<>();
 
-        // single-point crossover
+        // Single-point crossover.
         int point = getRandomizer().nextInt(Integer.min(other.genes.size(), this.genes.size()));
 
         DoubleChromosome firstChromosome;

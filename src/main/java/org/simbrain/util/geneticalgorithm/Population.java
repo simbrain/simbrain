@@ -8,20 +8,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A agentList has multiple agents
- *   Each agent has a genome, as well as a fitness function
- *     The genome has chromosomes (which enforce compatability of gene in cross-over)
- *     The chromosomes have genes
+ * The top level for genetic algorithms in Simbrain. A set of agents, each of which expresses
+ * a genotype and produces a fitness value at each generation.  Contains classes to initialize
+ * a population and run an evolutionary simulation.
  *
  * Environments are currently handled at this level.
  *
- * @param <G> The genome the agent has. TODO: Find a way to get rid of this. Only here to satisfy the type check
- *           when, for example, crossover
- * @param <A> The type of agent in this population
+ * @param <G> The type of genes the population evolves, "genotypes"
+ * @param <A> The type of agent the population evolves, "phenotypes"
  */
-public class Population<G extends Genome, A extends Agent<G, A>> {
-
-    //TODO: Pull this, chromosome, genome, and gene to a separate simbrain GA package.
+public class Population<G extends Genome, A extends Agent> {
 
     private int size;
 
@@ -37,7 +33,7 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
     public void populate(A prototype) {
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            agentList.add(prototype.copy());
+            agentList.add((A) prototype.copy());
         }
     }
 
@@ -52,7 +48,7 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
             }
             A agent1 = agentList.get(index1);
             A agent2 = agentList.get(index2);
-            A newAgent = agent1.crossover(agent2);
+            A newAgent = (A) agent1.crossover(agent2);
             newAgent.mutate();
             agentList.add(newAgent);
         }

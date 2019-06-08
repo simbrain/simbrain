@@ -6,14 +6,19 @@ import java.util.function.Function;
  * An agent based on a genome.  The main thing added at this level
  * is a fitness function used to determine how well an expression of the
  * genome (e.g. an Agent based on a neural network) does in an environment.
- * Any environment is currently maintained at the Population level.
  *
  * @param <G> The genome, e.g. NeuralNetwork, this agent is based on.
  */
-public abstract class Agent<G extends Genome, A extends Agent<G, A>> implements Comparable<Agent> {
+public abstract class Agent<G extends Genome, A extends Agent> implements Comparable<Agent> {
 
+    /**
+     * The agent's genome.
+     */
     private G genome;
 
+    /**
+     * The agent's fitness function, typically specified
+     */
     private Function<A, Double> fitnessFunction;
 
     /**

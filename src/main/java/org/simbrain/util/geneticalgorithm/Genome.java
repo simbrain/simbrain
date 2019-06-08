@@ -3,29 +3,35 @@ package org.simbrain.util.geneticalgorithm;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 /**
- * Contains a set of chromosomes, each of which contains a set of genes.
+ * Subclasses contain a set of chromosomes, each of which contains a set of genes.
  *
- * @param <T> The Type of object (e.g. Network) encoded by this genome
+ * @param <P> The prototype object or "phenotype" (e.g. Network) encoded by this genome
  */
-public abstract class Genome<T, G extends Genome<T, G>> {
+public abstract class Genome<P, G extends Genome> {
 
-    /**
-     * A list of Chromosomes, indexed by a string description of their type
-     */
-    // private Map<String, Chromosome<?>> chromosomes = new HashMap<>();
 
     private SimbrainRandomizer randomizer;
 
+    /**
+     * Override
+     * @param other the other genome to cross with this one
+     * @return the new genome crossing this and another
+     */
     public abstract G crossOver(G other);
 
+    /**
+     * Mutate the genes in this genome.
+     * Must someties be overrideen, when mutations must be aware of information beyond the chromosome level,
+     * e.g. an ability to make new connections.
+     */
     public abstract void mutate();
 
     public abstract G copy();
 
     /**
-     * Create an object using this genome. In a sense, create a phenotype.
+     * Create a prototype object using this genome. In a sense, create a phenotype.
      */
-    public abstract T build();
+    public abstract P build();
 
     public SimbrainRandomizer getRandomizer() {
         return randomizer;
@@ -44,7 +50,4 @@ public abstract class Genome<T, G extends Genome<T, G>> {
         this.randomizer = new SimbrainRandomizer(randomizer.nextLong());
     }
 
-    // public Map<String, Chromosome<?>> getChromosomes() {
-    //     return chromosomes;
-    // }
 }

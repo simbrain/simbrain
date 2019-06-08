@@ -6,11 +6,12 @@ import java.util.Collection;
 
 /**
  * A list of genes that can be crossed with genes from another chromosome of the same type.
- * Examples include Neuron Chromosomes, Double Chromosomes, and Synapse Chromosomes.
+ * See {@link org.simbrain.util.geneticalgorithm.numerical.DoubleChromosome} and
+ * {@link org.simbrain.util.neat2.ConnectionChromosome}.
  *
  * @param <T> the type of the genes in this chromosome
  */
-public abstract class Chromosome<T, C extends Chromosome<T, C>> {
+public abstract class Chromosome<T, C extends Chromosome> {
 
     private SimbrainRandomizer randomizer;
 
@@ -24,6 +25,9 @@ public abstract class Chromosome<T, C extends Chromosome<T, C>> {
         this.randomizer = randomizer;
     }
 
+    /**
+     * Randomizer used to set crossover points in mutations.
+     */
     public SimbrainRandomizer getRandomizer() {
         return randomizer;
     }

@@ -5,8 +5,14 @@ import org.simbrain.util.geneticalgorithm.Genome;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A list of double genes
+ */
 public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
 
+    /**
+     * All genes contained in a single chromosome, since all double genes are compatbile.
+     */
     private DoubleChromosome chromosome = new DoubleChromosome();
 
     @Override

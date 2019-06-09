@@ -50,14 +50,15 @@
         </p>
         <p>Various commands in Simbrain (e.g: connecting nodes, training weights, viewing weight matrices) require you to specify a set of source and target neurons (or neuron groups). Source neurons are surrounded by red squares and target neurons are surrounded by the standard green selection squares. Here is an example.</p>
         <p style="text-align: center; padding = 30px;"><img style="width: 450px" alt="source target" src="../../Images/sourceTarget.png"></p>
+        
+        <p>After setting the source and target neurons, a connection (represented by a line) attaching each source neuron to its target neuron should appear, as well as a weight attached to the target neuron. A source neuron will remain selected unless cleared or until a new source neuron is designated.</p>
 
         <p>The same ideas and visual conventions apply to neuron groups, which can be selected via their <a href="groups.html#interactionBox">interaction boxes</a> and connected with <a href="groups/SynapseGroup.html">synapse groups</a>.</p>
 
         <p>The main actions required to set up source and target neurons are as follows:</p>
         <blockquote>
-            <p><span class="heading2">To set source neurons</span>: select a group of neurons and either (1) press the "1" key, (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.</p>
-            <p><span class="heading2">To set target neurons</span>: simply select neurons as usual.
-            </p>
+            <p><span class="heading2">To set source neurons</span>: select individual neurons or a group of neurons and either (1) press the "1" key, (2) right-click and select&nbsp;<span> Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.</p>
+            <p><span class="heading2">To set target neurons</span>: simply select neurons as usual and either (1) press the "2" key, or (2) right-click and select&nbsp;<span class="command">Connect Neurons &gt; All-to-All (or any of the connections types)</span>.</p>
             <p><span class="heading2">To clear all source neurons</span>: unselect all neurons (by clicking outside of any neuron), and (1) press the "1" key or (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.</p>
             <p><span class="heading2">To clear specific source neurons</span>: select the neurons of interest and (1) right click and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>, or (2) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>.</p>
         </blockquote>
@@ -67,7 +68,8 @@
         <p>Neurons can be connected by synapses in several different ways:</p>
         <blockquote>
             <p><a id="quick12"></a><span class="heading2">The Quick Keyboard 1-2: </span> Select source neurons, designate them as source by pressing "1", select target neurons, and connect (all to all) by pressing "2".  Repeat as needed to connect series of neurons.   This tends to be easy to get the hang of, and once the commands are familiar, many neurons can be quickly connected in this way.</p>
-            <p><span class="heading2">Menu Commands: </span> Sam as the keyboard 1-2 but using the relevant menu commands to set as source and make the connections.</p>
+            <p><span class="heading2">Menu Commands: </span> To use menu commands: Select your desired source neuron(s), designate them as source by right-clicking on one of the selected neurons (if more than one is selected) and connect (all-to-all) by right-clicking on one of the selected neurons and clicking "Connect Neurons."" This will open up a window that gives you the option of customizing your connection preferences.</p>
+            <p><span class="heading2">Network Groups: </span> To connect a whole network group to itself or to another group, you can use either the 1-2 keyboard method or menu commands. But instead of selecting individual neurons, you will select the group header on the upper left of the network. After connecting a group to itself, a second group header should appear, this does not create a new group, but rather a subgroup representing all the connections made. By opening up the menu command for the second group, you are able to make edits and update your connection preferences for the initial group. Synapses are invisible by default, to make visible,  right-click on the second group and check the toggle synapse visibility button.</p>
             <p><span class="heading2">Connection Objects: </span> At the point that a connection is made using the "2" button, one can opt to create a special type of set of connections (not just all to all), and can also customize what the synapse strengths will be, using one of the built-in connection objects.  See the pages in the sub-menu above. </p>
             <p><span class="heading2">Scripts: </span> Highly customized connections (e.g. those used in the cortical branching script) can be created using <a href="../Scripting.html">scripts</a>.</p>
         </blockquote>

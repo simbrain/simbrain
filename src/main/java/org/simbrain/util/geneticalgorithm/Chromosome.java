@@ -13,21 +13,36 @@ import java.util.Collection;
  */
 public abstract class Chromosome<T, C extends Chromosome> {
 
+
     private SimbrainRandomizer randomizer;
 
+    /**
+     * Cross one chromosome over with another. See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)
+     * Details of crossover will depend on the specific implementaiotn.
+     *
+     * @param other the other chromosome to cross with this one.
+     * @return the new chromosome after crossing the two over
+     */
     public abstract C crossOver(C other);
+    // Todo: Possibly create default implementations of standard forms of crossover like single point, two point,
+    // k-point, etc.
 
-    public abstract void mutate();
+    /**
+     * Default chromosome level mutation is just to mutate every gene in the chromosome.
+     */
+    public void mutate() {
+        getGenes().forEach(Gene::mutate);
+    };
 
+    /**
+     * The collection of genes will be implemented in different ways depending on the sublcass.
+     */
     public abstract Collection<? extends Gene<T>> getGenes();
 
     public void setRandomizer(SimbrainRandomizer randomizer) {
         this.randomizer = randomizer;
     }
 
-    /**
-     * Randomizer used to set crossover points in mutations.
-     */
     public SimbrainRandomizer getRandomizer() {
         return randomizer;
     }

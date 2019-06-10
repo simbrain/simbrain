@@ -39,11 +39,6 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
     }
 
     @Override
-    public void mutate() {
-
-    }
-
-    @Override
     public Collection<NodeGene> getGenes() {
         return genes.values();
     }

@@ -59,7 +59,7 @@ public class NumberMatching {
     public void init() {
 
         // Create a new population
-        population = new Population<>(this.populationSize);
+        population = new Population<>(this.populationSize, System.nanoTime());
 
         // Create a double genome prototype, basically a list of doubles
         DoubleGenome doubleGenomePrototype = new DoubleGenome();

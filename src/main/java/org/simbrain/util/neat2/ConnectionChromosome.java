@@ -36,13 +36,6 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
         return ret;
     }
 
-    @Override
-    public void mutate() {
-        for (ConnectionGene connectionGene : connectionGenes.values()) {
-            connectionGene.mutate();
-        }
-    }
-
     public void addGene(int innovationNumber, ConnectionGene newGene) {
         connectionGenes.put(innovationNumber, newGene);
     }

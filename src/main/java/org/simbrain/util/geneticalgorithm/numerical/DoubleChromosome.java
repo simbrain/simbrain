@@ -74,11 +74,6 @@ public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
     }
 
     @Override
-    public void mutate() {
-        genes.forEach(DoubleGene::mutate);
-    }
-
-    @Override
     public Collection<DoubleGene> getGenes() {
         return genes;
     }

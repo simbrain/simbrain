@@ -75,7 +75,7 @@ public class Xor {
     }
 
     public void init() {
-        agentPopulation = new Population<>(this.populationSize);
+        agentPopulation = new Population<>(this.populationSize, System.nanoTime());
 
         NetworkGenome networkPrototype = new NetworkGenome();
         networkPrototype.addGroup("inputs", 2, false);

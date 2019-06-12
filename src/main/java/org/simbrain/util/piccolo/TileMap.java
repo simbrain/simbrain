@@ -4,15 +4,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.piccolo2d.nodes.PImage;
+import org.simbrain.util.Pair;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -78,18 +81,40 @@ public class TileMap {
      * The layers of this map.
      */
     @XStreamImplicit
-    public ArrayList<TileMapLayer> layers = new ArrayList<>();
+    private ArrayList<TileMapLayer> layers = new ArrayList<>();
 
     /**
      * Layers of the rendered map images
      */
     private transient ArrayList<PImage> renderedLayers = null;
 
+    private transient Map<String, Pair<TileMapLayer, PImage>> programmaticLayers = new HashMap<>();
+
+    private transient BiConsumer<PImage, PImage> layerImageUpdateCalllback;
+
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
      * (Not used for now)
      */
     private Color backgroundcolor;
+
+    /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
+     * Standard method call made to objects after they are deserialized. See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        changeSupport = new PropertyChangeSupport(this);
+        programmaticLayers = new HashMap<>();
+        return this;
+    }
 
     /**
      * Create a tilemap by parsing a tmx file, which is an xml representation
@@ -127,6 +152,31 @@ public class TileMap {
             }
         }
         return renderedLayers;
+    }
+
+    public void addTile(int tileID, int x, int y, boolean collision) {
+        String layerName = collision ? "c_program" : "u_program";
+        TileMapLayer layerToAdd;
+        if (programmaticLayers.get(layerName) == null) {
+            layerToAdd = new TileMapLayer(layerName, width, height, collision);
+            layers.add(layerToAdd);
+        } else {
+            layerToAdd = programmaticLayers.get(layerName).getKey();
+        }
+        layerToAdd.setTileID(tileID, x, y);
+        PImage oldRenderedImage = null;
+        if (programmaticLayers.containsKey(layerName)) {
+            oldRenderedImage = programmaticLayers.get(layerName).getValue();
+            renderedLayers.remove(oldRenderedImage);
+        }
+
+        PImage newRenderedImage = layerToAdd.renderImage(tilesets, true);
+        programmaticLayers.put(layerName, new Pair<>(layerToAdd, newRenderedImage));
+        renderedLayers.add(newRenderedImage);
+
+        // changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
+        layerImageUpdateCalllback.accept(oldRenderedImage, newRenderedImage);
+
     }
 
     /**
@@ -215,7 +265,10 @@ public class TileMap {
      * @return true if the given location has a collision tile
      */
     public boolean hasCollisionTile(int x, int y) {
-        for (TileMapLayer l : layers.stream().filter(l -> l.getName().contains("c_")).collect(Collectors.toList())) {
+        if (tilesets == null || tilesets.size() == 0) {
+            return false;
+        }
+        for (TileMapLayer l : layers.stream().filter(TileMapLayer::isCollideLayer).collect(Collectors.toList())) {
             if (tilesets.stream()
                     .map(t -> t.getTile(l.getTileIdAt(x, y)))
                     .filter(Objects::nonNull)
@@ -314,5 +367,13 @@ public class TileMap {
 
     public int getTileheight() {
         return tileheight;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void setLayerImageUpdateCalllback(BiConsumer<PImage, PImage> layerImageUpdateCalllback) {
+        this.layerImageUpdateCalllback = layerImageUpdateCalllback;
     }
 }

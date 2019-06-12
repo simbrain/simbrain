@@ -2,10 +2,15 @@ package org.simbrain.util.piccolo;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.converters.extended.NamedMapConverter;
 import org.piccolo2d.nodes.PImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,15 +36,38 @@ public class TileMapLayer {
     private int height;
 
     /**
+     * Custom properties defined in tmx.
+     */
+    @XStreamConverter(
+            value = NamedMapConverter.class,
+            strings = {"property", "name", "value"},
+            types = {String.class, String.class},
+            booleans = {true, true}
+    )
+    private HashMap<String, String> properties;
+
+    /**
      * The data from parsing tmx file.
      * Use {@link TiledData#getGid()} to retrieve the processed data (tile id list)
      */
-    public TiledData data;
+    private TiledData data;
 
     /**
      * The rendered image of the layer
      */
     private transient PImage layer = null;
+
+    public TileMapLayer() {
+    }
+
+    public TileMapLayer(String name, int width, int height, boolean collision) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+        this.properties = new HashMap<>();
+        this.properties.put("collide", collision ? "true" : "false");
+        this.data = new TiledData(width, height);
+    }
 
     /**
      * Render one layer of a tileset.
@@ -47,8 +75,8 @@ public class TileMapLayer {
      * @param tileSet the tileset to use on this layer
      * @return the image of this layer
      */
-    public PImage renderImage(List<TileSet> tileSet) {
-        if (layer == null) {
+    public PImage renderImage(List<TileSet> tileSet, boolean forced) {
+        if (layer == null || forced) {
             BufferedImage layerImage =
                     tileSet != null && tileSet.size() > 0 ? new BufferedImage(
                             tileSet.get(0).getTilewidth() * width,
@@ -85,6 +113,10 @@ public class TileMapLayer {
         return layer;
     }
 
+    public PImage renderImage(List<TileSet> tileSet) {
+        return renderImage(tileSet, false);
+    }
+
     /**
      * Get the id of a tile at the given tile coordinate location.
      *
@@ -105,5 +137,13 @@ public class TileMapLayer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isCollideLayer() {
+        return properties != null && properties.containsKey("collide") && properties.get("collide").equals("true");
+    }
+
+    public void setTileID(int tileID, int x, int y) {
+        data.setTileID(tileID, x, y, width);
     }
 }

@@ -183,6 +183,14 @@ public class OdorWorld implements EditableObject {
         addEntity(entity);
     }
 
+    public void addTile() {
+        tileMap.addTile(
+                61,
+                (int) lastClickedPosition.getX() / tileMap.getTilewidth(),
+                (int) lastClickedPosition.getY() / tileMap.getTileheight(),
+                true);
+    }
+
     /**
      * Does the world contain this entity?
      *

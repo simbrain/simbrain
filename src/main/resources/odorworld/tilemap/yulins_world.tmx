@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="1">
  <tileset firstgid="1" name="RoguelikeTileSet" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
   <image source="tileset_kenney.png" width="1936" height="1052"/>
   <tile id="5">
@@ -24,7 +24,7 @@
    </properties>
   </tile>
  </tileset>
- <layer name="u_ground" width="15" height="15">
+ <layer id="1" name="u_ground" width="15" height="15">
   <data encoding="csv">
 63,63,63,6,6,6,6,6,6,6,6,63,63,63,63,
 63,63,63,63,6,63,63,63,6,6,6,6,6,6,6,
@@ -43,7 +43,7 @@
 6,6,6,6,63,63,63,63,63,63,6,63,63,6,63
 </data>
  </layer>
- <layer name="u_groundOverlay" width="15" height="15">
+ <layer id="2" name="u_groundOverlay" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,407,466,466,466,408,0,0,0,0,0,0,0,0,0,
@@ -62,7 +62,10 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="c_groundOverlay" width="15" height="15">
+ <layer id="3" name="c_groundOverlay" width="15" height="15">
+  <properties>
+   <property name="collide" type="bool" value="true"/>
+  </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -81,7 +84,10 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="c_object" width="15" height="15">
+ <layer id="4" name="c_object" width="15" height="15">
+  <properties>
+   <property name="collide" type="bool" value="true"/>
+  </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,641,641,641,641,641,641,641,641,
 0,0,0,0,0,0,0,641,641,641,641,641,641,641,641,
@@ -100,7 +106,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="c_objectOverlay" width="15" height="15">
+ <layer id="5" name="c_objectOverlay" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -119,7 +125,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="o_object" width="15" height="15">
+ <layer id="6" name="o_object" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,584,584,584,584,584,584,584,584,
 0,0,0,0,0,0,0,584,0,0,0,0,584,584,584,

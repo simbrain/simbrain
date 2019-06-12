@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -42,6 +44,13 @@ public class TiledData {
      * The flat list of tile id from the raw data.
      */
     private transient List<Integer> gid = null;
+
+    public TiledData() {
+    }
+
+    public TiledData(int width, int height) {
+        this.gid = Stream.generate(() -> 0).limit(width * height).collect(Collectors.toList());
+    }
 
     /**
      * Get the list of tile id.
@@ -99,6 +108,10 @@ public class TiledData {
             }
         }
         return gid;
+    }
+
+    public void setTileID(int tileID, int x, int y, int width) {
+        gid.set(x + y * width, tileID);
     }
 
 }

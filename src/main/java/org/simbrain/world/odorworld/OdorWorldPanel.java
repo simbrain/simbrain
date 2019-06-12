@@ -187,6 +187,10 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().removeAllChildren();
                 layerImageList = world.getTileMap().createImageList();
                 canvas.getLayer().addChildren(layerImageList);
+                this.world.getTileMap().setLayerImageUpdateCalllback((oldImage, newImage) -> {
+                    canvas.getLayer().removeChild(oldImage);
+                    canvas.getLayer().addChild(newImage);
+                });
                 syncToModel();
                 repaint();
             } else if ("worldStarted".equals(evt.getPropertyName())) {
@@ -204,6 +208,8 @@ public class OdorWorldPanel extends JPanel {
                 }, 10, 10);
             }
         });
+
+
 
         this.component = component;
         this.world = world;
@@ -368,6 +374,7 @@ public class OdorWorldPanel extends JPanel {
         if (entity == null) {
             contextMenu.add(new JMenuItem(new AddEntityAction(this)));
             contextMenu.add(new JMenuItem(new AddAgentAction(this)));
+            contextMenu.add(new JMenuItem(new AddTile(this)));
             contextMenu.addSeparator();
         } else {
             contextMenu.add(new JMenuItem(new ShowEntityDialogAction(entity)));

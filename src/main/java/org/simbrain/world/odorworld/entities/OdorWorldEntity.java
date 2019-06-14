@@ -1236,7 +1236,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             for (int i = 0; i < 9; i++) {
                 int tileX = x + (i % 3) - 1;
                 int tileY = y + (i / 3) - 1;
-                if (tileX >= 0 && tileY >= 0 && parentWorld.getTileMap().hasCollisionTile(tileX, tileY)) {
+                if (parentWorld.getTileMap().hasCollisionTile(tileX, tileY)) {
                     eightNeighborCollisionBounds.add(new RectangleCollisionBound(parentWorld.getTileMap().getTileBound(tileX, tileY)));
                 }
             }

@@ -90,7 +90,6 @@ public class TileMap {
 
     private transient Map<String, Pair<TileMapLayer, PImage>> programmaticLayers = new HashMap<>();
 
-    private transient BiConsumer<PImage, PImage> layerImageUpdateCalllback;
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
@@ -111,8 +110,8 @@ public class TileMap {
      * @return Initialized object.
      */
     private Object readResolve() {
-        changeSupport = new PropertyChangeSupport(this);
         programmaticLayers = new HashMap<>();
+        changeSupport = new PropertyChangeSupport(this);
         return this;
     }
 
@@ -174,8 +173,8 @@ public class TileMap {
         programmaticLayers.put(layerName, new Pair<>(layerToAdd, newRenderedImage));
         renderedLayers.add(newRenderedImage);
 
-        // changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
-        layerImageUpdateCalllback.accept(oldRenderedImage, newRenderedImage);
+        changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
+
 
     }
 
@@ -371,9 +370,5 @@ public class TileMap {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void setLayerImageUpdateCalllback(BiConsumer<PImage, PImage> layerImageUpdateCalllback) {
-        this.layerImageUpdateCalllback = layerImageUpdateCalllback;
     }
 }

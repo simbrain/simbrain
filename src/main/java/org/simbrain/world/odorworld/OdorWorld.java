@@ -178,7 +178,15 @@ public class OdorWorld implements EditableObject {
 
         OdorWorldEntity entity = new OdorWorldEntity(this, EntityType.MOUSE);
         entity.setEntityType(EntityType.MOUSE);
-        entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        double x = lastClickedPosition.getX();
+        if (x > tileMap.getMapWidth() - EntityType.MOUSE.getImageWidth()) {
+            x = tileMap.getMapWidth() - EntityType.MOUSE.getImageWidth();
+        }
+        double y = lastClickedPosition.getY();
+        if (y > tileMap.getMapHeight() - EntityType.MOUSE.getImageHeight()) {
+            y = tileMap.getMapHeight() - EntityType.MOUSE.getImageHeight();
+        }
+        entity.setLocation(x, y);
         entity.addDefaultSensorsEffectors();
         addEntity(entity);
     }

@@ -187,9 +187,13 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().removeAllChildren();
                 layerImageList = world.getTileMap().createImageList();
                 canvas.getLayer().addChildren(layerImageList);
-                this.world.getTileMap().setLayerImageUpdateCalllback((oldImage, newImage) -> {
-                    canvas.getLayer().removeChild(oldImage);
-                    canvas.getLayer().addChild(newImage);
+                this.world.getTileMap().addPropertyChangeListener(e -> {
+                    if ("layerImageChanged".equals(e.getPropertyName())) {
+                        PImage oldImage = (PImage) e.getOldValue();
+                        PImage newImage = (PImage) e.getNewValue();
+                        canvas.getLayer().removeChild(oldImage);
+                        canvas.getLayer().addChild(newImage);
+                    }
                 });
                 syncToModel();
                 repaint();
@@ -209,7 +213,14 @@ public class OdorWorldPanel extends JPanel {
             }
         });
 
-
+        world.getTileMap().addPropertyChangeListener(e -> {
+            if ("layerImageChanged".equals(e.getPropertyName())) {
+                PImage oldImage = (PImage) e.getOldValue();
+                PImage newImage = (PImage) e.getNewValue();
+                canvas.getLayer().removeChild(oldImage);
+                canvas.getLayer().addChild(newImage);
+            }
+        });
 
         this.component = component;
         this.world = world;
@@ -253,6 +264,12 @@ public class OdorWorldPanel extends JPanel {
             }
             if (cameraNewY + cameraBounds.height > worldHeight) {
                 cameraNewY = worldHeight - cameraBounds.height;
+            }
+            if (cameraBounds.width > worldWidth) {
+                cameraNewX = 0;
+            }
+            if (cameraBounds.height > worldHeight) {
+                cameraNewY = 0;
             }
 
             camera.setViewBounds(new Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height));

@@ -43,6 +43,9 @@ public class NetworkWrapper {
         this.desktopComponent = desktopComponent;
         this.networkComponent = desktopComponent.getWorkspaceComponent();
         this.network = networkComponent.getNetwork();
+
+        // TODO: Temp to prevent NPC's.
+        getNetworkPanel().setAutoZoomMode(false);
     }
 
     public NeuronNode getNode(Neuron neuron) {

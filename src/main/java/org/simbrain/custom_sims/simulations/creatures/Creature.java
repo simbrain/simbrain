@@ -101,6 +101,12 @@ public class Creature {
      */
     float baseMovementStepSize = 0.01f;
 
+    /**
+     * Sensors
+     */
+    ObjectSensor swissSensor, poisonSensor;
+    Hearing hearCheese;
+
     //TODO: Add gender
 
     public Creature(CreaturesSim sim, String name, NetworkWrapper net, OdorWorldEntity agent) {
@@ -147,9 +153,7 @@ public class Creature {
         biochem.update();
     }
 
-    // TODO: Move this bank of sensor references to the top
-    ObjectSensor swissSensor;
-    Hearing hearCheese;
+
     /**
      * Configure the agent's name, smells, sensors, and effectors.
      */
@@ -164,6 +168,7 @@ public class Creature {
 
         // Add object sensors (Todo)
         swissSensor = new ObjectSensor(agent, EntityType.SWISS);
+        poisonSensor = new ObjectSensor(agent, EntityType.POISON);
         agent.addSensor(swissSensor);
 
         // Add hearing sensors
@@ -369,6 +374,7 @@ public class Creature {
 
         //// Couplings from center smell sensor to stimulus lobe
         parentSim.getSim().couple(swissSensor, stimulus.getNeuronByLabel("Cheese"));
+        parentSim.getSim().couple(poisonSensor, stimulus.getNeuronByLabel("Poison"));
 
         //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 0, stimulus.getNeuronByLabel("Toy"));
         //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 1, stimulus.getNeuronByLabel("Fish"));

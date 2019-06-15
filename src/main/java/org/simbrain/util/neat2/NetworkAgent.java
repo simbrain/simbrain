@@ -6,7 +6,7 @@ import org.simbrain.util.geneticalgorithm.Agent;
 import java.util.*;
 import java.util.function.Function;
 
-public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
+public class NetworkAgent extends Agent<NetworkGenome, NetworkAgent> {
 
     /**
      * A network to be run in the simulation
@@ -15,14 +15,14 @@ public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
 
     public List<String> activationRecoding = new LinkedList<>();
 
-    public NetworkBasedAgent(NetworkGenome genotype, Function<NetworkBasedAgent, Double> fitnessFunction) {
+    public NetworkAgent(NetworkGenome genotype, Function<NetworkAgent, Double> fitnessFunction) {
         super(genotype, fitnessFunction);
         agent = getGenome().build();
     }
 
     @Override
-    public NetworkBasedAgent crossover(NetworkBasedAgent other) {
-        return new NetworkBasedAgent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
+    public NetworkAgent crossover(NetworkAgent other) {
+        return new NetworkAgent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class NetworkBasedAgent extends Agent<NetworkGenome, NetworkBasedAgent> {
     }
 
     @Override
-    public NetworkBasedAgent copy() {
-        return new NetworkBasedAgent(getGenome().copy(), getFitnessFunction());
+    public NetworkAgent copy() {
+        return new NetworkAgent(getGenome().copy(), getFitnessFunction());
     }
 }

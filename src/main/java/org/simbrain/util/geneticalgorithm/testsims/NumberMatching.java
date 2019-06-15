@@ -6,7 +6,6 @@ import org.simbrain.util.geneticalgorithm.numerical.DoubleGenome;
 import org.simbrain.util.geneticalgorithm.Population;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A simple simulation demonstrating on the NEAT algorithm. This simulation tries to evolve an agent that can
@@ -17,12 +16,7 @@ public class NumberMatching {
     /**
      * The desired agent phenotype
      */
-    private static final List<Double> TARGET = List.of(1.0, 1.0, 1.0);
-
-    /**
-     * The maximum amount a double gene is allowed to alter within a generation
-     */
-    public static final double MAX_MUTATION = 0.1;
+    private static final List<Double> TARGET = List.of(1.0, -34.0, .80);
 
     /**
      * The population to be evolved.
@@ -44,7 +38,7 @@ public class NumberMatching {
      * Simulation stops if the error is above this.  Error is SSE between {@link #TARGET} output and what
      * {@link #eval(DoubleAgent)} produces.
      */
-    public double maxErrorThreshold = -.005;
+    public double maxErrorThreshold = -.05;
 
     /**
      * Create a number matching simulation.
@@ -84,7 +78,7 @@ public class NumberMatching {
     public static Double eval(DoubleAgent agent) {
         double sse = 0;
         for (int i = 0; i < TARGET.size(); i++) {
-            double error = agent.getAgent().get(i) - TARGET.get(i);
+            double error = agent.getPhenotype().get(i) - TARGET.get(i);
             sse += error * error;
         }
         return -sse;
@@ -101,7 +95,7 @@ public class NumberMatching {
             double bestFitness = population.computeNewFitness();
 
             System.out.printf("[%d] Fitness %.2f | ", i, bestFitness);
-            System.out.println("Phenotype: " + population.getAgentList().get(0).getAgent());
+            System.out.println("Phenotype: " + population.getAgentList().get(0).getPhenotype());
 
             // If the SSE is less than maxErrorThreshold, the simulation should stop.
             if (bestFitness > maxErrorThreshold) {

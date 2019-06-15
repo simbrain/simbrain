@@ -10,7 +10,10 @@ import org.simbrain.util.math.SimbrainRandomizer;
 public abstract class Genome<P, G extends Genome> {
 
 
-    private SimbrainRandomizer randomizer;
+    /**
+     * The randomizer for this genome.
+     */
+    private SimbrainRandomizer randomizer = new SimbrainRandomizer(0);
 
     /**
      * Override

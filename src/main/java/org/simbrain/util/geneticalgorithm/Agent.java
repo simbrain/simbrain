@@ -36,7 +36,7 @@ public abstract class Agent<G extends Genome, A extends Agent> implements Compar
     public abstract void mutate();
 
     /**
-     * Evaluate the fitness score of this agent.
+     * Evaluate the fitness score of this agent. Higher is better.
      */
     public abstract void computeFitness();
 

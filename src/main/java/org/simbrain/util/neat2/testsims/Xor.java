@@ -4,7 +4,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.NetworkGenome;
-import org.simbrain.util.neat2.NetworkBasedAgent;
+import org.simbrain.util.neat2.NetworkAgent;
 import org.simbrain.util.geneticalgorithm.Population;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class Xor {
     public static final double MIN_CONNECTION_STRENGTH = -10;
     public static final double MAX_CONNECTION_MUTATION = 1;
 
-    private Population<NetworkGenome, NetworkBasedAgent> agentPopulation;
+    private Population<NetworkGenome, NetworkAgent> agentPopulation;
 
     public SimbrainRandomizer randomizer;
 
@@ -42,8 +42,9 @@ public class Xor {
         new TrainingExample(List.of(1.0, 1.0), List.of(0.0))
     );
 
-    public static Double eval(NetworkBasedAgent agent) {
+    public static Double eval(NetworkAgent agent) {
 
+        System.out.println(agent.getAgent());
         List<Neuron> inputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("inputs"))).getNeuronList();
         List<Neuron> outputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("outputs"))).getNeuronList();
         double sse = 0.0;
@@ -82,7 +83,7 @@ public class Xor {
         networkPrototype.addGroup("outputs", 1, false);
         networkPrototype.setRandomizer(randomizer);
 
-        NetworkBasedAgent prototype = new NetworkBasedAgent(networkPrototype, Xor::eval);
+        NetworkAgent prototype = new NetworkAgent(networkPrototype, Xor::eval);
         agentPopulation.populate(prototype);
     }
 

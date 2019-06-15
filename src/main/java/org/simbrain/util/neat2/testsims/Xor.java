@@ -1,10 +1,11 @@
 package org.simbrain.util.neat2.testsims;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
-import org.simbrain.util.neat2.NetworkAgent;
 import org.simbrain.util.neat2.NetworkGenome;
 
 public class Xor {
@@ -27,7 +28,7 @@ public class Xor {
     /**
      * Population of xor networks to evolve
      */
-    private Population<NetworkGenome, NetworkAgent> population;
+    private Population<NetworkGenome, Network> population;
 
     /**
      * Training data
@@ -43,21 +44,24 @@ public class Xor {
     public static final double MIN_CONNECTION_STRENGTH = -10;
     public static final double MAX_CONNECTION_MUTATION = 1;
 
+
     /**
      * Evaluate xor function
      */
-    public static Double eval(NetworkAgent agent) {
+    public static Double eval(Agent<NetworkGenome, Network> agent) {
 
         double sse = 0.0;
+        NeuronGroup ig = (NeuronGroup) agent.getPhenotype().getGroupByLabel("inputs");
+        NeuronGroup og  = (NeuronGroup) agent.getPhenotype().getGroupByLabel("outputs");
         for(int row = 0; row < trainingSet.getSize(); row++ ) {
             double[] inputs = trainingSet.getInput(row);
-            agent.getInputs().forceSetActivations(inputs);
+            ig.forceSetActivations(inputs);
             // Add to error over a few iterations to penalize for instability
             for (int i = 0; i < 3; i++) {
-                agent.getNetwork().update();
+                agent.getPhenotype().update();
                 double[] targets = trainingSet.getTarget(row);
                 for (int n = 0; n < targets.length; n++) {
-                    double error =  agent.getOutputs().getNeuron(n).getActivation() - targets[n];
+                    double error =  og.getNeuron(n).getActivation() - targets[n];
                     sse += (error * error);
                 }
             }
@@ -71,7 +75,7 @@ public class Xor {
      */
     public void init() {
         population = new Population<>(this.populationSize, System.nanoTime());
-        NetworkAgent prototype = new NetworkAgent(new NetworkGenome(), Xor::eval);
+        Agent prototype = new Agent<>(new NetworkGenome(), Xor::eval);
         population.populate(prototype);
     }
 
@@ -89,7 +93,7 @@ public class Xor {
             population.replenish();
         }
 
-        Network winner = population.getAgentList().get(0).getNetwork();
+        Network winner =  population.getFittestAgent().getPhenotype();
         //System.out.println(winner);
 
         // Display the winning network

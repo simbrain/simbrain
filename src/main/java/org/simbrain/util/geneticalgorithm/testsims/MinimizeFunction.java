@@ -1,8 +1,10 @@
 package org.simbrain.util.geneticalgorithm.testsims;
 
+import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
-import org.simbrain.util.geneticalgorithm.numerical.DoubleAgent;
 import org.simbrain.util.geneticalgorithm.numerical.DoubleGenome;
+
+import java.util.List;
 
 /**
  * From Jenetics manual, section 5.2.
@@ -13,7 +15,7 @@ public class MinimizeFunction {
     /**
      * The population to be evolved.
      */
-    private Population<DoubleGenome, DoubleAgent> population;
+    private Population<DoubleGenome, List<Double>> population;
 
     /**
      * Default population size at each generation.
@@ -46,7 +48,7 @@ public class MinimizeFunction {
         dg.setMax(2*Math.PI);
 
         // Create an initial agent prototype
-        DoubleAgent doubleAgent = new DoubleAgent(dg, MinimizeFunction::eval);
+        Agent doubleAgent = new Agent<>(dg, MinimizeFunction::eval);
 
         // Populate the pool using the prototype
         population.populate(doubleAgent);
@@ -59,7 +61,7 @@ public class MinimizeFunction {
      * @param agent The agent to be evaluate
      * @return a fitness score
      */
-    public static Double eval(DoubleAgent agent) {
+    public static Double eval(Agent<DoubleGenome, List<Double>> agent) {
         double x = agent.getPhenotype().get(0);
         double valueToMinize = Math.cos(.5 + Math.sin(x)) * Math.cos(x);
         // We are minimizing the function, so smaller numbers are more "fit"
@@ -76,7 +78,7 @@ public class MinimizeFunction {
             double bestFitness = population.computeNewFitness();
 
             System.out.printf("[%d] Fitness %.2f | ", i, bestFitness);
-            System.out.println("Phenotype: " + population.getAgentList().get(0).getPhenotype());
+            System.out.println("Phenotype: " + population.getFittestAgent().getPhenotype());
 
             population.replenish();
         }

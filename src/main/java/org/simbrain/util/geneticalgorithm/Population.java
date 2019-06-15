@@ -15,9 +15,8 @@ import java.util.stream.Collectors;
  * Environments are currently handled at this level.
  *
  * @param <G> The type of genes the population evolves, "genotypes"
- * @param <A> The type of agent the population evolves, "phenotypes"
  */
-public class Population<G extends Genome, A extends Agent<G, A>> {
+public class Population<G extends Genome<G,P>, P> {
 
     /**
      * Number of agents in this population at a given generation.
@@ -27,7 +26,7 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
     /**
      * The agents in this population.
      */
-    private List<A> agentList;
+    private List<Agent> agentList;
 
     /**
      * Randomizer for this simnulation
@@ -51,7 +50,7 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
      *
      * @param prototype the prototype agent, which spawns all agents in the population.
      */
-    public void populate(A prototype) {
+    public void populate(Agent prototype) {
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             agentList.add(prototype.copy());
@@ -92,15 +91,20 @@ public class Population<G extends Genome, A extends Agent<G, A>> {
             while (index2 == index1) {
                 index2 = randomizer.nextInt(remainingPopulation);
             }
-            A agent1 = agentList.get(index1);
-            A agent2 = agentList.get(index2);
-            A newAgent = agent1.crossover(agent2);
+            Agent agent1 = agentList.get(index1);
+            Agent agent2 = agentList.get(index2);
+            Agent newAgent = agent1.crossover(agent2);
             newAgent.mutate();
             agentList.add(newAgent);
         }
     }
 
-    public List<A> getAgentList() {
+    public List<Agent> getAgentList() {
         return agentList;
     }
+
+    public Agent<G,P> getFittestAgent() {
+        return agentList.get(0);
+    }
+
 }

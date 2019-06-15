@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Contains a single chromosome with a list of double genes.
  */
-public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
+public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
 
     /**
      * All genes contained in a single chromosome, since all double genes are compatbile.
@@ -20,6 +20,7 @@ public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
      * 3 double genes.
      */
     public DoubleGenome() {
+        this(3);
     }
 
     /**
@@ -29,6 +30,7 @@ public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
      */
     public DoubleGenome(int chromosomeSize) {
         chromosome = new DoubleChromosome(chromosomeSize);
+        express();
     }
 
     @Override
@@ -37,12 +39,14 @@ public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
         ret.inheritRandomizer(getRandomizer());
         ret.chromosome = this.chromosome.crossOver(other.chromosome);
         ret.chromosome.setRandomizer(ret.getRandomizer());
+        express();
         return ret;
     }
 
     @Override
     public void mutate() {
         chromosome.mutate();
+        express();
     }
 
     @Override
@@ -52,14 +56,14 @@ public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
         ret.chromosome = this.chromosome.copy();
         ret.chromosome.setRandomizer(ret.getRandomizer());
         ret.chromosome.getGenes().forEach(g -> g.setRandomizer(ret.getRandomizer()));
+        ret.express();
         return ret;
     }
 
     @Override
-    public List<Double> build() {
+    public List<Double> express() {
         return chromosome.getGenes().stream().map(DoubleGene::getPrototype).collect(Collectors.toList());
     }
-
 
     public void setMin(double min) {
         chromosome.getGenes().forEach(g -> g.setMinimum(min));
@@ -76,5 +80,10 @@ public class DoubleGenome extends Genome<List<Double>, DoubleGenome> {
     public DoubleChromosome getChromosome() {
         return chromosome;
     }
+
+
+    //public List<Double> getPhenotype() {
+    //    return phenotype;
+    //}
 
 }

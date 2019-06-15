@@ -3,13 +3,14 @@ package org.simbrain.util.geneticalgorithm;
 import java.util.function.Function;
 
 /**
- * An agent based on a genome.  The main thing added at this level
- * is a fitness function used to determine how well an expression of the
- * genome (e.g. an Agent based on a neural network) does in an environment.
+ * A genome together with its phenotypic expression, and a fitness function
+ * Can be used to determine how well an expression of a
+ * genome performs.
  *
- * @param <G> The genome, e.g. NeuralNetwork, this agent is based on.
+ * @param <G> The genotype for this agent
+ * @param <P> The phenotype for this agent
  */
-public abstract class Agent<G extends Genome, A extends Agent> implements Comparable<Agent> {
+public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
 
     /**
      * The agent's genome.
@@ -17,36 +18,49 @@ public abstract class Agent<G extends Genome, A extends Agent> implements Compar
     private G genome;
 
     /**
+     * The agent's phenotype
+     */
+    private P phenotype;
+
+    /**
      * The agent's fitness function, typically specified
      */
-    private Function<A, Double> fitnessFunction;
+    private Function<Agent<G,P>, Double> fitnessFunction;
 
     /**
      * The fitness score of this agent. null if this agent has not been evaluate yet.
      */
     private Double fitness = null;
 
-    public Agent(G genome, Function<A, Double> fitnessFunction) {
+    public Agent(G genome, Function<Agent<G,P>, Double> fitnessFunction) {
         this.genome = genome;
         this.fitnessFunction = fitnessFunction;
+        phenotype = genome.express();
     }
 
-    public abstract A crossover(A other);
+    public Agent<G,P> crossover(Agent<G,P> other) {
+        return new Agent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
+    }
 
-    public abstract void mutate();
+    public void mutate() {
+        getGenome().mutate();
+        phenotype = genome.express();
+    };
 
     /**
      * Evaluate the fitness score of this agent. Higher is better.
      */
-    public abstract void computeFitness();
+    public void computeFitness() {
+        computeFitness(this);
+    };
 
-    protected void computeFitness(A agent) {
+    protected void computeFitness(Agent agent) {
         fitness = fitnessFunction.apply(agent);
     }
 
     // TODO: Re-implement using current fitness score
 
-    public Function<A, Double> getFitnessFunction() {
+    public Function<Agent<G,P>, Double> getFitnessFunction() {
         return fitnessFunction;
     }
 
@@ -54,7 +68,9 @@ public abstract class Agent<G extends Genome, A extends Agent> implements Compar
         return genome;
     }
 
-    public abstract A copy();
+    public Agent copy() {
+        return new Agent(getGenome().copy(), getFitnessFunction());
+    };
 
     @Override
     public int compareTo(Agent o) {
@@ -67,5 +83,9 @@ public abstract class Agent<G extends Genome, A extends Agent> implements Compar
 
     public void setFitness(Double fitness) {
         this.fitness = fitness;
+    }
+
+    public P getPhenotype() {
+        return phenotype;
     }
 }

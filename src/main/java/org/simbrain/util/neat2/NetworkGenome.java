@@ -9,7 +9,7 @@ import org.simbrain.util.neat2.testsims.Xor;
 
 import java.util.*;
 
-public class NetworkGenome extends Genome<Network, NetworkGenome> {
+public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
     private static Map<ConnectionGene, Integer> innovationNumberMap = new HashMap<>();
 
@@ -47,7 +47,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
     }
 
     @Override
-    public Network build() {
+    public Network express() {
 
         Network network = new Network();
 

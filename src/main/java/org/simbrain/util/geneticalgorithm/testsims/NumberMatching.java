@@ -1,7 +1,7 @@
 package org.simbrain.util.geneticalgorithm.testsims;
 
+import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.geneticalgorithm.numerical.DoubleAgent;
 import org.simbrain.util.geneticalgorithm.numerical.DoubleGenome;
 import org.simbrain.util.geneticalgorithm.Population;
 
@@ -16,12 +16,12 @@ public class NumberMatching {
     /**
      * The desired agent phenotype
      */
-    private static final List<Double> TARGET = List.of(1.0, -34.0, .80);
+    private static final List<Double> TARGET = List.of(2.0, 4.4, .8);
 
     /**
      * The population to be evolved.
      */
-    private Population<DoubleGenome, DoubleAgent> population;
+    private Population<DoubleGenome, List<Double>> population;
 
     /**
      * Default population size at each generation.
@@ -35,8 +35,7 @@ public class NumberMatching {
     public int maxIteration = 10_000;
 
     /**
-     * Simulation stops if the error is above this.  Error is SSE between {@link #TARGET} output and what
-     * {@link #eval(DoubleAgent)} produces.
+     * Simulation stops if the error is above this.
      */
     public double maxErrorThreshold = -.05;
 
@@ -58,11 +57,8 @@ public class NumberMatching {
         // Create a double genome prototype, basically a list of doubles
         DoubleGenome doubleGenomePrototype = new DoubleGenome();
 
-        // The prototype will share the same randomizer as this simulation
-        doubleGenomePrototype.setRandomizer(new SimbrainRandomizer(System.nanoTime()));
-
         // Create an initial agent prototype
-        DoubleAgent doubleAgent = new DoubleAgent(doubleGenomePrototype, NumberMatching::eval);
+        Agent doubleAgent = new Agent<>(doubleGenomePrototype, NumberMatching::eval);
 
         // Populate the pool using the prototype
         population.populate(doubleAgent);
@@ -75,7 +71,7 @@ public class NumberMatching {
      * @param agent The agent to be evaluate
      * @return a fitness score
      */
-    public static Double eval(DoubleAgent agent) {
+    public static Double eval(Agent<DoubleGenome, List<Double>> agent) {
         double sse = 0;
         for (int i = 0; i < TARGET.size(); i++) {
             double error = agent.getPhenotype().get(i) - TARGET.get(i);
@@ -95,7 +91,7 @@ public class NumberMatching {
             double bestFitness = population.computeNewFitness();
 
             System.out.printf("[%d] Fitness %.2f | ", i, bestFitness);
-            System.out.println("Phenotype: " + population.getAgentList().get(0).getPhenotype());
+            System.out.println("Phenotype: " + population.getFittestAgent().getPhenotype());
 
             // If the SSE is less than maxErrorThreshold, the simulation should stop.
             if (bestFitness > maxErrorThreshold) {
@@ -108,8 +104,6 @@ public class NumberMatching {
 
     /**
      * Main method.
-     *
-     * @param args not used
      */
     public static void main(String[] args) {
         NumberMatching numberMatchingTask = new NumberMatching();

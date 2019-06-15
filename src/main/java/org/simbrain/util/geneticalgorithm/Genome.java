@@ -5,10 +5,9 @@ import org.simbrain.util.math.SimbrainRandomizer;
 /**
  * Subclasses contain a set of chromosomes, each of which contains a set of genes.
  *
- * @param <P> The prototype object or "phenotype" (e.g. Network) encoded by this genome
+ * @param <P> The phenotype (e.g. Network) encoded by this genome
  */
-public abstract class Genome<P, G extends Genome> {
-
+public abstract class Genome<G extends Genome, P> {
 
     /**
      * The randomizer for this genome.
@@ -32,9 +31,9 @@ public abstract class Genome<P, G extends Genome> {
     public abstract G copy();
 
     /**
-     * Create a prototype object using this genome. In a sense, create a phenotype.
+     * Express the genotype as a phenotype.
      */
-    public abstract P build();
+    public abstract P express();
 
     public SimbrainRandomizer getRandomizer() {
         return randomizer;

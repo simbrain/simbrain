@@ -690,7 +690,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public String toString() {
         String ret = new String();
         ret += ("Neuron Group [" + getLabel() + "]. Neuron group with " + this.getNeuronList().size() + " neuron(s)" + ". Located at (" + Utils.round(this.getPosition().x, 2) + "," + Utils.round(this.getPosition().y, 2) + ").\n");
-        ret += layout.toString();
+        //ret += layout.toString();
         return ret;
     }
 

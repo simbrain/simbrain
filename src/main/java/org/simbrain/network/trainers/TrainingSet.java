@@ -205,13 +205,26 @@ public class TrainingSet {
         }
     }
 
+
     // TODO: Experimental for now
     public static double getMSE(TrainingSet ts, double[][] outputs) {
         double mse = 0;
         int i = 0;
-        for(double[] target : ts.getTargetData()) {
+        for (double[] target : ts.getTargetData()) {
             mse += SimbrainMath.getMeanSquaredError(target, outputs[i++]);
         }
         return mse;
+    }
+
+    public int getSize() {
+        return inputData.length;
+    }
+
+    public double[] getInput(int rowIndex) {
+        return inputData[rowIndex];
+    }
+
+    public double[] getTarget(int rowIndex) {
+        return targetData[rowIndex];
     }
 }

@@ -376,17 +376,22 @@ public class NetworkPanel extends JPanel {
     private AtomicInteger updateComplete = new AtomicInteger(0);
 
     /**
-     * Create a network panel given a model network
+     * Display the provided network in a dialog
      *
-     * @param network the model network to view
-     * @return the network panel view of the model
+     * @param network the model network to show
      */
-    public static NetworkPanel createNetworkPanel(Network network) {
+    public static void showNetwork(Network network) {
         // TODO: Creation outside of desktop lacks menus
         NetworkPanel np = new NetworkPanel(network);
         np.syncToModel();
-        return np;
+        StandardDialog dialog = new StandardDialog();
+        dialog.setContentPane(np);
+        dialog.setPreferredSize(new Dimension(500,500));
+        dialog.pack();
+        dialog.setVisible(true);
+        //System.out.println(np.debugString());
     }
+
 
     //TODO: Make constructor private and just use static creation method?
     /**

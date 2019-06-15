@@ -17,7 +17,6 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import javax.swing.*;
 import java.util.Random;
 
 public class Test {
@@ -442,17 +441,10 @@ public class Test {
         System.out.println("Elapsed time:" + duration / 1000.0 + " seconds.");
 
         // TODO: Should be able to set these in Genome
-//        topAgent.getGenome().getInputNg().setLocation(0, 225);
-//        topAgent.getGenome().getOutputNg().setLocation(0, 0);
+        //        topAgent.getGenome().getInputNg().setLocation(0, 225);
+        //        topAgent.getGenome().getOutputNg().setLocation(0, 0);
 
-        NetworkPanel np = NetworkPanel.createNetworkPanel(topAgent.getNet());
-
-        System.out.println(np.debugString());
-        JDialog dialog = np.displayPanelInWindow(np, "NEAT-XOR");
-        dialog.setSize(500, 500);
-        // TODO: Pack should work. Override preferred size in netpanel?
-        dialog.pack();
-
+        NetworkPanel.showNetwork(topAgent.getNet());
     }
 
 }

@@ -1,6 +1,7 @@
 package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Agent;
 
 import java.util.*;
@@ -11,13 +12,11 @@ public class NetworkAgent extends Agent<NetworkGenome, NetworkAgent> {
     /**
      * A network to be run in the simulation
      */
-    private Network agent;
-
-    public List<String> activationRecoding = new LinkedList<>();
+    private Network network;
 
     public NetworkAgent(NetworkGenome genotype, Function<NetworkAgent, Double> fitnessFunction) {
         super(genotype, fitnessFunction);
-        agent = getGenome().build();
+        network = getGenome().build();
     }
 
     @Override
@@ -30,8 +29,8 @@ public class NetworkAgent extends Agent<NetworkGenome, NetworkAgent> {
         getGenome().mutate();
     }
 
-    public Network getAgent() {
-        return agent;
+    public Network getNetwork() {
+        return network;
     }
 
     @Override
@@ -43,4 +42,13 @@ public class NetworkAgent extends Agent<NetworkGenome, NetworkAgent> {
     public NetworkAgent copy() {
         return new NetworkAgent(getGenome().copy(), getFitnessFunction());
     }
+
+    public NeuronGroup getInputs() {
+        return (NeuronGroup) getNetwork().getGroupByLabel("inputs");
+    }
+
+    public NeuronGroup getOutputs() {
+        return (NeuronGroup) getNetwork().getGroupByLabel("outputs");
+    }
+
 }

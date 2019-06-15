@@ -3,7 +3,6 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Genome;
 import org.simbrain.util.neat2.testsims.Xor;
@@ -24,65 +23,73 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
      */
     private ConnectionChromosome connectionGenes = new ConnectionChromosome();
 
+    // TODO
+    int numInputs = 2;
+    int numOutputs = 1;
+
+    public NetworkGenome() {
+
+        // Set up default input and output genes
+        for (int i = 0; i < numInputs; i++) {
+            NodeGene nodeGene = new NodeGene();
+            nodeGene.setMutable(false);
+            nodeGene.setType(NodeGene.NodeType.input);
+            nodeGene.getPrototype().setIncrement(1);
+            nodeGene.getPrototype().setClamped(true);
+            nodeGenes.addGene(nodeGene);
+        }
+        for (int i = 0; i < numOutputs; i++) {
+            NodeGene nodeGene = new NodeGene();
+            nodeGene.setMutable(false);
+            nodeGene.setType(NodeGene.NodeType.output);
+            nodeGenes.addGene(nodeGene);
+        }
+    }
 
     @Override
     public Network build() {
-        Network ret = new Network();
+
+        Network network = new Network();
+
         List<Neuron> neurons = new ArrayList<>();
 
-        nodeGenes.getGenes().forEach(n -> {
-            Neuron neuron = new Neuron(ret, n.getPrototype());
+        NeuronGroup inputGroup = new NeuronGroup(network);
+        NeuronGroup outputGroup = new NeuronGroup(network);
+
+        nodeGenes.getGenes().forEach(nodeGene -> {
+            Neuron neuron = new Neuron(network, nodeGene.getPrototype());
             neurons.add(neuron);
 
-            if (n.getNeuronGroupName() != null && !n.getNeuronGroupName().isEmpty()) {
-                Group group = ret.getGroupByLabel(n.getNeuronGroupName());
-                if (group == null) {
-                    NeuronGroup neuronGroup = new NeuronGroup(ret);
-                    neuronGroup.setLabel(n.getNeuronGroupName());
-                    ret.addGroup(neuronGroup);
-                    neuronGroup.addNeuron(neuron);
-                } else {
-                    if (group instanceof NeuronGroup) {
-                        ((NeuronGroup) group).addNeuron(neuron);
-                    }
-                }
+            if (nodeGene.getType() == NodeGene.NodeType.input) {
+                inputGroup.addNeuron(neuron);
+            } else if (nodeGene.getType() == NodeGene.NodeType.output) {
+                outputGroup.addNeuron(neuron);
+            } else {
+                neuron.setX(getRandomizer().nextDouble(-200, 200));
+                neuron.setY(getRandomizer().nextDouble(0, 300));
+                network.addNeuron(neuron);
             }
-            ret.addNeuron(neuron);
         });
 
-        connectionGenes.getGenes().forEach(c -> {
+        network.addGroup(inputGroup);
+        network.addGroup(outputGroup);
+        inputGroup.setLabel("inputs");
+        inputGroup.applyLayout();
+        inputGroup.offset(0, 300);
+        outputGroup.setLabel("outputs");
+        outputGroup.applyLayout();
+        connectionGenes.getGenes().forEach(connectionGene -> {
             Synapse synapse = new Synapse(
-                    ret,
-                    neurons.get(c.getSourceIndex()),
-                    neurons.get(c.getTargetIndex()),
-                    c.getPrototype().getLearningRule(),
-                    c.getPrototype()
+                    network,
+                    neurons.get(connectionGene.getSourceIndex()),
+                    neurons.get(connectionGene.getTargetIndex()),
+                    connectionGene.getPrototype().getLearningRule(),
+                    connectionGene.getPrototype()
             );
-            ret.addSynapse(synapse);
+            network.addSynapse(synapse);
         });
 
-        return ret;
-    }
-
-    public NetworkGenome addGroup(String name, int size, boolean mutable) {
-
-        List<NodeGene> toAdd = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            NodeGene nodeGene = new NodeGene();
-            nodeGene.setNeuronGroupName(name);
-            nodeGene.setMutable(mutable);
-            if ("inputs".equals(name)) {
-                nodeGene.setType(NodeGene.NodeType.input);
-                nodeGene.getPrototype().setClamped(true);
-            }
-            if ("outputs".equals(name)) {
-                nodeGene.setType(NodeGene.NodeType.output);
-            }
-            toAdd.add(nodeGene);
-        }
-        nodeGenes.addGenes(toAdd);
-
-        return this;
+        return network;
     }
 
     @Override
@@ -101,20 +108,21 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
     }
 
 
-
     @Override
     public void mutate() {
 
-        // new node mutation
+        // TODO: Decouple from Xor
+
+        // New node mutation
         if (getRandomizer().nextDouble(0, 1) < Xor.NEW_NODE_MUTATION_PROBABILITY) {
             nodeGenes.addGenes(Collections.singleton(new NodeGene()));
         }
 
-        // connection weight mutation
+        // Connection weight mutation
         connectionGenes.mutate();
 
-        // new connection mutation
-        // needs to be done here because it has dependency on the node genes
+        // New connection mutation
+        // TODO: Disallow self connections
         if (getRandomizer().nextDouble(0, 1) < Xor.NEW_CONNECTION_MUTATION_PROBABILITY) {
             int sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
@@ -142,6 +150,7 @@ public class NetworkGenome extends Genome<Network, NetworkGenome> {
 
     @Override
     public NetworkGenome copy() {
+
         NetworkGenome ret = new NetworkGenome();
 
         ret.inheritRandomizer(getRandomizer());

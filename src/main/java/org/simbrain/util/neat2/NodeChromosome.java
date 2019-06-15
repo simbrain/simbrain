@@ -43,6 +43,10 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
         return genes.values();
     }
 
+    public void addGene(NodeGene gene) {
+        addGenes(Collections.singleton(gene));
+    }
+
     public void addGenes(Collection<NodeGene> nodeGenes) {
         for (NodeGene nodeGene : nodeGenes) {
             genes.put(genes.size(), nodeGene);

@@ -1,15 +1,41 @@
 package org.simbrain.util.neat2.testsims;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat2.NetworkGenome;
-import org.simbrain.util.neat2.NetworkAgent;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.geneticalgorithm.Population;
-
-import java.util.List;
+import org.simbrain.util.neat2.NetworkAgent;
+import org.simbrain.util.neat2.NetworkGenome;
 
 public class Xor {
+
+    /**
+     * Default population size at each generation.
+     */
+    public int populationSize = 1000;
+
+    /**
+     * The maximum number of generation.
+     */
+    public int maxIterations = 1000;
+
+    /**
+     * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
+     */
+    double fitnessThreshold = -.01;
+
+    /**
+     * Population of xor networks to evolve
+     */
+    private Population<NetworkGenome, NetworkAgent> population;
+
+    /**
+     * Training data
+     */
+    public static TrainingSet trainingSet =
+            new TrainingSet(
+                    new double[][]{{0,0},{0,1},{1,0},{1,1}},
+                    new double[][]{{0},{1},{1},{0}});
 
     public static final double NEW_CONNECTION_MUTATION_PROBABILITY = 0.05;
     public static final double NEW_NODE_MUTATION_PROBABILITY = 0.05;
@@ -17,109 +43,66 @@ public class Xor {
     public static final double MIN_CONNECTION_STRENGTH = -10;
     public static final double MAX_CONNECTION_MUTATION = 1;
 
-    private Population<NetworkGenome, NetworkAgent> agentPopulation;
-
-    public SimbrainRandomizer randomizer;
-
-    public int populationSize;
-
-    public int maxIteration;
-
-    public Xor(long seed, int popuation, int maxIteration) {
-        this.randomizer = new SimbrainRandomizer(seed);
-        this.populationSize = popuation;
-        this.maxIteration = maxIteration;
-    }
-
-    public Xor() {
-        this(System.nanoTime(), 200, 1000);
-    }
-
-    public static final List<TrainingExample> TRAINING_SET = List.of(
-        new TrainingExample(List.of(0.0, 0.0), List.of(0.0)),
-        new TrainingExample(List.of(0.0, 1.0), List.of(1.0)),
-        new TrainingExample(List.of(1.0, 0.0), List.of(1.0)),
-        new TrainingExample(List.of(1.0, 1.0), List.of(0.0))
-    );
-
+    /**
+     * Evaluate xor function
+     */
     public static Double eval(NetworkAgent agent) {
 
-        System.out.println(agent.getAgent());
-        List<Neuron> inputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("inputs"))).getNeuronList();
-        List<Neuron> outputs = ((NeuronGroup) (agent.getAgent().getGroupByLabel("outputs"))).getNeuronList();
         double sse = 0.0;
-        agent.activationRecoding.add("New Generation");
-        for (TrainingExample trainingEntry : TRAINING_SET) {
-            String inputValues = "input: ";
-            for (int i = 0; i < trainingEntry.getInput().size(); i++) {
-                inputs.get(i).forceSetActivation(trainingEntry.getInput().get(i));
-                inputValues = inputValues + trainingEntry.getInput().get(i) + " ";
-            }
-            agent.activationRecoding.add("Wait for network to stabilize");
-            String output = "output/expected: ";
-            // for the network to stabilize
-            for (int i = 0; i < 10; i++) {
-                agent.getAgent().update();
-            }
-            for (int i = 0; i < 50; i++) {
-                agent.getAgent().update();
-                String outputValues = output + "";
-                for (int n = 0; n < trainingEntry.getOutput().size(); n++) {
-                    double error = outputs.get(n).getActivation() - trainingEntry.getOutput().get(n);
-                    outputValues += outputs.get(n).getActivation() + "/" + trainingEntry.getOutput().get(n);
-                    sse += error * error;
+        for(int row = 0; row < trainingSet.getSize(); row++ ) {
+            double[] inputs = trainingSet.getInput(row);
+            agent.getInputs().forceSetActivations(inputs);
+            // Add to error over a few iterations to penalize for instability
+            for (int i = 0; i < 3; i++) {
+                agent.getNetwork().update();
+                double[] targets = trainingSet.getTarget(row);
+                for (int n = 0; n < targets.length; n++) {
+                    double error =  agent.getOutputs().getNeuron(n).getActivation() - targets[n];
+                    sse += (error * error);
                 }
-                agent.activationRecoding.add(outputValues);
             }
+
         }
         return -sse;
     }
 
+    /**
+     * Initialize the population of networks.
+     */
     public void init() {
-        agentPopulation = new Population<>(this.populationSize, System.nanoTime());
-
-        NetworkGenome networkPrototype = new NetworkGenome();
-        networkPrototype.addGroup("inputs", 2, false);
-        networkPrototype.addGroup("outputs", 1, false);
-        networkPrototype.setRandomizer(randomizer);
-
-        NetworkAgent prototype = new NetworkAgent(networkPrototype, Xor::eval);
-        agentPopulation.populate(prototype);
+        population = new Population<>(this.populationSize, System.nanoTime());
+        NetworkAgent prototype = new NetworkAgent(new NetworkGenome(), Xor::eval);
+        population.populate(prototype);
     }
 
+    /**
+     * Run the simulation.
+     */
     public void run() {
-        for (int i = 0; i < 1000; i++) {
-            double bestFitness = agentPopulation.computeNewFitness();
-            System.out.printf("Fitness %.2f\n", bestFitness);
-            if (bestFitness > -5) {
+        for (int i = 0; i < maxIterations; i++) {
+
+            double bestFitness = population.computeNewFitness();
+            System.out.println(i + ", fitness = " + bestFitness);
+            if (bestFitness > fitnessThreshold) {
                 break;
             }
-            agentPopulation.replenish();
+            population.replenish();
         }
+
+        Network winner = population.getAgentList().get(0).getNetwork();
+        //System.out.println(winner);
+
+        // Display the winning network
+        NetworkPanel.showNetwork(winner);
+
     }
 
+    /**
+     * Main testing method
+     */
     public static void main(String[] args) {
         Xor test = new Xor();
         test.init();
         test.run();
-    }
-
-    public static class TrainingExample {
-        private List<Double> input;
-
-        private List<Double> output;
-
-        public TrainingExample(List<Double> input, List<Double> output) {
-            this.input = input;
-            this.output = output;
-        }
-
-        public List<Double> getInput() {
-            return input;
-        }
-
-        public List<Double> getOutput() {
-            return output;
-        }
     }
 }

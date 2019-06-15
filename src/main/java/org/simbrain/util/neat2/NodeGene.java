@@ -8,6 +8,9 @@ import org.simbrain.util.neat.ConnectionGene;
 
 import java.awt.geom.Point2D;
 
+/**
+ * A gene representing a node of a given type: input, hidden, or output.
+ */
 public class NodeGene extends Gene<Neuron> {
 
     /**
@@ -21,28 +24,39 @@ public class NodeGene extends Gene<Neuron> {
     private NodeType type;
 
     /**
-     * Index for this node; used in {@link ConnectionGene}.
-     * TODO: Implement.
-     */
-    private int nodeIndex;
-
-    private Point2D location;
-
-    private String neuronGroupName;
-
-    /**
-     * Prototype neuron
+     * Prototype neuron used when the gene is "expressed".
      */
     private Neuron prototype;
 
+    /**
+     * Create a node gene.  Defaults to hidden.
+     */
+    public NodeGene() {
+        this(NodeType.hidden);
+    }
+
+    /**
+     * Create a node gene of a specified type
+     *
+     * @param type the type for this gene
+     */
     public NodeGene(NodeType type) {
         this.type = type;
         this.prototype = new Neuron(null);
+        init();
     }
 
-    public NodeGene() {
-        this(NodeType.hidden);
-        this.prototype.setUpdateRule(new SigmoidalRule());
+    /**
+     * Initialize the node gene.
+     */
+    private void init() {
+        this.prototype = new Neuron(null);
+        //if (type == NodeType.hidden) {
+        //    SigmoidalRule rule = new SigmoidalRule();
+        //    rule.setUpperBound(1);
+        //    rule.setLowerBound(-1);
+        //    prototype.setUpdateRule(rule);
+        //}
     }
 
     @Override
@@ -52,24 +66,15 @@ public class NodeGene extends Gene<Neuron> {
 
     @Override
     public void mutate() {
-
+        // No implementation
     }
 
     @Override
     public NodeGene copy() {
         NodeGene ret = new NodeGene();
         ret.type = this.type;
-        ret.neuronGroupName = this.neuronGroupName;
         ret.prototype = this.prototype.deepCopy();
         return ret;
-    }
-
-    public String getNeuronGroupName() {
-        return neuronGroupName;
-    }
-
-    public void setNeuronGroupName(String neuronGroupName) {
-        this.neuronGroupName = neuronGroupName;
     }
 
     public NodeType getType() {

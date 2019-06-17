@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class MinimizeFunction {
 
-
     /**
      * The population to be evolved.
      */
@@ -25,7 +24,7 @@ public class MinimizeFunction {
     /**
      * The maximum number of generations.
      */
-    public int maxIteration = 100;
+    public int maxIteration = 1000;
 
     /**
      * Create a number matching simulation.

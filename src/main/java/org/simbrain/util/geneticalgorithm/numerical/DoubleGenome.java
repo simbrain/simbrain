@@ -30,7 +30,6 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
      */
     public DoubleGenome(int chromosomeSize) {
         chromosome = new DoubleChromosome(chromosomeSize);
-        express();
     }
 
     @Override
@@ -39,14 +38,12 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
         ret.inheritRandomizer(getRandomizer());
         ret.chromosome = this.chromosome.crossOver(other.chromosome);
         ret.chromosome.setRandomizer(ret.getRandomizer());
-        express();
         return ret;
     }
 
     @Override
     public void mutate() {
         chromosome.mutate();
-        express();
     }
 
     @Override
@@ -56,7 +53,6 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
         ret.chromosome = this.chromosome.copy();
         ret.chromosome.setRandomizer(ret.getRandomizer());
         ret.chromosome.getGenes().forEach(g -> g.setRandomizer(ret.getRandomizer()));
-        ret.express();
         return ret;
     }
 

@@ -35,11 +35,11 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
     public Agent(G genome, Function<Agent<G,P>, Double> fitnessFunction) {
         this.genome = genome;
         this.fitnessFunction = fitnessFunction;
-        phenotype = genome.express();
+        phenotype = genome.express(); // So that phenotypic properties are available in simulations.
     }
 
     public Agent<G,P> crossover(Agent<G,P> other) {
-        return new Agent(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
+        return new Agent<>(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
     }
 
     public void mutate() {
@@ -51,14 +51,13 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
      * Evaluate the fitness score of this agent. Higher is better.
      */
     public void computeFitness() {
+        phenotype = getGenome().express();
         computeFitness(this);
     };
 
-    protected void computeFitness(Agent agent) {
+    protected void computeFitness(Agent<G,P> agent) {
         fitness = fitnessFunction.apply(agent);
     }
-
-    // TODO: Re-implement using current fitness score
 
     public Function<Agent<G,P>, Double> getFitnessFunction() {
         return fitnessFunction;
@@ -68,8 +67,8 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
         return genome;
     }
 
-    public Agent copy() {
-        return new Agent(getGenome().copy(), getFitnessFunction());
+    public Agent<G,P> copy() {
+        return new Agent<>(getGenome().copy(), getFitnessFunction());
     };
 
     @Override

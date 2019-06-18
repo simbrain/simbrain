@@ -21,6 +21,7 @@ package org.simbrain.network.connections;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.SimbrainPreferences;
 
 import java.util.List;
 
@@ -71,7 +72,29 @@ public class QuickConnectionManager {
      * Construct the quick connection manager.
      */
     public QuickConnectionManager() {
-        currentConnector = allToAll;
+
+        // Set the current connection strategy based on user preferences
+        switch(SimbrainPreferences.getString("quickConnector")) {
+        case "AllToAll":
+            currentConnector = allToAll;
+            break;
+        case "OneToOne":
+            currentConnector = oneToOne;
+            break;
+        case "RadialGaussian":
+            currentConnector = radial;
+            break;
+        case "RadialSimple":
+            currentConnector = radialSimple;
+            break;
+        case "Sparse":
+            currentConnector = sparse;
+            break;
+        default:
+            currentConnector = allToAll;
+        }
+
+        //TODO: Implement inhibitory/excitatory ratio, probabilities, and connection properties
     }
 
     /**
@@ -107,6 +130,7 @@ public class QuickConnectionManager {
     }
 
     public void setCurrentConnector(ConnectionStrategy currentConnector) {
+        SimbrainPreferences.putString("quickConnector", currentConnector.getStringDescription());
         this.currentConnector = currentConnector;
     }
 

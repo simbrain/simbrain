@@ -134,4 +134,8 @@ public abstract class ConnectionStrategy implements EditableObject {
     public void setInRandomizer(ProbabilityDistribution inRandomizer) {
         this.inRandomizer = inRandomizer;
     }
+
+    public String getStringDescription() {
+        return "" + this.getClass().getSimpleName();
+    }
 }

@@ -23,7 +23,7 @@ public abstract class Genome<G extends Genome, P> {
 
     /**
      * Mutate the genes in this genome.
-     * Must someties be overrideen, when mutations must be aware of information beyond the chromosome level,
+     * Must sometimes be overridden, when mutations must be aware of information beyond the chromosome level,
      * e.g. an ability to make new connections.
      */
     public abstract void mutate();
@@ -31,7 +31,8 @@ public abstract class Genome<G extends Genome, P> {
     public abstract G copy();
 
     /**
-     * Express the genotype as a phenotype.
+     * Express the genotype as a phenotype. This should be called before the fitness function
+     * is evaluated.
      */
     public abstract P express();
 

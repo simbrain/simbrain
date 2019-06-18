@@ -26,7 +26,7 @@ public class Population<G extends Genome<G,P>, P> {
     /**
      * The agents in this population.
      */
-    private List<Agent> agentList;
+    private List<Agent<G,P>> agentList;
 
     /**
      * Randomizer for this simnulation
@@ -50,7 +50,7 @@ public class Population<G extends Genome<G,P>, P> {
      *
      * @param prototype the prototype agent, which spawns all agents in the population.
      */
-    public void populate(Agent prototype) {
+    public void populate(Agent<G,P> prototype) {
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             agentList.add(prototype.copy());
@@ -91,15 +91,15 @@ public class Population<G extends Genome<G,P>, P> {
             while (index2 == index1) {
                 index2 = randomizer.nextInt(remainingPopulation);
             }
-            Agent agent1 = agentList.get(index1);
-            Agent agent2 = agentList.get(index2);
-            Agent newAgent = agent1.crossover(agent2);
+            Agent<G,P> agent1 = agentList.get(index1);
+            Agent<G,P> agent2 = agentList.get(index2);
+            Agent<G,P> newAgent = agent1.crossover(agent2);
             newAgent.mutate();
             agentList.add(newAgent);
         }
     }
 
-    public List<Agent> getAgentList() {
+    public List<Agent<G,P>> getAgentList() {
         return agentList;
     }
 

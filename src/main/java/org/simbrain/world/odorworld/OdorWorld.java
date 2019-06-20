@@ -165,16 +165,17 @@ public class OdorWorld implements EditableObject {
     /**
      * Add new entity at last clicked position with default properties.
      */
-    public void addEntity() {
+    public OdorWorldEntity addEntity() {
         OdorWorldEntity entity = new OdorWorldEntity(this);
         entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
         addEntity(entity);
+        return entity;
     }
 
     /**
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */
-    public void addAgent() {
+    public OdorWorldEntity addAgent() {
 
         OdorWorldEntity entity = new OdorWorldEntity(this, EntityType.MOUSE);
         entity.setEntityType(EntityType.MOUSE);
@@ -189,6 +190,7 @@ public class OdorWorld implements EditableObject {
         entity.setLocation(x, y);
         entity.addDefaultSensorsEffectors();
         addEntity(entity);
+        return entity;
     }
 
     public void addTile() {

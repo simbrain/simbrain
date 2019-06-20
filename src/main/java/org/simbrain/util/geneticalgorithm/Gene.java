@@ -2,6 +2,8 @@ package org.simbrain.util.geneticalgorithm;
 
 import org.simbrain.util.math.SimbrainRandomizer;
 
+import java.util.function.Supplier;
+
 /**
  * A template that encodes information about an object used in an evolutionary
  * simulation.
@@ -16,6 +18,8 @@ public abstract class Gene<T> {
     private boolean mutable = true;
 
     private SimbrainRandomizer randomizer;
+
+    private Supplier<SimbrainRandomizer> getRandomizer;
 
     /**
      * Return a deep copy of this gene.
@@ -52,10 +56,17 @@ public abstract class Gene<T> {
     }
 
     public SimbrainRandomizer getRandomizer() {
+        if (randomizer == null) {
+            randomizer = getRandomizer.get();
+        }
         return randomizer;
     }
 
     public void setRandomizer(SimbrainRandomizer randomizer) {
         this.randomizer = randomizer;
+    }
+
+    public void setRandomizer(Supplier<SimbrainRandomizer> randomizerCallback) {
+        this.getRandomizer = randomizerCallback;
     }
 }

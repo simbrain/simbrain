@@ -53,6 +53,7 @@ public class Population<G extends Genome<G,P>, P> {
      * @param prototype the prototype agent, which spawns all agents in the population.
      */
     public void populate(Agent<G,P> prototype) {
+        prototype.getGenome().inheritRandomizer(randomizer);
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Agent<G, P> agent = prototype.copy();

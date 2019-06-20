@@ -120,6 +120,10 @@ public class Turning extends Effector {
         return amount;
     }
 
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
     /**
      * Add an amount to turning.  Allows for multiple "turns" to be aggregated.
      *

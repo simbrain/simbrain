@@ -28,9 +28,9 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
                         Function.identity(),
                         id -> {
                             if (genes.containsKey(id)) {
-                                return genes.get(id);
+                                return genes.get(id).copy();
                             } else {
-                                return other.genes.get(id);
+                                return other.genes.get(id).copy();
                             }
                         }
                 ));

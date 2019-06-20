@@ -3,7 +3,9 @@ package org.simbrain.util.neat2;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.geneticalgorithm.Gene;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat.ConnectionGene;
 
 import java.awt.geom.Point2D;
@@ -27,6 +29,8 @@ public class NodeGene extends Gene<Neuron> {
      * Prototype neuron used when the gene is "expressed".
      */
     private Neuron prototype;
+
+    private NetworkGenome.Configuration configuration;
 
     /**
      * Create a node gene.  Defaults to hidden.
@@ -66,6 +70,23 @@ public class NodeGene extends Gene<Neuron> {
 
     @Override
     public void mutate() {
+        if (isMutable()) {
+            if (prototype.getUpdateRule() instanceof BiasedUpdateRule) {
+                BiasedUpdateRule updateRule = (BiasedUpdateRule) prototype.getUpdateRule();
+                double newBias =
+                        updateRule.getBias() + getRandomizer().nextDouble(
+                                -configuration.getNodeMaxBiasMutation(),
+                                configuration.getNodeMaxBiasMutation()
+                        );
+                if (newBias < -configuration.getNodeMaxBias()) {
+                    newBias = -configuration.getNodeMaxBias();
+                }
+                if (newBias > configuration.getNodeMaxBias()) {
+                    newBias = configuration.getNodeMaxBias();
+                }
+                updateRule.setBias(newBias);
+            }
+        }
         // No implementation
     }
 
@@ -74,6 +95,8 @@ public class NodeGene extends Gene<Neuron> {
         NodeGene ret = new NodeGene();
         ret.type = this.type;
         ret.prototype = this.prototype.deepCopy();
+        ret.setRandomizer(new SimbrainRandomizer(getRandomizer().nextLong()));
+        ret.configuration = configuration;
         return ret;
     }
 
@@ -86,5 +109,9 @@ public class NodeGene extends Gene<Neuron> {
         if (type != NodeType.hidden) {
             this.prototype.setUpdateRule(new LinearRule());
         }
+    }
+
+    public void setConfiguration(NetworkGenome.Configuration configuration) {
+        this.configuration = configuration;
     }
 }

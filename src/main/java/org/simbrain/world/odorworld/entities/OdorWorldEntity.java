@@ -1179,6 +1179,15 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         return radius * radius > dx * dx + dy * dy;
     }
 
+    public double getRadiusTo(OdorWorldEntity other) {
+        if (other == this) {
+            return 0d;
+        }
+        double dx = getCenterX() - other.getCenterX();
+        double dy = getCenterY() - other.getCenterY();
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     public boolean isManualMode() {
         return manualMode;
     }

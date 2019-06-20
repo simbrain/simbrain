@@ -33,6 +33,8 @@ public class ConnectionGene extends Gene<Synapse> {
 
     private Synapse prototype = new Synapse(null, null, 1.0);
 
+    private NetworkGenome.Configuration configuration;
+
     /**
      * Construct a ConnectionGene. The connection is always enabled.
      *
@@ -83,7 +85,7 @@ public class ConnectionGene extends Gene<Synapse> {
     @Override
     public void mutate() {
         double newStrength =
-                randomizer.nextDouble(-Xor.MAX_CONNECTION_MUTATION, Xor.MAX_CONNECTION_MUTATION)
+                randomizer.nextDouble(-configuration.getMaxConnectionMutation(), configuration.getMaxConnectionMutation())
                         + prototype.getStrength();
         if (newStrength > prototype.getUpperBound()) {
             newStrength = prototype.getUpperBound();
@@ -121,5 +123,9 @@ public class ConnectionGene extends Gene<Synapse> {
         int result = sourceIndex;
         result = 31 * result + targetIndex;
         return result;
+    }
+
+    public void setConfiguration(NetworkGenome.Configuration configuration) {
+        this.configuration = configuration;
     }
 }

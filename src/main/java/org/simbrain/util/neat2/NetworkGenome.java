@@ -23,14 +23,14 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
      */
     private ConnectionChromosome connectionGenes = new ConnectionChromosome();
 
-    // TODO
-    int numInputs = 2;
-    int numOutputs = 1;
+    private NetworkGenome.Configuration configuration;
 
-    public NetworkGenome() {
+
+    public NetworkGenome(NetworkGenome.Configuration configuration) {
+        this.configuration = configuration;
 
         // Set up default input and output genes
-        for (int i = 0; i < numInputs; i++) {
+        for (int i = 0; i < configuration.numInputs; i++) {
             NodeGene nodeGene = new NodeGene();
             nodeGene.setMutable(false);
             nodeGene.setType(NodeGene.NodeType.input);
@@ -38,7 +38,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             nodeGene.getPrototype().setClamped(true);
             nodeGenes.addGene(nodeGene);
         }
-        for (int i = 0; i < numOutputs; i++) {
+        for (int i = 0; i < configuration.numOutputs; i++) {
             NodeGene nodeGene = new NodeGene();
             nodeGene.setMutable(false);
             nodeGene.setType(NodeGene.NodeType.output);
@@ -95,7 +95,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
     @Override
     public NetworkGenome crossOver(NetworkGenome otherGenome) {
 
-        NetworkGenome ret = new NetworkGenome();
+        NetworkGenome ret = new NetworkGenome(configuration);
 
         ret.inheritRandomizer(getRandomizer());
 
@@ -114,7 +114,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         // TODO: Decouple from Xor
 
         // New node mutation
-        if (getRandomizer().nextDouble(0, 1) < Xor.NEW_NODE_MUTATION_PROBABILITY) {
+        if (nodeGenes.getGenes().size() < configuration.maxNode && getRandomizer().nextDouble(0, 1) < configuration.newNodeMutationProbability) {
             nodeGenes.addGenes(Collections.singleton(new NodeGene()));
         }
 
@@ -123,13 +123,15 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
         // New connection mutation
         // TODO: Disallow self connections
-        if (getRandomizer().nextDouble(0, 1) < Xor.NEW_CONNECTION_MUTATION_PROBABILITY) {
+        if (getRandomizer().nextDouble(0, 1) < configuration.newConnectionMutationProbability) {
             int sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
                 sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             }
             int destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
-            while (!nodeGenes.contains(destinationNodeID) || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input) {
+            while (!nodeGenes.contains(destinationNodeID)
+                    || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input
+                    || (!configuration.allowSelfConnection && sourceNodeID == destinationNodeID)) {
                 destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
             }
             ConnectionGene newConnectionGene =
@@ -137,9 +139,10 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                             sourceNodeID,
                             destinationNodeID,
                             getRandomizer().nextDouble(
-                                    Xor.MIN_CONNECTION_STRENGTH,
-                                    Xor.MAX_CONNECTION_STRENGTH
+                                    configuration.minConnectionStrength,
+                                    configuration.maxConnectionStrength
                             ));
+            newConnectionGene.setConfiguration(configuration);
             if (!innovationNumberMap.containsKey(newConnectionGene)) {
                 innovationNumberMap.put(newConnectionGene, innovationNumberMap.size());
             }
@@ -151,7 +154,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
     @Override
     public NetworkGenome copy() {
 
-        NetworkGenome ret = new NetworkGenome();
+        NetworkGenome ret = new NetworkGenome(configuration);
 
         ret.inheritRandomizer(getRandomizer());
 
@@ -161,5 +164,96 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         ret.connectionGenes.setRandomizer(ret.getRandomizer());
 
         return ret;
+    }
+
+    public static class Configuration {
+        private int numInputs;
+
+        private int numOutputs;
+
+        private int maxNode = Integer.MAX_VALUE;
+
+        private boolean allowSelfConnection = true;
+
+        private double newConnectionMutationProbability = 0.05;
+        private double newNodeMutationProbability = 0.05;
+        private double maxConnectionStrength = 10;
+        private double minConnectionStrength = -10;
+        private double maxConnectionMutation = 1;
+
+        public Configuration() {
+        }
+
+        public int getNumInputs() {
+            return numInputs;
+        }
+
+        public void setNumInputs(int numInputs) {
+            this.numInputs = numInputs;
+        }
+
+        public int getNumOutputs() {
+            return numOutputs;
+        }
+
+        public void setNumOutputs(int numOutputs) {
+            this.numOutputs = numOutputs;
+        }
+
+        public int getMaxNode() {
+            return maxNode;
+        }
+
+        public void setMaxNode(int maxNode) {
+            this.maxNode = maxNode;
+        }
+
+        public boolean isAllowSelfConnection() {
+            return allowSelfConnection;
+        }
+
+        public void setAllowSelfConnection(boolean allowSelfConnection) {
+            this.allowSelfConnection = allowSelfConnection;
+        }
+
+        public double getNewConnectionMutationProbability() {
+            return newConnectionMutationProbability;
+        }
+
+        public void setNewConnectionMutationProbability(double newConnectionMutationProbability) {
+            this.newConnectionMutationProbability = newConnectionMutationProbability;
+        }
+
+        public double getNewNodeMutationProbability() {
+            return newNodeMutationProbability;
+        }
+
+        public void setNewNodeMutationProbability(double newNodeMutationProbability) {
+            this.newNodeMutationProbability = newNodeMutationProbability;
+        }
+
+        public double getMaxConnectionStrength() {
+            return maxConnectionStrength;
+        }
+
+        public void setMaxConnectionStrength(double maxConnectionStrength) {
+            this.maxConnectionStrength = maxConnectionStrength;
+        }
+
+        public double getMinConnectionStrength() {
+            return minConnectionStrength;
+        }
+
+        public void setMinConnectionStrength(double minConnectionStrength) {
+            this.minConnectionStrength = minConnectionStrength;
+        }
+
+        public double getMaxConnectionMutation() {
+            return maxConnectionMutation;
+        }
+
+        public void setMaxConnectionMutation(double maxConnectionMutation) {
+            this.maxConnectionMutation = maxConnectionMutation;
+        }
     }
 }

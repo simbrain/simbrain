@@ -33,6 +33,8 @@ public class Population<G extends Genome<G,P>, P> {
      */
     private SimbrainRandomizer randomizer;
 
+    private int generation = 0;
+
     /**
      * Construct a population with a specified size. A seed can be set so that
      * simulations can be replicated.
@@ -53,7 +55,9 @@ public class Population<G extends Genome<G,P>, P> {
     public void populate(Agent<G,P> prototype) {
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            agentList.add(prototype.copy());
+            Agent<G, P> agent = prototype.copy();
+            agent.setId(String.format("G%s|A%s", generation, i));
+            agentList.add(agent);
         }
     }
 
@@ -83,6 +87,7 @@ public class Population<G extends Genome<G,P>, P> {
      * by crossing over the genes of the remaining part of the population.
      */
     public void replenish() {
+        generation++;
         int remainingPopulation = agentList.size();
         int reproduceSize = size - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
@@ -95,6 +100,7 @@ public class Population<G extends Genome<G,P>, P> {
             Agent<G,P> agent2 = agentList.get(index2);
             Agent<G,P> newAgent = agent1.crossover(agent2);
             newAgent.mutate();
+            newAgent.setId(String.format("G%s|A%s", generation, i));
             agentList.add(newAgent);
         }
     }

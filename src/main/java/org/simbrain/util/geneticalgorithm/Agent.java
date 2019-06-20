@@ -1,5 +1,7 @@
 package org.simbrain.util.geneticalgorithm;
 
+import org.simbrain.util.math.SimbrainRandomizer;
+
 import java.util.function.Function;
 
 /**
@@ -26,6 +28,8 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
      * The agent's fitness function, typically specified
      */
     private Function<Agent<G,P>, Double> fitnessFunction;
+
+    private String id;
 
     /**
      * The fitness score of this agent. null if this agent has not been evaluate yet.
@@ -86,5 +90,17 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
 
     public P getPhenotype() {
         return phenotype;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public SimbrainRandomizer getRandomizer() {
+        return getGenome().getRandomizer();
     }
 }

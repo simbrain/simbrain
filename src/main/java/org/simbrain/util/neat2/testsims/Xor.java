@@ -8,6 +8,11 @@ import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 import org.simbrain.util.neat2.NetworkGenome;
 
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class Xor {
 
     /**
@@ -38,12 +43,6 @@ public class Xor {
                     new double[][]{{0,0},{0,1},{1,0},{1,1}},
                     new double[][]{{0},{1},{1},{0}});
 
-    public static final double NEW_CONNECTION_MUTATION_PROBABILITY = 0.05;
-    public static final double NEW_NODE_MUTATION_PROBABILITY = 0.05;
-    public static final double MAX_CONNECTION_STRENGTH = 10;
-    public static final double MIN_CONNECTION_STRENGTH = -10;
-    public static final double MAX_CONNECTION_MUTATION = 1;
-
 
     /**
      * Evaluate xor function
@@ -65,7 +64,6 @@ public class Xor {
                     sse += (error * error);
                 }
             }
-
         }
         return -sse;
     }
@@ -75,7 +73,12 @@ public class Xor {
      */
     public void init() {
         population = new Population<>(this.populationSize, System.nanoTime());
-        Agent prototype = new Agent<>(new NetworkGenome(), Xor::eval);
+        NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
+        configuration.setNumInputs(2);
+        configuration.setNumOutputs(1);
+        configuration.setAllowSelfConnection(false);
+        configuration.setMaxNode(6);
+        Agent<NetworkGenome, Network> prototype = new Agent<>(new NetworkGenome(configuration), Xor::eval);
         population.populate(prototype);
     }
 

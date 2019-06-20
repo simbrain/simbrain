@@ -6,8 +6,14 @@ import org.simbrain.util.geneticalgorithm.Chromosome;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A set of connection genes and machinery for crossing them over properly.
+ */
 public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromosome> {
 
+    /**
+     * The set of connection genes, indexed by innovation number.
+     */
     private Map<Integer, ConnectionGene> connectionGenes = new TreeMap<>();
 
     @Override
@@ -15,20 +21,26 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
 
         ConnectionChromosome ret = new ConnectionChromosome();
 
+        // Make a union of innovation numbers
         Set<Integer> allInnovationNumbers = new TreeSet<>(this.connectionGenes.keySet());
         allInnovationNumbers.addAll(other.connectionGenes.keySet());
 
         for (Integer i : allInnovationNumbers) {
             if (this.connectionGenes.containsKey(i) && other.connectionGenes.containsKey(i)) {
+                // Both parents have the innovation number, so choose it randomly.
+                // It will connect the same nodes but the connection properties may differ
                 double decision = getRandomizer().nextDouble(0, 1);
+                // TODO: Make the .5 configurable
                 if (decision < 0.5) {
                     ret.connectionGenes.put(i, this.connectionGenes.get(i));
                 } else {
                     ret.connectionGenes.put(i, other.connectionGenes.get(i));
                 }
             } else if (this.connectionGenes.containsKey(i)) {
+                // If only one parent has the connection gene, use it
                 ret.connectionGenes.put(i, this.connectionGenes.get(i));
             } else {
+                // If only one parent has the connection gene, use it
                 ret.connectionGenes.put(i, other.connectionGenes.get(i));
             }
         }

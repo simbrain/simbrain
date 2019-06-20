@@ -7,12 +7,11 @@ import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.testsims.Xor;
 
+/**
+ * A description of a connection. Note that connection genes are associated with innovation numbers but these are stored
+ * at the {@link NetworkGenome} level.
+ */
 public class ConnectionGene extends Gene<Synapse> {
-
-    /**
-     * Innovation Number.
-     */
-    private int innovationNumber;
 
     /**
      * The index of the source node in the node gene list maintained in
@@ -33,6 +32,9 @@ public class ConnectionGene extends Gene<Synapse> {
 
     private Synapse prototype = new Synapse(null, null, 1.0);
 
+    /**
+     * Connection genes need to be aware of some features of NetworkGenome configuration.
+     */
     private NetworkGenome.Configuration configuration;
 
     /**
@@ -118,6 +120,9 @@ public class ConnectionGene extends Gene<Synapse> {
         return targetIndex == that.targetIndex;
     }
 
+    /**
+     * Used in the "innovationNumberMap" in {@link NetworkGenome}.
+     */
     @Override
     public int hashCode() {
         int result = sourceIndex;

@@ -7,9 +7,15 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A set of node genes and machinery for crossing them over properly.
+ */
 public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
 
 
+    /**
+     * A set of node genes indexed by an integer id.
+     */
     private Map<Integer, NodeGene> genes = new TreeMap<>();
 
     private int maxNodeID;
@@ -19,6 +25,8 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
 
         NodeChromosome ret = new NodeChromosome();
 
+        // Align the node genes by their integer index and if both exist, (currently), choose
+        // the gene from the current chromosome. TODO: Choose randomly in this case
         Set<Integer> nodeIDUnionSet = new HashSet<>();
         nodeIDUnionSet.addAll(genes.keySet());
         nodeIDUnionSet.addAll(other.genes.keySet());

@@ -127,7 +127,7 @@ public class CreaturesSim extends RegisteredSimulation {
         fish.setSmellSource(new SmellSource(new double[]{0, 5, 0, 0, 0, 0, 0}));
 
         cheese = world.addEntity(200, 200, EntityType.SWISS);
-        cheese.setName("Fish");
+        cheese.setName("Swiss");
         cheese.setId("Cheese");
         cheese.setSmellSource(new SmellSource(new double[]{0, 0, 5, 0, 0, 0, 0}));
 

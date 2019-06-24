@@ -24,10 +24,13 @@
         <h1>Time Series</h1>
 
         <p>Time series plot allows you to track changes in a set of variables over time (time corresponds to <a href="../Workspace/Update.html">simulation time</a>, and is represented on the x-axis of the plot). For example, the spike pattern of a spiking nueron can be viewed by attaching the spiking nueron to a time series plot.</p>
-
-        <p style="float:right; padding:30px;"><img width="425" src="../../Images/JumpAndDecay.gif" border = "1">
+        <p>There are two modes for time series plots in Simbrain</p>
+        <p style="float:right;"><img width="350" src="../../Images/timeseries_arrayscalar.PNG" border = "1">
         </p>
-
+        <p class="heading">Scalar Mode</p>
+            <p>Scalar mode allows for couplings to be made between a time series plot and individual neurons. This is the default mode.</p>
+        <p class="heading">Array Mode</p>
+            <p>Array mode allows for couplings to be made between a time series plot and a neuron group. To switch to this mode, click on the drop-down (defaulted to scalar mode) on the bottom of the time series then select "Array Mode."</p>
         <p class="heading">Component Panel</p>
         <blockquote>
             <p style="margin-left: 10px;"><span class="heading2">Add:</span> Add a time series to the plot.</p>
@@ -35,11 +38,11 @@
             <p style="margin-left: 10px;"><span class="heading2">Clear Graph Data:</span> Clears all data from the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Show Graph Properties:</span> Opens up properties menu for the plot.</p>
         </blockquote>
-
+        <p style="float:right;"><img width="425" src="../../Images/JumpAndDecay.gif" border = "1">
+        </p>
         <p class="heading">Menus</p><a name="timeSeriesMenu"></a>
         <blockquote>
             <p style="margin-left: 10px;" class="heading">File</p>
-
             <p style="margin-left: 30px;"><span class="heading2">Open:</span> Opens a time series from a stored .xml file.</p>
             <p style="margin-left: 30px;"><span class="heading2">Save:</span> Saves the current time series.</p>
             <p style="margin-left: 30px;"><span class="heading2">Save As:</span> Saves the current time series and allows you to specify a name for the file.</p>

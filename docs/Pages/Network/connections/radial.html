@@ -1,48 +1,46 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
 
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
 
+<body>
+    <br>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span></p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../connections.html">Connections</a></p>
+        </div>
+        <h1>Radial Connection<br>
+        </h1><br>
+        <p>
+            Radial connection will connect a given neuron to all neurons within a
+            certain radius with a certain probability. The probability of forming
+            inhibitory and excitatory connections are set separately as well as the
+            <a href="../synapse.html">synapse type</a>
+            associated with each type of connection. If a set of neurons are
+            selected then connections will be made with the specified probabilities
+            from each individual neuron, as when only one is selected.
+        </p>
+        <p>A Radial connection type is like the Radial (Simple) type, but with more variations in how synapses radiate outward. This pattern is less predictable than that of the simple model.</p>
+        <h2>Parameters</h2>
+        <blockquote>
+            <p> Distance Drop-off: The distance (in pixels) of activation drop off. </p>
+            <p> Exc. -> Exc. Constant: The Excitatory-to-Excitatory synapse constant, ranges from 0 to 1.</p>
+            <p> Exc. -> Inh. Constant: The Excitatory-to-Inhibitory synapse constant, ranges from 0 to 1.</p>
+            <p> Inh. -> Exc. Constant: The Inhibitory-to-Excitatory synapse constant, ranges from 0 to 1.</p>
+            <p> Inh. -> Inh. Constant: The Inhibitory-to-Inhibitory synapse constant, ranges from 0 to 1.</p>
+            <p> No Polarity Constant: The connection probability for non-polar synapses.</p>
+        </blockquote>
+        <br>
+    </div>
+</body>
 
-
-  
-
-  
-  
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-  
-  <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<br>
-
-<a href="../../../SimbrainDocs.html">
-<div class="logo">
-<p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-<div class="navi">
-<p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../connections.html">Connections</a></p>
-</div>
-
-<h1>Radial Connection<br>
-</h1><br>
-<p>
-Radial connection will connect a given neuron to all neurons within a
-certain radius with a certain probability. The probability of forming
-inhibitory and excitatory connections are set separately as well as the
-<a href="../synapse.html">synapse type</a>
-associated with each type of connection. If a set of neurons are
-selected then connections will be made with the specified probabilities
-from each individual neuron, as when only one is selected.
-</p>
-
-<p> There are two types of radial connections in Simbrain. </p>
-
-<blockquote><h2>Radial (Simple)</h2>
-            <p>This connection type connects neurons in succession from a starting point. This creates weights in a directed manner and activation radiates outward from the starting point or initial site of activation. This type of radial connection is termed “simple” as it is the most basic radial pattern of activation. </p>
-            <h2>Radial</h2>
-            <p>This connection type is like the Radial (Simple) type, but with more variations in how synapses radiate outward. This pattern is less predictable the the simple model.</p>
-</blockquote>
-<br>
-
-</div></body></html>
+</html>

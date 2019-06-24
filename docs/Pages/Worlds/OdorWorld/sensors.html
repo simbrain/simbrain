@@ -37,17 +37,14 @@
         <h1>Sensors </h1>
         <p> Organisms have sensors that activate cells in their brains. An <a href="agents.html">agent</a> in Odor World also has sensors that it uses to receive information from its environment. These sensors can be <a href="../../Workspace/Couplings.html">coupled</a> with input neurons in neural networks so that a neuron fires each time a sensor gets activated.</p>
         <p> To display an agent's sensors, double click on the agent to display the <a href="entitydialog.html">entity dialog</a> and select the sensors tab. The sensor panel lists all of an agent's sensors along with its sensor type and label. Here is an example of the dialog, for an agent with three smell sensors:</p>
-        <p style="float: left; padding: 30px;">
+        <p>To edit a sensor, right click on any part of the row in the sensors panel and select "Edit..." Alternatively, you can double-click on the row to summon the edit menu. </p>
+        <p style="float: right;">
             <img src="../../../Images/OdorWorld_SensorPanel.png" width="340" border="1">
         </p>
-        <p>To edit a sensor, right click on any part of the row in the sensors panel and select "Edit..." Alternatively, you can double-click on the row to summon the edit menu. </p>
         <p>Labels can be renamed by double clicking on the label column.</p>
         <p>To add a sensor, click on the "Add" button at the bottom of the panel. Then, select the sensor type and input the appropriate parameters.</p>
         <p class="heading">Common Sensor Parameters</p>
         <blockquote>
-            <p style="float: right; padding: 30px;">
-            <img src="../../../Images/Agent-Sensors.gif"> 
-            </p>
             <p><span class="heading2">Label: </span>An optional string descriptor associated with the individual sensor.
             </p>
             <p><span class="heading2">Sensor angle: </span>The angle at which the sensor will be added. A sensor angle of 0 a smell sensor that is directly in front of the agent. A positive sensor angle locates the sensor at a position to the left of the agent's heading. A negative sensor angle locates the sensor at a position to the right of the agent's heading.
@@ -57,29 +54,20 @@
         </blockquote>
         <p>To delete a sensor, select all the sensors to be deleted in the list and click on the "Delete" button at the bottom of the panel.</p>
         <p>The different types of sensors in Odor World are described below.</p>
-        <br><br><br><br><br><br><br>
+        <p style="float: left;">
+            <img src="../../../Images/Agent-Sensors.gif"> 
+        </p>
+        <br><br><br><br><br><br><br><br><br>
         <p class="heading">
             <a name="bump"></a>Bump</p>
         <p>Agents in Simbrain can sense the presence of objects in OdorWorld such as trees, tents. etc. An agent can detect when it "bumps" or touches one of these map objects via bump sensors. Each bump Sensor is graphically represented by a white dot and is characterized by the following parameters:</p>
         <blockquote>
-            <p><span class="heading2">Label </span>
-            </p>
-            <p><span class="heading2">Sensor angle </span>
-            </p>
-            <p><span class="heading2">Sensor length </span>
-            </p>
             <p><span class="heading2">Base Value: </span>Determines the output value when a sensor is ‘bumped’ by an object.</p>
         </blockquote>
         <p class="heading">
             <a name="grid"></a>Grid</p>
         <p>Agents in Simbrain are able to detect their spatial location in the OdorWorld map via grid sensors. Grid sensors can be coupled to neural networks to visualize location through neural activation. Each grid sensor is graphically represented by a black cross and is characterized by the following parameters:</p>
         <blockquote>
-            <p><span class="heading2">Label </span>
-            </p>
-            <p><span class="heading2">Sensor angle </span>
-            </p>
-            <p><span class="heading2">Sensor length </span>
-            </p>
             <p><span class="heading2">Activation Amount: </span>Determines the amount of activation for a neuron coupled to a tile sensor when the tile sensor is activated.</p>
             <p><span class="heading2">Start X: </span>Defines the x-coordinates for the location of the top-left corner of the tile sensor.</p>
             <p><span class="heading2">Start Y: </span>Defines the y-coordinates for the location of the top-left corner of the tile sensor.</p>
@@ -97,12 +85,6 @@
         </p>
         <br>
         <blockquote>
-            <p><span class="heading2">Label </span>
-            </p>
-            <p><span class="heading2">Sensor angle </span>
-            </p>
-            <p><span class="heading2">Sensor length </span>
-            </p>
             <p><span class="heading2">Utterance: </span>The string or phrase associated with this sensor. Hearing sensors get activated when it senses a speech effectors of the same utterance.
                 <br>
             </p>
@@ -118,15 +100,7 @@
         <p style="float: right; padding: 30px;">
             <img width="300px" src="../../../Images/OdorWorld_AddSmellSensor.png" border="1">
         </p>
-        <p>Smell sensors are characterized by the following parameters:</p>
-        <blockquote>
-            <p><span class="heading2">Label </span>
-            </p>
-            <p><span class="heading2">Sensor angle </span>
-            </p>
-            <p><span class="heading2">Sensor length </span>
-            </p>
-        </blockquote>
+        <p>Smell sensors are characterized by the common sensor parameters mentioned above.</p>
         <p class="heading">
             <a name="tile"></a>Tile</p>
         <p>A <a href="http://en.wikipedia.org/wiki/Place_cell" target="_blank">place cell</a> is a cell that fires when an organism senses that it is in a particular location associated with that cell. An input neuron coupled with a tile sensor mimics the behavior of a place cell. When an agent is located inside a tile, its corresponding tile sensor gets activated. See the script <em>actor-critic.bsh</em> for an implementation of tile sensors in action.</p>
@@ -136,12 +110,6 @@
         </p>
         <br>
         <blockquote>
-            <p><span class="heading2">Label </span>
-            </p>
-            <p><span class="heading2">Sensor angle </span>
-            </p>
-            <p><span class="heading2">Sensor length </span>
-            </p>
             <p><span class="heading2">Activation amount: </span>Amount of activation that a neuron coupled with the tile sensor receives when the tile sensor is activated.
             <br>
             </p>

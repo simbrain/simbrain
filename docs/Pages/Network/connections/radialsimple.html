@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <br>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span></p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../connections.html">Connections</a></p>
+        </div>
+        <h1>Radial (Simple) Connection<br>
+        </h1><br>
+            <p>
+            A radial connection will connect a given neuron to all neurons within a
+            certain radius with a certain probability. The probability of forming
+            inhibitory and excitatory connections are set separately as well as the
+            <a href="../synapse.html">synapse type</a>
+            associated with each type of connection. If a set of neurons are
+            selected then connections will be made with the specified probabilities
+            from each individual neuron, as when only one is selected.
+            </p>
+            <p>The Simple Radial connection type connects neurons in succession from a starting point. This creates weights in a directed manner and activation radiates outward from the starting point or initial site of activation. This type of radial connection is "simple' as it is the most basic radial pattern of activation. </p>
+        <h1>Connection Properties</h1>
+        <blockquote>
+        <p class="heading">Connection Methods</p>
+            <p>Deterministic: </p>
+            <p>Probabilistic: </p>
+        <p class="heading">Other Properties</p>
+            <p>Inward/Outward: </p>
+            <p> Exc. Radius: Distance to search for excitatory neurons to connect to. This has a minimum value of 0.</p>
+            <p> Inh. Radius: Distance to search for inhibitory neurons to connect to. This has a minimum value of 0.</p>
+            <p> Exc. Probability: The probabbility that connections will be made to neighbor excitatory (or non-polar) neurons. This has a minimum value of 0 and a maximum value of 1. </p>
+            <p> Inh. Probability: The probability that connections will be made to neighbor inhibitory neurons. This has a minimum value of 0 and a maximum value of 1. </p>
+            <p> Num. Exc. Connections: The maximum number of connections with excitatory neurons. This has a minimum value of 0.</p>
+            <p> Num. Inh. Connections: The maximum number of connections with inhibitory neurons. This has a minimum value of 0.</p>
+            <br>
+        </blockquote>
+        </blockquote>
+    </div>
+</body>
+
+</html>

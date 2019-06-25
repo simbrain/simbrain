@@ -114,6 +114,11 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public abstract String getUpdateMethodDesecription();
 
+    /**
+     * If true, when the group is added to the network its id will not be used as its label.
+     */
+    private boolean useCustomLabel = false;
+
     @Override
     public String toString() {
         if (label != null) {
@@ -139,8 +144,18 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         return label;
     }
 
+
+    /**
+     * Set the label. This prevents the group id being used as the label for
+     * new groups.  If null or empty labels are sent in then the group label is used.
+     */
     @Consumable(idMethod = "getId", defaultVisibility = false)
     public void setLabel(String label) {
+        if (label == null  || label.isEmpty()) {
+            useCustomLabel = false;
+        } else {
+            useCustomLabel = true;
+        }
         String oldLabel = this.label;
         this.label = label;
         changeSupport.firePropertyChange("label", oldLabel , label);
@@ -199,13 +214,15 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     }
 
     /**
-     * Initialize the id for this group.   A default label based
-     * on the id is also set.   This is overridden  by
+     * Initialize the id for this group. A default label based
+     * on the id is also set. This is overridden by
      * {@link Subnetwork} so that sub-groups also are given ids.
      */
     public void initializeId() {
         id = getParentNetwork().getGroupIdGenerator().getId();
-        setLabel(id.replaceAll("_", " "));
+        if (!useCustomLabel) {
+            label = id.replaceAll("_", " ");
+        }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -224,6 +241,10 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public void fireLabelUpdated() {
         changeSupport.firePropertyChange("label", null , null);
+    }
+
+    public void setUseCustomLabel(boolean useCustomLabel) {
+        this.useCustomLabel = useCustomLabel;
     }
 
 }

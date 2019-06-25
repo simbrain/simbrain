@@ -256,6 +256,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             this.addNeuron(new Neuron(network, neuron), false);
         }
         this.setLabel(toCopy.getLabel());
+        this.setUseCustomLabel(false); // Don't copy labels
         this.setLayout(toCopy.getLayout());
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();

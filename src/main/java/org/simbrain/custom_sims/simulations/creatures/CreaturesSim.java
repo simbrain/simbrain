@@ -61,7 +61,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
         // Create starting creatures
         Creature ron = createCreature(0, 0, 833, 629, "Ron");
-        Creature eve = createCreature(0, 0, 233, 629, "Eve");
+        Creature eve = createCreature(100, 100, 233, 629, "Eve");
         eve.setAgentLocation(25, 25);
 
         // Make Eve a lion

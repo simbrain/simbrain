@@ -33,7 +33,7 @@ public class CreaturesBiochem {
      */
     private List<CreaturesChemEmitter> emitterList = new ArrayList<CreaturesChemEmitter>();
 
-    public static boolean tempLogFlag = true;
+    public static boolean tempLogFlag = false;
 
     public CreaturesBiochem() {
         initDefault();

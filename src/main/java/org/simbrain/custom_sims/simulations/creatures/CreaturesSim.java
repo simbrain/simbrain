@@ -10,7 +10,6 @@ import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.threedworld.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,7 +187,7 @@ public class CreaturesSim extends RegisteredSimulation {
      */
     public Creature createCreature(int x, int y, int width, int height, String name) {
 
-        NetworkWrapper net = sim.addNetwork2(x, y, 600, 600, name + "'s Brain");
+        NetworkWrapper net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
 
         // TODO: Below not working quite right because the network has not
         // finished

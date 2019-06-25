@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -41,7 +41,7 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Other variables.
      */
-    NetBuilder net;
+    NetworkWrapper net;
     Network network;
     ControlPanel panel;
     boolean hippoLesioned = false;

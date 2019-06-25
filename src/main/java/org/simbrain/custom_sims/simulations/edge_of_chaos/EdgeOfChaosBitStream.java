@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
@@ -47,7 +47,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
+        NetworkWrapper net = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
         network = net.getNetwork();
         buildNetwork();
 

@@ -23,11 +23,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A wrapper for a network with access to GUI network.
+ * A wrapper for a {@link Network}, with access to the {@link NetworkComponent}, and {@link
+ * org.simbrain.network.gui.NetworkPanel} which can be used to set the position of a window in the Simbrain desktop.
+ * Helper methods for creating neurons, neuron groups, etc. are also included.
  */
 public class NetworkWrapper {
 
-    // Consider adding static methods for adding neurons, neuron groups, etc.
+    // TODO: Consider adding static methods for adding neurons, neuron groups, etc.
+
 
     private final NetworkDesktopComponent desktopComponent;
 
@@ -37,26 +40,15 @@ public class NetworkWrapper {
 
     private double GRID_SPACE = 50; // todo; make this settable
 
-    //// NEW STUFF  ////
-
+    /**
+     * Create an instance of the wrapper.
+     */
     public NetworkWrapper(NetworkDesktopComponent desktopComponent) {
         this.desktopComponent = desktopComponent;
         this.networkComponent = desktopComponent.getWorkspaceComponent();
         this.network = networkComponent.getNetwork();
-
-        // TODO: Temp to prevent NPC's.
-        getNetworkPanel().setAutoZoomMode(false);
     }
 
-    public NeuronNode getNode(Neuron neuron) {
-        return getNetworkPanel().getNode(neuron);
-    }
-
-    public NetworkPanelDesktop getNetworkPanel() {
-        return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
-    }
-
-    // BELOW FROM THE ORIGINAL NET BUILDER CLASS //
 
     /**
      * Add a neuron at a specified location.
@@ -141,9 +133,9 @@ public class NetworkWrapper {
         connector.connectOneToOne(source.getNeuronList(), target.getNeuronList());
     }
 
-    public void connectAllToAll(NeuronGroup source, NeuronGroup target) {
+    public List<Synapse> connectAllToAll(NeuronGroup source, NeuronGroup target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
+        return connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
     }
 
     public void connectAllToAll(NeuronGroup inputs, Neuron target) {
@@ -208,19 +200,39 @@ public class NetworkWrapper {
 
     }
 
+
+    //TODO: Setting location not always working
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons) {
         return addNeuronGroup(x, y, numNeurons, "line", "LinearRule");
     }
 
+    /**
+     * Get a reference to a graphical {@link NeuronNode}.
+     */
+    public NeuronNode getNode(Neuron neuron) {
+        return getNetworkPanel().getNode(neuron);
+    }
+
+    /**
+     * Get a reference to the logical network object
+     */
     public Network getNetwork() {
         return network;
     }
 
     /**
-     * @return the networkComponent
+     * Get a reference to the network component.
      */
     public NetworkComponent getNetworkComponent() {
         return networkComponent;
     }
+
+    /**
+     * Get a reference to the network panel.
+     */
+    public NetworkPanelDesktop getNetworkPanel() {
+        return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
+    }
+
 
 }

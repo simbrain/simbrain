@@ -1,14 +1,13 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -29,9 +28,6 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -98,7 +94,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Set up network
-        NetBuilder net = sim.addNetwork(10, 10, 543, 545,
+        NetworkWrapper net = sim.addNetwork(10, 10, 543, 545,
             "Patterns of Activity");
         network = net.getNetwork();
         network.setTimeStep(0.5);

@@ -91,7 +91,7 @@ public class NEAT extends RegisteredSimulation {
 //      NetworkPanel np = NetworkPanel.createNetworkPanel(n);
 
 //      System.out.println(np.debugString());
-        sim.addNetwork(65, 15, 500, 500, new NetworkComponent("NEAT", n));
+        sim.addNetwork(new NetworkComponent("NEAT", n), 15, 500, 500, 65);
         // sim.addNetwork(65, 520, 500, 500, new NetworkComponent("NEAT2", n2));
 
         cheese = new OdorWorldEntity(w);

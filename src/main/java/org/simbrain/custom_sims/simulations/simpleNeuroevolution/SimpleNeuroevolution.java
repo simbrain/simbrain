@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.simpleNeuroevolution;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.math.SimbrainMath;
@@ -29,7 +29,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     boolean run = false;
 
 
-    List<NetBuilder> net = new ArrayList<>();
+    List<NetworkWrapper> net = new ArrayList<>();
     List<NetWorldPair> nwp = new ArrayList<>();
 
 
@@ -90,7 +90,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 
     private void deleteWorkspacePair(int netIndex) {
         System.out.println("Removing " + netIndex);
-        NetBuilder netToDelete = net.get(netIndex);
+        NetworkWrapper netToDelete = net.get(netIndex);
         OdorWorldBuilder worldToDelete = world.get(netIndex);
         sim.getWorkspace().removeWorkspaceComponent(netToDelete.getNetworkComponent());
         sim.getWorkspace().removeWorkspaceComponent(worldToDelete.getOdorWorldComponent());
@@ -242,7 +242,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 
             nc.setName("N" + attribute.get(netIndex).getNetID());
 
-            net.set(netIndex, sim.addNetwork(x, y, width, height, nc));
+            net.set(netIndex, sim.addNetwork(nc, y, width, height, x));
         } else {
             System.out.println("add");
             attribute.add(new NetWorldPairAttribute(prefix + netIndex, netIndex, x, y, width, height));
@@ -251,7 +251,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
 
             nc.setName("N" + attribute.get(netIndex).getNetID());
 
-            net.add(netIndex, sim.addNetwork(x, y, width, height, nc));
+            net.add(netIndex, sim.addNetwork(nc, y, width, height, x));
         }
     }
 

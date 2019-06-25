@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -68,7 +68,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetBuilder net = sim.addNetwork(10, 10, 337, 588,
+        NetworkWrapper net = sim.addNetwork(10, 10, 337, 588,
             "Patterns of Activity");
         network = net.getNetwork();
         network.setTimeStep(0.5);

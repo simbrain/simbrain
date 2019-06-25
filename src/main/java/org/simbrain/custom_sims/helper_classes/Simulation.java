@@ -49,13 +49,22 @@ public class Simulation {
     private transient CouplingManager couplingManager;
 
     /**
-     * Associate networks and worlds with their respective components. Entries
-     * are added when networks or worlds are added using the sim object.
+     * Associate networks with their respective components.
      * Facilitates making couplings using methods with fewer arguments.
      */
     private transient Hashtable<Network, NetworkComponent> netMap = new Hashtable();
+
+    /**
+     * Associate odor worlds with their respective components.
+     * Facilitates making couplings using methods with fewer arguments.
+     */
     private transient Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
+    /**
+     * Create a new simulation object
+     *
+     * @param desktop reference to Simbrain desktop
+     */
     public Simulation(SimbrainDesktop desktop) {
         super();
         this.desktop = desktop;
@@ -63,44 +72,24 @@ public class Simulation {
         couplingManager = workspace.getCouplingManager();
     }
 
-    // TODO: NEW STUFF USING NET WRAPPER. Work towards replacing netbuilder
-    // entirely.
-    public NetworkWrapper addNetwork2(int x, int y, int width, int height, String name) {
+    /**
+     * Create a network wrapper at the indicated location, with the indicated
+     * name (for the network window that appears in the desktop).
+     */
+    public NetworkWrapper addNetwork(int x, int y, int width, int height, String name) {
         NetworkComponent networkComponent = new NetworkComponent(name);
+        return addNetwork(networkComponent, y, width, height, x);
+    }
+
+    /**
+     * Create a network wrapper using a provided network component.
+     */
+    public NetworkWrapper addNetwork(NetworkComponent networkComponent, int y, int width, int height, int x) {
         workspace.addWorkspaceComponent(networkComponent);
         NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
         ndc.getParentFrame().setBounds(x, y, width, height);
         netMap.put(networkComponent.getNetwork(), networkComponent);
         return new NetworkWrapper(ndc);
-    }
-
-    public SimbrainDesktop getDesktop() {
-        return desktop;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    /**
-     * Add a network and return a network builder.
-     */
-    public NetBuilder addNetwork(int x, int y, int width, int height, String name) {
-        NetworkComponent networkComponent = new NetworkComponent(name);
-        workspace.addWorkspaceComponent(networkComponent);
-        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(x, y, width, height);
-        netMap.put(networkComponent.getNetwork(), networkComponent);
-        return new NetBuilder(networkComponent);
-    }
-
-    /**
-     * Add a network and return a network builder.
-     */
-    public NetBuilder addNetwork(int x, int y, int width, int height, NetworkComponent nc) {
-        workspace.addWorkspaceComponent(nc);
-        desktop.getDesktopComponent(nc).getParentFrame().setBounds(x, y, width, height);
-        netMap.put(nc.getNetwork(), nc);
-        return new NetBuilder(nc);
     }
 
     /**
@@ -321,4 +310,17 @@ public class Simulation {
         workspace.iterate(iterations);
     }
 
+    /**
+     * Reference to the Simbrain desktop.
+     */
+    public SimbrainDesktop getDesktop() {
+        return desktop;
+    }
+
+    /**
+     * Reference to the Simbrain workspace.
+     */
+    public Workspace getWorkspace() {
+        return workspace;
+    }
 }

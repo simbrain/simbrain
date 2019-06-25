@@ -52,7 +52,7 @@ public class MpfsSOM extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        netWrapper = sim.addNetwork2(144, 11, 550, 680, "Moral-Political SOM");
+        netWrapper = sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
         network = netWrapper.getNetwork();
         som = new SOMNetwork(network, numSOMNodes, 29, new Point2D.Double(0, 0));
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));

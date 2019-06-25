@@ -47,22 +47,11 @@ public class CreaturesBrain {
     /**
      * Constructor.
      *
-     * @param component
+     * @param NetworkWrapper
      */
-    public CreaturesBrain(NetworkDesktopComponent component, CreaturesSim parentSim) {
-        this.netWrapper = new NetworkWrapper(component);
-        this.netComponent = netWrapper.getNetworkComponent();
-        this.parentSim = parentSim;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param netBuilder
-     */
-    public CreaturesBrain(NetworkWrapper netBuilder, CreaturesSim parentSim) {
-        this.netWrapper = netBuilder;
-        this.netComponent = netBuilder.getNetworkComponent();
+    public CreaturesBrain(NetworkWrapper NetworkWrapper, CreaturesSim parentSim) {
+        this.netWrapper = NetworkWrapper;
+        this.netComponent = NetworkWrapper.getNetworkComponent();
         this.parentSim = parentSim;
     }
 

@@ -162,7 +162,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Create the network builder
-        NetBuilder net = sim.addNetwork(228, 3,563,597, "Neural Network");
+        NetworkWrapper net = sim.addNetwork(228, 3,563,597, "Neural Network");
         network = net.getNetwork();
 
         // Set up the control panel and tabbed pane
@@ -269,7 +269,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Set up main networks
      */
-    private void setupNetworks(NetBuilder net) {
+    private void setupNetworks(NetworkWrapper net) {
 
         // WTA network that routes to vehicles
         wtaNet = net.addWTAGroup(-234, 58, 3);
@@ -314,7 +314,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Set up the reward, value and td nodes
      */
-    private void setUpRLNodes(NetBuilder net) {
+    private void setUpRLNodes(NetworkWrapper net) {
         reward = net.addNeuron(300, 0);
         //reward.setClamped(true);
         reward.setLabel("Reward");
@@ -337,7 +337,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Set up the vehicle networks
      */
-    private void setUpVehicleNets(NetBuilder net, OdorWorldBuilder world) {
+    private void setUpVehicleNets(NetworkWrapper net, OdorWorldBuilder world) {
         // Labels for vehicles, which must be the same as the label for
         // the corresponding output node
         String strPursueCheese = "Pursue Cheese";
@@ -584,7 +584,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Set up the time series plot.
      */
-    private void setUpTimeSeries(NetBuilder net) {
+    private void setUpTimeSeries(NetworkWrapper net) {
         // Create a time series plot
         TimeSeriesPlotComponent ts= sim.addTimeSeriesPlot(0, 328, 293, 332, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Reward");

@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.simpleNeuroevolution;
 
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.core.Neuron;
@@ -16,7 +16,7 @@ public class NetWorldPair {
     public static Simulation sim;
 
     long netSeed;
-    NetBuilder net;
+    NetworkWrapper net;
     int generation;
 
 
@@ -51,7 +51,7 @@ public class NetWorldPair {
 
     //public void
 
-    public NetBuilder getNet() {
+    public NetworkWrapper getNet() {
         return net;
     }
 

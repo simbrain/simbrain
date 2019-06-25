@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -47,7 +47,7 @@ public class TestSim extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Basic setup
-        NetBuilder net = sim.addNetwork(10, 10, 450, 450, "Test network");
+        NetworkWrapper net = sim.addNetwork(10, 10, 450, 450, "Test network");
         Network network = net.getNetwork();
 
         // Graveyeard of old tests below

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.cerebellum;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
@@ -26,7 +26,7 @@ public class Cerebellum extends RegisteredSimulation {
     /**
      * Other variables.
      */
-    NetBuilder net;
+    NetworkWrapper net;
     Network network;
     ControlPanel panel;
     public int currentTrialLength = 200;

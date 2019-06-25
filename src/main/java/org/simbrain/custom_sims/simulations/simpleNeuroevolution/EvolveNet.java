@@ -282,7 +282,7 @@ public class EvolveNet extends Network {
     }
 
 
-    // TODO: not to copy paste from NetBuilder
+    // TODO: not to copy paste from NetworkWrapper
     private double GRID_SPACE = 50; // todo; make this settable
 
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons) {

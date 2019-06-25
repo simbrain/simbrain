@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
@@ -60,13 +60,13 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder netBuilder = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
-        network = netBuilder.getNetwork();
+        NetworkWrapper NetworkWrapper = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
+        network = NetworkWrapper.getNetwork();
         buildNetwork();
 
         // Projection plot
         ProjectionComponent pc = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(netBuilder.getNetworkComponent(), reservoir, pc);
+        sim.couple(NetworkWrapper.getNetworkComponent(), reservoir, pc);
 
         // Odor world sim
         buildOdorWorld();

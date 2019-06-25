@@ -82,7 +82,7 @@ public class TestEvolution extends RegisteredSimulation {
 
         // Add winning network
         Network winner = population.getFittestAgent().getPhenotype();
-        sim.addNetwork(10, 10, 491, 534, new NetworkComponent("Evolved Pursuer", winner));
+        sim.addNetwork(new NetworkComponent("Evolved Pursuer", winner), 10, 491, 534, 10);
 
         // Add odor world
         createOdorWorld();

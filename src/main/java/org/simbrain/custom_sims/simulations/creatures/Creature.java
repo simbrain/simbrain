@@ -487,6 +487,9 @@ public class Creature {
 
         // Get the noun to speak, and the effector that goes with it
         String noun = attention.getMostActiveNeuron().replaceAll("\\s", "");
+        if (noun.isEmpty()) {
+            return;
+        }
         String effectorName = "Say: \"" + noun + "\"";
         Speech effector = (Speech) agent.getEffector(effectorName);
 

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -31,7 +31,7 @@ public class CreaturesSim extends RegisteredSimulation {
      */
     private List<Creature> creatureList = new ArrayList<Creature>();
 
-    private OdorWorldBuilder world;
+    private OdorWorldWrapper world;
 
     // TODO: Make this more flexible, editable, etc.
     public OdorWorldEntity toy;

@@ -26,7 +26,7 @@ public class Cerebellum extends RegisteredSimulation {
     /**
      * Other variables.
      */
-    NetworkWrapper net;
+    NetworkWrapper networkWrapper;
     Network network;
     ControlPanel panel;
     public int currentTrialLength = 200;
@@ -82,8 +82,8 @@ public class Cerebellum extends RegisteredSimulation {
     void buildNetwork() {
 
         // Set up network
-        net = sim.addNetwork(246, 9, 538, 595, "Cerebellum");
-        network = net.getNetwork();
+        networkWrapper = sim.addNetwork(246, 9, 538, 595, "Cerebellum");
+        network = networkWrapper.getNetwork();
 
         DecayRule generalRule = new DecayRule();
         generalRule.setDecayFraction(.25);

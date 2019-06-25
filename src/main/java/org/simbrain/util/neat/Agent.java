@@ -1,6 +1,6 @@
 package org.simbrain.util.neat;
 
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -41,7 +41,7 @@ public class Agent implements Comparable<Agent> {
      * Reference to parent world.
      * TODO: Move this to a separate class.
      */
-    private OdorWorld world = new OdorWorldBuilder(new OdorWorldComponent("Hi")).getWorld();
+    private OdorWorld world = new OdorWorldWrapper(new OdorWorldComponent("Hi")).getWorld();
 
     /**
      * Reference to an agent in an odor world.

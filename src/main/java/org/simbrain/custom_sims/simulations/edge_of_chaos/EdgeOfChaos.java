@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -50,7 +50,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     Network network;
     SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
     NeuronGroup reservoir, sensorNodes;
-    OdorWorldBuilder world;
+    OdorWorldWrapper world;
     OdorWorldEntity mouse;
 
     @Override
@@ -60,13 +60,13 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkWrapper NetworkWrapper = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
-        network = NetworkWrapper.getNetwork();
+        NetworkWrapper netWrapper = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
+        network = netWrapper.getNetwork();
         buildNetwork();
 
         // Projection plot
         ProjectionComponent pc = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(NetworkWrapper.getNetworkComponent(), reservoir, pc);
+        sim.couple(netWrapper.getNetworkComponent(), reservoir, pc);
 
         // Odor world sim
         buildOdorWorld();

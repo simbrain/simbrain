@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.simpleNeuroevolution;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -33,7 +33,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     List<NetWorldPair> nwp = new ArrayList<>();
 
 
-    List<OdorWorldBuilder> world = new ArrayList<>();
+    List<OdorWorldWrapper> world = new ArrayList<>();
     List<OdorWorldEntity> mouse = new ArrayList<>();
     List<OdorWorldEntity> cheese = new ArrayList<>();
     List<OdorWorldEntity> poison = new ArrayList<>();
@@ -91,7 +91,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     private void deleteWorkspacePair(int netIndex) {
         System.out.println("Removing " + netIndex);
         NetworkWrapper netToDelete = net.get(netIndex);
-        OdorWorldBuilder worldToDelete = world.get(netIndex);
+        OdorWorldWrapper worldToDelete = world.get(netIndex);
         sim.getWorkspace().removeWorkspaceComponent(netToDelete.getNetworkComponent());
         sim.getWorkspace().removeWorkspaceComponent(worldToDelete.getOdorWorldComponent());
         net.set(netIndex, null);
@@ -259,7 +259,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
     private void addWorld(int worldIndex, int x, int y, int width, int height) {
         if (worldIndex < world.size()) {
             world.set(worldIndex, sim.addOdorWorld(x, y, width, height, "W" + attribute.get(worldIndex).getNetID()));
-            OdorWorldBuilder currentWorld = world.get(worldIndex);
+            OdorWorldWrapper currentWorld = world.get(worldIndex);
             currentWorld.getWorld().setObjectsBlockMovement(false);
             int worldHeight = currentWorld.getWorld().getHeight();
             int worldWidth = currentWorld.getWorld().getWidth();
@@ -274,7 +274,7 @@ public class SimpleNeuroevolution extends RegisteredSimulation {
             System.out.println("I: " + worldIndex + "; (" + worldWidth + ", " + worldHeight + ")");
         } else {
             world.add(sim.addOdorWorld(x, y, width, height, "W" + attribute.get(worldIndex).getNetID()));
-            OdorWorldBuilder currentWorld = world.get(worldIndex);
+            OdorWorldWrapper currentWorld = world.get(worldIndex);
             currentWorld.getWorld().setObjectsBlockMovement(false);
             int worldHeight = currentWorld.getWorld().getHeight();
             int worldWidth = currentWorld.getWorld().getWidth();

@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.*;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
@@ -29,15 +30,24 @@ import java.util.List;
  */
 public class NetworkWrapper {
 
-    // TODO: Consider adding static methods for adding neurons, neuron groups, etc.
-
-
+    /**
+     * The desktop component with full graphical access.
+     */
     private final NetworkDesktopComponent desktopComponent;
 
+    /**
+     * The network component.
+     */
     private final NetworkComponent networkComponent;
 
+    /**
+     * The logical network.
+     */
     private final Network network;
 
+    /**
+     * Grid spacing for methods that use a grid layout.
+     */
     private double GRID_SPACE = 50; // todo; make this settable
 
     /**
@@ -48,7 +58,6 @@ public class NetworkWrapper {
         this.networkComponent = desktopComponent.getWorkspaceComponent();
         this.network = networkComponent.getNetwork();
     }
-
 
     /**
      * Add a neuron at a specified location.
@@ -93,12 +102,7 @@ public class NetworkWrapper {
     }
 
     /**
-     * Make a single source -> target connection.
-     *
-     * @param source     the source neuron
-     * @param target     the target neuron
-     * @param lowerBound lower bound for synapse
-     * @param upperBound upper bound for synapse
+     * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.
      */
     public void connect(Neuron source, Neuron target, double value, double lowerBound, double upperBound) {
         Synapse synapse = new Synapse(source, target);
@@ -109,7 +113,7 @@ public class NetworkWrapper {
     }
 
     /**
-     * Make a single source -> target connection.
+     * Make a single source -> target neuron connection.
      *
      * @param source the source neuron
      * @param target the target neuron
@@ -121,6 +125,11 @@ public class NetworkWrapper {
         return synapse;
     }
 
+    /**
+     * Connect source to target with a provided learning rule and value.
+     *
+     * @return the new synapse
+     */
     public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
         Synapse synapse = new Synapse(source, target, rule);
         synapse.setStrength(value);
@@ -128,27 +137,50 @@ public class NetworkWrapper {
         return synapse;
     }
 
-    public void connectOneToOne(NeuronGroup source, NeuronGroup target) {
-        OneToOne connector = new OneToOne();
-        connector.connectOneToOne(source.getNeuronList(), target.getNeuronList());
-    }
-
+    /**
+     * Connect a source and neuron target group all to all
+     *
+     * @return the new synapses
+     */
     public List<Synapse> connectAllToAll(NeuronGroup source, NeuronGroup target) {
         AllToAll connector = new AllToAll();
         return connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
     }
 
+    /**
+     * Connect a source neuron group to a single target neuron
+     */
     public void connectAllToAll(NeuronGroup inputs, Neuron target) {
         AllToAll connector = new AllToAll();
         connector.connectAllToAll(inputs.getNeuronList(), Collections.singletonList(target));
     }
 
+    /**
+     * Connect source and target neuron groups with a provided connection strategy.
+     *
+     * @return the new synapses
+     */
+    public List<Synapse> connect(NeuronGroup source, NeuronGroup target, ConnectionStrategy connector) {
+        return connector.connectNeurons(network, source.getNeuronList(), target.getNeuronList());
+    }
+
+    /**
+     * Add a synapse group between a source and target neuron group
+     *
+     * @return the new synapse group
+     */
     public SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target) {
         SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target);
         network.addGroup(sg);
         return sg;
     }
 
+    /**
+     * Add a neuron group at the specified location, with a specified number of neurons, layout,
+     * and update rule.
+     *
+     * @return the new neuron group
+     */
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons, String layoutName, NeuronUpdateRule rule) {
 
         NeuronGroup ng;
@@ -161,10 +193,34 @@ public class NetworkWrapper {
 
     }
 
+    /**
+     * Add a neuron group with a specified number of neurons, layout, and neuron update rule
+     *
+     * @return the new neuron group
+     */
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons, String layoutName, String type) {
         return addNeuronGroup(x, y, numNeurons, layoutName, new LinearRule());
     }
 
+    /**
+     * Add a new neuron group at the specified location, with a default line layout and linear neurons.
+     *
+     * @return the new neuron group.
+     */
+    public NeuronGroup addNeuronGroup(double x, double y, int numNeurons) {
+        //TODO: Setting location not always working
+        return addNeuronGroup(x, y, numNeurons, "line", "LinearRule");
+    }
+
+    /**
+     * Layout a neuron group.
+     *
+     * @param ng reference to the group
+     * @param x reference x location (upper left)
+     * @param y reference y location (upper left)
+     * @param layoutName the type of layout to use: "line" (defaults to horizontal),
+     *                   "vertical line", or "grid".  TODO: Add hex.
+     */
     private void layoutNeuronGroup(NeuronGroup ng, double x, double y, String layoutName) {
 
         if (layoutName.toLowerCase().contains("line")) {
@@ -183,27 +239,16 @@ public class NetworkWrapper {
 
     }
 
+    /**
+     * Add a {@link WinnerTakeAll} network at the specified location.
+     *
+     * @return the new network
+     */
     public WinnerTakeAll addWTAGroup(double x, double y, int numNeurons) {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
         wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
         return wta;
-    }
-
-    public Group addSubnetwork(double x, double y, int numNeurons, String type) {
-        if (type.equalsIgnoreCase("wta")) {
-            WinnerTakeAll ret = new WinnerTakeAll(network, numNeurons);
-            network.addGroup(ret);
-            return ret;
-        }
-        return null;
-
-    }
-
-
-    //TODO: Setting location not always working
-    public NeuronGroup addNeuronGroup(double x, double y, int numNeurons) {
-        return addNeuronGroup(x, y, numNeurons, "line", "LinearRule");
     }
 
     /**

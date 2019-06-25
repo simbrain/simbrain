@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.simpleNeuroevolution;
 
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -26,7 +26,7 @@ public class NetWorldPair {
     NeuronGroup output;
     List<Neuron> sourceNeuron = new ArrayList<>();
     List<Neuron> targetNeuron = new ArrayList<>();
-    OdorWorldBuilder world;
+    OdorWorldWrapper world;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese;
     OdorWorldEntity poison;
@@ -55,7 +55,7 @@ public class NetWorldPair {
         return net;
     }
 
-    public OdorWorldBuilder getWorld() {
+    public OdorWorldWrapper getWorld() {
         return world;
     }
 

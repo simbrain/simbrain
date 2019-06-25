@@ -101,7 +101,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
-    OdorWorldBuilder worldBuilder;
+    OdorWorldWrapper worldBuilder;
     ProjectionComponent plot;
 
     SmellSensor leftSmell, rightSmell;
@@ -337,7 +337,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Set up the vehicle networks
      */
-    private void setUpVehicleNets(NetworkWrapper net, OdorWorldBuilder world) {
+    private void setUpVehicleNets(NetworkWrapper net, OdorWorldWrapper world) {
         // Labels for vehicles, which must be the same as the label for
         // the corresponding output node
         String strPursueCheese = "Pursue Cheese";

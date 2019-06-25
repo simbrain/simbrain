@@ -69,7 +69,7 @@ public class TestSim extends RegisteredSimulation {
         // in_out.randomizeConnectionWeights(); // TODO Not working?
 
         // Create the odor world
-        // OdorWorldBuilder world = sim.addOdorWorld(460, 10, 450, 450,
+        // OdorWorldWrapper world = sim.addOdorWorld(460, 10, 450, 450,
         // "My first world");
         // world.getWorld().setObjectsBlockMovement(false);
         // RotatingEntity mouse = world.addAgent(20, 20, "Mouse");

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -39,7 +39,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     // References
     Network network;
-    NetworkWrapper NetworkWrapper;
+    NetworkWrapper netWrapper;
     NeuronGroup sensory, motor, inputGroup;
     OdorWorldEntity mouse;
     List<OdorWorldEntity> worldEntities = new ArrayList<>();
@@ -71,9 +71,9 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetworkWrapper = sim.addNetwork(10, 10, 581, 297,
+        netWrapper = sim.addNetwork(10, 10, 581, 297,
             "Patterns of Activity");
-        network = NetworkWrapper.getNetwork();
+        network = netWrapper.getNetwork();
 
         // Sensory network
         sensory = addModule(-115, 10, 49, "Sensory", new DecayRule());
@@ -98,7 +98,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     private NeuronGroup addInputGroup(int x, int y) {
 
         // Alternate form would be based on vectors
-        NeuronGroup ng = NetworkWrapper.addNeuronGroup(x, y, mouse.getSensors().size());
+        NeuronGroup ng = netWrapper.addNeuronGroup(x, y, mouse.getSensors().size());
         ng.setLayout(new LineLayout(LineLayout.LineOrientation.VERTICAL));
         ng.applyLayout();
         ng.setLabel("Object Sensors");
@@ -120,9 +120,9 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
             Neuron tarNeuron = sensory.getNeuronList().get(j);
             double yloc = tarNeuron.getY();
             if (yloc < yEdge) {
-                NetworkWrapper.connect(neuron1, tarNeuron,1);
+                netWrapper.connect(neuron1, tarNeuron,1);
             } else {
-                NetworkWrapper.connect(neuron2, tarNeuron,1);
+                netWrapper.connect(neuron2, tarNeuron,1);
             }
         }
 
@@ -135,7 +135,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     }
 
     private NeuronGroup addBinaryModule(int x, int y, int numNeurons, String name) {
-        NeuronGroup ng = NetworkWrapper.addNeuronGroup(x, y, numNeurons);
+        NeuronGroup ng = netWrapper.addNeuronGroup(x, y, numNeurons);
         BinaryRule rule = new BinaryRule();
         ng.setNeuronType(rule);
         HexagonalGridLayout.layoutNeurons(ng.getNeuronListUnsafe(), 40, 40);
@@ -145,7 +145,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     }
 
     private NeuronGroup addModule(int x, int y, int numNeurons, String name, NeuronUpdateRule rule) {
-        NeuronGroup ng = NetworkWrapper.addNeuronGroup(x, y, numNeurons);
+        NeuronGroup ng = netWrapper.addNeuronGroup(x, y, numNeurons);
         //KuramotoRule rule = new KuramotoRule();
         //NakaRushtonRule rule = new NakaRushtonRule();
         //rule.setNaturalFrequency(.1);
@@ -185,7 +185,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     private void setUpWorld() {
 
-        OdorWorldBuilder world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
+        OdorWorldWrapper world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
 
         // Mouse
         mouse = world.addEntity(187, 113, EntityType.MOUSE);

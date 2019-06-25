@@ -9,7 +9,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Utility for building odor worlds in simulation files.
  */
-public class OdorWorldBuilder {
+public class OdorWorldWrapper {
 
     /**
      * Parent odor world component.
@@ -24,7 +24,7 @@ public class OdorWorldBuilder {
     /**
      * Construct the builder.
      */
-    public OdorWorldBuilder(OdorWorldComponent odorWorldComponent) {
+    public OdorWorldWrapper(OdorWorldComponent odorWorldComponent) {
         this.odorWorldComponent = odorWorldComponent;
         world = odorWorldComponent.getWorld();
     }

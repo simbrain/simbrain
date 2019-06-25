@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -154,7 +154,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Set up odor world
-        OdorWorldBuilder world = sim.addOdorWorld(338, 10, 436, 516, "World");
+        OdorWorldWrapper world = sim.addOdorWorld(338, 10, 436, 516, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
 

@@ -151,31 +151,31 @@ public class Simulation {
     /**
      * Add an odor world component.
      */
-    public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name) {
+    public OdorWorldWrapper addOdorWorld(int x, int y, int width, int height, String name) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name);
         workspace.addWorkspaceComponent(odorWorldComponent);
         desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
         desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setPreferredSize(new Dimension(width, height));
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        return new OdorWorldBuilder(odorWorldComponent);
+        return new OdorWorldWrapper(odorWorldComponent);
     }
 
     /**
      * Add an odor world component.
      */
-    public OdorWorldBuilder addOdorWorld(int x, int y, int width, int height, String name, OdorWorld world) {
+    public OdorWorldWrapper addOdorWorld(int x, int y, int width, int height, String name, OdorWorld world) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name, world);
         workspace.addWorkspaceComponent(odorWorldComponent);
         desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setBounds(x, y, width, height);
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        return new OdorWorldBuilder(odorWorldComponent);
+        return new OdorWorldWrapper(odorWorldComponent);
     }
 
     /**
      * Add an odor world component using a Tiled tmx file.
      */
-    public OdorWorldBuilder addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
-        OdorWorldBuilder ob = this.addOdorWorldTMX(x,y,tmxFile);
+    public OdorWorldWrapper addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
+        OdorWorldWrapper ob = this.addOdorWorldTMX(x,y,tmxFile);
         desktop.getDesktopComponent(ob.getOdorWorldComponent()).getParentFrame().setBounds(x, y,
             width, height);
         return ob;
@@ -184,13 +184,13 @@ public class Simulation {
     /**
      * Add an odor world component using a Tiled tmx file.
      */
-    public OdorWorldBuilder addOdorWorldTMX(int x, int y, String tmxFile) {
+    public OdorWorldWrapper addOdorWorldTMX(int x, int y, String tmxFile) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
         odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
         desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        return new OdorWorldBuilder(odorWorldComponent);
+        return new OdorWorldWrapper(odorWorldComponent);
     }
 
     /**

@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.actor_critic;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -75,8 +75,8 @@ public class ActorCritic extends RegisteredSimulation {
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
-    OdorWorldBuilder ob;
-    NetworkWrapper NetworkWrapper;
+    OdorWorldWrapper ob;
+    NetworkWrapper networkWrapper;
 
     /**
      * Tile World.
@@ -146,25 +146,25 @@ public class ActorCritic extends RegisteredSimulation {
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
 
-        // Create the network builder
-        NetworkWrapper = sim.addNetwork(236, 4, 522, 595, "Neural Network");
-        network = NetworkWrapper.getNetwork();
+        // Create the network wrapper
+        networkWrapper = sim.addNetwork(236, 4, 522, 595, "Neural Network");
+        network = networkWrapper.getNetwork();
 
         // Set up the control panel and tabbed pane
         makeControlPanel();
         controlPanel.addBottomComponent(tabbedPane);
 
         // Set up the main input-output network that is trained via RL
-        setUpInputOutputNetwork(NetworkWrapper);
+        setUpInputOutputNetwork(networkWrapper);
 
         // Set up the reward and td error nodes
-        setUpRLNodes(NetworkWrapper);
+        setUpRLNodes(networkWrapper);
 
         // Set up the tile world
         setUpWorldAndNetwork();
 
         // Set up the time series plot
-        setUpPlot(NetworkWrapper);
+        setUpPlot(networkWrapper);
 
         // Set custom network update
         network.getUpdateManager().clear();
@@ -209,7 +209,7 @@ public class ActorCritic extends RegisteredSimulation {
                 sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
-                NetworkWrapper.getNetworkComponent().update();
+                networkWrapper.getNetworkComponent().update();
 
                 // TODO: Why don't we have to call plot update?
             }
@@ -242,7 +242,7 @@ public class ActorCritic extends RegisteredSimulation {
         world.addEntity(cheese);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();
-        NetworkComponent nc = NetworkWrapper.getNetworkComponent();
+        NetworkComponent nc = networkWrapper.getNetworkComponent();
 
         tileNeurons = new ArrayList<Neuron>();
         sensorCouplings = new ArrayList<Coupling<?>>();
@@ -254,9 +254,9 @@ public class ActorCritic extends RegisteredSimulation {
         mouse.addSensor(sensor);
 
         // Set up location sensor neurons
-        sensorNeurons = NetworkWrapper.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
-        NetworkWrapper.connectAllToAll(sensorNeurons, value);
-        NetworkWrapper.connectAllToAll(sensorNeurons, outputs);
+        sensorNeurons = networkWrapper.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
+        networkWrapper.connectAllToAll(sensorNeurons, value);
+        networkWrapper.connectAllToAll(sensorNeurons, outputs);
 
         // Set up couplings
         Producer gridProducer = sim.getProducer(sensor, "getValues");

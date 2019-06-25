@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -115,7 +115,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
 
         // Set up odor world
-        OdorWorldBuilder world = sim.addOdorWorld(547, 5, 504, 548, "World");
+        OdorWorldWrapper world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
         world.getWorld().setTileMap(TileMap.create("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, EntityType.MOUSE);

@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
@@ -51,7 +51,7 @@ public class TestEvolution extends RegisteredSimulation {
     // Odor world stuff
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
-    OdorWorldBuilder worldBuilder;
+    OdorWorldWrapper worldBuilder;
 
     /**
      * Construct sim

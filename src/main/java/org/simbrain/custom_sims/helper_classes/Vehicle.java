@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.helper_classes;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -27,7 +26,7 @@ public class Vehicle {
     /**
      * The world with agents and sensors to attach to the vehicle.
      */
-    private final OdorWorldBuilder world;
+    private final OdorWorldWrapper world;
 
     /**
      * Size of sensor-motor weights. Determines how "sharply" agents turn.
@@ -60,7 +59,7 @@ public class Vehicle {
      * @param net   the network to add the vehicle subnetworks to
      * @param world the world to link the vehicles to
      */
-    public Vehicle(Simulation sim, NetworkWrapper net, OdorWorldBuilder world) {
+    public Vehicle(Simulation sim, NetworkWrapper net, OdorWorldWrapper world) {
         this.sim = sim;
         this.net = net;
         this.world = world;

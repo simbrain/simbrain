@@ -104,8 +104,8 @@ public class Creature {
     /**
      * Sensors
      */
-    ObjectSensor swissSensor, poisonSensor;
-    Hearing hearCheese;
+    ObjectSensor cheeseSensor, poisonSensor, toySensor, fishSensor, hazardSensor, flowerSensor, mouseSensor;
+    Hearing hearCheese, hearPoison, hearToy, hearFish, hearHazard, hearFlower, hearMouse, hearWait, hearLeft, hearRight, hearForward, hearBackward, hearSleep, hearApproach, hearIngest, hearLook, hearSmell, hearAttack, hearPlay, hearMate;
 
     //TODO: Add gender
 
@@ -167,32 +167,62 @@ public class Creature {
         agent.addEffector(new Turning(agent, Turning.RIGHT));
 
         // Add object sensors (Todo)
-        swissSensor = new ObjectSensor(agent, EntityType.SWISS);
+        cheeseSensor = new ObjectSensor(agent, EntityType.SWISS);
         poisonSensor = new ObjectSensor(agent, EntityType.POISON);
-        agent.addSensor(swissSensor);
+        toySensor = new ObjectSensor(agent, EntityType.BELL);
+        fishSensor = new ObjectSensor(agent, EntityType.FISH);
+        //hazardSensor = new ObjectSensor(agent, EntityType.???);
+        flowerSensor = new ObjectSensor(agent, EntityType.PANSY);
+        mouseSensor = new ObjectSensor(agent, EntityType.MOUSE);
+        agent.addSensor(cheeseSensor);
+        agent.addSensor(poisonSensor);
+        agent.addSensor(toySensor);
+        agent.addSensor(fishSensor);
+        //agent.addSensor(hazardSensor);
+        agent.addSensor(flowerSensor);
+        agent.addSensor(mouseSensor);
 
         // Add hearing sensors
         hearCheese = new Hearing(agent, "Cheese", 10);
+        hearPoison = new Hearing(agent, "Poison", 10);
+        hearToy = new Hearing(agent, "Toy", 10);
+        hearFish = new Hearing(agent, "Fish", 10);
+        hearHazard = new Hearing(agent, "Hazard", 10);
+        hearFlower = new Hearing(agent, "Flower", 10);
+        hearMouse = new Hearing(agent, "Mouse", 10);
+        hearWait = new Hearing(agent, "Wait", 10);
+        hearLeft = new Hearing(agent, "Left", 10);
+        hearRight = new Hearing(agent, "Right", 10);
+        hearForward = new Hearing(agent, "Forward", 10);
+        hearBackward = new Hearing(agent, "Backward", 10);
+        hearSleep = new Hearing(agent, "Sleep", 10);
+        hearApproach = new Hearing(agent, "Approach", 10);
+        hearIngest = new Hearing(agent, "Ingest", 10);
+        hearLook = new Hearing(agent, "Look", 10);
+        hearSmell = new Hearing(agent, "Smell", 10);
+        hearAttack = new Hearing(agent, "Attack", 10);
+        hearPlay = new Hearing(agent, "Play", 10);
+        hearMate = new Hearing(agent, "Mate", 10);
         agent.addSensor(hearCheese);
-        agent.addSensor(new Hearing(agent, "Toy", 10));
-        agent.addSensor(new Hearing(agent, "Fish", 10));
-        agent.addSensor(new Hearing(agent, "Poison", 10));
-        agent.addSensor(new Hearing(agent, "Hazard", 10));
-        agent.addSensor(new Hearing(agent, "Flower", 10));
-        agent.addSensor(new Hearing(agent, "Mouse", 10));
-        agent.addSensor(new Hearing(agent, "Wait", 10));
-        agent.addSensor(new Hearing(agent, "Left", 10));
-        agent.addSensor(new Hearing(agent, "Right", 10));
-        agent.addSensor(new Hearing(agent, "Forward", 10));
-        agent.addSensor(new Hearing(agent, "Backward", 10));
-        agent.addSensor(new Hearing(agent, "Sleep", 10));
-        agent.addSensor(new Hearing(agent, "Approach", 10));
-        agent.addSensor(new Hearing(agent, "Ingest", 10));
-        agent.addSensor(new Hearing(agent, "Look", 10));
-        agent.addSensor(new Hearing(agent, "Smell", 10));
-        agent.addSensor(new Hearing(agent, "Attack", 10));
-        agent.addSensor(new Hearing(agent, "Play", 10));
-        agent.addSensor(new Hearing(agent, "Mate", 10));
+        agent.addSensor(hearPoison);
+        agent.addSensor(hearToy);
+        agent.addSensor(hearFish);
+        agent.addSensor(hearHazard);
+        agent.addSensor(hearFlower);
+        agent.addSensor(hearMouse);
+        agent.addSensor(hearWait);
+        agent.addSensor(hearLeft);
+        agent.addSensor(hearRight);
+        agent.addSensor(hearForward);
+        agent.addSensor(hearBackward);
+        agent.addSensor(hearSleep);
+        agent.addSensor(hearApproach);
+        agent.addSensor(hearIngest);
+        agent.addSensor(hearLook);
+        agent.addSensor(hearSmell);
+        agent.addSensor(hearAttack);
+        agent.addSensor(hearPlay);
+        agent.addSensor(hearMate);
 
         // Add speech effectors
         agent.addEffector(new Speech(agent, "Toy", 1));
@@ -372,41 +402,38 @@ public class Creature {
      */
     public void initCouplings() {
 
-        //// Couplings from center smell sensor to stimulus lobe
-        parentSim.getSim().couple(swissSensor, stimulus.getNeuronByLabel("Cheese"));
+        // Couplings from center smell sensor to stimulus lobe
+        parentSim.getSim().couple(cheeseSensor, stimulus.getNeuronByLabel("Cheese"));
         parentSim.getSim().couple(poisonSensor, stimulus.getNeuronByLabel("Poison"));
+        parentSim.getSim().couple(toySensor, stimulus.getNeuronByLabel("Toy"));
+        parentSim.getSim().couple(fishSensor, stimulus.getNeuronByLabel("Fish"));
+        parentSim.getSim().couple(hazardSensor, stimulus.getNeuronByLabel("Hazard"));
+        parentSim.getSim().couple(flowerSensor, stimulus.getNeuronByLabel("Flower"));
+        parentSim.getSim().couple(mouseSensor, stimulus.getNeuronByLabel("Mouse"));
 
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 0, stimulus.getNeuronByLabel("Toy"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 1, stimulus.getNeuronByLabel("Fish"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 2, stimulus.getNeuronByLabel("Cheese"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 3, stimulus.getNeuronByLabel("Poison"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 4, stimulus.getNeuronByLabel("Hazard"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 5, stimulus.getNeuronByLabel("Flower"));
-        //parentSim.getSim().couple((SmellSensor) agent.getSensor("Smell-Center"), 6, stimulus.getNeuronByLabel("Mouse"));
-        //
-        //// Couplings from hearing sensors to noun lobe
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Toy\""), nouns.getNeuronByLabel("Toy"));
+        // Couplings from hearing sensors to noun lobe
         parentSim.getSim().couple(hearCheese, nouns.getNeuronByLabel("Cheese"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Fish\""), nouns.getNeuronByLabel("Fish"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Poison\""), nouns.getNeuronByLabel("Poison"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Hazard\""), nouns.getNeuronByLabel("Hazard"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Flower\""), nouns.getNeuronByLabel("Flower"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mouse\""), nouns.getNeuronByLabel("Mouse"));
-        //
-        //// Couplings from hearing sensors to verb lobe
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Wait\""), verbs.getNeuronByLabel("Wait"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Left\""), verbs.getNeuronByLabel("Left"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Right\""), verbs.getNeuronByLabel("Right"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Forward\""), verbs.getNeuronByLabel("Forward"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Backward\""), verbs.getNeuronByLabel("Backward"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Sleep\""), verbs.getNeuronByLabel("Sleep"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Approach\""), verbs.getNeuronByLabel("Approach"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Ingest\""), verbs.getNeuronByLabel("Ingest"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Look\""), verbs.getNeuronByLabel("Look"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Smell\""), verbs.getNeuronByLabel("Smell"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Attack\""), verbs.getNeuronByLabel("Attack"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Play\""), verbs.getNeuronByLabel("Play"));
-        //parentSim.getSim().couple((Hearing) agent.getSensor("Hear: \"Mate\""), verbs.getNeuronByLabel("Mate"));
+        parentSim.getSim().couple(hearPoison, nouns.getNeuronByLabel("Poison"));
+        parentSim.getSim().couple(hearToy, nouns.getNeuronByLabel("Toy"));
+        parentSim.getSim().couple(hearFish, nouns.getNeuronByLabel("Fish"));
+        parentSim.getSim().couple(hearHazard, nouns.getNeuronByLabel("Hazard"));
+        parentSim.getSim().couple(hearFlower, nouns.getNeuronByLabel("Flower"));
+        parentSim.getSim().couple(hearMouse, nouns.getNeuronByLabel("Mouse"));
+
+        // Couplings from hearing sensors to verb lobe
+        parentSim.getSim().couple(hearWait, verbs.getNeuronByLabel("Wait"));
+        parentSim.getSim().couple(hearLeft, verbs.getNeuronByLabel("Left"));
+        parentSim.getSim().couple(hearRight, verbs.getNeuronByLabel("Right"));
+        parentSim.getSim().couple(hearForward, verbs.getNeuronByLabel("Forward"));
+        parentSim.getSim().couple(hearBackward, verbs.getNeuronByLabel("Backward"));
+        parentSim.getSim().couple(hearSleep, verbs.getNeuronByLabel("Sleep"));
+        parentSim.getSim().couple(hearApproach, verbs.getNeuronByLabel("Approach"));
+        parentSim.getSim().couple(hearIngest, verbs.getNeuronByLabel("Ingest"));
+        parentSim.getSim().couple(hearLook, verbs.getNeuronByLabel("Look"));
+        parentSim.getSim().couple(hearSmell, verbs.getNeuronByLabel("Smell"));
+        parentSim.getSim().couple(hearAttack, verbs.getNeuronByLabel("Attack"));
+        parentSim.getSim().couple(hearPlay, verbs.getNeuronByLabel("Play"));
+        parentSim.getSim().couple(hearMate, verbs.getNeuronByLabel("Mate"));
 
         // Couplings from biochemistry to the brain
         couple(biochem.getChemByIndex(1), drives.getNeuronByLabel("Pain"));

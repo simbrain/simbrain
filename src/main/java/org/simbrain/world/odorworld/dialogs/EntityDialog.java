@@ -94,7 +94,7 @@ public class EntityDialog extends StandardDialog {
         JScrollPane sp = new JScrollPane(tabbedPane);
         setContentPane(sp);
 
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/objects.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/OdorWorld.html");
         addButton(new JButton(helpAction));
     }
 

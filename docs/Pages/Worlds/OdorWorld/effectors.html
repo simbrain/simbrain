@@ -19,13 +19,12 @@
         <div id="menu">
             <p class="menubold">Contents</p>
             <blockquote>
-                <p><a href="#straight">Straight</a>
-                    <br>
-                    <a href="#turning">Turning</a>
-                    <br>
+                <p>
                     <a href="#speech">Speech</a>
                     <br>
-                    <a href="#other">Other "effectors"</a>
+                    <a href="#straight">Straight</a>
+                    <br>
+                    <a href="#turning">Turning</a>
                     <br>
                 </p>
             </blockquote>
@@ -33,12 +32,14 @@
 
         <h1>Effectors </h1>
         <p>An <a href="agents.html">agent</a> in Odor World has effectors that it (currently) uses to move and speak. Effectors are <a href="../../Workspace/Couplings.html">coupled</a> with output neurons in neural networks. When neurons activate an agent's effectors, it performs the action associated with the effector, either moving, turning, or making an utterance.</p>
-
+        <br>
+        <p>There are three types of effectors in Simbrain: Speech, Straight Movement, and Turning. However, there are also other effector-like attributes that are not visible in the edit menu. Some of these effector-like entity attributes that are invisible by default in the <a href="../../Workspace/Couplings.html#visibility">attribute visibility panel</a> of the coupling manager (on the consumer side) are its x and y location, and "Absolute movement."  The latter can be used to move an agent in North, South, West, and East;  The former can be used to move the agent to specific locations; in both cases as the result of neuron activations. They are thus a kind of effector, though they cannot be explicitly added in the effector panel.</p>
+        <br>
         <p>To display an agent's effectors, double click on the agent in Odor World and select the effectors tab. The effector panel lists all of an agent's effectors along with its effector type and label. Labels can be renamed by double clicking on the label column.
         </p>
 
-        <p style="float: left; padding: 30px;">
-            <img src="../../../Images/OdorWorld_EffectorPanel.png" width="340" border="1">
+        <p style="float: right">
+            <img src="../../../Images/OdorWorld_EffectorPanel.png" width="350" border="1">
         </p>
 
         <p>To edit an effector, right click on any part of the row and select "Edit effector..."</p>
@@ -57,9 +58,6 @@
         <p>When a speech effector is activated, it stimulates any <a href="sensors.html#hearing">hearing</a> sensor an agent with a matching utterance value.  
         </p>
 
-        <p style="float: right; padding: 30px;">
-            <img src="../../../Images/OdorWorld_SpeechEffector.png" width="250" border="1">
-
         <blockquote>
             <p><span class="heading2">Utterance:</span> The string or phrase associated with this effector. A hearing effector gets activated when it senses a speech effector of the same utterance.</p>
             <p><span class="heading2">Characters per Row:</span> The maximum number of characters that can be displayed in one row of the hearing bubble. This only affects visual presentation/display and has no effect on activation parameters.</p>
@@ -70,10 +68,6 @@
         </p>
 
         <p>A straight effector moves the agent straight forward in Odor World. As long as the neuron coupled with the effector is active, the agent will continue to try to move directly forward in Odor World. The distance that the agent moves per time step is the product of the activation in the neuron and the base movement amount.
-        </p>
-
-        <p style="float: right; padding: 30px;">
-            <img src="../../../Images/OdorWorld_StraightEffector.png" width="250" border="1">
         </p>
 
 
@@ -89,14 +83,10 @@
 
         <blockquote>
             <p><span class="heading2">Turning Direction and Weight:</span> Determines the direction of that the agent turns to. A positive value makes the agent left. A negative value makes the agent turn right.  Any number besides 1 or -1 will also scale the amount of the turning.  Basically a scalar multiplied times turning amount to determine change in an agent's heading.</p>
-            <p><span class="heading2">Turning amount:</span> Determines the magnitude of an agent’s turn (in radians) with respect to the turning direction.</p>
+            <p><span class="heading2">Turning amount:</span> Determines the magnitude of an agent's turn (in radians) with respect to the turning direction.</p>
         </blockquote>
 
-        <p style="float: left; padding: 30px;">
-            <img src="../../../Images/OdorWorld_TurningEffector.png" width="250" border="1">
-        </p>
-
-                        <p class="heading">Output Commands</p>
+                <p class="heading">Output Commands</p>
         <blockquote>
             <p> Output Commands are essentially the motor controls of the agent. When coupling a neuron to an agent, one can choose between two styles of movement: relative movement, and absolute movement. Relative movements are motor commands that tell the agent how to move relative to its current orientation: e.g. move <em>forward</em> or to the <em>right</em>. Absolute movements tell the agent to move in directions that are independent of its orientation, such as move to the <em>north</em> or to the <em>south-west</em>. See <a href="../../Workspace/Couplings.html#Attributes">Attributes</a> to set the visibility of absolute movements.</p>
             <p>All movements are scaled based on the activity of the coupled neuron and a fixed movement factor (one for moving straight, one for turning) set in the <a href="entitydialog.html">entity dialog.</a> The larger the activation, the faster the agent. If a neuron is coupled with an agent and its activation becomes negative, the neuron will command the agent to do the opposite of what it would normally do. This is such that when a neuron that normally turns the agent <em>right</em> becomes negative, it will instead start telling the agent to turn left.</p>
@@ -110,10 +100,6 @@
                 <p><span class="heading2">Left, Right, Forward, Backward</span>. These move the creature relative to its orientation. These are particularly useful for programming AI.</p>
             </blockquote>
         </blockquote>
-
-        <p><a name="other"><span class="heading">Other "Effectors"</span><span class="heading"></span></a>
-        </p>
-        <p>Some effector-like entity attributes that are invisible by default in the <a href="../../Workspace/Couplings.html#visibility">attribute visibility panel</a> of the coupling manager (on the consumer side) are its x and y location, and "Absolute movement."  The latter can be used to move an agent in North, South, West, and East;  The former can be used to move the agent to specific locations; in both cases as the result of neuron activations. They are thus a kind of effector, though they cannot be explicitly added in the effector panel.</p>
     </div>
 </body>
 

@@ -3,6 +3,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.*;
 import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.*;
+import org.simbrain.network.groups.*;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.plot.barchart.*;
@@ -17,8 +18,8 @@ import java.awt.Color;
 {
 
     // PARAMETERS
-    int numNeurons = 10;
-    double sparsity = .2;
+    int numNeurons = 5;
+    double sparsity = .3;
     double excitatoryRatio = .5;
 
     // CLEAR CURRENT WORKSPACE
@@ -29,11 +30,11 @@ import java.awt.Color;
     workspace.addWorkspaceComponent(networkComponent);
     desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
     Network network = networkComponent.getNetwork();
-    for (int i = 0; i < numNeurons; i++) {
-        Neuron neuron = new Neuron(network, "DecayRule");
-        neuron.setUpperBound(10);
-        network.addNeuron(neuron);
-    }
+    NeuronGroup ng = new NeuronGroup(network, numNeurons);
+    ng.setNeuronType("DecayRule");
+    ng.setUpperBound(10);
+    network.addGroup(ng);
+    ng.randomize();
 
     // LAYOUT NEURONS
     LineLayout layout = new LineLayout(10,10,50, LineOrientation.HORIZONTAL);
@@ -51,15 +52,14 @@ import java.awt.Color;
     BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");
     barChart.getModel().setBarColor(Color.blue);
     barChart.getModel().setAutoRange(false);
-    barChart.getModel().setUpperBound(10);
+    barChart.getModel().setUpperBound(12);
     workspace.addWorkspaceComponent(barChart);
-    desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
+    desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
 
     // COUPLING NETWORK TO BARCHART
-    for (int i = 1; i <= numNeurons; i++) {
-        PotentialProducer neuronAttribute = networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class); 
-        PotentialConsumer barChartAttribute = barChart.getAttributeManager().createPotentialConsumer(barChart.getModel(), "setValue", new Class[]{double.class, Integer.class}, new Object[]{i-1});
-        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
-    }
+    Producer neuronProducer = CouplingUtils.getProducer(ng, "getActivations");
+    Consumer barChartConsumer = CouplingUtils.getConsumer(barChart.getModel(), "setBarValues"); 
+    workspace.getCouplingManager().tryCoupling(neuronProducer, barChartConsumer);
 
+    workspace.iterate();
 }

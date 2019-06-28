@@ -31,7 +31,6 @@ import org.simbrain.plot.timeseries.*;
     // Spiking neuron
     Neuron spiker = new Neuron(network, new IzhikevichRule());
     spiker.setLocation(150,10);
-    spiker.getUpdateRule().setInputType(InputType.WEIGHTED);
     spiker.setLabel("Spiking neuron");
     ((IzhikevichRule)spiker.getUpdateRule()).setA(.02);
     ((IzhikevichRule)spiker.getUpdateRule()).setB(.2);
@@ -47,17 +46,16 @@ import org.simbrain.plot.timeseries.*;
     desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10, 20, 400,300);
 
     // Make time series chart
-    TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("Sub-threshold dynamics of a spiking neuron", 1);
+    TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("Sub-threshold dynamics of a spiking neuron");
     chart.getModel().setAutoRange(false);
     chart.getModel().setRangeUpperBound(50);
     chart.getModel().setRangeLowerBound(-100);
     workspace.addWorkspaceComponent(chart);
     desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500,300);
 
-
     // Couple network to chart
-    PotentialProducer neuronProducer = networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_2"), "getActivation", double.class); 
-    PotentialConsumer timeSeriesConsumer = chart.getPotentialConsumers().get(0);
-    workspace.getCouplingManager().addCoupling(new Coupling(neuronProducer, timeSeriesConsumer));
+    Producer neuronProducer = CouplingUtils.getProducer(network.getNeuronByLabel("Spiking Neuron"), "getActivation");
+    Consumer timeSeriesConsumer =  CouplingUtils.getConsumer(chart.getModel().getTimeSeriesList().get(0), "setValue");
+    workspace.getCouplingManager().tryCoupling(neuronProducer, timeSeriesConsumer);
     
 }

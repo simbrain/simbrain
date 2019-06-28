@@ -34,6 +34,7 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
 
+import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.geom.*;
 import java.util.ArrayList;
@@ -162,11 +163,13 @@ final class DragEventHandler extends PDragSequenceEventHandler {
                 }
             }
 
-            // Create a new selection marquee at the mouse position
-            marquee = new SelectionMarquee((float) marqueeStartPosition.getX(), (float) marqueeStartPosition.getY());
+            SwingUtilities.invokeLater(() -> {
+                // Create a new selection marquee at the mouse position
+                marquee = new SelectionMarquee((float) marqueeStartPosition.getX(), (float) marqueeStartPosition.getY());
 
-            // Add marquee as child of the network panel's layer
-            networkPanel.getCanvas().getLayer().addChild(marquee);
+                // Add marquee as child of the network panel's layer
+                networkPanel.getCanvas().getLayer().addChild(marquee);
+            });
             return;
         }
 

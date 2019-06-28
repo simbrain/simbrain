@@ -1754,13 +1754,13 @@ public class NetworkPanel extends JPanel {
         difference.removeAll(selection);
 
         for (PNode node : difference) {
-            SelectionHandle.removeSelectionHandleFrom(node);
+            SwingUtilities.invokeLater(() -> SelectionHandle.removeSelectionHandleFrom(node));
         }
         for (PNode node : selection) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.showSelectionHandle()) {
-                    SelectionHandle.addSelectionHandleTo(node);
+                    SwingUtilities.invokeLater(() -> SelectionHandle.addSelectionHandleTo(node));
                 }
             }
         }

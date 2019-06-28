@@ -407,7 +407,7 @@ public class Creature {
         parentSim.getSim().couple(poisonSensor, stimulus.getNeuronByLabel("Poison"));
         parentSim.getSim().couple(toySensor, stimulus.getNeuronByLabel("Toy"));
         parentSim.getSim().couple(fishSensor, stimulus.getNeuronByLabel("Fish"));
-        parentSim.getSim().couple(hazardSensor, stimulus.getNeuronByLabel("Hazard"));
+        //parentSim.getSim().couple(hazardSensor, stimulus.getNeuronByLabel("Hazard"));
         parentSim.getSim().couple(flowerSensor, stimulus.getNeuronByLabel("Flower"));
         parentSim.getSim().couple(mouseSensor, stimulus.getNeuronByLabel("Mouse"));
 

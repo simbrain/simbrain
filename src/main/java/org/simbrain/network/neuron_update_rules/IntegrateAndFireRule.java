@@ -118,6 +118,10 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         order = 7)
     private double refractoryPeriod = 3;
 
+    static {
+        useCustomZeroPoint = true;
+    }
+
     /**
      * Noise generator.
      */

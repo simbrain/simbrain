@@ -38,15 +38,15 @@ import java.util.List;
 public abstract class NeuronUpdateRule implements CopyableObject, AttributeContainer {
 
     /**
-     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
-     * to set the update rule on a neuron.
+     * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor} to set the update rule
+     * on a neuron.
      */
     public static List<Class> RULE_LIST = Arrays.asList(AdExIFRule.class,
-        BinaryRule.class, DecayRule.class, FitzhughNagumo.class, IACRule.class,
-        IntegrateAndFireRule.class, IzhikevichRule.class, KuramotoRule.class,
-        LinearRule.class, MorrisLecarRule.class, NakaRushtonRule.class,
-        ProductRule.class, ContinuousSigmoidalRule.class, SigmoidalRule.class,
-        SpikingThresholdRule.class, ThreeValueRule.class, TimedAccumulatorRule.class);
+            BinaryRule.class, DecayRule.class, FitzhughNagumo.class, IACRule.class,
+            IntegrateAndFireRule.class, IzhikevichRule.class, KuramotoRule.class,
+            LinearRule.class, MorrisLecarRule.class, NakaRushtonRule.class,
+            ProductRule.class, ContinuousSigmoidalRule.class, SigmoidalRule.class,
+            SpikingThresholdRule.class, ThreeValueRule.class, TimedAccumulatorRule.class);
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.
@@ -61,8 +61,15 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     private static final int MAX_DIGITS = 9;
 
     /**
-     * Returns the type of time update (discrete or continuous) associated with
-     * this neuron.
+     * If true, use a custom zero point. Currently this is set to be between upper and lower bounds.  In the future more
+     * options could be added and this could become an enum.
+     * <p>
+     * Override and set to true if a neuron should use a custom zero point
+     */
+    protected static boolean useCustomZeroPoint = false;
+
+    /**
+     * Returns the type of time update (discrete or continuous) associated with this neuron.
      *
      * @return the time type
      */
@@ -101,8 +108,7 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Increment a neuron by increment, respecting neuron specific constraints.
-     * Intended to be overriden.
+     * Increment a neuron by increment, respecting neuron specific constraints. Intended to be overriden.
      *
      * @param n neuron to be incremented
      */
@@ -111,8 +117,7 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Decrement a neuron by increment, respecting neuron specific constraints.
-     * Intended to be overriden.
+     * Decrement a neuron by increment, respecting neuron specific constraints. Intended to be overriden.
      *
      * @param n neuron
      */
@@ -121,9 +126,8 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Returns a random value between the upper and lower bounds of this neuron.
-     * Update rules that require special randomization should override this
-     * method.
+     * Returns a random value between the upper and lower bounds of this neuron. Update rules that require special
+     * randomization should override this method.
      *
      * @return the random value.
      */
@@ -137,9 +141,8 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Returns a value for lower bound to be used in computing the saturation of
-     * neuron nodes. Override this to produce nicer graphics, and fine tune
-     * based on display of neurons in common use cases for a given neuron type.
+     * Returns a value for lower bound to be used in computing the saturation of neuron nodes. Override this to produce
+     * nicer graphics, and fine tune based on display of neurons in common use cases for a given neuron type.
      *
      * @return the graphical lower bound
      */
@@ -152,9 +155,8 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Returns a value for upper bound to be used in computing the saturation of
-     * neuron nodes. Override this to produce nicer graphics, and fine tune
-     * based on display of neurons in common use cases for a given neuron type.
+     * Returns a value for upper bound to be used in computing the saturation of neuron nodes. Override this to produce
+     * nicer graphics, and fine tune based on display of neurons in common use cases for a given neuron type.
      *
      * @return the graphical upper bound
      */
@@ -167,8 +169,8 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Set activation to 0; override for other "clearing" behavior (e.g. setting
-     * other variables to 0. Called in Gui when "clear" button pressed.
+     * Set activation to 0; override for other "clearing" behavior (e.g. setting other variables to 0. Called in Gui
+     * when "clear" button pressed.
      *
      * @param neuron reference to parent neuron
      */
@@ -177,16 +179,14 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     }
 
     /**
-     * Returns a name for this update rule.  Used in combo boxes in
-     * the GUI.
+     * Returns a name for this update rule.  Used in combo boxes in the GUI.
      *
      * @return the description.
      */
     public abstract String getName();
 
     /**
-     * Returns string for tool tip or short description. Override to provide
-     * custom information.
+     * Returns string for tool tip or short description. Override to provide custom information.
      *
      * @param neuron reference to parent neuron
      * @return tool tip text
@@ -208,4 +208,7 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
         return n.getActivation();
     }
 
+    public static boolean isUseCustomZeroPoint() {
+        return useCustomZeroPoint;
+    }
 }

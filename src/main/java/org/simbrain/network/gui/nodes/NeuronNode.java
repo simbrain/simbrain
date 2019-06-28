@@ -164,14 +164,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private boolean customStrokeColor = false;
 
     /**
-     * If true, use a custom zero point. Currently this is set to be between
-     * upper and lower bounds.  In the future more options could be added and
-     * this could become an enum.
-     */
-    // TODO: Wire this up on the GUI!
-    private boolean useCustomZeroPoint = false;
-
-    /**
      * Create a new neuron node.
      *
      * @param net    Reference to NetworkPanel
@@ -368,7 +360,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // A "graphical zero point" that shows as white
         double gZeroPoint = 0;
-        if (useCustomZeroPoint) {
+        if (neuron.getUpdateRule().isUseCustomZeroPoint()) {
             // Current custom choice is between upper and lower bounds.
             // For example useful to capture whether a biological neuron is
             // depolarized or hyperpolarized

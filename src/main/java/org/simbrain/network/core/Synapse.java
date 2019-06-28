@@ -20,6 +20,7 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -53,7 +54,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * A default spike responder.
      */
-    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
+    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new ConvolvedJumpAndDecay();
 
 
     /**

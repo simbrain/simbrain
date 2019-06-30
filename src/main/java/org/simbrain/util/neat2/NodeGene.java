@@ -30,6 +30,9 @@ public class NodeGene extends Gene<Neuron> {
      */
     private Neuron prototype;
 
+    /**
+     * Reference to configuration file for evolved networks.
+     */
     private NetworkGenome.Configuration configuration;
 
     /**
@@ -74,7 +77,7 @@ public class NodeGene extends Gene<Neuron> {
             if (prototype.getUpdateRule() instanceof BiasedUpdateRule) {
                 BiasedUpdateRule updateRule = (BiasedUpdateRule) prototype.getUpdateRule();
                 double newBias =
-                        updateRule.getBias() + getRandomizer().nextDouble(
+                        updateRule.getBias() +  SimbrainRandomizer.rand.nextDouble(
                                 -configuration.getNodeMaxBiasMutation(),
                                 configuration.getNodeMaxBiasMutation()
                         );
@@ -95,7 +98,6 @@ public class NodeGene extends Gene<Neuron> {
         NodeGene ret = new NodeGene();
         ret.type = this.type;
         ret.prototype = this.prototype.deepCopy();
-        ret.setRandomizer(new SimbrainRandomizer(getRandomizer().nextLong()));
         ret.configuration = configuration;
         return ret;
     }

@@ -3,6 +3,7 @@ package org.simbrain.util.geneticalgorithm.numerical;
 import org.simbrain.util.geneticalgorithm.Chromosome;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,8 +11,6 @@ import java.util.stream.Stream;
 
 /**
  * A list of double genes.
- *
- * Currently uses single point crossover. See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)#Single-point_crossover
  */
 public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
 
@@ -36,34 +35,21 @@ public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
         genes = Stream.generate(DoubleGene::new).limit(size).collect(Collectors.toList());
     }
 
+    /**
+     * Create an double chromosome initialized to some value.
+     *
+     * @param size number of genes
+     * @param value initial values for genes
+     */
+    public DoubleChromosome(int size, Double value) {
+        genes = Stream.generate(() -> new DoubleGene(value)).limit(size).collect(Collectors.toList());
+    }
 
     @Override
     public DoubleChromosome crossOver(DoubleChromosome other) {
-
-        DoubleChromosome ret = new DoubleChromosome();
-        ret.genes = new ArrayList<>();
-
-        // Single-point crossover.
-        int point = getRandomizer().nextInt(Integer.min(other.genes.size(), this.genes.size()));
-
-        DoubleChromosome firstChromosome;
-        DoubleChromosome secondChromosome;
-
-        if (getRandomizer().nextBoolean()) {
-            firstChromosome = this;
-            secondChromosome = other;
-        } else {
-            firstChromosome = other;
-            secondChromosome = this;
-        }
-
-        int i = 0;
-        for (; i < point; i++) {
-            ret.genes.add(firstChromosome.genes.get(i));
-        }
-        for (; i < secondChromosome.genes.size(); i++) {
-            ret.genes.add(secondChromosome.genes.get(i));
-        }
+        DoubleChromosome ret = new DoubleChromosome(0);
+        NumericalGeneticAlgUtils.
+                singlePointCrossover(this, other, ret);
         return ret;
     }
 
@@ -74,7 +60,8 @@ public class DoubleChromosome extends Chromosome<Double, DoubleChromosome> {
     }
 
     @Override
-    public Collection<DoubleGene> getGenes() {
+    public List<DoubleGene> getGenes() {
         return genes;
     }
+
 }

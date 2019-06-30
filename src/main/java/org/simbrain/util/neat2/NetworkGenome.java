@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Genome;
+import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;
 
@@ -54,7 +55,6 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             nodeGene.getPrototype().setIncrement(1);
             nodeGene.getPrototype().setClamped(true);
             nodeGene.setConfiguration(configuration);
-            nodeGene.setRandomizer(this::getRandomizer);
             nodeGenes.addGene(nodeGene);
         }
         for (int i = 0; i < configuration.numOutputs; i++) {
@@ -62,7 +62,6 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             nodeGene.setMutable(false);
             nodeGene.setType(NodeGene.NodeType.output);
             nodeGene.setConfiguration(configuration);
-            nodeGene.setRandomizer(this::getRandomizer);
             nodeGenes.addGene(nodeGene);
         }
     }
@@ -87,8 +86,8 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                 outputGroup.addNeuron(neuron);
             } else {
                 // Set locations based on where the input and outputs are set
-                neuron.setX(getRandomizer().nextDouble(-200, 200));
-                neuron.setY(getRandomizer().nextDouble(0, 300));
+                neuron.setX(SimbrainRandomizer.rand.nextDouble(-200, 200));
+                neuron.setY(SimbrainRandomizer.rand.nextDouble(0, 300));
                 network.addNeuron(neuron);
             }
         });
@@ -119,13 +118,9 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
         NetworkGenome ret = new NetworkGenome(configuration);
 
-        ret.inheritRandomizer(getRandomizer());
-
         ret.nodeGenes = nodeGenes.crossOver(otherGenome.nodeGenes);
-        ret.nodeGenes.setRandomizer(ret.getRandomizer());
 
         ret.connectionGenes = connectionGenes.crossOver(otherGenome.connectionGenes);
-        ret.connectionGenes.setRandomizer(ret.getRandomizer());
 
         return ret;
     }
@@ -137,10 +132,11 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         nodeGenes.mutate();
 
         // New node mutation
-        if (nodeGenes.getGenes().size() < configuration.maxNode && getRandomizer().nextDouble(0, 1) < configuration.newNodeMutationProbability) {
+        if (nodeGenes.getGenes().size() < configuration.maxNodes &&
+                SimbrainRandomizer.rand.nextDouble(0, 1) < configuration.newNodeMutationProbability) {
             NodeGene newNodeGene = new NodeGene();
             newNodeGene.setConfiguration(configuration);
-            newNodeGene.setRandomizer(nodeGenes.getRandomizer());
+            //newNodeGene.setRandomizer(nodeGenes.getRandomizer());
             nodeGenes.addGenes(Collections.singleton(newNodeGene));
         }
 
@@ -148,24 +144,24 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         connectionGenes.mutate();
 
         // New connection mutation
-        if (getRandomizer().nextDouble(0, 1) < configuration.newConnectionMutationProbability) {
+        if ( SimbrainRandomizer.rand.nextDouble(0, 1) < configuration.newConnectionMutationProbability) {
 
             // Create a new connection
 
             // First, select a source neuron.
-            int sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
+            int sourceNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
             // Ensure that the source neuron exists in the node genes, and is not a output neuron
             while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
-                sourceNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
+                sourceNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
             }
             // Now select a target neuron
-            int destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
+            int destinationNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
             // Ensure the the target neuron exists in the node genes, is not an input neuron, and (if set) is not
             // a self-connection
             while (!nodeGenes.contains(destinationNodeID)
                     || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input
                     || (!configuration.allowSelfConnection && sourceNodeID == destinationNodeID)) {
-                destinationNodeID = getRandomizer().nextInt(nodeGenes.getMaxNodeID() + 1);
+                destinationNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
             }
 
             // Create the new connection gene
@@ -173,7 +169,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                     new ConnectionGene(
                             sourceNodeID,
                             destinationNodeID,
-                            getRandomizer().nextDouble(
+                            SimbrainRandomizer.rand.nextDouble(
                                     configuration.minConnectionStrength,
                                     configuration.maxConnectionStrength
                             ));
@@ -183,24 +179,16 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             if (!innovationNumberMap.containsKey(newConnectionGene)) {
                 innovationNumberMap.put(newConnectionGene, innovationNumberMap.size());
             }
-            newConnectionGene.setRandomizer(connectionGenes.getRandomizer());
+            //newConnectionGene.setRandomizer(connectionGenes.getRandomizer());
             connectionGenes.addGene(innovationNumberMap.get(newConnectionGene), newConnectionGene);
         }
     }
 
     @Override
     public NetworkGenome copy() {
-
         NetworkGenome ret = new NetworkGenome(configuration);
-
-        ret.inheritRandomizer(getRandomizer());
-
         ret.nodeGenes = nodeGenes.copy();
-        ret.nodeGenes.setRandomizer(ret.getRandomizer());
-
         ret.connectionGenes = connectionGenes.copy();
-        ret.connectionGenes.setRandomizer(ret.getRandomizer());
-
         return ret;
     }
 
@@ -211,15 +199,15 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
         private int numInputs;
         private int numOutputs;
-        private int maxNode = Integer.MAX_VALUE;
+        private int maxNodes = Integer.MAX_VALUE;
         private double nodeMaxBiasMutation = 0.1;
-        private double nodeMaxBias = 1;
+        private double nodeMaxBias = 5;
         private boolean allowSelfConnection = true;
         private double newConnectionMutationProbability = 0.05;
         private double newNodeMutationProbability = 0.05;
         private double maxConnectionStrength = 10;
         private double minConnectionStrength = -10;
-        private double maxConnectionMutation = 1;
+        private double maxConnectionMutation = .1;
         private boolean allowFreeFloatingNodes = false;
 
         public Configuration() {
@@ -241,12 +229,12 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             this.numOutputs = numOutputs;
         }
 
-        public int getMaxNode() {
-            return maxNode;
+        public int getMaxNodes() {
+            return maxNodes;
         }
 
-        public void setMaxNode(int maxNode) {
-            this.maxNode = maxNode;
+        public void setMaxNodes(int maxNodes) {
+            this.maxNodes = maxNodes;
         }
 
         public boolean isAllowSelfConnection() {

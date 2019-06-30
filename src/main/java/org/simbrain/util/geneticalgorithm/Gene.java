@@ -19,8 +19,6 @@ public abstract class Gene<T> {
 
     private SimbrainRandomizer randomizer;
 
-    private Supplier<SimbrainRandomizer> getRandomizer;
-
     /**
      * Return a deep copy of this gene.
      *
@@ -55,18 +53,5 @@ public abstract class Gene<T> {
         this.mutable = mutable;
     }
 
-    public SimbrainRandomizer getRandomizer() {
-        if (randomizer == null) {
-            randomizer = getRandomizer.get();
-        }
-        return randomizer;
-    }
-
-    public void setRandomizer(SimbrainRandomizer randomizer) {
-        this.randomizer = randomizer;
-    }
-
-    public void setRandomizer(Supplier<SimbrainRandomizer> randomizerCallback) {
-        this.getRandomizer = randomizerCallback;
-    }
 }
+

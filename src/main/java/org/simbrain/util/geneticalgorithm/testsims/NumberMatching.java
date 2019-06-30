@@ -8,15 +8,15 @@ import org.simbrain.util.geneticalgorithm.Population;
 import java.util.List;
 
 /**
- * A simple simulation demonstrating on the NEAT algorithm. This simulation tries to evolve an agent that can
- * produce a list of numbers that matches the numbers in the {@link #TARGET} list.
+ * A simple simulation demonstrating on the NEAT algorithm. This simulation tries to evolve an agent that can produce a
+ * list of numbers that matches the numbers in the {@link #TARGET} list.
  */
 public class NumberMatching {
 
     /**
      * The desired agent phenotype
      */
-    private static final List<Double> TARGET = List.of(2.0, 4.4, .8);
+    private static final List<Double> TARGET = List.of(9.0, 1.4, -5.8);
 
     /**
      * The population to be evolved.
@@ -30,9 +30,9 @@ public class NumberMatching {
 
     /**
      * The maximum number of generation. Simulation will terminate after this many iterations regardless of the result.
-     *  the maximum of iteration/generation to run before forcing the simulation to stop.
+     * the maximum of iteration/generation to run before forcing the simulation to stop.
      */
-    public int maxIteration = 10_000;
+    public int maxIteration = 1000;
 
     /**
      * Simulation stops if the error is above this.
@@ -46,16 +46,18 @@ public class NumberMatching {
     }
 
     /**
-     * Initialize the simulation. Must call before {@link #run()}.
-     * See {@link #main(String[])} for an example.
+     * Initialize the simulation. Must call before {@link #run()}. See {@link #main(String[])} for an example.
      */
     public void init() {
 
         // Create a new population
-        population = new Population<>(this.populationSize, System.nanoTime());
+        population = new Population<>(this.populationSize);
 
         // Create a double genome prototype, basically a list of doubles
-        DoubleGenome doubleGenomePrototype = new DoubleGenome();
+        DoubleGenome doubleGenomePrototype = new DoubleGenome(3);
+        //doubleGenomePrototype.setMin(0);
+        //doubleGenomePrototype.setMax(1);
+        doubleGenomePrototype.setStepSize(.01);
 
         // Create an initial agent prototype
         Agent doubleAgent = new Agent<>(doubleGenomePrototype, NumberMatching::eval);
@@ -81,8 +83,7 @@ public class NumberMatching {
     }
 
     /**
-     * Core of the simulation. Must call {@link #init()} before executing.
-     *  See {@link #main(String[])} for an example.
+     * Core of the simulation. Must call {@link #init()} before executing. See {@link #main(String[])} for an example.
      */
     public void run() {
 

@@ -7,6 +7,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.neat2.NetworkGenome;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -125,16 +126,16 @@ public class TestEvolution extends RegisteredSimulation {
         mouse.setLocation(odorWorld.getWidth() / 2, odorWorld.getHeight() / 2);
         OdorWorldEntity cheese = odorWorld.addEntity();
 
-        double x = mouse.getCenterX() + agent.getRandomizer().nextDouble(32, 64);
-        x *= agent.getRandomizer().nextBoolean() ? 1 : -1;
+        double x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(32, 64);
+        x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (x < 0) {
             x = 0;
         } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
             x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
         }
 
-        double y = mouse.getCenterY() + agent.getRandomizer().nextDouble(32, 64);
-        y *= agent.getRandomizer().nextBoolean() ? 1 : -1;
+        double y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(32, 64);
+        y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (y < 0) {
             y = 0;
         } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {
@@ -164,16 +165,16 @@ public class TestEvolution extends RegisteredSimulation {
 
             if (mouse.isInRadius(cheese, 28)) {
                 score += 1;
-                x = mouse.getCenterX() + agent.getRandomizer().nextDouble(-64, 64);
-                x *= agent.getRandomizer().nextBoolean() ? 1 : -1;
+                x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
+                x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
                 if (x < 0) {
                     x = 0;
                 } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
                     x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
                 }
 
-                y = mouse.getCenterY() + agent.getRandomizer().nextDouble(-64, 64);
-                y *= agent.getRandomizer().nextBoolean() ? 1 : -1;
+                y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
+                y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
                 if (y < 0) {
                     y = 0;
                 } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {
@@ -194,12 +195,12 @@ public class TestEvolution extends RegisteredSimulation {
      * Initialize the population of networks.
      */
     public void init() {
-        population = new Population<>(this.populationSize, System.nanoTime());
+        population = new Population<>(this.populationSize);
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
         configuration.setNumInputs(3);
         configuration.setNumOutputs(3);
         configuration.setAllowSelfConnection(false);
-        configuration.setMaxNode(50);
+        configuration.setMaxNodes(50);
         configuration.setNodeMaxBias(1);
         Agent<NetworkGenome, Network> prototype = new Agent<>(new NetworkGenome(configuration), TestEvolution::eval);
         population.populate(prototype);

@@ -1,8 +1,6 @@
 package org.simbrain.util.geneticalgorithm;
 
-import org.simbrain.util.math.SimbrainRandomizer;
-
-import java.util.Collection;
+import java.util.List;
 
 /**
  * A list of genes that can be crossed with genes from another chromosome of the same type.
@@ -13,9 +11,6 @@ import java.util.Collection;
  */
 public abstract class Chromosome<T, C extends Chromosome> {
 
-
-    private SimbrainRandomizer randomizer;
-
     /**
      * Cross one chromosome over with another. See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)
      * Details of crossover will depend on the specific implementaiotn.
@@ -24,8 +19,6 @@ public abstract class Chromosome<T, C extends Chromosome> {
      * @return the new chromosome after crossing the two over
      */
     public abstract C crossOver(C other);
-    // Todo: Possibly create default implementations of standard forms of crossover like single point, two point,
-    // k-point, etc.
 
     /**
      * Default chromosome level mutation is just to mutate every gene in the chromosome.
@@ -34,16 +27,18 @@ public abstract class Chromosome<T, C extends Chromosome> {
         getGenes().forEach(Gene::mutate);
     };
 
+    // TODO: This could be made more generic and converted to a collection (it was initially).  Currently
+    // it's a list to make things easy in NumericGAUtils.singlePointCrossover.  If the converstion to lists
+    // in the NEAT chromosome classes is an issue make that change.
+
     /**
-     * The collection of genes will be implemented in different ways depending on the sublcass.
+     * The collection of genes will be implemented in different ways depending on the subclcass.
      */
-    public abstract Collection<? extends Gene<T>> getGenes();
+    public abstract List<? extends Gene<T>> getGenes();
 
-    public void setRandomizer(SimbrainRandomizer randomizer) {
-        this.randomizer = randomizer;
+    @Override
+    public String toString() {
+        return getGenes().toString();
     }
 
-    public SimbrainRandomizer getRandomizer() {
-        return randomizer;
-    }
 }

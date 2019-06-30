@@ -8,15 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The top level for genetic algorithms in Simbrain. A set of agents, each of which expresses
- * a genotype and produces a fitness value at each generation.  Contains classes to initialize
- * a population and run an evolutionary simulation.
+ * The top level for genetic algorithms in Simbrain. A set of agents, each of which expresses a genotype and produces a
+ * fitness value at each generation.  Contains classes to initialize a population and run an evolutionary simulation.
  * <p>
  * Environments are currently handled at this level.
  *
  * @param <G> The type of genes the population evolves, "genotypes"
  */
-public class Population<G extends Genome<G,P>, P> {
+public class Population<G extends Genome<G, P>, P> {
 
     /**
      * Number of agents in this population at a given generation.
@@ -26,25 +25,25 @@ public class Population<G extends Genome<G,P>, P> {
     /**
      * The agents in this population.
      */
-    private List<Agent<G,P>> agentList;
+    private List<Agent<G, P>> agentList;
 
     /**
-     * Randomizer for this simnulation
+     * Tracks generation number.
      */
-    private SimbrainRandomizer randomizer;
-
     private int generation = 0;
 
     /**
-     * Construct a population with a specified size. A seed can be set so that
-     * simulations can be replicated.
-     *
-     * @param size size of population
-     * @param seed random seed
+     * Amount to eliminate at each generation.
      */
-    public Population(int size, long seed) {
+    private double eliminationPercent = .5;
+
+    /**
+     * Initialize population to a specific size.
+     *
+     * @param size number of agents used in each generation
+     */
+    public Population(int size) {
         this.size = size;
-        this.randomizer = new SimbrainRandomizer(seed);
     }
 
     /**
@@ -52,8 +51,7 @@ public class Population<G extends Genome<G,P>, P> {
      *
      * @param prototype the prototype agent, which spawns all agents in the population.
      */
-    public void populate(Agent<G,P> prototype) {
-        prototype.getGenome().inheritRandomizer(randomizer);
+    public void populate(Agent<G, P> prototype) {
         agentList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Agent<G, P> agent = prototype.copy();
@@ -68,8 +66,13 @@ public class Population<G extends Genome<G,P>, P> {
      * @return the fitness of the most fit agent.
      */
     public Double computeNewFitness() {
+        //System.out.println("----------------");
+        //System.out.println("Before fitness computation:" + agentList);
         agentList.forEach(Agent::computeFitness);
+        //System.out.println("After fitness computation:" + agentList);
         eliminateLeastFit(); // Must happen in this order
+        //System.out.println("After replenishing:" + agentList);
+        //System.out.println("Most fit: " + agentList.get(0).getFitness());
         return agentList.get(0).getFitness();
     }
 
@@ -77,41 +80,55 @@ public class Population<G extends Genome<G,P>, P> {
      * Eliminate the least fit agents from the population.
      */
     private void eliminateLeastFit() {
+
+        // Agent@compareTo compares them on fitness
         Collections.sort(agentList);
         Collections.reverse(agentList);
-        // TODO: Make it possible to set the elimination ratio
-        agentList = agentList.stream().limit(agentList.size() / 2).collect(Collectors.toList());
+        agentList = agentList.stream().limit((long) (agentList.size() * eliminationPercent)).collect(Collectors.toList());
     }
 
     /**
-     * Replenish the part of the population that was eliminated in {@link #eliminateLeastFit()})
-     * by crossing over the genes of the remaining part of the population.
+     * Replenish the part of the population that was eliminated in {@link #eliminateLeastFit()}) by crossing over the
+     * genes of the remaining part of the population.
      */
     public void replenish() {
         generation++;
         int remainingPopulation = agentList.size();
         int reproduceSize = size - remainingPopulation;
         for (int i = 0; i < reproduceSize; i++) {
-            int index1 = randomizer.nextInt(remainingPopulation);
-            int index2 = randomizer.nextInt(remainingPopulation);
+            int index1 = SimbrainRandomizer.rand.nextInt(remainingPopulation);
+            int index2 = SimbrainRandomizer.rand.nextInt(remainingPopulation);
             while (index2 == index1) {
-                index2 = randomizer.nextInt(remainingPopulation);
+                index2 = SimbrainRandomizer.rand.nextInt(remainingPopulation);
             }
-            Agent<G,P> agent1 = agentList.get(index1);
-            Agent<G,P> agent2 = agentList.get(index2);
-            Agent<G,P> newAgent = agent1.crossover(agent2);
+            Agent<G, P> agent1 = agentList.get(index1);
+            Agent<G, P> agent2 = agentList.get(index2);
+            Agent<G, P> newAgent = agent1.crossover(agent2);// TODO: Test this
             newAgent.mutate();
             newAgent.setId(String.format("G%s|A%s", generation, i));
             agentList.add(newAgent);
         }
+        //System.out.println("Mutated:" + agentList);
     }
 
-    public List<Agent<G,P>> getAgentList() {
+    public List<Agent<G, P>> getAgentList() {
         return agentList;
     }
 
-    public Agent<G,P> getFittestAgent() {
+    public Agent<G, P> getFittestAgent() {
         return agentList.get(0);
     }
 
+    @Override
+    public String toString() {
+        return getAgentList().toString();
+    }
+
+    public double getEliminationPercent() {
+        return eliminationPercent;
+    }
+
+    public void setEliminationPercent(double eliminationPercent) {
+        this.eliminationPercent = eliminationPercent;
+    }
 }

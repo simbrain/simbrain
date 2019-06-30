@@ -1,6 +1,8 @@
 package org.simbrain.util.math;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
@@ -12,9 +14,15 @@ import static org.simbrain.util.neat.NeatUtils.assertBound;
  */
 public class SimbrainRandomizer extends Random {
 
-    //TODO: Move to Simbrain Math or somewhre else genetic
+    //TODO: Move to Simbrain Math or somewhere else generic
+    //TODO: If seed is used, use using superclass, else threadlocal
 
     private static final long serialVersionUID = -3217013262668966634L;
+
+    /**
+     * For general use.
+     */
+    public static SimbrainRandomizer rand = new SimbrainRandomizer(System.nanoTime());
 
     /**
      * Creates a new random number generator using a single long seed.
@@ -34,6 +42,19 @@ public class SimbrainRandomizer extends Random {
     public double nextDouble(double floor, double ceiling) {
         assertBound(floor, ceiling);
         double range = ceiling - floor;
-        return (nextDouble() * range) + floor;
+        return (ThreadLocalRandom.current().nextDouble() * range )+ floor;
     }
+
+    /**
+     * Returns the next pseudorandom, uniformly distributed integer value between floor and ceil
+     * from this random number generator's sequence.
+     * @param floor lower bound
+     * @param ceiling upper bound
+     * @return the next pseudorandom integer value between floor and ceil
+     */
+    public int nextInteger(int floor, int ceiling) {
+        assertBound(floor, ceiling);
+        return ThreadLocalRandom.current().nextInt(floor, ceiling+ 1);
+    }
+
 }

@@ -28,8 +28,6 @@ public class ConnectionGene extends Gene<Synapse> {
      */
     private boolean enabled;
 
-    private SimbrainRandomizer randomizer;
-
     private Synapse prototype = new Synapse(null, null, 1.0);
 
     /**
@@ -55,6 +53,7 @@ public class ConnectionGene extends Gene<Synapse> {
 
     /**
      * Construct a ConnectionGene with static learning rule. The connection is always enabled.
+     *
      * @param sourceIndex The index of the source node on the node gene list
      * @param targetIndex The index of the target node on the node gene list
      * @param weightStrength The weight strength the synapse will have
@@ -87,7 +86,7 @@ public class ConnectionGene extends Gene<Synapse> {
     @Override
     public void mutate() {
         double newStrength =
-                randomizer.nextDouble(-configuration.getMaxConnectionMutation(), configuration.getMaxConnectionMutation())
+                SimbrainRandomizer.rand.nextDouble(-configuration.getMaxConnectionMutation(), configuration.getMaxConnectionMutation())
                         + prototype.getStrength();
         if (newStrength > prototype.getUpperBound()) {
             newStrength = prototype.getUpperBound();
@@ -100,13 +99,8 @@ public class ConnectionGene extends Gene<Synapse> {
     @Override
     public ConnectionGene copy() {
         ConnectionGene ret = new ConnectionGene(sourceIndex, targetIndex, prototype.getStrength(), prototype.getLearningRule());
-        ret.randomizer = new SimbrainRandomizer(randomizer.nextLong());
         ret.enabled = enabled;
         return ret;
-    }
-
-    public void setRandomizer(SimbrainRandomizer randomizer) {
-        this.randomizer = randomizer;
     }
 
     @Override

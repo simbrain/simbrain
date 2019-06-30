@@ -8,17 +8,15 @@ import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 import org.simbrain.util.neat2.NetworkGenome;
 
-import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+/**
+ * The classic NEAT application.
+ */
 public class Xor {
 
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 1000;
+    public int populationSize = 2000;
 
     /**
      * The maximum number of generation.
@@ -42,7 +40,6 @@ public class Xor {
             new TrainingSet(
                     new double[][]{{0,0},{0,1},{1,0},{1,1}},
                     new double[][]{{0},{1},{1},{0}});
-
 
     /**
      * Evaluate xor function
@@ -72,12 +69,13 @@ public class Xor {
      * Initialize the population of networks.
      */
     public void init() {
-        population = new Population<>(this.populationSize, System.nanoTime());
+        population = new Population<>(this.populationSize);
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
         configuration.setNumInputs(2);
         configuration.setNumOutputs(1);
         configuration.setAllowSelfConnection(false);
-        configuration.setMaxNode(6);
+        configuration.setMaxNodes(20);
+
         Agent<NetworkGenome, Network> prototype = new Agent<>(new NetworkGenome(configuration), Xor::eval);
         population.populate(prototype);
     }
@@ -86,21 +84,18 @@ public class Xor {
      * Run the simulation.
      */
     public void run() {
-        for (int i = 0; i < maxIterations; i++) {
 
+        for (int i = 0; i < maxIterations; i++) {
             double bestFitness = population.computeNewFitness();
             System.out.println(i + ", fitness = " + bestFitness);
             if (bestFitness > fitnessThreshold) {
+                Network winner =  population.getFittestAgent().getPhenotype();
+                NetworkPanel.showNetwork(winner);
                 break;
             }
             population.replenish();
         }
 
-        Network winner =  population.getFittestAgent().getPhenotype();
-        //System.out.println(winner);
-
-        // Display the winning network
-        NetworkPanel.showNetwork(winner);
 
     }
 

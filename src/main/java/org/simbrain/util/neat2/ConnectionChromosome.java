@@ -2,6 +2,7 @@ package org.simbrain.util.neat2;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.geneticalgorithm.Chromosome;
+import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
             if (this.connectionGenes.containsKey(i) && other.connectionGenes.containsKey(i)) {
                 // Both parents have the innovation number, so choose it randomly.
                 // It will connect the same nodes but the connection properties may differ
-                double decision = getRandomizer().nextDouble(0, 1);
+                double decision =  SimbrainRandomizer.rand.nextDouble(0, 1);
                 // TODO: Make the .5 configurable
                 if (decision < 0.5) {
                     ret.connectionGenes.put(i, this.connectionGenes.get(i));
@@ -53,8 +54,8 @@ public class ConnectionChromosome extends Chromosome<Synapse, ConnectionChromoso
     }
 
     @Override
-    public Collection<ConnectionGene> getGenes() {
-        return connectionGenes.values();
+    public List<ConnectionGene> getGenes() {
+        return new ArrayList<>(connectionGenes.values());
     }
 
     public ConnectionChromosome copy() {

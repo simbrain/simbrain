@@ -7,7 +7,8 @@ import org.simbrain.util.geneticalgorithm.numerical.DoubleGenome;
 import java.util.List;
 
 /**
- * From Jenetics manual, section 5.2.
+ * From Jenetics manual, section 5.2. Expected result is 3.389.
+ *
  */
 public class MinimizeFunction {
 
@@ -19,7 +20,7 @@ public class MinimizeFunction {
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 200;
+    public int populationSize = 1000;
 
     /**
      * The maximum number of generations.
@@ -39,7 +40,7 @@ public class MinimizeFunction {
     public void init() {
 
         // Create a new population
-        population = new Population<>(this.populationSize, System.nanoTime());
+        population = new Population<>(this.populationSize);
 
         // Create a double genome prototype, basically a list of doubles
         DoubleGenome dg = new DoubleGenome(1);

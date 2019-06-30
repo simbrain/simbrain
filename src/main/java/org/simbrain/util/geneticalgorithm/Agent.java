@@ -1,7 +1,5 @@
 package org.simbrain.util.geneticalgorithm;
 
-import org.simbrain.util.math.SimbrainRandomizer;
-
 import java.util.function.Function;
 
 /**
@@ -55,13 +53,11 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
      * Evaluate the fitness score of this agent. Higher is better.
      */
     public void computeFitness() {
-        phenotype = getGenome().express();
-        computeFitness(this);
+        //TODO: This was causing most of the problems with convergence
+        //phenotype = getGenome().express();
+        fitness = fitnessFunction.apply(this);
     };
 
-    protected void computeFitness(Agent<G,P> agent) {
-        fitness = fitnessFunction.apply(agent);
-    }
 
     public Function<Agent<G,P>, Double> getFitnessFunction() {
         return fitnessFunction;
@@ -100,7 +96,9 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
         this.id = id;
     }
 
-    public SimbrainRandomizer getRandomizer() {
-        return getGenome().getRandomizer();
+    @Override
+    public String toString() {
+        return id + ":" + getPhenotype();
     }
+
 }

@@ -1,54 +1,54 @@
 package org.simbrain.util.geneticalgorithm.numerical;
 
 import org.simbrain.util.geneticalgorithm.Gene;
-import org.simbrain.util.geneticalgorithm.testsims.NumberMatching;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 /**
- * A double-valued gene.
+ * An integer-valued gene.  Can be used to
+ * represent bit-genes as well by setting min to 0 and max to 1.
  */
-public class DoubleGene extends Gene<Double> {
+public class IntegerGene extends Gene<Integer> {
 
     /**
      * Maximum value for gene mutations.
      */
-    private double maximum = 10;
+    private int maximum = 10;
 
     /**
      * Minimum value for gene mutations.
      */
-    private double minimum = -10;
+    private int minimum = -10;
 
     /**
      * Maximum value for gene mutations.
      */
-    private double stepSize = .01;
+    private Integer stepSize = 1;
 
     /**
      * Current value of the gene
      */
-    private Double value;
+    private Integer value;
 
     /**
      * Create a new double gene initialized to some value.
      *
      * @param value initial value
      */
-    public DoubleGene(Double value) {
+    public IntegerGene(Integer value) {
         this.value = value;
     }
 
     /**
      * Create a new double gene initialized to 0.
      */
-    public DoubleGene() {
-        this(0.0);
+    public IntegerGene() {
+        this(0);
     }
 
     @Override
     public void mutate() {
 
-        value +=  SimbrainRandomizer.rand.nextDouble(-stepSize, stepSize);
+        value +=  SimbrainRandomizer.rand.nextInteger(-stepSize, stepSize);
 
         // Clip max and min
         if (value < minimum) {
@@ -60,8 +60,8 @@ public class DoubleGene extends Gene<Double> {
     }
 
     @Override
-    public DoubleGene copy() {
-        DoubleGene newGene = new DoubleGene(value);
+    public IntegerGene copy() {
+        IntegerGene newGene = new IntegerGene(value);
         newGene.maximum = maximum;
         newGene.minimum = minimum;
         newGene.stepSize = stepSize;
@@ -69,31 +69,31 @@ public class DoubleGene extends Gene<Double> {
     }
 
     @Override
-    public Double getPrototype() {
+    public Integer getPrototype() {
         return value;
     }
 
-    public void setMinimum(double minimum) {
+    public void setMinimum(int minimum) {
         this.minimum = minimum;
     }
 
-    public void setMaximum(double maximum) {
+    public void setMaximum(int maximum) {
         this.maximum = maximum;
     }
 
-    public void setStepSize(double stepSize) {
+    public void setStepSize(int stepSize) {
         this.stepSize = stepSize;
     }
 
-    public double getMinimum() {
-        return minimum;
-    }
-
-    public double getMaximum() {
+    public int getMaximum() {
         return maximum;
     }
 
-    public double getStepSize() {
+    public int getMinimum() {
+        return minimum;
+    }
+
+    public Integer getStepSize() {
         return stepSize;
     }
 

@@ -24,6 +24,16 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
     }
 
     /**
+     * Create a double genome whose genes are initialized to some value.
+     *
+     * @param size number of genes
+     * @param value initial values for genes
+     */
+    public DoubleGenome(int size, double value) {
+        chromosome = new DoubleChromosome(size, value);
+    }
+
+    /**
      * Create a double genome with a specified number of genes.
      *
      * @param chromosomeSize number of genes on the chromosome.
@@ -35,9 +45,7 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
     @Override
     public DoubleGenome crossOver(DoubleGenome other) {
         DoubleGenome ret = new DoubleGenome(chromosome.getGenes().size());
-        ret.inheritRandomizer(getRandomizer());
         ret.chromosome = this.chromosome.crossOver(other.chromosome);
-        ret.chromosome.setRandomizer(ret.getRandomizer());
         return ret;
     }
 
@@ -49,10 +57,7 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
     @Override
     public DoubleGenome copy() {
         DoubleGenome ret = new DoubleGenome(chromosome.getGenes().size());
-        ret.inheritRandomizer(getRandomizer());
         ret.chromosome = this.chromosome.copy();
-        ret.chromosome.setRandomizer(ret.getRandomizer());
-        ret.chromosome.getGenes().forEach(g -> g.setRandomizer(ret.getRandomizer()));
         return ret;
     }
 
@@ -76,10 +81,5 @@ public class DoubleGenome extends Genome<DoubleGenome,List<Double>> {
     public DoubleChromosome getChromosome() {
         return chromosome;
     }
-
-
-    //public List<Double> getPhenotype() {
-    //    return phenotype;
-    //}
 
 }

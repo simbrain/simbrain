@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
  */
 public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
 
-
     /**
      * A set of node genes indexed by an integer id.
      */
@@ -47,8 +46,8 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
     }
 
     @Override
-    public Collection<NodeGene> getGenes() {
-        return genes.values();
+    public List<NodeGene> getGenes() {
+        return new ArrayList<>(genes.values());
     }
 
     public void addGene(NodeGene gene) {

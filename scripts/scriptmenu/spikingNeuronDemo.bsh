@@ -11,6 +11,8 @@ import org.simbrain.workspace.*;
 import org.simbrain.plot.timeseries.*;
 {
 
+    workspace.clearWorkspace();
+
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Spiking neuron");
     workspace.addWorkspaceComponent(networkComponent);

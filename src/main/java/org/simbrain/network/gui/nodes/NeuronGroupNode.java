@@ -212,8 +212,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         updateSynapseNodePositions();
     }
 
-    ;
-
     /**
      * Call update synapse node positions on all constituent neuron nodes.
      * Ensures synapse nodes are updated properly when this is moved.

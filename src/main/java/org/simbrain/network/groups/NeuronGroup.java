@@ -164,7 +164,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Array to hold subsamples to be used when, for example, plotting the
      * state of large network.
      */
-    private double[] subSampledValues = {};
+    private double[] subSampledValues;
 
     /**
      * Indices used with subsampling.

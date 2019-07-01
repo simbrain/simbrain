@@ -3,14 +3,13 @@ package org.simbrain.util.geneticalgorithm;
 import java.util.function.Function;
 
 /**
- * A genome together with its phenotypic expression, and a fitness function
- * Can be used to determine how well an expression of a
- * genome performs.
+ * A genome together with its phenotypic expression, and a fitness function. Can be used to determine how well an
+ * expression of a genome performs.
  *
  * @param <G> The genotype for this agent
  * @param <P> The phenotype for this agent
  */
-public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
+public class Agent<G extends Genome<G, P>, P> implements Comparable<Agent> {
 
     /**
      * The agent's genome.
@@ -25,8 +24,11 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
     /**
      * The agent's fitness function, typically specified
      */
-    private Function<Agent<G,P>, Double> fitnessFunction;
+    private Function<Agent<G, P>, Double> fitnessFunction;
 
+    /**
+     * Used for debugging now; tracks generation number and differentiates agents.
+     */
     private String id;
 
     /**
@@ -34,32 +36,49 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
      */
     private Double fitness = null;
 
-    public Agent(G genome, Function<Agent<G,P>, Double> fitnessFunction) {
+    /**
+     * Construct a new agent using a genome and a fitness function
+     *
+     * @param genome          the genome
+     * @param fitnessFunction the fitness functio
+     */
+    public Agent(G genome, Function<Agent<G, P>, Double> fitnessFunction) {
         this.genome = genome;
         this.fitnessFunction = fitnessFunction;
         phenotype = genome.express(); // So that phenotypic properties are available in simulations.
     }
 
-    public Agent<G,P> crossover(Agent<G,P> other) {
+    /**
+     * Cross over the genomes of this agents and  another, and return the new agent that results Let this agent be mom.
+     *
+     * @param other dad
+     * @return child
+     */
+    public Agent<G, P> crossover(Agent<G, P> other) {
         return new Agent<>(this.getGenome().crossOver(other.getGenome()), getFitnessFunction());
     }
 
+    /**
+     * Mutates the genome, and expresses the genome as a phenotype.
+     */
     public void mutate() {
         getGenome().mutate();
         phenotype = genome.express();
-    };
+    }
+
+    ;
 
     /**
      * Evaluate the fitness score of this agent. Higher is better.
      */
     public void computeFitness() {
-        //TODO: This was causing most of the problems with convergence
         //phenotype = getGenome().express();
         fitness = fitnessFunction.apply(this);
-    };
+    }
 
+    ;
 
-    public Function<Agent<G,P>, Double> getFitnessFunction() {
+    public Function<Agent<G, P>, Double> getFitnessFunction() {
         return fitnessFunction;
     }
 
@@ -67,9 +86,11 @@ public class Agent<G extends Genome<G,P>, P> implements Comparable<Agent> {
         return genome;
     }
 
-    public Agent<G,P> copy() {
+    public Agent<G, P> copy() {
         return new Agent<>(getGenome().copy(), getFitnessFunction());
-    };
+    }
+
+    ;
 
     @Override
     public int compareTo(Agent o) {

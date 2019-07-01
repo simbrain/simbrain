@@ -16,17 +16,17 @@ public class Xor {
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 2000;
+    private int populationSize = 2000;
 
     /**
      * The maximum number of generation.
      */
-    public int maxIterations = 1000;
+    private int maxIterations = 1000;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      */
-    double fitnessThreshold = -.01;
+    private double fitnessThreshold = -.01;
 
     /**
      * Population of xor networks to evolve

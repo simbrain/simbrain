@@ -90,7 +90,6 @@ public class NodeGene extends Gene<Neuron> {
                 updateRule.setBias(newBias);
             }
         }
-        // No implementation
     }
 
     @Override

@@ -45,6 +45,11 @@ public class PopulationTest {
     }
 
     @Test
+    public void testSort() {
+        //TODO
+    }
+
+    @Test
     public void testFitness() {
 
         Population population = new Population<>(6);
@@ -54,7 +59,7 @@ public class PopulationTest {
                 a -> Double.valueOf(a.getGenome().getChromosome().getGenes().get(0).getPrototype()));
         population.populate(integerAgent);
 
-        // Initially most fit is 5.
+        // Initially most fit is 10
         double mostFit = population.computeNewFitness();
         assertEquals(10.0, mostFit, .001);
         population.replenish();

@@ -16,8 +16,7 @@ public abstract class Gene<T> {
      * Some genes should not be mutated, e.g. "input node" genes.
      */
     private boolean mutable = true;
-
-    private SimbrainRandomizer randomizer;
+    // TODO Mutability is not currently enforced in numeric genes. Add failing unit tests then fix.
 
     /**
      * Return a deep copy of this gene.

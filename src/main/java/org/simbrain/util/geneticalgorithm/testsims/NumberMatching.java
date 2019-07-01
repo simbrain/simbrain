@@ -26,18 +26,18 @@ public class NumberMatching {
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 2000;
+    private int populationSize = 2000;
 
     /**
      * The maximum number of generation. Simulation will terminate after this many iterations regardless of the result.
      * the maximum of iteration/generation to run before forcing the simulation to stop.
      */
-    public int maxIteration = 1000;
+    private int maxIteration = 1000;
 
     /**
      * Simulation stops if the error is above this.
      */
-    public double maxErrorThreshold = -.05;
+    private double maxErrorThreshold = -.05;
 
     /**
      * Create a number matching simulation.

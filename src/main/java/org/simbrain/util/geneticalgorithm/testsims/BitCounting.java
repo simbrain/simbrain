@@ -20,13 +20,23 @@ public class BitCounting {
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 100;
+    private int populationSize = 100;
 
     /**
      * The maximum number of generation. Simulation will terminate after this many iterations regardless of the result.
      * the maximum of iteration/generation to run before forcing the simulation to stop.
      */
-    public int maxIterations = 10;
+    private int maxIterations = 10;
+
+    /**
+     * Number of bits
+     */
+    private int bitsPerChromosome = 10;
+
+    /**
+     * Number of ones that should be produced.
+     */
+    private int targetOneCount = 5;
 
     /**
      * Create the simulation.
@@ -40,11 +50,10 @@ public class BitCounting {
     public void init() {
 
         population = new Population<>(this.populationSize);
-        IntegerGenome ig = new IntegerGenome(15);
+        IntegerGenome ig = new IntegerGenome(bitsPerChromosome);
         ig.setMin(0);
         ig.setMax(1);
 
-        double targetOneCount = 5;
         Agent agent = new Agent<>(ig, b ->
                 Double.valueOf(-Math.abs(targetOneCount -
                         b.getPhenotype().stream().mapToInt(Integer::intValue).sum())));

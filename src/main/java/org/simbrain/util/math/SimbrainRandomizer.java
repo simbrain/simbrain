@@ -6,10 +6,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.simbrain.util.neat.NeatUtils.assertBound;
 
 /**
- * Extends java randomizer with convenience functions, e.g.
- * getting a number in a range.
+ * Extends java randomizer with convenience functions to, e.g. get numbers in a range.
+ * If called using the static instance, threadsafe random numbers are returned. If created
+ * using the constructor,a deterministic sequence of random numbers from an initial seed
+ * are returned.
  *
  * @author LeoYulinLi
+ * @author Jeff Yoshimi
  *
  */
 public class SimbrainRandomizer extends Random {
@@ -20,12 +23,22 @@ public class SimbrainRandomizer extends Random {
     private static final long serialVersionUID = -3217013262668966634L;
 
     /**
-     * For general use.
+     * If true, use the superclass randomizer for determinate results.
+     */
+    private boolean useSeed = true;
+
+    /**
+     * Threadsafe non-seeded randomizer for general use.
      */
     public static SimbrainRandomizer rand = new SimbrainRandomizer(System.nanoTime());
 
+    static {
+        rand.useSeed = false;
+    }
+
     /**
      * Creates a new random number generator using a single long seed.
+     *
      * @param seed the initial seed
      */
     public SimbrainRandomizer(long seed) {
@@ -42,7 +55,11 @@ public class SimbrainRandomizer extends Random {
     public double nextDouble(double floor, double ceiling) {
         assertBound(floor, ceiling);
         double range = ceiling - floor;
-        return (ThreadLocalRandom.current().nextDouble() * range )+ floor;
+        if (useSeed) {
+            return (nextDouble() * range) + floor;
+        } else {
+            return (ThreadLocalRandom.current().nextDouble() * range) + floor;
+        }
     }
 
     /**
@@ -54,7 +71,12 @@ public class SimbrainRandomizer extends Random {
      */
     public int nextInteger(int floor, int ceiling) {
         assertBound(floor, ceiling);
-        return ThreadLocalRandom.current().nextInt(floor, ceiling+ 1);
+        if (useSeed) {
+            int range = ceiling - floor;
+            return (nextInt(range) + floor);
+        } else  {
+            return ThreadLocalRandom.current().nextInt(floor, ceiling+ 1);
+        }
     }
 
 }

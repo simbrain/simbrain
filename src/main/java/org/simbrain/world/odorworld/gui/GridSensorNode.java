@@ -113,16 +113,7 @@ public class GridSensorNode extends EntityAttributeNode {
         }
     }
 
-    @Override
-    public void update() {
-
-        if (!checkGridSizeConsistency()) {
-            redrawGrid();
-        }
-        updateGridSizeInfo();
-
-        shape.setOffset(sensor.getRelativeLocation());
-
+    private void updateGrid() {
         if (sensor.getGridVisibility()) {
             double dx = sensor.getX() - sensor.getParent().getX();
             double dy = sensor.getY() - sensor.getParent().getY();
@@ -141,5 +132,18 @@ public class GridSensorNode extends EntityAttributeNode {
                 highlightedGrid.setPaint(paint);
             }
         }
+    }
+
+    @Override
+    public void update() {
+
+        if (!checkGridSizeConsistency()) {
+            redrawGrid();
+        }
+        updateGridSizeInfo();
+
+        shape.setOffset(sensor.getRelativeLocation());
+
+        updateGrid();
     }
 }

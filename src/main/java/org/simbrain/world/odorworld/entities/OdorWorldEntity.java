@@ -321,6 +321,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             this.x = newx;
         }
         updateCollisionBound();
+        updateSensors();
+        updateEffectors();
         changeSupport.firePropertyChange("moved", null, null);
 
     }
@@ -345,6 +347,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             this.y = newy;
         }
         updateCollisionBound();
+        updateSensors();
+        updateEffectors();
         changeSupport.firePropertyChange("moved", null, null);
     }
 

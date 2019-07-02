@@ -68,6 +68,9 @@ public class GridSensorNode extends EntityAttributeNode {
         setPickable(false);
         shape.setPickable(false);
         addChild(shape);
+
+        updateGrid();
+        shape.setOffset(sensor.getRelativeLocation());
     }
 
     /**
@@ -86,7 +89,7 @@ public class GridSensorNode extends EntityAttributeNode {
      *
      * @return true if not updated
      */
-    private boolean checkGridSizeConsistency() {
+    private boolean isGridSizeConsistent() {
         return this.gridWidth == sensor.getWidth()
             && this.gridHeight == sensor.getHeight()
             && this.gridColumns == sensor.getColumns()
@@ -137,7 +140,7 @@ public class GridSensorNode extends EntityAttributeNode {
     @Override
     public void update() {
 
-        if (!checkGridSizeConsistency()) {
+        if (!isGridSizeConsistent()) {
             redrawGrid();
         }
         updateGridSizeInfo();

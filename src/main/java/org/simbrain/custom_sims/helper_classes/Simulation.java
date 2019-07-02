@@ -188,6 +188,8 @@ public class Simulation {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
         odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
+        desktop.getDesktopComponent(odorWorldComponent).setBounds(x, y,
+                odorWorldComponent.getWorld().getWidth(), odorWorldComponent.getWorld().getHeight());
         desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
         return new OdorWorldWrapper(odorWorldComponent);

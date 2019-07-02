@@ -226,7 +226,7 @@ public class ActorCritic extends RegisteredSimulation {
 
         // TODO: Why can't I use worldwidth and worldheight below? I had to
         // manually set size.
-        ob = sim.addOdorWorldTMX(761, 8, 347, 390, "empty.tmx");
+        ob = sim.addOdorWorldTMX(761, 8, "actor-critic.tmx");
         world = ob.getWorld();
         world.setObjectsBlockMovement(true);
         world.setWrapAround(true); //TODO: Hack because it's currently going out of the world
@@ -250,7 +250,11 @@ public class ActorCritic extends RegisteredSimulation {
         // TODO: Use tilesets later. Right now just use 1 tileset
 
         // Create grid sensor
-        GridSensor sensor = new GridSensor(mouse, (int) 0, (int) 0, tileSize, tileSize);
+        GridSensor sensor = new GridSensor(
+                mouse,
+                0, 0,
+                ob.getWorld().getWidth() / numTiles, ob.getWorld().getHeight() / numTiles
+        );
         mouse.addSensor(sensor);
 
         // Set up location sensor neurons

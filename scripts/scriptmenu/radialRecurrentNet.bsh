@@ -74,6 +74,9 @@ import org.simbrain.workspace.*;
     double II_CONST = 0.1;
     double LAMBDA = 150;
 
+    // Clear workspace
+    workspace.clearWorkspace();
+
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");
     workspace.addWorkspaceComponent(networkComponent);
@@ -81,8 +84,8 @@ import org.simbrain.workspace.*;
     network.setTimeStep(0.5);
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-    List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
-    List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
+    List neurons = new ArrayList(NUM_NEURONS);
+    List outNeurons = new ArrayList(NUM_NEURONS);
     // Optional code to distribute neurons in 3D space with random z values
     // Random rand = new Random();
     Randomizer rand = new Randomizer();
@@ -165,7 +168,6 @@ import org.simbrain.workspace.*;
     			((LinearRule) n.getUpdateRule()).setBias(-1);
     		}
      }
-
 
     print(sg.size());
     

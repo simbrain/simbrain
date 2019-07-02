@@ -8,8 +8,8 @@ import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.workspace.*;
 import org.simbrain.network.connections.*;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.randomizer.*;
 import org.simbrain.util.math.*;
+import org.simbrain.util.math.ProbDistributions.*;
 
 //
 // Make a network of izhikevich neurons connected using a sparse connection.  Run and activate nodes with the wand to
@@ -25,6 +25,9 @@ import org.simbrain.util.math.*;
 	double SPARSITY = .05; // Percent of connections to make
 	double excitatoryRatio = .15;
     boolean useSTDP = true;
+
+    // Clear workspace
+	workspace.clearWorkspace();
 
 	// Build Network
 	NetworkComponent networkComponent = new NetworkComponent("Izhikevich Network");
@@ -51,9 +54,23 @@ import org.simbrain.util.math.*;
     Sparse.connectSparse(network.getFlatNeuronList(),
             network.getFlatNeuronList(), SPARSITY, false, false, true);
     //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
-    PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY, new NormalDistribution(1, 0.1));
-    PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY, new NormalDistribution(0.5, 0.1));
-    ConnectionUtilities.randomizeAndPolarizeSynapses(network.getFlatSynapseList(), 
+
+	// Set up randomizers
+	ProbabilityDistribution exciteRand = NormalDistribution
+		.builder()
+		.polarity(Polarity.EXCITATORY)
+		.mean(1)
+		.standardDeviation(.1)
+		.build();
+	ProbabilityDistribution inhibRand = NormalDistribution
+		.builder()
+		.polarity(Polarity.INHIBITORY)
+		.mean(.5)
+		.standardDeviation(.1)
+		.build();
+
+	// Randomize synapses
+    ConnectionUtilities.randomizeAndPolarizeSynapses(network.getFlatSynapseList(),
         exciteRand, inhibRand, excitatoryRatio);
 
     // Set synapses to STDP if requested

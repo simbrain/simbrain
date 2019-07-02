@@ -11,6 +11,7 @@ import org.simbrain.workspace.*;
 import org.simbrain.plot.timeseries.*;
 {
 
+    // Clear workspace
     workspace.clearWorkspace();
 
     // Build Network
@@ -22,7 +23,7 @@ import org.simbrain.plot.timeseries.*;
     // Input neuron
     Neuron inputNeuron = new Neuron(network, new LinearRule());
     inputNeuron.setLocation(10,10);
-    inputNeuron.setActivation(0);
+    inputNeuron.setActivation(5);
     inputNeuron.setUpperBound(50);
     inputNeuron.setLowerBound(-50);
     inputNeuron.setIncrement(1);
@@ -38,6 +39,7 @@ import org.simbrain.plot.timeseries.*;
     ((IzhikevichRule)spiker.getUpdateRule()).setB(.2);
     ((IzhikevichRule)spiker.getUpdateRule()).setC(-50);
     ((IzhikevichRule)spiker.getUpdateRule()).setD(2);
+    ((IzhikevichRule)spiker.getUpdateRule()).setiBg(2); // So spiking does not  happen without input
 
     network.addNeuron(spiker);
 
@@ -45,15 +47,20 @@ import org.simbrain.plot.timeseries.*;
     network.addSynapse(new Synapse(inputNeuron, spiker, 1));
 
     // Initialize network
-    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10, 20, 400,300);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10,20,458,347);
 
     // Make time series chart
     TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("Sub-threshold dynamics of a spiking neuron");
     chart.getModel().setAutoRange(false);
     chart.getModel().setRangeUpperBound(50);
     chart.getModel().setRangeLowerBound(-100);
+    chart.getModel().setFixedWidth(true);
+    chart.getModel().setWindowSize(600);
+    chart.getModel().removeAllScalarTimeSeries();
+    chart.getModel().addScalarTimeSeries(1);
+
     workspace.addWorkspaceComponent(chart);
-    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500,300);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(456,23,513,344);
 
     // Couple network to chart
     Producer neuronProducer = CouplingUtils.getProducer(network.getNeuronByLabel("Spiking Neuron"), "getActivation");

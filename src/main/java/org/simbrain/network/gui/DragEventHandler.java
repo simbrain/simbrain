@@ -240,6 +240,9 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             PBounds rect = new PBounds();
             rect.add(marqueeStartPosition);
             rect.add(position);
+            if (marquee == null) {
+                return;
+            }
             marquee.globalToLocal(rect);
             marquee.reset(); //todo: better way?
             marquee.append(new Rectangle2D.Float((float) rect.getX(), (float) rect.getY(), (float) rect.getWidth(), (float) rect.getHeight()), false);

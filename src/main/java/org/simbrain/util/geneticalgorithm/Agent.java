@@ -76,8 +76,6 @@ public class Agent<G extends Genome<G, P>, P> implements Comparable<Agent> {
         fitness = fitnessFunction.apply(this);
     }
 
-    ;
-
     public Function<Agent<G, P>, Double> getFitnessFunction() {
         return fitnessFunction;
     }

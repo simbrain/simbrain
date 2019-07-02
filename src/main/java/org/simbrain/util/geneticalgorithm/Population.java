@@ -35,7 +35,7 @@ public class Population<G extends Genome<G, P>, P> {
     /**
      * Amount to eliminate at each generation.
      */
-    private double eliminationPercent = .5;
+    private double eliminationRatio = .5;
 
     /**
      * Initialize population to a specific size.
@@ -86,7 +86,8 @@ public class Population<G extends Genome<G, P>, P> {
         System.out.println("Sorted: " + agentList);
         Collections.reverse(agentList);
         System.out.println("Reversed: " + agentList);
-        agentList = agentList.stream().limit((long) (agentList.size() * eliminationPercent)).collect(Collectors.toList());
+        agentList = agentList.stream()
+                .limit((long) (agentList.size() * eliminationRatio)).collect(Collectors.toList());
     }
 
     /**
@@ -126,11 +127,11 @@ public class Population<G extends Genome<G, P>, P> {
         return getAgentList().toString();
     }
 
-    public double getEliminationPercent() {
-        return eliminationPercent;
+    public double getEliminationRatio() {
+        return eliminationRatio;
     }
 
-    public void setEliminationPercent(double eliminationPercent) {
-        this.eliminationPercent = eliminationPercent;
+    public void setEliminationRatio(double eliminationRatio) {
+        this.eliminationRatio = eliminationRatio;
     }
 }

@@ -79,6 +79,8 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
             interpreter.set("workspace", workspace);
             interpreter.set("bsh.prompt", ">");
             interpreter.eval("addClassPath(\"scripts/console\");");
+            interpreter.print("Simbrain console\n");
+            interpreter.print("Enter \"help(); or \"tips();\" for help.\n");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -68,6 +68,8 @@ import javax.swing.event.InternalFrameEvent;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -384,11 +386,16 @@ public class NetworkPanel extends JPanel {
         // TODO: Creation outside of desktop lacks menus
         NetworkPanel np = new NetworkPanel(network);
         np.syncToModel();
-        StandardDialog dialog = new StandardDialog();
-        dialog.setContentPane(np);
-        dialog.setPreferredSize(new Dimension(500,500));
-        dialog.pack();
-        dialog.setVisible(true);
+        JFrame frame = new JFrame();
+        frame.setContentPane(np);
+        frame.setPreferredSize(new Dimension(500,500));
+        frame.pack();
+        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                System.exit(0);
+            }
+        });
         //System.out.println(np.debugString());
     }
 

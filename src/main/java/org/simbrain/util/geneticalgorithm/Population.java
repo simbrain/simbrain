@@ -66,13 +66,13 @@ public class Population<G extends Genome<G, P>, P> {
      * @return the fitness of the most fit agent.
      */
     public Double computeNewFitness() {
-        System.out.println("----------------");
-        System.out.println("Before fitness computation:" + agentList);
+        //System.out.println("----------------");
+        //System.out.println("Before fitness computation:" + agentList);
         agentList.forEach(Agent::computeFitness);
-        System.out.println("After fitness computation:" + agentList);
+        //System.out.println("After fitness computation:" + agentList);
         eliminateLeastFit(); // Must happen in this order
-        System.out.println("After elimination:" + agentList);
-        System.out.println("Most fit: " + agentList.get(0).getFitness());
+        //System.out.println("After elimination:" + agentList);
+        //System.out.println("Most fit: " + agentList.get(0).getFitness());
         return agentList.get(0).getFitness();
     }
 
@@ -83,9 +83,9 @@ public class Population<G extends Genome<G, P>, P> {
 
         // Agent@compareTo compares them on fitness
         Collections.sort(agentList);
-        System.out.println("Sorted: " + agentList);
+        //System.out.println("Sorted: " + agentList);
         Collections.reverse(agentList);
-        System.out.println("Reversed: " + agentList);
+        //System.out.println("Reversed: " + agentList);
         agentList = agentList.stream()
                 .limit((long) (agentList.size() * eliminationRatio)).collect(Collectors.toList());
     }
@@ -111,7 +111,7 @@ public class Population<G extends Genome<G, P>, P> {
             newAgent.setId(String.format("G%s|A%s", generation, i));
             agentList.add(newAgent);
         }
-        System.out.println("Mutated:" + agentList);
+        //System.out.println("Mutated:" + agentList);
     }
 
     public List<Agent<G, P>> getAgentList() {

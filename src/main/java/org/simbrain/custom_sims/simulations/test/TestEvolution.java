@@ -28,17 +28,17 @@ public class TestEvolution extends RegisteredSimulation {
     /**
      * Default population size at each generation.
      */
-    public int populationSize = 100;
+    private int populationSize = 100;
 
     /**
      * The maximum number of generation.
      */
-    public int maxIterations = 100;
+    private int maxIterations = 100;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      */
-    double fitnessThreshold = 3;
+    private double fitnessThreshold = 3;
 
     public static int maxMove = 500;
 

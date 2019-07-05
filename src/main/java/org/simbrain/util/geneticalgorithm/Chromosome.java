@@ -41,4 +41,12 @@ public abstract class Chromosome<T, C extends Chromosome> {
         return getGenes().toString();
     }
 
+    /**
+     * Get a reference to a specific gene
+     * @param index index of gene to retrieve
+     * @return the gene with that index
+     */
+    public Gene<T> getGene(int index) {
+        return getGenes().get(index);
+    }
 }

@@ -33,12 +33,18 @@
         <h1>Connection Properties</h1>
         <p class="heading">Connection Methods</p>
         <blockquote>
-            <p><span class="heading2">Deterministic: </span></p>
-            <p><span class="heading2">Probabilistic: </span></p>
+            <p><span class="heading2">Deterministic: </span>In a deterministic model, the cause of activity is predetermined and does not include elements of randomness.
         </blockquote>
+            </p>
+        <blockquote>
+            <p><span class="heading2">Probabilistic: </span>In a probabilistic model, the cause of activity is purely probabilistic and is based on elements of randomness.</p>
+        </blockquote>
+        
         <p class="heading">Other Properties</p>
         <blockquote>
-            <p><span class="heading2">Inward/Outward: </span></p>
+            <p><span class="heading2">Inward/Outward: </span>Determines whether the path of activation radiates inwards or outwards. The outward property will connect each neuron to all the neurons directly surrounding it.
+            <p style="left; padding-right: 20px;"> <img src="../../../Images/sparseSimpleOutward.PNG" height="250" border="0">
+            </p></p>
             <p><span class="heading2">Exc. Radius: </span>Distance to search for excitatory neurons to connect to. This has a minimum value of 0.</p>
             <p><span class="heading2">Inh. Radius: </span>Distance to search for inhibitory neurons to connect to. This has a minimum value of 0.</p>
             <p><span class="heading2">Exc. Probability: </span>The probabbility that connections will be made to neighbor excitatory (or non-polar) neurons. This has a minimum value of 0 and a maximum value of 1.</p>

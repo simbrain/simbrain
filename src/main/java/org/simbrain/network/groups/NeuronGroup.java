@@ -167,6 +167,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     private double[] subSampledValues;
 
     /**
+     * Array to hold activation values for any caller that needs the activation values for this group in array form.
+     * Lazy... activations are only written (and this array is only initialized) when {@link #getActivations()} is
+     * called.
+     */
+    private double [] activations;
+
+    /**
      * Indices used with subsampling.
      */
     private int[] subsamplingIndices = {};
@@ -759,18 +766,19 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * Return activations as a double array.
+     * Return activations as a double array in place.
      *
      * @return the activation array
      */
     @Producible(idMethod = "getId", arrayDescriptionMethod = "getLabelArray")
     public double[] getActivations() {
-        double[] retArray = new double[neuronList.size()];
-        int i = 0;
-        for (Neuron neuron : neuronList) {
-            retArray[i++] = neuron.getActivation();
+        if (activations == null) {
+            activations = new double[size()];
         }
-        return retArray;
+        for (int ii=0; ii<size(); ++ii) {
+            activations[ii] = neuronList.get(ii).getActivation();
+        }
+        return activations;
     }
 
     /**

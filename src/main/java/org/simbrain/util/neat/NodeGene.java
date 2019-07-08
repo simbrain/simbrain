@@ -25,7 +25,7 @@ public class NodeGene {
 
     /**
      * Index for this node; used in {@link ConnectionGene}.
-     * TODO: Implement.
+     * TODO: Implement or remove.
      */
     private int nodeIndex;
 

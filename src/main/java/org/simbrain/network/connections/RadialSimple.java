@@ -220,6 +220,8 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      */
     public List<Synapse> connectNeurons(final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
+        nonPolarNeurons = excNeurons.stream().filter(neuron -> neuron.getPolarity()
+                == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
         for (Neuron source : excNeurons) {
             makeExcitatory(source, syns, looseSynapses);
             makeInhibitory(source, syns, looseSynapses);

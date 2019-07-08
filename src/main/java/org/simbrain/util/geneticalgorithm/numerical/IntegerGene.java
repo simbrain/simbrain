@@ -101,4 +101,12 @@ public class IntegerGene extends Gene<Integer> {
     public String toString() {
         return "" + value;
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(Integer value) {
+        this.value = value;
+    }
 }

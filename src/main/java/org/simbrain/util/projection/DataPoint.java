@@ -39,7 +39,8 @@ public class DataPoint {
      * @param data the data to set this data point
      */
     public DataPoint(double[] data) {
-        this.data = data;
+        this.data = new double[data.length];
+        System.arraycopy(data, 0, this.data, 0, data.length);
     }
 
     /**

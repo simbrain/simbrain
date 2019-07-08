@@ -57,7 +57,7 @@ import org.simbrain.plot.timeseries.*;
     chart.getModel().setFixedWidth(true);
     chart.getModel().setWindowSize(600);
     chart.getModel().removeAllScalarTimeSeries();
-    chart.getModel().addScalarTimeSeries(1);
+    chart.getModel().addScalarTimeSeries("Membrane Potential");
 
     workspace.addWorkspaceComponent(chart);
     desktop.getDesktopComponent(chart).getParentFrame().setBounds(456,23,513,344);

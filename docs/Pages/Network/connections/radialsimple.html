@@ -21,7 +21,7 @@
         <h1>Radial (Simple) Connection<br>
         </h1>
         <p>
-            A radial connection will connect a given neuron to all neurons within a
+            A radial (simple) connection will connect a given neuron to all neurons within a
             certain radius with a certain probability. The probability of forming
             inhibitory and excitatory connections are set separately as well as the
             <a href="../synapse.html">synapse type</a>
@@ -35,18 +35,18 @@
         <blockquote>
             <p><span class="heading2">Deterministic: </span>In a deterministic model, the cause of activity is predetermined and does not include elements of randomness.
         </blockquote>
-            </p>
+        </p>
         <blockquote>
             <p><span class="heading2">Probabilistic: </span>In a probabilistic model, the cause of activity is purely probabilistic and is based on elements of randomness.</p>
         </blockquote>
-        
         <p class="heading">Other Properties</p>
         <blockquote>
             <p><span class="heading2">Inward/Outward: </span>Determines whether the path of activation radiates inwards or outwards. The outward property will connect each neuron to all the neurons directly surrounding it.
-            <p style="left; padding-right: 20px;"> <img src="../../../Images/sparseSimpleOutward.PNG" height="250" border="0">
-            </p></p>
-            <p><span class="heading2">Exc. Radius: </span>Distance to search for excitatory neurons to connect to. This has a minimum value of 0.</p>
-            <p><span class="heading2">Inh. Radius: </span>Distance to search for inhibitory neurons to connect to. This has a minimum value of 0.</p>
+                <p style="left; padding-right: 20px;"> <img src="../../../Images/sparseSimpleOutward.PNG" height="250" border="0">
+                </p>
+            </p>
+            <p><span class="heading2">Exc. Radius: </span>The distance to search for excitatory neurons to connect to. This has a minimum value of 0.</p>
+            <p><span class="heading2">Inh. Radius: </span>The distance to search for inhibitory neurons to connect to. This has a minimum value of 0.</p>
             <p><span class="heading2">Exc. Probability: </span>The probabbility that connections will be made to neighbor excitatory (or non-polar) neurons. This has a minimum value of 0 and a maximum value of 1.</p>
             <p><span class="heading2">Inh. Probability: </span>The probability that connections will be made to neighbor inhibitory neurons. This has a minimum value of 0 and a maximum value of 1.</p>
             <p><span class="heading2">Num. Exc. Connections: </span>The maximum number of connections with excitatory neurons. This has a minimum value of 0.</p>

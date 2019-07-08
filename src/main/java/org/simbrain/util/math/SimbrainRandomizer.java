@@ -79,4 +79,15 @@ public class SimbrainRandomizer extends Random {
         }
     }
 
+    public double mutateNumber(double source, double interval) {
+        return source + nextDouble(-interval, +interval);
+    }
+
+    public double mutateNumberWithProbability(double source, double interval, double probability) {
+        if (nextDouble(0, 1) > probability) {
+            return mutateNumber(source, interval);
+        }
+        return source;
+    }
+
 }

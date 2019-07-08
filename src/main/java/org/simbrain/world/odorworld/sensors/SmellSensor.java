@@ -137,7 +137,7 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public EditableObject copy() {
+    public SmellSensor copy() {
         return new SmellSensor(this);
     }
 

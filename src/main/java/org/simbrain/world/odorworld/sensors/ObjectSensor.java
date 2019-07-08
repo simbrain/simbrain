@@ -135,7 +135,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     }
 
     @Override
-    public EditableObject copy() {
+    public ObjectSensor copy() {
         return new ObjectSensor(this);
     }
 

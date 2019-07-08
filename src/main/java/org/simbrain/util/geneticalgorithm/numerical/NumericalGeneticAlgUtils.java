@@ -27,6 +27,10 @@ public class NumericalGeneticAlgUtils {
      */
     public static void singlePointCrossover(Chromosome mom, Chromosome dad, Chromosome child) {
 
+        if (mom.getGenes().size() == 0 || dad.getGenes().size() == 0) {
+            return;
+        }
+
         // Single-point crossover.
         int point =  SimbrainRandomizer.rand.nextInt(Integer.min(mom.getGenes().size(), dad.getGenes().size()));
 

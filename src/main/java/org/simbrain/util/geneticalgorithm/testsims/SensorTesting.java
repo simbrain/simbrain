@@ -45,6 +45,7 @@ public class SensorTesting {
         population = new Population<>(this.populationSize);
 
         OdorWorldEntityGenome genome = new OdorWorldEntityGenome();
+        genome.getConfig().setRadiusMin(20);
 
 
         Agent agent = new Agent<>(genome, b ->

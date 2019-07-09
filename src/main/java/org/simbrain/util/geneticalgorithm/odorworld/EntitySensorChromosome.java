@@ -1,7 +1,6 @@
 package org.simbrain.util.geneticalgorithm.odorworld;
 
 import org.simbrain.util.geneticalgorithm.Chromosome;
-import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.geneticalgorithm.numerical.NumericalGeneticAlgUtils;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -14,13 +13,13 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
 
     private List<SensorGene> sensorGenes = new ArrayList<>();
 
-    private Config config = new Config();
+    private OdorWorldEntityGenome.Config config;
 
     @Override
     public void mutate() {
         super.mutate();
 
-        if (SimbrainRandomizer.rand.nextDouble(0, 1) > config.newSensorMutationProbability) {
+        if (SimbrainRandomizer.rand.nextDouble(0, 1) > config.getNewSensorMutationProbability()) {
             int select = SimbrainRandomizer.rand.nextInteger(0, 1);
             SensorGene sensorGene;
             switch (select) {
@@ -31,6 +30,7 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
                     sensorGene = new SmellSensorGene();
                     break;
             }
+            sensorGene.setConfig(config);
             sensorGene.mutate();
             sensorGenes.add(sensorGene);
         }
@@ -39,6 +39,7 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
     @Override
     public EntitySensorChromosome crossOver(EntitySensorChromosome other) {
         EntitySensorChromosome ret = new EntitySensorChromosome();
+        ret.setConfig(config);
         NumericalGeneticAlgUtils.singlePointCrossover(this, other, ret);
         return ret;
     }
@@ -60,23 +61,11 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
         return sensorGenes;
     }
 
-    public class Config {
-        private double newSensorMutationProbability = 0.05;
+    public OdorWorldEntityGenome.Config getConfig() {
+        return config;
+    }
 
-        private double maxSensorCount = 5;
-
-        public Config newSensorMutationProbability(double newSensorMutationProbability) {
-            this.newSensorMutationProbability = newSensorMutationProbability;
-            return this;
-        }
-
-        public Config maxSensorCount(double maxSensorCount) {
-            this.maxSensorCount = maxSensorCount;
-            return this;
-        }
-
-        public EntitySensorChromosome done() {
-            return EntitySensorChromosome.this;
-        }
+    public void setConfig(OdorWorldEntityGenome.Config config) {
+        this.config = config;
     }
 }

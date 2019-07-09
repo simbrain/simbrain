@@ -4,8 +4,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 public class SmellSensorGene extends SensorGene {
 
-    private Config config = new Config();
-
     private SmellSensor prototype;
 
     public SmellSensorGene() {
@@ -22,14 +20,5 @@ public class SmellSensorGene extends SensorGene {
     @Override
     public SmellSensor getPrototype() {
         return prototype;
-    }
-
-    @Override
-    public Config config() {
-        return config;
-    }
-
-    public class Config extends SensorGene.Config<SmellSensorGene.Config> {
-        // no extra parameter here
     }
 }

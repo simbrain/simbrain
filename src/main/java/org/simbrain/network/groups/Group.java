@@ -247,4 +247,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         this.useCustomLabel = useCustomLabel;
     }
 
+    public boolean isUseCustomLabel() {
+        return useCustomLabel;
+    }
 }

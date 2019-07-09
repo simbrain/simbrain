@@ -2563,44 +2563,26 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    /**
-     * @param pasteX pasteX to set.
-     */
     public void setPasteX(final double pasteX) {
         this.pasteX = pasteX;
     }
 
-    /**
-     * @return pasteX. pasteX.
-     */
     public double getPasteX() {
         return pasteX;
     }
 
-    /**
-     * @param pasteY paste_y to set.
-     */
     public void setPasteY(final double pasteY) {
         this.pasteY = pasteY;
     }
 
-    /**
-     * @return pasteY pasteY;
-     */
     public double getPasteY() {
         return pasteY;
     }
 
-    /**
-     * @return Returns the guiOn.
-     */
     public boolean isGuiOn() {
         return guiOn && network.isRedrawTime();
     }
 
-    /**
-     * @param guiOn The guiOn to set.
-     */
     public void setGuiOn(final boolean guiOn) {
         if (guiOn) {
             this.setUpdateComplete(false);

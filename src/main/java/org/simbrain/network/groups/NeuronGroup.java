@@ -164,7 +164,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * Array to hold subsamples to be used when, for example, plotting the
      * state of large network.
      */
-    private double[] subSampledValues;
+    private double[] subSampledValues = {};
 
     /**
      * Array to hold activation values for any caller that needs the activation values for this group in array form.
@@ -262,8 +262,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         for (Neuron neuron : toCopy.getNeuronList()) {
             this.addNeuron(new Neuron(network, neuron), false);
         }
-        this.setLabel(toCopy.getLabel());
-        this.setUseCustomLabel(false); // Don't copy labels
+        this.setUseCustomLabel(toCopy.isUseCustomLabel());
+        if(isUseCustomLabel()) {
+            this.setLabel(toCopy.getLabel());
+        }
         this.setLayout(toCopy.getLayout());
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();
@@ -1045,6 +1047,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public void setLocation(final double x, final double y) {
         offset(-this.getMinX(), -this.getMinY());
         offset(x, y);
+    }
+
+    public void setLocation(Point2D point) {
+        setLocation(point.getX(), point.getY());
     }
 
     /**

@@ -248,6 +248,7 @@ public class NetworkWrapper {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
         wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
+        network.addGroup(wta);
         return wta;
     }
 

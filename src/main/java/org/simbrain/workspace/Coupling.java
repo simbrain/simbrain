@@ -37,6 +37,10 @@ public class Coupling<T> {
     /**
      * This is the main action!  Set the value of the consumer based on the
      * value of the producer.
+     * <br>
+     * Note that values are passed by reference, so that it is up to the producing or
+     * consuming methods to make defensive copies as needed.
+     * (cf http://www.javapractices.com/topic/TopicAction.do?Id=15)).
      */
     public void update() {
         consumer.setValue(producer.getValue());

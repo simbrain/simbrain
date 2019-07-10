@@ -66,6 +66,10 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         }
     }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
     @Override
     public Network express() {
 

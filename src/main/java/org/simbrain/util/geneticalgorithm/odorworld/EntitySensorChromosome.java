@@ -19,15 +19,19 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
     public void mutate() {
         super.mutate();
 
+        if (sensorGenes.size() >= config.getMaxSensorCount()) {
+            return;
+        }
+
         if (SimbrainRandomizer.rand.nextDouble(0, 1) > config.getNewSensorMutationProbability()) {
             int select = SimbrainRandomizer.rand.nextInteger(0, 1);
             SensorGene sensorGene;
             switch (select) {
-                case 0:
-                    sensorGene = new ObjectSensorGene();
-                    break;
+                // case 0:
+                //     sensorGene = new SmellSensorGene();
+                //     break;
                 default:
-                    sensorGene = new SmellSensorGene();
+                    sensorGene = new ObjectSensorGene();
                     break;
             }
             sensorGene.setConfig(config);

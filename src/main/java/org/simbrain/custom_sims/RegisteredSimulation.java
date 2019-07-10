@@ -32,6 +32,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillat
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.test.TestEvolution;
+import org.simbrain.custom_sims.simulations.test.TestNetworkEntityEvolution;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -79,6 +80,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new PatternsOfActivity( ));
         REGISTERED_SIMS.add(new KuramotoOscillators( ));
         // REGISTERED_SIMS.add(new NEAT());
+        REGISTERED_SIMS.add(new TestNetworkEntityEvolution());
         REGISTERED_SIMS.add(new TestEvolution());
         // REGISTERED_SIMS.add(new MpfsSOM());
         // REGISTERED_SIMS.add(new SimpleNeuroevolution());

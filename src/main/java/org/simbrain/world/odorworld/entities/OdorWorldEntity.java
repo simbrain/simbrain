@@ -445,6 +445,10 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         }
     }
 
+    public void setParentWorld(OdorWorld parentWorld) {
+        this.parentWorld = parentWorld;
+    }
+
     /**
      * Add an effector.
      *

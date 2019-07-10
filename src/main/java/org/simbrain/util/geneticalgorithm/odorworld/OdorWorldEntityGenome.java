@@ -1,7 +1,10 @@
 package org.simbrain.util.geneticalgorithm.odorworld;
 
 import org.simbrain.util.geneticalgorithm.Genome;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWorldEntity> {
 
@@ -37,10 +40,13 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
 
     @Override
     public OdorWorldEntity express() {
-        OdorWorldEntity ret = new OdorWorldEntity(null);
+        OdorWorldEntity ret = new OdorWorldEntity(null, EntityType.MOUSE);
         sensors.getGenes().stream()
                 .map(SensorGene::getPrototype)
+                .map(Sensor::copy)
+                .map(Sensor.class::cast)
                 .peek(s -> s.setId(""))
+                .peek(s -> s.setParent(ret))
                 .forEach(ret::addSensor);
         return ret;
     }

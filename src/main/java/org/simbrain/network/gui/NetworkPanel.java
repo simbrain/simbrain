@@ -659,7 +659,7 @@ public class NetworkPanel extends JPanel {
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.forceSetActivation(0);
-        getNetwork().addNeuron(neuron);
+        getNetwork().addLooseNeuron(neuron);
         // New objects are added to the right of the last neuron added.
         // Convenient for quickly making "lines" of neurons by repeatedly
         // adding neurons.
@@ -676,7 +676,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void redo() {
-                getNetwork().addNeuron(neuron);
+                getNetwork().addLooseNeuron(neuron);
                 // System.out.println("AddNeuron:redo. Add" + neuron.getId());
             }
 
@@ -717,7 +717,7 @@ public class NetworkPanel extends JPanel {
         ArrayList<NeuronNode> nodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : neurons) {
             nodes.add(new NeuronNode(this, neuron));
-            net.addNeuron(neuron);
+            net.addLooseNeuron(neuron);
         }
 
         setSelection(nodes);
@@ -1479,7 +1479,7 @@ public class NetworkPanel extends JPanel {
         // public void undo() {
         // for (Object object : deletedObjects) {
         // if (object instanceof Neuron) {
-        // network.addNeuron((Neuron) object);
+        // network.addLooseNeuron((Neuron) object);
         // } else if (object instanceof NetworkTextObject) {
         // network.addText((NetworkTextObject) object);
         // }

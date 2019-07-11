@@ -469,7 +469,7 @@ public class Network {
      *
      * @param neuron Type of neuron to add
      */
-    public void addNeuron(Neuron neuron) {
+    public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);
         neuron.setId(getNeuronIdGenerator().getId());
         updatePriorityList();
@@ -493,7 +493,7 @@ public class Network {
      *
      * @param synapse the weight object to add
      */
-    public void addSynapse(Synapse synapse) {
+    public void addLooseSynapse(Synapse synapse) {
         synapse.initSpikeResponder();
         looseSynapses.add(synapse);
         synapse.setId(getSynapseIdGenerator().getId());
@@ -503,7 +503,7 @@ public class Network {
     /**
      * Calls {@link Synapse#update} for each weight.
      */
-    public void updateAllSynapses() {
+    public void updateLooseSynapses() {
         // No Buffering necessary because the values of weights don't depend on one another
         for (Synapse s : looseSynapses) {
             s.update();
@@ -707,9 +707,9 @@ public class Network {
     }
 
     /**
-     * Randomizes all neurons.
+     * Randomizes all loose neurons.
      */
-    public void randomizeNeurons() {
+    public void randomizeLooseNeurons() {
         for (Neuron n : looseNeurons) {
             n.randomize();
         }
@@ -718,19 +718,19 @@ public class Network {
     /**
      * Randomizes all loose weights.
      */
-    public void randomizeWeights() {
+    public void randomizeLooseWeights() {
         for (Synapse s : looseSynapses) {
             s.randomize();
         }
     }
 
     /**
-     * Randomize all biased neurons.
+     * Randomize all biased loose neurons.
      *
      * @param lower lower bound for randomization.
      * @param upper upper bound for randomization.
      */
-    public void randomizeBiases(double lower, double upper) {
+    public void randomizeBiasesLooseNeurons(double lower, double upper) {
         for (Neuron neuron : looseNeurons) {
             neuron.randomizeBias(lower, upper);
         }
@@ -756,7 +756,7 @@ public class Network {
      * @return Weight at the points defined
      */
     // TODO: Either fix this or make its assumptions explicit
-    public Synapse getWeight(final int i, final int j) {
+    public Synapse getLooseWeight(final int i, final int j) {
         return getLooseNeuron(i).getFanOut().get(getLooseNeuron(j));
     }
 
@@ -1407,10 +1407,10 @@ public class Network {
         for (Object object : toAdd) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;
-                addNeuron(neuron);
+                addLooseNeuron(neuron);
             } else if (object instanceof Synapse) {
                 Synapse synapse = (Synapse) object;
-                addSynapse(synapse);
+                addLooseSynapse(synapse);
             } else if (object instanceof NetworkTextObject) {
                 addText((NetworkTextObject) object);
             } else if (object instanceof NeuronGroup) {

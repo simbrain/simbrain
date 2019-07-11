@@ -187,7 +187,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                     }
                     synapses.add(s);
                     if (loose) {
-                        src.getNetwork().addSynapse(s);
+                        src.getNetwork().addLooseSynapse(s);
                     }
                 }
             }
@@ -217,7 +217,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                     Synapse s = new Synapse(src, tar);
                     synapses.add(s);
                     if (loose) {
-                        src.getNetwork().addSynapse(s);
+                        src.getNetwork().addLooseSynapse(s);
                     }
                 }
             }
@@ -275,7 +275,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
         List<Synapse> syns = connectRadialPolarized(source, target, eeDistConst,
                 eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
         for(Synapse s : syns) {
-            network.addSynapse(s);
+            network.addLooseSynapse(s);
         }
         return syns;
     }
@@ -508,7 +508,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                         Synapse s = new Synapse(src, tar);
                         synapses.add(s);
                         if (loose) {
-                            src.getNetwork().addSynapse(s);
+                            src.getNetwork().addLooseSynapse(s);
                         }
                     }
                 }

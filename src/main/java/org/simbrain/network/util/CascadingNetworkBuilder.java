@@ -131,16 +131,16 @@ public final class CascadingNetworkBuilder {
             // For each neuron in the current layer, add a branch (a set of
             // target neurons)
             for (Neuron baseNeuron : currentLayer) {
-                network.addNeuron(baseNeuron);
+                network.addLooseNeuron(baseNeuron);
                 double initialXOffset = branchWidth / 2;
                 for (int j = 0; j < numBrachesPerNeuron; j++) {
                     Neuron targetNeuron = new Neuron(network, new LinearRule()); // TODO;
                     targetNeuron.setLocation(baseNeuron.getX() - initialXOffset + (j * layerSpacing), initialPosition.y - (layerIndex * verticalSpacing));
                     tempList.add(targetNeuron);
-                    network.addNeuron(targetNeuron);
+                    network.addLooseNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
                     Synapse synapse = new Synapse(network, baseNeuron, targetNeuron, new StaticSynapseRule());
-                    network.addSynapse(synapse);
+                    network.addLooseSynapse(synapse);
                 }
             }
             currentLayer = tempList;

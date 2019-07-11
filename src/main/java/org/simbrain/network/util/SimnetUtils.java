@@ -82,7 +82,7 @@ public class SimnetUtils {
                 } else {
                     Synapse newSynapse = new Synapse(src.get(i), tar.get(j));
                     newSynapse.forceSetStrength(w[i][j]);
-                    newSynapse.getParentNetwork().addSynapse(newSynapse);
+                    newSynapse.getParentNetwork().addLooseSynapse(newSynapse);
                 }
             }
         }

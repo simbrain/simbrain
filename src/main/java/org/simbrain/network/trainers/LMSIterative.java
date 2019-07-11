@@ -170,7 +170,7 @@ public class LMSIterative extends IterableTrainer {
     // List<Neuron> inputLayer = new ArrayList<Neuron>();
     // for (int i = 0; i < 4; i++) {
     // Neuron neuron = new Neuron(network, new LinearRule());
-    // network.addNeuron(neuron);
+    // network.addLooseNeuron(neuron);
     // inputLayer.add(neuron);
     // // System.out.println("Input " + i + " = " + neuron.getId());
     // }
@@ -183,7 +183,7 @@ public class LMSIterative extends IterableTrainer {
     // ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
     // rule.setLowerBound(0);
     // rule.setUpperBound(1);
-    // network.addNeuron(neuron);
+    // network.addLooseNeuron(neuron);
     // // System.out.println("Output " + i + " = " + neuron.getId());
     // outputLayer.add(neuron);
     // }
@@ -242,7 +242,7 @@ public class LMSIterative extends IterableTrainer {
     // List<Neuron> inputLayer = new ArrayList<Neuron>();
     // for (int i = 0; i < 2; i++) {
     // Neuron neuron = new Neuron(network, new LinearRule());
-    // network.addNeuron(neuron);
+    // network.addLooseNeuron(neuron);
     // inputLayer.add(neuron);
     // // System.out.println("Input " + i + " = " + neuron.getId());
     // }
@@ -255,7 +255,7 @@ public class LMSIterative extends IterableTrainer {
     // ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
     // rule.setLowerBound(0);
     // rule.setUpperBound(1);
-    // network.addNeuron(neuron);
+    // network.addLooseNeuron(neuron);
     // // System.out.println("Output " + i + " = " + neuron.getId());
     // outputLayer.add(neuron);
     // }

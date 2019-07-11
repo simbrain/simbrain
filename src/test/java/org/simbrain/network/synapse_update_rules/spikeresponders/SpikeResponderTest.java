@@ -7,8 +7,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
-import static org.junit.Assert.*;
-
 public class SpikeResponderTest {
 
 
@@ -23,8 +21,8 @@ public class SpikeResponderTest {
         lr.setClipped(false);
         Neuron output = new Neuron(net, lr );
         Synapse s = new Synapse(spiking, output);
-        net.addNeuron(spiking);
-        net.addNeuron(output);
+        net.addLooseNeuron(spiking);
+        net.addLooseNeuron(output);
 
         for (int i = 0; i < 100 ; i++) {
             net.update();

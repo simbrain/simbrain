@@ -150,14 +150,14 @@ public class OneToOne extends ConnectionStrategy implements EditableObject {
                 Neuron target = targets.next();
                 Synapse synapse = new Synapse(source, target);
                 if (looseSynapses) {
-                    source.getNetwork().addSynapse(synapse);
+                    source.getNetwork().addLooseSynapse(synapse);
                 }
                 syns.add(synapse);
                 // Allow neurons to be connected back to source.
                 if (useBidirectionalConnections) {
                     Synapse espanys = new Synapse(target, source);
                     if (looseSynapses) {
-                        source.getNetwork().addSynapse(espanys);
+                        source.getNetwork().addLooseSynapse(espanys);
                     }
                     syns.add(espanys);
                 }

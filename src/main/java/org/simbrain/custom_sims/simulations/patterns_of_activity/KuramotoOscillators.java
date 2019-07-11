@@ -142,7 +142,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // network.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
-        //errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
+        //errorNeuron = net.addLooseNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
         //errorNeuron.setClamped(true);
         //errorNeuron.setLabel("Error");
 

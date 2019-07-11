@@ -128,7 +128,7 @@ public class AllToAll extends ConnectionStrategy implements EditableObject {
         if (looseSynapses) {
             for (Synapse s : syns) {
                 s.setStrength(1);
-                s.getSource().getNetwork().addSynapse(s);
+                s.getSource().getNetwork().addLooseSynapse(s);
             }
         }
         return syns;
@@ -162,7 +162,7 @@ public class AllToAll extends ConnectionStrategy implements EditableObject {
                }
                Synapse syn = new Synapse(src, tar);
                retList.add(syn);
-               network.addSynapse(syn);
+               network.addLooseSynapse(syn);
            }
        }
         return retList;

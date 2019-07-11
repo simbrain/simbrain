@@ -1579,7 +1579,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     public void releaseNeurons() {
         for (Neuron neuron : neuronList) {
-            getParentNetwork().addNeuron(neuron);
+            getParentNetwork().addLooseNeuron(neuron);
         }
         neuronList.clear();
         stopRecording();

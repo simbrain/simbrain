@@ -118,7 +118,7 @@ public class Cerebellum extends RegisteredSimulation {
         network.addGroup(redNucleus);
 
         // Cortex to Red Nucleus
-        network.addSynapse(new Synapse(cortex.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(cortex.getNeuronList().get(0),
             redNucleus.getNeuronList().get(0), 1));
 
         // Inferior Olive
@@ -128,10 +128,10 @@ public class Cerebellum extends RegisteredSimulation {
         inferiorOlive.setLocation(200, 275);
         inferiorOlive.setLowerBound(0);
         inferiorOlive.forceSetActivation(0.3);
-        network.addNeuron(inferiorOlive);
+        network.addLooseNeuron(inferiorOlive);
 
         // Red Nucleus to Inf. Olive
-        network.addSynapse(new Synapse(redNucleus.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(redNucleus.getNeuronList().get(0),
             inferiorOlive, 1));
 
         // To Spinal Cord
@@ -143,11 +143,11 @@ public class Cerebellum extends RegisteredSimulation {
         network.addGroup(toSpinalCord);
 
         // Cortex to Spinal Cord
-        network.addSynapse(new Synapse(cortex.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(cortex.getNeuronList().get(0),
             toSpinalCord.getNeuronList().get(0), 1));
 
         // Red Nucleus to Spinal Cord
-        network.addSynapse(new Synapse(redNucleus.getNeuronList().get(1),
+        network.addLooseSynapse(new Synapse(redNucleus.getNeuronList().get(1),
             toSpinalCord.getNeuronList().get(1), 1));
 
         // Output
@@ -156,12 +156,12 @@ public class Cerebellum extends RegisteredSimulation {
         output.setUpdateRule(generalRule);
         output.setLocation(0, 325);
         output.setLowerBound(0);
-        network.addNeuron(output);
+        network.addLooseNeuron(output);
 
         // Spinal Cord to Output
-        network.addSynapse(
+        network.addLooseSynapse(
             new Synapse(toSpinalCord.getNeuronList().get(0), output, 1));
-        network.addSynapse(
+        network.addLooseSynapse(
             new Synapse(toSpinalCord.getNeuronList().get(1), output, 1));
 
         // Thalamus
@@ -170,10 +170,10 @@ public class Cerebellum extends RegisteredSimulation {
         thalamus.setUpdateRule(generalRule);
         thalamus.setLocation(100, 100);
         thalamus.setLowerBound(0);
-        network.addNeuron(thalamus);
+        network.addLooseNeuron(thalamus);
 
         // Thalamus to Cortex
-        network.addSynapse(
+        network.addLooseSynapse(
             new Synapse(thalamus, cortex.getNeuronList().get(0), 1));
 
         // Cerebellum
@@ -198,33 +198,33 @@ public class Cerebellum extends RegisteredSimulation {
         cerebellum.setLowerBound(0);
 
         // Purkinje to DCN and Granule to Purkinje
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(0),
             cerebellum.getNeuronList().get(1), -2));
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(0),
             cerebellum.getNeuronList().get(2), -2));
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(3),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(3),
             cerebellum.getNeuronList().get(0), 0.02));
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(4),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(4),
             cerebellum.getNeuronList().get(0), 0.02));
 
         // DCNe to RedNucleus
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(1),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(1),
             redNucleus.getNeuronList().get(1), 1));
 
         // DCNi to inferior Olive
-        network.addSynapse(new Synapse(cerebellum.getNeuronList().get(2),
+        network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(2),
             inferiorOlive, -1));
 
         // Inferior Olive to DCN, Pukinje
-        network.addSynapse(new Synapse(inferiorOlive,
+        network.addLooseSynapse(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(0), 0.3));
-        network.addSynapse(new Synapse(inferiorOlive,
+        network.addLooseSynapse(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(1), 1));
-        network.addSynapse(new Synapse(inferiorOlive,
+        network.addLooseSynapse(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(2), 1));
 
         // // DCNe to Thalamus
-        // network.addSynapse(new Synapse(cerebellum.getNeuronList().get(1),
+        // network.addLooseSynapse(new Synapse(cerebellum.getNeuronList().get(1),
         // thalamus, 1));
 
         // From Spinal Cord
@@ -239,11 +239,11 @@ public class Cerebellum extends RegisteredSimulation {
         fromSpinalCord.getNeuronList().get(1).setLabel("No Go");
 
         // From Spinal Cord to Granules
-        network.addSynapse(new Synapse(fromSpinalCord.getNeuronList().get(0), cerebellum.getNeuronList().get(3), 1));
-        network.addSynapse(new Synapse(fromSpinalCord.getNeuronList().get(1), cerebellum.getNeuronList().get(4), 1));
-        network.addSynapse(new Synapse(fromSpinalCord.getNeuronList().get(0),
+        network.addLooseSynapse(new Synapse(fromSpinalCord.getNeuronList().get(0), cerebellum.getNeuronList().get(3), 1));
+        network.addLooseSynapse(new Synapse(fromSpinalCord.getNeuronList().get(1), cerebellum.getNeuronList().get(4), 1));
+        network.addLooseSynapse(new Synapse(fromSpinalCord.getNeuronList().get(0),
             cerebellum.getNeuronList().get(3), 1));
-        network.addSynapse(new Synapse(fromSpinalCord.getNeuronList().get(1),
+        network.addLooseSynapse(new Synapse(fromSpinalCord.getNeuronList().get(1),
             cerebellum.getNeuronList().get(4), 1));
 
         // DA
@@ -251,10 +251,10 @@ public class Cerebellum extends RegisteredSimulation {
         dopamine.setLabel("Basal Ganglia (GPi)");
         dopamine.setLocation(150, 50);
         // dopamine.setLowerBound(0);
-        network.addNeuron(dopamine);
+        network.addLooseNeuron(dopamine);
 
         // DA to Thalamus
-        network.addSynapse(new Synapse(dopamine, thalamus, 1));
+        network.addLooseSynapse(new Synapse(dopamine, thalamus, 1));
 
         // Target
         Neuron target = new Neuron(network);
@@ -263,7 +263,7 @@ public class Cerebellum extends RegisteredSimulation {
         // target.setUpdateRule(targetRule);
         target.setLocation(240, 50);
         // target.setLowerBound(0);
-        network.addNeuron(target);
+        network.addLooseNeuron(target);
 
         // Labels
         NetworkTextObject parallelFiberLabel = new NetworkTextObject(network,

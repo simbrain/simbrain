@@ -92,7 +92,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                 // Set locations based on where the input and outputs are set
                 neuron.setX(SimbrainRandomizer.rand.nextDouble(-200, 200));
                 neuron.setY(SimbrainRandomizer.rand.nextDouble(0, 300));
-                network.addNeuron(neuron);
+                network.addLooseNeuron(neuron);
             }
         });
 
@@ -111,7 +111,7 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                     connectionGene.getPrototype().getLearningRule(),
                     connectionGene.getPrototype()
             );
-            network.addSynapse(synapse);
+            network.addLooseSynapse(synapse);
         });
 
         return network;

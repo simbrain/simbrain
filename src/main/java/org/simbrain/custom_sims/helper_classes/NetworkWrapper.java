@@ -3,11 +3,9 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.*;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.desktop.NetworkPanelDesktop;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -65,7 +63,7 @@ public class NetworkWrapper {
     public Neuron addNeuron(int x, int y) {
         Neuron neuron = new Neuron(network, "LinearRule");
         neuron.setLocation(x, y);
-        network.addNeuron(neuron);
+        network.addLooseNeuron(neuron);
         return neuron;
     }
 
@@ -77,7 +75,7 @@ public class NetworkWrapper {
         List<Neuron> newNeurons = new ArrayList();
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(network, type);
-            network.addNeuron(neuron);
+            network.addLooseNeuron(neuron);
             newNeurons.add(neuron);
         }
 
@@ -109,7 +107,7 @@ public class NetworkWrapper {
         synapse.setStrength(value);
         synapse.setLowerBound(lowerBound);
         synapse.setUpperBound(upperBound);
-        source.getNetwork().addSynapse(synapse);
+        source.getNetwork().addLooseSynapse(synapse);
     }
 
     /**
@@ -121,7 +119,7 @@ public class NetworkWrapper {
     public Synapse connect(Neuron source, Neuron target, double value) {
         Synapse synapse = new Synapse(source, target);
         synapse.setStrength(value);
-        source.getNetwork().addSynapse(synapse);
+        source.getNetwork().addLooseSynapse(synapse);
         return synapse;
     }
 
@@ -133,7 +131,7 @@ public class NetworkWrapper {
     public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
         Synapse synapse = new Synapse(source, target, rule);
         synapse.setStrength(value);
-        source.getNetwork().addSynapse(synapse);
+        source.getNetwork().addLooseSynapse(synapse);
         return synapse;
     }
 

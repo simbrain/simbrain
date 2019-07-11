@@ -215,7 +215,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
                     target = targetNeurons.get(tListCopy.get(j));
                     synapse = new Synapse(source, target);
                     if (looseSynapses) {
-                        source.getNetwork().addSynapse(synapse);
+                        source.getNetwork().addLooseSynapse(synapse);
                     }
                     syns.add(synapse);
                 }
@@ -231,7 +231,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
                             target = targetNeurons.get(j);
                             synapse = new Synapse(source, target);
                             if (looseSynapses) {
-                                source.getNetwork().addSynapse(synapse);
+                                source.getNetwork().addLooseSynapse(synapse);
                             }
                             syns.add(synapse);
                         }

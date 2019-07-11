@@ -308,7 +308,7 @@
 //                    }
 //
 //                    // Add our synapse to it
-//                    sg.addSynapse(syn);
+//                    sg.addLooseSynapse(syn);
 //
 //                    // Put the group in the routing map with the associated
 //                    // synapse
@@ -332,7 +332,7 @@
 //            final SynapseGroup synapseGroup) {
 //
 //        // If the synapse already exists in that group, don't add it.
-//        boolean wasAdded = synapseGroup.addSynapse(synapse);
+//        boolean wasAdded = synapseGroup.addLooseSynapse(synapse);
 //        if (wasAdded) {
 //            // Fire Event so network panel knows to add this synapse to
 //            // appropriate

@@ -94,7 +94,7 @@ class SimpleNetGenome extends Genome<SimpleNetGenome, Network> {
             Neuron neuron = new Neuron(network, type);
             neuron.setLowerBound(-10);
             neuron.setUpperBound(10);
-            network.addNeuron(neuron);
+            network.addLooseNeuron(neuron);
         }
         GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
                 .sqrt(numNeurons));
@@ -109,7 +109,7 @@ class SimpleNetGenome extends Genome<SimpleNetGenome, Network> {
 
         // Currently, the default behavior is to randomize the neurons of a
         // network and update it for a set number of iterations.
-        network.randomizeNeurons();
+        network.randomizeLooseNeurons();
         for (int i = 0; i < 50; i++) {
             network.update();
         }

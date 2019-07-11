@@ -266,7 +266,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                     }
                     synapse.setStrength(-Math.random());
                     if (looseSynapses) {
-                        network.addSynapse(synapse);
+                        network.addLooseSynapse(synapse);
                     } else {
                         if (syns != null)
                             syns.add(synapse);
@@ -281,7 +281,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                 }
                 synapse.setStrength(-Math.random());
                 if (looseSynapses) {
-                    network.addSynapse(synapse);
+                    network.addLooseSynapse(synapse);
                 } else {
                     if (syns != null)
                         syns.add(synapse);
@@ -331,7 +331,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                     }
                     synapse.setStrength(Math.random());
                     if (looseSynapses) {
-                        network.addSynapse(synapse);
+                        network.addLooseSynapse(synapse);
                     } else {
                         if (syns != null)
                             syns.add(synapse);
@@ -346,7 +346,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                 }
                 synapse.setStrength(Math.random());
                 if (looseSynapses) {
-                    network.addSynapse(synapse);
+                    network.addLooseSynapse(synapse);
                 } else {
                     if (syns != null)
                         syns.add(synapse);

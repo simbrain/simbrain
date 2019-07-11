@@ -20,6 +20,8 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
+import java.util.Arrays;
+
 public class TestNetworkEntityEvolution extends RegisteredSimulation {
 
     /**
@@ -30,15 +32,17 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
     /**
      * The maximum number of generation.
      */
-    private int maxIterations = 100;
+    private int maxIterations = 10;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      */
     private double fitnessThreshold = 3;
 
-    public static int maxMove = 500;
-
+    /**
+     * How many times to iterate the simulation of the network in an environment
+     */
+    public static int maxMoves = 500;
 
     /**
      * Population of xor networks to evolve
@@ -65,9 +69,25 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         super(desktop);
     }
 
+
     /**
-     * Run the simulation
+     * Initialize the population of networks.
      */
+    public void init() {
+        population = new Population<>(this.populationSize);
+        NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
+        configuration.setNumInputs(3);
+        configuration.setNumOutputs(3);
+        configuration.setAllowSelfConnection(false);
+        configuration.setMaxNodes(50);
+        configuration.setNodeMaxBias(1);
+
+        Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
+                new Agent<>(new NetworkEntityGenome(configuration),
+                        TestNetworkEntityEvolution::eval);
+        population.populate(prototype);
+    }
+
     @Override
     public void run() {
 
@@ -85,15 +105,16 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         // Add odor world
         createOdorWorld();
 
+        // Find the winning network / odorworld entity pair
         worldBuilder.getWorld().addEntity(population.getFittestAgent().getPhenotype().getValue());
-
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> agent = population.getFittestAgent();
 
+        // Get the mouse from the network / odor world pair
         mouse = agent.getPhenotype().getValue();
         mouse.setParentWorld(worldBuilder.getWorld());
-        mouse.addEffector(new StraightMovement(mouse));
-        mouse.addEffector(new Turning(mouse, Turning.LEFT));
-        mouse.addEffector(new Turning(mouse, Turning.RIGHT));
+        //mouse.addEffector(new StraightMovement(mouse));
+        //mouse.addEffector(new Turning(mouse, Turning.LEFT));
+        //mouse.addEffector(new Turning(mouse, Turning.RIGHT));
 
         // Create couplings
         NeuronGroup outputs = (NeuronGroup) winner.getGroupByLabel("outputs");
@@ -108,26 +129,6 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         // TODO: When the mouse gets the cheese, respawn to a new location
 
     }
-
-    /**
-     * Initialize the population of networks.
-     */
-    public void init() {
-        population = new Population<>(this.populationSize);
-        NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        configuration.setNumInputs(3);
-        configuration.setNumOutputs(3);
-        configuration.setAllowSelfConnection(false);
-        configuration.setMaxNodes(50);
-        configuration.setNodeMaxBias(1);
-
-        // TODO: too hard to construct
-        Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
-                new Agent<>(new NetworkEntityGenome(configuration),
-                TestNetworkEntityEvolution::eval);
-        population.populate(prototype);
-    }
-
 
     private void createOdorWorld() {
 
@@ -145,16 +146,21 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         // How many cheeses the agent eats
         double score = 0;
 
+        // Set up the odor world
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent("agent world");
         OdorWorld odorWorld = odorWorldComponent.getWorld();
         OdorWorldEntity mouse = agent.getPhenotype().getValue();
         mouse.setParentWorld(odorWorld);
-        mouse.addEffector(new StraightMovement(mouse));
+        mouse.addEffector(new StraightMovement(mouse)); // To be move to odorworldentitygenome
         mouse.addEffector(new Turning(mouse, Turning.LEFT));
         mouse.addEffector(new Turning(mouse, Turning.RIGHT));
         mouse.setLocation(odorWorld.getWidth() / 2, odorWorld.getHeight() / 2);
-        OdorWorldEntity cheese = odorWorld.addEntity();
 
+        // Add cheese
+        OdorWorldEntity cheese = odorWorld.addEntity();
+        cheese.getSmellSource().setDispersion(300);
+
+        // Randomize location of cheese. TODO Reuse respawn
         double x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(32, 64);
         x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (x < 0) {
@@ -162,7 +168,6 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
             x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
         }
-
         double y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(32, 64);
         y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (y < 0) {
@@ -172,19 +177,20 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         }
         cheese.setLocation(x, y);
 
-        for (int i = 0; i < maxMove; i++) {
+        // Run the simulation
+        for (int i = 0; i < maxMoves; i++) {
 
-            // sensing
+            // Update the sensors
             NeuronGroup inputs = (NeuronGroup) agent.getPhenotype().getKey().getGroupByLabel("inputs");
             for (int j = 0; j < inputs.size() && j < mouse.getSensors().size(); j++) {
                 ObjectSensor os = (ObjectSensor) mouse.getSensors().get(j);
                 inputs.getNeuronList().get(j).forceSetActivation(os.getCurrentValue());
             }
 
-            // "planning"
+            // Update the network
             agent.getPhenotype().getKey().update();
 
-            // acting
+            // Move the mouse
             NeuronGroup outputs = (NeuronGroup) agent.getPhenotype().getKey().getGroupByLabel("outputs");
             ((StraightMovement) mouse.getEffector("Move Straight")).setAmount(outputs.getActivations()[0]);
             ((Turning) mouse.getEffector("Turn Left")).setAmount(outputs.getActivations()[1]);
@@ -192,32 +198,41 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
 
             odorWorld.update();
 
+            // Update score if the mouse is close enough to the cheese
+            //System.out.println(mouse.getHeading());
             if (mouse.isInRadius(cheese, 28)) {
                 score += 1;
-                x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
-                x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
-                if (x < 0) {
-                    x = 0;
-                } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
-                    x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
-                }
-
-                y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
-                y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
-                if (y < 0) {
-                    y = 0;
-                } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {
-                    y = odorWorld.getHeight() - cheese.getEntityType().getImageHeight();
-                }
-
-                cheese.setLocation(x, y);
+                respawnCheese(odorWorld, mouse, cheese);
             }
 
         }
-        double distanceToCheese = mouse.getRadiusTo(cheese);
-        score += distanceToCheese < 48 ? (48 - distanceToCheese) / 48 : 0;
+
+        // Partial score if mouse never gets cheese but gets closer
+        //double distanceToCheese = mouse.getRadiusTo(cheese);
+        //score += distanceToCheese < 48 ? (48 - distanceToCheese) / 48 : 0;
 
         return score;
+    }
+
+    private static void respawnCheese(OdorWorld odorWorld, OdorWorldEntity mouse, OdorWorldEntity cheese) {
+        double x;
+        double y;
+        x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
+        x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
+        if (x < 0) {
+            x = 0;
+        } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
+            x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
+        }
+
+        y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
+        y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
+        if (y < 0) {
+            y = 0;
+        } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {
+            y = odorWorld.getHeight() - cheese.getEntityType().getImageHeight();
+        }
+        cheese.setLocation(x, y);
     }
 
     /**

@@ -23,6 +23,5 @@ public class ObjectSensorGene extends SensorGene {
     @Override
     public void mutate() {
         super.mutate();
-
     }
 }

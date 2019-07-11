@@ -4,11 +4,17 @@ import org.simbrain.util.geneticalgorithm.Genome;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
+/**
+ * Represents and OdorWorld entity.
+ */
 public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWorldEntity> {
 
     private EntitySensorChromosome sensors;
+
+    // Todo: EntityEffectorChromosome
 
     private Config config = new Config();
 
@@ -47,6 +53,11 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
                 .map(Sensor.class::cast)
                 .peek(s -> s.setId(""))
                 .peek(s -> s.setParent(ret))
+                .peek(s -> {
+                    if (s instanceof ObjectSensor) {
+                        ((ObjectSensor)s).getDecayFunction().setDispersion(300);
+                    }
+                })
                 .forEach(ret::addSensor);
         return ret;
     }

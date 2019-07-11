@@ -542,7 +542,7 @@ public class SynapseGroup extends Group {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Update synapses";
     }
 

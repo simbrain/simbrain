@@ -488,7 +488,7 @@ public abstract class Subnetwork extends Group {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Unspecified";
     }
 

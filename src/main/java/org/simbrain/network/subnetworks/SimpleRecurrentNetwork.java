@@ -274,7 +274,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
      * {@inheritDoc}
      */
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Hidden layer, copy hidden to context, update layer";
     }
 

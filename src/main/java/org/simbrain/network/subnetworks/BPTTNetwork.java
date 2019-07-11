@@ -103,7 +103,7 @@ public final class BPTTNetwork extends FeedForward implements Trainable {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Hidden layer, output layer, copy output to input";
     }
 

@@ -1133,7 +1133,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Update neurons";
     }
 

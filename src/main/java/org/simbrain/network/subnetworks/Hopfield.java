@@ -164,7 +164,7 @@ public class Hopfield extends Subnetwork implements Trainable {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return updateFunc.getDescription();
     }
 

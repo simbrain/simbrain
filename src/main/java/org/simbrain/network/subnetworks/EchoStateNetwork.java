@@ -654,7 +654,7 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Input layer, reservoir, output layer";
     }
 

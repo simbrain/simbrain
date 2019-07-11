@@ -112,7 +112,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      *
      * @return a description of the update method.
      */
-    public abstract String getUpdateMethodDesecription();
+    public abstract String getUpdateMethodDescription();
 
     /**
      * If true, when the group is added to the network its id will not be used as its label.

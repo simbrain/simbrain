@@ -51,7 +51,7 @@ public class UpdateGroup implements NetworkUpdateAction {
 
     @Override
     public String getDescription() {
-        String groupUpdateDescription = group.getUpdateMethodDesecription();
+        String groupUpdateDescription = group.getUpdateMethodDescription();
         if (group instanceof Subnetwork) {
             return "Subnetwork:" + group.getLabel() + " (" + groupUpdateDescription + ")";
         } else if (group instanceof NeuronGroup) {

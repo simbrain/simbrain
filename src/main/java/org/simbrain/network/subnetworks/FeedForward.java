@@ -192,7 +192,7 @@ public class FeedForward extends Subnetwork {
     }
 
     @Override
-    public String getUpdateMethodDesecription() {
+    public String getUpdateMethodDescription() {
         return "Layered update";
     }
 

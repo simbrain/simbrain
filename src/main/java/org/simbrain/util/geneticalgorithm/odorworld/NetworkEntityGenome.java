@@ -3,11 +3,8 @@ package org.simbrain.util.geneticalgorithm.odorworld;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Genome;
-import org.simbrain.util.neat2.NetworkGenome;
+import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
-
-import java.util.List;
 
 public class NetworkEntityGenome extends Genome<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> {
 

@@ -10,7 +10,7 @@ import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 import org.simbrain.util.geneticalgorithm.odorworld.NetworkEntityGenome;
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat2.NetworkGenome;
+import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -19,11 +19,6 @@ import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
-import org.simbrain.world.odorworld.sensors.Sensor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TestNetworkEntityEvolution extends RegisteredSimulation {
 

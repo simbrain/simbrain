@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * A list of genes that can be crossed with genes from another chromosome of the same type.
  * See {@link org.simbrain.util.geneticalgorithm.numerical.DoubleChromosome} and
- * {@link org.simbrain.util.neat2.ConnectionChromosome}.
+ * {@link org.simbrain.util.neat.ConnectionChromosome}.
  *
  * @param <T> the type of the genes in this chromosome
  */

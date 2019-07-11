@@ -8,7 +8,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat2.NetworkGenome;
+import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;

@@ -26,7 +26,6 @@ import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
 import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
-import org.simbrain.custom_sims.simulations.neat.NEAT;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;

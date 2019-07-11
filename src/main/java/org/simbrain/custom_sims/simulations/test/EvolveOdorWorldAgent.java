@@ -20,9 +20,7 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
-import java.util.Arrays;
-
-public class TestNetworkEntityEvolution extends RegisteredSimulation {
+public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
     /**
      * Default population size at each generation.
@@ -32,12 +30,12 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
     /**
      * The maximum number of generation.
      */
-    private int maxIterations = 10;
+    private int maxIterations = 200;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      */
-    private double fitnessThreshold = 3;
+    private double fitnessThreshold = 10;
 
     /**
      * How many times to iterate the simulation of the network in an environment
@@ -58,14 +56,14 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
     /**
      * Construct sim
      */
-    public TestNetworkEntityEvolution() {
+    public EvolveOdorWorldAgent() {
         super();
     }
 
     /**
      * @param desktop
      */
-    public TestNetworkEntityEvolution(SimbrainDesktop desktop) {
+    public EvolveOdorWorldAgent(SimbrainDesktop desktop) {
         super(desktop);
     }
 
@@ -75,16 +73,19 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
      */
     public void init() {
         population = new Population<>(this.populationSize);
+        //population.setEliminationRatio(.8);// TODO: causes problems
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
         configuration.setNumInputs(3);
         configuration.setNumOutputs(3);
-        configuration.setAllowSelfConnection(false);
-        configuration.setMaxNodes(50);
-        configuration.setNodeMaxBias(1);
+        configuration.setAllowSelfConnection(true);
+        configuration.setMaxNodes(10);
+        configuration.setMaxConnectionStrength(1);
+        configuration.setNodeMaxBias(2);
+        configuration.setMaxNeuronActivation(10);
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
                 new Agent<>(new NetworkEntityGenome(configuration),
-                        TestNetworkEntityEvolution::eval);
+                        EvolveOdorWorldAgent::eval);
         population.populate(prototype);
     }
 
@@ -112,6 +113,7 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         // Get the mouse from the network / odor world pair
         mouse = agent.getPhenotype().getValue();
         mouse.setParentWorld(worldBuilder.getWorld());
+
         //mouse.addEffector(new StraightMovement(mouse));
         //mouse.addEffector(new Turning(mouse, Turning.LEFT));
         //mouse.addEffector(new Turning(mouse, Turning.RIGHT));
@@ -121,10 +123,12 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         sim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
         sim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
         sim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
+        outputs.setClamped(false);
         NeuronGroup inputs = (NeuronGroup) winner.getGroupByLabel("inputs");
         sim.couple((ObjectSensor) mouse.getSensors().get(0), inputs.getNeuron(0));
         sim.couple((ObjectSensor) mouse.getSensors().get(1), inputs.getNeuron(1));
         sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
+        inputs.setClamped(false);
 
         // TODO: When the mouse gets the cheese, respawn to a new location
 
@@ -136,6 +140,7 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         worldBuilder.getWorld().setObjectsBlockMovement(false);
 
         cheese = worldBuilder.addEntity(100, 100, EntityType.SWISS);
+        cheese.getSmellSource().setDispersion(300);
         worldBuilder.getWorld().update();
 
     }
@@ -160,22 +165,8 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         OdorWorldEntity cheese = odorWorld.addEntity();
         cheese.getSmellSource().setDispersion(300);
 
-        // Randomize location of cheese. TODO Reuse respawn
-        double x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(32, 64);
-        x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
-        if (x < 0) {
-            x = 0;
-        } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
-            x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
-        }
-        double y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(32, 64);
-        y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
-        if (y < 0) {
-            y = 0;
-        } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {
-            y = odorWorld.getHeight() - cheese.getEntityType().getImageHeight();
-        }
-        cheese.setLocation(x, y);
+        // Randomize location of cheese.
+        respawnCheese(odorWorld, mouse, cheese);
 
         // Run the simulation
         for (int i = 0; i < maxMoves; i++) {
@@ -208,13 +199,13 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
         }
 
         // Partial score if mouse never gets cheese but gets closer
-        //double distanceToCheese = mouse.getRadiusTo(cheese);
-        //score += distanceToCheese < 48 ? (48 - distanceToCheese) / 48 : 0;
+        double distanceToCheese = mouse.getRadiusTo(cheese);
+        score += distanceToCheese < 48 ? (48 - distanceToCheese) / 48 : 0;
 
         return score;
     }
 
-    private static void respawnCheese(OdorWorld odorWorld, OdorWorldEntity mouse, OdorWorldEntity cheese) {
+    private static void respawnCheese(OdorWorld odorWorld,  OdorWorldEntity mouse,  OdorWorldEntity cheese) {
         double x;
         double y;
         x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
@@ -251,11 +242,11 @@ public class TestNetworkEntityEvolution extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Network Entity Evolution";
+        return "Evolve Mouse";
     }
 
     @Override
     public RegisteredSimulation instantiate(SimbrainDesktop desktop) {
-        return new TestNetworkEntityEvolution(desktop);
+        return new EvolveOdorWorldAgent(desktop);
     }
 }

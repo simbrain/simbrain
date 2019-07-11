@@ -53,11 +53,6 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
                 .map(Sensor.class::cast)
                 .peek(s -> s.setId(""))
                 .peek(s -> s.setParent(ret))
-                .peek(s -> {
-                    if (s instanceof ObjectSensor) {
-                        ((ObjectSensor)s).getDecayFunction().setDispersion(300);
-                    }
-                })
                 .forEach(ret::addSensor);
         return ret;
     }

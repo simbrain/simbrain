@@ -1,5 +1,6 @@
 package org.simbrain.util.geneticalgorithm.odorworld;
 
+import org.simbrain.custom_sims.simulations.test.EvolveOdorWorldAgent;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Genome;
@@ -10,7 +11,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * Represents a network attached to an odor world entity.  A literal pair with
  * a network and odor world entity.  Coupling between the two happens in an eval function.
  * We may later evolve the links between them directly.
- * See {@link org.simbrain.custom_sims.simulations.test.TestNetworkEntityEvolution}
+ * See {@link EvolveOdorWorldAgent}
  */
 public class NetworkEntityGenome extends Genome<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> {
 

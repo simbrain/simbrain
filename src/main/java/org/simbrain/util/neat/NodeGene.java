@@ -3,6 +3,7 @@ package org.simbrain.util.neat;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.math.SimbrainRandomizer;
 
@@ -70,6 +71,8 @@ public class NodeGene extends Gene<Neuron> {
     @Override
     public void mutate() {
         if (isMutable()) {
+            prototype.setLowerBound(configuration.getMinNeuronActivation());
+            prototype.setUpperBound(configuration.getMaxNeuronActivation());
             if (prototype.getUpdateRule() instanceof BiasedUpdateRule) {
                 BiasedUpdateRule updateRule = (BiasedUpdateRule) prototype.getUpdateRule();
                 double newBias =

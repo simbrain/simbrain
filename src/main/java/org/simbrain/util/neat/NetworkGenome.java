@@ -213,6 +213,8 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         private double minConnectionStrength = -10;
         private double maxConnectionMutation = .1;
         private boolean allowFreeFloatingNodes = false;
+        private double minNeuronActivation = 0;
+        private double maxNeuronActivation = 1;
 
         public Configuration() {
         }
@@ -303,6 +305,22 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
         public void setNodeMaxBias(double nodeMaxBias) {
             this.nodeMaxBias = nodeMaxBias;
+        }
+
+        public double getMinNeuronActivation() {
+            return minNeuronActivation;
+        }
+
+        public void setMinNeuronActivation(double minNeuronActivation) {
+            this.minNeuronActivation = minNeuronActivation;
+        }
+
+        public double getMaxNeuronActivation() {
+            return maxNeuronActivation;
+        }
+
+        public void setMaxNeuronActivation(double maxNeuronActivation) {
+            this.maxNeuronActivation = maxNeuronActivation;
         }
     }
 }

@@ -296,7 +296,9 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // Nothing was being dragged
         if (noObjectWasClickedOn()) {
             // End lasso selection
-            marquee.removeFromParent();
+            if (marquee != null) {
+                marquee.removeFromParent();
+            }
             marquee = null;
             marqueeStartPosition = null;
             return;

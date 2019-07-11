@@ -30,18 +30,18 @@ public class TestNetworkEvolution  {
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      * Must obviously change this depending on fitness function.
      */
-    private double fitnessThreshold = 100;
+    private double fitnessThreshold = -.01;
 
     /**
      * Evaluate a network agent
      */
     public static Double eval(Agent<SimpleNetGenome, Network> agent) {
         //return NetworkFitnessFunctions.getAverageValue(agent.getPhenotype(), 1);
-        //return -NetworkFitnessFunctions.howCloseToValue(agent.getPhenotype(), 4.0);
+        return -NetworkFitnessFunctions.howCloseToValue(agent.getPhenotype(), 7.2);
         //return -NetworkFitnessFunctions.getTotalActivation(agent.getPhenotype(), 1);
         //return NetworkFitnessFunctions.getTotalActivation(agent.getPhenotype(), 1);
         //return Double.valueOf(NetworkFitnessFunctions.getNumActive(agent.getPhenotype(), 1, .5 ));
-        return NetworkFitnessFunctions.percentActive(agent.getPhenotype(), 1, .5);
+        //return NetworkFitnessFunctions.percentActive(agent.getPhenotype(), 1, .5);
     }
 
     /**
@@ -63,7 +63,7 @@ public class TestNetworkEvolution  {
         for (int i = 0; i < maxIterations; i++) {
             double bestFitness = population.computeNewFitness();
             System.out.println(i + ", fitness = " + bestFitness);
-            System.out.println(population.getFittestAgent().getGenome().getIntChromosome());
+            //System.out.println(population.getFittestAgent().getGenome().getIntChromosome());
             if (bestFitness > fitnessThreshold) {
                 Network winner =  population.getFittestAgent().getPhenotype();
                 NetworkPanel.showNetwork(winner);

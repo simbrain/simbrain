@@ -1,4 +1,4 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;

@@ -1,4 +1,4 @@
-package org.simbrain.util.neat2.testsims;
+package org.simbrain.util.neat.testsims;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
@@ -6,7 +6,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
-import org.simbrain.util.neat2.NetworkGenome;
+import org.simbrain.util.neat.NetworkGenome;
 
 /**
  * The classic NEAT application.

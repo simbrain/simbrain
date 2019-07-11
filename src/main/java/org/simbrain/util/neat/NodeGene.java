@@ -1,14 +1,10 @@
-package org.simbrain.util.neat2;
+package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.geneticalgorithm.Gene;
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat.ConnectionGene;
-
-import java.awt.geom.Point2D;
 
 /**
  * A gene representing a node of a given type: input, hidden, or output.

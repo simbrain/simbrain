@@ -29,7 +29,7 @@ import org.simbrain.util.math.ProbDistributions.*;
     for (int i = 0; i < NUM_NEURONS; i++) {
         Neuron neuron = new Neuron(network, "NakaRushtonRule");
         neuron.setUpperBound(10);
-        network.addNeuron(neuron);
+        network.addLooseNeuron(neuron);
     }
     layout.layoutNeurons(network.getNeuronList());
 

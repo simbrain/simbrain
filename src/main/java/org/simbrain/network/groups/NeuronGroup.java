@@ -1521,7 +1521,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     @Producible(idMethod = "getId")
     public double[] getSubsampledActivations() {
-        if (subSampledValues == null) {
+        if (subSampledValues == null || subSampledValues.length != numSubSamples) {
             subSampledValues = new double[numSubSamples];
         }
         for (int ii = 0; ii < numSubSamples; ii++) {

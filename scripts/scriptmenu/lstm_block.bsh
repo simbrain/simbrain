@@ -50,7 +50,7 @@ import java.util.*;
         Neuron neuron=new Neuron(network,"LinearRule");
         neuron.setIncrement(1);
         neuron.setClamped(true);
-        network.addNeuron(neuron);
+        network.addLooseNeuron(neuron);
         neuron.setLabel("Gate "+(i+1));
         gates.add(neuron);
     }
@@ -59,7 +59,7 @@ import java.util.*;
     // Create the four units of the LSTM cell, three products (AND gates) and one sum (OR gate)
     // The load unit allows the info value to enter the store if the gate 1 is high
     Neuron load=new Neuron(network,new ProductRule());
-    network.addNeuron(load);
+    network.addLooseNeuron(load);
     load.setLabel("Load");
     load.setX(0);load.setY(-GRID_SPACE);
 

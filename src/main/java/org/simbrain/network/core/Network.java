@@ -716,6 +716,13 @@ public class Network {
     }
 
     /**
+     * Randomize loose neurons. Keeping this for legacy code.
+     */
+    public void randomizeNeurons() {
+        randomizeLooseNeurons();
+    }
+
+    /**
      * Randomizes all loose weights.
      */
     public void randomizeLooseWeights() {
@@ -723,6 +730,14 @@ public class Network {
             s.randomize();
         }
     }
+
+    /**
+     * Randomize loose weights. Keeping this for legacy code.
+     */
+    public void randomizeWeights() {
+        randomizeLooseWeights();
+    }
+
 
     /**
      * Randomize all biased loose neurons.

@@ -44,7 +44,7 @@ import org.simbrain.util.math.ProbDistributions.*;
     // Make neurons and lay them out
 	for (int i = 0; i < NUM_NEURONS; i++) {
 		Neuron neuron = new Neuron(network, templateNeuron.deepCopy());
-	    network.addNeuron(neuron);
+	    network.addLooseNeuron(neuron);
 	}
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     //layout.setInitialLocation(new Point(10, 10));

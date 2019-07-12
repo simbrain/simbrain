@@ -3,7 +3,6 @@ import java.util.*;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.*;
 import org.simbrain.network.core.*;
-import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.layouts.*;
 import org.simbrain.network.networks.*;
@@ -14,6 +13,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.*;
 import org.simbrain.network.update_actions.*;
 import org.simbrain.util.randomizer.*;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.math.*;
 import org.simbrain.workspace.*;
 
@@ -88,8 +88,9 @@ import org.simbrain.workspace.*;
     List outNeurons = new ArrayList(NUM_NEURONS);
     // Optional code to distribute neurons in 3D space with random z values
     // Random rand = new Random();
-    Randomizer rand = new Randomizer();
-    rand.setPdf(new NormalDistribution());
+
+	ProbabilityDistribution rand;
+
     for (int i = 0; i < NUM_NEURONS; i++) {
     	Neuron neuron = new Neuron(network);
         neurons.add(neuron);
@@ -102,7 +103,12 @@ import org.simbrain.workspace.*;
             iz.setB(0.25 - (0.05 * rVal));
             iz.setC(-65);
             iz.setD(2);
-            ((NormalDistribution) rand.getPdf()).setStandardDeviation(0.5);
+			rand = NormalDistribution
+				.builder()
+				.polarity(Polarity.INHIBITORY)
+				.standardDeviation(.5)
+				.build();
+
         } else {
             neuron.setPolarity(Polarity.EXCITATORY);
             iz.setRefractoryPeriod(2.0);
@@ -112,14 +118,18 @@ import org.simbrain.workspace.*;
             rVal *= rVal;
             iz.setC(-65.0 + (15.0 * rVal));
             iz.setD(8.0 - (6 * rVal));
-            ((NormalDistribution) rand.getPdf()).setStandardDeviation(1.2);
+			rand = NormalDistribution
+				.builder()
+				.polarity(Polarity.INHIBITORY)
+				.standardDeviation(1.25)
+				.build();
         }
         iz.setiBg(3.5);
         iz.setAddNoise(true);
         iz.setNoiseGenerator(rand);
         neuron.setUpdateRule(iz);
         Neuron outNeuron = new Neuron(network);
-        outNeuron.getUpdateRule().setInputType(InputType.SYNAPTIC);
+        //outNeuron.getUpdateRule().setInputType(InputType.SYNAPTIC);
         ((LinearRule) outNeuron.getUpdateRule()).setClipped(false);
         outNeurons.add(outNeuron);
     }
@@ -133,13 +143,22 @@ import org.simbrain.workspace.*;
     outs.applyLayout(new Point2D.Double(1900, 10));
     network.addGroup(ng1);
     network.addGroup(outs);
-    
-	PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY,
-		new LogNormalDistribution(0.8, 1.0));
-	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
-		new LogNormalDistribution(1.5, 1.0));
 
-	Radial rCon = new Radial(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
+    ProbabilityDistribution exRand = LogNormalDistribution
+		.builder()
+		.polarity(Polarity.EXCITATORY)
+		.location(.8)
+		.scale(1.0)
+		.build();
+
+    ProbabilityDistribution inRand = LogNormalDistribution
+		.builder()
+		.polarity(Polarity.INHIBITORY)
+		.location(1.5)
+		.scale(1.0)
+		.build();
+
+    RadialGaussian rCon = new RadialGaussian(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
 	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
 	sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
 	ConvolvedJumpAndDecay inhibSR = new ConvolvedJumpAndDecay();
@@ -175,7 +194,7 @@ import org.simbrain.workspace.*;
     sg.setLowerBound(0, Polarity.EXCITATORY);
     sg.setLowerBound(-70, Polarity.INHIBITORY);
     sg.setUpperBound(0, Polarity.INHIBITORY);
-    network.randomizeNeurons();
+    network.randomizeLooseNeurons();
     network.fireSynapsesUpdated();
     network.getUpdateManager().clear();
     network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));

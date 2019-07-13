@@ -42,14 +42,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Handle simbrain drag events, which pan the canvas, create lassos for
- * selection. handles selection an, toggle selection, drags objects as
- * appropriate, updates relevant graphics parameters like
- * "last clicked position".
+ * Handle simbrain drag events, which pan the canvas, create lassos for selection. handles selection an, toggle
+ * selection, drags objects as appropriate, updates relevant graphics parameters like "last clicked position".
  * <p>
- * Coding this properly requires tracking picked nodes and their parents fairly
- * closely. To see the scene graph hierarchy for debugging this use ctrl-c while
- * a network panel is open.
+ * Coding this properly requires tracking picked nodes and their parents fairly closely. To see the scene graph
+ * hierarchy for debugging this use ctrl-c while a network panel is open.
  *
  * @author Michael Heuer
  * @author Jeff Yoshimi
@@ -165,12 +162,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
             SwingUtilities.invokeLater(() -> {
                 // Create a new selection marquee at the mouse position
-                if (marquee != null) {
-                    marquee = new SelectionMarquee((float) marqueeStartPosition.getX(), (float) marqueeStartPosition.getY());
+                marquee = new SelectionMarquee((float) marqueeStartPosition.getX(), (float) marqueeStartPosition.getY());
 
-                    // Add marquee as child of the network panel's layer
-                    networkPanel.getCanvas().getLayer().addChild(marquee);
-                }
+                // Add marquee as child of the network panel's layer
+                networkPanel.getCanvas().getLayer().addChild(marquee);
             });
             return;
         }
@@ -220,8 +215,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
         // Pan the canvas for command-click on Mac and control-click on other systems
         boolean panMode = false;
-        if(SystemUtils.IS_OS_MAC) {
-            if(event.isMetaDown()) {
+        if (SystemUtils.IS_OS_MAC) {
+            if (event.isMetaDown()) {
                 panMode = true;
             }
         } else {
@@ -278,7 +273,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         // Continue to drag nodes that have already been selected
-        for (PNode node : networkPanel.getSelection() ) {
+        for (PNode node : networkPanel.getSelection()) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.isDraggable()) {
@@ -325,8 +320,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
     }
 
     /**
-     * Encapsulate logic for determining the case where no object (neuron node,
-     * synpase node, etc) was clicked on at the beginning of this drag sequence.
+     * Encapsulate logic for determining the case where no object (neuron node, synpase node, etc) was clicked on at the
+     * beginning of this drag sequence.
      *
      * @return true if no object was clicked on, false otherwise.
      */
@@ -337,8 +332,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
     }
 
     /**
-     * A filter that determines whether a given pnode is selectable or not.
-     * Bounds are updated as the lasso tool is dragged.
+     * A filter that determines whether a given pnode is selectable or not. Bounds are updated as the lasso tool is
+     * dragged.
      */
     private class BoundsFilter implements PNodeFilter {
 
@@ -406,8 +401,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
     }
 
     /**
-     * Selection event filter, accepts various mouse events, but only when the
-     * network panel's edit mode is <code>EditMode.SELECTION</code>.
+     * Selection event filter, accepts various mouse events, but only when the network panel's edit mode is
+     * <code>EditMode.SELECTION</code>.
      */
     private class SelectionEventFilter extends PInputEventFilter {
 
@@ -438,9 +433,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
     }
 
     /**
-     * Pans the camera in response to the pan event provided. (From the source
-     * code for PanEventHandler. Note that "autopan"--from that class--is not
-     * being used. Not sure what is being lost by not using it.)
+     * Pans the camera in response to the pan event provided. (From the source code for PanEventHandler. Note that
+     * "autopan"--from that class--is not being used. Not sure what is being lost by not using it.)
      *
      * @param event contains details about the drag used to translate the view
      * @author Jesse Grosjean

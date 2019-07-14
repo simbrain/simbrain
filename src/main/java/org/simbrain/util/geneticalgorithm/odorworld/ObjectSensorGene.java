@@ -8,6 +8,10 @@ public class ObjectSensorGene extends SensorGene {
 
     private ObjectSensor prototype = new ObjectSensor();
 
+    {
+        prototype.getDecayFunction().setDispersion(250);
+    }
+
     @Override
     public ObjectSensorGene copy() {
         ObjectSensorGene cpy = new ObjectSensorGene();

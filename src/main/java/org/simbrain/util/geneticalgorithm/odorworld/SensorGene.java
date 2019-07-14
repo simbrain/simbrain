@@ -18,12 +18,14 @@ public abstract class SensorGene extends Gene<Sensor> {
                 getPrototype().getRadius(), getConfig().getRadiusMaxMutation(),
                 getConfig().getRadiusMutationProbability()
         );
-        getPrototype().setRadius(NeatUtils.clipping(newRadius, getConfig().getRadiusMin(), getConfig().getRadiusMax()));
+        //getPrototype().setRadius(NeatUtils.clipping(newRadius, getConfig().getRadiusMin(), getConfig().getRadiusMax()));
+        getPrototype().setRadius(50);
 
         double newTheta = SimbrainRandomizer.rand.mutateNumberWithProbability(
                 getPrototype().getTheta(), getConfig().getThetaMaxMutation(), getConfig().getThetaMutationProbability()
         );
         getPrototype().setTheta(newTheta);
+
     }
 
     public OdorWorldEntityGenome.Config getConfig() {

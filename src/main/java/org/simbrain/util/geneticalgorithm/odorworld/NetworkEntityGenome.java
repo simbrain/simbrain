@@ -27,7 +27,7 @@ public class NetworkEntityGenome extends Genome<NetworkEntityGenome, Pair<Networ
         networkGenome = new NetworkGenome(configuration);
 
         entityGenome = new OdorWorldEntityGenome();
-        entityGenome.getConfig().setMaxSensorCount(3);
+        entityGenome.getConfig().setMaxSensorCount(2);
     }
 
     public NetworkGenome.Configuration configNetworkGenome() {

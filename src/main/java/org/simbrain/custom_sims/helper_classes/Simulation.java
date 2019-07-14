@@ -283,7 +283,7 @@ public class Simulation {
      */
     public void couple(Neuron neuron, Effector effector) {
         Producer effectorNeuron = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer agentEffector = CouplingUtils.getConsumer(effector, "addAmount");
+        Consumer agentEffector = CouplingUtils.getConsumer(effector, "setAmount");
         tryCoupling(effectorNeuron, agentEffector);
     }
 

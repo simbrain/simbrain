@@ -120,6 +120,7 @@ public class Turning extends Effector {
         return amount;
     }
 
+    @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setAmount(double amount) {
         this.amount = amount;
     }

@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
@@ -20,6 +21,8 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
+import java.util.Arrays;
+
 public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
     /**
@@ -30,12 +33,12 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
     /**
      * The maximum number of generation.
      */
-    private int maxIterations = 200;
+    private int maxIterations = 1000;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
      */
-    private double fitnessThreshold = 10;
+    private double fitnessThreshold = 2.5;
 
     /**
      * How many times to iterate the simulation of the network in an environment
@@ -75,13 +78,18 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         population = new Population<>(this.populationSize);
         //population.setEliminationRatio(.8);// TODO: causes problems
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        configuration.setNumInputs(3);
+        configuration.setNumInputs(2);
         configuration.setNumOutputs(3);
         configuration.setAllowSelfConnection(true);
         configuration.setMaxNodes(10);
-        configuration.setMaxConnectionStrength(1);
+        configuration.setMinConnectionStrength(-.5);
+        configuration.setMaxConnectionStrength(2);
         configuration.setNodeMaxBias(2);
-        configuration.setMaxNeuronActivation(10);
+        configuration.setMinNeuronActivation(-1);
+        configuration.setMaxNeuronActivation(4);
+        configuration.setRules(Arrays.asList(
+                LinearRule.class, DecayRule.class, NakaRushtonRule.class,
+                BinaryRule.class, ThreeValueRule.class));
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
                 new Agent<>(new NetworkEntityGenome(configuration),
@@ -127,8 +135,8 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         NeuronGroup inputs = (NeuronGroup) winner.getGroupByLabel("inputs");
         sim.couple((ObjectSensor) mouse.getSensors().get(0), inputs.getNeuron(0));
         sim.couple((ObjectSensor) mouse.getSensors().get(1), inputs.getNeuron(1));
-        sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
-        inputs.setClamped(false);
+        //sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
+        //inputs.setClamped(false);
 
         // TODO: When the mouse gets the cheese, respawn to a new location
 
@@ -140,7 +148,7 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         worldBuilder.getWorld().setObjectsBlockMovement(false);
 
         cheese = worldBuilder.addEntity(100, 100, EntityType.SWISS);
-        cheese.getSmellSource().setDispersion(300);
+        //cheese.getSmellSource().setDispersion(500);
         worldBuilder.getWorld().update();
 
     }
@@ -163,7 +171,6 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
         // Add cheese
         OdorWorldEntity cheese = odorWorld.addEntity();
-        cheese.getSmellSource().setDispersion(300);
 
         // Randomize location of cheese.
         respawnCheese(odorWorld, mouse, cheese);
@@ -205,19 +212,19 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         return score;
     }
 
-    private static void respawnCheese(OdorWorld odorWorld,  OdorWorldEntity mouse,  OdorWorldEntity cheese) {
+    private static void respawnCheese(OdorWorld odorWorld, OdorWorldEntity mouse, OdorWorldEntity cheese) {
         double x;
         double y;
-        x = mouse.getCenterX() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
-        x *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
+        x = mouse.getCenterX() + SimbrainRandomizer.rand.nextDouble(-64, 64);
+        x *= SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (x < 0) {
             x = 0;
         } else if (x > odorWorld.getWidth() - cheese.getEntityType().getImageWidth()) {
             x = odorWorld.getWidth() - cheese.getEntityType().getImageWidth();
         }
 
-        y = mouse.getCenterY() +  SimbrainRandomizer.rand.nextDouble(-64, 64);
-        y *=  SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
+        y = mouse.getCenterY() + SimbrainRandomizer.rand.nextDouble(-64, 64);
+        y *= SimbrainRandomizer.rand.nextBoolean() ? 1 : -1;
         if (y < 0) {
             y = 0;
         } else if (y > odorWorld.getHeight() - cheese.getEntityType().getImageHeight()) {

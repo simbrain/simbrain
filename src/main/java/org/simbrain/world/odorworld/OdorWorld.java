@@ -108,7 +108,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Default constructor.
      */
-    OdorWorld() {
+    public OdorWorld() {
     }
 
     /**

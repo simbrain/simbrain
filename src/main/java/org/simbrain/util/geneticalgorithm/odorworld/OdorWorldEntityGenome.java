@@ -47,6 +47,7 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
     @Override
     public OdorWorldEntity express() {
         OdorWorldEntity ret = new OdorWorldEntity(null, EntityType.MOUSE);
+        // Express the sensors and add them to the entity
         sensors.getGenes().stream()
                 .map(SensorGene::getPrototype)
                 .map(Sensor::copy)

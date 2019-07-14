@@ -311,6 +311,15 @@ public class Workspace {
     }
 
     /**
+     * Simple non-synchronized updater for non-GUI applications running
+     * in a single thread.
+     */
+    public void simpleIterate() {
+        updater.getWorkspace().getCouplingManager().updateCouplings();
+        componentList.forEach(WorkspaceComponent::update);
+    }
+
+    /**
      * Remove all components (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {

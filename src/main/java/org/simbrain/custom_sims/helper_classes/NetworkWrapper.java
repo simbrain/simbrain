@@ -31,7 +31,7 @@ public class NetworkWrapper {
     /**
      * The desktop component with full graphical access.
      */
-    private final NetworkDesktopComponent desktopComponent;
+    private NetworkDesktopComponent desktopComponent;
 
     /**
      * The network component.
@@ -54,6 +54,15 @@ public class NetworkWrapper {
     public NetworkWrapper(NetworkDesktopComponent desktopComponent) {
         this.desktopComponent = desktopComponent;
         this.networkComponent = desktopComponent.getWorkspaceComponent();
+        this.network = networkComponent.getNetwork();
+    }
+
+    /**
+     * Create a network wrapper _without_ a GUI component.
+     * TODO: This has only been tested for a few methods
+     */
+    public NetworkWrapper(NetworkComponent nc) {
+        this.networkComponent = nc;
         this.network = networkComponent.getNetwork();
     }
 

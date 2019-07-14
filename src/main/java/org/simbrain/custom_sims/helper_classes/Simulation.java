@@ -73,6 +73,20 @@ public class Simulation {
     }
 
     /**
+     * Create a simulation without a desktop. For use in non-GUI
+     * simulations.
+     * TODO: This has only been tested for a small part of the code
+     *
+     * @param workspace reference to workspace to use
+     */
+    public Simulation(Workspace workspace) {
+        super();
+        this.desktop = null;
+        this.workspace = workspace;
+        couplingManager = workspace.getCouplingManager();
+    }
+
+    /**
      * Create a network wrapper at the indicated location, with the indicated
      * name (for the network window that appears in the desktop).
      */
@@ -86,10 +100,15 @@ public class Simulation {
      */
     public NetworkWrapper addNetwork(NetworkComponent networkComponent, int y, int width, int height, int x) {
         workspace.addWorkspaceComponent(networkComponent);
-        NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
-        ndc.getParentFrame().setBounds(x, y, width, height);
         netMap.put(networkComponent.getNetwork(), networkComponent);
-        return new NetworkWrapper(ndc);
+        if(desktop != null) {
+            NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
+            ndc.getParentFrame().setBounds(x, y, width, height);
+            return new NetworkWrapper(ndc);
+        } else {
+            return new NetworkWrapper(networkComponent);
+        }
+
     }
 
     /**
@@ -154,8 +173,10 @@ public class Simulation {
     public OdorWorldWrapper addOdorWorld(int x, int y, int width, int height, String name) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name);
         workspace.addWorkspaceComponent(odorWorldComponent);
-        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
-        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setPreferredSize(new Dimension(width, height));
+        if (desktop != null) {
+            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
+            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setPreferredSize(new Dimension(width, height));
+        }
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
         return new OdorWorldWrapper(odorWorldComponent);
     }
@@ -176,8 +197,10 @@ public class Simulation {
      */
     public OdorWorldWrapper addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
         OdorWorldWrapper ob = this.addOdorWorldTMX(x,y,tmxFile);
-        desktop.getDesktopComponent(ob.getOdorWorldComponent()).getParentFrame().setBounds(x, y,
-            width, height);
+        if (desktop != null) {
+            desktop.getDesktopComponent(ob.getOdorWorldComponent()).getParentFrame().setBounds(x, y,
+                    width, height);
+        }
         return ob;
     }
 
@@ -188,10 +211,12 @@ public class Simulation {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
         odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
-        desktop.getDesktopComponent(odorWorldComponent).setBounds(x, y,
-                odorWorldComponent.getWorld().getWidth(), odorWorldComponent.getWorld().getHeight());
-        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
+        if(desktop != null) {
+            desktop.getDesktopComponent(odorWorldComponent).setBounds(x, y,
+                    odorWorldComponent.getWorld().getWidth(), odorWorldComponent.getWorld().getHeight());
+            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
+        }
         return new OdorWorldWrapper(odorWorldComponent);
     }
 

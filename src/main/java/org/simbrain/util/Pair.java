@@ -1,42 +1,42 @@
 package org.simbrain.util;
 
 /**
- * Key value pair
+ * Pair of objects.
  *
- * @param <K> Key type
- * @param <V> Value type
+ * @param <F> type of first object
+ * @param <S> type of second object
  */
-public class Pair<K, V> {
+public class Pair<F, S> {
 
     /**
-     * Key of this pair
+     * First object of this pair
      */
-    private K key;
+    private F first;
 
     /**
-     * Value of this pair
+     * Second object of this pair
      */
-    private V value;
+    private S second;
 
-    public Pair(K key, V value) {
-        this.key = key;
-        this.value = value;
+    public Pair(F first, S second) {
+        this.first = first;
+        this.second = second;
     }
 
-    public K getKey() {
-        return key;
+    public F getFirst() {
+        return first;
     }
 
-    public void setKey(K key) {
-        this.key = key;
+    public void setFirst(F first) {
+        this.first = first;
     }
 
-    public V getValue() {
-        return value;
+    public S getSecond() {
+        return second;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    public void setSecond(S second) {
+        this.second = second;
     }
 
     @Override
@@ -46,19 +46,19 @@ public class Pair<K, V> {
 
         Pair<?, ?> pair = (Pair<?, ?>) o;
 
-        if (key != null ? !key.equals(pair.key) : pair.key != null) return false;
-        return value != null ? value.equals(pair.value) : pair.value == null;
+        if (first != null ? !first.equals(pair.first) : pair.first != null) return false;
+        return second != null ? second.equals(pair.second) : pair.second == null;
     }
 
     @Override
     public int hashCode() {
-        int result = key != null ? key.hashCode() : 0;
-        result = 31 * result + (value != null ? value.hashCode() : 0);
+        int result = first != null ? first.hashCode() : 0;
+        result = 31 * result + (second != null ? second.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Pair{key=" + key + ", value=" + value + '}';
+        return "Pair{key=" + first + ", value=" + second + '}';
     }
 }

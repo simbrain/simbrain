@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
@@ -16,14 +15,11 @@ import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
-
-import java.util.Arrays;
 
 public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
@@ -82,9 +78,9 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         configuration.setNodeMaxBias(2);
         configuration.setMinNeuronActivation(-1);
         configuration.setMaxNeuronActivation(4);
-        configuration.setRules(Arrays.asList(
-                LinearRule.class, DecayRule.class, NakaRushtonRule.class,
-                BinaryRule.class, ThreeValueRule.class));
+        //configuration.setRules(Arrays.asList(
+        //        LinearRule.class, DecayRule.class, NakaRushtonRule.class,
+        //        BinaryRule.class, ThreeValueRule.class));
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
                 new Agent<>(new NetworkEntityGenome(configuration),
@@ -103,11 +99,11 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Add winning network
-        Network network = population.getFittestAgent().getPhenotype().getKey();
+        Network network = population.getFittestAgent().getPhenotype().getFirst();
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> agent = population.getFittestAgent();
 
         // Get the mouse from the network / odor world pair
-        OdorWorldEntity mouse = agent.getPhenotype().getValue();
+        OdorWorldEntity mouse = agent.getPhenotype().getSecond();
         setUpWorkspace(sim, network, mouse);
 
         // TODO: When the mouse gets the cheese, respawn to a new location
@@ -166,8 +162,8 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         Simulation sim = new Simulation(workspace);
 
         // Get current network and mouse
-        Network network = agent.getPhenotype().getKey();
-        OdorWorldEntity mouse = agent.getPhenotype().getValue();
+        Network network = agent.getPhenotype().getFirst();
+        OdorWorldEntity mouse = agent.getPhenotype().getSecond();
 
         // Set up the sim
         OdorWorldEntity cheese = setUpWorkspace(sim,network, mouse);

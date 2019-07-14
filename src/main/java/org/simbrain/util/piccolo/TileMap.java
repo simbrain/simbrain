@@ -15,7 +15,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.*;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -160,12 +159,12 @@ public class TileMap {
             layerToAdd = new TileMapLayer(layerName, width, height, collision);
             layers.add(layerToAdd);
         } else {
-            layerToAdd = programmaticLayers.get(layerName).getKey();
+            layerToAdd = programmaticLayers.get(layerName).getFirst();
         }
         layerToAdd.setTileID(tileID, x, y);
         PImage oldRenderedImage = null;
         if (programmaticLayers.containsKey(layerName)) {
-            oldRenderedImage = programmaticLayers.get(layerName).getValue();
+            oldRenderedImage = programmaticLayers.get(layerName).getSecond();
             renderedLayers.remove(oldRenderedImage);
         }
 

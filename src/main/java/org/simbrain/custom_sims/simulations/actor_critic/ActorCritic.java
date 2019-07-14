@@ -7,10 +7,15 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.math.DecayFunction;
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
@@ -23,6 +28,7 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.GridSensor;
+import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -115,7 +121,7 @@ public class ActorCritic extends RegisteredSimulation {
     Neuron value;
     Neuron tdError;
     NeuronGroup sensorNeurons;
-    double preditionError; // used to set "confidence interval" on plot halo
+    double predictionError; // used to set "confidence interval" on plot halo
     WinnerTakeAll outputs;
     JTextField trialField = new JTextField();
     JTextField discountField = new JTextField();
@@ -181,7 +187,7 @@ public class ActorCritic extends RegisteredSimulation {
     }
 
     /**
-     * Add custom workspace upadate method.
+     * Add custom workspace update method.
      */
     private void addCustomWorkspaceUpdate() {
         // Custom workspace update rule
@@ -235,19 +241,27 @@ public class ActorCritic extends RegisteredSimulation {
         world.addEntity(mouse);
         resetMouse();
 
+        // Set up cheese
         cheese = new OdorWorldEntity(world, EntityType.SWISS);
-        double dispersion = rewardDispersionFactor * (tileSize / 2);
         cheese.setCenterLocation(tileSize / 2, tileSize / 2);
-        cheese.setSmellSource(new SmellSource(new double[]{1, 0}, StepDecayFunction.create(), dispersion));
         world.addEntity(cheese);
+
+        // Set up cheese sensor
+        ObjectSensor cheeseSensor = new ObjectSensor(mouse);
+        cheeseSensor.setLabel("Cheese sensor");
+        double dispersion = rewardDispersionFactor * (tileSize / 2);
+        DecayFunction decayFunction =
+                StepDecayFunction.builder()
+                        .dispersion(dispersion)
+                        .build();
+        cheeseSensor.setDecayFunction(decayFunction);
+        mouse.addSensor(cheeseSensor);
 
         OdorWorldComponent oc = ob.getOdorWorldComponent();
         NetworkComponent nc = networkWrapper.getNetworkComponent();
 
-        tileNeurons = new ArrayList<Neuron>();
-        sensorCouplings = new ArrayList<Coupling<?>>();
-
-        // TODO: Use tilesets later. Right now just use 1 tileset
+        tileNeurons = new ArrayList<>();
+        sensorCouplings = new ArrayList<>();
 
         // Create grid sensor
         GridSensor sensor = new GridSensor(
@@ -259,8 +273,10 @@ public class ActorCritic extends RegisteredSimulation {
 
         // Set up location sensor neurons
         sensorNeurons = networkWrapper.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
-        networkWrapper.connectAllToAll(sensorNeurons, value);
-        networkWrapper.connectAllToAll(sensorNeurons, outputs);
+        List<Synapse> wts = networkWrapper.connectAllToAll(sensorNeurons, value, 0);
+        wts.forEach(w -> w.setLowerBound(0));
+        List<Synapse> wts2 =  networkWrapper.connectAllToAll(sensorNeurons, outputs, 0);
+        wts2.forEach(w -> w.setLowerBound(0));
 
         // Set up couplings
         Producer gridProducer = sim.getProducer(sensor, "getValues");
@@ -310,31 +326,35 @@ public class ActorCritic extends RegisteredSimulation {
         Coupling westCoupling = sim.tryCoupling(westProducer, westMovement);
         effectorCouplings.add(westCoupling);
 
-        //TODO
         // Add reward smell coupling
-//        Producer smell = sim.getProducer(world.getSensor(mouse.getId(), "Sensor_2"), "getCurrentValues");
-//        smell.setDescription("Reward");
-//        Consumer rewardConsumer = sim.getConsumer(reward, "forceSetActivation");
-//        Coupling rewardCoupling = sim.tryCoupling(smell, rewardConsumer);
-//        sensorCouplings.add(rewardCoupling);
+        Producer smell = sim.getProducer(mouse.getSensor("Cheese sensor"), "getCurrentValue");
+        smell.setDescription("Reward");
+        Consumer rewardConsumer = sim.getConsumer(reward, "forceSetActivation");
+        Coupling rewardCoupling = sim.tryCoupling(smell, rewardConsumer);
+        sensorCouplings.add(rewardCoupling);
     }
 
     /**
      * Set up the time series plot.
      */
     private void setUpPlot(NetworkWrapper net) {
-        // Create a time series plot
-        //TODO
-//        plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
-//        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(), reward, plot.getTimeSeriesComponent(), 0);
-//        Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError, plot.getTimeSeriesComponent(), 1);
-//        Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value, plot.getTimeSeriesComponent(), 2);
-//        plot.getTimeSeriesModel().setAutoRange(false);
-//        plot.getTimeSeriesModel().setRangeUpperBound(2);
-//        plot.getTimeSeriesModel().setRangeLowerBound(-1);
-//        sensorCouplings.add(rewardCoupling);
-//        sensorCouplings.add(tdCoupling);
-//        sensorCouplings.add(valueCoupling);
+        TimeSeriesPlotComponent plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
+        plot.getModel().setAutoRange(false);
+        plot.getModel().setRangeUpperBound(2);
+        plot.getModel().setRangeLowerBound(-1);
+
+        plot.getModel().removeAllScalarTimeSeries();
+        TimeSeriesModel.ScalarTimeSeries ts1 = plot.getModel().addScalarTimeSeries("Reward");
+        TimeSeriesModel.ScalarTimeSeries ts2 = plot.getModel().addScalarTimeSeries("TD Error");
+        TimeSeriesModel.ScalarTimeSeries ts3  = plot.getModel().addScalarTimeSeries("Value");
+
+        Coupling rewardCoupling = sim.couple(reward, ts1);
+        Coupling tdCoupling = sim.couple(tdError, ts2);
+        Coupling valueCoupling = sim.couple(value, ts3);
+
+        sensorCouplings.add(rewardCoupling);
+        sensorCouplings.add(tdCoupling);
+        sensorCouplings.add(valueCoupling);
     }
 
     /**
@@ -366,7 +386,6 @@ public class ActorCritic extends RegisteredSimulation {
 
         tdError = net.addNeuron(400, 0);
         tdError.setLabel("TD Error");
-
     }
 
     /**

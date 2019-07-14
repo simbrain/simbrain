@@ -103,6 +103,10 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         return decayFunction;
     }
 
+    public void setDecayFunction(DecayFunction decayFunction) {
+        this.decayFunction = decayFunction;
+    }
+
     public ObjectSensor(OdorWorldEntity parent, EntityType type, double angle, double radius) {
         this(parent, type);
         setTheta(angle);

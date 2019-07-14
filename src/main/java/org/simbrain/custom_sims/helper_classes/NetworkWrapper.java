@@ -146,11 +146,29 @@ public class NetworkWrapper {
     }
 
     /**
+     * Connect input nodes to target nodes with weights initialized to a value.
+     */
+    public List<Synapse> connectAllToAll(NeuronGroup source, NeuronGroup target, double  value) {
+        List<Synapse> wts = connectAllToAll(source, target);
+        wts.forEach(wt -> wt.setStrength(value));
+        return wts;
+    }
+
+    /**
      * Connect a source neuron group to a single target neuron
      */
-    public void connectAllToAll(NeuronGroup inputs, Neuron target) {
+    public List<Synapse> connectAllToAll(NeuronGroup inputs, Neuron target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(inputs.getNeuronList(), Collections.singletonList(target));
+        return connector.connectAllToAll(inputs.getNeuronList(), Collections.singletonList(target));
+    }
+
+    /**
+     * Connect input nodes to target node with weights initialized to a value.
+     */
+    public List<Synapse> connectAllToAll(NeuronGroup source, Neuron target, double  value) {
+        List<Synapse> wts = connectAllToAll(source, target);
+        wts.forEach(wt -> wt.setStrength(value));
+        return wts;
     }
 
     /**

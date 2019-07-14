@@ -29,20 +29,6 @@ public class RL_Update implements NetworkUpdateAction {
     Neuron reward, value, tdError;
 
     /**
-     * This variable is a hack needed because the reward neuron's lastactivation
-     * value is not being updated properly in this simulation now.
-     * <p>
-     * Todo: Remove after fixing the issue. The issue is probably based on
-     * coupling update.
-     */
-    double lastReward;
-
-    /**
-     * Current winning output neuron.
-     */
-    Neuron winner;
-
-    /**
      * Construct the updater.
      */
     public RL_Update(ActorCritic sim) {
@@ -70,14 +56,19 @@ public class RL_Update implements NetworkUpdateAction {
     public void invoke() {
 
         // Update neurons and networks
+        sim.sensorNeurons.update();
         Network.updateNeurons(Collections.singletonList(sim.value));
         Network.updateNeurons(Collections.singletonList(sim.reward));
         sim.outputs.update();
-        sim.sensorNeurons.update();
 
         // System.out.println("td error:" + value.getActivation() + " + " +
         // reward.getActivation() + " - " + value.getLastActivation());
-        sim.tdError.forceSetActivation((reward.getActivation() + sim.gamma * value.getActivation()) - value.getLastActivation());
+        sim.tdError.forceSetActivation((reward.getActivation()
+                + sim.gamma * value.getActivation())
+                - value.getLastActivation());
+        if(sim.tdError.getActivation() > 1) {
+            sim.tdError.setActivation(1); // todo!
+        }
 
         // Update all value synapses
         for (Synapse synapse : value.getFanIn()) {
@@ -86,8 +77,8 @@ public class RL_Update implements NetworkUpdateAction {
             // current value),
             // since that is what the current td error reflects.
             double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-            // synapse.setStrength(synapse.clip(newStrength));
-            synapse.forceSetStrength(newStrength);
+            synapse.setStrength(synapse.clip(newStrength));
+            //synapse.forceSetStrength(newStrength);
             // System.out.println("Value Neuron / Tile neuron (" +
             // sourceNeuron.getId() + "):" + newStrength);
         }
@@ -101,10 +92,10 @@ public class RL_Update implements NetworkUpdateAction {
                     Neuron sourceNeuron = synapse.getSource();
                     if (sourceNeuron.getLastActivation() > 0) {
                         double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-                        // synapse.setStrength(synapse.clip(newStrength));
-                        synapse.forceSetStrength(newStrength);
+                        synapse.setStrength(synapse.clip(newStrength));
+                        //synapse.forceSetStrength(newStrength);
                         // System.out.println(tdError.getActivation() + "," +
-                        // sourceNeuron.getLastActivation());                        
+                        // sourceNeuron.getLastActivation());
                     }
                 }
 

@@ -2,6 +2,7 @@ package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.geneticalgorithm.Genome;
@@ -216,6 +217,12 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         private double minNeuronActivation = 0;
         private double maxNeuronActivation = 1;
 
+        /**
+         * Node gene mutations will select from the the list of neuron update rules
+         * included in this list.
+         */
+        private List<Class> rules = NeuronUpdateRule.getTypes();
+
         public Configuration() {
         }
 
@@ -321,6 +328,14 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
         public void setMaxNeuronActivation(double maxNeuronActivation) {
             this.maxNeuronActivation = maxNeuronActivation;
+        }
+
+        public List<Class> getRules() {
+            return rules;
+        }
+
+        public void setRules(List<Class> rules) {
+            this.rules = rules;
         }
     }
 }

@@ -71,6 +71,13 @@ public class NodeGene extends Gene<Neuron> {
     @Override
     public void mutate() {
         if (isMutable()) {
+            // Leave input nodes as linear
+            // Could make this an option later
+            if (type == NodeType.input) {
+                return;
+            }
+            int typeIndex = SimbrainRandomizer.rand.nextInteger(0,configuration.getRules().size()-1);
+            prototype.setUpdateRule(configuration.getRules().get(typeIndex).getSimpleName());
             prototype.setLowerBound(configuration.getMinNeuronActivation());
             prototype.setUpperBound(configuration.getMaxNeuronActivation());
             if (prototype.getUpdateRule() instanceof BiasedUpdateRule) {

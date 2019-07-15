@@ -68,7 +68,7 @@ public class Population<G extends Genome<G, P>, P> {
     public Double computeNewFitness() {
         //System.out.println("----------------");
         //System.out.println("Before fitness computation:" + agentList);
-        agentList.forEach(Agent::computeFitness);
+        agentList.parallelStream().forEach(Agent::computeFitness);
         //System.out.println("After fitness computation:" + agentList);
         eliminateLeastFit(); // Must happen in this order
         //System.out.println("After elimination:" + agentList);

@@ -124,7 +124,7 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         // Set up odor world
         OdorWorldEntity cheese, flower, fish;
         OdorWorldWrapper worldBuilder;
-        worldBuilder = theSim.addOdorWorldTMX(486, 14, 400, 400, "empty.tmx");
+        worldBuilder = theSim.addOdorWorldTMX(486, 14, "empty.tmx");
         worldBuilder.getWorld().setObjectsBlockMovement(false);
         mouse.setParentWorld(worldBuilder.getWorld());
         mouse.setLocation(300,300);

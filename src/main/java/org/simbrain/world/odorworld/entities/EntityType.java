@@ -43,7 +43,8 @@ public enum EntityType {
     JAKE("Jake", true, true, true, 96, 96),
     LION("Lion", true, true, true, 96, 96),
     STEVE("Steve", true, true, true, 96, 96),
-    SUSI("Susi", true, true, true, 96, 96);
+    SUSI("Susi", true, true, true, 96, 96),
+    CIRCLE("Circle", true, true, true, 73, 73);
 
     /**
      * String description that shows up in dialog boxes.

@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
+import org.simbrain.util.piccolo.Animations;
 import org.simbrain.util.piccolo.RotatingSprite;
 import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -216,6 +217,11 @@ public class EntityNode extends PNode {
                 break;
             case MOUSE:
                 sprite = new RotatingSprite(RotatingEntityManager.getMouse());
+                break;
+            case CIRCLE:
+                sprite = new RotatingSprite(Animations.createAnimation(
+                        OdorWorldResourceManager.getBufferedImage("circle.png")));
+
                 break;
             case AMY:
             case ARNO:

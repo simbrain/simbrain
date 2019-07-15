@@ -336,7 +336,6 @@ public class OdorWorld implements EditableObject {
         }
     }
 
-
     /**
      * Computes maximum stimulus length. This is used for scaling the color in
      * the graphical display of the agent sensors.

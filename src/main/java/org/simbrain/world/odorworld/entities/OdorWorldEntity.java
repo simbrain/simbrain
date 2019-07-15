@@ -308,7 +308,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     @Consumable(idMethod = "getId")
     public void setX(final double newx) {
-        // System.out.println("x:" + newx);
+        // System.out.println("x:" + newx)
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
                 this.x = parentWorld.getWidth() - (Math.abs(newx) % parentWorld.getWidth());
@@ -324,7 +324,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         updateSensors();
         updateEffectors();
         changeSupport.firePropertyChange("moved", null, null);
-
     }
 
     /**
@@ -334,7 +333,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     @Consumable(idMethod = "getId")
     public void setY(final double newy) {
-        // System.out.println("y:" + newy);
+        // System.out.println("y:" + newy)
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
                 this.y = parentWorld.getHeight() - (Math.abs(newy) % parentWorld.getHeight());
@@ -639,8 +638,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * @param y y coordinate
      */
     public void setCenterLocation(double x, double y) {
-        this.x = x - entityType.getImageWidth() / 2;
-        this.y = y - entityType.getImageHeight() / 2;
+        setX(x - entityType.getImageWidth() / 2);
+        setY(y - entityType.getImageHeight() / 2);
     }
 
     /**
@@ -677,44 +676,26 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         }
     }
 
-    /**
-     * @return the sensors
-     */
     public List<Sensor> getSensors() {
         return sensors;
     }
 
-    /**
-     * @param sensors the sensors to set
-     */
     public void setSensors(List<Sensor> sensors) {
         this.sensors = sensors;
     }
 
-    /**
-     * @return the effectors
-     */
     public List<Effector> getEffectors() {
         return effectors;
     }
 
-    /**
-     * @param effectors the effectors to set
-     */
     public void setEffectors(List<Effector> effectors) {
         this.effectors = effectors;
     }
 
-    /**
-     * @return the sensorsEnabled
-     */
     public boolean isSensorsEnabled() {
         return sensorsEnabled;
     }
 
-    /**
-     * @param sensorsEnabled the sensorsEnabled to set
-     */
     public void setSensorsEnabled(boolean sensorsEnabled) {
         this.sensorsEnabled = sensorsEnabled;
     }
@@ -1038,10 +1019,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void addDefaultSensorsEffectors() {
 
-        // Add default effectors
-        addEffector(new StraightMovement(this));
-        addEffector(new Turning(this, Turning.LEFT));
-        addEffector(new Turning(this, Turning.RIGHT));
+        addDefaultEffectors();
 
         // Add default sensors
         addSensor(new ObjectSensor(this,  EntityType.SWISS, Math.PI / 8,
@@ -1052,6 +1030,32 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
         //TODO: Add more defaults
 
+    }
+
+    /**
+     * Add left, right, and straight movement effectors.
+     */
+    public void addDefaultEffectors() {
+        addEffector(new StraightMovement(this));
+        addEffector(new Turning(this, Turning.LEFT));
+        addEffector(new Turning(this, Turning.RIGHT));
+    }
+
+    /**
+     * Add left and right sensors of a given type.
+     *
+     * @param type type of sensor to add
+     * @param range the range of the object sensors
+     */
+    public void addLeftRightSensors(EntityType type, double range) {
+        ObjectSensor leftSensor = new ObjectSensor(this,  type, -Math.PI / 8,
+                50);
+        leftSensor.setRange(range);
+        addSensor(leftSensor);
+        ObjectSensor rigthSensor = new ObjectSensor(this,  type, Math.PI / 8,
+                50);
+        rigthSensor.setRange(range);
+        addSensor(rigthSensor);
     }
 
     /**
@@ -1120,15 +1124,22 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Check if this entity is colliding with any entity in the world.
+     * Check if this entity is colliding with anything.
      *
      * @param direction direction can be "x", "y".
      * @return true if collided
      */
     public boolean collideOn(String direction) {
+
         if (!getParentWorld().isObjectsBlockMovement()) {
             return false;
         }
+
+        if (!parentWorld.getWrapAround()) {
+            return collisionBound.collide
+                    (direction, parentWorld.getWorldBoundary());
+        }
+
         for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
             if (i != this) {
                 if (collideOn(direction, i)) {
@@ -1145,7 +1156,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             }
         }
 
-        return !parentWorld.getWrapAround() && collisionBound.collide(direction, parentWorld.getWorldBoundary());
+        return false;
     }
 
     /**

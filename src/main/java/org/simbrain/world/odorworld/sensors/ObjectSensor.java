@@ -156,6 +156,10 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         return showLabel;
     }
 
+    public void setRange(double value) {
+        decayFunction.setDispersion(value);
+    }
+
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {

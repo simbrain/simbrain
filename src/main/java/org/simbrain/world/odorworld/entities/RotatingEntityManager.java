@@ -24,6 +24,7 @@ import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * Manages the creation of treemaps for rotating entities.
@@ -81,19 +82,6 @@ public class RotatingEntityManager {
         int index = (int)(degree / degreeApart);
         return animations.get(index);
     }
-
-    /**
-     * Returns circle image.
-     *
-     * @return circle
-     */
-//    public static TreeMap<Double, Image> getCircle() {
-//        TreeMap<Double, Image> circleMap = new TreeMap<Double, Image>();
-//        // map all angles to same image
-//        circleMap.put(1d, new Image("circle.png"));
-//        return circleMap;
-//    }
-
 
     /**
      * Tree map for a rotating image from Reiner Prokein's collection.

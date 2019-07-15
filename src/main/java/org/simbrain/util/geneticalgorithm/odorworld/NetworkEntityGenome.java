@@ -38,6 +38,14 @@ public class NetworkEntityGenome extends Genome<NetworkEntityGenome, Pair<Networ
         return entityGenome.getConfig();
     }
 
+    public NetworkGenome getNetworkGenome() {
+        return networkGenome;
+    }
+
+    public OdorWorldEntityGenome getEntityGenome() {
+        return entityGenome;
+    }
+
     @Override
     public NetworkEntityGenome crossOver(NetworkEntityGenome other) {
         NetworkEntityGenome ret = new NetworkEntityGenome();

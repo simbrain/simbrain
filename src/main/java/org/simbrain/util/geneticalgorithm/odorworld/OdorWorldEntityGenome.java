@@ -16,6 +16,8 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
 
     // Todo: EntityEffectorChromosome
 
+    private OdorWorldEntity baseEntity = new OdorWorldEntity(null, EntityType.MOUSE);
+
     private Config config = new Config();
 
     public OdorWorldEntityGenome() {
@@ -46,7 +48,7 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
 
     @Override
     public OdorWorldEntity express() {
-        OdorWorldEntity ret = new OdorWorldEntity(null, EntityType.MOUSE);
+        OdorWorldEntity ret = baseEntity;
         // Express the sensors and add them to the entity
         sensors.getGenes().stream()
                 .map(SensorGene::getPrototype)
@@ -58,11 +60,23 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
         return ret;
     }
 
+    public OdorWorldEntity getBaseEntity() {
+        return baseEntity;
+    }
+
+    public void setBaseEntity(OdorWorldEntity baseEntity) {
+        this.baseEntity = baseEntity;
+    }
+
     public Config getConfig() {
         return config;
     }
 
+    /**
+     * Configuration for odor world entity, sensors, and effectors.
+     */
     public class Config {
+
         private double thetaMaxMutation = 0.314;
 
         private double thetaMutationProbability = 0.5;

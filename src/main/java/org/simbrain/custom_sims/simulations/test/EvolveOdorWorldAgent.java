@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
@@ -20,6 +21,8 @@ import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
+
+import java.util.Arrays;
 
 public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
@@ -78,13 +81,17 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         configuration.setNodeMaxBias(2);
         configuration.setMinNeuronActivation(-1);
         configuration.setMaxNeuronActivation(4);
-        //configuration.setRules(Arrays.asList(
-        //        LinearRule.class, DecayRule.class, NakaRushtonRule.class,
-        //        BinaryRule.class, ThreeValueRule.class));
+        configuration.setRules(Arrays.asList(
+                LinearRule.class, DecayRule.class, NakaRushtonRule.class,
+                BinaryRule.class, ThreeValueRule.class));
+
+        NetworkEntityGenome neg = new NetworkEntityGenome(configuration);
+        // TODO: Must manually add ids to sensors
+        //OdorWorldEntity baseEntity = neg.getEntityGenome().getBaseEntity();
+        //baseEntity.addLeftRightSensors(EntityType.SWISS, 250);
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
-                new Agent<>(new NetworkEntityGenome(configuration),
-                        EvolveOdorWorldAgent::eval);
+                new Agent<>(neg, EvolveOdorWorldAgent::eval);
         population.populate(prototype);
     }
 

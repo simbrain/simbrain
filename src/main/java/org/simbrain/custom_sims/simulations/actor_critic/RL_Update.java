@@ -66,9 +66,6 @@ public class RL_Update implements NetworkUpdateAction {
         sim.tdError.forceSetActivation((reward.getActivation()
                 + sim.gamma * value.getActivation())
                 - value.getLastActivation());
-        if(sim.tdError.getActivation() > 1) {
-            sim.tdError.setActivation(1); // todo!
-        }
 
         // Update all value synapses
         for (Synapse synapse : value.getFanIn()) {

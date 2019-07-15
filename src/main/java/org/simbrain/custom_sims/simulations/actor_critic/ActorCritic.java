@@ -211,13 +211,12 @@ public class ActorCritic extends RegisteredSimulation {
                 // Update world
                 ob.getOdorWorldComponent().update();
 
-                // Update world > tile neurons and plot couplings
+                // Update world > tile neurons
+                // sensorcoupling also couples to the time series plot
                 sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
                 networkWrapper.getNetworkComponent().update();
-
-                // TODO: Why don't we have to call plot update?
             }
 
         };
@@ -230,12 +229,10 @@ public class ActorCritic extends RegisteredSimulation {
      */
     void setUpWorldAndNetwork() {
 
-        // TODO: Why can't I use worldwidth and worldheight below? I had to
-        // manually set size.
         ob = sim.addOdorWorldTMX(761, 8, "actor-critic.tmx");
         world = ob.getWorld();
-        world.setObjectsBlockMovement(true);
-        world.setWrapAround(true); //TODO: Hack because it's currently going out of the world
+        world.setObjectsBlockMovement(false);
+        world.setWrapAround(false);
 
         mouse = new OdorWorldEntity(world, EntityType.MOUSE);
         world.addEntity(mouse);

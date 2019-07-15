@@ -86,15 +86,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     private RectangleCollisionBound collisionBound;
 
     /**
-     * X Velocity.
+     * X Velocity. Used internally for {@link #simpleMotion()}.
      */
-    @UserParameter(label = "dx", description = "amount to move in x-direction each update", order = 5)
     protected double dx;
 
     /**
-     * Y Velocity.
+     * Y Velocity. Used internally for {@link #simpleMotion()}.
      */
-    @UserParameter(label = "dy", description = "amount to move in y-direction each update", order = 6)
     protected double dy;
 
     /**
@@ -318,7 +316,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 this.x = newx;
             }
         } else {
-            this.x = newx;
+            if (newx <= 0) {
+                this.x = 0;
+            } else if (newx > parentWorld.getWidth()) {
+                this.x = parentWorld.getWidth();
+            } else {
+                this.x = newx;
+            }
         }
         updateCollisionBound();
         updateSensors();
@@ -343,7 +347,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 this.y = newy;
             }
         } else {
-            this.y = newy;
+            if (newy <= 0) {
+                this.y = 0;
+            } else if (newy > parentWorld.getHeight()) {
+                this.y = parentWorld.getHeight();
+            } else {
+                this.y = newy;
+            }
         }
         updateCollisionBound();
         updateSensors();
@@ -354,8 +364,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Gets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
-     *
-     * @return
      */
     @Producible(idMethod = "getId")
     public double getVelocityX() {
@@ -365,8 +373,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Gets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
-     *
-     * @return
      */
     @Producible(idMethod = "getId")
     public double getVelocityY() {
@@ -376,10 +382,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Sets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
-     *
-     * @param dx
      */
-    @Consumable(idMethod = "getId")
     public void setVelocityX(final double dx) {
         this.dx = dx;
         updateCollisionBound();
@@ -388,10 +391,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Sets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
-     *
-     * @param dy
      */
-    @Consumable(idMethod = "getId")
     public void setVelocityY(final double dy) {
         this.dy = dy;
         updateCollisionBound();

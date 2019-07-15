@@ -17,11 +17,11 @@ public class OdorWorldEntityTest {
         entity.setY(15);
         assertEquals(15.0, entity.getY(), 0.0);
 
-        // These should not change the x and y values to the width and height
+        // These should not change the x and y values
         entity.setX(world.getWidth() + 20);
         entity.setY(world.getHeight() + 20);
-        assertEquals(world.getWidth(), entity.getX(), 0.0);
-        assertEquals(world.getHeight(), entity.getY(), 0.0);
+        assertEquals(10, entity.getX(), 0.0);
+        assertEquals(15, entity.getY(), 0.0);
 
     }
 }

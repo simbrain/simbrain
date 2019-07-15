@@ -71,13 +71,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * X Position.
      */
-    @UserParameter(label = "X", description = "X Position", order = 3)
+    @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
     protected double x;
 
     /**
      * Y Position.
      */
-    @UserParameter(label = "Y", description = "Y Position", order = 4)
+    @UserParameter(label = "Y", description = "Y Position", useSetter = true, order = 4)
     protected double y;
 
     /**
@@ -316,11 +316,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 this.x = newx;
             }
         } else {
-            if (newx <= 0) {
-                this.x = 0;
-            } else if (newx > parentWorld.getWidth()) {
-                this.x = parentWorld.getWidth();
-            } else {
+            if (newx >= 0 && newx <= parentWorld.getWidth()) {
                 this.x = newx;
             }
         }
@@ -347,11 +343,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 this.y = newy;
             }
         } else {
-            if (newy <= 0) {
-                this.y = 0;
-            } else if (newy > parentWorld.getHeight()) {
-                this.y = parentWorld.getHeight();
-            } else {
+            if (newy >= 0 && newy <= parentWorld.getHeight()) {
                 this.y = newy;
             }
         }

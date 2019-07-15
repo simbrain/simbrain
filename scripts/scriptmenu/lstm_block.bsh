@@ -66,29 +66,29 @@ import java.util.*;
     // The maintain unit allows the store value to remain in the store if gate 2 is high
     Neuron maintain=new Neuron(network,new ProductRule());
     maintain.setLabel("Maintain");
-    network.addNeuron(maintain);
+    network.addLooseNeuron(maintain);
     maintain.setX(GRID_SPACE);maintain.setY(-GRID_SPACE);
 
     // The store unit takes the sum of the load and maintain signals
     Neuron store=new Neuron(network,new LinearRule());
     store.setLabel("Store");
-    network.addNeuron(store);
+    network.addLooseNeuron(store);
     store.setX(0);store.setY(-2*GRID_SPACE);
 
     // The out unit allows the store value to be read out of the cell if gate 3 is high
     Neuron out=new Neuron(network,new ProductRule());
     out.setLabel("Out");
-    network.addNeuron(out);
+    network.addLooseNeuron(out);
     out.setX(0);out.setY(-3*GRID_SPACE);
 
     // Create the internal connections of the LSTM cell, set all connections to a strength of 1
-    network.addSynapse(new Synapse(gates.get(0),load,1));
-    network.addSynapse(new Synapse(gates.get(1),load,1));
-    network.addSynapse(new Synapse(gates.get(2),maintain,1));
-    network.addSynapse(new Synapse(store,maintain,1));
-    network.addSynapse(new Synapse(load,store,1));
-    network.addSynapse(new Synapse(maintain,store,1));
-    network.addSynapse(new Synapse(gates.get(3),out,1));
-    network.addSynapse(new Synapse(store,out,1));
+    network.addLooseSynapse(new Synapse(gates.get(0),load,1));
+    network.addLooseSynapse(new Synapse(gates.get(1),load,1));
+    network.addLooseSynapse(new Synapse(gates.get(2),maintain,1));
+    network.addLooseSynapse(new Synapse(store,maintain,1));
+    network.addLooseSynapse(new Synapse(load,store,1));
+    network.addLooseSynapse(new Synapse(maintain,store,1));
+    network.addLooseSynapse(new Synapse(gates.get(3),out,1));
+    network.addLooseSynapse(new Synapse(store,out,1));
 
 }

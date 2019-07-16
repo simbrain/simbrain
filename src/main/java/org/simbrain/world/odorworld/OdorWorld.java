@@ -61,14 +61,14 @@ public class OdorWorld implements EditableObject {
     /**
      * Whether or not sprites wrap around or are halted at the borders
      */
-    @UserParameter(label = "Wrap around", description = "Whether or not sprites wrap around or are halted at the borders", order = 6)
+    @UserParameter(label = "Map boundary wraps around", description = "Whether or not entities wrap around or are halted at the borders of the map", order = 6)
     private boolean wrapAround = true;
 
     /**
      * If true, then objects block movements; otherwise agents can walk through
      * objects.
      */
-    @UserParameter(label = "Blocking", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
+    @UserParameter(label = "Objects block movement", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
 
     /**
@@ -316,10 +316,10 @@ public class OdorWorld implements EditableObject {
             entityList.remove(entity);
             entity.delete();
             for (Sensor sensor : entity.getSensors()) {
-//                fireSensorRemoved(sensor);
+                //fireSensorRemoved(sensor);
             }
             for (Effector effector : entity.getEffectors()) {
-//                fireEffectorRemoved(effector);
+                //fireEffectorRemoved(effector);
             }
             recomputeMaxStimulusLength();
             changeSupport.firePropertyChange("entityDeleted", null, entity);
@@ -370,62 +370,6 @@ public class OdorWorld implements EditableObject {
         return this;
     }
 
-    //TODO: Collision detection should probably be handled by piccolo for now.
-    // It does make this a weird "model" with incomplete information about the virtual
-    // physics, etc...
-
-//    /**
-//     * Updates all entities.
-//     */
-//    private void updateEntity(final OdorWorldEntity entity, final int time) {
-//
-//        // Collision detection
-//        double dx = entity.getVelocityX();
-//        double oldX = entity.getX();
-//        double dy = entity.getVelocityY();
-//        double oldY = entity.getY();
-//
-//        // Very simple motion
-//        if (dx != 0) {
-//            entity.setX(entity.getX() + dx);
-//        }
-//        if (dy != 0) {
-//            entity.setY(entity.getY() + dy);
-//        }
-//
-//        // Behavior
-//        // entity.getBehavior().apply(time);
-//
-//        // Handle sprite collisions
-//        //        entity.setHasCollided(false);
-//        //        for (OdorWorldEntity otherEntity : entityList) {
-//        //            if (entity == otherEntity) {
-//        //                continue;
-//        //            }
-//        //            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
-//        //                otherEntity.setHasCollided(true);
-//        //            }
-//        //        }
-//        //
-//        // // Handle sprite collisions
-//        // if (xCollission(entity, newX)) {
-//        // entity.collideHorizontal();
-//        // } else {
-//        // // sprite.setX(newX);
-//        // }
-//        // if (yCollission(entity, newY)) {
-//        // entity.collideVertical();
-//        // } else {
-//        // // sprite.setY(newY);
-//        // }
-//
-//        // Update creature
-//        entity.update();
-//
-//        // System.out.println(sprite.getId() + " new - x: " + sprite.getX() +
-//        // " y:" + sprite.getY());
-//    }
-
     /**
      * Handle collisions in x directions.
      *
@@ -446,9 +390,9 @@ public class OdorWorld implements EditableObject {
             if (entity == entityToCheck) {
                 continue;
             }
-//            if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
-//                return true;
-//            }
+            //if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
+            //    return true;
+            //}
         }
         return false;
     }
@@ -474,9 +418,9 @@ public class OdorWorld implements EditableObject {
                 continue;
             }
 
-//            if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
-//                return true;
-//            }
+            //if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
+            //    return true;
+            //}
         }
         return false;
     }
@@ -499,16 +443,10 @@ public class OdorWorld implements EditableObject {
         changeSupport.removePropertyChangeListener(listener);
     }
 
-    /**
-     * @return the wrapAround
-     */
     public boolean getWrapAround() {
         return wrapAround;
     }
 
-    /**
-     * @param wrapAround the wrapAround to set
-     */
     public void setWrapAround(boolean wrapAround) {
         this.wrapAround = wrapAround;
     }
@@ -531,23 +469,14 @@ public class OdorWorld implements EditableObject {
         return tileMap.getMapHeight();
     }
 
-    /**
-     * @return the objectsBlockMovement
-     */
     public boolean isObjectsBlockMovement() {
         return objectsBlockMovement;
     }
 
-    /**
-     * @param objectsBlockMovement the objectsBlockMovement to set
-     */
     public void setObjectsBlockMovement(boolean objectsBlockMovement) {
         this.objectsBlockMovement = objectsBlockMovement;
     }
 
-    /**
-     * @return the maxSmellVectorLength
-     */
     public double getTotalSmellVectorLength() {
         return totalSmellVectorLength;
     }
@@ -597,7 +526,6 @@ public class OdorWorld implements EditableObject {
         changeSupport.firePropertyChange("worldStarted", null, null);
     }
 
-
     public Point2D getLastClickedPosition() {
         return lastClickedPosition;
     }
@@ -610,5 +538,9 @@ public class OdorWorld implements EditableObject {
         return worldBoundary;
     }
 
+    @Override
+    public String getName() {
+        return "Odor World";
+    }
 
 }

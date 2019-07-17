@@ -5,6 +5,7 @@ import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -270,6 +271,15 @@ public class Simulation {
     }
 
     /**
+     * Couple a synapse to a specific time series in a time series plot
+     */
+    public Coupling couple(Synapse synapse, TimeSeriesModel.ScalarTimeSeries ts) {
+        Producer producer = CouplingUtils.getProducer(synapse, "getStrength");
+        Consumer consumer = CouplingUtils.getConsumer(ts, "setValue");
+        return tryCoupling(producer, consumer);
+    }
+
+    /**
      * Couple a neuron group to a projection plot.
      */
     public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
@@ -350,4 +360,5 @@ public class Simulation {
     public Workspace getWorkspace() {
         return workspace;
     }
+
 }

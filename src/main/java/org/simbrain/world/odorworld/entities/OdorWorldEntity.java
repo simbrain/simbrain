@@ -1034,20 +1034,30 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     /**
+     * Add an object sensor to this entity.
+     *
+     * @param type the type of object to sense
+     * @param radius the radius of sensor
+     * @param angle the angle of sensor relative to the front of the entity
+     * @param range how far away sensor can detect objects\
+     * @return the sensor
+     */
+    public ObjectSensor addObjectSensor(EntityType type, double radius, double angle, double range) {
+        ObjectSensor sensor = new ObjectSensor(this,  type, angle, radius);
+        sensor.setRange(range);
+        addSensor(sensor);
+        return sensor;
+    }
+
+    /**
      * Add left and right sensors of a given type.
      *
      * @param type type of sensor to add
      * @param range the range of the object sensors
      */
     public void addLeftRightSensors(EntityType type, double range) {
-        ObjectSensor leftSensor = new ObjectSensor(this,  type, -Math.PI / 8,
-                50);
-        leftSensor.setRange(range);
-        addSensor(leftSensor);
-        ObjectSensor rigthSensor = new ObjectSensor(this,  type, Math.PI / 8,
-                50);
-        rigthSensor.setRange(range);
-        addSensor(rigthSensor);
+        addObjectSensor(type, -Math.PI / 8, 50, range);
+        addObjectSensor(type, Math.PI / 8, 50, range);
     }
 
     /**

@@ -21,6 +21,10 @@ package org.simbrain.custom_sims;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
+import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
+import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
+import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
+import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
 import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
 import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
@@ -30,6 +34,8 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscilla
 import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
+import org.simbrain.custom_sims.simulations.test.ConvertSim;
+import org.simbrain.custom_sims.simulations.test.ReadSim;
 import org.simbrain.custom_sims.simulations.test.TestEvolution;
 import org.simbrain.custom_sims.simulations.test.EvolveOdorWorldAgent;
 import org.simbrain.workspace.AttributeContainer;
@@ -74,15 +80,19 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new CreaturesSim());
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
+        REGISTERED_SIMS.add(new OperantWithEnvironment());
+        REGISTERED_SIMS.add(new ClassicalConditioning());
+        REGISTERED_SIMS.add(new OperantConditioning());
+        REGISTERED_SIMS.add(new SimpleOperant());
         REGISTERED_SIMS.add(new CortexSimple());
+        REGISTERED_SIMS.add(new ConvertSim());
+        REGISTERED_SIMS.add(new ReadSim());
         REGISTERED_SIMS.add(new ModularOscillatoryNetwork( ));
         REGISTERED_SIMS.add(new PatternsOfActivity( ));
         REGISTERED_SIMS.add(new KuramotoOscillators( ));
-        // REGISTERED_SIMS.add(new NEAT());
         REGISTERED_SIMS.add(new EvolveOdorWorldAgent());
         REGISTERED_SIMS.add(new TestEvolution());
         // REGISTERED_SIMS.add(new MpfsSOM());
-        // REGISTERED_SIMS.add(new SimpleNeuroevolution());
 
         // Alphabetize
         REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getName));

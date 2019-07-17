@@ -494,14 +494,32 @@ public class SimbrainMath {
      * @param arr
      * @return
      */
-    public static double getMinimum(final Number[] arr) {
+    /**
+     * Returns the minimum value of an array of numbers.
+     */
+    public static double getMinimum(final double[] arr) {
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0, n = arr.length; i < n; i++) {
-            if (arr[i].doubleValue() < min) {
-                min = arr[i].doubleValue();
+            if (arr[i] < min) {
+                min = arr[i];
             }
         }
         return min;
+    }
+
+    /**
+     * Normalize between minimum and maximium value of vectors.
+     * @param vec
+     * @return
+     */
+    public static double[] minMaxNormalize(double[] vec) {
+        double min = getMinimum(vec);
+        double max = getMaximum(vec);
+        double[] normedVec = new double[vec.length];
+        for (int i = 0, n = vec.length; i < n; i++) {
+            normedVec[i] = (vec[i] - min) / (max - min);
+        }
+        return normedVec;
     }
 
     /**

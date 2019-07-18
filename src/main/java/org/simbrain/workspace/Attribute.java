@@ -83,15 +83,10 @@ public abstract class Attribute {
      * Returns a string id, e.g. "Neuron15" or "Sensor5".
      */
     public String getId() {
-        if (idMethod == null) {
+        if (baseObject.getId() == null) {
             return baseObject.getClass().getSimpleName();
         } else {
-            try {
-                return (String) idMethod.invoke(baseObject);
-            } catch (IllegalAccessException | InvocationTargetException ex) {
-                // Should never happen
-                throw new AssertionError(ex);
-            }
+            return baseObject.getId();
         }
     }
 

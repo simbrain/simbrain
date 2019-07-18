@@ -19,9 +19,9 @@ public final class ArchivedAttribute {
     private String componentId;
 
     /**
-     * The id of the couplable object.
+     * The id of the consumer or producer object.
      */
-    private String id;
+    private String attributeId;
 
     /**
      * The method name.
@@ -36,7 +36,7 @@ public final class ArchivedAttribute {
      */
     ArchivedAttribute(WorkspaceComponent component, Attribute attribute) {
         componentId = component.getName();
-        id = attribute.getId();
+        attributeId = attribute.getId();
         methodName = attribute.getMethod().getName();
     }
 
@@ -44,8 +44,8 @@ public final class ArchivedAttribute {
         return componentId;
     }
 
-    public String getId() {
-        return id;
+    public String getAttributeId() {
+        return attributeId;
     }
 
     public String getMethodName() {

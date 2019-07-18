@@ -375,7 +375,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      *
      * @param act Activation
      */
-    @Consumable(idMethod = "getId", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setActivation(final double act) {
         lastActivation = getActivation();
         if (isClamped()) {
@@ -405,18 +405,19 @@ public class Neuron implements EditableObject, AttributeContainer {
      *
      * @param act the new activation value
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
         changeSupport.firePropertyChange("activation", lastActivation, act);
     }
 
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getActivation() {
         return activation;
     }
 
+    @Override
     public String getId() {
         return id;
     }
@@ -703,7 +704,7 @@ public class Neuron implements EditableObject, AttributeContainer {
      *
      * @param inputValue The inputValue to set.
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
     }
@@ -965,12 +966,12 @@ public class Neuron implements EditableObject, AttributeContainer {
         changeSupport.firePropertyChange("clamped", null, clamped);
     }
 
-    @Producible(idMethod = "getId", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public String getLabel() {
         return label;
     }
 
-    @Consumable(idMethod = "getId", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setLabel(final String label) {
         String oldLabel = this.label;
         this.label = label;

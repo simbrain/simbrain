@@ -164,12 +164,12 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         return NumericTable.getXStream().toXML(dataTable);
     }
 
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setRow(double[] values) {
         dataTable.setVectorCurrentRow(values);
     }
 
-    @Producible(idMethod = "getId")
+    @Producible()
     public double[] getRow() {
         return dataTable.getVectorCurrentRow();
     }

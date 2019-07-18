@@ -14,9 +14,6 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  */
 public interface PeripheralAttribute extends AttributeContainer, EditableObject {
 
-
-    public String getId();
-
     public String getLabel();
 
     public OdorWorldEntity getParent();

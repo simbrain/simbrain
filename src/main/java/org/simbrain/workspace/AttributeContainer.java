@@ -18,10 +18,25 @@
  */
 package org.simbrain.workspace;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
- * Marker interface which designates an object as one that contains {@link Consumable}
- * or {@link Producible} annotations.
+ * Designates an object as one that contains {@link Consumable}
+ * or {@link Producible} annotations, that can be linked together in
+ * {@link Coupling}s.
  */
 public interface AttributeContainer {
+
+    /**
+     * Returns an id that can be used to identify this container. Used in persistence
+     * (see {@link org.simbrain.workspace.serialization.ArchivedAttribute} and in displaying
+     * Producers and consumers.
+     *
+     * @return the String id.
+     */
+    default String getId() {
+        // TODO: Remove default.
+        return null;
+    }
 
 }

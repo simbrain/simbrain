@@ -116,49 +116,49 @@ public class PhysicalEntity implements Entity {
         });
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getX() {
         return getPosition().x;
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setX(double value) {
         Vector3f location = getPosition();
         location.x = (float) value;
         queuePosition(location);
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getY() {
         return getPosition().y;
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setY(double value) {
         Vector3f location = getPosition();
         location.y = (float) value;
         queuePosition(location);
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getZ() {
         return getPosition().z;
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setZ(double value) {
         Vector3f location = getPosition();
         location.z = (float) value;
         queuePosition(location);
     }
 
-    @Producible(description = "getPosition", idMethod = "getName")
+    @Producible(description = "getPosition")
     public double[] getPositionComponents() {
         Vector3f position = getPosition();
         return new double[]{position.x, position.y, position.z};
     }
 
-    @Consumable(description = "setPosition", idMethod = "getName", defaultVisibility = false)
+    @Consumable(description = "setPosition", defaultVisibility = false)
     public void setPositionComponents(double[] value) {
         Vector3f position = new Vector3f((float) value[0], (float) value[1], (float) value[2]);
         queuePosition(position);
@@ -169,7 +169,7 @@ public class PhysicalEntity implements Entity {
         node.move(offset);
     }
 
-    @Consumable(idMethod = "getName")
+    @Consumable()
     public void move(double[] offset) {
         engine.enqueue(() -> {
             move(new Vector3f((float) offset[0], (float) offset[1], (float) offset[2]));
@@ -200,49 +200,49 @@ public class PhysicalEntity implements Entity {
         });
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getYaw() {
         return FastMath.RAD_TO_DEG * getRotationAngles()[1];
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setYaw(double value) {
         double[] rotation = getRotationAngles();
         rotation[1] = FastMath.DEG_TO_RAD * (float) value;
         setRotationAngles(rotation);
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getPitch() {
         return FastMath.RAD_TO_DEG * getRotationAngles()[0];
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setPitch(double value) {
         double[] rotation = getRotationAngles();
         rotation[0] = FastMath.DEG_TO_RAD * (float) value;
         setRotationAngles(rotation);
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public double getRoll() {
         return FastMath.RAD_TO_DEG * getRotationAngles()[2];
     }
 
-    @Consumable(idMethod = "getName", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setRoll(double value) {
         double[] rotation = getRotationAngles();
         rotation[2] = FastMath.DEG_TO_RAD * (float) value;
         setRotationAngles(rotation);
     }
 
-    @Producible(description = "getRotation", idMethod = "getName")
+    @Producible(description = "getRotation")
     private double[] getRotationAngles() {
         float[] angles = getRotation().toAngles(null);
         return new double[]{angles[0], angles[1], angles[2]};
     }
 
-    @Consumable(description = "setRotation", idMethod = "getName", defaultVisibility = false)
+    @Consumable(description = "setRotation", defaultVisibility = false)
     private void setRotationAngles(double[] values) {
         Quaternion rotation = new Quaternion();
         float[] angles = new float[]{(float) values[0], (float) values[1], (float) values[2]};
@@ -255,7 +255,7 @@ public class PhysicalEntity implements Entity {
         node.rotate(rotation);
     }
 
-    @Consumable(idMethod = "getName")
+    @Consumable()
     public void rotate(double[] values) {
         engine.enqueue(() -> {
             Quaternion rotation = new Quaternion();
@@ -283,5 +283,10 @@ public class PhysicalEntity implements Entity {
     @Override
     public Editor getEditor() {
         return new EntityEditor(this);
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

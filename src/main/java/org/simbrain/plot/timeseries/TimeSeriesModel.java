@@ -414,9 +414,14 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
             return series.getDescription();
         }
 
-        @Consumable(idMethod = "getDescription")
+        @Consumable()
         public void setValue(double value) {
             series.add(timeSupplier.get(), (Number) value);
+        }
+
+        @Override
+        public String getId() {
+            return getDescription();
         }
     }
 }

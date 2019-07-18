@@ -481,7 +481,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * @return Strength of synapse.
      */
-    @Producible(idMethod = "getId", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public final double getStrength() {
         return strength;
     }
@@ -489,9 +489,9 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Sets the strength of the synapse.
      *
-     * @param wt Strength value
+     * @param wt new strength value
      */
-    @Consumable(idMethod = "getId", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setStrength(final double wt) {
         if (isTemplate) {
             forceSetStrength(wt);

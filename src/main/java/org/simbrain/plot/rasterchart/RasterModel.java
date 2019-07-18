@@ -236,7 +236,7 @@ public class RasterModel implements AttributeContainer, EditableObject {
             this.index = index;
         }
 
-        @Consumable(idMethod = "getId")
+        @Consumable()
         public void setValues(final double[] values) {
             if (values.length == 0) {
                 getDataset().getSeries(index).add(timeSupplier.get(), null);

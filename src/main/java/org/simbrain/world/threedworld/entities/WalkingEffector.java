@@ -193,7 +193,7 @@ public class WalkingEffector implements Effector {
         turnAnimSpeed = value;
     }
 
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getWalking() {
         return walking;
     }
@@ -206,14 +206,14 @@ public class WalkingEffector implements Effector {
         walking = (float) value;
     }
 
-    @Consumable(description = "setWalking", idMethod = "getId")
+    @Consumable(description = "setWalking")
     public void queueWalking(double value) {
         agent.getEngine().enqueue(() -> {
             setWalking((float) value);
         });
     }
 
-    @Producible(idMethod = "getId")
+    @Producible()
     public float getTurning() {
         return turning;
     }
@@ -226,7 +226,7 @@ public class WalkingEffector implements Effector {
         turning = value;
     }
 
-    @Consumable(description = "setTurning", idMethod = "getId")
+    @Consumable(description = "setTurning")
     public void queueTurning(double value) {
         agent.getEngine().enqueue(() -> {
             setTurning((float) value);

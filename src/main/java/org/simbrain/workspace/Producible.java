@@ -23,11 +23,6 @@ public @interface Producible {
     String description() default "";
 
     /**
-     * The name of a method that returns a custom id for the base object of the producer.
-     */
-    String idMethod() default "";
-
-    /**
      * The name of a method that returns a custom description for the producer.
      */
     String customDescriptionMethod() default "";

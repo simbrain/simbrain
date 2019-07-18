@@ -39,13 +39,24 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Serializes and deserializes workspaces. Custom serialization (beyond what
- * XStream can do) is required, in order to recreate workspace components and
- * couplings from a legible xml form / zipped directory structure. Mainly this
- * means recreating components, couplings, and update actions. Also some effort
- * has been made to allow reuse between individual component save / reopen and
- * workspace level save / reopen.  Some additional information is in
- * {@link Workspace}.
+ * Serializes and deserializes workspaces. Custom serialization (beyond what XStream can do) is required, in order to
+ * recreate workspace components and couplings from a legible xml form in a zipped directory structure. Some additional
+ * information is in {@link Workspace}.
+ * <br>
+ * To make a workspace component serializable, here are some things you should do.
+ * <ol>
+ * <li>In your subclass of {@link WorkspaceComponent}, override {@link WorkspaceComponent#getXML()} and
+ * {@link WorkspaceComponent#save(OutputStream, String)}}, which convert your main model objects to and from xml.</li>
+ * <li>In your subclass of {@link WorkspaceComponent}, override {@link WorkspaceComponent#getAttributeContainers()}.
+ * It should return a list of objects that contain consumers or producers, i.e. that contain methods
+ * annotated as {@link Consumable} or {@link Producible}.</li>
+ * <li>Mark any fields that should not be serialized as transient.</li>
+ * <li>Special initialization before de-serializing can be handled with ReadResolve methods, by calling methods
+ * before and after serialization in Save, and soetimes using specail XStream converters.</li>
+ * </ol>
+ * <br>
+ * Some good examples are in {@link org.simbrain.network.NetworkComponent} and {@link
+ * org.simbrain.world.odorworld.OdorWorldComponent}.
  *
  * @author Matt Watson
  * @author Zoë Tosi
@@ -142,7 +153,7 @@ public class WorkspaceSerializer {
      *
      * @param serializer The serializer for the components.
      * @param archive    The archive contents to update.
-     * @param component the component to serialize
+     * @param component  the component to serialize
      * @param zipStream  The zipstream to write to.
      */
     private void serializeComponent(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, WorkspaceComponent component, ZipOutputStream zipStream) {
@@ -192,8 +203,8 @@ public class WorkspaceSerializer {
      * Add a serialized coupling to the archive.
      *
      * @param couplingComponents a map from couplings to components
-     * @param coupling the coupling to save
-     * @param archive the archive object to save to
+     * @param coupling           the coupling to save
+     * @param archive            the archive object to save to
      */
     private void serializeCoupling(HashMap<Object, WorkspaceComponent> couplingComponents, Coupling<?> coupling, ArchivedWorkspace archive) {
         ArchivedAttribute producer = new ArchivedAttribute(couplingComponents.get(coupling.getProducer().getBaseObject()), coupling.getProducer());
@@ -330,8 +341,7 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * Helper method that will read the InputStream repeatedly until the given
-     * array is filled.
+     * Helper method that will read the InputStream repeatedly until the given array is filled.
      *
      * @param istream the InputStream to read from.
      * @param bytes   the array to write to
@@ -362,8 +372,8 @@ public class WorkspaceSerializer {
     /**
      * Helper method for openings workspace components from a file.
      * <p>
-     * A call might look like this <code>NetworkComponent networkComponent =
-     * (NetworkComponent) WorkspaceFileOpener(NetworkComponent.class, new File("Net.xml"));</code>
+     * A call might look like this <code>NetworkComponent networkComponent = (NetworkComponent)
+     * WorkspaceFileOpener(NetworkComponent.class, new File("Net.xml"));</code>
      *
      * @param fileClass the type of Workpsace component to open; a subclass of WorkspaceComponent.
      * @param file      the File to open

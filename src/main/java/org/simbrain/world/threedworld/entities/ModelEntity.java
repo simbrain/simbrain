@@ -80,7 +80,7 @@ public class ModelEntity extends PhysicalEntity {
         return getAnimations().contains(name);
     }
 
-    @Producible(idMethod = "getName")
+    @Producible()
     public String getAnimation() {
         AnimControl animator = getAnimator();
         if (animator == null || animator.getNumChannels() == 0) {
@@ -91,7 +91,7 @@ public class ModelEntity extends PhysicalEntity {
         }
     }
 
-    @Consumable(idMethod = "getName")
+    @Consumable()
     public void setAnimation(String name) {
         setAnimation(name, 1);
     }

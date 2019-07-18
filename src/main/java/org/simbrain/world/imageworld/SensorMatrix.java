@@ -109,27 +109,27 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
         return source.getHeight();
     }
 
-    @Producible(idMethod = "getName")
+    @Producible()
     public double[] getBrightness() {
         return channels[0];
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible( defaultVisibility = false)
     public double[] getRed() {
         return channels[1];
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible( defaultVisibility = false)
     public double[] getGreen() {
         return channels[2];
     }
 
-    @Producible(idMethod = "getName", defaultVisibility = false)
+    @Producible( defaultVisibility = false)
     public double[] getBlue() {
         return channels[3];
     }
 
-    @Producible(idMethod = "getName")
+    @Producible()
     public int[] getRGBColor() {
         return rgbColors;
     }
@@ -181,4 +181,8 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
         }
     }
 
+    @Override
+    public String getId() {
+        return getName();
+    }
 }

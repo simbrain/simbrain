@@ -139,7 +139,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     }
 
 
-    @Producible(idMethod = "getId", defaultVisibility = false)
+    @Producible(defaultVisibility = false)
     public String getLabel() {
         return label;
     }
@@ -149,7 +149,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * Set the label. This prevents the group id being used as the label for
      * new groups.  If null or empty labels are sent in then the group label is used.
      */
-    @Consumable(idMethod = "getId", defaultVisibility = false)
+    @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
         if (label == null  || label.isEmpty()) {
             useCustomLabel = false;

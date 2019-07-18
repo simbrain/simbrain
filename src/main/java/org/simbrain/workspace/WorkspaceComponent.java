@@ -170,9 +170,9 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Finds objects based on a key. Used in deserializing {@link Attribute}'s.
+     * Override to return objects based on a key. Used in deserializing {@link Attribute}s.
      * Any class that produces attributes should override this for
-     * serialization.  Each attribute object in a component must be given a
+     * serialization.  Each attribute container in a component must be given a
      * unique id (relative to that component) for deserializing to work.
      *
      * @param objectKey String key
@@ -183,7 +183,7 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Return a collection of all {@link AttributeContainer}'s currently managed by this
+     * Override to return a collection of all {@link AttributeContainer}'s currently managed by this
      * component.
      */
     public List<AttributeContainer> getAttributeContainers() {
@@ -196,7 +196,7 @@ public abstract class WorkspaceComponent {
      * @param annotation Annotation of the methods. Expect {@link Producible} or {@link Consumable}.
      * @return a list of all attribute methods in this component.
      */
-    public List<Method> getAttributeMethods(Class<? extends Annotation> annotation) {
+    public final List<Method> getAttributeMethods(Class<? extends Annotation> annotation) {
         if (annotation != Producible.class && annotation != Consumable.class) {
             return null;
         }
@@ -486,59 +486,36 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns true if it's changed since the last save.
-     *
-     * @return the changedSinceLastSave
      */
     public boolean hasChangedSinceLastSave() {
         return changedSinceLastSave;
     }
 
-    /**
-     * @return the currentFile
-     */
     public File getCurrentFile() {
         return currentFile;
     }
 
-    /**
-     * @param currentFile the currentFile to set
-     */
     public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
     }
 
-    /**
-     * @return the logger
-     */
     public Logger getLogger() {
         return logger;
     }
 
-    /**
-     * @param logger the logger to set
-     */
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
-    /**
-     * @return the guiOn
-     */
     public boolean isGuiOn() {
         return guiOn;
     }
 
-    /**
-     * @param guiOn the guiOn to set
-     */
     public void setGuiOn(boolean guiOn) {
         this.guiOn = guiOn;
         this.fireGuiToggleEvent();
     }
 
-    /**
-     * @return the updateOn
-     */
     public boolean getUpdateOn() {
         return updateOn;
     }

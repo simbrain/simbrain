@@ -174,7 +174,6 @@ public abstract class CouplingUtils {
 
         return Producer.builder(container, method)
                 .description(annotation.description())
-                .idMethod(getMethod(container, annotation.idMethod()))
                 .customDescription(getMethod(container, annotation.customDescriptionMethod()))
                 .arrayDescriptionMethod(getMethod(container, annotation.arrayDescriptionMethod()))
                 .visibility(annotation.defaultVisibility())
@@ -192,7 +191,6 @@ public abstract class CouplingUtils {
         }
 
         return Consumer.builder(container, method)
-                .idMethod(getMethod(container, annotation.idMethod()))
                 .customDescription(getMethod(container, annotation.customDescriptionMethod()))
                 .description(annotation.description())
                 .visibility(annotation.defaultVisibility())

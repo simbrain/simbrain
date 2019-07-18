@@ -56,6 +56,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * static open method that must also be created. An example is {@link
  * org.simbrain.world.odorworld.OdorWorldComponent#open(InputStream, String,
  * String)}
+ * <br>
+ * For instructions on setting up serialization see {@link WorkspaceSerializer}.
  *
  * @author Jeff Yoshimi
  * @author Matt Watson

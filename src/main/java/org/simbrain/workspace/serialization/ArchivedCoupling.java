@@ -50,13 +50,17 @@ class ArchivedCoupling {
         return CouplingUtils.getConsumer(container, method);
     }
 
+    /**
+     * Find the attribute container corresponding to an archived attribute object.
+     */
     private AttributeContainer getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
         WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
-        AttributeContainer container = component.getObjectFromKey(attribute.getId());
-        if (container == null) {
-            throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.", attribute.getId(), attribute.getComponentId()));
+        for(AttributeContainer container : component.getAttributeContainers()) {
+            if (container.getId().equals(attribute.getAttributeId())) {
+                return container;
+            }
         }
-        return container;
+        throw new RuntimeException(String.format("Failed to retrieve object %s from serialized component %s.", attribute.getAttributeId(), attribute.getComponentId()));
     }
 
 }

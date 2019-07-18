@@ -304,7 +304,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param newx
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setX(final double newx) {
         // System.out.println("x:" + newx)
         if (parentWorld.getWrapAround()) {
@@ -331,7 +331,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param newy
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void setY(final double newy) {
         // System.out.println("y:" + newy)
         if (parentWorld.getWrapAround()) {
@@ -357,7 +357,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * Gets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getVelocityX() {
         return dx;
     }
@@ -366,7 +366,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * Gets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getVelocityY() {
         return dy;
     }
@@ -598,7 +598,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @return center location of the entity.
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public double[] getCenterLocation() {
         return new double[] {getCenterX(), getCenterY()};
     }
@@ -608,7 +608,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @return center x coordinate.
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getCenterX() {
         return x + entityType.getImageWidth() / 2;
     }
@@ -618,7 +618,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @return center y coordinate.
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public double getCenterY() {
         return y + entityType.getImageHeight() / 2;
     }
@@ -640,7 +640,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * @return location of the entity.
      */
     //TODO: Remove
-    @Producible(idMethod = "getId")
+    @Producible()
     public double[] getLocation() {
         return new double[] {x, y};
     }
@@ -722,7 +722,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void moveNorth(double amount) {
         if (!collideOn("y") && (amount > 0)) {
             if (this.isRotating()) {
@@ -737,7 +737,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void moveSouth(double amount) {
         if (!collideOn("y") && (amount > 0)) {
             if (this.isRotating()) {
@@ -752,7 +752,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void moveEast(double amount) {
         if (!collideOn("x") && (amount > 0)) {
             if (this.isRotating()) {
@@ -783,7 +783,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @param amount amount to move by
      */
-    @Consumable(idMethod = "getId")
+    @Consumable()
     public void moveWest(double amount) {
         if (!collideOn("left") && (amount > 0)) {
             if (this.isRotating()) {
@@ -1222,7 +1222,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      *
      * @return the name of the nearby object or an empty string if there is none
      */
-    @Producible(idMethod = "getId")
+    @Producible()
     public String getNearbyObjects() {
         List<OdorWorldEntity> entities = this.getEntitiesInRadius(7);
         //TODO: Need them ordered by distance

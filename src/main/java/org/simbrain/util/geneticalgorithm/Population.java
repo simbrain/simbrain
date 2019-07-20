@@ -134,4 +134,8 @@ public class Population<G extends Genome<G, P>, P> {
     public void setEliminationRatio(double eliminationRatio) {
         this.eliminationRatio = eliminationRatio;
     }
+
+    public int getGeneration() {
+        return generation;
+    }
 }

@@ -58,7 +58,7 @@ public class NodeGene extends Gene<Neuron> {
         //if (type == NodeType.hidden) {
         //    SigmoidalRule rule = new SigmoidalRule();
         //    rule.setUpperBound(1);
-        //    rule.setLowerBound(-1);
+        //    rule.setLowerBound(-1); 
         //    prototype.setUpdateRule(rule);
         //}
     }
@@ -116,6 +116,11 @@ public class NodeGene extends Gene<Neuron> {
         if (type != NodeType.hidden) {
             this.prototype.setUpdateRule(new LinearRule());
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s: %s", type, prototype.getUpdateRule().getName());
     }
 
     public void setConfiguration(NetworkGenome.Configuration configuration) {

@@ -1,11 +1,13 @@
 package org.simbrain.util.geneticalgorithm.odorworld;
 
 import org.simbrain.util.geneticalgorithm.Genome;
-import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.neat.NodeChromosome;
+import org.simbrain.util.neat.NodeGene;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
+
+import java.util.function.Supplier;
 
 /**
  * Represents and OdorWorld entity.
@@ -19,6 +21,8 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
     private OdorWorldEntity baseEntity = new OdorWorldEntity(null, EntityType.MOUSE);
 
     private Config config = new Config();
+
+    private Supplier<Integer> nodeGeneInnovationNumberSupplier;
 
     public OdorWorldEntityGenome() {
         sensors = new EntitySensorChromosome();
@@ -58,6 +62,25 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
                 .peek(s -> s.setParent(ret))
                 .forEach(ret::addSensor);
         return ret;
+    }
+
+    public Supplier<Integer> getNodeGeneInnovationNumberSupplier() {
+        return nodeGeneInnovationNumberSupplier;
+    }
+
+    public void setNodeGeneInnovationNumberSupplier(Supplier<Integer> nodeGeneInnovationNumberSupplier) {
+        this.nodeGeneInnovationNumberSupplier = nodeGeneInnovationNumberSupplier;
+        this.sensors.setNodeGeneInnovationNumberSupplier(nodeGeneInnovationNumberSupplier);
+    }
+
+    public NodeChromosome getSensorEffectorNodeChromosome() {
+        NodeChromosome nodeChromosome = new NodeChromosome();
+        for (Integer innovationNumber : sensors.getGeneMap().keySet()) {
+            NodeGene nodeGene = new NodeGene();
+            nodeGene.setType(NodeGene.NodeType.input);
+            nodeChromosome.addGene(nodeGene, innovationNumber);
+        }
+        return nodeChromosome;
     }
 
     public OdorWorldEntity getBaseEntity() {

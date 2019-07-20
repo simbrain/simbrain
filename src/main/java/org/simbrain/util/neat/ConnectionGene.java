@@ -123,6 +123,11 @@ public class ConnectionGene extends Gene<Synapse> {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%1$d-%3$s%2$d", sourceIndex, targetIndex, enabled ? ">" : "x");
+    }
+
     public void setConfiguration(NetworkGenome.Configuration configuration) {
         this.configuration = configuration;
     }

@@ -1,5 +1,8 @@
 package org.simbrain.util.math;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -88,6 +91,14 @@ public class SimbrainRandomizer extends Random {
             return mutateNumber(source, interval);
         }
         return source;
+    }
+
+    public <T> T randomPick(List<T> list) {
+        if (list.size() == 0) {
+            return null;
+        }
+        int index = nextInt(list.size());
+        return list.get(index);
     }
 
 }

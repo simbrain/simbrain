@@ -21,8 +21,10 @@ import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
+import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
@@ -34,7 +36,7 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
     /**
      * The maximum number of generation.
      */
-    private int maxIterations = 150;
+    private int maxGeneration = 150;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
@@ -50,6 +52,8 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
      * Population of xor networks to evolve
      */
     private Population<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> population;
+
+    private int nextInnovationNumber;
 
     /**
      * Construct sim
@@ -72,7 +76,7 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         population = new Population<>(this.populationSize);
         //population.setEliminationRatio(.8);// TODO: causes problems
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        configuration.setNumInputs(2);
+        // configuration.setNumInputs(2); // Note: This is being overwritten in the constructor of NetworkEntityGenome
         configuration.setNumOutputs(3);
         configuration.setAllowSelfConnection(true);
         configuration.setMaxNodes(10);
@@ -81,18 +85,23 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         configuration.setNodeMaxBias(2);
         configuration.setMinNeuronActivation(-1);
         configuration.setMaxNeuronActivation(4);
-        configuration.setRules(Arrays.asList(
-                LinearRule.class, DecayRule.class, NakaRushtonRule.class,
-                BinaryRule.class, ThreeValueRule.class));
+        configuration.setRules(List.of(
+               LinearRule.class, DecayRule.class, NakaRushtonRule.class,
+               BinaryRule.class, ThreeValueRule.class));
 
-        NetworkEntityGenome neg = new NetworkEntityGenome(configuration);
-        // TODO: Must manually add ids to sensors
-        //OdorWorldEntity baseEntity = neg.getEntityGenome().getBaseEntity();
-        //baseEntity.addLeftRightSensors(EntityType.SWISS, 250);
+        nextInnovationNumber = configuration.getNumInputs() + configuration.getNumOutputs();
+
+        NetworkEntityGenome networkEntityGenome = new NetworkEntityGenome(configuration);
+        networkEntityGenome.setNodeGeneInnovationNumberBaseSupplier(this::getNextInnovationNumber);
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
-                new Agent<>(neg, EvolveOdorWorldAgent::eval);
+                new Agent<>(networkEntityGenome,
+                        EvolveOdorWorldAgent::eval);
         population.populate(prototype);
+    }
+
+    public Integer getNextInnovationNumber() {
+        return nextInnovationNumber;
     }
 
     @Override
@@ -151,11 +160,15 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         outputs.setClamped(false);
         NeuronGroup inputs = (NeuronGroup) network.getGroupByLabel("inputs");
         // TODO: Why not always at least 2 sensors?
-        if(mouse.getSensors().size() > 1) {
-            theSim.couple((ObjectSensor) mouse.getSensors().get(0), inputs.getNeuron(0));
-            theSim.couple((ObjectSensor) mouse.getSensors().get(1), inputs.getNeuron(1));
-            //sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
-            //inputs.setClamped(false);
+
+        for (int i = 0; i < mouse.getSensors().size(); i++) {
+            Sensor sensor = mouse.getSensors().get(i);
+            if (sensor instanceof SmellSensor) {
+                SmellSensor smellSensor = (SmellSensor) sensor;
+            } else {
+
+                theSim.couple((ObjectSensor) sensor, inputs.getNeuron(i));
+            }
         }
 
         return cheese;
@@ -224,8 +237,15 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
      * Run the simulation.
      */
     public void evolve() {
-        for (int i = 0; i < maxIterations; i++) {
+        for (int i = 0; i < maxGeneration; i++) {
             double bestFitness = population.computeNewFitness();
+            nextInnovationNumber = 1 +
+                    population.getAgentList()
+                            .stream()
+                            .map(Agent::getGenome)
+                            .map(NetworkEntityGenome::getLastInnovationNumber)
+                            .reduce(Integer::max)
+                            .orElse(nextInnovationNumber);
             System.out.println(i + ", fitness = " + bestFitness);
             if (bestFitness > fitnessThreshold) {
                 break;

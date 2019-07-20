@@ -9,6 +9,8 @@ import org.simbrain.util.geneticalgorithm.Genome;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Contains node genes and connection genes (a {@link NodeChromosome} and {@link ConnectionChromosome}
@@ -29,6 +31,8 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
      * A set of node genes.
      */
     private NodeChromosome nodeGenes = new NodeChromosome();
+
+    private List<Supplier<NodeChromosome>> externalNodes = new ArrayList<>();
 
     /**
      * A set of connection genes.
@@ -71,6 +75,10 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         return configuration;
     }
 
+    public NodeChromosome getNodeGenes() {
+        return nodeGenes;
+    }
+
     @Override
     public Network express() {
 
@@ -81,12 +89,18 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         NeuronGroup inputGroup = new NeuronGroup(network);
         NeuronGroup outputGroup = new NeuronGroup(network);
 
-        nodeGenes.getGenes().forEach(nodeGene -> {
+        Map<Integer, NodeGene> combinedNodeGenes = getCombinedNodeGenes();
+
+        Map<Integer, Neuron> phenotypes = new HashMap<>();
+
+        combinedNodeGenes.forEach((innovationNumber, nodeGene) -> {
             Neuron neuron = new Neuron(network, nodeGene.getPrototype());
+            phenotypes.put(innovationNumber, neuron);
             neurons.add(neuron);
 
             if (nodeGene.getType() == NodeGene.NodeType.input) {
                 inputGroup.addNeuron(neuron);
+                neuron.setClamped(true);
             } else if (nodeGene.getType() == NodeGene.NodeType.output) {
                 outputGroup.addNeuron(neuron);
             } else {
@@ -107,8 +121,8 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         connectionGenes.getGenes().forEach(connectionGene -> {
             Synapse synapse = new Synapse(
                     network,
-                    neurons.get(connectionGene.getSourceIndex()),
-                    neurons.get(connectionGene.getTargetIndex()),
+                    phenotypes.get(connectionGene.getSourceIndex()),
+                    phenotypes.get(connectionGene.getTargetIndex()),
                     connectionGene.getPrototype().getLearningRule(),
                     connectionGene.getPrototype()
             );
@@ -153,20 +167,18 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
 
             // Create a new connection
 
+            Map<Integer, NodeGene> combinedGenes = getCombinedNodeGenes();
+
             // First, select a source neuron.
-            int sourceNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
-            // Ensure that the source neuron exists in the node genes, and is not a output neuron
-            while (!nodeGenes.contains(sourceNodeID) || nodeGenes.getByID(sourceNodeID).getType() == NodeGene.NodeType.output) {
-                sourceNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
+            Integer sourceNodeID =  getPotentialSourceNodeID(combinedGenes);
+            if (sourceNodeID == null) {
+                return;
             }
+
             // Now select a target neuron
-            int destinationNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
-            // Ensure the the target neuron exists in the node genes, is not an input neuron, and (if set) is not
-            // a self-connection
-            while (!nodeGenes.contains(destinationNodeID)
-                    || nodeGenes.getByID(destinationNodeID).getType() == NodeGene.NodeType.input
-                    || (!configuration.allowSelfConnection && sourceNodeID == destinationNodeID)) {
-                destinationNodeID =  SimbrainRandomizer.rand.nextInt(nodeGenes.getMaxNodeID() + 1);
+            Integer destinationNodeID =  getPotentialTargetNodeID(combinedGenes);
+            if (destinationNodeID == null || (sourceNodeID.equals(destinationNodeID) && configuration.allowSelfConnection)) {
+                return;
             }
 
             // Create the new connection gene
@@ -195,6 +207,46 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
         ret.nodeGenes = nodeGenes.copy();
         ret.connectionGenes = connectionGenes.copy();
         return ret;
+    }
+
+    public void addExternalNodeGenes(Supplier<NodeChromosome> nodeGenes) {
+        externalNodes.add(nodeGenes);
+    }
+
+    public void resetExternalNodeGenes() {
+        externalNodes = new ArrayList<>();
+    }
+
+    public Map<Integer, NodeGene> getCombinedNodeGenes() {
+
+        HashMap<Integer, NodeGene> combinedGenes = new HashMap<>(nodeGenes.getGeneMap());
+
+        externalNodes.stream()
+                .map(Supplier::get)
+                .filter(Objects::nonNull)
+                .map(NodeChromosome::getGeneMap)
+                .forEach(combinedGenes::putAll);
+
+        return combinedGenes;
+    }
+
+    private Integer getPotentialSourceNodeID(Map<Integer, NodeGene> genes) {
+        List<Integer> temp = genes.entrySet().stream()
+                .filter(entry -> entry.getValue().getType() != NodeGene.NodeType.output)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        return SimbrainRandomizer.rand.randomPick(
+                temp
+        );
+    }
+
+    private Integer getPotentialTargetNodeID(Map<Integer, NodeGene> genes) {
+        return SimbrainRandomizer.rand.randomPick(
+                genes.entrySet().stream()
+                        .filter(entry -> entry.getValue().getType() != NodeGene.NodeType.input)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList())
+        );
     }
 
     /**

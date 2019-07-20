@@ -2,9 +2,11 @@ package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.geneticalgorithm.Chromosome;
+import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -16,6 +18,8 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
      * A set of node genes indexed by an integer id.
      */
     private Map<Integer, NodeGene> genes = new TreeMap<>();
+
+    private Supplier<Integer> innovationNumberSupplier = this.genes::size;
 
     private int maxNodeID;
 
@@ -50,13 +54,25 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
         return new ArrayList<>(genes.values());
     }
 
+    public Map<Integer, NodeGene> getGeneMap() {
+        return Collections.unmodifiableMap(genes);
+    }
+
+    public List<Integer> getInnovationNumbers() {
+        return new ArrayList<>(genes.keySet());
+    }
+
     public void addGene(NodeGene gene) {
         addGenes(Collections.singleton(gene));
     }
 
+    public void addGene(NodeGene gene, int index) {
+        genes.put(index, gene);
+    }
+
     public void addGenes(Collection<NodeGene> nodeGenes) {
         for (NodeGene nodeGene : nodeGenes) {
-            genes.put(genes.size(), nodeGene);
+            genes.put(innovationNumberSupplier.get(), nodeGene);
         }
         maxNodeID = genes.keySet().stream().reduce(Integer::max).orElse(0);
     }
@@ -82,5 +98,9 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
 
     public int getMaxNodeID() {
         return maxNodeID;
+    }
+
+    public void setInnovationNumberSupplier(Supplier<Integer> innovationNumberSupplier) {
+        this.innovationNumberSupplier = innovationNumberSupplier;
     }
 }

@@ -4,16 +4,21 @@ import org.simbrain.util.geneticalgorithm.Chromosome;
 import org.simbrain.util.geneticalgorithm.numerical.NumericalGeneticAlgUtils;
 import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChromosome> {
 
-    private List<SensorGene> sensorGenes = new ArrayList<>();
+    private Map<Integer, SensorGene> sensorGenes = new TreeMap<>();
 
     private OdorWorldEntityGenome.Config config;
+
+    private Supplier<Integer> nodeGeneInnovationNumberSupplier;
 
     @Override
     public void mutate() {
@@ -36,7 +41,7 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
             }
             sensorGene.setConfig(config);
             sensorGene.mutate();
-            sensorGenes.add(sensorGene);
+            sensorGenes.put(nodeGeneInnovationNumberSupplier.get(), sensorGene);
         }
     }
 
@@ -44,7 +49,26 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
     public EntitySensorChromosome crossOver(EntitySensorChromosome other) {
         EntitySensorChromosome ret = new EntitySensorChromosome();
         ret.setConfig(config);
-        NumericalGeneticAlgUtils.singlePointCrossover(this, other, ret);
+        Set<Integer> nodeIDUnionSet = new HashSet<>();
+        nodeIDUnionSet.addAll(sensorGenes.keySet());
+        nodeIDUnionSet.addAll(other.sensorGenes.keySet());
+        ret.sensorGenes = nodeIDUnionSet.stream()
+                .limit((long) config.getMaxSensorCount()) // find a better way
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        id -> {
+                            if (sensorGenes.containsKey(id)) {
+                                SensorGene gene = sensorGenes.get(id).copy();
+                                gene.setConfig(config);
+                                return gene;
+                            } else {
+                                SensorGene gene = other.sensorGenes.get(id).copy();
+                                gene.setConfig(config);
+                                return gene;
+                            }
+                        }
+                ));
+
         return ret;
     }
 
@@ -52,17 +76,22 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
         EntitySensorChromosome ret = new EntitySensorChromosome();
 
         ret.config = this.config;
-        ret.sensorGenes = sensorGenes.stream()
-                .map(SensorGene::copy)
-                .map(SmellSensorGene.class::cast)
-                .collect(Collectors.toList());
+        ret.sensorGenes = sensorGenes.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().copy()
+                ));
 
         return ret;
     }
 
     @Override
     public List<? extends SensorGene> getGenes() {
-        return sensorGenes;
+        return new ArrayList<>(sensorGenes.values());
+    }
+
+    public Map<Integer, SensorGene> getGeneMap() {
+        return Collections.unmodifiableMap(sensorGenes);
     }
 
     public OdorWorldEntityGenome.Config getConfig() {
@@ -71,5 +100,9 @@ public class EntitySensorChromosome extends Chromosome<Sensor, EntitySensorChrom
 
     public void setConfig(OdorWorldEntityGenome.Config config) {
         this.config = config;
+    }
+
+    public void setNodeGeneInnovationNumberSupplier(Supplier<Integer> nodeGeneInnovationNumberSupplier) {
+        this.nodeGeneInnovationNumberSupplier = nodeGeneInnovationNumberSupplier;
     }
 }

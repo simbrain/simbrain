@@ -28,6 +28,9 @@ public abstract class SensorGene extends Gene<Sensor> {
 
     }
 
+    @Override
+    public abstract SensorGene copy();
+
     public OdorWorldEntityGenome.Config getConfig() {
         return config;
     }

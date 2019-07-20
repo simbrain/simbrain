@@ -22,3 +22,4 @@ out/*
 *.ipr
 *.iws
 .DS_Store
+*.so

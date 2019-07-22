@@ -152,7 +152,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public EditableObject copy() {
+    public BumpSensor copy() {
         return new BumpSensor(this);
     }
 

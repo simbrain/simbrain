@@ -147,7 +147,7 @@ public class StraightMovement extends Effector {
     }
 
     @Override
-    public EditableObject copy() {
+    public StraightMovement copy() {
         return new StraightMovement(this);
     }
 }

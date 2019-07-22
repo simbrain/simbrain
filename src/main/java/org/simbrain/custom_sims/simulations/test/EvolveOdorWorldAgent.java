@@ -76,7 +76,7 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
         population = new Population<>(this.populationSize);
         //population.setEliminationRatio(.8);// TODO: causes problems
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        // configuration.setNumInputs(2); // Note: This is being overwritten in the constructor of NetworkEntityGenome
+        configuration.setNumInputs(1); // Must match the sensor count in base entity
         configuration.setNumOutputs(3);
         configuration.setAllowSelfConnection(true);
         configuration.setMaxNodes(10);
@@ -93,6 +93,11 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
 
         NetworkEntityGenome networkEntityGenome = new NetworkEntityGenome(configuration);
         networkEntityGenome.setNodeGeneInnovationNumberBaseSupplier(this::getNextInnovationNumber);
+        OdorWorldEntity baseEntity = new OdorWorldEntity(null, EntityType.MOUSE);
+        ObjectSensor defaultSensor = new ObjectSensor();
+        defaultSensor.setId("default");
+        baseEntity.addSensor(defaultSensor);
+        networkEntityGenome.getEntityGenome().setBaseEntity(baseEntity);
 
         Agent<NetworkEntityGenome, Pair<Network, OdorWorldEntity>> prototype =
                 new Agent<>(networkEntityGenome,

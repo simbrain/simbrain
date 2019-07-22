@@ -82,6 +82,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      */
     public ObjectSensor(ObjectSensor objectSensor) {
         super(objectSensor);
+        this.setId(objectSensor.getId());
         this.baseValue = objectSensor.baseValue;
         this.decayFunction = (DecayFunction) objectSensor.decayFunction.copy();
         this.objectType = objectSensor.objectType;

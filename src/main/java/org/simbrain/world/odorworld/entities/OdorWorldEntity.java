@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld.entities;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -1272,5 +1273,26 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             }
             return eightNeighborCollisionBounds;
         }
+    }
+
+    public OdorWorldEntity copy() {
+        OdorWorldEntity copy = new OdorWorldEntity(parentWorld, entityType);
+        copy.sensors =
+                sensors.stream()
+                        .map(Sensor::copy)
+                        .peek(s -> s.setParent(copy))
+                        .collect(Collectors.toList());
+        copy.effectors =
+                effectors.stream()
+                        .map(Effector::copy)
+                        .peek(s -> s.setParent(copy))
+                        .collect(Collectors.toList());
+        copy.name = name;
+        copy.id = id;
+        copy.x = x;
+        copy.y = y;
+        copy.setEffectorsEnabled(isEffectorsEnabled());
+        copy.setSensorsEnabled(isSensorsEnabled());
+        return copy;
     }
 }

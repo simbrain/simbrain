@@ -153,6 +153,9 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
         this.label = label;
     }
 
+    @Override
+    public abstract Effector copy();
+
     public static class EffectorCreator implements EditableObject {
 
         @UserParameter(label="Effector", isObjectType = true)

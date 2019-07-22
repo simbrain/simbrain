@@ -171,7 +171,7 @@ public class Turning extends Effector {
     }
 
     @Override
-    public EditableObject copy() {
+    public Turning copy() {
         return new Turning(this);
     }
 }

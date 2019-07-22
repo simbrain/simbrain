@@ -98,7 +98,7 @@ public class TileSensor extends Sensor {
     }
 
     @Override
-    public EditableObject copy() {
+    public TileSensor copy() {
         return new TileSensor(this);
     }
 

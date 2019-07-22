@@ -118,6 +118,10 @@ public class NodeGene extends Gene<Neuron> {
         }
     }
 
+    public void addFutureCouplingReceiver() {
+
+    }
+
     @Override
     public String toString() {
         return String.format("%s: %s", type, prototype.getUpdateRule().getName());

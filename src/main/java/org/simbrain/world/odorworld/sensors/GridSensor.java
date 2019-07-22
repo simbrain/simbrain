@@ -254,7 +254,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public EditableObject copy() {
+    public GridSensor copy() {
         return new GridSensor(this);
     }
 

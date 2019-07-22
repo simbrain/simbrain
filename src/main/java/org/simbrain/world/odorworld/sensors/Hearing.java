@@ -195,7 +195,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     }
 
     @Override
-    public EditableObject copy() {
+    public Hearing copy() {
         return new Hearing(this);
     }
 

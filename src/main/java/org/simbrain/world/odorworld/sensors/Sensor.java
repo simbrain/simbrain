@@ -251,6 +251,9 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
         relativeLocation = new Point2D.Double();
     }
 
+    @Override
+    public abstract Sensor copy();
+
     public static class SensorCreator implements EditableObject {
 
         @UserParameter(label="Sensor", isObjectType = true)

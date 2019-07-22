@@ -32,6 +32,7 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
     @Override
     public OdorWorldEntityGenome crossOver(OdorWorldEntityGenome other) {
         OdorWorldEntityGenome ret = new OdorWorldEntityGenome();
+        ret.baseEntity = baseEntity;
         ret.config = this.config;
         ret.sensors = this.sensors.crossOver(other.sensors);
         return ret;
@@ -45,6 +46,7 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
     @Override
     public OdorWorldEntityGenome copy() {
         OdorWorldEntityGenome ret = new OdorWorldEntityGenome();
+        ret.baseEntity = baseEntity;
         ret.sensors = sensors.copy();
         ret.config = this.config;
         return ret;
@@ -52,12 +54,11 @@ public class OdorWorldEntityGenome extends Genome<OdorWorldEntityGenome, OdorWor
 
     @Override
     public OdorWorldEntity express() {
-        OdorWorldEntity ret = new OdorWorldEntity(null, EntityType.MOUSE);
+        OdorWorldEntity ret = baseEntity.copy();
         // Express the sensors and add them to the entity
         sensors.getGenes().stream()
                 .map(SensorGene::getPrototype)
                 .map(Sensor::copy)
-                .map(Sensor.class::cast)
                 .peek(s -> s.setId(""))
                 .peek(s -> s.setParent(ret))
                 .forEach(ret::addSensor);

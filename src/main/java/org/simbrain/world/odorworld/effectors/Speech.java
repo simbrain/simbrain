@@ -207,7 +207,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     }
 
     @Override
-    public EditableObject copy() {
+    public Speech copy() {
         return new Speech(this);
     }
 

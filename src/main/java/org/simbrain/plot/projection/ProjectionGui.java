@@ -287,13 +287,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         clearBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getWorkspaceComponent().getWorkspace().stop();
-                Executors.newSingleThreadExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        getWorkspaceComponent().clearData();
-                    }
-                });
+                SwingUtilities.invokeLater(() -> getWorkspaceComponent().clearData());
             }
         });
         playBtn.addActionListener(new ActionListener() {

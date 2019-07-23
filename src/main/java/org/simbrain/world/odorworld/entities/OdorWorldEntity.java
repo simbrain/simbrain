@@ -376,6 +376,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * Sets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
+    @Consumable(defaultVisibility = false)
     public void setVelocityX(final double dx) {
         this.dx = dx;
         updateCollisionBound();
@@ -385,6 +386,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * Sets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
+    @Consumable(defaultVisibility = false)
     public void setVelocityY(final double dy) {
         this.dy = dy;
         updateCollisionBound();

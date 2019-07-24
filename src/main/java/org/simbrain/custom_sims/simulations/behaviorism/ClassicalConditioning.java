@@ -57,19 +57,19 @@ public class ClassicalConditioning extends RegisteredSimulation {
         network = networkWrapper.getNetwork();
 
         // Construct the network
-        Neuron bellDetector = new Neuron(network);
-        bellDetector.setX(295);
-        bellDetector.setY(194);
-        bellDetector.setLabel("Bell Detector");
-        bellDetector.setClamped(true);
-        network.addLooseNeuron(bellDetector);
+        Neuron bellDetectorNeuron = new Neuron(network);
+        bellDetectorNeuron.setX(295);
+        bellDetectorNeuron.setY(194);
+        bellDetectorNeuron.setLabel("Bell Detector");
+        bellDetectorNeuron.setClamped(true);
+        network.addLooseNeuron(bellDetectorNeuron);
 
-        Neuron cheeseDetector = new Neuron(network);
-        cheeseDetector.setX(160);
-        cheeseDetector.setY(194);
-        cheeseDetector.setLabel("Cheese Detector");
-        cheeseDetector.setClamped(true);
-        network.addLooseNeuron(cheeseDetector);
+        Neuron cheeseDetectorNeuron = new Neuron(network);
+        cheeseDetectorNeuron.setX(160);
+        cheeseDetectorNeuron.setY(194);
+        cheeseDetectorNeuron.setLabel("Cheese Detector");
+        cheeseDetectorNeuron.setClamped(false);
+        network.addLooseNeuron(cheeseDetectorNeuron);
 
         BinaryRule responseRule = new BinaryRule();
         responseRule.setThreshold(.5);
@@ -80,11 +80,11 @@ public class ClassicalConditioning extends RegisteredSimulation {
         salivationResponse.setLabel("Salivation");
         network.addLooseNeuron(salivationResponse);
 
-        Synapse cheeseToSalivation = new Synapse(cheeseDetector, salivationResponse,1);
+        Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);
         network.addLooseSynapse(cheeseToSalivation);
 
-        Synapse association = new Synapse(bellDetector, cheeseDetector);
+        Synapse association = new Synapse(bellDetectorNeuron, cheeseDetectorNeuron);
         association.setStrength(0);
         association.setLowerBound(0);
         association.setUpperBound(1);
@@ -107,16 +107,16 @@ public class ClassicalConditioning extends RegisteredSimulation {
         ObjectSensor bellSensor = mouse.addObjectSensor(EntityType.BELL, 50, 0, 65);
 
         // Couple agent to network
-        sim.couple(swissSensor, cheeseDetector); //todo: rename neurons
-        sim.couple(bellSensor, bellDetector);
+        sim.couple(swissSensor, cheeseDetectorNeuron, false);
+        sim.couple(bellSensor, bellDetectorNeuron);
 
         // Create a time series plot
-        plot = sim.addTimeSeriesPlot(705,10,406,448, "Association Strength");
+        plot = sim.addTimeSeriesPlot(805,16,406,448, "Association Strength");
         plot.getModel().removeAllScalarTimeSeries();
         plot.getModel().setAutoRange(false);
-        plot.getModel().setRangeUpperBound(1.1);
-        plot.getModel().setRangeLowerBound(-.1);
-        TimeSeriesModel.ScalarTimeSeries ts1 = plot.getModel().addScalarTimeSeries("Reward");
+        plot.getModel().setFixedWidth(true);
+        plot.getModel().setWindowSize(1500);
+        TimeSeriesModel.ScalarTimeSeries ts1 = plot.getModel().addScalarTimeSeries("Association Strength");
         sim.couple(association, ts1);
 
         // Add custom network update action
@@ -125,11 +125,11 @@ public class ClassicalConditioning extends RegisteredSimulation {
             @Override
             public void invoke() {
 
-                if ((bellDetector.getActivation() > 0) && (cheeseDetector.getActivation() > 0)) {
+                if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() > 0)) {
                     // Learning
                     association.setIncrement(.001); // learning rate
                     association.incrementWeight();
-                } else if ((bellDetector.getActivation() > 0) && (cheeseDetector.getActivation() <= 0)) {
+                } else if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() <= 0)) {
                     // Extinction
                     association.setIncrement(.0005); // extinction rate
                     association.decrementWeight();

@@ -290,11 +290,27 @@ public class Simulation {
 
     /**
      * Couple an object sensor to a neuron.
+     *
+     * @param sensor the object sensor
+     * @param neuron the neuron to receive activation
+     * @param forceSet if true, assume the neuron is clamped and use forceSet
+     */
+    public void couple(ObjectSensor sensor, Neuron neuron, boolean forceSet) {
+        Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValue");
+        Consumer sensoryConsumer;
+        if(forceSet) {
+            sensoryConsumer = CouplingUtils.getConsumer(neuron, "forceSetActivation");
+        } else {
+            sensoryConsumer = CouplingUtils.getConsumer(neuron, "setInputValue");
+        }
+        tryCoupling(sensoryProducer, sensoryConsumer);
+    }
+
+    /**
+     *  Couple an object sensor to a neuron and assume the neuron is clamped.
      */
     public void couple(ObjectSensor sensor, Neuron neuron) {
-        Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValue");
-        Consumer sensoryConsumer = CouplingUtils.getConsumer(neuron, "forceSetActivation");
-        tryCoupling(sensoryProducer, sensoryConsumer);
+        couple(sensor,neuron, true);
     }
 
     /**

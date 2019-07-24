@@ -306,7 +306,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
     @Override
     public String getName() {
-        return "Behaviorism: Operant Conditioning";
+        return "Behaviorism: Operant Conditioning (Environment)";
     }
 
     @Override

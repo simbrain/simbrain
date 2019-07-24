@@ -20,14 +20,17 @@ import java.util.stream.Collectors;
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
  * (https://doc.mapeditor.org/en/stable/)
- *
+ * <br>
  * A tilemap contains a list of {@link TileMapLayer} objects and a {@link TileSet}
  * object. Each layer is basically a grid of tiles, each of which points to a
  * member of a tileset, which is like a sprite sheet. To get a sense of
  * this see a sample tmx file like <code>aris_world.tmx</code>.
- *
+ * <br>
  * The map returns a list of PImages, one per layer, which can be rendered in a
  * Piccolo canvas.
+ * <br>
+ * The XStream annotations in this class allow XStream to read in a .tmx file in its
+ * default format.
  *
  */
 @XStreamAlias("map")
@@ -87,8 +90,11 @@ public class TileMap {
      */
     private transient ArrayList<PImage> renderedLayers = null;
 
+    /**
+     * Layers used when user adds tiles by hand, e.g. using a script or by right clicking
+     * and adding a tile.
+     */
     private transient Map<String, Pair<TileMapLayer, PImage>> programmaticLayers = new HashMap<>();
-
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)

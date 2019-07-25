@@ -28,21 +28,21 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
- * Convert selected neurons to a neuron group.
+ * Add selected neurons to a neuron collection.
  */
-public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
+public final class NeuronCollectionAction extends ConditionallyEnabledAction {
 
     /**
-     * Create a new new neuron group network action with the specified network
+     * Create a new new neuron collection with the specified network
      * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public NewNeuronGroupAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Convert to Neuron Group", EnablingCondition.NEURONS);
+    public NeuronCollectionAction(final NetworkPanel networkPanel) {
+        super(networkPanel, "Add Neurons to  Collection", EnablingCondition.NEURONS);
 
-        putValue(NAME, "Convert Neurons to Neuron Group");
-        putValue(SHORT_DESCRIPTION, "Convert selected neurons to a neuron group (G)");
+        putValue(NAME, "Add Neurons to Collection");
+        putValue(SHORT_DESCRIPTION, "Add selected neurons to a neuron collction (Shift-G)");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('G'), this);
         networkPanel.getActionMap().put(this, this);
 
@@ -55,9 +55,7 @@ public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> neuronList = networkPanel.getSelectedModelNeurons();
         if (neuronList.size() > 0) {
-            NeuronGroup group = new NeuronGroup(networkPanel.getNetwork());
-            networkPanel.getNetwork().transferNeuronsToGroup(neuronList, group);
-            networkPanel.getNetwork().addGroup(group);
+            networkPanel.getNetwork().createNeuronCollection(neuronList);
         }
     }
 

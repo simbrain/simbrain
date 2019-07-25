@@ -137,7 +137,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
                 outlinedObjects.setDrawOutline(false);
             }
         }
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+        //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+
         group.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -165,7 +166,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     @Override
     public void layoutChildren() {
         if (this.getVisible() && !networkPanel.isRunning()) {
-            interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2, outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
+            interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2,
+                    outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
         }
     }
 
@@ -304,14 +306,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         menu.add(editGroup);
         menu.add(renameAction);
         menu.add(removeAction);
-//        // TODO: Not yet working
-//        Action removeGroupOnly = new AbstractAction("Remove group but not neurons") {
-//            @Override
-//            public void actionPerformed(final ActionEvent event) {
-//                networkPanel.getNetwork().detachNeuronsFromGroup(neuronGroup);
-//            }
-//        };
-//        menu.add(removeGroupOnly);
 
         // Selection submenu
         menu.addSeparator();
@@ -406,20 +400,12 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         };
         menu.add(recordingAction);
 
-        // Coupling menus
-        JMenu consumerMenu = networkPanel.getNeuronGroupConsumerMenu(neuronGroup);
-        JMenu producerMenu = networkPanel.getNeuronGroupProducerMenu(neuronGroup);
-        if ((consumerMenu != null) || (producerMenu != null)) {
-            menu.addSeparator();
-        }
-        if (consumerMenu != null) {
-            menu.add(consumerMenu);
-        }
-        if (producerMenu != null) {
-            menu.add(producerMenu);
+        // Coupling menu
+        JMenu couplingMenu = networkPanel.getNeuronGroupCouplingMenu(neuronGroup);
+        if (couplingMenu != null) {
+            menu.add(couplingMenu);
         }
 
-        // Add the menu
         return menu;
     }
 
@@ -436,7 +422,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         @Override
         protected JDialog getPropertyDialog() {
             return NeuronGroupNode.this.getPropertyDialog();
-
         }
 
         @Override
@@ -470,7 +455,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     }
 
     /**
-     * Set a custom interaction box.
+     * Set a custom interaction box.  Subclasses can call this to customize its behavior.
      *
      * @param newBox the newBox to set.
      */
@@ -493,8 +478,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         interactionBox.updateText();
     }
 
-    ;
-
     /**
      * Action for editing the group name.
      */
@@ -513,8 +496,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
-            putValue(NAME, "Remove Group...");
-            putValue(SHORT_DESCRIPTION, "Remove neuron group...");
+            putValue(NAME, "Remove Neuron Group");
+            putValue(SHORT_DESCRIPTION, "Remove neuron group");
         }
 
         @Override

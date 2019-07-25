@@ -412,7 +412,7 @@ public final class SynapseNode extends ScreenElement {
         // contextMenu.add(new DeleteAction(getNetworkPanel()));
         // contextMenu.addSeparator();
         //
-        // contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
+        // contextMenu.add(getNetworkPanel().getActionManager().getNeuronCollectionAction());
         // contextMenu.addSeparator();
         //
         // // Workspace workspace = getNetworkPanel().getWorkspace();

@@ -21,6 +21,7 @@ package org.simbrain.network.desktop;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.EditMode;
@@ -135,7 +136,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getShowAdjustSynapsesDialog());
         editMenu.addSeparator();
         editMenu.add(actionManager.getLayoutNeuronsAction());
-        editMenu.add(actionManager.getGroupMenu());
+        editMenu.add(actionManager.getNeuronCollectionAction());
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
@@ -354,7 +355,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     @Override
-    public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
+    public JMenu getNeuronGroupCouplingMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
             CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuronGroup);
             return menu;
@@ -363,9 +364,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     @Override
-    public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
+    public JMenu getNeuronCollectionCouplingMenu(NeuronCollection nc) {
+        if (component.getWorkspaceComponent() != null) {
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), nc);
+            return menu;
+        }
         return null;
     }
+
 
     @Override
     public JMenu getSynapseGroupProducerMenu(SynapseGroup synapseGroup) {

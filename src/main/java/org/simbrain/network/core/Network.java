@@ -19,21 +19,20 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.AttributeContainer;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the
@@ -60,6 +59,8 @@ public class Network {
      * the initial synapse visibility flag is set false.
      */
     private transient static int synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold");
+
+
 
     /**
      * Two types of time used in simulations.
@@ -97,7 +98,12 @@ public class Network {
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /**
-     * Array list of neurons.
+     * Neuron Collections. Can overlap.
+     */
+    private final List<NeuronCollection> ncList = new ArrayList();
+
+    /**
+     * Neuron Array objects (nd4j). Not yet implemented.
      */
     private final List<NeuronArray> naList = new ArrayList();
 
@@ -156,6 +162,11 @@ public class Network {
      * Group Id generator.
      */
     private SimpleId groupIdGenerator = new SimpleId("Group", 1);
+
+    /**
+     * Collection Id generator.
+     */
+    private SimpleId collectionIdGenerator = new SimpleId("Collection", 1);
 
     /**
      * A variable telling the network not to fire events to any listeners during
@@ -374,6 +385,20 @@ public class Network {
     }
 
     /**
+     * Get a neuron collection given its id
+     * @param id id of collection
+     * @return the collection with that id
+     */
+    public NeuronCollection getNeuronCollection(String id) {
+        for (NeuronCollection nc : getNeuronCollectionList()) {
+            if (nc.getId().equalsIgnoreCase(id)) {
+                return nc;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Find groups with a given label, or null if none found.
      *
      * @param label label to search for.
@@ -542,6 +567,17 @@ public class Network {
     }
 
     /**
+     * Remove the indicated neuron collection.
+     *
+     * @param nc the collection to remove
+     */
+    public void removeNeuronCollection(NeuronCollection nc) {
+        ncList.remove(nc);
+        nc.delete();
+        changeSupport.firePropertyChange("ncRemoved", nc, null);
+    }
+
+    /**
      * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete
@@ -583,21 +619,26 @@ public class Network {
     }
 
     /**
-     * Remove the given neurons from the neuron list (without firing an event)
-     * and add them to the provided group.
-     * <p>
-     * This is only needed in cases where the neurons have already been added,
-     * and must be transferred in to a group. This is what happens in converting
-     * loose neurons to a neuron group. It also happens to be the way the add
-     * neurons dialog does things (it defaults to adding neurons, but if a user
-     * wants they can be put in a group). This is not part of the standard
-     * neuron group creation process.
-     * <p>
-     * TODO: Confusing; if possible refactor so that this method is not needed.
+     * Create a {@link NeuronCollection) from a provided list of neurons
      *
-     * @param list  the list of neurons to transfer
-     * @param group the group to transfer them to
+     * @param neuronList list of neurons to add to a neuron collection.
      */
+    public void createNeuronCollection(List<Neuron> neuronList) {
+
+        // Filter out loose neurons (parent group is null)
+        List<Neuron> loose = neuronList.stream()
+                .filter(n -> n.getParentGroup() == null)
+                .collect(Collectors.toList());
+
+        // Only make the neuron collection if some neurons have been selected
+        if (!loose.isEmpty()) {
+            NeuronCollection nc = new NeuronCollection(this, loose);
+            ncList.add(nc);
+            changeSupport.firePropertyChange("ncAdded", null, nc);
+        }
+    }
+
+    //TODO: Remove after neuron group refactor
     public void transferNeuronsToGroup(List<Neuron> list, NeuronGroup group) {
         for (Neuron neuron : list) {
             looseNeurons.remove(neuron);
@@ -605,16 +646,6 @@ public class Network {
         }
     }
 
-    /**
-     * Remove a neuron group, but not the neurons inside it: they can stay as
-     * loose neurons. NOT YET WORKING.
-     *
-     * @param group the group to remove
-     */
-    public void detachNeuronsFromGroup(NeuronGroup group) {
-        group.releaseNeurons();
-        removeGroup(group);
-    }
 
     /**
      * Set the activation level of all neurons to zero.
@@ -1016,6 +1047,7 @@ public class Network {
         for (Synapse synapse : this.getSynapseList()) {
             synapse.postUnmarshallingInit();
         }
+
         updateCompleted = new AtomicBoolean(false);
         return this;
     }
@@ -1282,6 +1314,10 @@ public class Network {
         updateCompleted.set(b);
     }
 
+    public List<NeuronCollection> getNeuronCollectionList() {
+        return ncList;
+    }
+
     @Override
     public String toString() {
 
@@ -1302,6 +1338,11 @@ public class Network {
         for (int i = 0; i < getGroupList().size(); i++) {
             Group group = getGroupList().get(i);
             ret += group.toString();
+        }
+
+        for (int i = 0; i < getNeuronCollectionList().size(); i++) {
+            NeuronCollection nc = getNeuronCollectionList().get(i);
+            ret += nc.toString();
         }
 
         for (NetworkTextObject text : textList) {
@@ -1367,6 +1408,10 @@ public class Network {
 
     public SimpleId getGroupIdGenerator() {
         return groupIdGenerator;
+    }
+
+    public SimpleId getCollectionIdGenerator() {
+        return collectionIdGenerator;
     }
 
     /**

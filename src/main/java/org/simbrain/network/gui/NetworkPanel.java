@@ -27,10 +27,7 @@ import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.*;
-import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -540,6 +537,8 @@ public class NetworkPanel extends JPanel {
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     NeuronArrayNode nad = new NeuronArrayNode(this, (NeuronArray) evt.getNewValue());
                     canvas.getLayer().addChild(nad);
+                } else if ("ncAdded".equals(evt.getPropertyName())) {
+                    addNeuronCollection((NeuronCollection)evt.getNewValue());
                 } else if ("updateTimeDisplay".equals(evt.getPropertyName())) {
                     updateTime();
                 } else if ("updateCompleted".equals(evt.getPropertyName())) {
@@ -904,6 +903,26 @@ public class NetworkPanel extends JPanel {
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
+    }
+
+    /**
+     * Add a representation of a neuron collection to this panel.
+     *
+     * @param nc the {@link NeuronCollection} to add
+     */
+    private void addNeuronCollection(NeuronCollection nc) {
+
+        NeuronCollectionNode ncn = new NeuronCollectionNode(this, nc);
+
+        List<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
+        for (Neuron neuron : nc.getNeuronList()) {
+            neuronNodes.add((NeuronNode) objectNodeMap.get(neuron));
+        }
+        for (NeuronNode node : neuronNodes) {
+            ncn.addNeuronNode(node);
+        }
+        canvas.getLayer().addChild(ncn);
+        objectNodeMap.put(nc, ncn);
     }
 
     /**
@@ -2102,6 +2121,9 @@ public class NetworkPanel extends JPanel {
         for (Synapse synapse : network.getSynapseList()) {
             addSynapse(synapse);
         }
+        for (NeuronCollection nc: network.getNeuronCollectionList()) {
+            addNeuronCollection(nc);
+        }
         for (NetworkTextObject text : network.getTextList()) {
             addTextObject(text);
         }
@@ -2898,7 +2920,7 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getConnectionMenu());
         contextMenu.addSeparator();
         contextMenu.add(actionManager.getLayoutNeuronsAction());
-        contextMenu.add(actionManager.getGroupMenu());
+        contextMenu.add(actionManager.getNeuronCollectionAction());
         contextMenu.addSeparator();
         // Add align and space menus if objects are selected
         if (this.getSelectedNeurons().size() > 1) {
@@ -2929,7 +2951,7 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new DeleteAction(this));
         contextMenu.addSeparator();
 
-        // contextMenu.add(this.getActionManager().getGroupMenu());
+        // contextMenu.add(this.getActionManager().getNeuronCollectionAction());
         // contextMenu.addSeparator();
 
         // Workspace workspace = getNetworkPanel().getWorkspace();
@@ -2943,32 +2965,31 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates the producer menu for neuron groups. Null if the network panel is
+     * Creates the coupling menu for neuron groups. Null if the network panel is
      * not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
      *
-     * @param neuronGroup the neuron group that can produce vectors for
-     *                    couplings.
-     * @return the producer menu
+     * @param neuronGroup the neuron group whose producers and consumers will be used to produce a menu
+     * @return the coupling menu
      */
-    public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
+    public JMenu getNeuronGroupCouplingMenu(NeuronGroup neuronGroup) {
         return null;
     }
 
     /**
-     * Creates the consumer menu for neuron groups. Null if the network panel is
+     * Creates the coupling menu for neuron collections. Null if the network panel is
      * not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
      *
-     * @param neuronGroup the neuron group that can consume vectors for
-     *                    couplings.
-     * @return the consumer menu
+     * @param nc the neuron collection whose producers and consumers will be used to produce a menu
+     * @return the coupling menu
      */
-    public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
+    public JMenu getNeuronCollectionCouplingMenu(NeuronCollection nc) {
         return null;
     }
+
 
     /**
      * Creates the producer menu for synapse groups. Null if the network panel

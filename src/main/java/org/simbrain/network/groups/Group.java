@@ -138,12 +138,10 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         return id;
     }
 
-
     @Producible(defaultVisibility = false)
     public String getLabel() {
         return label;
     }
-
 
     /**
      * Set the label. This prevents the group id being used as the label for

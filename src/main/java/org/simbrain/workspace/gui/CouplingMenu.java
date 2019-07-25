@@ -43,6 +43,13 @@ public class CouplingMenu extends JMenu {
         for (Producer<?> producer : producers) {
             createProducerSubmenu(producer);
         }
+        List<Consumer<?>> consumers =
+                sourceComponent.getVisibleConsumers().stream()
+                        .filter(p -> p.getBaseObject().equals(source))
+                        .collect(Collectors.toList());
+        for (Consumer<?> consumer: consumers) {
+            createConsumerSubmenu(consumer);
+        }
     }
 
     /**

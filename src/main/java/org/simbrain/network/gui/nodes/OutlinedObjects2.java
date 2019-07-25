@@ -18,32 +18,33 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PShape;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
- * A node that draws an outline around its children nodes. To use create an
- * instance and then add children directly to it using addChild().
- * <p>
- * Adapted from an example in the piccolo 1.3 source by Lance Good.
+ * A version of {@link OutlinedObjects} that does not have {@link NeuronNode}s as children
+ * but uses them to determine bounds.
+ *
+ * TODO: See if this can be merged to OutlinedObjects as a special case or if code can be shared.
  *
  * @author Lance Good
  * @author Jeff Yoshimi
  */
-public class OutlinedObjects extends PPath.Float {
+public class OutlinedObjects2 extends PPath.Float {
 
     /**
-     * The width and height of the arc in the rounded rectangle that surrounds
-     * the outlined objects.
+     * The width and height of the arc in the rounded rectangle that surrounds the outlined objects.
      */
     public static final int ROUNDING_WIDTH_HEIGHT = 20;
 
     /**
-     * Whether to draw an outline around entire set of grouped objects or not.
-     * In some cases a fill is enough.
+     * Whether to draw an outline around entire set of grouped objects or not. In some cases a fill is enough.
      */
     private boolean drawOutline = true;
 
@@ -73,31 +74,44 @@ public class OutlinedObjects extends PPath.Float {
     private PBounds cachedChildBounds = new PBounds();
 
     /**
-     * Cache of bound to compare with cached bounds. For use in validating
-     * bounds.
+     * Cache of bound to compare with cached bounds. For use in validating bounds.
      */
     private PBounds comparisonBounds = new PBounds();
+
+    ArrayList<NeuronNode> neuronNodeRefs = new ArrayList<>();
 
     /**
      * Construct the outlined objects group.
      */
-    public OutlinedObjects() {
+    public OutlinedObjects2() {
         super();
         // This seems to be needed to initialize the paint system properly
+        this.setVisible(true);
         this.setPaint(Color.gray);
     }
 
+    public void addChildRef(NeuronNode node) {
+        neuronNodeRefs.add(node);
+    }
+
+    public ArrayList<NeuronNode> getNeuronNodeRefs() {
+        return neuronNodeRefs;
+    }
+
+    @Override
+    public PBounds getFullBounds() {
+        return getUnionOfBounds();
+    }
+
     /**
-     * Change the default paint to fill an expanded bounding box based on its
-     * children's bounds.
+     * Change the default paint to fill an expanded bounding box based on its children's bounds.
      */
     @Override
     public void paint(final PPaintContext ppc) {
-        System.out.println("OutlinedObjects.paint");
         final Paint paint = getPaint();
         if (paint != null) {
             final Graphics2D g2 = ppc.getGraphics();
-            final PBounds bounds = getUnionOfChildrenBounds(null);
+            final PBounds bounds = getUnionOfBounds();
 
             if (fillBackground) {
                 g2.setPaint(backgroundColor);
@@ -108,34 +122,38 @@ public class OutlinedObjects extends PPath.Float {
                 g2.setPaint(lineColor);
                 g2.drawRoundRect((int) bounds.getX() - outlinePadding, (int) bounds.getY() - outlinePadding, (int) bounds.getWidth() + 2 * outlinePadding, (int) bounds.getHeight() + 2 * outlinePadding, ROUNDING_WIDTH_HEIGHT, ROUNDING_WIDTH_HEIGHT);
             }
-            // if (backgroundColor != null) {
-            // g2.setPaint(backgroundColor);
-            // g2.fillRect((int) bounds.getX() - updatePadding,
-            // (int) bounds.getY() - updatePadding,
-            // (int) bounds.getWidth() + 2 * updatePadding,
-            // (int) bounds.getHeight() + 2 * updatePadding);
-            // }
         }
     }
 
+
+    private PBounds getUnionOfBounds() {
+        PBounds resultBounds = new PBounds();
+        for(PNode node : neuronNodeRefs) {
+            resultBounds.add(node.getFullBoundsReference());
+        }
+        return resultBounds;
+    }
+
+
+    //TODO: Below works with validatefull bounds
     /**
-     * Change the full bounds computation to take into account that we are
-     * expanding the children's bounds Do this instead of overriding
-     * getBoundsReference() since the node is not volatile.
+     * Change the full bounds computation to take into account that we are expanding the children's bounds Do this
+     * instead of overriding getBoundsReference() since the node is not volatile.
      */
     @Override
     public PBounds computeFullBounds(final PBounds dstBounds) {
-        final PBounds result = getUnionOfChildrenBounds(dstBounds);
+        final PBounds result = getUnionOfBounds();
 
         cachedChildBounds.setRect(result);
-        result.setRect(result.getX() - outlinePadding, result.getY() - outlinePadding, result.getWidth() + 2 * outlinePadding, result.getHeight() + 2 * outlinePadding);
-        localToParent(result);
+        //result.setRect(result.getX() - outlinePadding, result.getY() - outlinePadding,
+        //        result.getWidth() + 2 * outlinePadding, result.getHeight() + 2 * outlinePadding);
+        //localToParent(result);
         return result;
     }
 
     /**
-     * This is a crucial step. We have to override this method to invalidate the
-     * paint each time the bounds are changed so we repaint the correct region
+     * This is a crucial step. We have to override this method to invalidate the paint each time the bounds are changed
+     * so we repaint the correct region // True must be returned for smooth update of bounds (TODO: Move to NG)
      */
     @Override
     public boolean validateFullBounds() {
@@ -143,7 +161,7 @@ public class OutlinedObjects extends PPath.Float {
             if (comparisonBounds == null) {
                 System.out.println("Im null before.");
             }
-            comparisonBounds = getUnionOfChildrenBounds(comparisonBounds);
+            comparisonBounds = getUnionOfBounds();
             if (comparisonBounds == null) {
                 System.out.println("Im null after.");
             }
@@ -154,6 +172,8 @@ public class OutlinedObjects extends PPath.Float {
         if (!cachedChildBounds.equals(comparisonBounds)) {
             setPaintInvalid(true);
         }
+
+        // TODO: We get smooth update when this returns true
         return super.validateFullBounds();
     }
 
@@ -196,5 +216,6 @@ public class OutlinedObjects extends PPath.Float {
     public void setLineColor(Color lineColor) {
         this.lineColor = lineColor;
     }
+
 
 }

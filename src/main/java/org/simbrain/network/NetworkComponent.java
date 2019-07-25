@@ -19,6 +19,7 @@ package org.simbrain.network;
 
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronArrayNode;
 import org.simbrain.util.Utils;
@@ -92,7 +93,13 @@ public final class NetworkComponent extends WorkspaceComponent {
                     fireAttributeContainerAdded((Group) evt.getNewValue());
                 } else if ("groupRemoved".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((Group) evt.getNewValue());
+                    fireAttributeContainerRemoved((Group) evt.getOldValue());
+                } else if ("ncAdded".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerAdded((NeuronCollection) evt.getNewValue());
+                } else if ("ncRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((NeuronCollection) evt.getOldValue());
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                 }
             }
@@ -108,6 +115,8 @@ public final class NetworkComponent extends WorkspaceComponent {
             return this.getNetwork().getLooseSynapse(objectKey);
         } else if (objectKey.startsWith("Group_")) {
             return this.getNetwork().getGroup(objectKey);
+        } else if (objectKey.startsWith("Group_")) {
+            return this.getNetwork().getNeuronCollection(objectKey);
         }
         return null;
     }
@@ -120,6 +129,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         retList.addAll(network.getSynapseList());
         retList.addAll(network.getNeuronGroups());
         retList.addAll(network.getSynapseGroups());
+        retList.addAll(network.getNeuronCollectionList());
         return retList;
     }
 

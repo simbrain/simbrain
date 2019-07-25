@@ -25,7 +25,7 @@ import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
-import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
+import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction;
 import org.simbrain.network.gui.actions.network.*;
 import org.simbrain.network.gui.actions.neuron.NewActivityGeneratorAction;
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
@@ -211,7 +211,7 @@ public final class NetworkActionManager {
     /**
      * Create a neuron group.
      */
-    private final Action neuronGroupAction;
+    private final Action neuronCollectionAction;
 
     /**
      * Create an activity generator.
@@ -379,7 +379,7 @@ public final class NetworkActionManager {
         groupAction = new GroupAction(networkPanel);
         ungroupAction = new UngroupAction(networkPanel, networkPanel.getViewGroupNode());
 
-        neuronGroupAction = new NewNeuronGroupAction(networkPanel);
+        neuronCollectionAction = new NeuronCollectionAction(networkPanel);
 
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
@@ -446,15 +446,10 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Returns a menu of model group actions.
-     *
-     * @return the group menu
+     * Returns action to create neuron collections
      */
-    public JMenu getGroupMenu() {
-        // TODO: Fix menu. Alone with one right now.
-        JMenu groupMenu = new JMenu("Group");
-        groupMenu.add(neuronGroupAction);
-        return groupMenu;
+    public JMenuItem getNeuronCollectionAction() {
+        return new JMenuItem(neuronCollectionAction);
     }
 
     /**

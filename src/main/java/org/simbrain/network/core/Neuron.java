@@ -189,7 +189,8 @@ public class Neuron implements EditableObject, AttributeContainer {
     private double lastActivation;
 
     /**
-     * Parent group, if any (null if none).
+     * Parent {@link Group}, if any (null if none).  Does not apply to {@link org.simbrain.network.groups.NeuronCollection},
+     * which is not a subclass of group.
      */
     private Group parentGroup;
 

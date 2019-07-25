@@ -211,6 +211,7 @@ public class AddNeuronsDialog extends StandardDialog {
         addNeurons();
         NeuronGroup ng = groupPanel.generateNeuronGroup();
         if (ng != null) {
+            // TODO: Rewrite after refactoring neuron groups
             networkPanel.getNetwork().transferNeuronsToGroup(addedNeurons, ng);
             networkPanel.getNetwork().addGroup(ng);
             ng.setLayout(layoutObject.getLayout());

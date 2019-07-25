@@ -267,6 +267,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             delta = event.getDeltaRelativeTo(pickedNode.getParent());
             if (pickedNode.getParent() instanceof NeuronGroupNode) {
                 pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
+            } else if (pickedNode.getParent() instanceof NeuronCollectionNode) {
+                pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
             } else if (pickedNode.getParent() instanceof SubnetworkNode) {
                 pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
             }

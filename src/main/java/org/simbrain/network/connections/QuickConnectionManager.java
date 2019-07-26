@@ -76,9 +76,8 @@ public class QuickConnectionManager {
     public QuickConnectionManager() {
 
         String xml = SimbrainPreferences.getString("quickConnector");
-
         // Set the current connection strategy based on user preferences
-        if (xml == null || xml.isEmpty()) {
+        if (xml == null || xml.isEmpty() || !xml.startsWith("<org")) {
             currentConnector = new AllToAll();
         } else {
             currentConnector = (ConnectionStrategy) Utils.getSimbrainXStream().fromXML(xml);

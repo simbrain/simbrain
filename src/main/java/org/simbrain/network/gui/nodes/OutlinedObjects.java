@@ -93,7 +93,6 @@ public class OutlinedObjects extends PPath.Float {
      */
     @Override
     public void paint(final PPaintContext ppc) {
-        System.out.println("OutlinedObjects.paint");
         final Paint paint = getPaint();
         if (paint != null) {
             final Graphics2D g2 = ppc.getGraphics();

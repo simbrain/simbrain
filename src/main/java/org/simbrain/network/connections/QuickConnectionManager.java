@@ -22,7 +22,9 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,35 +75,21 @@ public class QuickConnectionManager {
      */
     public QuickConnectionManager() {
 
-        // Set the current connection strategy based on user preferences
-        switch(SimbrainPreferences.getString("quickConnector")) {
-        case "AllToAll":
-            currentConnector = allToAll;
-            break;
-        case "OneToOne":
-            currentConnector = oneToOne;
-            break;
-        case "RadialGaussian":
-            currentConnector = radial;
-            break;
-        case "RadialSimple":
-            currentConnector = radialSimple;
-            break;
-        case "Sparse":
-            currentConnector = sparse;
-            break;
-        default:
-            currentConnector = allToAll;
-        }
+        String xml = SimbrainPreferences.getString("quickConnector");
 
-        //TODO: Implement inhibitory/excitatory ratio, probabilities, and connection properties
+        // Set the current connection strategy based on user preferences
+        if (xml == null || xml.isEmpty()) {
+            currentConnector = new AllToAll();
+        } else {
+            currentConnector = (ConnectionStrategy) Utils.getSimbrainXStream().fromXML(xml);
+        }
     }
 
     /**
      * @return the connection objects
      */
-    public ConnectionStrategy[] getConnectors() {
-        return new ConnectionStrategy[]{allToAll, oneToOne, radial, radialSimple, sparse};
+    public List<ConnectionStrategy> getConnectors() {
+        return List.of(allToAll, oneToOne, radial, radialSimple, sparse);
     }
 
     /**
@@ -130,27 +118,7 @@ public class QuickConnectionManager {
     }
 
     public void setCurrentConnector(ConnectionStrategy currentConnector) {
-        SimbrainPreferences.putString("quickConnector", currentConnector.getStringDescription());
+        SimbrainPreferences.putString("quickConnector", Utils.getSimbrainXStream().toXML(currentConnector));
         this.currentConnector = currentConnector;
-    }
-
-    public AllToAll getAllToAll() {
-        return allToAll;
-    }
-
-    public OneToOne getOneToOne() {
-        return oneToOne;
-    }
-
-    public Sparse getSparse() {
-        return sparse;
-    }
-
-    public RadialGaussian getRadial() {
-        return radial;
-    }
-
-    public RadialSimple getRadialSimple() {
-        return radialSimple;
     }
 }

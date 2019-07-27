@@ -2121,7 +2121,7 @@ public class NetworkPanel extends JPanel {
         for (Synapse synapse : network.getSynapseList()) {
             addSynapse(synapse);
         }
-        for (NeuronCollection nc: network.getNeuronCollectionList()) {
+        for (NeuronCollection nc: network.getNeuronCollectionSet()) {
             addNeuronCollection(nc);
         }
         for (NetworkTextObject text : network.getTextList()) {

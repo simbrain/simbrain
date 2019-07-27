@@ -283,7 +283,6 @@ public class NeuronCollection implements AttributeContainer {
     public String toString() {
         String ret = new String();
         ret += ("Neuron Collection [" + getLabel() + "]. Neuron collection with " + this.getNeuronList().size() + " neuron(s)" + ". Located at (" + Utils.round(this.getPosition().x, 2) + "," + Utils.round(this.getPosition().y, 2) + ").\n");
-        //ret += layout.toString();
         return ret;
     }
 
@@ -786,6 +785,21 @@ public class NeuronCollection implements AttributeContainer {
 
     public Network getParentNetwork() {
         return parentNetwork;
+    }
+
+    // TODO: Consider adverse impacts
+    @Override
+    public boolean equals(Object o) {
+        return this.hashCode() == o.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        for(Neuron n : neuronList) {
+            hash += n.hashCode();
+        }
+        return hash;
     }
 
 }

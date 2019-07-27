@@ -26,7 +26,6 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.AttributeContainer;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -38,9 +37,8 @@ import java.util.stream.Collectors;
  * <b>Network</b> provides core neural network functionality and is the the
  * main
  * <p>
- * API for external calls. Network objects are sets of neurons and weights
- * connecting them. Most update and learning logic occurs in the neurons and
- * weights themselves, as well as in special groups.
+ * API for external calls. Network objects are sets of neurons and weights connecting them. Most update and learning
+ * logic occurs in the neurons and weights themselves, as well as in special groups.
  */
 public class Network {
 
@@ -55,11 +53,10 @@ public class Network {
     private static final double LOG_10 = Math.log(10);
 
     /**
-     * If a subnetwork or synapse group has more than this many synapses, then
-     * the initial synapse visibility flag is set false.
+     * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
+     * set false.
      */
     private transient static int synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold");
-
 
 
     /**
@@ -100,7 +97,7 @@ public class Network {
     /**
      * Neuron Collections. Can overlap.
      */
-    private final List<NeuronCollection> ncList = new ArrayList();
+    private final HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
     /**
      * Neuron Array objects (nd4j). Not yet implemented.
@@ -138,8 +135,7 @@ public class Network {
     private transient AtomicBoolean updateCompleted = new AtomicBoolean(false);
 
     /**
-     * List of neurons sorted by their update priority. Used in priority based
-     * update.
+     * List of neurons sorted by their update priority. Used in priority based update.
      */
     private List<Neuron> prioritySortedNeuronList;
 
@@ -169,14 +165,12 @@ public class Network {
     private SimpleId collectionIdGenerator = new SimpleId("Collection", 1);
 
     /**
-     * A variable telling the network not to fire events to any listeners during
-     * update.
+     * A variable telling the network not to fire events to any listeners during update.
      */
     private volatile boolean fireUpdates = true;
 
     /**
-     * An internal id giving networks unique numbers within the same simbrain
-     * session.
+     * An internal id giving networks unique numbers within the same simbrain session.
      */
     private static int current_id = 0;
 
@@ -196,8 +190,7 @@ public class Network {
     private int updateFreq = 1;
 
     /**
-     * A special flag for if the network is being run for a one-time single
-     * iteration.
+     * A special flag for if the network is being run for a one-time single iteration.
      */
     private boolean oneOffRun = false;
 
@@ -217,9 +210,8 @@ public class Network {
     }
 
     /**
-     * The core update function of the neural network. Calls the current update
-     * function on each neuron, decays all the neurons, and checks their
-     * bounds.
+     * The core update function of the neural network. Calls the current update function on each neuron, decays all the
+     * neurons, and checks their bounds.
      */
     public void update() {
 
@@ -252,11 +244,10 @@ public class Network {
     }
 
     /**
-     * This function is used to update the neuron and sub-network activation
-     * values if the user chooses to set different priority values for a subset
-     * of neurons and sub-networks. The priority value determines the order in
-     * which the neurons and sub-networks get updated - smaller priority value
-     * elements will be updated before larger priority value elements.
+     * This function is used to update the neuron and sub-network activation values if the user chooses to set different
+     * priority values for a subset of neurons and sub-networks. The priority value determines the order in which the
+     * neurons and sub-networks get updated - smaller priority value elements will be updated before larger priority
+     * value elements.
      */
     public void updateNeuronsByPriority() {
         for (Neuron neuron : prioritySortedNeuronList) {
@@ -282,8 +273,7 @@ public class Network {
     }
 
     /**
-     * Clears out input values of network nodes, which otherwise linger and
-     * cause problems.
+     * Clears out input values of network nodes, which otherwise linger and cause problems.
      */
     public void clearInputs() {
 
@@ -296,9 +286,8 @@ public class Network {
     }
 
     /**
-     * Return the list of synapses. These are "loose" neurons. For the full set
-     * of neurons, including neurons inside of subnetworks and groups, use
-     * {@link #getFlatNeuronList()}.
+     * Return the list of synapses. These are "loose" neurons. For the full set of neurons, including neurons inside of
+     * subnetworks and groups, use {@link #getFlatNeuronList()}.
      *
      * @return List of neurons in network.
      */
@@ -307,9 +296,8 @@ public class Network {
     }
 
     /**
-     * Return the list of synapses. These are "loose" synapses. For the full set
-     * of synapses, including synapses inside of subnetworks and groups, use
-     * {@link #getFlatSynapseList()}.
+     * Return the list of synapses. These are "loose" synapses. For the full set of synapses, including synapses inside
+     * of subnetworks and groups, use {@link #getFlatSynapseList()}.
      *
      * @return List of synapses in network.
      */
@@ -332,8 +320,7 @@ public class Network {
     }
 
     /**
-     * Calculates the Euclidean distance between two neurons' positions in
-     * coordinate space.
+     * Calculates the Euclidean distance between two neurons' positions in coordinate space.
      *
      * @param n1 The first neuron.
      * @param n2 The second neuron.
@@ -354,6 +341,7 @@ public class Network {
     public Neuron getLooseNeuron(int neuronIndex) {
         return looseNeurons.get(neuronIndex);
     }
+
     /**
      * Find a neuron with a given string id.
      *
@@ -386,11 +374,12 @@ public class Network {
 
     /**
      * Get a neuron collection given its id
+     *
      * @param id id of collection
      * @return the collection with that id
      */
     public NeuronCollection getNeuronCollection(String id) {
-        for (NeuronCollection nc : getNeuronCollectionList()) {
+        for (NeuronCollection nc : getNeuronCollectionSet()) {
             if (nc.getId().equalsIgnoreCase(id)) {
                 return nc;
             }
@@ -454,13 +443,12 @@ public class Network {
     }
 
     /**
-     * Returns the synapse group between some source neuron group and some
-     * target neuron group, if it exists. Returns null otherwise.
+     * Returns the synapse group between some source neuron group and some target neuron group, if it exists. Returns
+     * null otherwise.
      *
      * @param source the source neuron group
      * @param target the target neuron group
-     * @return the synapse group between source and target, null if there is
-     * none
+     * @return the synapse group between source and target, null if there is none
      */
     public SynapseGroup getSynapseGroup(NeuronGroup source, NeuronGroup target) {
         for (Group group : groupList) {
@@ -503,8 +491,7 @@ public class Network {
 
 
     /**
-     * TODO: This is initial (still experiental) support for ND4J
-     * neuron arrays
+     * TODO: This is initial (still experiental) support for ND4J neuron arrays
      */
     public void addNeuronArray(NeuronArray na) {
         // Set id
@@ -513,8 +500,7 @@ public class Network {
     }
 
     /**
-     * Adds a weight to the neuron network, where that weight already has
-     * designated source and target neurons.
+     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param synapse the weight object to add
      */
@@ -538,7 +524,7 @@ public class Network {
     /**
      * Remove a neuron.
      *
-     * @param toDelete the neuron to remove
+     * @param toDelete  the neuron to remove
      * @param fireEvent whether to fire an event
      */
     public void removeNeuron(final Neuron toDelete, boolean fireEvent) {
@@ -561,7 +547,7 @@ public class Network {
         }
 
         // Notify listeners that this neuron has been deleted
-        if(fireEvent) {
+        if (fireEvent) {
             changeSupport.firePropertyChange("neuronRemoved", toDelete, null);
         }
     }
@@ -572,7 +558,7 @@ public class Network {
      * @param nc the collection to remove
      */
     public void removeNeuronCollection(NeuronCollection nc) {
-        ncList.remove(nc);
+        neuronCollectionSet.remove(nc);
         nc.delete();
         changeSupport.firePropertyChange("ncRemoved", nc, null);
     }
@@ -583,7 +569,7 @@ public class Network {
      * @param toDelete neuron to delete
      */
     public void removeNeuron(final Neuron toDelete) {
-       removeNeuron(toDelete, true);
+        removeNeuron(toDelete, true);
     }
 
     /**
@@ -625,15 +611,25 @@ public class Network {
      */
     public void createNeuronCollection(List<Neuron> neuronList) {
 
-        // Filter out loose neurons (parent group is null)
+        // Filter out loose neurons (a neuron is loose if its parent group is null)
         List<Neuron> loose = neuronList.stream()
                 .filter(n -> n.getParentGroup() == null)
                 .collect(Collectors.toList());
 
         // Only make the neuron collection if some neurons have been selected
         if (!loose.isEmpty()) {
+
+            // Don't make two neuron collections with the same members
+            int hashCode = loose.stream().mapToInt(n -> n.hashCode()).sum();
+            for (NeuronCollection nc : neuronCollectionSet) {
+                if (hashCode == nc.hashCode()) {
+                    return;
+                }
+            }
+
+            // Make the collection
             NeuronCollection nc = new NeuronCollection(this, loose);
-            ncList.add(nc);
+            neuronCollectionSet.add(nc);
             changeSupport.firePropertyChange("ncAdded", null, nc);
         }
     }
@@ -682,9 +678,8 @@ public class Network {
     }
 
     /**
-     * Sets neuron activations using values in an array of doubles. Currently
-     * these activations are applied to the network in whatever order the
-     * neurons were added.
+     * Sets neuron activations using values in an array of doubles. Currently these activations are applied to the
+     * network in whatever order the neurons were added.
      *
      * @param activationArray array of values to apply to network
      */
@@ -711,11 +706,9 @@ public class Network {
     }
 
     /**
-     * Returns the "state" of the network: the activation level of its neurons.
-     * An activation vector.
+     * Returns the "state" of the network: the activation level of its neurons. An activation vector.
      *
-     * @return an array representing the activation levels of all the neurons in
-     * this network
+     * @return an array representing the activation levels of all the neurons in this network
      */
     public double[] getState() {
         double[] ret = new double[this.getNeuronCount()];
@@ -783,8 +776,7 @@ public class Network {
     }
 
     /**
-     * Returns a reference to the synapse connecting two neurons, or null if
-     * there is none.
+     * Returns a reference to the synapse connecting two neurons, or null if there is none.
      *
      * @param src source neuron
      * @param tar target neuron
@@ -807,9 +799,8 @@ public class Network {
     }
 
     /**
-     * Add a group to the network. This works for both singular groups like
-     * neuron groups and synapse groups as well as for composite groups like any
-     * subclass of Subnetwork.
+     * Add a group to the network. This works for both singular groups like neuron groups and synapse groups as well as
+     * for composite groups like any subclass of Subnetwork.
      *
      * @param group group of network elements
      */
@@ -860,8 +851,7 @@ public class Network {
     }
 
     /**
-     * Create "flat" list of neurons, which includes the top-level neurons plus
-     * all group neurons.
+     * Create "flat" list of neurons, which includes the top-level neurons plus all group neurons.
      *
      * @return the flat list
      */
@@ -885,8 +875,7 @@ public class Network {
     }
 
     /**
-     * Create "flat" list of synapses, which includes the top-level synapses
-     * plus all subnet synapses.
+     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
      *
      * @return the flat list
      */
@@ -906,8 +895,7 @@ public class Network {
     }
 
     /**
-     * Create a "flat" list of groups, which includes the top-level groups plus
-     * all subgroups.
+     * Create a "flat" list of groups, which includes the top-level groups plus all subgroups.
      *
      * @return the flat list
      */
@@ -924,8 +912,7 @@ public class Network {
     }
 
     /**
-     * Create a "flat" list of groups, which only includes sub-groups of
-     * subnetworks and unbound groups.
+     * Create a "flat" list of groups, which only includes sub-groups of subnetworks and unbound groups.
      *
      * @return the flat list
      */
@@ -972,9 +959,8 @@ public class Network {
     }
 
     /**
-     * Convenience method for asynchronously updating a set of neurons, by
-     * calling each neuron's update function (which sets a buffer), and then
-     * setting each neuron's activation to the buffer state.
+     * Convenience method for asynchronously updating a set of neurons, by calling each neuron's update function (which
+     * sets a buffer), and then setting each neuron's activation to the buffer state.
      *
      * @param neuronList the list of neurons to be updated
      */
@@ -1018,8 +1004,7 @@ public class Network {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * Standard method call made to objects after they are deserialized. See: http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
      * @return Initialized object.
@@ -1053,8 +1038,7 @@ public class Network {
     }
 
     /**
-     * Perform operations required before saving a network. Post-opening
-     * operations occur in {@link #readResolve()}.
+     * Perform operations required before saving a network. Post-opening operations occur in {@link #readResolve()}.
      */
     public void preSaveInit() {
         for (SynapseGroup group : this.getSynapseGroups()) {
@@ -1091,8 +1075,7 @@ public class Network {
     /**
      * Returns the current number of iterations.
      *
-     * @return the number of update iterations which have been run since the
-     * network was created.
+     * @return the number of update iterations which have been run since the network was created.
      */
     public long getIterations() {
         return (long) (time / timeStep);
@@ -1136,8 +1119,7 @@ public class Network {
     }
 
     /**
-     * If there is a single continuous neuron in the network, consider this a
-     * continuous network.
+     * If there is a single continuous neuron in the network, consider this a continuous network.
      */
     public void updateTimeType() {
         timeType = TimeType.DISCRETE;
@@ -1149,17 +1131,16 @@ public class Network {
     }
 
     /**
-     * Increment the time counter, using a different method depending on whether
-     * this is a continuous or discrete. network.
+     * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
+     * network.
      */
     public void updateTime() {
         setTime(time + timeStep);
     }
 
     /**
-     * TODO: Resolve priority update issue. Here as a hack to make the list
-     * available to groups that want to update via priorities WITHIN the
-     * group... To be resolved.
+     * TODO: Resolve priority update issue. Here as a hack to make the list available to groups that want to update via
+     * priorities WITHIN the group... To be resolved.
      *
      * @return the prioritySortedNeuronList
      */
@@ -1204,17 +1185,16 @@ public class Network {
     }
 
     /**
-     * Fire this event when the visible state of a neuron (e.g. its activation)
-     * has been changed and this should be reflected in the GUI.
+     * Fire this event when the visible state of a neuron (e.g. its activation) has been changed and this should be
+     * reflected in the GUI.
      */
     public void fireNeuronsUpdated() {
         changeSupport.firePropertyChange("neuronsUpdated", null, getNeuronList());
     }
 
     /**
-     * Fire this event when the visible state of a specified list of neuron
-     * (e.g. their activations) has been changed and this should be reflected in
-     * the GUI.
+     * Fire this event when the visible state of a specified list of neuron (e.g. their activations) has been changed
+     * and this should be reflected in the GUI.
      *
      * @param neurons the neurons whose state has changed
      */
@@ -1239,18 +1219,18 @@ public class Network {
     public void fireSynapseRemoved(final Synapse deleted) {
         changeSupport.firePropertyChange("synapseRemoved", deleted, null);
     }
+
     /**
-     * Fire this event when the visible state of a synapse (e.g. its strength)
-     * has been changed and this should be reflected in the GUI.
+     * Fire this event when the visible state of a synapse (e.g. its strength) has been changed and this should be
+     * reflected in the GUI.
      */
     public void fireSynapsesUpdated() {
         changeSupport.firePropertyChange("synapsesUpdated", null, getSynapseList());
     }
 
     /**
-     * Fire this event when the visible state of a specified list of synapses
-     * (e.g. their strengths) has been changed and this should be reflected in
-     * the GUI.
+     * Fire this event when the visible state of a specified list of synapses (e.g. their strengths) has been changed
+     * and this should be reflected in the GUI.
      *
      * @param synapses the synapses whose state has changed
      */
@@ -1295,8 +1275,7 @@ public class Network {
     }
 
     /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
+     * Used by Network thread to ensure that an update cycle is complete before updating again.
      *
      * @return whether the network has been updated or not
      */
@@ -1305,8 +1284,7 @@ public class Network {
     }
 
     /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
+     * Used by Network thread to ensure that an update cycle is complete before updating again.
      *
      * @param b whether the network has been updated or not.
      */
@@ -1314,8 +1292,8 @@ public class Network {
         updateCompleted.set(b);
     }
 
-    public List<NeuronCollection> getNeuronCollectionList() {
-        return ncList;
+    public HashSet<NeuronCollection> getNeuronCollectionSet() {
+        return neuronCollectionSet;
     }
 
     @Override
@@ -1340,8 +1318,7 @@ public class Network {
             ret += group.toString();
         }
 
-        for (int i = 0; i < getNeuronCollectionList().size(); i++) {
-            NeuronCollection nc = getNeuronCollectionList().get(i);
+        for (NeuronCollection nc : neuronCollectionSet) {
             ret += nc.toString();
         }
 
@@ -1371,8 +1348,8 @@ public class Network {
     }
 
     /**
-     * Search for a neuron by label. If there are more than one with the same
-     * label only the first one found is returned.
+     * Search for a neuron by label. If there are more than one with the same label only the first one found is
+     * returned.
      *
      * @param inputString label of neuron to search for
      * @return list of matched neurons, or null if none are found
@@ -1445,8 +1422,8 @@ public class Network {
     }
 
     /**
-     * Add an update action to the network' action list (the sequence of actions
-     * invoked on each iteration of the network).
+     * Add an update action to the network' action list (the sequence of actions invoked on each iteration of the
+     * network).
      *
      * @param action new action
      */
@@ -1493,8 +1470,7 @@ public class Network {
     }
 
     /**
-     * Connect a source neuron group to a target neuron group using a connection
-     * object.
+     * Connect a source neuron group to a target neuron group using a connection object.
      *
      * @param sng        source neuron group
      * @param tng        target neuron group
@@ -1522,9 +1498,8 @@ public class Network {
     }
 
     /**
-     * Convenience method to return a list of synapse groups in the network.
-     * Note this is a "flat" list of synapse groups because there is no such
-     * thing as a "loose" synapse group.
+     * Convenience method to return a list of synapse groups in the network. Note this is a "flat" list of synapse
+     * groups because there is no such thing as a "loose" synapse group.
      *
      * @return list of all synapse groups
      */

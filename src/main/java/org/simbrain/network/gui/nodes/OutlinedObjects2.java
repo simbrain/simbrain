@@ -78,7 +78,10 @@ public class OutlinedObjects2 extends PPath.Float {
      */
     private PBounds comparisonBounds = new PBounds();
 
-    ArrayList<NeuronNode> neuronNodeRefs = new ArrayList<>();
+    /**
+     * References to neuron nodes used to determine bounds.
+     */
+    private ArrayList<NeuronNode> neuronNodeRefs = new ArrayList<>();
 
     /**
      * Construct the outlined objects group.

@@ -48,7 +48,8 @@ import java.util.concurrent.Executors;
 /**
  * Gui Component to display a high dimensional projection object.
  */
-public class ProjectionGui extends GuiComponent<ProjectionComponent> {
+public class
+ProjectionGui extends GuiComponent<ProjectionComponent> {
 
     /**
      * Open button.
@@ -264,7 +265,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         // that show high-d point
         CustomRenderer renderer = new CustomRenderer();
         chart.getXYPlot().setRenderer(renderer);
-        renderer.setSeriesLinesVisible(0, false);
+        renderer.setSeriesLinesVisible(0, false);  // TODO: Make this settable
         renderer.setSeriesShape(0, new Ellipse2D.Double(-5, -5, 5, 5));
         CustomToolTipGenerator generator = new CustomToolTipGenerator();
         renderer.setSeriesToolTipGenerator(0, generator);

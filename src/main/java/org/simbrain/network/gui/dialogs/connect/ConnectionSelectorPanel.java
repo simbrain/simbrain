@@ -97,14 +97,19 @@ public class ConnectionSelectorPanel extends EditablePanel {
     }
 
     /**
-     * Sets selected item in the combo box to the indicated strategy
+     * The Combo Box is initialized with the CONNECTORS object, and then the provided
+     * strategy is swapped out at the appropriate place.
      */
     private void setComboBox(ConnectionStrategy strategy) {
+        int i = 0;
         for(ConnectionStrategy cs : CONNECTORS) {
             if (cs.getName().equals(strategy.getName())) {
-                // TODO: Must copy strategy over to cs
-                cbConnectionType.setSelectedItem(cs);
+                cbConnectionType.insertItemAt(strategy, i);
+                cbConnectionType.setSelectedIndex(i);
+                cbConnectionType.removeItem(cs);
+                return;
             }
+            i++;
         }
     }
 

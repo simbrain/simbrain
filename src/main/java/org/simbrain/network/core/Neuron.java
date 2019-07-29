@@ -78,7 +78,8 @@ public class Neuron implements EditableObject, AttributeContainer {
     /**
      * Activation value of the neuron. The main state variable.
      */
-    @UserParameter(label = "Activation", description = "Main activation property",
+    @UserParameter(label = "Activation", description = "Neuron activation. If you want a value greater" +
+            " than upper bound or less than lower bound you must set those first, and close this dialog.",
         increment = .5, probDist = "Normal", order = 1)
     private double activation;
 

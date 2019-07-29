@@ -38,8 +38,7 @@ import java.util.*;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
- * (grow or weaken) based on various factors, including the activation level of
- * connected neurons.
+ * (grow or weaken) based on various factors, including the activation level of connected neurons.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
@@ -70,9 +69,10 @@ public class Synapse implements EditableObject, AttributeContainer {
     /**
      * Strength of synapse.
      */
-    @UserParameter(label = "Strength", useSetter =  true, description = "Weight Strength",
-        minimumValue = -10, maximumValue = 10, probDist = "Normal", probParam1 = .1, probParam2 = .5,
-        order = 1)
+    @UserParameter(label = "Strength", useSetter = true, description = "Weight Strength. If you want a value greater" +
+            "than upper bound or less than lower bound you must set those first, and close this dialog.",
+            probDist = "Normal", probParam1 = .1, probParam2 = .5,
+            order = 1)
     private double strength = 0;
 
     @Override
@@ -81,8 +81,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Parent network. Can't just use getSouce().getParent() because synapses
-     * and their parents can occur at different levels of the network hierarchy.
+     * Parent network. Can't just use getSouce().getParent() because synapses and their parents can occur at different
+     * levels of the network hierarchy.
      */
     private Network parentNetwork;
 
@@ -98,18 +98,17 @@ public class Synapse implements EditableObject, AttributeContainer {
 
     //TODO: Rename learningRule to synapseupdaterule
     /**
-     * The update method of this synapse, which corresponds to what kind of
-     * synapse it is.
+     * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
     @UserParameter(label = "Learning Rule", useSetter = true,
-        isObjectType = true, order = 100)
+            isObjectType = true, order = 100)
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /**
      * Only used of source neuron is a spiking neuron.
      */
     @UserParameter(label = "Spike Responder", isObjectType = true,
-        showDetails = false, order = 200)
+            showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /**
@@ -123,37 +122,35 @@ public class Synapse implements EditableObject, AttributeContainer {
     private static final int MAX_DIGITS = 2;
 
     /**
-     * Post synaptic response. The totality of the output of this synapse; the
-     * total contribution of this synapse to the post-synaptic or target neuron.
-     * This is computed using a {@link SpikeResponder} in the
-     * case of a spiking pre-synaptic neuron. In the case of a non-spiking node
-     * this is the product of the source activation and the weight of a synapse,
-     * i.e. one term in a classical weighted input.
+     * Post synaptic response. The totality of the output of this synapse; the total contribution of this synapse to the
+     * post-synaptic or target neuron. This is computed using a {@link SpikeResponder} in the case of a spiking
+     * pre-synaptic neuron. In the case of a non-spiking node this is the product of the source activation and the
+     * weight of a synapse, i.e. one term in a classical weighted input.
      */
     private double psr;
 
     /**
      * Amount to increment the neuron.
      */
-    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0, maximumValue = 100, order = 2)
+    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0, order = 2)
     private double increment = 1;
 
     /**
      * Upper limit of synapse.
      */
-    @UserParameter(label = "Upper bound", description = "Upper bound", minimumValue = 0, maximumValue = 100, order = 3)
+    @UserParameter(label = "Upper bound", description = "Upper bound", minimumValue = 0, order = 3)
     private double upperBound = DEFAULT_UPPER_BOUND;
 
     /**
      * Lower limit of synapse.
      */
-    @UserParameter(label = "Lower bound", description = "Lower bound", minimumValue = -100, maximumValue = 0, order = 4)
+    @UserParameter(label = "Lower bound", description = "Lower bound", maximumValue = 0, order = 4)
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * Time to delay sending activation to target neuron.
      */
-    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, maximumValue = 100, order = 5)
+    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, order = 5)
     private int delay;
 
     /**
@@ -162,15 +159,15 @@ public class Synapse implements EditableObject, AttributeContainer {
     private SynapseGroup parentGroup;
 
     /**
-     * Boolean flag, indicating whether this type of synapse participates in the
-     * computation of weighted input. Set to a default value of true.
+     * Boolean flag, indicating whether this type of synapse participates in the computation of weighted input. Set to a
+     * default value of true.
      */
     @UserParameter(label = "Enabled", description = "Synapse is enabled. If disabled, it won't pass activation through", order = 6)
     private boolean enabled = true;
 
     /**
-     * Boolean flag, indicating whether or not this synapse's strength can be
-     * changed by any means other than direct user intervention.
+     * Boolean flag, indicating whether or not this synapse's strength can be changed by any means other than direct
+     * user intervention.
      */
     @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", order = 6)
     private boolean frozen;
@@ -181,8 +178,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     private double[] delayManager;
 
     /**
-     * Points to the location in the delay manager that corresponds to the
-     * current time.
+     * Points to the location in the delay manager that corresponds to the current time.
      */
     private int dlyPtr = 0;
 
@@ -192,13 +188,11 @@ public class Synapse implements EditableObject, AttributeContainer {
     private double dlyVal = 0;
 
     /**
-     * This special tag denotes that the synapse is a template to other
-     * synapses. That is, it exists solely to store parameter values for a large
-     * group of synapses. Normally synapses must have a source and target
-     * neuron. Template synapses are the only case where having a null source
-     * and target is acceptable. This tag exists to prevent
-     * NullPointerExceptions since some methods in synapse consult the source or
-     * target neuron before allowing certain changes.
+     * This special tag denotes that the synapse is a template to other synapses. That is, it exists solely to store
+     * parameter values for a large group of synapses. Normally synapses must have a source and target neuron. Template
+     * synapses are the only case where having a null source and target is acceptable. This tag exists to prevent
+     * NullPointerExceptions since some methods in synapse consult the source or target neuron before allowing certain
+     * changes.
      */
     private final boolean isTemplate;
 
@@ -222,9 +216,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Construct a synapse using a source and target neuron, defaulting to
-     * ClampedSynapse and assuming the parent of the source neuron is the parent
-     * of this synapse.
+     * Construct a synapse using a source and target neuron, defaulting to ClampedSynapse and assuming the parent of the
+     * source neuron is the parent of this synapse.
      *
      * @param source source neuron
      * @param target target neuron
@@ -251,8 +244,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Construct a synapse using a source and target neuron, and a specified
-     * learning rule and parent network
+     * Construct a synapse using a source and target neuron, and a specified learning rule and parent network
      *
      * @param newParent    new parent network for this synapse.
      * @param source       source neuron
@@ -268,9 +260,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Construct a synapse using a source and target neuron, and a specified
-     * learning rule. Assumes the parent network is the same as the parent
-     * network of the provided source neuron.
+     * Construct a synapse using a source and target neuron, and a specified learning rule. Assumes the parent network
+     * is the same as the parent network of the provided source neuron.
      *
      * @param source       source neuron
      * @param target       target neuron
@@ -281,12 +272,10 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Construct a synapse using a source and target neuron, and a specified
-     * learning rule. Assumes the parent network is the same as the parent
-     * network of the provided source neuron.
+     * Construct a synapse using a source and target neuron, and a specified learning rule. Assumes the parent network
+     * is the same as the parent network of the provided source neuron.
      *
-     * @param newParent       new parent network for this synapse. Used when copying
-     *                        and pasting to new network.
+     * @param newParent       new parent network for this synapse. Used when copying and pasting to new network.
      * @param source          source neuron
      * @param target          target neuron
      * @param learningRule    update rule for this synapse
@@ -301,8 +290,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Construct a synapse using a source and target neuron, and a specified
-     * learning rule.
+     * Construct a synapse using a source and target neuron, and a specified learning rule.
      *
      * @param source       source neuron
      * @param target       target neuron
@@ -385,9 +373,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * For spiking source neurons, returns the spike-responder's value times the
-     * synapse strength. For non-spiking neurons, returns the pre-synaptic
-     * activation times the synapse strength.
+     * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
+     * neurons, returns the pre-synaptic activation times the synapse strength.
      *
      * @return the post-synaptic response as determined by a spike responder.
      */
@@ -407,9 +394,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * For non-spiking neurons returns the weighted sum, i.e. the activation of
-     * the pre-synaptic (source) neuron multiplied by the strength of this
-     * synapse.
+     * For non-spiking neurons returns the weighted sum, i.e. the activation of the pre-synaptic (source) neuron
+     * multiplied by the strength of this synapse.
      *
      * @return the post synaptic response calculated as a simple weighted sum
      */
@@ -429,9 +415,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * The name of the learning rule of the synapse; it's "type". Used via
-     * reflection for consistency checking in the gui. (Open multiple synapses
-     * and if they are of the different types the dialog is different).
+     * The name of the learning rule of the synapse; it's "type". Used via reflection for consistency checking in the
+     * gui. (Open multiple synapses and if they are of the different types the dialog is different).
      *
      * @return the name of the class of this network.
      */
@@ -447,11 +432,9 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Sets the source and target neurons simultaneously, used only in
-     * constructors. Synapses without source or target neurons are ill formed
-     * and generally speaking not allowed. The only exception to this are
-     * template synapses used for instance in SynapseGroup which exist to store
-     * synapse variables for other synapses or exist as a template.
+     * Sets the source and target neurons simultaneously, used only in constructors. Synapses without source or target
+     * neurons are ill formed and generally speaking not allowed. The only exception to this are template synapses used
+     * for instance in SynapseGroup which exist to store synapse variables for other synapses or exist as a template.
      *
      * @param newSource the source neuron to the synapse
      * @param newTarget the target neuron to the synapse
@@ -605,9 +588,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Randomizes this synapse and sets the symmetric analogue to the same
-     * value. A bit of a hack, since it it is used on a collection a bunch of
-     * redundancy could happen.
+     * Randomizes this synapse and sets the symmetric analogue to the same value. A bit of a hack, since it it is used
+     * on a collection a bunch of redundancy could happen.
      */
     public void randomizeSymmetric() {
         randomize();
@@ -657,8 +639,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Utility function for use in learning rules. If value is above or below
-     * the bounds of this synapse set it to those bounds.
+     * Utility function for use in learning rules. If value is above or below the bounds of this synapse set it to those
+     * bounds.
      *
      * @param value Value to be checked
      * @return Evaluated value
@@ -793,9 +775,8 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * A better name than setSendWeightedInput. Forwarding to
-     * setSendWeightedInput for now. Possibly change name for 3.0. have not done
-     * so yet so as note to break a bunch of simulations.
+     * A better name than setSendWeightedInput. Forwarding to setSendWeightedInput for now. Possibly change name for
+     * 3.0. have not done so yet so as note to break a bunch of simulations.
      *
      * @param enabled true if enabled, false otherwise.
      */
@@ -899,14 +880,11 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * A method which takes in a collection of synapses and returns a list of
-     * their update rules in the order in which they appear in the original
-     * collection, if that collection supports a consistent order.
+     * A method which takes in a collection of synapses and returns a list of their update rules in the order in which
+     * they appear in the original collection, if that collection supports a consistent order.
      *
-     * @param synapseCollection The collection of synapses whose update rules we
-     *                          want to query.
-     * @return Returns a list of synapse update rules associated with the group
-     * of synapses
+     * @param synapseCollection The collection of synapses whose update rules we want to query.
+     * @return Returns a list of synapse update rules associated with the group of synapses
      */
     public static List<SynapseUpdateRule> getRuleList(Collection<Synapse> synapseCollection) {
         ArrayList<SynapseUpdateRule> ruleList = new ArrayList<SynapseUpdateRule>(synapseCollection.size());
@@ -918,15 +896,13 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * A template synapse is a synapse that has no proper references, but is
-     * used for setting properties. When the user is ready to instantiate it,
-     * they call this method to give the proper references.
+     * A template synapse is a synapse that has no proper references, but is used for setting properties. When the user
+     * is ready to instantiate it, they call this method to give the proper references.
      *
      * @param source source neuron
      * @param target target neuron
      * @param parent parent network
-     * @return a new synapse with these references and the base synapse's
-     * properties
+     * @return a new synapse with these references and the base synapse's properties
      */
     public Synapse instantiateTemplateSynapse(Neuron source, Neuron target, Network parent) {
         this.source = source;
@@ -944,8 +920,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength
-     * in half.
+     * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength in half.
      *
      * @param decayPercent decay percent
      */
@@ -1032,8 +1007,7 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * Called after a synapse is de-serialized, to repopulate fan-in and fan-out
-     * lists.
+     * Called after a synapse is de-serialized, to repopulate fan-in and fan-out lists.
      */
     public void postUnmarshallingInit() {
         changeSupport = new PropertyChangeSupport(this);
@@ -1061,12 +1035,12 @@ public class Synapse implements EditableObject, AttributeContainer {
     }
 
     /**
-     * "Clear" the synapse in the sense of setting post synaptic result to 0
-     * and removing all queued activations from the delay manager.
+     * "Clear" the synapse in the sense of setting post synaptic result to 0 and removing all queued activations from
+     * the delay manager.
      */
     public void clear() {
         setPsr(0);
-        if(delayManager != null) {
+        if (delayManager != null) {
             Arrays.fill(delayManager, 0);
         }
     }
@@ -1090,7 +1064,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      * Label update needs to be reflected in GUI.
      */
     public void fireStrengthUpdated() {
-        changeSupport.firePropertyChange("strength", null , null);
+        changeSupport.firePropertyChange("strength", null, null);
     }
 
 }

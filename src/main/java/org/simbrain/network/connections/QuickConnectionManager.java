@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Manage quick connection preferences, where a connection is applied using key
- * commands. Basically a repository of connection objects whose settings can be
+ * commands. A repository of connection objects whose settings can be
  * changed.
  * <p>
  * Not thread-safe. This class is used by gui methods, and is not intended to be
@@ -41,31 +41,6 @@ import java.util.List;
 public class QuickConnectionManager {
 
     /**
-     * The all to all connector.
-     */
-    private final AllToAll allToAll = new AllToAll();
-
-    /**
-     * The one to one connector.
-     */
-    private final OneToOne oneToOne = new OneToOne();
-
-    /**
-     * The Gaussian connector.
-     */
-    private final RadialGaussian radial = new RadialGaussian();
-
-    /**
-     * The Radial connector.
-     */
-    private final RadialSimple radialSimple = new RadialSimple();
-
-    /**
-     * The sparse connector.
-     */
-    private final Sparse sparse = new Sparse();
-
-    /**
      * The current connection object.
      */
     private ConnectionStrategy currentConnector;
@@ -75,20 +50,14 @@ public class QuickConnectionManager {
      */
     public QuickConnectionManager() {
 
-        String xml = SimbrainPreferences.getString("quickConnector");
         // Set the current connection strategy based on user preferences
+        String xml = SimbrainPreferences.getString("quickConnector");
         if (xml == null || xml.isEmpty() || !xml.startsWith("<org")) {
+            // If no viable preferences found, default to All to All
             currentConnector = new AllToAll();
         } else {
             currentConnector = (ConnectionStrategy) Utils.getSimbrainXStream().fromXML(xml);
         }
-    }
-
-    /**
-     * @return the connection objects
-     */
-    public List<ConnectionStrategy> getConnectors() {
-        return List.of(allToAll, oneToOne, radial, radialSimple, sparse);
     }
 
     /**
@@ -117,6 +86,7 @@ public class QuickConnectionManager {
     }
 
     public void setCurrentConnector(ConnectionStrategy currentConnector) {
+        // Store the preferences using xml
         SimbrainPreferences.putString("quickConnector", Utils.getSimbrainXStream().toXML(currentConnector));
         this.currentConnector = currentConnector;
     }

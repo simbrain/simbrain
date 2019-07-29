@@ -49,6 +49,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
      */
     private JComboBox<ConnectionStrategy> cbConnectionType;
 
+
     /**
      * The current selected connection panel
      */
@@ -91,30 +92,20 @@ public class ConnectionSelectorPanel extends EditablePanel {
         cbConnectionType = new JComboBox(CONNECTORS);
         cbConnectionType.setPreferredSize(new Dimension(200, 20));
         this.isCreation = isCreation;
-        for (ConnectionStrategy cn : CONNECTORS) {
-            if (cn.getClass() == initConnection.getClass()) {
-                cbConnectionType.removeItem(cn);
-                cbConnectionType.addItem(initConnection);
-                break;
-            }
-        }
-        cbConnectionType.setSelectedItem(initConnection);
+        setComboBox(initConnection);
         init();
     }
 
     /**
-     * Construct the panel from a specified set of connection manager objects.
-     *
-     * @param connectionManagers list of connection managers for drop down
-     * @param initConnection     initial connection manager
+     * Sets selected item in the combo box to the indicated strategy
      */
-    public ConnectionSelectorPanel(List<ConnectionStrategy> connectionManagers,
-                                   ConnectionStrategy initConnection, Window parentFrame, boolean isCreation) {
-        this.parentFrame = parentFrame;
-        this.isCreation = isCreation;
-        cbConnectionType = new JComboBox(connectionManagers.toArray());
-        cbConnectionType.setSelectedItem(initConnection);
-        init();
+    private void setComboBox(ConnectionStrategy strategy) {
+        for(ConnectionStrategy cs : CONNECTORS) {
+            if (cs.getName().equals(strategy.getName())) {
+                // TODO: Must copy strategy over to cs
+                cbConnectionType.setSelectedItem(cs);
+            }
+        }
     }
 
     /**

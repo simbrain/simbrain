@@ -88,23 +88,15 @@ public final class ConnectionPanel extends JPanel {
     /**
      * Construct the dialog.
      *
-     * @param connectionManager   the underlying connection object
+     * @param connectionStrategy   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionManager, int noTar, boolean rec,
+    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionStrategy, int noTar, boolean rec,
                            boolean isCreation) {
         this.parentFrame = parent;
-        this.connectionStrategy = connectionManager;
+        this.connectionStrategy = connectionStrategy;
         this.noTar = noTar;
         this.rec = rec;
         this.isCreation = isCreation;
-        init();
-    }
-
-    /**
-     * Initialize the connection panel.
-     */
-    private void init() {
-
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));

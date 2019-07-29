@@ -87,11 +87,8 @@ public class NetworkDialog extends StandardDialog {
         tabbedPane.addTab("Main", networkPropertiesPanel);
 
         // Quick-connect properties
-        List<ConnectionStrategy> connectors = new ArrayList<>();
         ConnectionStrategy currentConnector = networkPanel.getQuickConnector().getCurrentConnector();
-        connectors.add(currentConnector);
-        connectors.addAll(networkPanel.getQuickConnector().getConnectors());
-        quickConnectPanel = new ConnectionSelectorPanel(connectors, currentConnector, this, true);
+        quickConnectPanel = new ConnectionSelectorPanel(currentConnector, this, true);
         JScrollPane wrapper = new JScrollPane(quickConnectPanel);
         tabbedPane.addTab("Connections", wrapper);
 

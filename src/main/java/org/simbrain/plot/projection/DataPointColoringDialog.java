@@ -24,8 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * DataPointColoringDialog is a dialog box for making changes to the coloring
- * method in projection plot.
+ * DataPointColoringDialog is a dialog box for making changes to the coloring method in projection plot.
  *
  * @author Lam Nguyen
  */
@@ -35,7 +34,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     /**
      * String of coloring methods.
      */
-    private String[] projectionMethod = {"None", "DecayTrail", "Frequency"};
+    private String[] projectionMethod = {"None", "DecayTrail", "Frequency", "Bayesian"};
 
     /**
      * Projection coloring manager.
@@ -129,8 +128,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     }
 
     /**
-     * Initialize the dialog. Fill field values based on state of coloring
-     * manager.
+     * Initialize the dialog. Fill field values based on state of coloring manager.
      */
     private void init() {
         setTitle("Data Point Coloring Settings");
@@ -255,6 +253,12 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
             baseColorButton.setVisible(true);
             baseColorIndicator.setVisible(true);
             mainPanel.add(currentColoringPanel);
+        } else if (coloringMethod.getSelectedItem() == "Bayesian") {
+            clearColoringPanel();
+            currentColoringPanel = getFrequencyPanel();
+            baseColorButton.setVisible(true);
+            baseColorIndicator.setVisible(true);
+            mainPanel.add(currentColoringPanel);
         }
         pack();
         setLocationRelativeTo(null);
@@ -313,8 +317,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     }
 
     /**
-     * Helper method to check that a value is between 0 and 1 and display a
-     * warning if not.
+     * Helper method to check that a value is between 0 and 1 and display a warning if not.
      *
      * @param paramName parameter name to display in warning dialog
      * @param val       value to check
@@ -373,6 +376,11 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
                 colorManager.setBaseColor(baseColor);
                 colorManager.setIncrementAmount(incAmount);
                 colorManager.setCeiling(ceilingVal);
+            }
+            if (coloringMethod.getSelectedItem() == "Bayesian") {
+                colorManager.setColoringMethod("Bayesian");
+                colorManager.setBaseColor(baseColor);
+                colorManager.setCeiling(20);
             }
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Non-numeric field values:" + "\nNetwork construction failed.", "Error", JOptionPane.ERROR_MESSAGE);

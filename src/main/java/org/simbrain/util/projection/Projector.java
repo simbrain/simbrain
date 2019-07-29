@@ -95,6 +95,11 @@ public class Projector {
     private boolean useColorManager = true;
 
     /**
+     * One-step ahead prediction used for Bayesian datapoint coloring
+     */
+    private OneStepPrediction predictor = new OneStepPrediction();
+
+    /**
      * List of Neuron update rules; used in Gui Combo boxes.
      */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
@@ -176,7 +181,6 @@ public class Projector {
      * @param point the upstairs point to add
      */
     public void addDatapoint(final DataPointColored point) {
-
         logger.debug("addDatapoint called");
         if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
             return;
@@ -185,6 +189,10 @@ public class Projector {
         // Iterable functions to be re-initialized when new data is added
         if (projectionMethod.isIterable()) {
             ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
+        }
+
+        if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
+            predictor.addSourceTargetPair(currentPoint, point);
         }
 
         // Add the point directly to the upstairs dataset. If the point already
@@ -383,6 +391,7 @@ public class Projector {
         this.getUpstairs().clear();
         this.getDownstairs().clear();
         this.fireProjectorDataChanged();
+        predictor.clear();
         // getCurrentProjectionMethod().resetColorIndices();
     }
 
@@ -478,16 +487,10 @@ public class Projector {
         return true;
     }
 
-    /**
-     * @return the projectionMethods
-     */
     public HashMap<Class<?>, String> getProjectionMethods() {
         return projectionMethods;
     }
 
-    /**
-     * @return the currentPoint
-     */
     public DataPoint getCurrentPoint() {
         return currentPoint;
     }
@@ -498,5 +501,9 @@ public class Projector {
 
     public void setUseColorManager(boolean useColorManager) {
         this.useColorManager = useColorManager;
+    }
+
+    public OneStepPrediction getPredictor() {
+        return predictor;
     }
 }

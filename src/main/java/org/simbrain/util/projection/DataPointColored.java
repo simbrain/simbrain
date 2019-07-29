@@ -26,7 +26,7 @@ import java.awt.*;
  *
  * @see DataColoringManager
  */
-public class DataPointColored extends DataPoint {
+public class DataPointColored extends DataPoint  {
 
     /**
      * Color of this datapoint.

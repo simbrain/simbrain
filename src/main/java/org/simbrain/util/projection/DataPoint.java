@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.projection;
 
+import java.util.Arrays;
+
 /**
  * <b>Datapoint</b> represents a single datapoint.
  */
@@ -80,19 +82,6 @@ public class DataPoint {
         return data.length;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < data.length; i++) {
-            builder.append(data[i]);
-            if (i < data.length - 1) {
-                builder.append(", ");
-            }
-        }
-
-        return builder.toString();
-    }
 
     public String getLabel() {
         return label;
@@ -102,4 +91,20 @@ public class DataPoint {
         this.label = label;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof  DataPoint)) {
+            return false;
+        }
+        DataPoint dp = (DataPoint) o;
+        return Arrays.equals(getVector(), dp.getVector());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(data);
+    }
 }

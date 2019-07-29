@@ -30,7 +30,7 @@ public class DataColoringManager {
     /**
      * List of methods for coloring points.
      */
-    private enum ColoringMethod {
+    public enum ColoringMethod {
 
         /**
          * No special coloring. All points colored the base color.
@@ -47,7 +47,12 @@ public class DataColoringManager {
          * As a point is visited more its activation and hence the saturation of
          * its color representation increases.
          */
-        Frequency
+        Frequency,
+
+        /**
+         * Use the {@link OneStepPrediction} for datapoint coloring
+         */
+        Bayesian
     }
 
     /**
@@ -156,6 +161,25 @@ public class DataColoringManager {
             } else {
                 point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
             }
+        } else if (coloringMethod == ColoringMethod.Bayesian) {
+            DataPoint current = projector.getCurrentPoint();
+            if (point == current) {
+                if (point == projector.getCurrentPoint() && hotPointMode == true) {
+                    point.setColor(hotColor);
+                } else {
+                    point.setColor(baseColor);
+                }
+            } else {
+                Double prob = projector.getPredictor().getProbability(current, point);
+                //System.out.println(prob);
+                if (prob > .1) {
+                    // For now just set a color directly
+                    // TODO: Scale colors appropriately
+                    point.setColor(Color.orange);
+                } else {
+                    point.setColor(baseColor);
+                }
+            }
         }
 
     }
@@ -170,6 +194,8 @@ public class DataColoringManager {
             return "DecayTrail";
         } else if (coloringMethod == ColoringMethod.Frequency) {
             return "Frequency";
+        } else if (coloringMethod == ColoringMethod.Bayesian) {
+            return "Bayesian";
         } else {
             return "None";
         }
@@ -187,89 +213,59 @@ public class DataColoringManager {
             coloringMethod = ColoringMethod.DecayTrail;
         } else if (selectedMethod == "Frequency") {
             coloringMethod = ColoringMethod.Frequency;
+        } else if (selectedMethod == "Bayesian") {
+            coloringMethod = ColoringMethod.Bayesian;
         }
     }
 
-    /**
-     * @return the hotColor
-     */
+    public ColoringMethod getColoringMethod() {
+        return coloringMethod;
+    }
+
     public Color getHotColor() {
         return hotColor;
     }
 
-    /**
-     * @return the baseColor
-     */
     public Color getBaseColor() {
         return baseColor;
     }
 
-    /**
-     * @return the floor
-     */
     public double getFloor() {
         return floor;
     }
 
-    /**
-     * @return the ceiling
-     */
     public double getCeiling() {
         return ceiling;
     }
 
-    /**
-     * @return the incrementAmount
-     */
     public double getIncrementAmount() {
         return incrementAmount;
     }
 
-    /**
-     * @return the decrementAmount
-     */
     public double getDecrementAmount() {
         return decrementAmount;
     }
 
-    /**
-     * @param hotColor the hotColor to set
-     */
     public void setHotColor(Color hotColor) {
         this.hotColor = hotColor;
     }
 
-    /**
-     * @param baseColor the baseColor to set
-     */
     public void setBaseColor(Color baseColor) {
         this.baseColor = baseColor;
     }
 
-    /**
-     * @param floor the floor to set
-     */
     public void setFloor(double floor) {
         this.floor = floor;
     }
 
-    /**
-     * @param ceiling the ceiling to set
-     */
     public void setCeiling(double ceiling) {
         this.ceiling = ceiling;
     }
 
-    /**
-     * @param incrementAmount the incrementAmount to set
-     */
     public void setIncrementAmount(double incrementAmount) {
         this.incrementAmount = incrementAmount;
     }
 
-    /**
-     * @param decrementAmount the decrementAmount to set
-     */
     public void setDecrementAmount(double decrementAmount) {
         this.decrementAmount = decrementAmount;
     }
@@ -283,9 +279,6 @@ public class DataColoringManager {
         this.hotPointMode = hotPointMode;
     }
 
-    /**
-     * @return the hotPointMode
-     */
     public boolean getHotPointMode() {
         return hotPointMode;
     }

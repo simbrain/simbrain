@@ -198,4 +198,8 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
         return this;
     }
 
+    @Override
+    public String getId() {
+        return super.getName();
+    }
 }

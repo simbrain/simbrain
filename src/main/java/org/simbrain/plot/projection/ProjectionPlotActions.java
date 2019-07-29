@@ -48,9 +48,7 @@ public class ProjectionPlotActions {
                 putValue(SHORT_DESCRIPTION, "Export hi-d data (.csv)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
@@ -78,9 +76,7 @@ public class ProjectionPlotActions {
                 putValue(SHORT_DESCRIPTION, "Export low-d data (.csv)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
@@ -108,9 +104,7 @@ public class ProjectionPlotActions {
                 putValue(SHORT_DESCRIPTION, "Import data (.csv)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();

@@ -70,6 +70,9 @@ public class Halo {
      * @param radius radius of the halo
      */
     public static void makeHalo(Projector proj, double[] target, float radius) {
+
+        // TODO: Shouldn't this use proj.getUpstairs().getKNearestNeighbors()
+
         for (int i = 0; i < proj.getUpstairs().getNumPoints(); i++) {
 
             // Color the current point green

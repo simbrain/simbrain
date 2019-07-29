@@ -278,9 +278,17 @@ public class NeuronCollectionNode extends PNode implements PropertyChangeListene
      */
     public class NeuronCollectionInteractionBox extends InteractionBox {
 
+        /**
+         * Color for the neuron collection interaction box
+         */
+        private final Color BOX_COLOR= new Color(209,255, 204);
+
+        /**
+         * Construct the interaction box
+         */
         public NeuronCollectionInteractionBox(NetworkPanel net) {
             super(net);
-            setPaint(Color.green.brighter());
+            setPaint(BOX_COLOR);
             //setTransparency(.2f);
             updateText();
         }

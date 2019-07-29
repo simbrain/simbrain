@@ -26,6 +26,7 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
 import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.awt.geom.Point2D;
@@ -126,8 +127,10 @@ public class EntityNode extends PNode {
      * @param attribute the attribute to add
      */
     private void addAttribute(VisualizableEntityAttribute attribute) {
-        visualizableAttributeMap.put(attribute, EntityAttributeNode.getNode(attribute));
+        EntityAttributeNode node = EntityAttributeNode.getNode(attribute);
+        visualizableAttributeMap.put(attribute, node);
         addChild(visualizableAttributeMap.get(attribute));
+        node.update();
     }
 
     /**

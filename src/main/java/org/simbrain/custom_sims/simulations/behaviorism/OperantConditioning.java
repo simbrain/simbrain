@@ -242,8 +242,13 @@ public class OperantConditioning extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Behaviorism";
+    }
+
+    @Override
     public String getName() {
-        return "Behaviorism: Operant Conditioning";
+        return "Operant Conditioning";
     }
 
     @Override

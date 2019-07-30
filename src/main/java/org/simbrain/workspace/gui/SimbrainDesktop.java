@@ -88,8 +88,8 @@ public class SimbrainDesktop {
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
     /**
-     * Reference to the last internal frames that were focused, so that they can
-     * get the focus when the next one is closed.
+     * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
+     * closed.
      */
     private static final Stack<GuiComponent<?>> lastFocusedStack = new Stack<GuiComponent<?>>();
 
@@ -343,9 +343,7 @@ public class SimbrainDesktop {
         frame.addWindowListener(windowListener);
         frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
 
-
         // Set the "dock" image.
-
         if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
             Taskbar.getTaskbar().setIconImage((ResourceManager.getImage("simbrain-icon.png")));
         }
@@ -398,8 +396,7 @@ public class SimbrainDesktop {
     };
 
     /**
-     * Takes the last gui component opened and moves it to the front of the
-     * simbrain desktop, place it in focus.
+     * Takes the last gui component opened and moves it to the front of the simbrain desktop, place it in focus.
      */
     private void moveLastFocusedComponentToFront() {
         if (!lastFocusedStack.isEmpty()) {
@@ -558,16 +555,34 @@ public class SimbrainDesktop {
         scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
-        for (RegisteredSimulation rs : RegisteredSimulation.REGISTERED_SIMS) {
-            JMenuItem item = new JMenuItem(rs.getName());
-            item.addActionListener(ae -> {
+        for (RegisteredSimulation rs : RegisteredSimulation.getRegisteredSims()) {
+
+            JMenuItem menuItem = new JMenuItem(rs.getName());
+            menuItem.addActionListener(ae -> {
                 rs.instantiate(this).run();
             });
-            scriptMenu.add(item);
+
+            String submenuName = rs.getSubmenuName();
+            if (submenuName == null) {
+                // There is no submenu; add to main menu
+                scriptMenu.add(menuItem);
+            } else {
+                // Check whether the script menu contains the submenu
+                JMenu existingMenu = findSubmenu(scriptMenu, submenuName);
+                if(existingMenu == null) {
+                    // Create a new submenu
+                    JMenu submenu = new JMenu(submenuName);
+                    submenu.add(menuItem);
+                    scriptMenu.add(submenu);
+                } else {
+                    // Add to existing submenu
+                    existingMenu.add(menuItem);
+                }
+            }
         }
-        if(actionManager.getScriptActions(this) == null) {
+        if (actionManager.getScriptActions(this) == null) {
             JOptionPane.showOptionDialog(null, "To use scripts place Simbrain.jar in the same directory as the scripts directory and restart.", "Warning", JOptionPane.DEFAULT_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, null, null);
+                    JOptionPane.WARNING_MESSAGE, null, null, null);
         } else {
             scriptMenu.addSeparator();
             for (Action action : actionManager.getScriptActions(this)) {
@@ -575,6 +590,23 @@ public class SimbrainDesktop {
             }
         }
         return scriptMenu;
+    }
+
+    /**
+     * Look for a submenu in the scriptmenu with the provided name
+     *
+     * @return reference to the submenu if found; null otherwise
+     */
+    private JMenu findSubmenu(JMenu scriptMenu, String menuName) {
+        for (int i = 0; i < scriptMenu.getItemCount(); i++) {
+            JMenuItem itemToCheck = scriptMenu.getItem(i);
+            if(itemToCheck != null) {
+                if(itemToCheck.getText().equals(menuName)) {
+                    return (JMenu) itemToCheck;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -714,8 +746,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Returns the desktop component corresponding to a named workspace
-     * component.
+     * Returns the desktop component corresponding to a named workspace component.
      *
      * @param componentName name of desktop component to return
      * @return component desktop component, or null if none found
@@ -730,8 +761,8 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Utility class for adding internal frames, which are not wrappers for
-     * WorkspaceComponents. Wraps GUI Component in a JInternalFrame for Desktop.
+     * Utility class for adding internal frames, which are not wrappers for WorkspaceComponents. Wraps GUI Component in
+     * a JInternalFrame for Desktop.
      */
     private static class DesktopInternalFrame extends GenericJInternalFrame {
 
@@ -867,7 +898,8 @@ public class SimbrainDesktop {
      * @param workspaceComponent Workspace component
      * @param guiComponent       GUI component
      */
-    public void registerComponentInstance(final WorkspaceComponent workspaceComponent, final GuiComponent guiComponent) {
+    public void registerComponentInstance(final WorkspaceComponent workspaceComponent,
+                                          final GuiComponent guiComponent) {
         guiComponent.setDesktop(this);
         guiComponents.put(workspaceComponent, guiComponent);
     }
@@ -927,8 +959,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Creates an instance of the proper wrapper class around the provided
-     * instance.
+     * Creates an instance of the proper wrapper class around the provided instance.
      *
      * @param component   The component to wrap.
      * @param parentFrame The frame of this component
@@ -993,8 +1024,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * If changes exist, show a change dialog, otherwise just save the current
-     * file.
+     * If changes exist, show a change dialog, otherwise just save the current file.
      */
     public void save() {
 
@@ -1021,8 +1051,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Clear desktop of all components. Show a save-as dialog if there have been
-     * changes.
+     * Clear desktop of all components. Show a save-as dialog if there have been changes.
      */
     public void clearDesktop() {
 
@@ -1052,8 +1081,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Create the GUI and show it. For thread safety, this method should be
-     * invoked from the event-dispatching thread.
+     * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
      */
     private void createAndShowGUI() {
         /*
@@ -1082,7 +1110,7 @@ public class SimbrainDesktop {
 
         try {
             UIManager.setLookAndFeel(
-                UIManager.getSystemLookAndFeelClassName());
+                    UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1281,9 +1309,9 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Position a component given an index. Lays out components in a pattern
-     * moving diagonally and downward across the desktop.
-     *
+     * Position a component given an index. Lays out components in a pattern moving diagonally and downward across the
+     * desktop.
+     * <p>
      * Note that this is overridden when individual components are opened.
      *
      * @param positionIndex
@@ -1298,24 +1326,24 @@ public class SimbrainDesktop {
         if (positionIndex == 0) {
             // If this is the first window at it at a default position
             guiComponent.getParentFrame().setBounds(DEFAULT_WINDOW_OFFSET,
-                DEFAULT_WINDOW_OFFSET,
-                (int) guiComponent.getPreferredSize().getWidth(),
-                (int) guiComponent.getPreferredSize().getHeight());
+                    DEFAULT_WINDOW_OFFSET,
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
         } else {
             // Add window below the current window at a slight offent
             guiComponent.getParentFrame().setBounds(
-                (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
-                    % (desktop.getWidth() - guiComponent
-                    .getPreferredSize().getWidth())),
-                (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
-                    % (desktop.getHeight() - guiComponent
-                    .getPreferredSize().getHeight())),
-                (int) guiComponent.getPreferredSize().getWidth(),
-                (int) guiComponent.getPreferredSize().getHeight());
+                    (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
+                            % (desktop.getWidth() - guiComponent
+                            .getPreferredSize().getWidth())),
+                    (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
+                            % (desktop.getHeight() - guiComponent
+                            .getPreferredSize().getHeight())),
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
             // Focus the last positioned frame to have the focus
             try {
                 ((JInternalFrame) guiComponent.getParentFrame())
-                    .setSelected(true);
+                        .setSelected(true);
             } catch (PropertyVetoException e) {
                 e.printStackTrace();
             }
@@ -1324,8 +1352,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Reposition all the windows. Useful when windows get resized and can't be
-     * "recaptured".
+     * Reposition all the windows. Useful when windows get resized and can't be "recaptured".
      */
     public void repositionAllWindows() {
         // TODO: Do this for non-component internal frames as well?

@@ -150,8 +150,13 @@ public class ClassicalConditioning extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Behaviorism";
+    }
+
+    @Override
     public String getName() {
-        return "Behaviorism: Classical Conditioning";
+        return "Classical Conditioning";
     }
 
     @Override

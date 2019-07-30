@@ -21,6 +21,7 @@ package org.simbrain.custom_sims;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
+import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
@@ -63,7 +64,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
      * list in order to show up in the gui menu. All items are sorted
      * alphabetically by name.
      */
-    public static final List<RegisteredSimulation> REGISTERED_SIMS = new ArrayList<>();
+    private static final List<RegisteredSimulation> REGISTERED_SIMS = new ArrayList<>();
 
     /**
      * The main simulation object.
@@ -87,14 +88,15 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new CortexSimple());
         REGISTERED_SIMS.add(new ConvertSim());
         REGISTERED_SIMS.add(new ReadSim());
-        REGISTERED_SIMS.add(new ModularOscillatoryNetwork( ));
-        REGISTERED_SIMS.add(new PatternsOfActivity( ));
-        REGISTERED_SIMS.add(new KuramotoOscillators( ));
+        REGISTERED_SIMS.add(new ModularOscillatoryNetwork());
+        REGISTERED_SIMS.add(new PatternsOfActivity());
+        REGISTERED_SIMS.add(new KuramotoOscillators());
         REGISTERED_SIMS.add(new EvolveOdorWorldAgent());
         REGISTERED_SIMS.add(new TestEvolution());
         // REGISTERED_SIMS.add(new MpfsSOM());
 
         // Alphabetize
+        // TODO: Find a way to sort by submenu name as well.
         REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getName));
     }
 
@@ -122,6 +124,15 @@ public abstract class RegisteredSimulation implements AttributeContainer {
      * @return the name of the custom simulation
      */
     public abstract String getName();
+
+    /**
+     * Override to return a submenu name. If it is set, the simulation will be placed in a menu of that name.
+     *
+     * @return the name of the submenu used, if any
+     */
+    public String getSubmenuName() {
+        return null;
+    };
 
     /**
      * Run the simulation.
@@ -152,4 +163,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         }
     }
 
+    public static List<RegisteredSimulation> getRegisteredSims() {
+        return REGISTERED_SIMS;
+    }
 }

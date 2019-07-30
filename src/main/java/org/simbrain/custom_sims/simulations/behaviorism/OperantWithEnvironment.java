@@ -305,8 +305,13 @@ public class OperantWithEnvironment extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Behaviorism";
+    }
+
+    @Override
     public String getName() {
-        return "Behaviorism: Operant Conditioning (Environment)";
+        return "Operant Conditioning (Environment)";
     }
 
     @Override

@@ -19,29 +19,19 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -51,7 +41,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronCollectionNode extends PNode implements PropertyChangeListener {
+public class NeuronCollectionNode extends PNode  {
 
     /**
      * Parent network panel.
@@ -71,7 +61,7 @@ public class NeuronCollectionNode extends PNode implements PropertyChangeListene
     /**
      * The outlined objects (neurons) for this neuron group.
      */
-    private final OutlinedObjects2 outlinedObjects;
+    private final NeuronCollectionOutline outlinedObjects;
 
     /**
      * Create a Neuron Group PNode.
@@ -84,8 +74,7 @@ public class NeuronCollectionNode extends PNode implements PropertyChangeListene
         this.networkPanel = networkPanel;
         this.neuronCollection = nc;
 
-        outlinedObjects = new OutlinedObjects2();
-        outlinedObjects.setFillBackground(false);
+        outlinedObjects = new NeuronCollectionOutline();
         addChild(outlinedObjects);
 
         interactionBox = new NeuronCollectionInteractionBox(networkPanel);
@@ -122,34 +111,6 @@ public class NeuronCollectionNode extends PNode implements PropertyChangeListene
             interactionBox.setOffset(
                     outlinedObjects.getFullBounds().getX(),
                     outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() - 8);
-        }
-    }
-
-    @Override
-    public void paint(final PPaintContext ppc) {
-        super.paint(ppc);
-        //TODO: Not sure why I have to call the next line explicitly. Bad smell...Not needed in NeuronGroupNode
-        outlinedObjects.paint(ppc);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        updateSynapseNodePositions();
-    }
-
-    /**
-     * Call update synapse node positions on all constituent neuron nodes. Ensures synapse nodes are updated properly
-     * when this is moved.
-     */
-    public void updateSynapseNodePositions() {
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        for (Object node : outlinedObjects.getNeuronNodeRefs()) {
-            ((NeuronNode) node).updateSynapseNodePositions();
         }
     }
 

@@ -36,7 +36,7 @@ import java.util.ArrayList;
  * @author Lance Good
  * @author Jeff Yoshimi
  */
-public class OutlinedObjects2 extends PPath.Float {
+public class NeuronCollectionOutline extends PPath.Float {
 
     /**
      * The width and height of the arc in the rounded rectangle that surrounds the outlined objects.
@@ -54,11 +54,6 @@ public class OutlinedObjects2 extends PPath.Float {
     private Color lineColor = Color.gray;
 
     /**
-     * Whether to fill the background around grouped objects or not.
-     */
-    private boolean fillBackground = true;
-
-    /**
      * What background color to use.
      */
     private Color backgroundColor = Color.white;
@@ -69,16 +64,6 @@ public class OutlinedObjects2 extends PPath.Float {
     private int outlinePadding = 10;
 
     /**
-     * Cache of children bounds. For use in validating bounds,
-     */
-    private PBounds cachedChildBounds = new PBounds();
-
-    /**
-     * Cache of bound to compare with cached bounds. For use in validating bounds.
-     */
-    private PBounds comparisonBounds = new PBounds();
-
-    /**
      * References to neuron nodes used to determine bounds.
      */
     private ArrayList<NeuronNode> neuronNodeRefs = new ArrayList<>();
@@ -86,19 +71,32 @@ public class OutlinedObjects2 extends PPath.Float {
     /**
      * Construct the outlined objects group.
      */
-    public OutlinedObjects2() {
+    public NeuronCollectionOutline() {
         super();
         // This seems to be needed to initialize the paint system properly
         this.setVisible(true);
         this.setPaint(Color.gray);
+
+        // TODO: Below just forces a repaint
+        setBounds(10,10,10,10);
+
     }
 
+    /**
+     * Add a reference to the a neuron node for updating the outline bounds.
+     */
     public void addChildRef(NeuronNode node) {
         neuronNodeRefs.add(node);
-    }
-
-    public ArrayList<NeuronNode> getNeuronNodeRefs() {
-        return neuronNodeRefs;
+        // TODO: Outline not updated continuously as in OutlinedObjects, where the neuron nodes are
+        // proper children of the PNode.  Commented out code (here and in validateFullBounds below) were efforts to fix,
+        //but to no avail.
+        //this.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, node);
+        //node.getNeuron().addPropertyChangeListener(event -> {
+        //    if(event.getPropertyName().equals("moved")) {
+        //        this.computeFullBounds(null);
+        //        this.repaint();
+        //    };
+        //});
     }
 
     @Override
@@ -115,12 +113,6 @@ public class OutlinedObjects2 extends PPath.Float {
         if (paint != null) {
             final Graphics2D g2 = ppc.getGraphics();
             final PBounds bounds = getUnionOfBounds();
-
-            if (fillBackground) {
-                g2.setPaint(backgroundColor);
-                g2.fillRect((int) bounds.getX() - outlinePadding, (int) bounds.getY() - outlinePadding, (int) bounds.getWidth() + 2 * outlinePadding, (int) bounds.getHeight() + 2 * outlinePadding);
-            }
-
             if (drawOutline) {
                 g2.setPaint(lineColor);
                 g2.drawRoundRect((int) bounds.getX() - outlinePadding, (int) bounds.getY() - outlinePadding, (int) bounds.getWidth() + 2 * outlinePadding, (int) bounds.getHeight() + 2 * outlinePadding, ROUNDING_WIDTH_HEIGHT, ROUNDING_WIDTH_HEIGHT);
@@ -128,7 +120,9 @@ public class OutlinedObjects2 extends PPath.Float {
         }
     }
 
-
+    /**
+     * Get union of referenced neuron node bounds
+     */
     private PBounds getUnionOfBounds() {
         PBounds resultBounds = new PBounds();
         for(PNode node : neuronNodeRefs) {
@@ -138,86 +132,28 @@ public class OutlinedObjects2 extends PPath.Float {
     }
 
 
-    //TODO: Below works with validatefull bounds
-    /**
-     * Change the full bounds computation to take into account that we are expanding the children's bounds Do this
-     * instead of overriding getBoundsReference() since the node is not volatile.
-     */
-    @Override
-    public PBounds computeFullBounds(final PBounds dstBounds) {
-        final PBounds result = getUnionOfBounds();
+    //@Override
+    //public boolean validateFullBounds() {
+    //    try {
+    //        if (comparisonBounds == null) {
+    //            System.out.println("Im null before.");
+    //        }
+    //        comparisonBounds = getUnionOfBounds();
+    //        if (comparisonBounds == null) {
+    //            System.out.println("Im null after.");
+    //        }
+    //    } catch (NullPointerException npe) {
+    //        npe.printStackTrace();
+    //    }
+    //    if (!cachedChildBounds.equals(comparisonBounds)) {
+    //        setPaintInvalid(true);
+    //    }
+    //    // TODO: We get smooth update when this returns true
+    //    return super.validateFullBounds();
+    //}
 
-        cachedChildBounds.setRect(result);
-        //result.setRect(result.getX() - outlinePadding, result.getY() - outlinePadding,
-        //        result.getWidth() + 2 * outlinePadding, result.getHeight() + 2 * outlinePadding);
-        //localToParent(result);
-        return result;
-    }
-
-    /**
-     * This is a crucial step. We have to override this method to invalidate the paint each time the bounds are changed
-     * so we repaint the correct region // True must be returned for smooth update of bounds (TODO: Move to NG)
-     */
-    @Override
-    public boolean validateFullBounds() {
-        try {
-            if (comparisonBounds == null) {
-                System.out.println("Im null before.");
-            }
-            comparisonBounds = getUnionOfBounds();
-            if (comparisonBounds == null) {
-                System.out.println("Im null after.");
-            }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        }
-
-        if (!cachedChildBounds.equals(comparisonBounds)) {
-            setPaintInvalid(true);
-        }
-
-        // TODO: We get smooth update when this returns true
-        return super.validateFullBounds();
-    }
-
-    public boolean isDrawOutline() {
-        return drawOutline;
-    }
-
-    public void setDrawOutline(boolean drawOutline) {
-        this.drawOutline = drawOutline;
-    }
-
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(Color backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
-
-    public int getOutlinePadding() {
-        return outlinePadding;
-    }
-
-    public void setOutlinePadding(int outlinePadding) {
-        this.outlinePadding = outlinePadding;
-    }
-
-    public boolean isFillBackground() {
-        return fillBackground;
-    }
-
-    public void setFillBackground(boolean fillBackground) {
-        this.fillBackground = fillBackground;
-    }
-
-    public Color getLineColor() {
-        return lineColor;
-    }
-
-    public void setLineColor(Color lineColor) {
-        this.lineColor = lineColor;
+    public ArrayList<NeuronNode> getNeuronNodeRefs() {
+        return neuronNodeRefs;
     }
 
 

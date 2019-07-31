@@ -95,7 +95,7 @@ public class Network {
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /**
-     * Neuron Collections. Can overlap.
+     * Neuron Collections. Can contain overlapping neurons.
      */
     private final HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
@@ -622,7 +622,7 @@ public class Network {
             // Don't make two neuron collections with the same members
             int hashCode = loose.stream().mapToInt(n -> n.hashCode()).sum();
             for (NeuronCollection nc : neuronCollectionSet) {
-                if (hashCode == nc.hashCode()) {
+                if (hashCode == nc.getSummedNeuronHash()) {
                     return;
                 }
             }

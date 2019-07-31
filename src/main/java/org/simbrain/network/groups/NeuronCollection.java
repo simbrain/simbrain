@@ -787,19 +787,13 @@ public class NeuronCollection implements AttributeContainer {
         return parentNetwork;
     }
 
-    // TODO: Consider adverse impacts
-    @Override
-    public boolean equals(Object o) {
-        return this.hashCode() == o.hashCode();
+    /**
+     * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections
+     * from identical nerons.
+     *
+     * @return summed has
+     */
+    public int getSummedNeuronHash() {
+        return neuronList.stream().mapToInt(n -> n.hashCode()).sum();
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        for(Neuron n : neuronList) {
-            hash += n.hashCode();
-        }
-        return hash;
-    }
-
 }

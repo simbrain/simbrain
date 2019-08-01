@@ -89,6 +89,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new ConvertSim());
         REGISTERED_SIMS.add(new ReadSim());
         REGISTERED_SIMS.add(new ModularOscillatoryNetwork());
+        REGISTERED_SIMS.add(new RandomizedPursuer());
         REGISTERED_SIMS.add(new PatternsOfActivity());
         REGISTERED_SIMS.add(new KuramotoOscillators());
         REGISTERED_SIMS.add(new EvolveOdorWorldAgent());

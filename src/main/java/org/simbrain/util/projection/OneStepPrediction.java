@@ -20,7 +20,6 @@ public class OneStepPrediction {
     private final HashMap<DataPoint, HashMap<DataPoint, Double>>
             data = new HashMap<>();
 
-
     /**
      * Add a source point and the target point that occurred after it. If the source-target pair already exists in the
      * dataset increment the "activation" of that pair by one.
@@ -28,21 +27,26 @@ public class OneStepPrediction {
      * @param src the source point
      * @param tar the next point that occurred
      */
-    public void addSourceTargetPair(DataPoint src, DataPoint tar) {
+    public double addSourceTargetPair(DataPoint src, DataPoint tar) {
 
         HashMap<DataPoint, Double> targets = data.get(src);
 
         if (targets == null) {
+            // A new source point
             targets = new HashMap();
             targets.put(tar, 1.0);
             data.put(src, targets);
+            return 0.0;
         } else {
             Double d = targets.get(tar);
+            // Source point has not occurred with this target before
             if (d == null) {
                 targets.put(tar, 1.0);
+                return 0.0;
             } else {
                 // If the target already exists increment its activation by one
                 targets.put(tar, d + 1.0);
+                return d / getSummedActivations(src); // return the probability before incrementing
             }
         }
 
@@ -102,10 +106,25 @@ public class OneStepPrediction {
         return ret.toString();
     }
 
+    /**
+     * Returns the set of  target points and their probabilities, assocaited
+     * with a given source.
+     */
+    public HashMap<DataPoint, Double> getTargets(DataPoint src) {
+        return data.get(src);
+    }
+
+    /**
+     * Number of sources in the dataset (each associated with a
+     * list of targets and probabilities.)
+     */
     public int getNumPairs() {
         return data.keySet().size();
     }
 
+    /**
+     * Returns the number of targets a source point has.
+     */
     public int getNumTargetsForSource(DataPoint src) {
         HashMap<DataPoint, Double> targetMap = data.get(src);
         if (targetMap == null) {

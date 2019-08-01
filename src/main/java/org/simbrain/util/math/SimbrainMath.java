@@ -208,6 +208,22 @@ public class SimbrainMath {
     }
 
     /**
+     * Round the component of an array to the specified number of
+     * decimal places.
+     *
+     * @param vec the array to round
+     * @param places precision of the rounding in decimal places
+     * @return the rounded array
+     */
+    public static double[] roundVec(double[] vec, int places) {
+        double[] retVec = new double[vec.length];
+        for (int i = 0, n = vec.length; i < n; i++) {
+            retVec[i] = roundDouble(vec[i], places);
+        }
+        return retVec;
+    }
+
+    /**
      * The soft-max of the vector.
      *
      * @param vec the vector to soft-max

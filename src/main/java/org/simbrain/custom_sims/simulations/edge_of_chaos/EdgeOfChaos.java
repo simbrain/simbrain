@@ -66,7 +66,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Projection plot
         ProjectionComponent pc = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
-        sim.couple(netWrapper.getNetworkComponent(), reservoir, pc);
+        sim.couple(reservoir, pc);
 
         // Odor world sim
         buildOdorWorld();

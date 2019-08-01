@@ -21,6 +21,7 @@ package org.simbrain.util.projection;
 import com.Ostermiller.util.CSVParser;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -181,6 +182,7 @@ public class Projector {
      * @param point the upstairs point to add
      */
     public void addDatapoint(final DataPointColored point) {
+
         logger.debug("addDatapoint called");
         if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
             return;
@@ -191,8 +193,12 @@ public class Projector {
             ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
         }
 
+        // For Bayesian update must use the one-step predictor object.
         if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
-            predictor.addSourceTargetPair(currentPoint, point);
+            double surprise = predictor.addSourceTargetPair(currentPoint, point);
+
+            // TODO: Make it possible to couple to surprise
+            //System.out.println("Surprise:" + (1-SimbrainMath.roundDouble(surprise,2)));
         }
 
         // Add the point directly to the upstairs dataset. If the point already
@@ -216,8 +222,13 @@ public class Projector {
             projectionMethod.project();
             fireDataPointAdded();
         }
+
         if(useColorManager) {
-            colorManager.updateDataPointColors(upstairs);
+            if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
+                colorManager.updateBayes();
+            } else {
+                colorManager.updateDataPointColors(upstairs);
+            }
         }
     }
 

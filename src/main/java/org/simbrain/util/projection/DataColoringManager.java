@@ -21,6 +21,7 @@ package org.simbrain.util.projection;
 import org.simbrain.util.Utils;
 
 import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Manage the coloring of datapoints.
@@ -63,12 +64,18 @@ public class DataColoringManager {
     /**
      * The "hot color" to be used for the current point.
      */
-    private Color hotColor = Color.red;
+    private Color hotColor = new Color (8,0,255);
 
     /**
      * The base color to be used for all points besides the current point.
      */
-    private Color baseColor = Color.green;
+    private Color baseColor = new Color(232, 232, 232);
+
+    /**
+     * Base color of states predicted by the Bayesian method.
+     */
+    private Color predictedColor = new Color(22, 219, 45);
+
 
     /**
      * Toggle for hot point coloring mode. The current point is colored hotColor
@@ -133,18 +140,10 @@ public class DataColoringManager {
      */
     private void updateColorOfPoint(DataPointColored point) {
         if (coloringMethod == ColoringMethod.None) {
-            if (point == projector.getCurrentPoint() && hotPointMode == true) {
-                point.setColor(hotColor);
-            } else {
-                point.setColor(baseColor);
-            }
+            setHotPoint(point);
         } else if (coloringMethod == ColoringMethod.DecayTrail) {
             if (point == projector.getCurrentPoint()) {
-                if (point == projector.getCurrentPoint() && hotPointMode == true) {
-                    point.setColor(hotColor);
-                } else {
-                    point.setColor(baseColor);
-                }
+                setHotPoint(point);
                 point.spikeActivation(ceiling);
             } else {
                 point.decrementActivation(floor, decrementAmount);
@@ -152,36 +151,58 @@ public class DataColoringManager {
             }
         } else if (coloringMethod == ColoringMethod.Frequency) {
             if (point == projector.getCurrentPoint()) {
-                if (point == projector.getCurrentPoint() && hotPointMode == true) {
-                    point.setColor(hotColor);
-                } else {
-                    point.setColor(baseColor);
-                }
+                setHotPoint(point);
                 point.incrementActivation(ceiling, incrementAmount);
             } else {
                 point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
             }
         } else if (coloringMethod == ColoringMethod.Bayesian) {
-            DataPoint current = projector.getCurrentPoint();
-            if (point == current) {
-                if (point == projector.getCurrentPoint() && hotPointMode == true) {
-                    point.setColor(hotColor);
-                } else {
-                    point.setColor(baseColor);
-                }
-            } else {
-                Double prob = projector.getPredictor().getProbability(current, point);
-                //System.out.println(prob);
-                if (prob > .1) {
-                    // For now just set a color directly
-                    // TODO: Scale colors appropriately
-                    point.setColor(Color.orange);
-                } else {
-                    point.setColor(baseColor);
+            ; // Should not occur.  See UpdateBayes.
+        }
+
+    }
+
+    /**
+     * Update entire datset using bayesian method
+     */
+    public void updateBayes() {
+
+        Dataset data = projector.getUpstairs();
+        // Color in the base color first
+        for (int i = 0; i < data.getNumPoints(); i++) {
+            DataPointColored point = (DataPointColored) data.getPoint(i);
+            point.setColor(baseColor);
+        }
+
+        // Color in predicted colors
+        OneStepPrediction pred = projector.getPredictor();
+        HashMap<DataPoint, Double> targets = pred.getTargets(projector.getCurrentPoint());
+        if (targets != null) {
+            for(DataPoint halo : targets.keySet()) {
+                if (halo != null) {
+                    int[] indices = data.getKNearestNeighbors(1, halo);
+                    if (indices != null) {
+                        //System.out.println("; "+indices.length);
+                        for (int i = 0; i < indices.length; i++) {
+                            DataPointColored point = (DataPointColored) data.getPoint(indices[i]);
+                            point.setColor(predictedColor);
+                        }
+                    }
                 }
             }
         }
+        setHotPoint((DataPointColored) projector.getCurrentPoint());
+    }
 
+    /**
+     * Set the color of the "hot point"
+     */
+    private void setHotPoint(DataPointColored point) {
+        if (point == projector.getCurrentPoint() && hotPointMode == true) {
+            point.setColor(hotColor);
+        } else {
+            point.setColor(baseColor);
+        }
     }
 
     /**

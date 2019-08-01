@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.projection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -46,15 +47,6 @@ public class DataPoint {
     }
 
     /**
-     * Returns the underlying data vector.
-     *
-     * @return the data vector
-     */
-    public double[] getVector() {
-        return data;
-    }
-
-    /**
      * Get the value at a specified location in this vector.
      *
      * @param index the index for the data of interest
@@ -64,24 +56,28 @@ public class DataPoint {
         return data[index];
     }
 
-    /**
-     * Set the data vector.
-     *
-     * @param data the new data
-     */
+    // TODO: Dangerous to have this public...?
     public void setData(double[] data) {
         this.data = data;
+    }
+
+    public double[] getData() {
+        return data;
+    }
+
+    // Here for backwards compatibility. TODO: Remove this.
+    public double[] getVector() {
+        return data;
     }
 
     /**
      * Returns the number of components of the data vector.
      *
-     * @return the dimensionalit of the space this point lives in.
+     * @return the dimensionality of the space this point lives in.
      */
     public int getDimension() {
         return data.length;
     }
-
 
     public String getLabel() {
         return label;
@@ -101,6 +97,11 @@ public class DataPoint {
         }
         DataPoint dp = (DataPoint) o;
         return Arrays.equals(getVector(), dp.getVector());
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(data);
     }
 
     @Override

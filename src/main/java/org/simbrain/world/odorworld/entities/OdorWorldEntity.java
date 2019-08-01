@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld.entities;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -1059,8 +1060,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * @param range the range of the object sensors
      */
     public void addLeftRightSensors(EntityType type, double range) {
-        addObjectSensor(type, -Math.PI / 8, 50, range);
-        addObjectSensor(type, Math.PI / 8, 50, range);
+        addObjectSensor(type,  50, Math.PI / 8, range); // Left sensor
+        addObjectSensor(type,  50,-Math.PI / 8, range); // Right sensor
     }
 
     /**
@@ -1296,5 +1297,14 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         copy.setEffectorsEnabled(isEffectorsEnabled());
         copy.setSensorsEnabled(isSensorsEnabled());
         return copy;
+    }
+
+    /**
+     * Randomize the location of this entity within the parent world.
+     */
+    public void randomizeLocation() {
+        setLocation(
+                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getHeight()),
+                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getWidth()));
     }
 }

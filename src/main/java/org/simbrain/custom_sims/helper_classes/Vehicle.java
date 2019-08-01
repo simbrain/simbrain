@@ -79,7 +79,7 @@ public class Vehicle {
                                   ObjectSensor leftSensor, ObjectSensor rightSensor) {
 
         // Create the network
-        NeuronGroup vehicle = new NeuronGroup(net.getNetwork());
+        NeuronGroup vehicle = new NeuronGroup(net.getNetwork()); //TODO Change to NeuronCollection
         // These have to be updated first to update properly
         // unless priority is used
         Neuron leftInput = net.addNeuron(x, y + 100);

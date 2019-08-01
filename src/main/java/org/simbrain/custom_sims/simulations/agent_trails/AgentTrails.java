@@ -152,7 +152,7 @@ public class AgentTrails extends RegisteredSimulation {
     private void setUpPlot() {
         plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states + Predictions");
         plot.getProjector().setTolerance(.001);
-        sim.couple(networkWrapper.getNetworkComponent(), sensoryNet, plot);
+        sim.couple(sensoryNet, plot);
 
         // Uncomment for prediction halo
         plot.getProjectionModel().getProjector().setUseColorManager(false);

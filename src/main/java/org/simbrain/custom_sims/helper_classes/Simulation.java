@@ -7,6 +7,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
@@ -282,8 +283,17 @@ public class Simulation {
     /**
      * Couple a neuron group to a projection plot.
      */
-    public void couple(NetworkComponent network, NeuronGroup ng, ProjectionComponent plot) {
+    public void couple(NeuronGroup ng, ProjectionComponent plot) {
         Producer ngProducer = CouplingUtils.getProducer(ng, "getActivations");
+        Consumer projConsumer = CouplingUtils.getConsumer(plot, "addPoint");
+        tryCoupling(ngProducer, projConsumer);
+    }
+
+    /**
+     * Copuple a neuron collection to a projection plot
+     */
+    public void couple(NeuronCollection nc, ProjectionComponent plot) {
+        Producer ngProducer = CouplingUtils.getProducer(nc, "getActivations");
         Consumer projConsumer = CouplingUtils.getConsumer(plot, "addPoint");
         tryCoupling(ngProducer, projConsumer);
     }
@@ -328,6 +338,7 @@ public class Simulation {
         }
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
+
 
     /**
      * Couple a neuron to an effector on an odor world agent.
@@ -376,5 +387,6 @@ public class Simulation {
     public Workspace getWorkspace() {
         return workspace;
     }
+
 
 }

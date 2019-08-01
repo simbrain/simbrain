@@ -619,7 +619,8 @@ public class Network {
         // Only make the neuron collection if some neurons have been selected
         if (!loose.isEmpty()) {
 
-            // Don't make two neuron collections with the same members
+            // Creating a neuron collection increments the id counter so don't
+            // even create it if it's a duplicate
             int hashCode = loose.stream().mapToInt(n -> n.hashCode()).sum();
             for (NeuronCollection nc : neuronCollectionSet) {
                 if (hashCode == nc.getSummedNeuronHash()) {
@@ -629,9 +630,24 @@ public class Network {
 
             // Make the collection
             NeuronCollection nc = new NeuronCollection(this, loose);
-            neuronCollectionSet.add(nc);
-            changeSupport.firePropertyChange("ncAdded", null, nc);
+            addNeuronCollection(nc);
         }
+    }
+
+    /**
+     * Add a neuron collection to the network
+     * @param nc the neuron collection to add
+     */
+    public void addNeuronCollection(NeuronCollection nc) {
+        // Don't add duplicates
+        int hashCode = nc.getSummedNeuronHash();
+        for (NeuronCollection other : neuronCollectionSet) {
+            if (hashCode == other.getSummedNeuronHash()) {
+                return;
+            }
+        }
+        neuronCollectionSet.add(nc);
+        changeSupport.firePropertyChange("ncAdded", null, nc);
     }
 
     //TODO: Remove after neuron group refactor

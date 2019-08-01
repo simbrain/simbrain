@@ -157,7 +157,7 @@ public class SimbrainDesktop {
     /**
      * Interpreter for terminal.
      */
-    Interpreter interpreter;
+    private Interpreter interpreter;
 
     /**
      * Time indicator.
@@ -193,6 +193,12 @@ public class SimbrainDesktop {
      * Associates workspace components with their corresponding gui components.
      */
     private static Map<WorkspaceComponent, GuiComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
+
+    /**
+     * Associates script submenunames ({@link RegisteredSimulation#getSubmenuName()})
+     * with submenus in the script menu.
+     */
+    private HashMap<String, JMenu> submenuMap = new HashMap<>();
 
     /**
      * Listener on the workspace.
@@ -568,10 +574,11 @@ public class SimbrainDesktop {
                 scriptMenu.add(menuItem);
             } else {
                 // Check whether the script menu contains the submenu
-                JMenu existingMenu = findSubmenu(scriptMenu, submenuName);
+                JMenu existingMenu = submenuMap.get(submenuName);
                 if(existingMenu == null) {
                     // Create a new submenu
                     JMenu submenu = new JMenu(submenuName);
+                    submenuMap.put(submenuName, submenu);
                     submenu.add(menuItem);
                     scriptMenu.add(submenu);
                 } else {
@@ -590,23 +597,6 @@ public class SimbrainDesktop {
             }
         }
         return scriptMenu;
-    }
-
-    /**
-     * Look for a submenu in the scriptmenu with the provided name
-     *
-     * @return reference to the submenu if found; null otherwise
-     */
-    private JMenu findSubmenu(JMenu scriptMenu, String menuName) {
-        for (int i = 0; i < scriptMenu.getItemCount(); i++) {
-            JMenuItem itemToCheck = scriptMenu.getItem(i);
-            if(itemToCheck != null) {
-                if(itemToCheck.getText().equals(menuName)) {
-                    return (JMenu) itemToCheck;
-                }
-            }
-        }
-        return null;
     }
 
     /**

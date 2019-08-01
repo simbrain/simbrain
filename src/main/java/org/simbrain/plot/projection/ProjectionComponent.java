@@ -153,6 +153,15 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
         return projectionModel;
     }
 
+    /**
+     * Surprise of the current point relative to past predictions. Only works
+     * with Bayesian coloring
+     */
+    @Producible(defaultVisibility = false)
+    public double getSurprise() {
+        return projectionModel.getProjector().getSurprise();
+    }
+
     @Producible
     public double[] getCurrentPoint() {
         if (projectionModel.getProjector().getCurrentPoint() != null) {

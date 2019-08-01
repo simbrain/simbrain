@@ -10,7 +10,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.projection.ProjectionPlotActions;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingUtils;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -32,7 +39,6 @@ public class RandomizedPursuer extends RegisteredSimulation {
     NeuronGroup vehicleNetwork;
     NeuronCollection sensorNodes, motorNodes;
 
-    ProjectionComponent plot;
     OdorWorldWrapper worldBuilder;
 
     int cheeseX = 200;
@@ -61,14 +67,14 @@ public class RandomizedPursuer extends RegisteredSimulation {
         // Set up control panel
         setUpControlPanel();
 
-        // Set up Plot
-        setUpPlot();
+        // Set up Plots
+        setUpPlots();
 
     }
 
     private void createOdorWorld() {
 
-        worldBuilder = sim.addOdorWorldTMX(629, 9, "empty.tmx");
+        worldBuilder = sim.addOdorWorldTMX(629,9,378,350, "empty.tmx");
         worldBuilder.getWorld().setObjectsBlockMovement(false);
 
         mouse = worldBuilder.addEntity(204, 343, EntityType.MOUSE);
@@ -98,11 +104,28 @@ public class RandomizedPursuer extends RegisteredSimulation {
         net.addNeuronCollection(sensorNodes);
     }
 
-    private void setUpPlot() {
-        plot = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states");
-        plot.getProjector().setTolerance(.01);
-        plot.getProjector().getColorManager().setColoringMethod("Bayesian");
-        sim.couple(sensorNodes, plot);
+    private void setUpPlots() {
+
+        // Projection plot
+        ProjectionComponent projComp = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states");
+        projComp.getProjector().setTolerance(.01);
+        projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
+        sim.couple(sensorNodes, projComp);
+
+        // Time series
+        TimeSeriesPlotComponent tsPlot = sim.addTimeSeriesPlot(626,368,363,285, "Surprise");
+        tsPlot.getModel().setAutoRange(false);
+        tsPlot.getModel().setFixedWidth(false);
+        tsPlot.getModel().setWindowSize(1000);
+        tsPlot.getModel().setRangeUpperBound(1.1);
+        tsPlot.getModel().setRangeLowerBound(-.1);
+
+        tsPlot.getModel().removeAllScalarTimeSeries();
+        TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Surprise");
+
+        Producer surprise = CouplingUtils.getProducer(projComp, "getSurprise");
+        Consumer timeSeries = CouplingUtils.getConsumer(ts1, "setValue");
+        sim.tryCoupling(surprise, timeSeries);
 
     }
 

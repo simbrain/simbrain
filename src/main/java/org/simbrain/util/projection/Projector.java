@@ -105,6 +105,12 @@ public class Projector {
      */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
 
+    /**
+     * For Bayesian update, 1 - the probability of the observed point occurring
+     */
+    private double surprise = 0;
+
+
     // Initialization
     {
         listeners = new ArrayList<ProjectorListener>();
@@ -195,10 +201,7 @@ public class Projector {
 
         // For Bayesian update must use the one-step predictor object.
         if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
-            double surprise = predictor.addSourceTargetPair(currentPoint, point);
-
-            // TODO: Make it possible to couple to surprise
-            //System.out.println("Surprise:" + (1-SimbrainMath.roundDouble(surprise,2)));
+            surprise = predictor.addSourceTargetPair(currentPoint, point);
         }
 
         // Add the point directly to the upstairs dataset. If the point already
@@ -516,5 +519,9 @@ public class Projector {
 
     public OneStepPrediction getPredictor() {
         return predictor;
+    }
+
+    public double getSurprise() {
+        return surprise;
     }
 }

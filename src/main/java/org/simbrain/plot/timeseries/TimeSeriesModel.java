@@ -293,7 +293,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     public void setWindowSize(int value) {
         windowSize = value;
-        setFixedWidth(fixedWidth);
     }
 
     public XYSeriesCollection getDataset() {

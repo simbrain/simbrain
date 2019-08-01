@@ -18,27 +18,6 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  */
 public class ReadSim extends RegisteredSimulation {
 
-
-    /**
-     * Construct sim
-     */
-    public ReadSim() {
-        super();
-    }
-
-    /**
-     * @param desktop
-     */
-    public ReadSim(SimbrainDesktop desktop) {
-        super(desktop);
-    }
-
-
-    @Override
-    public String getName() {
-        return "Read Sim";
-    }
-
     @Override
     public void run() {
 
@@ -143,6 +122,24 @@ public class ReadSim extends RegisteredSimulation {
         net_Network1.addLooseSynapse(syn_Synapse_30);
 
 
+    }
+
+    public ReadSim() {
+        super();
+    }
+
+    public ReadSim(SimbrainDesktop desktop) {
+        super(desktop);
+    }
+
+    @Override
+    public String getSubmenuName() {
+        return "Utils";
+    }
+
+    @Override
+    public String getName() {
+        return "Read Sim";
     }
 
     @Override

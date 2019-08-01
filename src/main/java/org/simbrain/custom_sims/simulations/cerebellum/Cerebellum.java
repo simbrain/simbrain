@@ -470,6 +470,11 @@ public class Cerebellum extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Brain";
+    }
+
+    @Override
     public String getName() {
         return "Cerebellum";
     }

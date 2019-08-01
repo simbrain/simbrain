@@ -265,6 +265,11 @@ public class AgentTrails extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Cognitive Maps";
+    }
+
+    @Override
     public String getName() {
         return "Agent Trails";
     }

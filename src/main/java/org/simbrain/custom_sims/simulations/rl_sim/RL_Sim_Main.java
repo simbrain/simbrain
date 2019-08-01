@@ -611,6 +611,11 @@ public class RL_Sim_Main extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Reinforcement Learning";
+    }
+
+    @Override
     public String getName() {
         return "RL Vehicles";
     }

@@ -260,6 +260,11 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Evolution";
+    }
+
+    @Override
     public String getName() {
         return "Evolve Mouse";
     }

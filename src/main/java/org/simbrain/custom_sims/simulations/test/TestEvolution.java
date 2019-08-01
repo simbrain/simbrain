@@ -220,6 +220,10 @@ public class TestEvolution extends RegisteredSimulation {
         }
     }
 
+    @Override
+    public String getSubmenuName() {
+        return "Evolution";
+    }
 
     @Override
     public String getName() {

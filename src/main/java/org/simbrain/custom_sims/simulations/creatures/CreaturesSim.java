@@ -223,6 +223,11 @@ public class CreaturesSim extends RegisteredSimulation {
         return new CreaturesSim(desktop);
     }
 
+    @Override
+    public String getSubmenuName() {
+        return "Evolution";
+    }
+
     // Accessor methods below this point
     @Override
     public String getName() {

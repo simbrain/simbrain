@@ -500,4 +500,10 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
     }
 
+    @Override
+    public String getSubmenuName() {
+        return "Cognitive Maps";
+    }
+
+
 }

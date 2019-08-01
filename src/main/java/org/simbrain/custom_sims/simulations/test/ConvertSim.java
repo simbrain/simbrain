@@ -33,25 +33,8 @@ import java.util.Arrays;
  */
 public class ConvertSim extends RegisteredSimulation {
 
-    /**
-     * Construct sim
-     */
     public ConvertSim() {
         super();
-    }
-
-    /**
-     * @param desktop
-     */
-    public ConvertSim(SimbrainDesktop desktop) {
-        super(desktop);
-    }
-
-
-
-    @Override
-    public String getName() {
-        return "Convert Sim";
     }
 
     @Override
@@ -85,6 +68,21 @@ public class ConvertSim extends RegisteredSimulation {
                 }
             }
         }
+    }
+
+
+    public ConvertSim(SimbrainDesktop desktop) {
+        super(desktop);
+    }
+
+    @Override
+    public String getSubmenuName() {
+        return "Utils";
+    }
+
+    @Override
+    public String getName() {
+        return "Convert Sim";
     }
 
     @Override

@@ -98,7 +98,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
 
         // Alphabetize
         // TODO: Find a way to sort by submenu name as well.
-        REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getName));
+        REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getSubmenuName));
     }
 
     /**

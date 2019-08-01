@@ -158,6 +158,11 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Chaos";
+    }
+
+    @Override
     public String getName() {
         return "Edge of Chaos (Bit Stream)";
     }

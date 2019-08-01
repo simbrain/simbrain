@@ -471,6 +471,11 @@ public class ActorCritic extends RegisteredSimulation {
     }
 
     @Override
+    public String getSubmenuName() {
+        return "Reinforcement Learning";
+    }
+
+    @Override
     public String getName() {
         return "Actor-Critic";
     }

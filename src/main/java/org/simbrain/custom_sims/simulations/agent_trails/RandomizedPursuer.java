@@ -14,6 +14,9 @@ import org.simbrain.plot.projection.ProjectionPlotActions;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.util.projection.ProjectCoordinate;
+import org.simbrain.util.projection.ProjectionMethod;
+import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingUtils;
@@ -108,12 +111,18 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
         // Projection plot
         ProjectionComponent projComp = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states");
-        projComp.getProjector().setTolerance(.01);
-        projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
+        Projector proj = projComp.getProjector();
+        proj.setTolerance(.01);
+        //proj.setProjectionMethod("Coordinate Projection");
+        //((ProjectCoordinate)proj.getProjectionMethod()).setAutoFind(false);
+        //((ProjectCoordinate)proj.getProjectionMethod()).setHiD1(0);
+        //((ProjectCoordinate)proj.getProjectionMethod()).setHiD2(1);
+
         sim.couple(sensorNodes, projComp);
+        projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Time series
-        TimeSeriesPlotComponent tsPlot = sim.addTimeSeriesPlot(626,368,363,285, "Surprise");
+        TimeSeriesPlotComponent tsPlot = sim.addTimeSeriesPlot(626,368,363,285, "Prediction");
         tsPlot.getModel().setAutoRange(false);
         tsPlot.getModel().setFixedWidth(false);
         tsPlot.getModel().setWindowSize(1000);
@@ -121,24 +130,27 @@ public class RandomizedPursuer extends RegisteredSimulation {
         tsPlot.getModel().setRangeLowerBound(-.1);
 
         tsPlot.getModel().removeAllScalarTimeSeries();
-        TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Surprise");
+        TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Current State Probability / Fulfillment");
 
-        Producer surprise = CouplingUtils.getProducer(projComp, "getSurprise");
+        Producer surprise = CouplingUtils.getProducer(projComp, "getCurrentStateProbability");
         Consumer timeSeries = CouplingUtils.getConsumer(ts1, "setValue");
         sim.tryCoupling(surprise, timeSeries);
 
     }
+
+    // TODO: Current set up just runs the mouse by the cheese once
+    // for simple testing while debugging the prediction stuff
+    // Should be maximally surprised the whole time!
+    int numTrials = 1;
 
     private void setUpControlPanel() {
 
         panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
 
         panel.addButton("Run", () -> {
-            double height = worldBuilder.getWorld().getHeight();
-            double width =  worldBuilder.getWorld().getWidth();
-            for (int trial = 0; trial  < 5; trial ++) {
-                mouse.randomizeLocation();
-                sim.iterate(300);
+            for (int trial = 0; trial  < numTrials; trial ++) {
+                //mouse.randomizeLocation();
+                sim.iterate(100);
             }
         });
 

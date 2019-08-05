@@ -22,6 +22,7 @@ import org.simbrain.util.Utils;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Manage the coloring of datapoints.
@@ -152,7 +153,7 @@ public class DataColoringManager {
         } else if (coloringMethod == ColoringMethod.Frequency) {
             if (point == projector.getCurrentPoint()) {
                 setHotPoint(point);
-                point.incrementActivation(ceiling, incrementAmount);
+                point.incrementActivation(incrementAmount, ceiling);
             } else {
                 point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
             }
@@ -163,7 +164,7 @@ public class DataColoringManager {
     }
 
     /**
-     * Update entire datset using bayesian method
+     * Update entire datset using Bayesian method
      */
     public void updateBayes() {
 
@@ -174,21 +175,15 @@ public class DataColoringManager {
             point.setColor(baseColor);
         }
 
-        // Color in predicted colors
+        // TODO: May not need this later. Just use probabilities
+        // Or give this some other name, like simple-halo
+
+        // Color in predicted colors relative to current point
         OneStepPrediction pred = projector.getPredictor();
-        HashMap<DataPoint, Double> targets = pred.getTargets(projector.getCurrentPoint());
+        HashSet<DataPoint> targets = pred.getTargets(projector.getCurrentPoint());
         if (targets != null) {
-            for(DataPoint halo : targets.keySet()) {
-                if (halo != null) {
-                    int[] indices = data.getKNearestNeighbors(1, halo);
-                    if (indices != null) {
-                        //System.out.println("; "+indices.length);
-                        for (int i = 0; i < indices.length; i++) {
-                            DataPointColored point = (DataPointColored) data.getPoint(indices[i]);
-                            point.setColor(predictedColor);
-                        }
-                    }
-                }
+            for (DataPoint point : targets) {
+                ((DataPointColored) point).setColor(predictedColor);
             }
         }
         setHotPoint((DataPointColored) projector.getCurrentPoint());

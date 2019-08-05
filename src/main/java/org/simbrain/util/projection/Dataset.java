@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and
- * high dimensional data of the current {@link ProjectionMethod} are instances
+ * high dimensional data of the current {@link Projector} are instances
  * of this class. Dataset provides methods for working with such sets (e.g. open
  * dataset up, adding points, checking their integrity, finding nearest
  * neighbors of a point, calculating their interpoint distances, etc.). It is
@@ -39,6 +39,7 @@ import java.util.List;
  */
 public class Dataset {
 
+    // TODO: Consider migrating this to ND4J and friends.
     /**
      * Logger.
      */
@@ -176,6 +177,9 @@ public class Dataset {
      * @param point point to be added
      */
     public void addPoint(final DataPoint point) {
+        // TODO: Rename to unsafe or no-check or force or
+        // something to communicate that the tolerance check
+        // does not happen?
         logger.debug("addPoint called");
 
         checkDimension(point);
@@ -476,7 +480,7 @@ public class Dataset {
      * Check that a given point is "new", that is, that it is not already in the
      * dataset.
      *
-     * @param point     the point to check
+     * @param toCheck     the point to check
      * @param tolerance distance within which a point is considered old, and
      *                  outside of which it is considered new
      * @return null if the point is new, reference to overlapping point

@@ -27,7 +27,6 @@ import org.simbrain.workspace.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -154,12 +153,13 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     }
 
     /**
-     * Surprise of the current point relative to past predictions. Only works
+     * Probability of the current point relative to past predictions. Only works
      * with Bayesian coloring
      */
     @Producible(defaultVisibility = false)
-    public double getSurprise() {
-        return projectionModel.getProjector().getSurprise();
+    public double getCurrentStateProbability() {
+
+        return projectionModel.getProjector().getCurrentPoint().getProbability();
     }
 
     @Producible

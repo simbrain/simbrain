@@ -21,7 +21,6 @@ package org.simbrain.util.projection;
 import com.Ostermiller.util.CSVParser;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.math.SimbrainMath;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +32,15 @@ import java.util.List;
 
 /**
  * <b>Projector</b> is a the main class of this package, which provides an
- * interface for projecting high dimensional data to 2 dimensions (this is also
- * known as "dimensionality reduction"). Contains a high dimensional dataset (
- * "upstairs") and a low-dimensional projection of that high dimensional data (
- * "downstairs"), as well as a modifiable projection method.
+ * interface for projecting high dimensional data to 2 dimensions.
+ * <br>
+ * Contains two {@link Dataset}s: an "upstairs" of high-d data, a "downstairs"
+ * of 2-d data, and a {@link ProjectionMethod} that projects between them.
+ * Other state information about the projector is also stored here.
+ * The data in the upstairs dataset is stored in the same order as the data in the
+ * downstairs dataset.
+ * <br>
+ * Cf. {@url https://en.wikipedia.org/wiki/Dimensionality_reduction}
  */
 public class Projector {
 
@@ -96,20 +100,14 @@ public class Projector {
     private boolean useColorManager = true;
 
     /**
-     * One-step ahead prediction used for Bayesian datapoint coloring
-     */
-    private OneStepPrediction predictor = new OneStepPrediction();
-
-    /**
      * List of Neuron update rules; used in Gui Combo boxes.
      */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
 
     /**
-     * For Bayesian update, 1 - the probability of the observed point occurring
+     * One-step ahead prediction used for Bayesian datapoint coloring
      */
-    private double surprise = 0;
-
+    private OneStepPrediction predictor = new OneStepPrediction();
 
     // Initialization
     {
@@ -194,14 +192,19 @@ public class Projector {
             return;
         }
 
+        //point.setData(SimbrainMath.roundVec(point.getData(), 1));
+
         // Iterable functions to be re-initialized when new data is added
         if (projectionMethod.isIterable()) {
             ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
         }
 
         // For Bayesian update must use the one-step predictor object.
+        // must do it before officially adding the point so that the lastAddedPoint is correct
         if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
-            surprise = predictor.addSourceTargetPair(currentPoint, point);
+            if (upstairs.getLastAddedPoint() != null) {
+                predictor.addSourceTargetPair(currentPoint, upstairs.getLastAddedPoint());
+            }
         }
 
         // Add the point directly to the upstairs dataset. If the point already
@@ -433,7 +436,8 @@ public class Projector {
 
     @Override
     public String toString() {
-        return "Number of Points: " + this.getNumPoints() + "\n-----------------------\n High Dimensional Data \n" + upstairs.toString() + "-----------------------\nProjected Data \n" + downstairs.toString();
+        String ret = "Projection Method " + projectionMethod + "\n";
+        return ret + "Number of Points: " + this.getNumPoints() + "\n-----------------------\n High Dimensional Data \n" + upstairs.toString() + "-----------------------\nProjected Data \n" + downstairs.toString();
     }
 
     /**
@@ -519,9 +523,5 @@ public class Projector {
 
     public OneStepPrediction getPredictor() {
         return predictor;
-    }
-
-    public double getSurprise() {
-        return surprise;
     }
 }

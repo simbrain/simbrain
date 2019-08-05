@@ -37,6 +37,17 @@ public class DataPoint {
     private String label = "";
 
     /**
+     * Number of times this datapoint has been "activated"
+     */
+    private int activationCount = 0;
+
+    /**
+     * Probability of this point occurring relative to {@link OneStepPrediction}.
+     * Set to activationCount / Total activations relative to a source point
+     */
+    private double probability = 0;
+
+    /**
      * Initialize a datapoint.
      *
      * @param data the data to set this data point
@@ -108,4 +119,21 @@ public class DataPoint {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
+    public void incrementActivationCount() {
+        activationCount++;
+    }
+
+    public double getProbability() {
+        return probability;
+    }
+
+    public void setProbability(double probability) {
+        this.probability = probability;
+    }
+
+    public int getActivationCount() {
+        return activationCount;
+    }
+
 }

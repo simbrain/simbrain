@@ -38,6 +38,7 @@ public class DataPointColored extends DataPoint  {
      */
     public static final double DEFAULT_ACTIVATION = .15;
 
+    // TODO: Use for probability in Bayesian
     /**
      * An activation associated with this point that is used to determine the
      * color of the point. Frequency increments this when the point is active.
@@ -57,9 +58,6 @@ public class DataPointColored extends DataPoint  {
         super(data);
     }
 
-    /**
-     * @return the color
-     */
     public Color getColor() {
         return color;
     }
@@ -115,18 +113,26 @@ public class DataPointColored extends DataPoint  {
     }
 
     /**
-     * Increment the activation of this point (for frequency based coloring).
+     * Increment the activation of this point.
      *
-     * @param ceiling         upper bound of activation
      * @param incrementAmount amount to increment
+     * @param ceiling         upper bound of activation
      */
-    public void incrementActivation(double ceiling, double incrementAmount) {
+    public void incrementActivation(double incrementAmount, double ceiling) {
         activation += incrementAmount;
         // System.out.println("activation:" + activation);
         // in case of an overshoot
         if (activation > ceiling) {
             activation = ceiling;
         }
+    }
+
+    public void setActivation(double activation) {
+        this.activation = activation;
+    }
+
+    public double getActivation() {
+        return activation;
     }
 
     /**

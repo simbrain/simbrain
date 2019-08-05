@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.projection;
 
-
 /**
  * <b>Project Coordinate</b> is perhaps the simplest possible projection
  * algorithm; It simply takes two specified dimensions in the high dimensional
@@ -94,44 +93,26 @@ public class ProjectCoordinate extends ProjectionMethod {
         }
     }
 
-    /**
-     * @return the hiD1
-     */
     public int getHiD1() {
         return hiD1;
     }
 
-    /**
-     * @param hiD1 the hiD1 to set
-     */
     public void setHiD1(int hiD1) {
         this.hiD1 = hiD1;
     }
 
-    /**
-     * @return the hiD2
-     */
     public int getHiD2() {
         return hiD2;
     }
 
-    /**
-     * @param hiD2 the hiD2 to set
-     */
     public void setHiD2(int hiD2) {
         this.hiD2 = hiD2;
     }
 
-    /**
-     * @return the autoFind
-     */
     public boolean isAutoFind() {
         return autoFind;
     }
 
-    /**
-     * @param autoFind the autoFind to set
-     */
     public void setAutoFind(boolean autoFind) {
         // If preferences aren't set these values do not persist when the
         // projector is changed and reset

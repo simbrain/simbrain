@@ -9,7 +9,6 @@ public class OneStepPredictionTest {
     @Test
     public void basicTest() {
 
-
         // Set up with a single source and target
         OneStepPrediction prediction = new OneStepPrediction();
         DataPoint src = new DataPoint(new double[]{1,0});
@@ -54,14 +53,13 @@ public class OneStepPredictionTest {
         prediction.addSourceTargetPair(src, tar2);
 
         // Initially 1/2 chance for each
-        assertEquals(.5, prediction.getProbability(src, tar), .01);
-        assertEquals(.5, prediction.getProbability(src, tar2), .01);
+        assertEquals(.5, tar.getProbability(), 0);
+        assertEquals(.5, tar2.getProbability(), 0);
 
         // Probabilities increase to 3/4 for first pair, 1/4 for the second
         prediction.addSourceTargetPair(src, tar);
         prediction.addSourceTargetPair(src, tar);
-        assertEquals(.75, prediction.getProbability(src, tar), .01);
-        assertEquals(.25, prediction.getProbability(src, tar2), .01);
-
+        assertEquals(.75, tar.getProbability(), 0);
+        assertEquals(.25, tar2.getProbability(), 0);
     }
 }

@@ -55,7 +55,7 @@ public class UpdateCoupling implements UpdateAction {
         if (coupling == null) {
             return "Invalid action";
         } else {
-            return "Update coupling (" + coupling.getConsumer() + ">" + coupling.getProducer() + ")";
+            return "Update coupling (" + coupling.getProducer() + ">" + coupling.getConsumer() + ")";
         }
     }
 

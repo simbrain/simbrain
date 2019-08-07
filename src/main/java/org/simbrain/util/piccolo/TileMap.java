@@ -349,6 +349,29 @@ public class TileMap {
         return pixelToTileCoordinate(p.getX(), p.getY());
     }
 
+    public List<TileMapLayer> getAllLayers() {
+        List<TileMapLayer> ret = new ArrayList<>();
+        ret.addAll(layers);
+        ret.addAll(programmaticLayers.values().stream().map(Pair::getFirst).collect(Collectors.toList()));
+        return ret;
+    }
+
+    public void updateMapSize(int width, int height) {
+        if (width < 0 || height < 0) {
+            return;
+        }
+
+        this.width = width;
+        this.height = height;
+
+        renderedLayers = new ArrayList<>();
+
+        getAllLayers().stream()
+                .peek(TileMapLayer::empty)
+                .forEach(l -> renderedLayers.add(l.renderImage(tilesets, true)));
+
+    }
+
     public int getMapHeight() {
         return height * tileheight;
     }

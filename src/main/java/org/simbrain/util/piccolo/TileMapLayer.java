@@ -155,4 +155,15 @@ public class TileMapLayer {
     public void setTileID(int tileID, int x, int y) {
         data.setTileID(tileID, x, y, width);
     }
+
+
+    public void empty() {
+        empty(width, height);
+    }
+
+    public void empty(int width, int height) {
+        this.width = width;
+        this.height = height;
+        data = new TiledData(width, height);
+    }
 }

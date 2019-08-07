@@ -198,12 +198,19 @@ public class Simulation {
      * Add an odor world component using a Tiled tmx file.
      */
     public OdorWorldWrapper addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
-        OdorWorldWrapper ob = this.addOdorWorldTMX(x,y,tmxFile);
-        if (desktop != null) {
-            desktop.getDesktopComponent(ob.getOdorWorldComponent()).getParentFrame().setBounds(x, y,
-                    width, height);
+        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
+        workspace.addWorkspaceComponent(odorWorldComponent);
+
+        TileMap tileMap = TileMap.create(tmxFile);
+
+        // The following operation will clear the content of all layers, so do it only if the tmx is empty.tmx
+        if (tmxFile.equals("empty.tmx")) {
+            tileMap.updateMapSize(width / tileMap.getTilewidth(), height / tileMap.getTileheight());
         }
-        return ob;
+
+        odorWorldComponent.getWorld().setTileMap(tileMap);
+
+        return createOdorWorldWrapper(x, y, odorWorldComponent);
     }
 
     /**
@@ -213,12 +220,17 @@ public class Simulation {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
         odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
+        return createOdorWorldWrapper(x, y, odorWorldComponent);
+    }
+
+    private OdorWorldWrapper createOdorWorldWrapper(int x, int y, OdorWorldComponent odorWorldComponent) {
         odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
         if(desktop != null) {
             desktop.getDesktopComponent(odorWorldComponent).setBounds(x, y,
                     odorWorldComponent.getWorld().getWidth(), odorWorldComponent.getWorld().getHeight());
             desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
         }
+
         return new OdorWorldWrapper(odorWorldComponent);
     }
 

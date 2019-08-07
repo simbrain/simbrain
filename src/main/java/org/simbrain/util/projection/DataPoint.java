@@ -18,8 +18,10 @@
  */
 package org.simbrain.util.projection;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * <b>Datapoint</b> represents a single datapoint.
@@ -35,17 +37,6 @@ public class DataPoint {
      * String label that can be attached to a datapoint.
      */
     private String label = "";
-
-    /**
-     * Number of times this datapoint has been "activated"
-     */
-    private int activationCount = 0;
-
-    /**
-     * Probability of this point occurring relative to {@link OneStepPrediction}.
-     * Set to activationCount / Total activations relative to a source point
-     */
-    private double probability = 0;
 
     /**
      * Initialize a datapoint.
@@ -118,22 +109,6 @@ public class DataPoint {
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
-    }
-
-    public void incrementActivationCount() {
-        activationCount++;
-    }
-
-    public double getProbability() {
-        return probability;
-    }
-
-    public void setProbability(double probability) {
-        this.probability = probability;
-    }
-
-    public int getActivationCount() {
-        return activationCount;
     }
 
 }

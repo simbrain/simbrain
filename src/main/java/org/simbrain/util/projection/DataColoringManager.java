@@ -21,7 +21,6 @@ package org.simbrain.util.projection;
 import org.simbrain.util.Utils;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -180,7 +179,7 @@ public class DataColoringManager {
 
         // Color in predicted colors relative to current point
         OneStepPrediction pred = projector.getPredictor();
-        HashSet<DataPoint> targets = pred.getTargets(projector.getCurrentPoint());
+        HashSet<DataPointColored> targets = pred.getTargets((DataPointColored) projector.getCurrentPoint());
         if (targets != null) {
             for (DataPoint point : targets) {
                 ((DataPointColored) point).setColor(predictedColor);

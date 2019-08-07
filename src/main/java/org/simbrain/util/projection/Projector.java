@@ -21,28 +21,26 @@ package org.simbrain.util.projection;
 import com.Ostermiller.util.CSVParser;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Producible;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * <b>Projector</b> is a the main class of this package, which provides an
  * interface for projecting high dimensional data to 2 dimensions.
  * <br>
- * Contains two {@link Dataset}s: an "upstairs" of high-d data, a "downstairs"
- * of 2-d data, and a {@link ProjectionMethod} that projects between them.
- * Other state information about the projector is also stored here.
- * The data in the upstairs dataset is stored in the same order as the data in the
- * downstairs dataset.
+ * Contains two {@link Dataset}s: an "upstairs" of high-d data, a "downstairs" of 2-d data, and a {@link
+ * ProjectionMethod} that projects between them. Other state information about the projector is also stored here. The
+ * data in the upstairs dataset is stored in the same order as the data in the downstairs dataset.
  * <br>
  * Cf. {@url https://en.wikipedia.org/wiki/Dimensionality_reduction}
  */
-public class Projector {
+public class Projector implements AttributeContainer {
 
     /**
      * Log4j logger.
@@ -56,13 +54,12 @@ public class Projector {
 
     /**
      * A set of hi-d datapoints, each of which is an array of doubles The data
-     * to be projected.
+     * A set of hi-d datapoints, each of which is an array of doubles The data to be projected.
      */
     protected Dataset upstairs;
 
     /**
-     * A set of low-d datapoints, each of which is an array of doubles The
-     * projection of the upstairs data.
+     * A set of low-d datapoints, each of which is an array of doubles The projection of the upstairs data.
      */
     protected Dataset downstairs;
 
@@ -70,10 +67,8 @@ public class Projector {
      * Reference to current "hot" point.
      */
     private DataPoint currentPoint;
-
     /**
-     * Default number of sources. This is the dimensionality of the hi D
-     * projectionModel
+     * Default number of sources. This is the dimensionality of the hi D projectionModel
      */
     private final static int DEFAULT_NUMBER_OF_DIMENSIONS = 25;
 
@@ -83,8 +78,7 @@ public class Projector {
     private final static String DEFAULT_PROJECTION_METHOD = "PCA";
 
     /**
-     * Distance within which added points are considered old and are thus not
-     * added.
+     * Distance within which added points are considered old and are thus not added.
      */
     protected double tolerance;
 
@@ -94,8 +88,8 @@ public class Projector {
     private ProjectionMethod projectionMethod;
 
     /**
-     * Set to false to turn off color manager and use custom point coloring,
-     * as in, e.g., the use of the {@link Halo} tool.
+     * Set to false to turn off color manager and use custom point coloring, as in, e.g., the use of the {@link Halo}
+     * tool.
      */
     private boolean useColorManager = true;
 
@@ -108,6 +102,11 @@ public class Projector {
      * One-step ahead prediction used for Bayesian datapoint coloring
      */
     private OneStepPrediction predictor = new OneStepPrediction();
+
+    /**
+     * Probability of the current state relative to the {@link #predictor} object.
+     */
+    private double currentStateProbabilty = 0;
 
     // Initialization
     {
@@ -199,24 +198,16 @@ public class Projector {
             ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
         }
 
-        // For Bayesian update must use the one-step predictor object.
-        // must do it before officially adding the point so that the lastAddedPoint is correct
-        if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
-            if (upstairs.getLastAddedPoint() != null) {
-                predictor.addSourceTargetPair(currentPoint, upstairs.getLastAddedPoint());
-            }
-        }
-
         // Add the point directly to the upstairs dataset. If the point already
         // exists just change colors and return. If the point is new. add a
         // point downstairs, and call the projection algorithm.
         DataPoint existingPoint = upstairs.addPoint(point, tolerance);
         if (existingPoint != null) {
+            // That point was already in the dataset
             currentPoint = existingPoint;
         } else {
+            // It's a new point
             currentPoint = point;
-            // colorManager.updateColorOfPoint(point); TODO: Seems to be needed
-            // so that hot stays hot. But then hot color "doubling"
             DataPoint newPoint;
             if (point.getDimension() == 1) {
                 // For 1-d datasets plot points on a horizontal line
@@ -229,8 +220,15 @@ public class Projector {
             fireDataPointAdded();
         }
 
-        if(useColorManager) {
-            if(colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
+        if (useColorManager) {
+            if (colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
+                // Update predictor
+                if ((upstairs.getLastPoint() != null) && (upstairs.getCurrentPoint() != null)) {
+                    currentStateProbabilty = predictor.addSourceTargetPair((DataPointColored) upstairs.getLastPoint(),
+                            (DataPointColored) upstairs.getCurrentPoint());
+                } else {
+                    currentStateProbabilty = 0;
+                }
                 colorManager.updateBayes();
             } else {
                 colorManager.updateDataPointColors(upstairs);
@@ -239,8 +237,7 @@ public class Projector {
     }
 
     /**
-     * Change the current projection method and perform and other needed
-     * initialization.
+     * Change the current projection method and perform and other needed initialization.
      *
      * @param method the new projection algorithm
      */
@@ -274,8 +271,7 @@ public class Projector {
     /**
      * Add new high-d datapoints and reinitialize the datasets.
      *
-     * @param theFile file containing the high-d data, forwarded to a dataset
-     *                method
+     * @param theFile file containing the high-d data, forwarded to a dataset method
      */
     public void importData(final File theFile) {
         try {
@@ -307,8 +303,7 @@ public class Projector {
     }
 
     /**
-     * Used to get the String associated with the current projection method.
-     * Used by a combo box in the gui.
+     * Used to get the String associated with the current projection method. Used by a combo box in the gui.
      *
      * @return the String associated with current projection method.
      */
@@ -347,8 +342,7 @@ public class Projector {
     }
 
     /**
-     * Notify listeners that the colors of some datapoints have changed but
-     * nothing else.
+     * Notify listeners that the colors of some datapoints have changed but nothing else.
      */
     public void fireProjectorColorsChanged() {
         for (ProjectorListener listener : listeners) {
@@ -357,8 +351,7 @@ public class Projector {
     }
 
     /**
-     * Notify listeners that data (in particular the underlying points) have
-     * been changed.
+     * Notify listeners that data (in particular the underlying points) have been changed.
      */
     public void fireProjectorDataChanged() {
         for (ProjectorListener listener : listeners) {
@@ -405,10 +398,14 @@ public class Projector {
      * Reset the projector. Clear the underlying datasets.
      */
     public void reset() {
-        this.getUpstairs().clear();
-        this.getDownstairs().clear();
-        this.fireProjectorDataChanged();
+        upstairs.clear();
+        downstairs.clear();
+        fireProjectorDataChanged();
         predictor.clear();
+        for (int i = 0; i < getNumPoints(); i++) {
+            ((DataPointColored)upstairs.getPoint(i)).clear();
+        }
+
         // getCurrentProjectionMethod().resetColorIndices();
     }
 
@@ -420,7 +417,7 @@ public class Projector {
             DataPointColored point = (DataPointColored) upstairs.getPoint(i);
             point.resetActivation();
         }
-        if(useColorManager) {
+        if (useColorManager) {
             colorManager.updateDataPointColors(upstairs);
         }
     }
@@ -440,23 +437,16 @@ public class Projector {
         return ret + "Number of Points: " + this.getNumPoints() + "\n-----------------------\n High Dimensional Data \n" + upstairs.toString() + "-----------------------\nProjected Data \n" + downstairs.toString();
     }
 
-    /**
-     * @return the tolerance
-     */
     public double getTolerance() {
         return tolerance;
     }
 
-    /**
-     * @param tolerance the tolerance to set
-     */
     public void setTolerance(double tolerance) {
         this.tolerance = tolerance;
     }
 
     /**
-     * Randomize the low-dimensional data. Used with iterative projection
-     * methods to "restart" the iteration.
+     * Randomize the low-dimensional data. Used with iterative projection methods to "restart" the iteration.
      *
      * @param upperBound the upper bound of randomization
      */
@@ -465,21 +455,15 @@ public class Projector {
         this.fireProjectorDataChanged();
     }
 
-    /**
-     * @return the colorManager
-     */
     public DataColoringManager getColorManager() {
         return colorManager;
     }
 
     /**
-     * Check the integrity of the two datasets by checking: (1) That the low-d
-     * set is at least 2 dimensions (2) That the low d space is lower
-     * dimensional than the hi d space (3) That both datasets have the same
-     * number of points.
+     * Check the integrity of the two datasets by checking: (1) That the low-d set is at least 2 dimensions (2) That the
+     * low d space is lower dimensional than the hi d space (3) That both datasets have the same number of points.
      *
-     * @return true if low dimensions are lower than hi dimensions and low
-     * dimension is less than one
+     * @return true if low dimensions are lower than hi dimensions and low dimension is less than one
      */
     public boolean compareDatasets() {
         if (downstairs.getDimensions() < 1) {
@@ -523,5 +507,15 @@ public class Projector {
 
     public OneStepPrediction getPredictor() {
         return predictor;
+    }
+
+    @Producible
+    public double getCurrentStateProbability() {
+        return currentStateProbabilty;
+    }
+
+    @Override
+    public String getId() {
+        return "Projector";
     }
 }

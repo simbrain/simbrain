@@ -41,16 +41,12 @@ public class UpdateCoupling implements UpdateAction {
         this.coupling = coupling;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void invoke() {
         coupling.update();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription() {
         if (coupling == null) {
             return "Invalid action";
@@ -68,9 +64,6 @@ public class UpdateCoupling implements UpdateAction {
         }
     }
 
-    /**
-     * @return the coupling
-     */
     public Coupling<?> getCoupling() {
         return coupling;
     }

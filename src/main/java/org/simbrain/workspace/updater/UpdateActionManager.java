@@ -212,6 +212,19 @@ public class UpdateActionManager {
     }
 
     /**
+     * Add an update action at the specified position in the action list.
+     *
+     * @param action the action to add
+     * @param position the position in the list to add it at
+     */
+    public void addAction(UpdateAction action, int position) {
+        actionList.add(position, action);
+        for (UpdateManagerListener listener : listeners) {
+            listener.actionAdded(action);
+        }
+    }
+
+    /**
      * Completely remove an action.
      *
      * @param action the action to completely remove
@@ -304,4 +317,17 @@ public class UpdateActionManager {
         return availableActionList;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append("-----Update Actions----\n");
+        for(UpdateAction action : actionList) {
+            ret.append(action.getDescription()+"\n");
+        }
+        ret.append("----Potential Actions-----\n");
+        for(UpdateAction action : getAvailableActionList()) {
+            ret.append(action.getDescription()+"\n");
+        }
+        return ret.toString();
+    }
 }

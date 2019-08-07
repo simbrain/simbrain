@@ -266,7 +266,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
         CustomRenderer renderer = new CustomRenderer();
         chart.getXYPlot().setRenderer(renderer);
         // TODO: Make the visibility of series lines and point size adjustible
-        renderer.setSeriesLinesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
         renderer.setSeriesShape(0, new Ellipse2D.Double(-7, -7, 7, 7));
         CustomToolTipGenerator generator = new CustomToolTipGenerator();
         renderer.setSeriesToolTipGenerator(0, generator);

@@ -158,8 +158,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      */
     @Producible(defaultVisibility = false)
     public double getCurrentStateProbability() {
-
-        return projectionModel.getProjector().getCurrentPoint().getProbability();
+        return projectionModel.getProjector().getCurrentStateProbability();
     }
 
     @Producible
@@ -199,6 +198,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> container = new ArrayList<>();
         container.add(this);
+        container.add(this.projectionModel.getProjector());
         return container;
     }
 

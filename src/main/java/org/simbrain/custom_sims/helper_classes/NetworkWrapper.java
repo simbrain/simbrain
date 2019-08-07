@@ -113,7 +113,7 @@ public class NetworkWrapper {
      */
     public void connect(Neuron source, Neuron target, double value, double lowerBound, double upperBound) {
         Synapse synapse = new Synapse(source, target);
-        synapse.setStrength(value);
+        synapse.forceSetStrength(value);
         synapse.setLowerBound(lowerBound);
         synapse.setUpperBound(upperBound);
         source.getNetwork().addLooseSynapse(synapse);
@@ -127,7 +127,7 @@ public class NetworkWrapper {
      */
     public Synapse connect(Neuron source, Neuron target, double value) {
         Synapse synapse = new Synapse(source, target);
-        synapse.setStrength(value);
+        synapse.forceSetStrength(value);
         source.getNetwork().addLooseSynapse(synapse);
         return synapse;
     }
@@ -139,7 +139,7 @@ public class NetworkWrapper {
      */
     public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
         Synapse synapse = new Synapse(source, target, rule);
-        synapse.setStrength(value);
+        synapse.forceSetStrength(value);
         source.getNetwork().addLooseSynapse(synapse);
         return synapse;
     }
@@ -159,7 +159,7 @@ public class NetworkWrapper {
      */
     public List<Synapse> connectAllToAll(NeuronGroup source, NeuronGroup target, double  value) {
         List<Synapse> wts = connectAllToAll(source, target);
-        wts.forEach(wt -> wt.setStrength(value));
+        wts.forEach(wt -> wt.forceSetStrength(value));
         return wts;
     }
 
@@ -176,7 +176,7 @@ public class NetworkWrapper {
      */
     public List<Synapse> connectAllToAll(NeuronGroup source, Neuron target, double  value) {
         List<Synapse> wts = connectAllToAll(source, target);
-        wts.forEach(wt -> wt.setStrength(value));
+        wts.forEach(wt -> wt.forceSetStrength(value));
         return wts;
     }
 

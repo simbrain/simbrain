@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Build a graph model which can be used to predict the next state of an arbitrary system.
  * <br>
- * The basic data-structure is a hash map which associated data points with sets of target {@link DataPointColored},
+ * The basic data-structure is a hash map which associated data points with sets of target {@link DataPointColoredColored},
  * which have an activation field that can be used to track probabilities.
  * <br>
  * Builds a Markov Model (which assumes the history of the states does not influence the next state, only the current
@@ -17,10 +17,10 @@ import java.util.*;
 public class OneStepPrediction {
 
     /**
-     * Associate a source {@link DataPoint} with a set of datapoints that store activations, used to compute next-step
+     * Associate a source {@link DataPointColored} with a set of DataPointColoreds that store activations, used to compute next-step
      * probabilities
      */
-    private final HashMap<DataPoint, HashSet<DataPoint>>
+    private final HashMap<DataPointColored, HashSet<DataPointColored>>
             data = new HashMap<>();
 
     /**
@@ -30,33 +30,43 @@ public class OneStepPrediction {
      * @param src the source point
      * @param tar the next point that occurred
      */
-    public void addSourceTargetPair(DataPoint src, DataPoint tar) {
+    public double addSourceTargetPair(DataPointColored src, DataPointColored tar) {
 
-        HashSet<DataPoint> targets = data.get(src);
+        HashSet<DataPointColored> targets = data.get(src);
 
         // Increment target point
-        tar.incrementActivationCount();
+        tar.incrementActivationCount(src);
 
         if (targets == null) {
             // Add a set of targets for this source
-            targets = new HashSet<DataPoint>();
+            targets = new HashSet<DataPointColored>();
             targets.add(tar);
             data.put(src, targets);
         } else {
             targets.add(tar);
         }
 
+        double prob =  tar.getProbability(src);
         updateProbabililties(src);
+        return prob;
     }
 
     /**
-     * Update probabilities associated  with the provided point
+     * Update probabilities associated with the provided point.
+     * TODO: Pretty much hacked together.
+     * Still pending a proper implementation.
      */
-    private void updateProbabililties(DataPoint update) {
-        double total = getSummedActivations(update);
+    private void updateProbabililties(DataPointColored src) {
+
+        // Total times all fan-out targets from source have been visited
+        double total = getSummedActivations(src);
         if (total != 0) {
-            for (DataPoint target : data.get(update)) {
-                target.setProbability(target.getActivationCount() / total);
+            for (DataPointColored target : data.get(src)) {
+                target.setProbability(src,target.getActivationCount(src) / total);
+            }
+        } else {
+            for (DataPointColored target : data.get(src)) {
+                target.setProbability(src,0);
             }
         }
     }
@@ -64,40 +74,18 @@ public class OneStepPrediction {
     /**
      * Get the sum of the activations of the target points associated with the provided source.
      */
-    private double getSummedActivations(DataPoint src) {
-        HashSet<DataPoint> fanOut = data.get(src);
-        if (fanOut != null) {
-            return fanOut.stream().mapToDouble(DataPoint::getActivationCount).sum();
+    private double getSummedActivations(DataPointColored src) {
+        HashSet<DataPointColored> targets = data.get(src);
+        if (targets != null) {
+            double total = 0;
+            for (DataPointColored tar : targets) {
+                total += tar.getActivationCount(src);
+            }
+            return total;
         } else {
             return 0;
         }
     }
-
-    /**
-     * Get the probability that the provided target point will occur after the provided source point.
-     *
-     * @param src the source point
-     * @param tar the target point
-     * @return the conditional probability of target given source.
-     */
-    public Double getProbability(DataPoint src, DataPoint tar) {
-        // TODO: Should no longer be needed. Stored in datapoints
-        // themselves
-
-        return 0.0;
-
-        //// TODO: This is inefficient.  A separate map from source-target pairs to probabilities should be maintained.
-        //HashSet<DataPoint> fanOut = data.get(src);
-        //if (fanOut == null) {
-        //    return 0.0;
-        //}
-        //if(fanOut.contains(tar)) {
-        //    return tar.getActivation(); // TODO
-        //} else {
-        //    return 0.0;
-        //}
-    }
-
 
     /**
      * Clear the data.
@@ -109,11 +97,11 @@ public class OneStepPrediction {
     @Override
     public String toString() {
         StringBuilder ret = new StringBuilder();
-        for (DataPoint src : data.keySet()) {
+        for (DataPointColored src : data.keySet()) {
             ret.append("Source: " + src + "\n");
-            HashSet<DataPoint> targets = data.get(src);
+            HashSet<DataPointColored> targets = data.get(src);
             ret.append("Targets: " + "\n");
-            for (DataPoint tar : targets) {
+            for (DataPointColored tar : targets) {
                 ret.append("   " + tar + "\n");
             }
             // TODO: Add counts and probabilities?
@@ -135,15 +123,15 @@ public class OneStepPrediction {
      * @param src the source point
      * @return the set of targets, or null if no targets are yet associated with it
      */
-    public HashSet<DataPoint> getTargets(DataPoint src) {
+    public HashSet<DataPointColored> getTargets(DataPointColored src) {
         return data.get(src);
     }
 
     /**
      * Returns the number of targets a source point has.
      */
-    public int getNumTargetsForSource(DataPoint src) {
-        HashSet<DataPoint> targets = data.get(src);
+    public int getNumTargetsForSource(DataPointColored src) {
+        HashSet<DataPointColored> targets = data.get(src);
         if (targets == null) {
             return 0;
         } else {

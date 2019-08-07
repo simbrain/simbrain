@@ -31,11 +31,10 @@ import java.util.List;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and
- * high dimensional data of the current {@link Projector} are instances
- * of this class. Dataset provides methods for working with such sets (e.g. open
- * dataset up, adding points, checking their integrity, finding nearest
- * neighbors of a point, calculating their interpoint distances, etc.). It is
- * assumed that all points in a dataset have the same dimensionality.
+ * high dimensional data of the current {@link Projector} are instances of this class. Dataset provides methods for
+ * working with such sets (e.g. open dataset up, adding points, checking their integrity, finding nearest neighbors of a
+ * point, calculating their interpoint distances, etc.). It is assumed that all points in a dataset have the same
+ * dimensionality.
  */
 public class Dataset {
 
@@ -61,15 +60,27 @@ public class Dataset {
     private transient double[] distances = new double[10240];
 
     /**
-     * Persistent form of data, which is read back in to the dataset to recreate
-     * all necessary structures.
+     * Persistent form of data, which is read back in to the dataset to recreate all necessary structures.
      */
     private List<DataPoint> persistentData = new ArrayList<DataPoint>();
 
     /**
-     * The last point added to this dataset.
+     * The last point added to this dataset.  I.e. it was not determined to overlap an existing point, but was actually
+     * added to the dataset and increased its size by one,
      */
     private DataPoint lastAddedPoint;
+
+    /**
+     * A reference to the current point, i.e. the last one that an external user sent it. It may or may not have
+     * actually been added to the dataset (it may just be a duplicate point).
+     */
+    private DataPoint currentPoint;
+
+    /**
+     * Same as {@link #currentPoint}, but the last one sent in. Unlike {@link #lastAddedPoint}, this is just whatever
+     * point the user _attempted_ to add at the last time step.
+     */
+    private DataPoint lastPoint;
 
     /**
      * Creates and instance of Dataset.
@@ -135,28 +146,12 @@ public class Dataset {
         }
     }
 
-    /**
-     * Adds a point to this set.
-     *
-     * @param point the point to add
-     * @return null if point added, overlapping point otherwise
-     */
-    private DataPoint _addPoint(DataPoint point) {
-        DataPoint existingPoint = ntree.add(point);
-        if (existingPoint != null) {
-            return existingPoint;
-        }
-        ensureDistances();
-        lastAddedPoint = point;
-        return null;
-    }
 
     /**
      * Add a new datapoint to the dataset.
      *
      * @param point     A point in the high dimensional space
-     * @param tolerance forwarded to isUniquePoint; if -1 then add point
-     *                  regardless of whether it is unique or not
+     * @param tolerance forwarded to isUniquePoint; if -1 then add point regardless of whether it is unique or not
      * @return null if point added, overlapping point otherwise
      */
     public DataPoint addPoint(final DataPoint point, final double tolerance) {
@@ -167,8 +162,38 @@ public class Dataset {
         if (existingPoint == null) {
             return _addPoint(point);
         } else {
+            setCurrentPoint(existingPoint);
             return existingPoint;
         }
+    }
+
+    /**
+     * Adds a point to this set.
+     *
+     * @param point the point to add
+     * @return null if point added, overlapping point otherwise
+     */
+    private DataPoint _addPoint(DataPoint point) {
+        DataPoint existingPoint = ntree.add(point);
+        // TODO: This is called by addPoint which already does a uniqueness
+        // check, which makes this redundant. Another API oddity.  All this
+        // needs a cleanup pass
+        if (existingPoint != null) {
+            setCurrentPoint(existingPoint);
+            return existingPoint;
+        }
+        ensureDistances();
+        lastAddedPoint = point;
+        setCurrentPoint(point);
+        return null;
+    }
+
+    /**
+     * Set the refererence to the current point and also the reference to the last point.
+     */
+    private void setCurrentPoint(DataPoint newCurrent) {
+        lastPoint = currentPoint;
+        currentPoint = newCurrent;
     }
 
     /**
@@ -235,8 +260,7 @@ public class Dataset {
     }
 
     /**
-     * calculates the index of the start index for distances from the given
-     * point
+     * calculates the index of the start index for distances from the given point
      *
      * @param point the point to find the start index for
      * @return the index to the distances array for the given point
@@ -254,8 +278,7 @@ public class Dataset {
     }
 
     /**
-     * Calculates the distances between pointA and pointB. A must be greater
-     * than B
+     * Calculates the distances between pointA and pointB. A must be greater than B
      *
      * @param pointA the first point
      * @param pointB the second point
@@ -274,8 +297,7 @@ public class Dataset {
     }
 
     /**
-     * Calculates and stores all the distances to all other points with the
-     * given point
+     * Calculates and stores all the distances to all other points with the given point
      *
      * @param point the point to calculate distances for
      */
@@ -428,8 +450,7 @@ public class Dataset {
     }
 
     /**
-     * Print out low dimensional points so maple can plot them Just does low
-     * dimension = 2.
+     * Print out low dimensional points so maple can plot them Just does low dimension = 2.
      *
      * @param ps
      */
@@ -449,9 +470,8 @@ public class Dataset {
     }
 
     /**
-     * Get a specific coordinate of a specific datapoint. Say, the second
-     * component of the third datapoint in a 5-dimensional dataset with 50
-     * points.
+     * Get a specific coordinate of a specific datapoint. Say, the second component of the third datapoint in a
+     * 5-dimensional dataset with 50 points.
      *
      * @param datapointNumber index of the point to get
      * @param dimension       dimension of the desired component
@@ -477,14 +497,11 @@ public class Dataset {
     }
 
     /**
-     * Check that a given point is "new", that is, that it is not already in the
-     * dataset.
+     * Check that a given point is "new", that is, that it is not already in the dataset.
      *
-     * @param toCheck     the point to check
-     * @param tolerance distance within which a point is considered old, and
-     *                  outside of which it is considered new
-     * @return null if the point is new, reference to overlapping point
-     * otherwise
+     * @param toCheck   the point to check
+     * @param tolerance distance within which a point is considered old, and outside of which it is considered new
+     * @return null if the point is new, reference to overlapping point otherwise
      */
     private DataPoint isUniquePoint(final DataPoint toCheck, final double tolerance) {
         logger.debug("checking for uniqueness with tolerance: " + tolerance);
@@ -507,8 +524,7 @@ public class Dataset {
     }
 
     /**
-     * returns k neighbors where the 0th item is the closest and the 1st item is
-     * the second closest etc.
+     * returns k neighbors where the 0th item is the closest and the 1st item is the second closest etc.
      *
      * @param k     the number of points to retrieve
      * @param point the point to find neighbors for
@@ -586,8 +602,8 @@ public class Dataset {
     }
 
     /**
-     * Returns a matrix of interpoint distances, between the points in the
-     * dataset. Note that the lower triangular duplicates the upper triangular
+     * Returns a matrix of interpoint distances, between the points in the dataset. Note that the lower triangular
+     * duplicates the upper triangular
      *
      * @return a matrix of interpoint distances
      */
@@ -640,8 +656,7 @@ public class Dataset {
     }
 
     /**
-     * Returns the covariance of the ith component of the dataset with respect
-     * to the jth component.
+     * Returns the covariance of the ith component of the dataset with respect to the jth component.
      *
      * @param i first dimension
      * @param j second dimension
@@ -666,8 +681,7 @@ public class Dataset {
     /**
      * Returns a covariance matrix for the dataset.
      *
-     * @return covariance matrix which describes how the data covary along each
-     * dimension
+     * @return covariance matrix which describes how the data covary along each dimension
      */
     public Matrix getCovarianceMatrix() {
         Matrix m = new Matrix(dimensions, dimensions);
@@ -684,8 +698,8 @@ public class Dataset {
     }
 
     /**
-     * Returns the k'th most variant dimesion. For example, the most variant
-     * dimension (k=1), or the least variant dimension (k=num_dimensions).
+     * Returns the k'th most variant dimesion. For example, the most variant dimension (k=1), or the least variant
+     * dimension (k=num_dimensions).
      *
      * @param k Number of variant dimension
      * @return the k'th most variant dimension
@@ -763,8 +777,7 @@ public class Dataset {
     }
 
     /**
-     * Returns a matrix of strings, one row for each datapoint, representing the
-     * dataset.
+     * Returns a matrix of strings, one row for each datapoint, representing the dataset.
      *
      * @return a matrix of strings representing the dataset
      */
@@ -792,7 +805,7 @@ public class Dataset {
             persistentData.add(getPoint(i));
         }
     }
-    
+
     /**
      * Initializes Dataset from persistent data.
      */
@@ -817,12 +830,15 @@ public class Dataset {
         return builder.toString();
     }
 
-    /**
-     * Returns the last point added to this dataset.
-     *
-     * @return the last added point
-     */
     public DataPoint getLastAddedPoint() {
         return lastAddedPoint;
+    }
+
+    public DataPoint getCurrentPoint() {
+        return currentPoint;
+    }
+
+    public DataPoint getLastPoint() {
+        return lastPoint;
     }
 }

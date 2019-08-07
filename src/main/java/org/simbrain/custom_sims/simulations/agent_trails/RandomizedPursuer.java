@@ -17,16 +17,19 @@ import org.simbrain.util.math.SimbrainRandomizer;
 import org.simbrain.util.projection.ProjectCoordinate;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingUtils;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updater.UpdateActionManager;
+import org.simbrain.workspace.updater.UpdateComponent;
+import org.simbrain.workspace.updater.UpdateCoupling;
+import org.simbrain.workspace.updater.WorkspaceUpdater;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Create a Braitenberg pursuer with a projection plot to sensor neurons.
@@ -73,6 +76,11 @@ public class RandomizedPursuer extends RegisteredSimulation {
         // Set up Plots
         setUpPlots();
 
+        // Set up custom update
+        WorkspaceUpdater updater = sim.getWorkspace().getUpdater();
+        updater.getUpdateManager().addAction(
+                new UpdateComponent(updater, worldBuilder.getOdorWorldComponent()),0);
+
     }
 
     private void createOdorWorld() {
@@ -80,13 +88,14 @@ public class RandomizedPursuer extends RegisteredSimulation {
         worldBuilder = sim.addOdorWorldTMX(629,9,378,350, "empty.tmx");
         worldBuilder.getWorld().setObjectsBlockMovement(false);
 
-        mouse = worldBuilder.addEntity(204, 343, EntityType.MOUSE);
+        mouse = worldBuilder.addEntity(0, 0, EntityType.MOUSE);
         mouse.setHeading(90);
+        mouse.setLocationRelativeToCenter(0, 70);
         mouse.addLeftRightSensors(EntityType.SWISS, 200);
         mouse.addDefaultEffectors();
 
-        cheese = worldBuilder.addEntity(cheeseX, cheeseY, EntityType.SWISS, new double[]{1, 0, 0});
-
+        cheese = worldBuilder.addEntity(0,0, EntityType.SWISS, new double[]{1, 0, 0});
+        cheese.setLocationRelativeToCenter(0,-30);
         worldBuilder.getWorld().update();
 
     }
@@ -112,13 +121,13 @@ public class RandomizedPursuer extends RegisteredSimulation {
         // Projection plot
         ProjectionComponent projComp = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states");
         Projector proj = projComp.getProjector();
-        proj.setTolerance(.01);
+        proj.setTolerance(1);
         //proj.setProjectionMethod("Coordinate Projection");
         //((ProjectCoordinate)proj.getProjectionMethod()).setAutoFind(false);
         //((ProjectCoordinate)proj.getProjectionMethod()).setHiD1(0);
         //((ProjectCoordinate)proj.getProjectionMethod()).setHiD2(1);
-
-        sim.couple(sensorNodes, projComp);
+        // TODO: Below can be sensorNodes or vehicleNetwork
+        sim.couple(vehicleNetwork, projComp);
         projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Time series
@@ -132,16 +141,16 @@ public class RandomizedPursuer extends RegisteredSimulation {
         tsPlot.getModel().removeAllScalarTimeSeries();
         TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Current State Probability / Fulfillment");
 
-        Producer surprise = CouplingUtils.getProducer(projComp, "getCurrentStateProbability");
+        Producer probability = CouplingUtils.getProducer(projComp, "getCurrentStateProbability");
         Consumer timeSeries = CouplingUtils.getConsumer(ts1, "setValue");
-        sim.tryCoupling(surprise, timeSeries);
+        sim.tryCoupling(probability, timeSeries);
 
     }
 
     // TODO: Current set up just runs the mouse by the cheese once
     // for simple testing while debugging the prediction stuff
-    // Should be maximally surprised the whole time!
-    int numTrials = 1;
+    // Should start off low probability and the probability should slowly rise
+    int numTrials = 5;
 
     private void setUpControlPanel() {
 
@@ -149,8 +158,8 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
         panel.addButton("Run", () -> {
             for (int trial = 0; trial  < numTrials; trial ++) {
-                //mouse.randomizeLocation();
-                sim.iterate(100);
+                mouse.randomizeLocation();
+                sim.iterate(300);
             }
         });
 

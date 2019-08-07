@@ -1307,4 +1307,19 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getHeight()),
                 SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getWidth()));
     }
+
+    /**
+     * Set the location relative to the center of the world.
+     *
+     * @param x x offset from center
+     * @param y y offset from center
+     */
+    public void setLocationRelativeToCenter(double x, double y) {
+        double midX = getParentWorld().getWidth() / 2;
+        midX -= entityType.getImageWidth()/2;
+        double midY = getParentWorld().getHeight() / 2;
+        midY -= entityType.getImageHeight()/2;
+        setLocation(midX + x, midY + y);
+    }
+
 }

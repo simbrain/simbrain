@@ -40,16 +40,15 @@ public class DataPointColored extends DataPoint  {
     public static final double DEFAULT_ACTIVATION = .15;
 
     /**
-     * Number of times this datapoint has been visited or "activated"relative
+     * Number of times this datapoint has been visited or "activated" relative
      * to different source data points. Fan-in of activation counts.
      */
     private HashMap<DataPoint, Integer> activationCounts = new HashMap<>();
 
     /**
-     * Probability of this point occurring relative to {@link OneStepPrediction}.
-     * Used for Bayesian update of probabilities.
+     * Total times this point has been visited. Used in Bayesian update.
      */
-    private HashMap<DataPoint, Double> probabilities = new HashMap<>();
+    private int totalVisits = 0;
 
     /**
      * An activation associated with this point that is used to determine the
@@ -168,16 +167,19 @@ public class DataPointColored extends DataPoint  {
 
     // TODO: This is all temp just to get something working
 
-    public double getProbability(DataPoint src) {
-        Double prob = probabilities.get(src);
-        return prob == null ? 0 : prob;
-    }
-    public void setProbability(DataPointColored src, double val) {
-        probabilities.put(src, val);
+    public double getProbability(DataPointColored src) {
+        if (activationCounts.get(src) == null) {
+            return 0;
+        }
+        Double prob = ((double) activationCounts.get(src))/src.getTotalVisits();
+        //System.out.println(activationCounts.get(src) + "/" +
+        //        src.getTotalVisits() + "=" + prob);
+        return prob;
     }
 
-    public void incrementActivationCount(DataPoint src) {
+    public void incrementActivationCount(DataPointColored src) {
         Integer count = activationCounts.get(src);
+        src.setTotalVisits(src.getTotalVisits()+1);
         if(count != null) {
             activationCounts.put(src, count + 1);
         } else {
@@ -190,8 +192,11 @@ public class DataPointColored extends DataPoint  {
         return count == null ? 0 : count;
     }
 
-    public void clear() {
-        activationCounts.clear();
-        probabilities.clear();
+    public int getTotalVisits() {
+        return totalVisits;
+    }
+
+    public void setTotalVisits(int totalVisits) {
+        this.totalVisits = totalVisits;
     }
 }

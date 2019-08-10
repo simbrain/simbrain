@@ -51,10 +51,11 @@ public class OneStepPredictionTest {
         prediction.addSourceTargetPair(src, tar);
         prediction.addSourceTargetPair(src, tar2);
 
-        // Initially 1/2 chance for each
+        // Initially src->tar, src->tar2, so 1/2 chance for each
         assertEquals(.5, tar.getProbability(src), 0);
         assertEquals(.5, tar2.getProbability(src), 0);
 
+        // Activate src-> tar two more times
         // Probabilities increase to 3/4 for first pair, 1/4 for the second
         prediction.addSourceTargetPair(src, tar);
         prediction.addSourceTargetPair(src, tar);

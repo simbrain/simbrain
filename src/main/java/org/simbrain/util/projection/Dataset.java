@@ -252,6 +252,9 @@ public class Dataset {
      * Clear all data.
      */
     public void clear() {
+        lastPoint = null;
+        currentPoint = null;
+        lastAddedPoint = null;
         ntree = new NTree(dimensions);
         if (distances == null) {
             distances = new double[10240];

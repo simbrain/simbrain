@@ -5,8 +5,8 @@ import java.util.*;
 /**
  * Build a graph model which can be used to predict the next state of an arbitrary system.
  * <br>
- * The basic data-structure is a hash map which associated data points with sets of target {@link DataPointColoredColored},
- * which have an activation field that can be used to track probabilities.
+ * The basic data-structure is a hash map which associated data points with sets of target
+ * {@link DataPointColored}, which have an activation field that can be used to track probabilities.
  * <br>
  * Builds a Markov Model (which assumes the history of the states does not influence the next state, only the current
  * state) with an NxN state transition matrix which needs to be estimated. Then estimate the transition matrix Stores
@@ -17,8 +17,8 @@ import java.util.*;
 public class OneStepPrediction {
 
     /**
-     * Associate a source {@link DataPointColored} with a set of DataPointColoreds that store activations, used to compute next-step
-     * probabilities
+     * Associate a source {@link DataPointColored} with a set of DataPointColoreds that store activations, used to
+     * compute next-step probabilities
      */
     private final HashMap<DataPointColored, HashSet<DataPointColored>>
             data = new HashMap<>();
@@ -34,6 +34,9 @@ public class OneStepPrediction {
 
         HashSet<DataPointColored> targets = data.get(src);
 
+        // Get the probability before accounting for this event
+        double prob = tar.getProbability(src);
+
         // Increment target point
         tar.incrementActivationCount(src);
 
@@ -46,29 +49,7 @@ public class OneStepPrediction {
             targets.add(tar);
         }
 
-        double prob =  tar.getProbability(src);
-        updateProbabililties(src);
         return prob;
-    }
-
-    /**
-     * Update probabilities associated with the provided point.
-     * TODO: Pretty much hacked together.
-     * Still pending a proper implementation.
-     */
-    private void updateProbabililties(DataPointColored src) {
-
-        // Total times all fan-out targets from source have been visited
-        double total = getSummedActivations(src);
-        if (total != 0) {
-            for (DataPointColored target : data.get(src)) {
-                target.setProbability(src,target.getActivationCount(src) / total);
-            }
-        } else {
-            for (DataPointColored target : data.get(src)) {
-                target.setProbability(src,0);
-            }
-        }
     }
 
     /**

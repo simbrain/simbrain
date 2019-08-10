@@ -224,7 +224,8 @@ public class Projector implements AttributeContainer {
             if (colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
                 // Update predictor
                 if ((upstairs.getLastPoint() != null) && (upstairs.getCurrentPoint() != null)) {
-                    currentStateProbabilty = predictor.addSourceTargetPair((DataPointColored) upstairs.getLastPoint(),
+                    currentStateProbabilty = predictor.addSourceTargetPair(
+                            (DataPointColored) upstairs.getLastPoint(),
                             (DataPointColored) upstairs.getCurrentPoint());
                 } else {
                     currentStateProbabilty = 0;
@@ -402,10 +403,6 @@ public class Projector implements AttributeContainer {
         downstairs.clear();
         fireProjectorDataChanged();
         predictor.clear();
-        for (int i = 0; i < getNumPoints(); i++) {
-            ((DataPointColored)upstairs.getPoint(i)).clear();
-        }
-
         // getCurrentProjectionMethod().resetColorIndices();
     }
 

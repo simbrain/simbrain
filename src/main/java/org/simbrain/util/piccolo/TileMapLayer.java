@@ -87,8 +87,8 @@ public class TileMapLayer {
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
             List<Integer> gid = data.getGid();
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
                     final int streamI = i;
                     final int streamJ = j;
                     Image image = tileSet != null ? tileSet.stream()
@@ -96,7 +96,7 @@ public class TileMapLayer {
                             .filter(Objects::nonNull)
                             .findFirst()
                             .orElse(TileSet.getMissingTexture())
-                            : TileSet.getTransparentTexture();
+                        : TileSet.getTransparentTexture();
 
                             // getTileImage(gid.get(i * width + j));
                     int tileWidth = tileSet != null && tileSet.size() > 0 ? tileSet.get(0).getTilewidth() : 32;

@@ -367,7 +367,7 @@ public class TileMap {
         renderedLayers = new ArrayList<>();
 
         getAllLayers().stream()
-                .peek(TileMapLayer::empty)
+                .peek(l -> l.empty(width, height))
                 .forEach(l -> renderedLayers.add(l.renderImage(tilesets, true)));
 
     }

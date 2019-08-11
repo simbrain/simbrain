@@ -110,6 +110,14 @@ public class TiledData {
         return gid;
     }
 
+    /**
+     * Update a tile id at a given location.
+     *
+     * @param tileID the new tile id
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param width the width of the tile map layer
+     */
     public void setTileID(int tileID, int x, int y, int width) {
         gid.set(x + y * width, tileID);
     }

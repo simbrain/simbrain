@@ -349,6 +349,11 @@ public class TileMap {
         return pixelToTileCoordinate(p.getX(), p.getY());
     }
 
+    /**
+     * Get a list of tile map layer including the {@link #programmaticLayers}.
+     *
+     * @return a list of layers including the
+     */
     public List<TileMapLayer> getAllLayers() {
         List<TileMapLayer> ret = new ArrayList<>();
         ret.addAll(layers);
@@ -356,6 +361,12 @@ public class TileMap {
         return ret;
     }
 
+    /**
+     * Clear and resize the map to the specified size
+     *
+     * @param width the new width of the map
+     * @param height the new height of the map
+     */
     public void updateMapSize(int width, int height) {
         if (width < 0 || height < 0) {
             return;
@@ -372,26 +383,56 @@ public class TileMap {
 
     }
 
+    /**
+     * Get the map height in pixels.
+     *
+     * @return height in pixels
+     */
     public int getMapHeight() {
         return height * tileheight;
     }
 
+    /**
+     * Get the map width in pixels.
+     *
+     * @return map width in pixels
+     */
     public int getMapWidth() {
         return width * tilewidth;
     }
 
+    /**
+     * Get the height of the map in tiles.
+     *
+     * @return map height in number of tiles
+     */
     public int getMapHeightInTiles() {
         return height;
     }
 
+    /**
+     * Get the width of the map in tiles.
+     *
+     * @return map width in number of tiles
+     */
     public int getMapWidthInTiles() {
         return width;
     }
 
+    /**
+     * Get the width of a single tile.
+     *
+     * @return tile width
+     */
     public int getTilewidth() {
         return tilewidth;
     }
 
+    /**
+     * Get the height of a single tile.
+     *
+     * @return tile height
+     */
     public int getTileheight() {
         return tileheight;
     }

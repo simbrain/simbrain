@@ -148,19 +148,41 @@ public class TileMapLayer {
         this.name = name;
     }
 
+    /**
+     * Return true if the tiles on this layer are set to have collision bounds.
+     *
+     * @return true if tiles are blocking
+     */
     public boolean isCollideLayer() {
         return properties != null && properties.containsKey("collide") && properties.get("collide").equals("true");
     }
 
+    /**
+     * Modify a tile id at a given location.
+     * NOTE: This does NOT update of the tile map layer image. To update the image after changing tile id, use
+     * {@link #renderImage(List)} and update the corresponding PImage in TileMap#renderedLayers
+     *
+     * @param tileID the new tile id
+     * @param x the x coordinate on map
+     * @param y the y coordinate on map
+     */
     public void setTileID(int tileID, int x, int y) {
         data.setTileID(tileID, x, y, width);
     }
 
-
+    /**
+     * Clear all tiles on this layer.
+     */
     public void empty() {
         empty(width, height);
     }
 
+    /**
+     * Clear all tiles on this layer and set the layer to the specified size.
+     *
+     * @param width the new width
+     * @param height the new height
+     */
     public void empty(int width, int height) {
         this.width = width;
         this.height = height;

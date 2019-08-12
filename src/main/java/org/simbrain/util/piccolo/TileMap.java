@@ -168,17 +168,21 @@ public class TileMap {
             layerToAdd = programmaticLayers.get(layerName).getFirst();
         }
         layerToAdd.setTileID(tileID, x, y);
-        PImage oldRenderedImage = null;
-        if (programmaticLayers.containsKey(layerName)) {
-            oldRenderedImage = programmaticLayers.get(layerName).getSecond();
-            renderedLayers.remove(oldRenderedImage);
+
+        // update rendered image only when renderedLayers exists (which implies GUI is running)
+        if (renderedLayers != null) {
+            PImage oldRenderedImage = null;
+            if (programmaticLayers.containsKey(layerName)) {
+                oldRenderedImage = programmaticLayers.get(layerName).getSecond();
+                renderedLayers.remove(oldRenderedImage);
+            }
+
+            PImage newRenderedImage = layerToAdd.renderImage(tilesets, true);
+            programmaticLayers.put(layerName, new Pair<>(layerToAdd, newRenderedImage));
+            renderedLayers.add(newRenderedImage);
+
+            changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
         }
-
-        PImage newRenderedImage = layerToAdd.renderImage(tilesets, true);
-        programmaticLayers.put(layerName, new Pair<>(layerToAdd, newRenderedImage));
-        renderedLayers.add(newRenderedImage);
-
-        changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
 
 
     }
@@ -249,7 +253,7 @@ public class TileMap {
             return stack;
         }
 
-        for (TileMapLayer l : layers) {
+        for (TileMapLayer l : getAllLayers()) {
             Tile tile = tilesets.stream()
                     .map(t -> t.getTile(l.getTileIdAt(x, y)))
                     .filter(Objects::nonNull)

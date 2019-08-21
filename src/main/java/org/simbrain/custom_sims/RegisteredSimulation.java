@@ -35,10 +35,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscilla
 import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
-import org.simbrain.custom_sims.simulations.test.ConvertSim;
-import org.simbrain.custom_sims.simulations.test.ReadSim;
-import org.simbrain.custom_sims.simulations.test.TestEvolution;
-import org.simbrain.custom_sims.simulations.test.EvolveOdorWorldAgent;
+import org.simbrain.custom_sims.simulations.test.*;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -94,6 +91,7 @@ public abstract class RegisteredSimulation implements AttributeContainer {
         REGISTERED_SIMS.add(new KuramotoOscillators());
         REGISTERED_SIMS.add(new EvolveOdorWorldAgent());
         REGISTERED_SIMS.add(new TestEvolution());
+        REGISTERED_SIMS.add(new EvolvePursuer());
         // REGISTERED_SIMS.add(new MpfsSOM());
 
         // Alphabetize

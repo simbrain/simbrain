@@ -37,6 +37,11 @@ public class Agent<G extends Genome<G, P>, P> implements Comparable<Agent> {
     private Double fitness = null;
 
     /**
+     * True if the agent is not dead
+     */
+    private boolean alive = true;
+
+    /**
      * Construct a new agent using a genome and a fitness function
      *
      * @param genome          the genome
@@ -66,7 +71,13 @@ public class Agent<G extends Genome<G, P>, P> implements Comparable<Agent> {
         phenotype = genome.express();
     }
 
-    ;
+    public void kill() {
+        alive = false;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
 
     /**
      * Evaluate the fitness score of this agent. Higher is better.
@@ -88,7 +99,6 @@ public class Agent<G extends Genome<G, P>, P> implements Comparable<Agent> {
         return new Agent<>(getGenome().copy(), getFitnessFunction());
     }
 
-    ;
 
     @Override
     public int compareTo(Agent o) {

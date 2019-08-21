@@ -19,7 +19,7 @@ public class NodeChromosome extends Chromosome<Neuron, NodeChromosome> {
      */
     private Map<Integer, NodeGene> genes = new TreeMap<>();
 
-    private Supplier<Integer> innovationNumberSupplier = this.genes::size;
+    private Supplier<Integer> innovationNumberSupplier = () -> this.genes.size();
 
     private int maxNodeID;
 

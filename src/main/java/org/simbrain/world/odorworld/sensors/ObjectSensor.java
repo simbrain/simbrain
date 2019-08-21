@@ -161,6 +161,10 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         decayFunction.setDispersion(value);
     }
 
+    public void setObjectType(EntityType objectType) {
+        this.objectType = objectType;
+    }
+
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {

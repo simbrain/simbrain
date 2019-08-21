@@ -44,6 +44,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -193,6 +195,10 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     @UserParameter(label = "Heading based on velocity", description = "If true, the agent's heading is updated at each iteration based on its velocity.", order = 100)
     private boolean updateHeadingBasedOnVelocity = false;
 
+    private List<Consumer<OdorWorldEntity>> collisionEventHandlers = new ArrayList<>();
+
+    private List<MotionEvent> motionEventListeners = new ArrayList<>();
+
     /**
      * Collision boxes of the tile map
      */
@@ -287,6 +293,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 setY(y + dy);
             }
         }
+
+        OdorWorldEntity entityCollided = collidedWithEntity();
+
+        if (entityCollided != null) {
+            collisionEventHandlers.forEach(a -> a.accept(entityCollided));
+        }
+
         if (dtheta != 0) {
             setHeading(heading + dtheta);
             double dthetaRad = Math.toRadians(-dtheta);
@@ -299,6 +312,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                 this.dy = dy2;
             }
         }
+        motionEventListeners.forEach(f -> f.apply(dx, dy, dtheta));
     }
 
     /**
@@ -475,6 +489,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public void addSensor(final Sensor sensor) {
         // if (sensor.getApplicableTypes().contains(this.getClass()))...
         sensors.add(sensor);
+
+        sensor.setParent(this);
 
         // Assign an id unless it already has one
         if (sensor.getId() == null) {
@@ -1137,10 +1153,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public boolean collideOn(String direction) {
 
-        if (!getParentWorld().isObjectsBlockMovement()) {
-            return false;
-        }
-
         if (!parentWorld.getWrapAround()) {
             return collisionBound.collide
                     (direction, parentWorld.getWorldBoundary());
@@ -1163,6 +1175,17 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         }
 
         return false;
+    }
+
+    public OdorWorldEntity collidedWithEntity() {
+        for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
+            if (i != this) {
+                if (collideOn("xy", i)) {
+                    return i;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -1249,6 +1272,18 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         this.updateHeadingBasedOnVelocity = updateHeadingBasedOnVelocity;
     }
 
+    public void onCollide(Consumer<OdorWorldEntity> handler) {
+        collisionEventHandlers.add(handler);
+    }
+
+    public void onMotion(MotionEvent handler) {
+        motionEventListeners.add(handler);
+    }
+
+    public interface MotionEvent {
+        void apply(double dx, double dy, double dtheta);
+    }
+
     /**
      * A class representing the tile map collision boxes.
      */
@@ -1304,8 +1339,31 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void randomizeLocation() {
         setLocation(
-                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getHeight()),
-                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getWidth()));
+                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getWidth() - entityType.getImageWidth()),
+                SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getHeight() - entityType.getImageHeight())
+        );
+    }
+
+    public void randomizeLocationInRange(double range) {
+        double x = getLocation()[0] + SimbrainRandomizer.rand.nextDouble(-range, range);
+        double y = getLocation()[1] + SimbrainRandomizer.rand.nextDouble(-range, range);
+        setLocation(x, y);
+    }
+
+    public void randomizeNewLocation(double minimumDistance) {
+        double x = getLocation()[0];
+        double y = getLocation()[1];
+        double newX, newY;
+        for (int i = 0; i < 20; i++) {
+            newX = SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getWidth() - entityType.getImageWidth());
+            newY = SimbrainRandomizer.rand.nextDouble(0.0, parentWorld.getHeight() - entityType.getImageHeight());
+            double deltaX = newX - x;
+            double deltaY = newY - y;
+            if (deltaX * deltaX + deltaY + deltaY > minimumDistance * minimumDistance) {
+                setLocation(newX, newY);
+                return;
+            }
+        }
     }
 
     /**

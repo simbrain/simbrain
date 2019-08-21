@@ -156,6 +156,8 @@ public class OdorWorld implements EditableObject {
         // map.addSprite(entity);
         entityList.add(entity);
 
+        entity.setParentWorld(this);
+
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length

@@ -88,7 +88,7 @@ public class Population<G extends Genome<G, P>, P> {
         //System.out.println("Reversed: " + agentList);
         agentList = agentList.stream()
                 .filter(Agent::isAlive)
-                .limit((long) (agentList.size() * eliminationRatio)).collect(Collectors.toList());
+                .limit((long) (agentList.size() * (1-eliminationRatio))).collect(Collectors.toList());
     }
 
     /**

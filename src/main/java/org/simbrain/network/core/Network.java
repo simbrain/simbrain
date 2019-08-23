@@ -388,6 +388,21 @@ public class Network {
     }
 
     /**
+     * Get a neuron collection given its id
+     *
+     * @param label label of collection
+     * @return the collection with that id
+     */
+    public NeuronCollection getNeuronCollectionByLabel(String label) {
+        for (NeuronCollection nc : getNeuronCollectionSet()) {
+            if (nc.getLabel().equalsIgnoreCase(label)) {
+                return nc;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Find groups with a given label, or null if none found.
      *
      * @param label label to search for.

@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
@@ -31,12 +32,12 @@ public class EvolvePursuer extends RegisteredSimulation {
     /**
      * Default population size at each generation.
      */
-    private int populationSize = 500;
+    private int populationSize = 100;
 
     /**
      * The maximum number of generation.
      */
-    private int maxGeneration = 35;
+    private int maxGeneration = 50;
 
     /**
      * If fitness rises above this threshold before maxiterations is reached, simulation terminates.
@@ -46,7 +47,7 @@ public class EvolvePursuer extends RegisteredSimulation {
     /**
      * How many times to iterate the simulation of the network in an environment
      */
-    public static int maxMoves = 1000 ;
+    public static int maxMoves = 400 ;
 
     public List<NewGenerationListener> newGenerationListeners = new ArrayList<>();
 
@@ -74,19 +75,19 @@ public class EvolvePursuer extends RegisteredSimulation {
      */
     public void init() {
         population = new Population<>(this.populationSize);
-        //population.setEliminationRatio(.8);// TODO: causes problems
+        population.setEliminationRatio(.8);// TODO: causes performance problems
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        configuration.setNumInputs(9); // Must match the sensor count in base entity
-        configuration.setNumOutputs(3);
+        configuration.setNumInputs(6); // Must match the mouse's sensor count (see setUpWorkspace)
+        configuration.setNumOutputs(3); // Must match the mouse's effector count
         configuration.setAllowSelfConnection(true);
         configuration.setMaxNodes(25);
-        configuration.setMinConnectionStrength(-10);
-        configuration.setMaxConnectionStrength(10);
+        configuration.setMinConnectionStrength(-100);
+        configuration.setMaxConnectionStrength(100);
         configuration.setNodeMaxBias(1);
-        configuration.setMinNeuronActivation(-1);
-        configuration.setMaxNeuronActivation(1);
-        configuration.setRules(List.of(
-                LinearRule.class, SigmoidalRule.class));
+        configuration.setMinNeuronActivation(-10);
+        configuration.setMaxNeuronActivation(10);
+        configuration.setRules(List.of(DecayRule.class, NakaRushtonRule.class, BinaryRule.class,
+                LinearRule.class, SigmoidalRule.class, IACRule.class));
 
         NetworkGenome networkGenome = new NetworkGenome(configuration);
 
@@ -159,7 +160,6 @@ public class EvolvePursuer extends RegisteredSimulation {
         worldBuilder.getWorld().update();
         // Find the winning network
 
-
         mouse.onCollide(other -> {
             if (other.getEntityType() == EntityType.SWISS || other.getEntityType() == EntityType.FLOWER || other.getEntityType() == EntityType.POISON) {
                 other.randomizeLocationInRange(150);
@@ -175,30 +175,26 @@ public class EvolvePursuer extends RegisteredSimulation {
         theSim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
         theSim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
         theSim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
+        outputs.getNeuron(0).setLabel("Forward");
+        outputs.getNeuron(1).setLabel("Left");
+        outputs.getNeuron(2).setLabel("Right");
         outputs.setClamped(false);
         NeuronGroup inputs = (NeuronGroup) network.getGroupByLabel("inputs");
+        LineLayout layout = (LineLayout) inputs.getLayout();
+        layout.setSpacing(100);
+        inputs.applyLayout();
 
-        // Adding extra sensors to sense different objects
-        List<ObjectSensor> extraSensors = new ArrayList<>();
+        mouse.clearSensors();
 
-        for (Sensor sensor : mouse.getSensors()) {
-            ObjectSensor objectSensor = (ObjectSensor) sensor;
-            objectSensor.setRange(350);
-            ObjectSensor flowerSensor = objectSensor.copy();
-            flowerSensor.setObjectType(EntityType.FLOWER);
+        mouse.addLeftRightSensors(EntityType.SWISS, 150);
+        mouse.addLeftRightSensors(EntityType.FLOWER, 150);
+        mouse.addLeftRightSensors(EntityType.POISON, 150);
 
-            ObjectSensor poisonSensor = objectSensor.copy();
-            poisonSensor.setObjectType(EntityType.POISON);
-
-            extraSensors.add(flowerSensor);
-            extraSensors.add(poisonSensor);
-        }
-
-        extraSensors.forEach(mouse::addSensor);
 
         for (int i = 0; i < mouse.getSensors().size(); i++) {
             Sensor sensor = mouse.getSensors().get(i);
             theSim.couple((ObjectSensor) sensor, inputs.getNeuron(i));
+            inputs.getNeuron(i).setLabel(sensor.getLabel().replaceFirst(" Detector", ""));
         }
 
         return mouse;
@@ -221,20 +217,19 @@ public class EvolvePursuer extends RegisteredSimulation {
         AtomicInteger score = new AtomicInteger();
 
         // Started with 20000 energy
-        AtomicLong energy = new AtomicLong(-2500 * (agent.getGenome().getNodeGenes().getGenes().size() - 12));
+        AtomicLong energyConsumed = new AtomicLong(-2500 * (agent.getGenome().getNodeGenes().getGenes().size() - 12));
 
         // when the mouse touches other entity
         mouse.onCollide(other -> {
             if (other.getEntityType() == EntityType.SWISS) {
                 score.incrementAndGet();
-                energy.accumulateAndGet(-10000, Long::sum); // getting the cheese add 10000 energy
+                energyConsumed.accumulateAndGet(-10000, Long::sum); // getting the cheese add 10000 energy
             } else if (other.getEntityType() == EntityType.FLOWER) {
                 score.accumulateAndGet(-2, Integer::sum); // getting flower lower the score by 2
             } else if (other.getEntityType() == EntityType.POISON) {
                 agent.kill(); // poison kills the mouse
             }
         });
-
 
         // motion costs energy
         // mouse.onMotion((dx, dy, dtheta) -> {
@@ -252,7 +247,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         double nodeSizePenalty = 0;
 
         // extra energy does not count towards fitness, and scale down to fit score better
-        double energyPenalty = Long.max(0, energy.get()) / 100000.0;
+        double energyPenalty = Long.max(0, energyConsumed.get()) / 100000.0;
 
         return score.get() - nodeSizePenalty - energyPenalty;
     }
@@ -273,6 +268,7 @@ public class EvolvePursuer extends RegisteredSimulation {
             }
             population.replenish();
         }
+        System.out.println("Final fitness:" + fitness);
         return fitness;
     }
 

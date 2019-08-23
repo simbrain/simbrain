@@ -1280,9 +1280,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         motionEventListeners.add(handler);
     }
 
+
     public interface MotionEvent {
         void apply(double dx, double dy, double dtheta);
     }
+
 
     /**
      * A class representing the tile map collision boxes.
@@ -1378,6 +1380,28 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         double midY = getParentWorld().getHeight() / 2;
         midY -= entityType.getImageHeight()/2;
         setLocation(midX + x, midY + y);
+    }
+
+
+    /**
+     * Remove all sensors.
+     */
+    public void clearSensors() {
+        for (Sensor sensor : sensors) {
+            changeSupport.firePropertyChange("sensorRemoved", null, sensor);
+        }
+        sensors.clear();
+    }
+
+
+    /**
+     * Remove all effectors.
+     */
+    public void clearEffectors() {
+        for (Effector effector : effectors) {
+            changeSupport.firePropertyChange("effectorRemoved", null, effector);
+        }
+        effectors.clear();
     }
 
 }

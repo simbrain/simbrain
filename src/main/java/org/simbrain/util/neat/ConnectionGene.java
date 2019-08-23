@@ -88,9 +88,10 @@ public class ConnectionGene extends Gene<Synapse> {
                 SimbrainRandomizer.rand.nextDouble(-configuration.getMaxConnectionMutation(), configuration.getMaxConnectionMutation())
                         + prototype.getStrength();
         if (newStrength > prototype.getUpperBound()) {
-            newStrength = prototype.getUpperBound();
+            // Eran A's suggestion to re-randomize when parameters hit end of range
+            newStrength = SimbrainRandomizer.rand.nextDouble(prototype.getLowerBound(), prototype.getUpperBound());
         } else if (newStrength < prototype.getLowerBound()) {
-            newStrength = prototype.getLowerBound();
+            newStrength = SimbrainRandomizer.rand.nextDouble(prototype.getLowerBound(), prototype.getUpperBound());
         }
         prototype.setStrength(newStrength);
     }

@@ -32,7 +32,7 @@ public class EvolvePursuer extends RegisteredSimulation {
     /**
      * Default population size at each generation.
      */
-    private int populationSize = 100;
+    private int populationSize = 500;
 
     /**
      * The maximum number of generation.
@@ -75,9 +75,9 @@ public class EvolvePursuer extends RegisteredSimulation {
      */
     public void init() {
         population = new Population<>(this.populationSize);
-        population.setEliminationRatio(.8);// TODO: causes performance problems
+        population.setEliminationRatio(.8);
         NetworkGenome.Configuration configuration = new NetworkGenome.Configuration();
-        configuration.setNumInputs(6); // Must match the mouse's sensor count (see setUpWorkspace)
+        configuration.setNumInputs(4); // Must match the mouse's sensor count (see setUpWorkspace)
         configuration.setNumOutputs(3); // Must match the mouse's effector count
         configuration.setAllowSelfConnection(true);
         configuration.setMaxNodes(25);
@@ -151,9 +151,9 @@ public class EvolvePursuer extends RegisteredSimulation {
         cheese = worldBuilder.addEntity(300, 150, EntityType.SWISS);
         cheese.getSmellSource().setDispersion(300);
 
-        flower = worldBuilder.addEntity(150, 200, EntityType.FLOWER);
-        flower.getSmellSource().setDispersion(300);
-
+        //flower = worldBuilder.addEntity(150, 200, EntityType.FLOWER);
+        //flower.getSmellSource().setDispersion(300);
+        //
         poison = worldBuilder.addEntity(300, 300, EntityType.POISON);
         poison.getSmellSource().setDispersion(300);
 
@@ -167,7 +167,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         });
 
         cheese.randomizeLocationInRange(50);
-        flower.randomizeLocationInRange(50);
+        //flower.randomizeLocationInRange(50);
         poison.randomizeLocationInRange(50);
 
         // Create couplings
@@ -187,7 +187,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         mouse.clearSensors();
 
         mouse.addLeftRightSensors(EntityType.SWISS, 150);
-        mouse.addLeftRightSensors(EntityType.FLOWER, 150);
+        //mouse.addLeftRightSensors(EntityType.FLOWER, 150);
         mouse.addLeftRightSensors(EntityType.POISON, 150);
 
 
@@ -224,10 +224,12 @@ public class EvolvePursuer extends RegisteredSimulation {
             if (other.getEntityType() == EntityType.SWISS) {
                 score.incrementAndGet();
                 energyConsumed.accumulateAndGet(-10000, Long::sum); // getting the cheese add 10000 energy
-            } else if (other.getEntityType() == EntityType.FLOWER) {
-                score.accumulateAndGet(-2, Integer::sum); // getting flower lower the score by 2
-            } else if (other.getEntityType() == EntityType.POISON) {
-                agent.kill(); // poison kills the mouse
+            }
+            //else if (other.getEntityType() == EntityType.FLOWER) {
+            //    score.accumulateAndGet(-2, Integer::sum); // getting flower lower the score by 2
+            else if (other.getEntityType() == EntityType.POISON) {
+                score.accumulateAndGet(-10, Integer::sum); // getting flower lower the score by 2
+                //agent.kill(); // poison kills the mouse
             }
         });
 

@@ -47,7 +47,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     /**
      * Timer to update entity animations.
      */
-    private Timer animationTimer = new Timer();
+    private Timer animationTimer;
 
     /**
      * Default constructor.

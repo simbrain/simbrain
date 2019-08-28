@@ -90,10 +90,27 @@ public class OdorWorldPanel extends JPanel {
      */
     private int defaultHeight = 450;
 
+    /**
+     * Timer to update entity animations.
+     */
+    private Timer animationTimer;
+
+    /**
+     * Timer used for updating entity position when they are manually moved. Allows timing of
+     * manualy movement to be consistent whether the workspace is running or not.
+     */
     private Timer movementTimer;
 
+    /**
+     * Used for a mask that allows multiple movements to be applied at once.
+     * Lower four bits are used for U,D,L,R.
+     */
     private byte manualMovementState;
 
+    /**
+     * List corresponding to the layers of a tmx file.
+     *
+     */
     private List<PImage> layerImageList;
 
     /**
@@ -179,6 +196,8 @@ public class OdorWorldPanel extends JPanel {
                     .forEach(i -> ((EntityNode) i).advance());
                 repaint();
             } else if ("stopAnimation".equals(evt.getPropertyName())) {
+                // When movement is stopped use the "static" animation so we don't show entities in strange
+                // intermediate states
                 canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).resetToStaticFrame());
@@ -202,6 +221,14 @@ public class OdorWorldPanel extends JPanel {
                     movementTimer.cancel();
                     movementTimer = null;
                 }
+                animationTimer = new Timer();
+                animationTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        world.advance();
+                    }
+                }, 50, 50);
+
             } else if ("worldStopped".equals(evt.getPropertyName())) {
                 movementTimer = new Timer();
                 movementTimer.schedule(new TimerTask() {
@@ -210,6 +237,7 @@ public class OdorWorldPanel extends JPanel {
                         manualMovementUpdate();
                     }
                 }, 10, 10);
+                animationTimer.cancel();
             }
         });
 

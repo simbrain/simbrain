@@ -45,11 +45,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
     private OdorWorld world;
 
     /**
-     * Timer to update entity animations.
-     */
-    private Timer animationTimer;
-
-    /**
      * Default constructor.
      *
      * @param name
@@ -172,19 +167,11 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     @Override
     public void start() {
-        animationTimer = new Timer();
-        animationTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                world.advance();
-            }
-        }, 50, 50);
         world.start();
     }
 
     @Override
     public void stop() {
-        animationTimer.cancel();
         world.stopAnimation();
     }
 }

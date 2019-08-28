@@ -22,16 +22,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A wrapper for a {@link Network}, with access to the {@link NetworkComponent}, and {@link
- * org.simbrain.network.gui.NetworkPanel} which can be used to set the position of a window in the Simbrain desktop.
- * Helper methods for creating neurons, neuron groups, etc. are also included.
+ * A wrapper for a {@link Network}, with access to the {@link NetworkComponent}.
+ * Includes helper methods for creating neurons, neuron groups, etc. are also included.
  */
 public class NetworkWrapper {
-
-    /**
-     * The desktop component with full graphical access.
-     */
-    private NetworkDesktopComponent desktopComponent;
 
     /**
      * The network component.
@@ -49,17 +43,7 @@ public class NetworkWrapper {
     private double GRID_SPACE = 50; // todo; make this settable
 
     /**
-     * Create an instance of the wrapper.
-     */
-    public NetworkWrapper(NetworkDesktopComponent desktopComponent) {
-        this.desktopComponent = desktopComponent;
-        this.networkComponent = desktopComponent.getWorkspaceComponent();
-        this.network = networkComponent.getNetwork();
-    }
-
-    /**
      * Create a network wrapper _without_ a GUI component.
-     * TODO: This has only been tested for a few methods
      */
     public NetworkWrapper(NetworkComponent nc) {
         this.networkComponent = nc;
@@ -278,13 +262,6 @@ public class NetworkWrapper {
     }
 
     /**
-     * Get a reference to a graphical {@link NeuronNode}.
-     */
-    public NeuronNode getNode(Neuron neuron) {
-        return getNetworkPanel().getNode(neuron);
-    }
-
-    /**
      * Get a reference to the logical network object
      */
     public Network getNetwork() {
@@ -297,13 +274,5 @@ public class NetworkWrapper {
     public NetworkComponent getNetworkComponent() {
         return networkComponent;
     }
-
-    /**
-     * Get a reference to the network panel.
-     */
-    public NetworkPanelDesktop getNetworkPanel() {
-        return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
-    }
-
 
 }

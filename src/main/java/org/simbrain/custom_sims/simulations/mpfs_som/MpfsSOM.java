@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.mpfs_som;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class MpfsSOM extends RegisteredSimulation {
 
     // References
-    NetworkWrapper netWrapper;
+    NetworkDesktopWrapper netWrapper;
     Network network;
     SOMTrainer trainer;
     SOMNetwork som;
@@ -52,7 +53,7 @@ public class MpfsSOM extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        netWrapper = sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
+        netWrapper = (NetworkDesktopWrapper) sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
         network = netWrapper.getNetwork();
         som = new SOMNetwork(network, numSOMNodes, 29, new Point2D.Double(0, 0));
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));

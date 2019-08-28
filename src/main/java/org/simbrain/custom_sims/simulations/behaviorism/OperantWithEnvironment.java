@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
@@ -31,7 +32,7 @@ import java.util.Map;
 public class OperantWithEnvironment extends RegisteredSimulation {
 
     // Network
-    NetworkWrapper networkWrapper;
+    NetworkDesktopWrapper networkWrapper;
     Network network;
     ControlPanel panel;
     NeuronGroup behaviorNet;
@@ -60,7 +61,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        networkWrapper = sim.addNetwork(155,9,575,500, "Brain");
+        networkWrapper = (NetworkDesktopWrapper) sim.addNetwork(155,9,575,500, "Brain");
         network = networkWrapper.getNetwork();
 
         // Behavioral nodes

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
@@ -27,7 +27,7 @@ public class OperantConditioning extends RegisteredSimulation {
 
     //TODO: Test.
 
-    NetworkWrapper networkWrapper;
+    NetworkDesktopWrapper networkWrapper;
     Network network;
     ControlPanel panel;
     NeuronGroup behaviorNet;
@@ -56,7 +56,7 @@ public class OperantConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        networkWrapper = sim.addNetwork(195, 9, 624, 500, "Simulation");
+        networkWrapper = (NetworkDesktopWrapper) sim.addNetwork(195, 9, 624, 500, "Simulation");
         network = networkWrapper.getNetwork();
 
         // Behavioral nodes

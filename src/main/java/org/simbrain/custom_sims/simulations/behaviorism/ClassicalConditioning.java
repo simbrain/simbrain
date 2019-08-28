@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
@@ -28,7 +29,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
     // TODO: Factor common methods out to a utility class in this directory
 
     // Network stuff
-    NetworkWrapper networkWrapper;
+    NetworkDesktopWrapper networkWrapper;
     Network network;
     ControlPanel panel;
 
@@ -53,7 +54,8 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        networkWrapper = sim.addNetwork(0,14,350,444, "Agent Brain (Black Box)");
+        networkWrapper = (NetworkDesktopWrapper)
+                sim.addNetwork(0,14,350,444, "Agent Brain (Black Box)");
         network = networkWrapper.getNetwork();
 
         // Construct the network

@@ -106,7 +106,7 @@ public class Simulation {
         if(desktop != null) {
             NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
             ndc.getParentFrame().setBounds(x, y, width, height);
-            return new NetworkWrapper(ndc);
+            return new NetworkDesktopWrapper(ndc);
         } else {
             return new NetworkWrapper(networkComponent);
         }

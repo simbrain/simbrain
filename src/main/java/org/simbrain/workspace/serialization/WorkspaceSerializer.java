@@ -407,6 +407,8 @@ public class WorkspaceSerializer {
                     WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
                     serializer.serialize(ostream);
                     workspace.setWorkspaceChanged(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     ostream.close();
                 }

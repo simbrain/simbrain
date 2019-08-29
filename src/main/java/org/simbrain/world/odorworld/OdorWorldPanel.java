@@ -237,7 +237,9 @@ public class OdorWorldPanel extends JPanel {
                         manualMovementUpdate();
                     }
                 }, 10, 10);
-                animationTimer.cancel();
+                if (animationTimer != null) {
+                    animationTimer.cancel();
+                }
             }
         });
 

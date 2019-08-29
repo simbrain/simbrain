@@ -128,6 +128,8 @@ public class EvolvePursuer extends RegisteredSimulation {
 
                         progressWindow.close();
 
+                        sim.saveWorkspace("Winner.zip");
+
                     });
                 });
 
@@ -199,7 +201,6 @@ public class EvolvePursuer extends RegisteredSimulation {
 
         return mouse;
     }
-
 
     public static Double eval(Agent<NetworkGenome, Network> agent) {
 
@@ -273,6 +274,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         System.out.println("Final fitness:" + fitness);
         return fitness;
     }
+
 
     @Override
     public String getSubmenuName() {

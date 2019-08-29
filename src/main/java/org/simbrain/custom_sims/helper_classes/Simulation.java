@@ -15,6 +15,7 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -24,6 +25,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.Hashtable;
 
 /**
@@ -369,6 +371,16 @@ public class Simulation {
         Consumer sensoryNeuron = CouplingUtils.getConsumer(neuron, "forceSetActivation");
         tryCoupling(agentSensor, sensoryNeuron);
     }
+
+    /**
+     * Helper method to manually save the simulation workspace.
+     *
+     * @param fileName name of file to save.
+     */
+    public void saveWorkspace(String fileName) {
+        WorkspaceSerializer.save(new File(fileName), workspace);
+    }
+
 
     /**
      * Iterate the simulation once.

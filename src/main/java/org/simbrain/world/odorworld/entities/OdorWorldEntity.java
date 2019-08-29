@@ -195,9 +195,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     @UserParameter(label = "Heading based on velocity", description = "If true, the agent's heading is updated at each iteration based on its velocity.", order = 100)
     private boolean updateHeadingBasedOnVelocity = false;
 
-    private List<Consumer<OdorWorldEntity>> collisionEventHandlers = new ArrayList<>();
+    private transient List<Consumer<OdorWorldEntity>> collisionEventHandlers = new ArrayList();
 
-    private List<MotionEvent> motionEventListeners = new ArrayList<>();
+    private transient List<MotionEvent> motionEventListeners = new ArrayList();
 
     /**
      * Collision boxes of the tile map
@@ -682,7 +682,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void postSerializationInit() {
         changeSupport = new PropertyChangeSupport(this);
-        currentlyHeardPhrases = new ArrayList<String>();
+        motionEventListeners = new ArrayList<>();
+        collisionEventHandlers = new ArrayList<>();
+        currentlyHeardPhrases = new ArrayList<>();
         for(Sensor sensor : sensors) {
             sensor.postSerializationInit();
         }
@@ -1284,7 +1286,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     public interface MotionEvent {
         void apply(double dx, double dy, double dtheta);
     }
-
 
     /**
      * A class representing the tile map collision boxes.

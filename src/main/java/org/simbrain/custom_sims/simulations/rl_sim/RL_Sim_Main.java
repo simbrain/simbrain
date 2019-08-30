@@ -14,6 +14,7 @@ import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Producible;
@@ -43,7 +44,7 @@ import java.util.concurrent.Executors;
  * At any time, only the "winning" vehicle subnetwork is updated.
  */
 // CHECKSTYLE:OFF
-public class RL_Sim_Main extends RegisteredSimulation {
+public class RL_Sim_Main extends RegisteredSimulation implements AttributeContainer {
 
     /**
      * List of "sub-simulations" available from this one.

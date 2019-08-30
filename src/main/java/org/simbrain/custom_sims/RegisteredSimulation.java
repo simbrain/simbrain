@@ -37,6 +37,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActiv
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.test.*;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ import java.util.List;
  * @author ztosi
  * @author jyoshimi
  */
-public abstract class RegisteredSimulation implements AttributeContainer {
+public abstract class RegisteredSimulation {
 
     /**
      * The list used by calling classes to determine what custom simulations are
@@ -164,5 +165,24 @@ public abstract class RegisteredSimulation implements AttributeContainer {
 
     public static List<RegisteredSimulation> getRegisteredSims() {
         return REGISTERED_SIMS;
+    }
+
+    //public static void main(String[] args) {
+    //    run("Evolve Mouse Pursuer");
+    //}
+
+    /**
+     * Run a simulation with the given name, outside the GUI.  Used, for example, to run
+     * evolution scripts on a server.
+     *
+     * @param simName the name of the simulation to run
+     */
+    public static void run(String simName) {
+        REGISTERED_SIMS.stream()
+                .filter(s -> s.getName().equals(simName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Simulation named " + simName + " does not exist"))
+                .instantiate(new SimbrainDesktop(new Workspace()))
+                .run();
     }
 }

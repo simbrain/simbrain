@@ -49,6 +49,9 @@ public class EvolvePursuer extends RegisteredSimulation {
      */
     public static int maxMoves = 400 ;
 
+    /**
+     * For progress bar.
+     */
     public List<NewGenerationListener> newGenerationListeners = new ArrayList<>();
 
     /**
@@ -152,21 +155,18 @@ public class EvolvePursuer extends RegisteredSimulation {
 
         cheese = worldBuilder.addEntity(300, 150, EntityType.SWISS);
         cheese.getSmellSource().setDispersion(300);
+        cheese.setEdible(true);
 
         //flower = worldBuilder.addEntity(150, 200, EntityType.FLOWER);
         //flower.getSmellSource().setDispersion(300);
-        //
+        //flower.setEdible(true);
+
         poison = worldBuilder.addEntity(300, 300, EntityType.POISON);
         poison.getSmellSource().setDispersion(300);
+        poison.setEdible(true);
 
         worldBuilder.getWorld().update();
         // Find the winning network
-
-        mouse.onCollide(other -> {
-            if (other.getEntityType() == EntityType.SWISS || other.getEntityType() == EntityType.FLOWER || other.getEntityType() == EntityType.POISON) {
-                other.randomizeLocationInRange(150);
-            }
-        });
 
         cheese.randomizeLocationInRange(50);
         //flower.randomizeLocationInRange(50);

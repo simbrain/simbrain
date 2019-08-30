@@ -195,9 +195,23 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     @UserParameter(label = "Heading based on velocity", description = "If true, the agent's heading is updated at each iteration based on its velocity.", order = 100)
     private boolean updateHeadingBasedOnVelocity = false;
 
+    /**
+     * Handle collision events. Used externally by simulations.
+     */
     private transient List<Consumer<OdorWorldEntity>> collisionEventHandlers = new ArrayList();
 
+    /**
+     * Handle "energy consuming" events. Used externally by simulations.
+     */
     private transient List<MotionEvent> motionEventListeners = new ArrayList();
+
+    /**
+     * Whether this entity can be "eaten".
+     */
+    @UserParameter(label = "Edible", description = "If true, colliding with this entity makes it respawn", order = 20)
+    private boolean edible = false;
+    //TODO: Obviously more could be done with "edibility" than simply respawning.
+    // Eg. specify range and timing of respawn, or whether there is a respawn.
 
     /**
      * Collision boxes of the tile map
@@ -297,6 +311,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         OdorWorldEntity entityCollided = collidedWithEntity();
 
         if (entityCollided != null) {
+            if (entityCollided.isEdible()) {
+                entityCollided.randomizeLocationInRange(150);
+            }
             collisionEventHandlers.forEach(a -> a.accept(entityCollided));
         }
 
@@ -1274,15 +1291,27 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         this.updateHeadingBasedOnVelocity = updateHeadingBasedOnVelocity;
     }
 
+    /**
+     * Can be used to handle collision events by external simulations.  Not serialized.
+     *
+     * @param handler handles the other entity this entity has collided with
+     */
     public void onCollide(Consumer<OdorWorldEntity> handler) {
         collisionEventHandlers.add(handler);
     }
 
+    /**
+     * Can be used to handle motion events by external simulations.  Not serialized.
+     *
+     * @param handler handles events where this entity moves or turns
+     */
     public void onMotion(MotionEvent handler) {
         motionEventListeners.add(handler);
     }
 
-
+    /**
+     * Wrapper for changes in entity location or heading
+     */
     public interface MotionEvent {
         void apply(double dx, double dy, double dtheta);
     }
@@ -1405,4 +1434,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         effectors.clear();
     }
 
+    public boolean isEdible() {
+        return edible;
+    }
+
+    public void setEdible(boolean edible) {
+        this.edible = edible;
+    }
 }

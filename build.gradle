@@ -178,6 +178,17 @@ dependencies {
 //             collect { zipTree(it) }
 // }
 
+
+// Sample call: gradle runSim -PsimName='Evolve Mouse Pursuer'
+task runSim(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.simbrain.custom_sims.RegisteredSimulation"
+    if(project.hasProperty('simName')){
+        args simName
+    }
+}
+
+
 task printStuff {
     group 'Misc'
     description 'For printing variable bindings / learning gradle'

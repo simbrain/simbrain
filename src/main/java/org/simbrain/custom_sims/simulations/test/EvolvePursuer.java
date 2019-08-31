@@ -21,6 +21,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -109,16 +110,20 @@ public class EvolvePursuer extends RegisteredSimulation {
         // Evolve the pursuer
         init();
 
-        //Where member variables are declared:
-        ProgressWindow progressWindow = new ProgressWindow(maxGeneration);
+        final ProgressWindow progressWindow = new ProgressWindow(maxGeneration);
 
-        newGenerationListeners.add((generation, score) -> {
-            System.out.printf("[%d] Fitness: %.2f\n", generation, score);
-            SwingUtilities.invokeLater(() -> {
-                progressWindow.getProgressBar().setValue(generation);
-                progressWindow.getFitnessScore().setText("Fitness Score: " + score);
+        //Where member variables are declared:
+        if (!GraphicsEnvironment.isHeadless()) {
+
+            newGenerationListeners.add((generation, score) -> {
+                System.out.printf("[%d] Fitness: %.2f\n", generation, score);
+                SwingUtilities.invokeLater(() -> {
+                    progressWindow.getProgressBar().setValue(generation);
+                    progressWindow.getFitnessScore().setText("Fitness Score: " + score);
+                });
             });
-        });
+
+        }
 
         CompletableFuture.supplyAsync(this::evolve)
                 .thenRun(() -> {
@@ -129,7 +134,9 @@ public class EvolvePursuer extends RegisteredSimulation {
                         // Get the mouse from the network / odor world pair
                         setUpWorkspace(sim, network);
 
-                        progressWindow.close();
+                        if (!GraphicsEnvironment.isHeadless()) {
+                            progressWindow.close();
+                        }
 
                         simulationCompleted();
 

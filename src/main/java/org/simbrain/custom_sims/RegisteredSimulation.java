@@ -188,6 +188,9 @@ public abstract class RegisteredSimulation {
         return REGISTERED_SIMS;
     }
 
+    /**
+     * This can be called from gradle using "runSim"
+     */
     public static void main(String[] args) {
        run(args[0]);
     }

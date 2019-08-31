@@ -189,7 +189,7 @@ public abstract class RegisteredSimulation {
     }
 
     public static void main(String[] args) {
-        run("Evolve Mouse Pursuer");
+       run(args[0]);
     }
 
     /**

@@ -69,6 +69,11 @@ public abstract class RegisteredSimulation {
      */
     protected final Simulation sim;
 
+    /**
+     * Handle simulation completion events. See {@link #simulationCompleted()}.
+     */
+    private Runnable completionHandler;
+
     static {
         // TODO: Commented out items are not ready for prime time
         REGISTERED_SIMS.add(new EdgeOfChaos());
@@ -140,6 +145,22 @@ public abstract class RegisteredSimulation {
     public abstract void run();
 
     /**
+     * See {@link #simulationCompleted()}.
+     */
+    public void onCompleted(Runnable handler) {
+        completionHandler = handler;
+    }
+
+    /**
+     * Call when the simulation is completed for proper termination when run outside of GUI.
+     */
+    public void simulationCompleted() {
+        if (completionHandler != null) {
+            completionHandler.run();
+        }
+    };
+
+    /**
      * Instantiates a registered simulation class the same as the caller.
      *
      * @param desktop the simbrain desktop object where the instantiated sim
@@ -167,9 +188,9 @@ public abstract class RegisteredSimulation {
         return REGISTERED_SIMS;
     }
 
-    //public static void main(String[] args) {
-    //    run("Evolve Mouse Pursuer");
-    //}
+    public static void main(String[] args) {
+        run("Evolve Mouse Pursuer");
+    }
 
     /**
      * Run a simulation with the given name, outside the GUI.  Used, for example, to run
@@ -178,11 +199,16 @@ public abstract class RegisteredSimulation {
      * @param simName the name of the simulation to run
      */
     public static void run(String simName) {
-        REGISTERED_SIMS.stream()
+        RegisteredSimulation sim = REGISTERED_SIMS.stream()
                 .filter(s -> s.getName().equals(simName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Simulation named " + simName + " does not exist"))
-                .instantiate(new SimbrainDesktop(new Workspace()))
-                .run();
+                .orElseThrow(() -> new IllegalArgumentException("Simulation named " + simName + " does not exist"));
+
+        sim = sim.instantiate(new SimbrainDesktop(new Workspace()));
+        sim.onCompleted(() -> {
+            System.exit(0);
+        });
+        sim.run();
+
     }
 }

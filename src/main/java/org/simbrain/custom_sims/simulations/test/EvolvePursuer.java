@@ -131,13 +131,18 @@ public class EvolvePursuer extends RegisteredSimulation {
 
                         progressWindow.close();
 
-                        sim.saveWorkspace("Winner.zip");
+                        simulationCompleted();
+
 
                     });
                 });
 
+
     }
 
+    /**
+     * Set a network up in a workspace and return the mouse
+     */
     static OdorWorldEntity setUpWorkspace(Simulation theSim, Network network) {
 
         theSim.addNetwork(new NetworkComponent("Evolved Pursuer", network), 10, 491, 534, 10);
@@ -205,8 +210,7 @@ public class EvolvePursuer extends RegisteredSimulation {
     public static Double eval(Agent<NetworkGenome, Network> agent) {
 
         // Set up the odor world
-        Workspace workspace = new Workspace();
-        Simulation sim = new Simulation(workspace);
+        Simulation sim = new Simulation(new Workspace());
 
         // Get current network and mouse
         Network network = agent.getPhenotype();
@@ -242,7 +246,7 @@ public class EvolvePursuer extends RegisteredSimulation {
 
         // Run the simulation
         for (int i = 0; i < maxMoves && agent.isAlive(); i++) {
-            workspace.simpleIterate();
+            sim.getWorkspace().simpleIterate();
         }
 
         // IGNORED FOR NOW
@@ -259,20 +263,27 @@ public class EvolvePursuer extends RegisteredSimulation {
      * Run the simulation.
      */
     public double evolve() {
-        double fitness = 0;
+        double finalFitness = 0;
+        double bestOverallFitness = Double.MIN_VALUE;
         for (int i = 0; i < maxGeneration; i++) {
-            double bestFitness = population.computeNewFitness();
-            fitness = bestFitness;
+            double bestOfGeneration = population.computeNewFitness();
+            finalFitness = bestOfGeneration;
             // System.out.println(i + ", fitness = " + bestFitness);
             final int generation = i;
-            newGenerationListeners.forEach(f -> f.run(generation, bestFitness));
-            if (bestFitness > fitnessThreshold) {
+            newGenerationListeners.forEach(f -> f.run(generation, bestOfGeneration));
+            if (bestOfGeneration > bestOverallFitness) {
+                bestOverallFitness = bestOfGeneration;
+                Simulation sim = new Simulation(new Workspace());
+                setUpWorkspace(sim, population.getFittestAgent().getPhenotype());
+                sim.saveWorkspace("Winner.zip");
+            }
+            if (bestOfGeneration > fitnessThreshold) {
                 break;
             }
             population.replenish();
         }
-        System.out.println("Final fitness:" + fitness);
-        return fitness;
+        System.out.println("Best fitness:" + bestOverallFitness);
+        return finalFitness;
     }
 
 

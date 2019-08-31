@@ -162,12 +162,15 @@ public class WorkspaceSerializer {
         try {
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component, zipStream);
-            GuiComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace).getDesktopComponent(component);
-            if (desktopComponent != null) {
-                ArchivedWorkspaceComponent.ArchivedDesktopComponent dc = archiveComp.addDesktopComponent(desktopComponent);
-                entry = new ZipEntry(dc.getUri());
-                zipStream.putNextEntry(entry);
-                desktopComponent.save(zipStream);
+            if (SimbrainDesktop.getDesktop(workspace) != null) {
+                GuiComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace).getDesktopComponent(component);
+                // Makes it possible to save a non-GUI simulation
+                if (desktopComponent != null) {
+                    ArchivedWorkspaceComponent.ArchivedDesktopComponent dc = archiveComp.addDesktopComponent(desktopComponent);
+                    entry = new ZipEntry(dc.getUri());
+                    zipStream.putNextEntry(entry);
+                    desktopComponent.save(zipStream);
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();

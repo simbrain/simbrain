@@ -221,40 +221,29 @@ public class EvolvePursuer extends RegisteredSimulation {
         // How many times the rat gets cheese!
         AtomicInteger score = new AtomicInteger();
 
-        // Started with 20000 energy
-        AtomicLong energyConsumed = new AtomicLong(-2500 * (agent.getGenome().getNodeGenes().getGenes().size() - 12));
-
         // when the mouse touches other entity
         mouse.onCollide(other -> {
             if (other.getEntityType() == EntityType.SWISS) {
                 score.incrementAndGet();
-                energyConsumed.accumulateAndGet(-10000, Long::sum); // getting the cheese add 10000 energy
             }
             //else if (other.getEntityType() == EntityType.FLOWER) {
             //    score.accumulateAndGet(-2, Integer::sum); // getting flower lower the score by 2
             else if (other.getEntityType() == EntityType.POISON) {
-                score.accumulateAndGet(-10, Integer::sum); // getting flower lower the score by 2
+                score.accumulateAndGet(-100, Integer::sum); // getting flower lower the score by 2
                 //agent.kill(); // poison kills the mouse
             }
         });
-
-        // motion costs energy
-        // mouse.onMotion((dx, dy, dtheta) -> {
-        //     long sum = (long) ((Math.abs(dx) + Math.abs(dy) + Math.abs(dtheta) * 10) * 100);
-        //     energy.accumulateAndGet(sum, Long::sum);
-        // });
 
         // Run the simulation
         for (int i = 0; i < maxMoves && agent.isAlive(); i++) {
             sim.getWorkspace().simpleIterate();
         }
 
-        // IGNORED FOR NOW
         // double nodeSizePenalty = Integer.max(agent.getGenome().getNodeGenes().getGenes().size() - 16, 0) / 100.0;
         double nodeSizePenalty = 0;
 
         // extra energy does not count towards fitness, and scale down to fit score better
-        double energyPenalty = Long.max(0, energyConsumed.get()) / 100000.0;
+        double energyPenalty = Double.max(0, mouse.getEnergyLevel())/10_000;
 
         return score.get() - nodeSizePenalty - energyPenalty;
     }

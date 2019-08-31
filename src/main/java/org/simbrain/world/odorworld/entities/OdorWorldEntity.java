@@ -22,12 +22,10 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
-import org.simbrain.world.odorworld.CollisionBound;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.RectangleCollisionBound;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -44,7 +42,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -214,6 +211,16 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     // Eg. specify range and timing of respawn, or whether there is a respawn.
 
     /**
+     * Current energy. TODO: Do this properly with calories, an energy model, etc.
+     */
+    private double energyLevel = 10000;
+
+    /**
+     * How much energy is supplied by eating this entity.
+     */
+    private double calories = 1000;
+
+    /**
      * Collision boxes of the tile map
      */
     private TileCollision tileCollision = new TileCollision();
@@ -313,6 +320,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         if (entityCollided != null) {
             if (entityCollided.isEdible()) {
                 entityCollided.randomizeLocationInRange(150);
+                // Eating adds energy
+                energyLevel += entityCollided.getCalories();
             }
             collisionEventHandlers.forEach(a -> a.accept(entityCollided));
         }
@@ -330,6 +339,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             }
         }
         motionEventListeners.forEach(f -> f.apply(dx, dy, dtheta));
+
+        // Moving costs energy
+        energyLevel -= (Math.abs(dx) + Math.abs(dy) + Math.abs(dtheta));
     }
 
     /**
@@ -1440,5 +1452,21 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
     public void setEdible(boolean edible) {
         this.edible = edible;
+    }
+
+    public double getEnergyLevel() {
+        return energyLevel;
+    }
+
+    public void setEnergyLevel(double energyLevel) {
+        this.energyLevel = energyLevel;
+    }
+
+    public double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(double calories) {
+        this.calories = calories;
     }
 }

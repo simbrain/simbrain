@@ -69,10 +69,13 @@ public class NeuronArrayNode extends ScreenElement  {
     private PText infoText;
 
     /**
-     * Image to show activations
+     * Image to show activations.
      */
     private PImage activations = new PImage();
 
+    /**
+     * A background to show when no {@link #activations} image is present. (So that the node will not be transparent)
+     */
     private PPath background = PPath.createRectangle(0 ,0,50,25);
 
     /**
@@ -102,6 +105,11 @@ public class NeuronArrayNode extends ScreenElement  {
         init();
     }
 
+    /**
+     * Render an image and set it to {@link #activations} to show the current activations.
+     *
+     * Will not render when {@link NeuronArray#isRenderActivations()} is set to false.
+     */
     private void renderArrayToActivationsImage() {
 
         if (!neuronArray.isRenderActivations()) {
@@ -110,15 +118,17 @@ public class NeuronArrayNode extends ScreenElement  {
 
         ColorModel colorModel = new DirectColorModel(24, 0xff << 16, 0xff << 8, 0xff);
         SampleModel sampleModel = colorModel.createCompatibleSampleModel(neuronArray.getCols(), neuronArray.getRows());
-        float[] vector = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
 
-        int[] data = new int[neuronArray.getCols() * neuronArray.getRows()];
-        for (int i = 0; i < vector.length; i++) {
-            float s = vector[i];
+        float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+
+        int[] raster = new int[neuronArray.getCols() * neuronArray.getRows()];
+
+        for (int i = 0; i < activations.length; i++) {
+            float s = activations[i];
             if (s < 0) {
-                data[i] = Color.HSBtoRGB(2/3f, -s, 1.0f);
+                raster[i] = Color.HSBtoRGB(2/3f, -s, 1.0f);
             } else {
-                data[i] = Color.HSBtoRGB(0.0f, s, 1.0f);
+                raster[i] = Color.HSBtoRGB(0.0f, s, 1.0f);
             }
         }
 
@@ -127,15 +137,15 @@ public class NeuronArrayNode extends ScreenElement  {
                 colorModel,
                 Raster.createWritableRaster(
                         sampleModel,
-                        new DataBufferInt(data, data.length),
+                        new DataBufferInt(raster, raster.length),
                         null
                 ),
                 false,
                 null
         );
 
-        activations.setImage(img);
-        activations.setBounds(getBounds());
+        this.activations.setImage(img);
+        this.activations.setBounds(getBounds());
     }
 
     /**

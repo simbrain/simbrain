@@ -220,6 +220,8 @@ public class Network {
         // Main update
         updateManager.invokeAllUpdates();
 
+        naList.forEach(NeuronArray::update);
+
         clearInputs();
         updateTime();
         changeSupport.firePropertyChange("updateTimeDisplay", null, false);
@@ -1003,6 +1005,7 @@ public class Network {
         for (Neuron neuron : neuronList) {
             neuron.setToBufferVals();
         }
+
     }
 
     /**

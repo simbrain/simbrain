@@ -18,7 +18,11 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.nd4j.linalg.dataset.api.preprocessor.MinMaxStrategy;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
+import org.nd4j.linalg.factory.Nd4j;
 import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
@@ -33,8 +37,10 @@ import org.simbrain.util.Utils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.image.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,6 +69,13 @@ public class NeuronArrayNode extends ScreenElement  {
     private PText infoText;
 
     /**
+     * Image to show activations
+     */
+    private PImage activations = new PImage();
+
+    private PPath background = PPath.createRectangle(0 ,0,50,25);
+
+    /**
      * Font for info text.
      */
     public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 7);
@@ -76,9 +89,53 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     public NeuronArrayNode(final NetworkPanel net, final NeuronArray na) {
         super(net);
+        square.setTransparency(0.2f);
         this.neuronArray = na;
+
+        neuronArray.addPropertyChangeListener(evt -> {
+            if ("updated".equals(evt.getPropertyName())) {
+                renderArrayToActivationsImage();
+            }
+        });
+
         this.centerFullBoundsOnPoint(na.getX(), na.getY());
         init();
+    }
+
+    private void renderArrayToActivationsImage() {
+
+        if (!neuronArray.isRenderActivations()) {
+            return;
+        }
+
+        ColorModel colorModel = new DirectColorModel(24, 0xff << 16, 0xff << 8, 0xff);
+        SampleModel sampleModel = colorModel.createCompatibleSampleModel(neuronArray.getCols(), neuronArray.getRows());
+        float[] vector = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+
+        int[] data = new int[neuronArray.getCols() * neuronArray.getRows()];
+        for (int i = 0; i < vector.length; i++) {
+            float s = vector[i];
+            if (s < 0) {
+                data[i] = Color.HSBtoRGB(2/3f, -s, 1.0f);
+            } else {
+                data[i] = Color.HSBtoRGB(0.0f, s, 1.0f);
+            }
+        }
+
+        // ref: https://stackoverflow.com/questions/33460365/what-the-fastest-way-to-draw-pixels-buffer-in-java
+        BufferedImage img = new BufferedImage(
+                colorModel,
+                Raster.createWritableRaster(
+                        sampleModel,
+                        new DataBufferInt(data, data.length),
+                        null
+                ),
+                false,
+                null
+        );
+
+        activations.setImage(img);
+        activations.setBounds(getBounds());
     }
 
     /**
@@ -86,9 +143,14 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     private void init() {
 
-
         square.setPickable(true);
+
+        addChild(background);
+        addChild(activations);
         addChild(square);
+
+        renderArrayToActivationsImage();
+
         PBounds bounds = square.getBounds();
         setBounds(bounds);
 
@@ -101,6 +163,8 @@ public class NeuronArrayNode extends ScreenElement  {
         //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
     }
+
+
 
     @Override
     public boolean isSelectable() {
@@ -151,6 +215,5 @@ public class NeuronArrayNode extends ScreenElement  {
     public void resetColors() {
 
     }
-
 
 }

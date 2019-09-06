@@ -6,7 +6,8 @@ apply plugin: 'checkstyle'
 def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '[3.2,)'
 def log4jVer = '2.5'
-def dl4j_version = "1.0.0-beta"
+// https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
+def dl4j_version = "1.0.0-beta4"
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
@@ -48,7 +49,7 @@ dependencies {
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
 
     // Dl4j, ND4j.
-    // compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
+    compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
     compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core

@@ -789,9 +789,9 @@ public class NeuronCollection implements AttributeContainer {
 
     /**
      * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections
-     * from identical nerons.
+     * from identical neurons.
      *
-     * @return summed has
+     * @return summed hash
      */
     public int getSummedNeuronHash() {
         return neuronList.stream().mapToInt(n -> n.hashCode()).sum();

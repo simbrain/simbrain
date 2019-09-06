@@ -259,6 +259,8 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
         chart.getXYPlot().setRangeGridlinePaint(Color.gray);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
         chart.getXYPlot().getRangeAxis().setAutoRange(true);
+        //chart.getXYPlot().setForegroundAlpha(.5f); // TODO: Make this settable
+
         panel = new ChartPanel(chart);
 
         // Custom render points as dots (not squares) and use custom tooltips
@@ -266,7 +268,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
         CustomRenderer renderer = new CustomRenderer();
         chart.getXYPlot().setRenderer(renderer);
         // TODO: Make the visibility of series lines and point size adjustible
-        renderer.setSeriesLinesVisible(0, false);
+        //renderer.setSeriesLinesVisible(0, true);
         renderer.setSeriesShape(0, new Ellipse2D.Double(-7, -7, 7, 7));
         CustomToolTipGenerator generator = new CustomToolTipGenerator();
         renderer.setSeriesToolTipGenerator(0, generator);

@@ -19,10 +19,13 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAn
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -65,7 +68,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
     private int netSize = 1024;
     private int spacing = 40;
     private int maxDly = 12;
-    private NeuronGroup recNeurons;
+    private NeuronGroup recurrentNetwork;
     private int dispersion = 140;
     double maxDist = Math.sqrt(2 * netSize * spacing);
     private STDPRule ruleEx = new STDPRule(5, 1, 20, 100, 0.001,
@@ -87,6 +90,12 @@ public class PatternsOfActivity extends RegisteredSimulation {
     private Neuron dwNeuron;
     private Neuron upNeuron;
 
+    private double[] frEsts = new double[netSize + 4];
+    private double[] graphicVal = new double[netSize + 4];
+
+
+    private NeuronGroup outputNeurons;
+    OdorWorldEntity mouse;
 
     @Override
     public void run() {
@@ -98,7 +107,6 @@ public class PatternsOfActivity extends RegisteredSimulation {
             "Patterns of Activity");
         network = net.getNetwork();
         network.setTimeStep(0.5);
-
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5);
@@ -112,8 +120,21 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sensoryNetR.setPolarity(Polarity.EXCITATORY);
         sensoryNetR.setLabel("Sensory Right");
 
+        // Build odor world
+        mouse = buildWorld();
+
+        // Create network
+        buildNetwork(sensoryNetL, sensoryNetR, mouse);
+
+        // Set up plots
+        addProjection(sensoryNetL, 8, 562, 1, "getActivations");
+        addProjection(recurrentNetwork, 368, 562, 24, "getSubsampledActivations");
+        addProjection(outputNeurons, 723, 562, .1, "getActivations");
 
 
+    }
+
+    private OdorWorldEntity buildWorld() {
         // Set up odor world
         OdorWorldWrapper world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
@@ -123,7 +144,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 40));
         mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 40));
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(92, 220, EntityType.SWISS,
+        OdorWorldEntity cheese = world.addEntity(72, 220, EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
         cheese.getSmellSource().setDispersion(dispersion);
         OdorWorldEntity flower = world.addEntity(190, 221, EntityType.FLOWER,
@@ -141,9 +162,10 @@ public class PatternsOfActivity extends RegisteredSimulation {
         OdorWorldEntity steve = world.addEntity(315, 305, EntityType.STEVE,
             new double[] {12, 0, 20, 15});
         steve.getSmellSource().setDispersion(dispersion);
+        return mouse;
+    }
 
-        // Set up neural net ==============================================================
-
+    private void buildNetwork(NeuronGroup sensoryNetL, NeuronGroup sensoryNetR, OdorWorldEntity mouse) {
         // Set up Recurrent portion
         List<Neuron> neuronList = new ArrayList<>();
         for (int ii = 0; ii < netSize; ++ii) {
@@ -164,19 +186,20 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
-        recNeurons = new NeuronGroup(network, neuronList);
+        recurrentNetwork = new NeuronGroup(network, neuronList);
+        recurrentNetwork.setLabel("Recurrent network");
         new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
-            .layoutNeurons(recNeurons.getNeuronListUnsafe());
-        sensoryNetL.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
-        sensoryNetR.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 100);
+            .layoutNeurons(recurrentNetwork.getNeuronListUnsafe());
+        sensoryNetL.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
+        sensoryNetR.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
 
         // Set up recurrent synapses
-        SynapseGroup recSyns = new SynapseGroup(recNeurons, recNeurons);
+        SynapseGroup recSyns = new SynapseGroup(recurrentNetwork, recurrentNetwork);
         new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
             200).connectNeurons(recSyns);
-//        new Sparse(0.10, false, false)
-//                .connectNeurons(recSyns);
+        //new Sparse(0.10, false, false)
+        //        .connectNeurons(recSyns);
         initializeSynParameters(recSyns);
         recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
         for (Neuron n : neuronList) {
@@ -195,7 +218,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         }
 
         // Set up input synapses (connections from sensory group to the recurrent group)
-        SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recNeurons,
+        SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recurrentNetwork,
             new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGL);
         inpSynGL.setStrength(50, Polarity.EXCITATORY);
@@ -206,7 +229,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 inpSynGL.removeSynapse(s);
             }
         }
-        SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recNeurons,
+        SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recurrentNetwork,
                 new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGR);
         inpSynGR.setStrength(50, Polarity.EXCITATORY);
@@ -228,8 +251,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 n.setPolarity(Polarity.EXCITATORY);
             }
             n.setUpdateRule(new NormIFRule(netSize + tmp));
-//            ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-//                    .ofMean(0).ofStandardDeviation(0.2).build());
+            //((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
+            //        .ofMean(0).ofStandardDeviation(0.2).build());
             ((IntegrateAndFireRule) (n.getUpdateRule())).setBackgroundCurrent(19.9);
             tmp++;
         }
@@ -237,14 +260,14 @@ public class PatternsOfActivity extends RegisteredSimulation {
         lfNeuron = outGroup.getNeuron(1);
         dwNeuron = outGroup.getNeuron(2);
         upNeuron = outGroup.getNeuron(3);
-        outGroup.setLocation(recNeurons.getMaxX() + 300, recNeurons.getMinY() + 800);
+        outGroup.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 800);
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
-        SynapseGroup rec2out = new SynapseGroup(recNeurons, outGroup);
+        SynapseGroup rec2out = new SynapseGroup(recurrentNetwork, outGroup);
         initializeSynParameters(rec2out);
-        double xEdge = recNeurons.getCenterX();
-        double yEdge = recNeurons.getCenterY();
+        double xEdge = recurrentNetwork.getCenterX();
+        double yEdge = recurrentNetwork.getCenterY();
         for (int ii = 0; ii < netSize; ++ii) {
             Neuron n = neuronList.get(ii);
             if (n.getPolarity() == Polarity.INHIBITORY) {
@@ -289,9 +312,10 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
-        NeuronGroup readGroup = new NeuronGroup(network, 2);
-        readGroup.setLocation(recNeurons.getMaxX() + 350, recNeurons.getMinY() + 380);
-        for (Neuron n : readGroup.getNeuronList()) {
+        outputNeurons = new NeuronGroup(network, 2);
+        outputNeurons.setLabel("Motor outputs");
+        outputNeurons.setLocation(recurrentNetwork.getMaxX() + 350, recurrentNetwork.getMinY() + 380);
+        for (Neuron n : outputNeurons.getNeuronList()) {
             n.setUpdateRule(new SigmoidalRule());
             ((SigmoidalRule) n.getUpdateRule()).setLowerBound(-4);
             ((SigmoidalRule) n.getUpdateRule()).setUpperBound(4);
@@ -301,33 +325,33 @@ public class PatternsOfActivity extends RegisteredSimulation {
         }
 
         // Set up the connections to the read out neurons
-        SynapseGroup out2read = new SynapseGroup(outGroup, readGroup);
+        SynapseGroup out2read = new SynapseGroup(outGroup, outputNeurons);
         out2read.setSpikeResponder(new ConvolvedJumpAndDecay(20), Polarity.BOTH);
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), readGroup.getNeuron(0)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), readGroup.getNeuron(0)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), readGroup.getNeuron(1)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(3), readGroup.getNeuron(1)));
+        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), outputNeurons.getNeuron(0)));
+        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), outputNeurons.getNeuron(0)));
+        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), outputNeurons.getNeuron(1)));
+        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(3), outputNeurons.getNeuron(1)));
         out2read.setDisplaySynapses(false);
         out2read.setConnectionManager(new AllToAll());
         out2read.setUpperBound(1000000000, Polarity.BOTH);
         out2read.setLowerBound(-1000000000, Polarity.BOTH);
 
         // Make couplings
-        sim.tryCoupling(sim.getProducer(readGroup.getNeuron(0), "getActivation"),
+        sim.tryCoupling(sim.getProducer(outputNeurons.getNeuron(0), "getActivation"),
             sim.getConsumer(mouse, "setVelocityX"));
-        sim.tryCoupling(sim.getProducer(readGroup.getNeuron(1), "getActivation"),
+        sim.tryCoupling(sim.getProducer(outputNeurons.getNeuron(1), "getActivation"),
             sim.getConsumer(mouse, "setVelocityY"));
         sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
         // Add everything to the network
-        network.addGroup(recNeurons);
+        network.addGroup(recurrentNetwork);
         network.addGroup(inpSynGL);
         network.addGroup(inpSynGR);
         network.addGroup(recSyns);
         network.addGroup(outGroup);
         network.addGroup(rec2out);
-        network.addGroup(readGroup);
+        network.addGroup(outputNeurons);
         network.addGroup(out2read);
         network.addGroup(sensoryNetL);
         network.addGroup(sensoryNetR);
@@ -335,13 +359,9 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up concurrent buffered update
         network.getUpdateManager().clear();
         network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
-
     }
 
 
-    /**
-     * @param synG
-     */
     private void initializeSynParameters(SynapseGroup synG) {
         synG.setLearningRule(ruleEx, Polarity.EXCITATORY);
         synG.setLearningRule(ruleIn, Polarity.INHIBITORY);
@@ -372,10 +392,6 @@ public class PatternsOfActivity extends RegisteredSimulation {
     public PatternsOfActivity instantiate(SimbrainDesktop desktop) {
         return new PatternsOfActivity(desktop);
     }
-
-
-    private double[] frEsts = new double[netSize + 4];
-    private double[] graphicVal = new double[netSize + 4];
 
     /**
      * Extends the normal integrate and fire rule but also normalizes synapses
@@ -416,8 +432,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
             double dt = n.getNetwork().getTimeStep();
             totalTimeS += dt;
             double tau_base = dt / 1E5;
-//            frEsts[index] = (1 - (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50))) * frEsts[index])
-//                    + (n.isSpike() ? 1 : 0) * (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50)));
+            //frEsts[index] = (1 - (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50))) * frEsts[index])
+            //        + (n.isSpike() ? 1 : 0) * (tau_base * Math.sqrt((spkCounts[index] + 1) / (totalTimeS + 50)));
             double spk = n.isSpike() ? 1 : 0;
             frEsts[index] = ((1 - tau_base) * frEsts[index])
                 + spk * ((spk) + frEsts[index]) * tau_base;// * tau_base;
@@ -500,6 +516,26 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
     }
 
+    private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance, String methodName) {
+
+        // Create projection component
+        ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
+        pc.getProjectionModel().init(toPlot.size());
+        pc.getProjectionModel().getProjector().setTolerance(tolerance);
+        pc.getProjectionModel().getProjector().getColorManager().setColoringMethod("Bayesian");
+
+        // Coupling
+        Producer inputProducer = sim.getProducer(toPlot, methodName);
+        Consumer plotConsumer = sim.getConsumer(pc, "addPoint");
+        sim.tryCoupling(inputProducer, plotConsumer);
+
+        // Text of nearest world object to projection plot current dot
+        Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        Consumer plotText = sim.getConsumer(pc, "setLabel");
+        sim.tryCoupling(currentObject, plotText);
+
+
+    }
     @Override
     public String getSubmenuName() {
         return "Cognitive Maps";

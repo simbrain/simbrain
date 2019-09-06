@@ -173,10 +173,10 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public void setLabel(String text) {
         if (projectionModel.getProjector().getCurrentPoint() != null) {
             String currentText = projectionModel.getProjector().getCurrentPoint().getLabel();
-            // // Don't empty filled text
-            // if (text.isEmpty() && !currentText.isEmpty()) {
-            //     return;
-            // }
+             // Don't empty filled text
+             if (text.isEmpty() && !currentText.isEmpty()) {
+                 return;
+             }
             projectionModel.getProjector().getCurrentPoint().setLabel(text);
         }
     }

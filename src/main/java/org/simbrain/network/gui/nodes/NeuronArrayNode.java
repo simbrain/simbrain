@@ -144,8 +144,10 @@ public class NeuronArrayNode extends ScreenElement  {
                 null
         );
 
-        this.activations.setImage(img);
-        this.activations.setBounds(getBounds());
+        SwingUtilities.invokeLater(() -> {
+            this.activations.setImage(img);
+            this.activations.setBounds(getBounds());
+        });
     }
 
     /**

@@ -1,8 +1,13 @@
 package org.simbrain.network.core;
 
 
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.buffer.DoubleBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -11,7 +16,7 @@ import java.beans.PropertyChangeSupport;
  * High performance immutable array backed by ND4J Array.
  */
 //TOOD: Name? More like layer?  Or tensor?
-public class NeuronArray {
+public class NeuronArray implements AttributeContainer {
 
     /**
      * Reference to network this neuron is part of.
@@ -21,7 +26,7 @@ public class NeuronArray {
     /**
      * ND4J Array backing this object
      */
-    private INDArray neuronArray = Nd4j.rand(1000,1000).subi(0.5).mul(2);
+    private INDArray neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
 
     /**
      * x-coordinate of this neuron in 2-space.
@@ -54,10 +59,21 @@ public class NeuronArray {
         parent = net;
     }
 
+    @Consumable()
+    public void setValues(double[] values) {
+        neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
+        System.out.println(neuronArray);
+    }
+
+    @Producible()
+    public double[] getValues() {
+        return Nd4j.toFlattened(neuronArray).toDoubleVector();
+    }
+
     public void update() {
 
         // TODO: This is just a place holder. Do something useful.
-        neuronArray = Nd4j.rand(1000,1000).subi(0.5).mul(2);
+        neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
 
         changeSupport.firePropertyChange("updated", null, null);
     }

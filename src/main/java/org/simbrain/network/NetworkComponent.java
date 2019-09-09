@@ -101,6 +101,8 @@ public final class NetworkComponent extends WorkspaceComponent {
                     setChangedSinceLastSave(true);
                     fireAttributeContainerRemoved((NeuronCollection) evt.getOldValue());
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerAdded((NeuronArray) evt.getNewValue());
                 }
             }
         );
@@ -130,6 +132,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         retList.addAll(network.getNeuronGroups());
         retList.addAll(network.getSynapseGroups());
         retList.addAll(network.getNeuronCollectionSet());
+        retList.addAll(network.getNaList());
         return retList;
     }
 

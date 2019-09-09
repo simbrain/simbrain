@@ -1562,6 +1562,10 @@ public class Network {
         return retList;
     }
 
+    public List<NeuronArray> getNaList() {
+        return naList;
+    }
+
     public static int getSynapseVisibilityThreshold() {
         return synapseVisibilityThreshold;
     }

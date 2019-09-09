@@ -751,6 +751,33 @@ public class SimbrainMath {
     }
 
     /**
+     * Returns a bounded value of a number.
+     * 
+     * @param number the number to check
+     * @param upperBound upper bound
+     * @param lowerBound lower bound
+     * @param <T> T has to be a number
+     *
+     * @return the clipped value
+     */
+    public static <T extends Number & Comparable<T>> T clip(T number, T upperBound, T lowerBound) {
+        if (upperBound.compareTo(lowerBound) < 0) {
+            T temp = upperBound;
+            upperBound = lowerBound;
+            lowerBound = temp;
+        }
+
+        if (number.compareTo(lowerBound) < 0) {
+            return lowerBound;
+        } else if (number.compareTo(upperBound) > 0) {
+            return upperBound;
+        } else {
+            return number;
+        }
+
+    }
+
+    /**
      * Test randPermuteWithExclusion.
      *
      * @param yarhg

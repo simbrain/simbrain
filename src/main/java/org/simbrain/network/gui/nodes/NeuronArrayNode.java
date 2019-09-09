@@ -33,6 +33,7 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -124,11 +125,12 @@ public class NeuronArrayNode extends ScreenElement  {
         int[] raster = new int[neuronArray.getCols() * neuronArray.getRows()];
 
         for (int i = 0; i < activations.length; i++) {
-            float s = activations[i];
-            if (s < 0) {
-                raster[i] = Color.HSBtoRGB(2/3f, -s, 1.0f);
+            float saturation = activations[i];
+            saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
+            if (saturation < 0) {
+                raster[i] = Color.HSBtoRGB(2/3f, -saturation, 1.0f);
             } else {
-                raster[i] = Color.HSBtoRGB(0.0f, s, 1.0f);
+                raster[i] = Color.HSBtoRGB(0.0f, saturation, 1.0f);
             }
         }
 

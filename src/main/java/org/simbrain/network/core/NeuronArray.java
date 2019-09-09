@@ -61,8 +61,7 @@ public class NeuronArray implements AttributeContainer {
 
     @Consumable()
     public void setValues(double[] values) {
-        neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
-        System.out.println(neuronArray);
+        neuronArray = Nd4j.create(values).reshape(neuronArray.columns(), neuronArray.rows());
     }
 
     @Producible()
@@ -73,7 +72,7 @@ public class NeuronArray implements AttributeContainer {
     public void update() {
 
         // TODO: This is just a place holder. Do something useful.
-        neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
+        // neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
 
         changeSupport.firePropertyChange("updated", null, null);
     }

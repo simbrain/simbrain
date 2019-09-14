@@ -22,16 +22,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -243,10 +242,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
         panel.getActionMap().put("neuronArray", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                NeuronArray na = new NeuronArray(panel.getNetwork());
-                na.setX(panel.getLastClickedPosition().getX());
-                na.setY(panel.getLastClickedPosition().getY());
-                panel.getNetwork().addNeuronArray(na);
+                panel.showNeuronArrayCreationDialog();
             }
         });
 

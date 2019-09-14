@@ -25,17 +25,23 @@ public class NeuronArray implements EditableObject, AttributeContainer {
      */
     private final Network parent;
 
+    /**
+     * Number of columns in the under laying ND4J Array.
+     */
     @UserParameter(
             label = "columns",
             description = "Number of columns",
-            minimumValue = 1
+            editable = false
     )
     private int columns = 10;
 
+    /**
+     * Number of rows in the under laying ND4J Array.
+     */
     @UserParameter(
             label = "rows",
             description = "Number of rows",
-            minimumValue = 1
+            editable = false
     )
     private int rows = 10;
 
@@ -75,6 +81,11 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         parent = net;
     }
 
+    private NeuronArray(Network net, int columns, int rows) {
+        this(net);
+        neuronArray = Nd4j.rand(rows, columns).subi(0.5).mul(2);
+    }
+
     @Consumable()
     public void setValues(double[] values) {
         neuronArray = Nd4j.create(values).reshape(neuronArray.rows(), neuronArray.columns());
@@ -90,16 +101,6 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         // TODO: This is just a place holder. Do something useful.
         // neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
 
-        changeSupport.firePropertyChange("updated", null, null);
-    }
-
-    @Override
-    public void onCommit() {
-        if (columns * rows == neuronArray.length()) {
-            neuronArray = neuronArray.reshape(rows, columns);
-        } else {
-            neuronArray = Nd4j.zeros(rows, columns);
-        }
         changeSupport.firePropertyChange("updated", null, null);
     }
 
@@ -149,5 +150,53 @@ public class NeuronArray implements EditableObject, AttributeContainer {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public String getName() {
+        return "Neuron Array";
+    }
+
+    /**
+     * Since Neuron Array is immutable, this object will be used in the creation dialog.
+     */
+    public static class CreationTemplate implements EditableObject {
+
+        /**
+         * Number of columns in the under laying ND4J Array.
+         */
+        @UserParameter(
+                label = "columns",
+                description = "Number of columns",
+                minimumValue = 1
+        )
+        private int columns = 10;
+
+        /**
+         * Number of rows in the under laying ND4J Array.
+         */
+        @UserParameter(
+                label = "rows",
+                description = "Number of rows",
+                minimumValue = 1
+        )
+        private int rows = 10;
+
+        /**
+         * Add a neuron array to network created from field values which should be setup by an Annotated Property
+         * Editor.
+         *
+         * @param network the network this neuron array adds to
+         *
+         * @return the created neuron array
+         */
+        public NeuronArray create(Network network) {
+            return new NeuronArray(network, columns, rows);
+        }
+
+        @Override
+        public String getName() {
+            return "Neuron Array";
+        }
     }
 }

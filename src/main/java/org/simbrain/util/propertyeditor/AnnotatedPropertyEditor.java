@@ -351,8 +351,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         }
 
-        objectsToEdit.forEach(EditableObject::onCommit);
-
     }
 
     /**

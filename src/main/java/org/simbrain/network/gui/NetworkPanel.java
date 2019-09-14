@@ -33,6 +33,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.neuron.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
@@ -1295,6 +1296,7 @@ public class NetworkPanel extends JPanel {
         // Insert actions
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(new AddNeuronsAction(this));
+        contextMenu.add(new AddNeuronArrayAction(this));
         contextMenu.add(actionManager.getNewGroupMenu());
         contextMenu.add(actionManager.getNewNetworkMenu());
 
@@ -2776,6 +2778,21 @@ public class NetworkPanel extends JPanel {
         StandardDialog dialog = new AnnotatedPropertyEditor(arrays).getDialog();
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
+    }
+
+    public void showNeuronArrayCreationDialog() {
+        NeuronArray.CreationTemplate creationTemplate = new NeuronArray.CreationTemplate();
+        StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();
+        and.addClosingTask( () -> SwingUtilities.invokeLater(() -> {
+            Network network = getNetwork();
+            NeuronArray neuronArray = creationTemplate.create(network);
+            neuronArray.setX(getLastClickedPosition().getX());
+            neuronArray.setY(getLastClickedPosition().getY());
+            network.addNeuronArray(neuronArray);
+        }));
+        and.pack();
+        and.setLocationRelativeTo(null);
+        and.setVisible(true);
     }
 
     public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {

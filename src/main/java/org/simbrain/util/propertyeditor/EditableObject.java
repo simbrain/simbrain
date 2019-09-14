@@ -36,9 +36,4 @@ public interface EditableObject {
     }
     // See ParameterWidget#getTypeMap
 
-    default void onCommit() {
-
-    }
-
-
 }

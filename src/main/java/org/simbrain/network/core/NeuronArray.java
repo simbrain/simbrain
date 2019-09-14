@@ -26,12 +26,21 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     private final Network parent;
 
     /**
+     * A label for this Neuron Array for display purpose.
+     */
+    @UserParameter(
+            label = "Label"
+    )
+    private String label = "Neuron Array";
+
+    /**
      * Number of columns in the under laying ND4J Array.
      */
     @UserParameter(
-            label = "columns",
+            label = "Columns",
             description = "Number of columns",
-            editable = false
+            editable = false,
+            order = 1
     )
     private int columns = 10;
 
@@ -39,9 +48,10 @@ public class NeuronArray implements EditableObject, AttributeContainer {
      * Number of rows in the under laying ND4J Array.
      */
     @UserParameter(
-            label = "rows",
+            label = "Rows",
             description = "Number of rows",
-            editable = false
+            editable = false,
+            order = 2
     )
     private int rows = 10;
 
@@ -153,6 +163,15 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     }
 
     @Override
+    public void onCommit() {
+        changeSupport.firePropertyChange("labelChanged", null, label);
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
     public String getName() {
         return "Neuron Array";
     }
@@ -163,12 +182,21 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     public static class CreationTemplate implements EditableObject {
 
         /**
+         * A label for this Neuron Array for display purpose.
+         */
+        @UserParameter(
+                label = "Label"
+        )
+        private String label = "Neuron Array";
+
+        /**
          * Number of columns in the under laying ND4J Array.
          */
         @UserParameter(
-                label = "columns",
+                label = "Columns",
                 description = "Number of columns",
-                minimumValue = 1
+                minimumValue = 1,
+                order = 1
         )
         private int columns = 10;
 
@@ -176,9 +204,10 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * Number of rows in the under laying ND4J Array.
          */
         @UserParameter(
-                label = "rows",
+                label = "Rows",
                 description = "Number of rows",
-                minimumValue = 1
+                minimumValue = 1,
+                order = 2
         )
         private int rows = 10;
 
@@ -191,7 +220,9 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            return new NeuronArray(network, columns, rows);
+            NeuronArray neuronArray = new NeuronArray(network, columns, rows);
+            neuronArray.label = label;
+            return neuronArray;
         }
 
         @Override

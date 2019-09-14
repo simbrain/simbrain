@@ -59,10 +59,16 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     protected NeuronArray neuronArray;
 
+    private final float squareWidth = 100;
+
+    private final float squareHeight = 50;
+
     /**
      * Square shape for representing activity generators.
      */
-    private PPath square = PPath.createRectangle(0 ,0,50,25);
+    private PPath square = PPath.createRectangle(0, 0, squareWidth, squareHeight);
+
+    private NeuronArrayInteractionBox interactionBox;
 
     /**
      * Number text inside neuron.
@@ -77,12 +83,12 @@ public class NeuronArrayNode extends ScreenElement  {
     /**
      * A background to show when no {@link #activations} image is present. (So that the node will not be transparent)
      */
-    private PPath background = PPath.createRectangle(0 ,0,50,25);
+    private PPath background = PPath.createRectangle(0, 0, squareWidth, squareHeight);
 
     /**
      * Font for info text.
      */
-    public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 7);
+    public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 16);
 
 
     /**
@@ -95,11 +101,18 @@ public class NeuronArrayNode extends ScreenElement  {
         super(net);
         square.setTransparency(0.2f);
         this.neuronArray = na;
-
+        interactionBox = new NeuronArrayInteractionBox(net);
+        interactionBox.setText(neuronArray.getLabel());
+        addChild(interactionBox);
+        // Must do this after it's added to properly locate it
+        interactionBox.updateText();
         neuronArray.addPropertyChangeListener(evt -> {
             if ("updated".equals(evt.getPropertyName())) {
                 renderArrayToActivationsImage();
                 updateInfoText();
+            } else if("labelChanged".equals(evt.getPropertyName())) {
+                interactionBox.setText((String) evt.getNewValue());
+                interactionBox.updateText();
             }
         });
 
@@ -169,11 +182,11 @@ public class NeuronArrayNode extends ScreenElement  {
         PBounds bounds = square.getBounds();
         setBounds(bounds);
 
-        infoText = new PText("rows: " + neuronArray.getRows() + "\n cols: "
-            + neuronArray.getCols());
+        infoText = new PText();
+        updateInfoText();
         infoText.setFont(INFO_FONT);
         addChild(infoText);
-        infoText.offset(4,4);
+        infoText.offset(8, 8);
 
         //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
@@ -184,9 +197,22 @@ public class NeuronArrayNode extends ScreenElement  {
     }
 
     public void updateInfoText() {
-        infoText.setText("rows: " + neuronArray.getRows() + "\n cols: "
-                + neuronArray.getCols());
+        infoText.setText("rows: " + neuronArray.getRows() + "\ncols: " + neuronArray.getCols());
     }
+
+    /**
+     * Override PNode layoutChildren method in order to properly set the
+     * positions of children nodes.
+     */
+    @Override
+    public void layoutChildren() {
+        if (this.getVisible() && !getNetworkPanel().isRunning()) {
+            interactionBox.setOffset(square.getFullBounds().getX(),
+                    square.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
+        }
+    }
+
+
 
 
     @Override
@@ -224,6 +250,10 @@ public class NeuronArrayNode extends ScreenElement  {
         return null;
     }
 
+    public NeuronArrayInteractionBox getInteractionBox() {
+        return interactionBox;
+    }
+
     @Override
     protected boolean hasPropertyDialog() {
         return true;
@@ -237,6 +267,39 @@ public class NeuronArrayNode extends ScreenElement  {
     @Override
     public void resetColors() {
 
+    }
+
+    /**
+     * Custom interaction box for Subnetwork node. Ensures a property dialog
+     * appears when the box is double-clicked.
+     */
+    public class NeuronArrayInteractionBox extends InteractionBox {
+
+        public NeuronArrayInteractionBox(NetworkPanel net) {
+            super(net);
+        }
+
+        @Override
+        protected boolean hasPropertyDialog() {
+            return false;
+        }
+
+        @Override
+        protected boolean hasContextMenu() {
+            return false;
+        }
+
+        @Override
+        protected String getToolTipText() {
+            return "NeuronGroup: " + neuronArray.getId()
+                    + " Location: (" + Utils.round(neuronArray.getX(),2) + ","
+                    + Utils.round(neuronArray.getY(),2) + ")";
+        }
+
+        @Override
+        protected boolean hasToolTipText() {
+            return true;
+        }
     }
 
 }

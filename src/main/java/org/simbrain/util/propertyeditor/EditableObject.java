@@ -36,4 +36,11 @@ public interface EditableObject {
     }
     // See ParameterWidget#getTypeMap
 
+    /**
+     * A method to be invoked at the end of {@link AnnotatedPropertyEditor#commitChanges()}
+     */
+    default void onCommit() {
+
+    }
+
 }

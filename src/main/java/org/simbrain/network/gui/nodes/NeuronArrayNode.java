@@ -99,6 +99,7 @@ public class NeuronArrayNode extends ScreenElement  {
         neuronArray.addPropertyChangeListener(evt -> {
             if ("updated".equals(evt.getPropertyName())) {
                 renderArrayToActivationsImage();
+                updateInfoText();
             }
         });
 
@@ -168,7 +169,7 @@ public class NeuronArrayNode extends ScreenElement  {
         PBounds bounds = square.getBounds();
         setBounds(bounds);
 
-        infoText = new PText("rows: " + neuronArray.getRows() + "\n cols:"
+        infoText = new PText("rows: " + neuronArray.getRows() + "\n cols: "
             + neuronArray.getCols());
         infoText.setFont(INFO_FONT);
         addChild(infoText);
@@ -178,6 +179,14 @@ public class NeuronArrayNode extends ScreenElement  {
 
     }
 
+    public NeuronArray getNeuronArray() {
+        return neuronArray;
+    }
+
+    public void updateInfoText() {
+        infoText.setText("rows: " + neuronArray.getRows() + "\n cols: "
+                + neuronArray.getCols());
+    }
 
 
     @Override
@@ -217,12 +226,12 @@ public class NeuronArrayNode extends ScreenElement  {
 
     @Override
     protected boolean hasPropertyDialog() {
-        return false;
+        return true;
     }
 
     @Override
     protected JDialog getPropertyDialog() {
-        return null;
+        return getNetworkPanel().getNeuronArrayDialog();
     }
 
     @Override

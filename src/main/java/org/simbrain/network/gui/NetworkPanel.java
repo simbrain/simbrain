@@ -56,6 +56,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
 
@@ -1653,6 +1654,17 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Creates and displays the neuron properties dialog.
+     */
+    public void showSelectedNeuronArrayProperties() {
+        StandardDialog dialog = new AnnotatedPropertyEditor(getSelectedModelNeurons()).getDialog();
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    /**
      * Creates and displays the synapse properties dialog.
      */
     public void showSelectedSynapseProperties() {
@@ -1848,6 +1860,19 @@ public class NetworkPanel extends JPanel {
             }
         }
         return ret;
+    }
+
+    /**
+     * Returns selected Neuron Arrays.
+     *
+     * @return list of selectedNeuronArrays
+     */
+    public List<NeuronArray> getSelectedModelNeuronArrays() {
+        return getSelection().stream()
+                .filter(NeuronArrayNode.class::isInstance)
+                .map(NeuronArrayNode.class::cast)
+                .map(NeuronArrayNode::getNeuronArray)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -2739,6 +2764,16 @@ public class NetworkPanel extends JPanel {
             return null;
         }
         NeuronDialog dialog = new NeuronDialog(neurons);
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
+    }
+
+    public StandardDialog getNeuronArrayDialog() {
+        List<NeuronArray> arrays = getSelectedModelNeuronArrays();
+        if (arrays == null || arrays.isEmpty()) {
+            return null;
+        }
+        StandardDialog dialog = new AnnotatedPropertyEditor(arrays).getDialog();
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
     }

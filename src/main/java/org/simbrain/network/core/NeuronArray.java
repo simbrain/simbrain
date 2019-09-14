@@ -5,6 +5,8 @@ import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.buffer.DoubleBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -16,17 +18,31 @@ import java.beans.PropertyChangeSupport;
  * High performance immutable array backed by ND4J Array.
  */
 //TOOD: Name? More like layer?  Or tensor?
-public class NeuronArray implements AttributeContainer {
+public class NeuronArray implements EditableObject, AttributeContainer {
 
     /**
      * Reference to network this neuron is part of.
      */
     private final Network parent;
 
+    @UserParameter(
+            label = "columns",
+            description = "Number of columns",
+            minimumValue = 1
+    )
+    private int columns = 10;
+
+    @UserParameter(
+            label = "rows",
+            description = "Number of rows",
+            minimumValue = 1
+    )
+    private int rows = 10;
+
     /**
      * ND4J Array backing this object
      */
-    private INDArray neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
+    private INDArray neuronArray = Nd4j.rand(rows, columns).subi(0.5).mul(2);
 
     /**
      * x-coordinate of this neuron in 2-space.
@@ -61,7 +77,7 @@ public class NeuronArray implements AttributeContainer {
 
     @Consumable()
     public void setValues(double[] values) {
-        neuronArray = Nd4j.create(values).reshape(neuronArray.columns(), neuronArray.rows());
+        neuronArray = Nd4j.create(values).reshape(neuronArray.rows(), neuronArray.columns());
     }
 
     @Producible()
@@ -77,6 +93,16 @@ public class NeuronArray implements AttributeContainer {
         changeSupport.firePropertyChange("updated", null, null);
     }
 
+    @Override
+    public void onCommit() {
+        if (columns * rows == neuronArray.length()) {
+            neuronArray = neuronArray.reshape(rows, columns);
+        } else {
+            neuronArray = Nd4j.zeros(rows, columns);
+        }
+        changeSupport.firePropertyChange("updated", null, null);
+    }
+
     public int getRows() {
         return neuronArray.rows();
     }
@@ -88,8 +114,6 @@ public class NeuronArray implements AttributeContainer {
     public INDArray getNeuronArray() {
         return neuronArray;
     }
-
-
 
     public double getX() {
         return x;

@@ -1,4 +1,4 @@
-package org.simbrain.network.gui.actions.neuron;
+package org.simbrain.network.gui.actions.neuronarray;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronArray;

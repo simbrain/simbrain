@@ -31,7 +31,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.neuron.AddNeuronArrayAction;
+import org.simbrain.network.gui.actions.neuronarray.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;

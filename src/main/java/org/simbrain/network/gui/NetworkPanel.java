@@ -33,7 +33,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.neuron.AddNeuronArrayAction;
+import org.simbrain.network.gui.actions.neuronarray.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
@@ -1840,12 +1840,28 @@ public class NetworkPanel extends JPanel {
             .collect(Collectors.toList());
     }
 
+    public List<NeuronCollectionNode> getSelectedNeuronCollections() {
+        return getSelection().stream()
+                .filter(n -> n.getParent() instanceof NeuronCollectionNode)
+                .map(PNode::getParent)
+                .map(NeuronCollectionNode.class::cast)
+                .collect(Collectors.toList());
+    }
+
     public Collection<SynapseGroupNode> getSelectedSynapseGroups() {
         return getSelection().stream()
             .filter(n -> n.getParent() instanceof SynapseGroupNode)
             .map(PNode::getParent)
             .map(n -> (SynapseGroupNode)n)
             .collect(Collectors.toList());
+    }
+
+    public List<NeuronArrayNode> getSelectedNeuronArrays() {
+        return getSelection().stream()
+                .filter(n -> n.getParent() instanceof NeuronArrayNode)
+                .map(PNode::getParent)
+                .map(NeuronArrayNode.class::cast)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1931,6 +1947,15 @@ public class NetworkPanel extends JPanel {
         return ret;
     }
 
+    public List<NeuronCollection> getSelectedModelNeuronCollection() {
+        return getSelection().stream()
+                .filter(n -> n.getParent() instanceof NeuronCollectionNode)
+                .map(PNode::getParent)
+                .map(NeuronCollectionNode.class::cast)
+                .map(NeuronCollectionNode::getNeuronCollection)
+                .collect(Collectors.toList());
+    }
+
     /**
      * Returns selected synapse groups.
      *
@@ -1974,6 +1999,38 @@ public class NetworkPanel extends JPanel {
             }
         }
         return ret;
+    }
+
+    public void connectNeuronArray() {
+        if (!(getSelectedModelNeuronArrays().isEmpty()) || !(getSourceModelNeuronArrays().isEmpty())) {
+            // ArrayList<NeuronGroup> sourceGroup = panel.getSourceModelGroups();
+            List<NeuronCollection> sourceCollection = getSourceModelNeuronCollections();
+            List<NeuronArray> sourceArray = getSourceModelNeuronArrays();
+
+            // Collection<NeuronGroupNode> targetGroup = panel.getSelectedNeuronGroups();
+            List<NeuronCollection> targetCollection = getSelectedModelNeuronCollection();
+            List<NeuronArray> targetArray = getSelectedModelNeuronArrays();
+
+            // array -> array
+            for (NeuronArray source : sourceArray) {
+                for (NeuronArray target : targetArray) {
+                    getNetwork().addNeuronArrayConnection(source, target);
+                }
+            }
+
+            // collection -> array
+            for (NeuronCollection source : sourceCollection) {
+                for (NeuronArray target : targetArray) {
+                    network.addNeuronArrayConnection(source, target);
+                }
+            }
+
+            for (NeuronArray source : sourceArray) {
+                for (NeuronCollection target : targetCollection) {
+                    network.addNeuronArrayConnection(source, target);
+                }
+            }
+        }
     }
 
     /**
@@ -2516,6 +2573,14 @@ public class NetworkPanel extends JPanel {
             sourceElements.add(node.getInteractionBox());
             SourceHandle.addSourceHandleTo(node.getInteractionBox());
         }
+        for (NeuronCollectionNode node : getSelectedNeuronCollections()) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node.getInteractionBox());
+        }
+        for (NeuronArrayNode node : this.getSelectedNeuronArrays()) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
+        }
         selectionModel.fireSelectionChanged();
     }
 
@@ -2574,6 +2639,22 @@ public class NetworkPanel extends JPanel {
             }
         }
         return ret;
+    }
+
+    public List<NeuronCollection> getSourceModelNeuronCollections() {
+        return sourceElements.stream()
+                .filter(NeuronCollectionNode.class::isInstance)
+                .map(NeuronCollectionNode.class::cast)
+                .map(NeuronCollectionNode::getNeuronCollection)
+                .collect(Collectors.toList());
+    }
+
+    public List<NeuronArray> getSourceModelNeuronArrays() {
+        return sourceElements.stream()
+                .filter(NeuronArrayNode.class::isInstance)
+                .map(NeuronArrayNode.class::cast)
+                .map(NeuronArrayNode::getNeuronArray)
+                .collect(Collectors.toList());
     }
 
     /**

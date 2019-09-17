@@ -168,6 +168,12 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         changeSupport.addPropertyChangeListener(listener);
     }
 
+    public void setNeuronArray(INDArray data) {
+        neuronArray = data;
+        columns = data.columns();
+        rows = data.rows();
+    }
+
     @Override
     public void onCommit() {
         changeSupport.firePropertyChange("labelChanged", null, label);

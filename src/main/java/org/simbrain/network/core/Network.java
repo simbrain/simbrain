@@ -20,6 +20,7 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.*;
+import org.simbrain.network.gui.actions.neuronarray.NeuronArrayConnection;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
@@ -83,6 +84,8 @@ public class Network {
      * Array list of "loose synapses" (as opposed to synapses in synapse groups)
      */
     private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
+
+    private final Set<NeuronArrayConnection> neuronArrayConnections = new HashSet<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -541,6 +544,10 @@ public class Network {
         for (Synapse s : looseSynapses) {
             s.update();
         }
+    }
+
+    public void updateNeuronArrayConnections() {
+        neuronArrayConnections.forEach(NeuronArrayConnection::update);
     }
 
     /**
@@ -1528,6 +1535,18 @@ public class Network {
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
         addGroup(group);
+    }
+
+    public void addNeuronArrayConnection(NeuronArray source, NeuronArray target) {
+        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
+    }
+
+    public void addNeuronArrayConnection(NeuronCollection source, NeuronArray target) {
+        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
+    }
+
+    public void addNeuronArrayConnection(NeuronArray source, NeuronCollection target) {
+        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
     }
 
     /**

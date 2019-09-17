@@ -60,6 +60,8 @@ import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.gui.CouplingMenu;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -539,6 +541,9 @@ public class NetworkPanel extends JPanel {
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     NeuronArrayNode nad = new NeuronArrayNode(this, (NeuronArray) evt.getNewValue());
                     canvas.getLayer().addChild(nad);
+                    zoomToFitPage(true);
+                } else if ("naRemoved".equals(evt.getPropertyName())) {
+                    ((NeuronArray)evt.getOldValue()).fireDeleted();
                 } else if ("ncAdded".equals(evt.getPropertyName())) {
                     addNeuronCollection((NeuronCollection)evt.getNewValue());
                 } else if ("updateTimeDisplay".equals(evt.getPropertyName())) {
@@ -1479,6 +1484,9 @@ public class NetworkPanel extends JPanel {
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.removeSynapse(selectedSynapseNode.getSynapse());
+            } else if (selectedNode instanceof NeuronArrayNode) {
+                NeuronArrayNode arrayNode = (NeuronArrayNode) selectedNode;
+                network.removeNeuronArray(arrayNode.getNeuronArray());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());
@@ -1951,6 +1959,8 @@ public class NetworkPanel extends JPanel {
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
+            } else if (e instanceof NeuronArrayNode) {
+                ret.add(((NeuronArrayNode) e).getNeuronArray());
             } else if (e instanceof TextNode) {
                 ret.add(((TextNode) e).getTextObject());
             } else if (e instanceof InteractionBox) {
@@ -3016,6 +3026,21 @@ public class NetworkPanel extends JPanel {
         return contextMenu;
     }
 
+
+    /**
+     * Creates the coupling menu for the provided attribute container. Null if the network panel is
+     * not in a desktop environment. Overridden by
+     * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
+     * to workspace level coupling menus.
+     *
+     * @param container the neuron group whose producers and consumers will be used to produce a menu
+     * @return the coupling menu
+     */
+    public JMenu getCouplingMenu(AttributeContainer container) {
+        return null;
+    }
+
+    // TODO: Get rid of cruft below
     /**
      * Creates the coupling menu for neuron groups. Null if the network panel is
      * not in a desktop environment. Overridden by
@@ -3026,6 +3051,19 @@ public class NetworkPanel extends JPanel {
      * @return the coupling menu
      */
     public JMenu getNeuronGroupCouplingMenu(NeuronGroup neuronGroup) {
+        return null;
+    }
+
+    /**
+     * Creates the coupling menu for neuron arrays. Null if the network panel is
+     * not in a desktop environment. Overridden by
+     * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
+     * to workspace level coupling menus.
+     *
+     * @param neuronArray the neuron group whose producers and consumers will be used to produce a menu
+     * @return the coupling menu
+     */
+    public JMenu getNeuronArrayCouplingMenu(NeuronArray neuronArray) {
         return null;
     }
 

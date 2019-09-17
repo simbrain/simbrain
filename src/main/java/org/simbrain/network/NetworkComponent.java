@@ -100,6 +100,9 @@ public final class NetworkComponent extends WorkspaceComponent {
                 } else if ("ncRemoved".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
                     fireAttributeContainerRemoved((NeuronCollection) evt.getOldValue());
+                } else if ("naRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((NeuronArray) evt.getOldValue());
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
                     fireAttributeContainerAdded((NeuronArray) evt.getNewValue());

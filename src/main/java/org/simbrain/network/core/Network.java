@@ -165,6 +165,11 @@ public class Network {
     private SimpleId collectionIdGenerator = new SimpleId("Collection", 1);
 
     /**
+     * Collection Id generator.
+     */
+    private SimpleId naIdGenerator = new SimpleId("Array", 1);
+
+    /**
      * A variable telling the network not to fire events to any listeners during update.
      */
     private volatile boolean fireUpdates = true;
@@ -570,7 +575,7 @@ public class Network {
     }
 
     /**
-     * Remove the indicated neuron collection.
+     * Remove a neuron collection.
      *
      * @param nc the collection to remove
      */
@@ -578,6 +583,16 @@ public class Network {
         neuronCollectionSet.remove(nc);
         nc.delete();
         changeSupport.firePropertyChange("ncRemoved", nc, null);
+    }
+
+    /**
+     * Remove a neuron array.
+     *
+     * @param na the neuron array to remove
+     */
+    public void removeNeuronArray(NeuronArray na) {
+        naList.remove(na);
+        changeSupport.firePropertyChange("naRemoved", na, null);
     }
 
     /**

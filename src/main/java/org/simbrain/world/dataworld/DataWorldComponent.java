@@ -85,7 +85,9 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
             @Override
             public void couplingAdded(Coupling<?> coupling) {
                 if (coupling.getConsumer().getBaseObject() == DataWorldComponent.this) {
-                    dataTable.setColumnHeadings(Arrays.asList(coupling.getProducer().getLabelArray()));
+                    if (coupling.getProducer().getLabelArray() != null) {
+                        dataTable.setColumnHeadings(Arrays.asList(coupling.getProducer().getLabelArray()));
+                    }
                 }
             }
         });

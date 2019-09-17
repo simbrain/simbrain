@@ -17,8 +17,9 @@ import java.beans.PropertyChangeSupport;
 /**
  * High performance immutable array backed by ND4J Array.
  */
-//TOOD: Name? More like layer?  Or tensor?
 public class NeuronArray implements EditableObject, AttributeContainer {
+
+    //TODO: Rename ideas: Array, Layer, ND4J Array, Double Array
 
     /**
      * Reference to network this neuron is part of.
@@ -42,7 +43,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
             editable = false,
             order = 1
     )
-    private int columns = 10;
+    private int columns = 100;
 
     /**
      * Number of rows in the under laying ND4J Array.
@@ -53,7 +54,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
             editable = false,
             order = 2
     )
-    private int rows = 10;
+    private int rows = 1;
 
     /**
      * ND4J Array backing this object
@@ -80,6 +81,11 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     /**
      * Render an image showing each activation when true.
      */
+    @UserParameter(
+            label = "Show activations",
+            description = "Whether to show activations as a pixel image",
+            order = 4
+    )
     private boolean renderActivations = true;
 
     /**
@@ -177,6 +183,13 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     }
 
     /**
+     * Notify listeners that this object has been deleted.
+     */
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", this, null);
+    }
+
+    /**
      * Since Neuron Array is immutable, this object will be used in the creation dialog.
      */
     public static class CreationTemplate implements EditableObject {
@@ -198,7 +211,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
                 minimumValue = 1,
                 order = 1
         )
-        private int columns = 10;
+        private int columns = 100;
 
         /**
          * Number of rows in the under laying ND4J Array.
@@ -209,7 +222,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
                 minimumValue = 1,
                 order = 2
         )
-        private int rows = 10;
+        private int rows = 1;
 
         /**
          * Add a neuron array to network created from field values which should be setup by an Annotated Property

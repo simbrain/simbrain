@@ -20,6 +20,7 @@ package org.simbrain.network.desktop;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
@@ -47,6 +48,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -355,6 +357,27 @@ public class NetworkPanelDesktop extends NetworkPanel {
         dialog.setVisible(true);
 
     }
+
+    @Override
+    public JMenu getCouplingMenu(AttributeContainer container) {
+        if (component.getWorkspaceComponent() != null) {
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), container);
+            return menu;
+        }
+        return null;
+    }
+
+    // TODO: Get rid of cruft below
+
+    @Override
+    public JMenu getNeuronArrayCouplingMenu(NeuronArray neuronArray) {
+        if (component.getWorkspaceComponent() != null) {
+            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuronArray);
+            return menu;
+        }
+        return null;
+    }
+
 
     @Override
     public JMenu getNeuronGroupCouplingMenu(NeuronGroup neuronGroup) {

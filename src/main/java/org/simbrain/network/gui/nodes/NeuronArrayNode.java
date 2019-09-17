@@ -18,34 +18,25 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.nd4j.linalg.dataset.api.preprocessor.MinMaxStrategy;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.nd4j.linalg.factory.Nd4j;
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
-import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.Utils;
+import org.simbrain.network.gui.actions.SetTextPropertiesAction;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
+import java.awt.event.ActionEvent;
 import java.awt.image.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-//import org.piccolo2d.nodes.PText;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -59,37 +50,51 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     protected NeuronArray neuronArray;
 
-    private final float squareWidth = 100;
-
-    private final float squareHeight = 50;
-
     /**
-     * Square shape for representing activity generators.
+     * Width in pixels of the main display box for ND4J arrays.
      */
-    private PPath square = PPath.createRectangle(0, 0, squareWidth, squareHeight);
-
-    private NeuronArrayInteractionBox interactionBox;
+    private final float boxWidth = 100;
 
     /**
-     * Number text inside neuron.
+     * Height in pixels of the main display box for ND4J arrays.
+     */
+    private final float boxHeight = 50;
+
+    /**
+     * Height in pixels of the pixel display showing the activations.
+     */
+    private double activationImageHeight = 10;
+
+    /**
+     * Text showing info about the array.
      */
     private PText infoText;
 
     /**
-     * Image to show activations.
+     * Square shape for representing activity generators.  Shown as a gray border.
      */
-    private PImage activations = new PImage();
+    private PPath borderBox = PPath.createRectangle(0, 0, boxWidth, boxHeight);
 
     /**
-     * A background to show when no {@link #activations} image is present. (So that the node will not be transparent)
+     * Image to show activationImage.
      */
-    private PPath background = PPath.createRectangle(0, 0, squareWidth, squareHeight);
+    private PImage activationImage = new PImage();
+
+    /**
+     * A backgroundImage to show when no {@link #activationImage} image is present.
+     * (So that the node will not be transparent)
+     */
+    private PPath backgroundImage = PPath.createRectangle(0, 0, boxWidth, boxHeight);
 
     /**
      * Font for info text.
      */
-    public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 16);
+    public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 8);
 
+    /**
+     * Parent network panel.
+     */
+    private final NetworkPanel networkPanel;
 
     /**
      * Create a new neuron array node.
@@ -99,35 +104,55 @@ public class NeuronArrayNode extends ScreenElement  {
      */
     public NeuronArrayNode(final NetworkPanel net, final NeuronArray na) {
         super(net);
-        square.setTransparency(0.2f);
+        borderBox.setTransparency(0.2f);
         this.neuronArray = na;
-        interactionBox = new NeuronArrayInteractionBox(net);
-        interactionBox.setText(neuronArray.getLabel());
-        addChild(interactionBox);
-        // Must do this after it's added to properly locate it
-        interactionBox.updateText();
+        networkPanel = net;
+
         neuronArray.addPropertyChangeListener(evt -> {
             if ("updated".equals(evt.getPropertyName())) {
                 renderArrayToActivationsImage();
                 updateInfoText();
             } else if("labelChanged".equals(evt.getPropertyName())) {
-                interactionBox.setText((String) evt.getNewValue());
-                interactionBox.updateText();
+                //interactionBox.setText((String) evt.getNewValue());
+                //interactionBox.updateText();
+            } else if("delete".equals(evt.getPropertyName())) {
+                NeuronArrayNode.this.removeFromParent();
             }
         });
 
         this.centerFullBoundsOnPoint(na.getX(), na.getY());
-        init();
+
+        // Set up main items
+        borderBox.setPickable(true);
+        addChild(backgroundImage);
+        addChild(activationImage);
+        addChild(borderBox);
+
+        // Border box determines bounds
+        PBounds bounds = borderBox.getBounds();
+        setBounds(bounds);
+
+        // Info text
+        infoText = new PText();
+        infoText.setFont(INFO_FONT);
+        addChild(infoText);
+        infoText.offset(8, 8);
+        updateInfoText();
+
+        // Image array
+        renderArrayToActivationsImage();
+
     }
 
     /**
-     * Render an image and set it to {@link #activations} to show the current activations.
+     * Render an image and set it to {@link #activationImage} to show the current activationImage.
      *
      * Will not render when {@link NeuronArray#isRenderActivations()} is set to false.
      */
     private void renderArrayToActivationsImage() {
 
         if (!neuronArray.isRenderActivations()) {
+            // TODO: Remove existing
             return;
         }
 
@@ -138,6 +163,7 @@ public class NeuronArrayNode extends ScreenElement  {
 
         int[] raster = new int[neuronArray.getCols() * neuronArray.getRows()];
 
+        // TODO: Use standardized Simbrain library for these color scalings
         for (int i = 0; i < activations.length; i++) {
             float saturation = activations[i];
             saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
@@ -161,35 +187,10 @@ public class NeuronArrayNode extends ScreenElement  {
         );
 
         SwingUtilities.invokeLater(() -> {
-            this.activations.setImage(img);
-            this.activations.setBounds(getBounds());
+            this.activationImage.setImage(img);
+            this.activationImage.setBounds(5,.75*boxHeight - activationImageHeight /2,
+                    boxWidth-10, activationImageHeight);
         });
-    }
-
-    /**
-     * Initialize the NeuronNode.
-     */
-    private void init() {
-
-        square.setPickable(true);
-
-        addChild(background);
-        addChild(activations);
-        addChild(square);
-
-        renderArrayToActivationsImage();
-
-        PBounds bounds = square.getBounds();
-        setBounds(bounds);
-
-        infoText = new PText();
-        updateInfoText();
-        infoText.setFont(INFO_FONT);
-        addChild(infoText);
-        infoText.offset(8, 8);
-
-        //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-
     }
 
     public NeuronArray getNeuronArray() {
@@ -197,23 +198,10 @@ public class NeuronArrayNode extends ScreenElement  {
     }
 
     public void updateInfoText() {
-        infoText.setText("rows: " + neuronArray.getRows() + "\ncols: " + neuronArray.getCols());
+        infoText.setText("nodes: " + neuronArray.getNeuronArray().length()
+                + "\nmean activation: "
+                + SimbrainMath.roundDouble((java.lang.Double) neuronArray.getNeuronArray().meanNumber(),4));
     }
-
-    /**
-     * Override PNode layoutChildren method in order to properly set the
-     * positions of children nodes.
-     */
-    @Override
-    public void layoutChildren() {
-        if (this.getVisible() && !getNetworkPanel().isRunning()) {
-            interactionBox.setOffset(square.getFullBounds().getX(),
-                    square.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
-        }
-    }
-
-
-
 
     @Override
     public boolean isSelectable() {
@@ -242,16 +230,39 @@ public class NeuronArrayNode extends ScreenElement  {
 
     @Override
     protected boolean hasContextMenu() {
-        return false;
+        return true;
     }
 
     @Override
     protected JPopupMenu getContextMenu() {
-        return null;
-    }
+        JPopupMenu contextMenu = new JPopupMenu();
 
-    public NeuronArrayInteractionBox getInteractionBox() {
-        return interactionBox;
+        //contextMenu.add(new CutAction(getNetworkPanel()));
+        //contextMenu.add(new CopyAction(getNetworkPanel()));
+        //contextMenu.add(new PasteAction(getNetworkPanel()));
+        //contextMenu.addSeparator();
+
+        // Edit Submenu
+        Action editArray = new AbstractAction("Edit...") {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                StandardDialog dialog = (StandardDialog) getPropertyDialog();
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        };
+        contextMenu.add(editArray);
+        contextMenu.add(new DeleteAction(getNetworkPanel()));
+
+        // Coupling menu
+        contextMenu.addSeparator();
+        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronArray);
+        if (couplingMenu != null) {
+            contextMenu.add(couplingMenu);
+        }
+
+        return contextMenu;
     }
 
     @Override
@@ -266,40 +277,5 @@ public class NeuronArrayNode extends ScreenElement  {
 
     @Override
     public void resetColors() {
-
     }
-
-    /**
-     * Custom interaction box for Subnetwork node. Ensures a property dialog
-     * appears when the box is double-clicked.
-     */
-    public class NeuronArrayInteractionBox extends InteractionBox {
-
-        public NeuronArrayInteractionBox(NetworkPanel net) {
-            super(net);
-        }
-
-        @Override
-        protected boolean hasPropertyDialog() {
-            return false;
-        }
-
-        @Override
-        protected boolean hasContextMenu() {
-            return false;
-        }
-
-        @Override
-        protected String getToolTipText() {
-            return "NeuronGroup: " + neuronArray.getId()
-                    + " Location: (" + Utils.round(neuronArray.getX(),2) + ","
-                    + Utils.round(neuronArray.getY(),2) + ")";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-    }
-
 }

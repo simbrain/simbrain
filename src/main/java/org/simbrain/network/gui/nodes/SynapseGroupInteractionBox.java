@@ -192,16 +192,10 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(tsvCheckBox);
 
         // Coupling menu
-        JMenu consumerMenu = this.getNetworkPanel().getSynapseGroupConsumerMenu(synapseGroup);
-        JMenu producerMenu = getNetworkPanel().getSynapseGroupProducerMenu(synapseGroup);
-        if ((consumerMenu != null) || (producerMenu != null)) {
+        JMenu couplingMenu = this.getNetworkPanel().getCouplingMenu(synapseGroup);
+        if (couplingMenu != null) {
             menu.addSeparator();
-        }
-        if (consumerMenu != null) {
-            menu.add(consumerMenu);
-        }
-        if (producerMenu != null) {
-            menu.add(producerMenu);
+            menu.add(couplingMenu);
         }
         return menu;
     }

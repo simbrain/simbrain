@@ -401,7 +401,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         menu.add(recordingAction);
 
         // Coupling menu
-        JMenu couplingMenu = networkPanel.getNeuronGroupCouplingMenu(neuronGroup);
+        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronGroup);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }

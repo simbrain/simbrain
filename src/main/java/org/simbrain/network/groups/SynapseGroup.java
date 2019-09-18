@@ -30,6 +30,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.Producible;
 
 import java.beans.PropertyChangeSupport;
 import java.io.FileWriter;
@@ -892,6 +893,7 @@ public class SynapseGroup extends Group {
      *
      * @return weights
      */
+    @Producible
     public double[] getWeightVector() {
         double[] retArray = new double[size()];
         int i = 0;
@@ -907,6 +909,7 @@ public class SynapseGroup extends Group {
     /**
      * @return the strengths of all the inhibitory synapses as a double array
      */
+    @Producible
     public double[] getInhibitoryStrengths() {
         double[] retArray = new double[inSynapseSet.size()];
         int i = 0;
@@ -919,6 +922,7 @@ public class SynapseGroup extends Group {
     /**
      * @return the strengths of all the excitatory synapses as a double array
      */
+    @Producible
     public double[] getExcitatoryStrengths() {
         double[] retArray = new double[exSynapseSet.size()];
         int i = 0;

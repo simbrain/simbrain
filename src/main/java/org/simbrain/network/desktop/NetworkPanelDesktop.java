@@ -355,7 +355,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
     }
 
     @Override
@@ -364,72 +363,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
             CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), container);
             return menu;
         }
-        return null;
-    }
-
-    // TODO: Get rid of cruft below
-
-    @Override
-    public JMenu getNeuronArrayCouplingMenu(NeuronArray neuronArray) {
-        if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuronArray);
-            return menu;
-        }
-        return null;
-    }
-
-
-    @Override
-    public JMenu getNeuronGroupCouplingMenu(NeuronGroup neuronGroup) {
-        if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuronGroup);
-            return menu;
-        }
-        return null;
-    }
-
-    @Override
-    public JMenu getNeuronCollectionCouplingMenu(NeuronCollection nc) {
-        if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), nc);
-            return menu;
-        }
-        return null;
-    }
-
-
-    @Override
-    public JMenu getSynapseGroupProducerMenu(SynapseGroup synapseGroup) {
-        if (component.getWorkspaceComponent() != null) {
-            CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), synapseGroup);
-            return menu;
-        }
-        return null;
-    }
-
-    @Override
-    public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
-        //
-        // Below not implemented now for two reasons. (1) There are no obvious
-        // uses now. (2) Assigning components in a 1-d array of weights to
-        // a synapse group is a non-trivial operation and the results
-        // would be hard to predict for users. More natural would be
-        // a matrix-coupling. Matrix-couplings are not as of 2014 implemented.
-        //
-        // if (component.getWorkspaceComponent() != null) {
-        // PotentialConsumer consumer = component
-        // .getWorkspaceComponent()
-        // .getAttributeManager()
-        // .createPotentialConsumer(synapseGroup, "setWeightVector",
-        // double[].class);
-        // consumer.setCustomDescription("Synapse Group: " +
-        // synapseGroup.getLabel());
-        //
-        // JMenu menu = new CouplingMenuConsumer(
-        // "Receive Vector Coupling from", component
-        // .getWorkspaceComponent().getWorkspace(), consumer);
-        // return menu;
-        // }
         return null;
     }
 

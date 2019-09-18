@@ -206,7 +206,7 @@ public class NeuronCollectionNode extends PNode  {
         menu.add(unclampNeuronsAction);
 
         // Coupling menu
-        JMenu couplingMenu = networkPanel.getNeuronCollectionCouplingMenu(neuronCollection);
+        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronCollection);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }

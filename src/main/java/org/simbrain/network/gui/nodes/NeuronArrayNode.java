@@ -25,6 +25,7 @@ import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -32,6 +33,8 @@ import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.table.SimbrainDataTable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,7 +56,7 @@ public class NeuronArrayNode extends ScreenElement  {
     /**
      * Width in pixels of the main display box for ND4J arrays.
      */
-    private final float boxWidth = 100;
+    private final float boxWidth = 150;
 
     /**
      * Height in pixels of the main display box for ND4J arrays.
@@ -197,8 +200,13 @@ public class NeuronArrayNode extends ScreenElement  {
         return neuronArray;
     }
 
-    public void updateInfoText() {
-        infoText.setText("nodes: " + neuronArray.getNeuronArray().length()
+    /**
+     * Update status text.
+     */
+    private void updateInfoText() {
+        infoText.setText(
+                ""+ neuronArray.getLabel() + "    " +
+                "nodes: " + neuronArray.getNeuronArray().length()
                 + "\nmean activation: "
                 + SimbrainMath.roundDouble((java.lang.Double) neuronArray.getNeuronArray().meanNumber(),4));
     }
@@ -246,14 +254,26 @@ public class NeuronArrayNode extends ScreenElement  {
         Action editArray = new AbstractAction("Edit...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                StandardDialog dialog = (StandardDialog) getPropertyDialog();
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
+                StandardDialog dialog = getArrayDialog();
                 dialog.setVisible(true);
             }
         };
         contextMenu.add(editArray);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
+
+        // TODO: Add ability to edit the components of the array
+        // possibly in a separate tab of the same dialog
+        //Action editComponents= new AbstractAction("Edit Components...") {
+        //    @Override
+        //    public void actionPerformed(final ActionEvent event) {
+        //        StandardDialog dialog = new StandardDialog();
+        //        dialog.setContentPane(new SimbrainDataTable<Double>(neuronArray.getComponents()));
+        //        dialog.pack();
+        //        dialog.setLocationRelativeTo(null);
+        //        dialog.setVisible(true);
+        //    }
+        //};
+        //contextMenu.add(editComponents);
 
         // Coupling menu
         contextMenu.addSeparator();
@@ -265,6 +285,19 @@ public class NeuronArrayNode extends ScreenElement  {
         return contextMenu;
     }
 
+    /**
+     * Returns the dialog for editing this neuron array.
+     */
+    private StandardDialog getArrayDialog() {
+        StandardDialog dialog = new AnnotatedPropertyEditor(neuronArray).getDialog();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.addClosingTask(() -> {
+            NeuronArrayNode.this.updateInfoText();
+        });
+        return dialog;
+    }
+
     @Override
     protected boolean hasPropertyDialog() {
         return true;
@@ -272,7 +305,7 @@ public class NeuronArrayNode extends ScreenElement  {
 
     @Override
     protected JDialog getPropertyDialog() {
-        return getNetworkPanel().getNeuronArrayDialog();
+        return getArrayDialog();
     }
 
     @Override

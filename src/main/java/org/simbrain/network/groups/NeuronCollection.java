@@ -17,19 +17,13 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.*;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.NeuronArrayNode;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -37,12 +31,9 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection).

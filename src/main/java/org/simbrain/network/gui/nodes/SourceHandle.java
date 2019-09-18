@@ -145,6 +145,7 @@ public final class SourceHandle extends PHandle {
         }
 
         PNodeLocator nodeLocator = new PNodeLocator(node);
+        // SourceHandle constructor is where it gets added
         SourceHandle selectionHandle = new SourceHandle(nodeLocator);
     }
 

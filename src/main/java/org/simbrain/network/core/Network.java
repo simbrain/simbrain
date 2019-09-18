@@ -168,9 +168,9 @@ public class Network {
     private SimpleId collectionIdGenerator = new SimpleId("Collection", 1);
 
     /**
-     * Collection Id generator.
+     * Array Id generator.
      */
-    private SimpleId naIdGenerator = new SimpleId("Array", 1);
+    private SimpleId arrayIdGenerator = new SimpleId("Array", 1);
 
     /**
      * A variable telling the network not to fire events to any listeners during update.
@@ -520,6 +520,7 @@ public class Network {
      */
     public void addNeuronArray(NeuronArray na) {
         // Set id
+        na.initializeId();
         naList.add(na);
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
@@ -1445,6 +1446,10 @@ public class Network {
 
     public SimpleId getCollectionIdGenerator() {
         return collectionIdGenerator;
+    }
+
+    public SimpleId getArrayIdGenerator() {
+        return arrayIdGenerator;
     }
 
     /**

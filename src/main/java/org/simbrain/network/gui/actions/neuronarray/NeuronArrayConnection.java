@@ -28,7 +28,6 @@ public class NeuronArrayConnection implements EditableObject, AttributeContainer
         target.setActivations(source.getActivations().mmul(weightMatrix));
     }
 
-
     public NeuronArrayConnection(NeuronArray source, NeuronArray target) {
         this.source = new NeuronArrayAdapter(source);
         this.target = new NeuronArrayAdapter(target);

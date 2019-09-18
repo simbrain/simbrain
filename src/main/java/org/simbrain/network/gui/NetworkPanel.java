@@ -2851,16 +2851,6 @@ public class NetworkPanel extends JPanel {
         return dialog;
     }
 
-    public StandardDialog getNeuronArrayDialog() {
-        List<NeuronArray> arrays = getSelectedModelNeuronArrays();
-        if (arrays == null || arrays.isEmpty()) {
-            return null;
-        }
-        StandardDialog dialog = new AnnotatedPropertyEditor(arrays).getDialog();
-        dialog.setModalityType(Dialog.ModalityType.MODELESS);
-        return dialog;
-    }
-
     public void showNeuronArrayCreationDialog() {
         NeuronArray.CreationTemplate creationTemplate = new NeuronArray.CreationTemplate();
         StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();

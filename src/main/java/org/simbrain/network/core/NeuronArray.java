@@ -1,10 +1,9 @@
 package org.simbrain.network.core;
 
 
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.buffer.DoubleBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -33,7 +32,13 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     @UserParameter(
             label = "Label"
     )
-    private String label = "Neuron Array";
+    private String label = "";
+
+    /**
+     * Id of this array.
+     */
+    @UserParameter(label = "ID", description = "Id of this array", order = -1, editable = false)
+    private String id;
 
     /**
      * Number of columns in the under laying ND4J Array.
@@ -62,11 +67,9 @@ public class NeuronArray implements EditableObject, AttributeContainer {
     private double y;
 
     /**
-     * z-coordinate of this neuron in 3-space. Currently no GUI implementation,
-     * but fully useable for scripting. Like polarity this will get a full
-     * implementation in the next development cycle... probably by 4.0.
+     * If true, when the array is added to the network its id will not be used as its label.
      */
-    private double z;
+    private boolean useCustomLabel = false;
 
     /**
      * Render an image showing each activation when true.
@@ -105,6 +108,33 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         return Nd4j.toFlattened(neuronArray).toDoubleVector();
     }
 
+    /**
+     * Set the label. This prevents the group id being used as the label for
+     * new groups.  If null or empty labels are sent in then the group label is used.
+     */
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        if (label == null  || label.isEmpty()) {
+            useCustomLabel = false;
+        } else {
+            useCustomLabel = true;
+        }
+        String oldLabel = this.label;
+        this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
+    }
+
+    /**
+     * Initialize the id for this array. A default label based
+     * on the id is also set.
+     */
+    public void initializeId() {
+        id = parent.getArrayIdGenerator().getId();
+        if (!useCustomLabel) {
+            label = id.replaceAll("_", " ");
+        }
+    }
+
     public void update() {
 
         // TODO: This is just a place holder. Do something useful.
@@ -135,14 +165,6 @@ public class NeuronArray implements EditableObject, AttributeContainer {
 
     public void setY(double y) {
         this.y = y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
     }
 
     public boolean isRenderActivations() {
@@ -183,6 +205,14 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         changeSupport.firePropertyChange("delete", this, null);
     }
 
+    public boolean isUseCustomLabel() {
+        return useCustomLabel;
+    }
+
+    public void setUseCustomLabel(boolean useCustomLabel) {
+        this.useCustomLabel = useCustomLabel;
+    }
+
     /**
      * Since Neuron Array is immutable, this object will be used in the creation dialog.
      */
@@ -194,9 +224,10 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * A label for this Neuron Array for display purpose.
          */
         @UserParameter(
-                label = "Label"
+                label = "Label",
+                description = "If left blank, a default label will be created."
         )
-        private String label = "Neuron Array";
+        private String label = "";
 
         /**
          * Number of columns in the under laying ND4J Array.
@@ -217,9 +248,9 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray neuronArray = new NeuronArray(network, numNodes);
-            neuronArray.label = label;
-            return neuronArray;
+            NeuronArray na = new NeuronArray(network, numNodes);
+            na.setLabel(label);
+            return na;
         }
 
         @Override
@@ -227,4 +258,10 @@ public class NeuronArray implements EditableObject, AttributeContainer {
             return "Neuron Array";
         }
     }
+
+    public double[] getComponents() {
+        return neuronArray.toDoubleVector();
+    }
+
+
 }

@@ -19,6 +19,7 @@
 package org.simbrain.network.groups;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.util.SimpleId;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -40,7 +41,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     private final Network parentNetwork;
 
     /**
-     * Name of this group.
+     * Id of this group.
      */
     @UserParameter(label = "ID", description = "Id of this group", order = -1, editable = false)
     private String id;
@@ -248,4 +249,5 @@ public abstract class Group implements CopyableObject, AttributeContainer {
     public boolean isUseCustomLabel() {
         return useCustomLabel;
     }
+
 }

@@ -18,26 +18,15 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.swing.*;
-
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NeuronArray;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
-import org.simbrain.network.gui.nodes.NeuronArrayNode;
-import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.piccolo.SceneGraphBrowser;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent  ;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings

@@ -20,6 +20,7 @@ import java.beans.PropertyChangeSupport;
 public class NeuronArray implements EditableObject, AttributeContainer {
 
     //TODO: Rename ideas: Array, Layer, ND4J Array, Double Array
+    //TODO: See if data can be stored as an array. If not maybe used column instead of row.
 
     /**
      * Reference to network this neuron is part of.
@@ -38,28 +39,17 @@ public class NeuronArray implements EditableObject, AttributeContainer {
      * Number of columns in the under laying ND4J Array.
      */
     @UserParameter(
-            label = "Columns",
-            description = "Number of columns",
+            label = "Nodes",
+            description = "Number of nodes",
             editable = false,
             order = 1
     )
-    private int columns = 100;
-
-    /**
-     * Number of rows in the under laying ND4J Array.
-     */
-    @UserParameter(
-            label = "Rows",
-            description = "Number of rows",
-            editable = false,
-            order = 2
-    )
-    private int rows = 1;
+    private int numNodes = 100;
 
     /**
      * ND4J Array backing this object
      */
-    private INDArray neuronArray = Nd4j.rand(rows, columns).subi(0.5).mul(2);
+    private INDArray neuronArray;
 
     /**
      * x-coordinate of this neuron in 2-space.
@@ -93,13 +83,16 @@ public class NeuronArray implements EditableObject, AttributeContainer {
      */
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    public NeuronArray(Network net) {
+    /**
+     * Create a neuron array.
+     *
+     * @param net parent net
+     * @param numNodes number of nodes
+     */
+    private NeuronArray(Network net, int numNodes) {
         parent = net;
-    }
-
-    private NeuronArray(Network net, int columns, int rows) {
-        this(net);
-        neuronArray = Nd4j.rand(rows, columns).subi(0.5).mul(2);
+        this.numNodes = numNodes;
+        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
     }
 
     @Consumable()
@@ -120,12 +113,8 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         changeSupport.firePropertyChange("updated", null, null);
     }
 
-    public int getRows() {
-        return neuronArray.rows();
-    }
-
-    public int getCols() {
-        return neuronArray.columns();
+    public int getNumNodes() {
+        return (int) neuronArray.length();
     }
 
     public INDArray getNeuronArray() {
@@ -170,8 +159,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
 
     public void setNeuronArray(INDArray data) {
         neuronArray = data;
-        columns = data.columns();
-        rows = data.rows();
+        numNodes = data.columns();
     }
 
     @Override
@@ -200,6 +188,8 @@ public class NeuronArray implements EditableObject, AttributeContainer {
      */
     public static class CreationTemplate implements EditableObject {
 
+        // See NeuronGroup.NeuronGroupCreator. Possibly reuse.
+
         /**
          * A label for this Neuron Array for display purpose.
          */
@@ -212,23 +202,11 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * Number of columns in the under laying ND4J Array.
          */
         @UserParameter(
-                label = "Columns",
-                description = "Number of columns",
-                minimumValue = 1,
+                label = "Nodes",
+                description = "Number of nodes",
                 order = 1
         )
-        private int columns = 100;
-
-        /**
-         * Number of rows in the under laying ND4J Array.
-         */
-        @UserParameter(
-                label = "Rows",
-                description = "Number of rows",
-                minimumValue = 1,
-                order = 2
-        )
-        private int rows = 1;
+        private int numNodes = 100;
 
         /**
          * Add a neuron array to network created from field values which should be setup by an Annotated Property
@@ -239,7 +217,7 @@ public class NeuronArray implements EditableObject, AttributeContainer {
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray neuronArray = new NeuronArray(network, columns, rows);
+            NeuronArray neuronArray = new NeuronArray(network, numNodes);
             neuronArray.label = label;
             return neuronArray;
         }

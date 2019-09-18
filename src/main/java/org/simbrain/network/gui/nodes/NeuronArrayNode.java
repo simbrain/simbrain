@@ -157,11 +157,11 @@ public class NeuronArrayNode extends ScreenElement  {
         }
 
         ColorModel colorModel = new DirectColorModel(24, 0xff << 16, 0xff << 8, 0xff);
-        SampleModel sampleModel = colorModel.createCompatibleSampleModel(neuronArray.getCols(), neuronArray.getRows());
+        SampleModel sampleModel = colorModel.createCompatibleSampleModel(neuronArray.getNumNodes(), 1);
 
         float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
 
-        int[] raster = new int[neuronArray.getCols() * neuronArray.getRows()];
+        int[] raster = new int[neuronArray.getNumNodes()];
 
         // TODO: Use standardized Simbrain library for these color scalings
         for (int i = 0; i < activations.length; i++) {

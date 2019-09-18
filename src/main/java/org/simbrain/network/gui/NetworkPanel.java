@@ -1858,8 +1858,7 @@ public class NetworkPanel extends JPanel {
 
     public List<NeuronArrayNode> getSelectedNeuronArrays() {
         return getSelection().stream()
-                .filter(n -> n.getParent() instanceof NeuronArrayNode)
-                .map(PNode::getParent)
+                .filter(NeuronArrayNode.class::isInstance)
                 .map(NeuronArrayNode.class::cast)
                 .collect(Collectors.toList());
     }

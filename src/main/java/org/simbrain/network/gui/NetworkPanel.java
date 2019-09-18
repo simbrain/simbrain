@@ -2526,23 +2526,14 @@ public class NetworkPanel extends JPanel {
     public void closeNetwork() {
     }
 
-    /**
-     * @return Returns the edit tool bar.
-     */
     public CustomToolBar getEditToolBar() {
         return editToolBar;
     }
 
-    /**
-     * @return Returns run tool bar.
-     */
     public CustomToolBar getRunToolBar() {
         return runToolBar;
     }
 
-    /**
-     * @return Returns the main tool bar.
-     */
     public CustomToolBar getMainToolBar() {
         return mainToolBar;
     }
@@ -2573,7 +2564,7 @@ public class NetworkPanel extends JPanel {
             SourceHandle.addSourceHandleTo(node.getInteractionBox());
         }
         for (NeuronCollectionNode node : getSelectedNeuronCollections()) {
-            sourceElements.add(node);
+            sourceElements.add(node.getInteractionBox());
             SourceHandle.addSourceHandleTo(node.getInteractionBox());
         }
         for (NeuronArrayNode node : this.getSelectedNeuronArrays()) {

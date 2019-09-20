@@ -23,6 +23,7 @@ import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
@@ -46,7 +47,7 @@ import java.awt.image.*;
  * network model.
  */
 @SuppressWarnings("serial")
-public class NeuronArrayNode extends ScreenElement  {
+public class NeuronArrayNode extends ScreenElement {
 
     /**
      * The logical neuron array this screen element represents.
@@ -310,5 +311,11 @@ public class NeuronArrayNode extends ScreenElement  {
 
     @Override
     public void resetColors() {
+    }
+
+    @Override
+    protected void paint(PPaintContext paintContext) {
+        paintContext.getGraphics().setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        super.paint(paintContext);
     }
 }

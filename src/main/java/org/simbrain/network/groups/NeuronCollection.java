@@ -17,10 +17,9 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.core.*;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -40,7 +39,7 @@ import java.util.List;
  * Allows them to be labelled, moved around as a unit, coupled to, etc.   However no special processing
  * occurs in neuron collections.  They are a convenience.  NeuronCollections can overlap each other.
  */
-public class NeuronCollection implements AttributeContainer {
+public class NeuronCollection implements AttributeContainer, ArrayConnectable {
 
     /**
      * Reference to the network this group is a part of.
@@ -786,5 +785,26 @@ public class NeuronCollection implements AttributeContainer {
      */
     public int getSummedNeuronHash() {
         return neuronList.stream().mapToInt(n -> n.hashCode()).sum();
+    }
+
+    @Override
+    public INDArray getActivationArray() {
+        float[] floatActivation = new float[getActivations().length];
+        // Potential performance cost, but no clear way around this
+        for (int i = 0; i < getActivations().length; i++) {
+            floatActivation[i] = (float) getActivations()[i];
+        }
+        return Nd4j.create(new int[]{floatActivation.length}, floatActivation);
+
+    }
+
+    @Override
+    public void setActivationArray(INDArray activations) {
+        setActivations(activations.toDoubleVector());
+    }
+
+    @Override
+    public long arraySize() {
+        return neuronList.size();
     }
 }

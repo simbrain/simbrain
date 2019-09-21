@@ -16,7 +16,7 @@ import java.beans.PropertyChangeSupport;
 /**
  * High performance immutable array backed by ND4J Array.
  */
-public class NeuronArray implements EditableObject, AttributeContainer {
+public class NeuronArray implements EditableObject, AttributeContainer, ArrayConnectable {
 
     //TODO: Rename ideas: Array, Layer, ND4J Array, Double Array
     //TODO: See if data can be stored as an array. If not maybe used column instead of row.
@@ -263,5 +263,29 @@ public class NeuronArray implements EditableObject, AttributeContainer {
         return neuronArray.toDoubleVector();
     }
 
+    @Override
+    public INDArray getActivationArray() {
+        return neuronArray;
+    }
 
+    @Override
+    public void setActivationArray(INDArray activations) {
+        setNeuronArray(activations);
+        //update();
+    }
+
+    @Override
+    public long arraySize() {
+        return neuronArray.length();
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Array [" + getId() + "] with " + arraySize() + " components\n";
+    }
 }

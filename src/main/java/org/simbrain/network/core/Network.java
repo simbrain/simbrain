@@ -20,7 +20,6 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.*;
-import org.simbrain.network.gui.actions.neuronarray.NeuronArrayConnection;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
@@ -85,7 +84,10 @@ public class Network {
      */
     private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
 
-    private final Set<NeuronArrayConnection> neuronArrayConnections = new HashSet<>();
+    /**
+     * Set of weight matrices.
+     */
+    private final Set<WeightMatrix> weightMatrices = new HashSet<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -548,7 +550,7 @@ public class Network {
     }
 
     public void updateNeuronArrayConnections() {
-        neuronArrayConnections.forEach(NeuronArrayConnection::update);
+        weightMatrices.forEach(WeightMatrix::update);
     }
 
     /**
@@ -1379,6 +1381,14 @@ public class Network {
             ret += nc.toString();
         }
 
+        for (NeuronArray na : naList) {
+            ret += na.toString();
+        }
+
+        for (WeightMatrix wm : weightMatrices) {
+            ret += wm.toString();
+        }
+
         for (NetworkTextObject text : textList) {
             ret += (text + "\n");
         }
@@ -1535,23 +1545,23 @@ public class Network {
      *
      * @param sng        source neuron group
      * @param tng        target neuron group
-     * @param connection conection object
+     * @param connection connection object
      */
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
         addGroup(group);
     }
 
-    public void addNeuronArrayConnection(NeuronArray source, NeuronArray target) {
-        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
-    }
-
-    public void addNeuronArrayConnection(NeuronCollection source, NeuronArray target) {
-        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
-    }
-
-    public void addNeuronArrayConnection(NeuronArray source, NeuronCollection target) {
-        neuronArrayConnections.add(new NeuronArrayConnection(source, target));
+    /**
+     * Add a weight matrix between two {@link ArrayConnectable}'s.
+     * Can "adapt" a neuron collection to an ND4J array, or be a weight
+     * matrix between those arrays.
+     *
+     * @param source source neuron collection or nd4j array
+     * @param target target neuron collection or nd4j array
+     */
+    public void addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
+        weightMatrices.add(new WeightMatrix(source, target));
     }
 
     /**

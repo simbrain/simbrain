@@ -907,7 +907,7 @@ public class Neuron implements EditableObject, AttributeContainer {
 
     @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + this.x + "," + this.y + ")";
+        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + this.x + "," + this.y + ")\n";
     }
 
     /**

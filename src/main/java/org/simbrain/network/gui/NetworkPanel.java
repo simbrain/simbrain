@@ -61,7 +61,6 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.gui.CouplingMenu;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -2000,33 +1999,36 @@ public class NetworkPanel extends JPanel {
         return ret;
     }
 
-    public void connectNeuronArray() {
+    /**
+     * Add a weight matrix between neuron collections or arrays.
+     */
+    public void addWeightMatrix() {
         if (!(getSelectedModelNeuronArrays().isEmpty()) || !(getSourceModelNeuronArrays().isEmpty())) {
-            // ArrayList<NeuronGroup> sourceGroup = panel.getSourceModelGroups();
+
             List<NeuronCollection> sourceCollection = getSourceModelNeuronCollections();
             List<NeuronArray> sourceArray = getSourceModelNeuronArrays();
 
-            // Collection<NeuronGroupNode> targetGroup = panel.getSelectedNeuronGroups();
             List<NeuronCollection> targetCollection = getSelectedModelNeuronCollection();
             List<NeuronArray> targetArray = getSelectedModelNeuronArrays();
 
             // array -> array
             for (NeuronArray source : sourceArray) {
                 for (NeuronArray target : targetArray) {
-                    getNetwork().addNeuronArrayConnection(source, target);
+                    getNetwork().addWeightMatrix(source, target);
                 }
             }
 
-            // collection -> array
+            // neuron collection -> array
             for (NeuronCollection source : sourceCollection) {
                 for (NeuronArray target : targetArray) {
-                    network.addNeuronArrayConnection(source, target);
+                    network.addWeightMatrix(source, target);
                 }
             }
 
+            // array -> neuron collection
             for (NeuronArray source : sourceArray) {
                 for (NeuronCollection target : targetCollection) {
-                    network.addNeuronArrayConnection(source, target);
+                    network.addWeightMatrix(source, target);
                 }
             }
         }
@@ -2633,7 +2635,8 @@ public class NetworkPanel extends JPanel {
 
     public List<NeuronCollection> getSourceModelNeuronCollections() {
         return sourceElements.stream()
-                .filter(NeuronCollectionNode.class::isInstance)
+                .filter(NeuronCollectionNode.NeuronCollectionInteractionBox.class::isInstance)
+                .map(PNode::getParent)
                 .map(NeuronCollectionNode.class::cast)
                 .map(NeuronCollectionNode::getNeuronCollection)
                 .collect(Collectors.toList());

@@ -83,6 +83,16 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     }
 
     /**
+     * Display 1-d data.  For proper display suggest wrapping this in a
+     * {@link SimbrainJTableScrollPanel}.
+     */
+    public NumericTable(final double[] data) {
+        double[][] newData = new double[1][];
+        newData[0] = data;
+        setData(newData);
+    }
+
+    /**
      * Default constructor.
      */
     public NumericTable() {
@@ -149,7 +159,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      * @return the values of the current row
      */
     public double[] getVectorCurrentRow() {
-        double[] retVec = new double[this.getColumnCount()];
+        double[] retVec = new double[this.getColumnCount()-1];
         int currRow = getCurrentRow();
         for (int i = 0; i < this.getLogicalColumnCount(); i++) {
             retVec[i] = this.getLogicalValueAt(currRow, i);

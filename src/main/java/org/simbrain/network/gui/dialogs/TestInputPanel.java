@@ -180,9 +180,7 @@ public class TestInputPanel extends DataPanel {
             putValue(SHORT_DESCRIPTION, "Advance row");
         }
 
-        /**
-         * {@ineritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             advanceRow();
         }
@@ -197,9 +195,7 @@ public class TestInputPanel extends DataPanel {
             putValue(SHORT_DESCRIPTION, "Test row");
         }
 
-        /**
-         * {@ineritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             testRow();
         }
@@ -213,9 +209,7 @@ public class TestInputPanel extends DataPanel {
             putValue(NAME, "Iteration mode");
         }
 
-        /**
-         * {@ineritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (iterationMode) {
                 iterationMode = false;
@@ -236,9 +230,7 @@ public class TestInputPanel extends DataPanel {
             putValue(SHORT_DESCRIPTION, "Test table");
         }
 
-        /**
-         * {@ineritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             testTable();
         }

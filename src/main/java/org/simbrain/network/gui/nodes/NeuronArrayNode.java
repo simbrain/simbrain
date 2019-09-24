@@ -36,7 +36,10 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainDataTable;
+import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -278,20 +281,25 @@ public class NeuronArrayNode extends ScreenElement {
         };
         contextMenu.add(randomizeAction);
 
+        contextMenu.addSeparator();
+        Action editComponents= new AbstractAction("Edit Components...") {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                StandardDialog dialog = new StandardDialog();
+                NumericTable arrayData = new NumericTable(neuronArray.getNeuronArray().toDoubleVector());
+                dialog.setContentPane(new SimbrainJTableScrollPanel(
+                        SimbrainJTable.createTable(arrayData)));
+                dialog.addClosingTask(() -> {
+                    neuronArray.getNeuronArray().data().setData(arrayData.getVectorCurrentRow());
+                    neuronArray.update();
+                });
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
 
-        // TODO: Add ability to edit the components of the array
-        // possibly in a separate tab of the same dialog
-        //Action editComponents= new AbstractAction("Edit Components...") {
-        //    @Override
-        //    public void actionPerformed(final ActionEvent event) {
-        //        StandardDialog dialog = new StandardDialog();
-        //        dialog.setContentPane(new SimbrainDataTable<Double>(neuronArray.getComponents()));
-        //        dialog.pack();
-        //        dialog.setLocationRelativeTo(null);
-        //        dialog.setVisible(true);
-        //    }
-        //};
-        //contextMenu.add(editComponents);
+            }
+        };
+        contextMenu.add(editComponents);
 
         // Coupling menu
         contextMenu.addSeparator();

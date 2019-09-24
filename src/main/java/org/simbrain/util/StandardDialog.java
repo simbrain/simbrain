@@ -213,6 +213,7 @@ public class StandardDialog extends GenericJDialog {
 
     /**
      * Adds a function to invoke when closing the dialog.
+     * Note: Must call this before making the dialog visible!
      *
      * @param task a Runnable to execute when closing
      */

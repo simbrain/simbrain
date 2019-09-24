@@ -124,7 +124,8 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         // Add 1 to numrows for header row
         int rows = jtable.getData().getRowCount();
         if (rows < maxVisibleRows) {
-            height = (rows + 1) * rowHeight;
+            height = 20 + (rows + 1) * rowHeight;
+            // 20 useful as a buffer for one row tables
         } else {
             height = (maxVisibleRows + 1) * rowHeight;
         }

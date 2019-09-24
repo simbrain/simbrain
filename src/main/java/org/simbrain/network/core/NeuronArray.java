@@ -267,10 +267,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         }
     }
 
-    public double[] getComponents() {
-        return neuronArray.toDoubleVector();
-    }
-
     @Override
     public INDArray getActivationArray() {
         return neuronArray;

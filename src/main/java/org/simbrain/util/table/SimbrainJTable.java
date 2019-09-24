@@ -398,9 +398,6 @@ public class SimbrainJTable extends JXTable {
         return null;
     }
 
-    /**
-     * @return the randomization toolbar
-     */
     public JToolBar getToolbarRandomize() {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
@@ -411,9 +408,6 @@ public class SimbrainJTable extends JXTable {
         return null;
     }
 
-    /**
-     * @return
-     */
     public JToolBar getToolbarNormalize() {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
@@ -552,9 +546,7 @@ public class SimbrainJTable extends JXTable {
      */
     private class CustomCellRenderer extends DefaultTableCellRenderer {
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focused, int row, int column) {
 
             if (column == 0) {

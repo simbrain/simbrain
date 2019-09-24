@@ -103,7 +103,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> models = new ArrayList<>();
-        models.add(world);
+        //models.add(world); No couplings at world level currently
         for (Entity entity : world.getEntities()) {
             models.add(entity);
             if (entity instanceof Agent) {

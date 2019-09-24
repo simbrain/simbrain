@@ -4,7 +4,6 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.renderer.RenderManager;
-import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.world.threedworld.actions.ActionManager;
 import org.simbrain.world.threedworld.controllers.AgentController;
 import org.simbrain.world.threedworld.controllers.CameraController;
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * ThreeDWorld is a container for the engine, entities, and controllers needed
  * for the simbrain 3d environment.
  */
-public class ThreeDWorld implements AppState, AttributeContainer {
+public class ThreeDWorld implements AppState {
 
     /**
      * Listener receives notifications when a ThreeDWorld is initialized or updated.
@@ -260,4 +259,16 @@ public class ThreeDWorld implements AppState, AttributeContainer {
         }
         listeners.forEach(l -> l.onWorldClosing(this));
     }
+
+    /**
+     * Without this method the compiler complains that getId() is not overridden, even though AppState does not require getId().
+     * {@link org.simbrain.workspace.AttributeContainer}, which this used to override, does require getId(), though even
+     * there there is a default implementation. So it's a mystery why this is needed.
+     *
+     * The error only happens when running using gradle run.
+     */
+    public String getId() {
+        return null;
+    }
+
 }

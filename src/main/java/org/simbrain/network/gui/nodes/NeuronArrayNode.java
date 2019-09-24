@@ -32,6 +32,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -261,6 +262,22 @@ public class NeuronArrayNode extends ScreenElement {
         };
         contextMenu.add(editArray);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
+
+        contextMenu.addSeparator();
+        Action randomizeAction = new AbstractAction("Randomize") {
+
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
+            }
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                neuronArray.randomize();
+            }
+        };
+        contextMenu.add(randomizeAction);
+
 
         // TODO: Add ability to edit the components of the array
         // possibly in a separate tab of the same dialog

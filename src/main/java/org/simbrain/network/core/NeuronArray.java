@@ -95,7 +95,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private NeuronArray(Network net, int numNodes) {
         parent = net;
         this.numNodes = numNodes;
-        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
+        randomize();
     }
 
     @Consumable()
@@ -122,6 +122,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         String oldLabel = this.label;
         this.label = label;
         changeSupport.firePropertyChange("label", oldLabel , label);
+    }
+
+    /**
+     * Simple randomization for now.
+     */
+    public void randomize() {
+        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
+        changeSupport.firePropertyChange("updated", null , null);
     }
 
     /**

@@ -150,7 +150,7 @@ public class NeuronArrayNode extends ScreenElement {
 
         // Image array
         renderArrayToActivationsImage();
-
+        pushViewPositionToModel();
     }
 
     /**

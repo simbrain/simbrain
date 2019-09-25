@@ -1561,8 +1561,10 @@ public class Network {
      * @param source source neuron collection or nd4j array
      * @param target target neuron collection or nd4j array
      */
-    public void addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
-        weightMatrices.add(new WeightMatrix(source, target));
+    public WeightMatrix addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
+        WeightMatrix newMatrix = new WeightMatrix(source, target);
+        weightMatrices.add(newMatrix);
+        return newMatrix;
     }
 
     /**

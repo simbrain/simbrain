@@ -256,7 +256,7 @@ public class KeyBindings {
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
 
-                panel.addWeightMatrix();
+                panel.addWeightMatricesFromSelection();
 
                 if (ConditionallyEnabledAction
                         .sourceAndTargetNeuronGroupsSelected(panel)) {

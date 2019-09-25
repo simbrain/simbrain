@@ -131,6 +131,7 @@ public class NeuronCollectionNode extends PNode  {
         for (Object object : outlinedObjects.getNeuronNodeRefs()) {
             ((NeuronNode) object).offset(dx, dy);
         }
+        neuronCollection.firePositionChanged();
     }
 
     /**

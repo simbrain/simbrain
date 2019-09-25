@@ -2014,9 +2014,26 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Create a new weight matrix from a source and target.
+     *
+     * @param source the source of the connection
+     * @param target the target of the connection
+     */
+    public void addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
+        WeightMatrix matrix = network.addWeightMatrix(source, target);
+        if (objectNodeMap.get(matrix) != null) {
+            return;
+        }
+        WeightMatrixNode node = new WeightMatrixNode(matrix);
+        canvas.getLayer().addChild(node);
+        node.lowerToBottom();
+        objectNodeMap.put(matrix, node);
+    }
+
+    /**
      * Add a weight matrix between neuron collections or arrays.
      */
-    public void addWeightMatrix() {
+    public void addWeightMatricesFromSelection() {
         if (!(getSelectedModelNeuronArrays().isEmpty()) || !(getSourceModelNeuronArrays().isEmpty())) {
 
             List<NeuronCollection> sourceCollection = getSourceModelNeuronCollections();
@@ -2028,21 +2045,21 @@ public class NetworkPanel extends JPanel {
             // array -> array
             for (NeuronArray source : sourceArray) {
                 for (NeuronArray target : targetArray) {
-                    getNetwork().addWeightMatrix(source, target);
+                    addWeightMatrix(source, target);
                 }
             }
 
             // neuron collection -> array
             for (NeuronCollection source : sourceCollection) {
                 for (NeuronArray target : targetArray) {
-                    network.addWeightMatrix(source, target);
+                    addWeightMatrix(source, target);
                 }
             }
 
             // array -> neuron collection
             for (NeuronArray source : sourceArray) {
                 for (NeuronCollection target : targetCollection) {
-                    network.addWeightMatrix(source, target);
+                    addWeightMatrix(source, target);
                 }
             }
         }

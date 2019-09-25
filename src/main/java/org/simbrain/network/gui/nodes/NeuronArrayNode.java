@@ -44,6 +44,7 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.*;
 
 /**
@@ -150,6 +151,22 @@ public class NeuronArrayNode extends ScreenElement {
         // Image array
         renderArrayToActivationsImage();
 
+    }
+
+    /**
+     * Update the position of the model neuron based on the global coordinates
+     * of this pnode.
+     */
+    public void pushViewPositionToModel() {
+        Point2D p = this.getGlobalTranslation();
+        neuronArray.setX(p.getX());
+        neuronArray.setY(p.getY());
+    }
+
+    @Override
+    public void offset(double dx, double dy) {
+        pushViewPositionToModel();
+        super.offset(dx, dy);
     }
 
     /**
@@ -333,6 +350,8 @@ public class NeuronArrayNode extends ScreenElement {
     protected JDialog getPropertyDialog() {
         return getArrayDialog();
     }
+
+
 
     @Override
     public void resetColors() {

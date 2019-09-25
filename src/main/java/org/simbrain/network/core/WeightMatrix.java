@@ -30,6 +30,11 @@ public class WeightMatrix {
     private INDArray weightMatrix;
 
     /**
+     * WeightMatrixNode will render an image of this matrix if set to true
+     */
+    private boolean enableRendering = true;
+
+    /**
      * Construct the matrix.
      *
      * @param source source layer
@@ -67,4 +72,23 @@ public class WeightMatrix {
         return ret;
     }
 
+    public ArrayConnectable getSource() {
+        return source;
+    }
+
+    public ArrayConnectable getTarget() {
+        return target;
+    }
+
+    public INDArray getWeightMatrix() {
+        return weightMatrix;
+    }
+
+    public boolean isEnableRendering() {
+        return enableRendering;
+    }
+
+    public void setEnableRendering(boolean enableRendering) {
+        this.enableRendering = enableRendering;
+    }
 }

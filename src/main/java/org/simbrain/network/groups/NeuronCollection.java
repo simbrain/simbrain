@@ -698,6 +698,20 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
         return id;
     }
 
+    @Override
+    public Point2D getLocation() {
+        return getPosition();
+    }
+
+    @Override
+    public void onLocationChange(Runnable task) {
+        changeSupport.addPropertyChangeListener(evt -> {
+            if ("moved".equals(evt.getPropertyName())) {
+                task.run();
+            }
+        });
+    }
+
 
     /**
      * Set input values of neurons using an array of doubles. Assumes the order

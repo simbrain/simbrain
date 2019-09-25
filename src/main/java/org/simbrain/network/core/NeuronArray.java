@@ -10,6 +10,7 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -178,6 +179,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     public void setX(double x) {
         this.x = x;
+        fireLocationChange();
     }
 
     public double getY() {
@@ -186,6 +188,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     public void setY(double y) {
         this.y = y;
+        fireLocationChange();
     }
 
     public boolean isRenderActivations() {
@@ -311,6 +314,24 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Point2D getLocation() {
+        return new Point2D.Double(x + 150 / 2.0, y + 50 / 2.0);
+    }
+
+    public void fireLocationChange() {
+        changeSupport.firePropertyChange("moved", null, null);
+    }
+
+    @Override
+    public void onLocationChange(Runnable task) {
+        addPropertyChangeListener(evt -> {
+            if ("moved".equals(evt.getPropertyName())) {
+                task.run();
+            }
+        });
     }
 
     @Override

@@ -18,10 +18,7 @@ e * Part of Simbrain--a java-based neural network kit
  */
 package org.simbrain.network.util;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkTextObject;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.groups.CopyableGroup;
 
 import java.util.ArrayList;
@@ -70,6 +67,9 @@ public class CopyPaste {
                 ret.add(newText);
             } else if (item instanceof CopyableGroup) {
                 Object copy = ((CopyableGroup<?>) item).deepCopy(newParent);
+                ret.add(copy);
+            } else if (item instanceof NeuronArray) {
+                Object copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
                 ret.add(copy);
             }
         }

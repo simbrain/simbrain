@@ -353,6 +353,8 @@ public class NetworkPanel extends JPanel {
     /**
      * Map associating network model objects with Piccolo Pnodes.
      */
+    // TODO: Phase this out? After moving to changesupport,
+    // only seems to be used in Clipboard.getPostPasteSelectionObjects
     private final Map<Object, PNode> objectNodeMap = Collections.synchronizedMap(new HashMap<Object, PNode>());
 
     /**
@@ -538,9 +540,7 @@ public class NetworkPanel extends JPanel {
                 } else if ("groupAdded".equals(evt.getPropertyName())) {
                     addGroup((Group) evt.getNewValue());
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
-                    NeuronArrayNode nad = new NeuronArrayNode(this, (NeuronArray) evt.getNewValue());
-                    canvas.getLayer().addChild(nad);
-                    zoomToFitPage(true);
+                    addNeuronArray((NeuronArray) evt.getNewValue());
                 } else if ("naRemoved".equals(evt.getPropertyName())) {
                     ((NeuronArray)evt.getOldValue()).fireDeleted();
                 } else if ("ncAdded".equals(evt.getPropertyName())) {
@@ -909,8 +909,21 @@ public class NetworkPanel extends JPanel {
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
+
+        repaint();
     }
 
+    /**
+     * Add a graphical representation of a neuron array to the network
+     *
+     * @param neuronArray the neuron array
+     */
+    private void addNeuronArray(NeuronArray neuronArray) {
+        NeuronArrayNode nad = new NeuronArrayNode(this, neuronArray);
+        canvas.getLayer().addChild(nad);
+        objectNodeMap.put(neuronArray, nad);
+        repaint();
+    }
     /**
      * Add a representation of a neuron collection to this panel.
      *
@@ -929,6 +942,7 @@ public class NetworkPanel extends JPanel {
         }
         canvas.getLayer().addChild(ncn);
         objectNodeMap.put(nc, ncn);
+        repaint();
     }
 
     /**
@@ -2889,16 +2903,10 @@ public class NetworkPanel extends JPanel {
         toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));
     }
 
-    /**
-     * @return the isRunning
-     */
     public boolean isRunning() {
         return network.isRunning();
     }
 
-    /**
-     * @param value the isRunning to set
-     */
     public void setRunning(boolean value) {
         network.setRunning(value);
     }
@@ -2915,28 +2923,9 @@ public class NetworkPanel extends JPanel {
         clearSelection();
     }
 
-    /**
-     * @return the canvas
-     */
     public PCanvas getCanvas() {
         return canvas;
     }
-
-    // /**
-    // * Show the trainer panel. This is overridden by the desktop version to
-    // * display the panel within the Simbrain desktop.
-    // */
-    // public void showTrainer() {
-    // Backprop trainer = new Backprop(getNetwork(),
-    // getSourceModelNeurons(),
-    // getSelectedModelNeurons());
-    // JDialog dialog = new JDialog();
-    // TrainerPanel trainerPanel = new TrainerPanel((GenericFrame) dialog,
-    // trainer);
-    // dialog.setContentPane(trainerPanel);
-    // dialog.pack();
-    // dialog.setVisible(true);
-    // }
 
     /**
      * Display a panel in a dialog. This is overridden by the desktop version to
@@ -2983,44 +2972,26 @@ public class NetworkPanel extends JPanel {
         return frame;
     }
 
-    /**
-     * @return the objectNodeMap
-     */
     public Map<Object, PNode> getObjectNodeMap() {
         return objectNodeMap;
     }
 
-    /**
-     * @return the undoManager
-     */
     public UndoManager getUndoManager() {
         return undoManager;
     }
 
-    /**
-     * @return the backgroundColor
-     */
     public static Color getBackgroundColor() {
         return backgroundColor;
     }
 
-    /**
-     * @param backgroundColor the backgroundColor to set
-     */
     public static void setBackgroundColor(Color backgroundColor) {
         NetworkPanel.backgroundColor = backgroundColor;
     }
 
-    /**
-     * @return the nudgeAmount
-     */
     public static double getNudgeAmount() {
         return nudgeAmount;
     }
 
-    /**
-     * @param nudgeAmount the nudgeAmount to set
-     */
     public static void setNudgeAmount(double nudgeAmount) {
         NetworkPanel.nudgeAmount = nudgeAmount;
     }

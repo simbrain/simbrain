@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkTextObject;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
@@ -36,9 +33,11 @@ import java.util.Iterator;
  */
 public class Clipboard {
 
-    // To add new copy-pastable items, must update all elseifs here,
-    // util.CopyPaste, Network.addObjects, and
-    // NetworkPanel.getSelectedModelElements()
+    // To add new copy-pastable items, must update:
+    // 1) all elseifs here,
+    // 2) CopyPaste.getCopy()
+    // 3) Network.addObjects
+    // 4) NetworkPanel.getSelectedModelElements()
 
     /**
      * Static list of cut or copied objects.
@@ -115,6 +114,8 @@ public class Clipboard {
             } else if (object instanceof NetworkTextObject) {
                 ret.add(net.getObjectNodeMap().get(object));
             } else if (object instanceof NeuronGroup) {
+                ret.add(net.getObjectNodeMap().get(object));
+            } else if (object instanceof NeuronArray) {
                 ret.add(net.getObjectNodeMap().get(object));
             }
         }
@@ -224,6 +225,9 @@ public class Clipboard {
             } else if (object instanceof NeuronGroup) {
                 NeuronGroup group = (NeuronGroup) object;
                 group.offset(offsetX, offsetY);
+            } else if (object instanceof NeuronGroup) {
+                NeuronArray array = (NeuronArray) object;
+                array.offset(offsetX, offsetY);
             }
         }
     }

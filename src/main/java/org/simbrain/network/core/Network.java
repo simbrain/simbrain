@@ -518,10 +518,9 @@ public class Network {
 
 
     /**
-     * TODO: This is initial (still experiental) support for ND4J neuron arrays
+     * Add an ND4J array object.
      */
     public void addNeuronArray(NeuronArray na) {
-        // Set id
         na.initializeId();
         naList.add(na);
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
@@ -1523,6 +1522,8 @@ public class Network {
                 addText((NetworkTextObject) object);
             } else if (object instanceof NeuronGroup) {
                 addGroup((NeuronGroup) object);
+            }  else if (object instanceof NeuronArray) {
+                addNeuronArray((NeuronArray) object);
             }
         }
     }

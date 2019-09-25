@@ -98,6 +98,19 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         randomize();
     }
 
+    /**
+     * Make a deep copy of this array.
+     *
+     * @param newParent the new parent network
+     * @param orig the array to copy
+     * @return the deep copy
+     */
+    public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
+        NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
+        copy.setValues(orig.getValues());
+        return copy;
+    }
+
     @Consumable()
     public void setValues(double[] values) {
         neuronArray = Nd4j.create(values).reshape(neuronArray.rows(), neuronArray.columns());
@@ -219,6 +232,18 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     public void setUseCustomLabel(boolean useCustomLabel) {
         this.useCustomLabel = useCustomLabel;
+    }
+
+    /**
+     * Offset this neuron array
+     *
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
+     */
+    public void offset(final double offsetX, final double offsetY) {
+        x += offsetX;
+        y += offsetY;
+        changeSupport.firePropertyChange("updated", null , null);
     }
 
     /**

@@ -250,10 +250,10 @@ public class NeuronArrayNode extends ScreenElement {
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
-        //contextMenu.add(new CutAction(getNetworkPanel()));
-        //contextMenu.add(new CopyAction(getNetworkPanel()));
-        //contextMenu.add(new PasteAction(getNetworkPanel()));
-        //contextMenu.addSeparator();
+        contextMenu.add(new CutAction(getNetworkPanel()));
+        contextMenu.add(new CopyAction(getNetworkPanel()));
+        contextMenu.add(new PasteAction(getNetworkPanel()));
+        contextMenu.addSeparator();
 
         // Edit Submenu
         Action editArray = new AbstractAction("Edit...") {

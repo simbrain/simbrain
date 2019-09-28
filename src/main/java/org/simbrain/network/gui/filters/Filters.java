@@ -111,7 +111,12 @@ public final class Filters {
     private static final AbstractFilter SELECTABLE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return (((node instanceof NeuronNode) && (!isGrouped(node))) || ((node instanceof SynapseNode) && (!isGrouped(node))) || ((node instanceof TextNode) && (!isGrouped(node))) || (node instanceof ViewGroupNode));
+            return (((node instanceof NeuronNode) && (!isGrouped(node)))
+                    || ((node instanceof SynapseNode) && (!isGrouped(node)))
+                    || ((node instanceof WeightMatrixNode) && (!isGrouped(node)))
+                    || ((node instanceof NeuronArrayNode) && (!isGrouped(node)))
+                    || ((node instanceof TextNode) && (!isGrouped(node)))
+                    || (node instanceof ViewGroupNode));
         }
     };
 

@@ -98,9 +98,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
@@ -132,9 +130,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Save table as .csv");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
@@ -164,9 +160,7 @@ public class TableActionManager {
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
-            /**
-             * {@ineritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 table.randomize();
             }
@@ -192,9 +186,7 @@ public class TableActionManager {
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
-            /**
-             * {@ineritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 table.normalize();
             }
@@ -218,9 +210,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Set randomization bounds");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 StandardDialog dialog = new StandardDialog();
                 JPanel pane = new JPanel();
@@ -266,9 +256,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 StandardDialog dialog = new StandardDialog();
                 JPanel pane = new JPanel();
@@ -312,9 +300,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 StandardDialog dialog = new StandardDialog();
                 JPanel pane = new JPanel();
@@ -358,9 +344,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (table.getSelectedRow() != -1) {
                     if (table.getData() instanceof MutableTable) {
@@ -390,9 +374,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
                     ((MutableTable) jtable.getData()).insertColumn(jtable.getSelectedColumn());
@@ -419,9 +401,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Delete row");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO: Also allow multiple column selection using this method?
                 List<Integer> selection = new ArrayList<Integer>(0);
@@ -463,9 +443,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Delete column");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
                     ((MutableTable) jtable.getData()).removeColumn(jtable.getSelectedColumn() - 1);
@@ -492,9 +470,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Add rows");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 String numRows = JOptionPane.showInputDialog(null, "Number of rows to add:", "5");
                 table.addRows(Integer.parseInt(numRows));
@@ -520,9 +496,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Add columns");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 String numCols = JOptionPane.showInputDialog(null, "Number of columns to add:", "5");
                 table.addColumns(Integer.parseInt(numCols));
@@ -550,9 +524,7 @@ public class TableActionManager {
                 putValue(ACCELERATOR_KEY, keyStroke);
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 table.fill(new Double(0));
             }
@@ -577,12 +549,9 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Fill table selected cells with specified value");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
-                String val = JOptionPane.showInputDialog(null, "Value:", "0");
-                table.fill(Double.parseDouble(val));
+                table.fill();
             }
 
         };
@@ -604,9 +573,7 @@ public class TableActionManager {
                 putValue(SHORT_DESCRIPTION, "Randomize the positions of the rows");
             }
 
-            /**
-             * {@inheritDoc}
-             */
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 table.shuffle();
             }

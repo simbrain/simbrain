@@ -250,6 +250,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     /**
+     * Clear activations;
+     */
+    public void clear() {
+        neuronArray.assign(0);
+        changeSupport.firePropertyChange("updated", null , null);
+    }
+
+    /**
      * Since Neuron Array is immutable, this object will be used in the creation dialog.
      */
     public static class CreationTemplate implements EditableObject {

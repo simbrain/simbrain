@@ -121,12 +121,24 @@ public class SimbrainJTable extends JXTable {
      * Initialize the table.
      */
     protected void initJTable() {
-        // addKeyListener(keyListener);
         setColumnSelectionAllowed(true);
         setRolloverEnabled(true);
         setRowSelectionAllowed(true);
         setGridColor(gridColor);
         updateRowSelection();
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_R) {
+                    randomize();
+                } else if (e.getKeyCode() == KeyEvent.VK_F) {
+                    fill();
+                } else if (e.getKeyCode() == KeyEvent.VK_Z) {
+                    fill(0);
+                }
+            }
+        });
 
         // First column displays row numbers
         this.setDefaultRenderer(Double.class, new CustomCellRenderer());
@@ -510,35 +522,13 @@ public class SimbrainJTable extends JXTable {
         }
     }
 
-    /**
-     * @return The selected point.
-     */
     public Point getSelectedPoint() {
         return selectedPoint;
     }
 
-    /**
-     * Sets the selected point.
-     *
-     * @param selectedPoint the selected point
-     */
     public void setSelectedPoint(final Point selectedPoint) {
         this.selectedPoint = selectedPoint;
     }
-
-    /**
-     * Listener for key events. Not yet used.
-     */
-    private KeyListener keyListener = new KeyAdapter() {
-        /**
-         * Responds to key typed events.
-         *
-         * @param arg0 Key event
-         */
-        public void keyTyped(final KeyEvent arg0) {
-            // System.out.println("Key typed");
-        }
-    };
 
     /**
      * Renderer for table. If custom row headings are used, treats first column
@@ -574,23 +564,14 @@ public class SimbrainJTable extends JXTable {
         }
     }
 
-    /**
-     * @return the rowHeadings
-     */
     public List<String> getRowHeadings() {
         return rowHeadings;
     }
 
-    /**
-     * @param rowHeadings the rowHeadings to set
-     */
     public void setRowHeadings(List<String> rowHeadings) {
         this.rowHeadings = rowHeadings;
     }
 
-    /**
-     * @param columnHeadings the columnHeadings to set
-     */
     public void setColumnHeadings(List<String> columnHeadings) {
         data.setColumnHeadings(columnHeadings);
     }
@@ -613,93 +594,54 @@ public class SimbrainJTable extends JXTable {
         data.setDisplayColumnHeadings(displayColumnHeadings);
     }
 
-    /**
-     * @return the displayPopUpMenu
-     */
     public boolean isDisplayPopUpMenu() {
         return displayPopUpMenu;
     }
 
-    /**
-     * @param displayPopUpMenu the displayPopUpMenu to set
-     */
     public void setDisplayPopUpMenu(boolean displayPopUpMenu) {
         this.displayPopUpMenu = displayPopUpMenu;
     }
 
-    /**
-     * @return the hasChanged
-     */
     public boolean hasChanged() {
         return hasChangedSinceLastSave;
     }
 
-    /**
-     * @param hasChanged the hasChanged to set
-     */
     public void setHasChangedSinceLastSave(boolean hasChanged) {
         this.hasChangedSinceLastSave = hasChanged;
     }
 
-    /**
-     * @param showInsertRowPopupMenu the showInsertRowPopupMenu to set
-     */
     public void setShowInsertRowPopupMenu(boolean showInsertRowPopupMenu) {
         this.showInsertRowPopupMenu = showInsertRowPopupMenu;
     }
 
-    /**
-     * @param showInsertColumnPopupMenu the showInsertColumnPopupMenu to set
-     */
     public void setShowInsertColumnPopupMenu(boolean showInsertColumnPopupMenu) {
         this.showInsertColumnPopupMenu = showInsertColumnPopupMenu;
     }
 
-    /**
-     * @param showDeleteRowPopupMenu the showDeleteRowPopupMenu to set
-     */
     public void setShowDeleteRowPopupMenu(boolean showDeleteRowPopupMenu) {
         this.showDeleteRowPopupMenu = showDeleteRowPopupMenu;
     }
 
-    /**
-     * @param showDeleteColumnPopupMenu the showDeleteColumnPopupMenu to set
-     */
     public void setShowDeleteColumnPopupMenu(boolean showDeleteColumnPopupMenu) {
         this.showDeleteColumnPopupMenu = showDeleteColumnPopupMenu;
     }
 
-    /**
-     * @param showEditInPopupMenu the showEditInPopupMenu to set
-     */
     public void setShowEditInPopupMenu(boolean showEditInPopupMenu) {
         this.showEditInPopupMenu = showEditInPopupMenu;
     }
 
-    /**
-     * @param showRandomizeInPopupMenu the showRandomizeInPopupMenu to set
-     */
     public void setShowRandomizeInPopupMenu(boolean showRandomizeInPopupMenu) {
         this.showRandomizeInPopupMenu = showRandomizeInPopupMenu;
     }
 
-    /**
-     * @param showNormalizeInPopupMenu the showNormalizeInPopupMenu to set
-     */
     public void setShowNormalizeInPopupMenu(boolean showNormalizeInPopupMenu) {
         this.showNormalizeInPopupMenu = showNormalizeInPopupMenu;
     }
 
-    /**
-     * @param showFillInPopupMenu the showFillInPopupMenu to set
-     */
     public void setShowFillInPopupMenu(boolean showFillInPopupMenu) {
         this.showFillInPopupMenu = showFillInPopupMenu;
     }
 
-    /**
-     * @param showCSVInPopupMenu the showCSVInPopupMenu to set
-     */
     public void setShowCSVInPopupMenu(boolean showCSVInPopupMenu) {
         this.showCSVInPopupMenu = showCSVInPopupMenu;
     }
@@ -723,6 +665,24 @@ public class SimbrainJTable extends JXTable {
         if (data instanceof NumericTable) {
             ((NumericTable) data).randomize(getSelectedLogicalCellIndices());
         }
+    }
+
+    private List<CellIndex> getAllIndices() {
+        List<CellIndex> indices = new ArrayList<CellIndex>();
+        for (int i = 0; i < this.getRowCount(); i++) {
+            for (int j = 1; j < this.getColumnCount(); j++) {
+                indices.add(new CellIndex(i, j - 1));
+            }
+        }
+        return indices;
+    }
+
+    /**
+     * Open a dialog and fill with the provided value.
+     */
+    public void fill() {
+        String val = JOptionPane.showInputDialog(this, "Value:", "0");
+        fill(Double.parseDouble(val));
     }
 
     /**

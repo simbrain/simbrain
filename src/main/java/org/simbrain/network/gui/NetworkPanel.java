@@ -1919,6 +1919,19 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Returns selected weight matrices
+     *
+     * @return list of selected weight matrices
+     */
+    public List<WeightMatrix> getSelectedModelWeightMatrices() {
+        return getSelection().stream()
+                .filter(WeightMatrixNode.class::isInstance)
+                .map(WeightMatrixNode.class::cast)
+                .map(WeightMatrixNode::getWeightMatrix)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Returns selected synapses.
      *
      * @return list of selected synapses
@@ -3167,6 +3180,9 @@ public class NetworkPanel extends JPanel {
         }
         for (SynapseNode node : getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
+        }
+        for (NeuronArray na : getSelectedModelNeuronArrays()) {
+            na.clear();
         }
     }
 

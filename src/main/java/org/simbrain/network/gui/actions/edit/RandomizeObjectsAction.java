@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
+import org.simbrain.network.core.NeuronArray;
+import org.simbrain.network.core.WeightMatrix;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
@@ -61,6 +63,12 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         }
         for (NeuronGroupNode node : networkPanel.getSelectedNeuronGroups()) {
             node.getNeuronGroup().randomize();
+        }
+        for (NeuronArray na: networkPanel.getSelectedModelNeuronArrays()) {
+            na.randomize();
+        }
+        for (WeightMatrix wm: networkPanel.getSelectedModelWeightMatrices()) {
+            wm.randomize();
         }
         // Show Synapse Group Randomization dialog for one synapse group only
         Optional<SynapseGroupNode> sg = networkPanel.getSelectedSynapseGroups().stream().findFirst();

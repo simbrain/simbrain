@@ -19,6 +19,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
+import umontreal.iro.lecuyer.simevents.Sim;
 
 import javax.swing.*;
 import java.awt.*;
@@ -271,8 +272,8 @@ public class WeightMatrixNode extends ScreenElement {
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
                 NumericTable table = new NumericTable(weightMatrix.getWeightMatrix().toDoubleMatrix());
-                dialog.setContentPane(new SimbrainJTableScrollPanel(
-                        SimbrainJTable.createTable(table)));
+                SimbrainJTable st = SimbrainJTable.createTable(table);
+                dialog.setContentPane(new SimbrainJTableScrollPanel(st));
 
                 dialog.addClosingTask(() -> {
                     weightMatrix.setWeights(table.getFlattenedData());

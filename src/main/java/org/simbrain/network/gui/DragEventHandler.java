@@ -53,6 +53,8 @@ import java.util.Collections;
  */
 final class DragEventHandler extends PDragSequenceEventHandler {
 
+    //TODO: Rename to selection event handler? Regular selection events are also handled here.
+
     /**
      * Selection marquee.
      */
@@ -173,6 +175,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // System.out.println("start:" + pickedNode);
         // System.out.println("start-parent:" + pickedNode.getParent());
 
+        // Single click selection of entities happens here.
+        // "Start drag" is thus a bit of a misnomer
+
+        // This code transfers the "picked" object to the object that will be dragged
         // Must be careful no to add too much hierarchy in pnodes because then it's hard to pick them
         // Currently most pnodes have just a single layer of children.
         if (pickedNode.getParent() instanceof TextNode) {
@@ -182,6 +188,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         } else if (pickedNode.getParent() instanceof NeuronArrayNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof SynapseNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof WeightMatrixNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof InteractionBox) {
             pickedNode = pickedNode.getParent();

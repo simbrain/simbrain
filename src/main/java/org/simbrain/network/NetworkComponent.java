@@ -136,6 +136,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         retList.addAll(network.getSynapseGroups());
         retList.addAll(network.getNeuronCollectionSet());
         retList.addAll(network.getNaList());
+        retList.addAll(network.getWeightMatrices());
         return retList;
     }
 

@@ -23,7 +23,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     //TODO: See if data can be stored as an array. If not maybe used column instead of row.
 
     /**
-     * Reference to network this neuron is part of.
+     * Reference to network this array is part of.
      */
     private final Network parent;
 

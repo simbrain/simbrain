@@ -4,15 +4,21 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * An ND4J weight matrix that connects a source and target {@link ArrayConnectable}
  * object.
  */
-public class WeightMatrix {
-
-    //TODO Id, Label
+public class WeightMatrix implements EditableObject, AttributeContainer {
 
     /**
      * The source "layer" / activation vector for this weight matrix.
@@ -25,9 +31,33 @@ public class WeightMatrix {
     private ArrayConnectable target;
 
     /**
+     * Reference to network this neuron is part of.
+     */
+    private final Network parent;
+
+    /**
+     * A label for this Neuron Array for display purpose.
+     */
+    @UserParameter(
+            label = "Label"
+    )
+    private String label = "";
+
+    /**
+     * Id of this array.
+     */
+    @UserParameter(label = "ID", description = "Id of this weight matrix", order = -1, editable = false)
+    private String id;
+
+    /**
      * The weight matrix object.
      */
     private INDArray weightMatrix;
+
+    /**
+     * If true, when the weight matrix is added to the network its id will not be used as its label.
+     */
+    private boolean useCustomLabel = false;
 
     /**
      * WeightMatrixNode will render an image of this matrix if set to true
@@ -35,12 +65,19 @@ public class WeightMatrix {
     private boolean enableRendering = true;
 
     /**
+     * Support for property change events.
+     */
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
      * Construct the matrix.
      *
+     * @param net parent network
      * @param source source layer
      * @param target target layer
      */
-    public WeightMatrix(ArrayConnectable source, ArrayConnectable target) {
+    public WeightMatrix(Network net, ArrayConnectable source, ArrayConnectable target) {
+        this.parent = net;
         this.source = source;
         this.target = target;
 
@@ -51,11 +88,21 @@ public class WeightMatrix {
             weightMatrix.get(NDArrayIndex.createCoveringShape(id.shape())).assign(id);
         } else {
             // For now randomize new matrices between arrays
-            weightMatrix = Nd4j.rand((int) source.arraySize(), (int) target.arraySize()).subi(0.5).mul(2);
+            randomize();
         }
 
     }
 
+    /**
+     * Initialize the id for this array. A default label based
+     * on the id is also set.
+     */
+    public void initializeId() {
+        id = parent.getWeightMatrixGenerator().getId();
+        if (!useCustomLabel) {
+            label = id.replaceAll("_", " ");
+        }
+    }
     /**
      * Default update simply matrix multiplies source times matrix and sets
      * result to target.
@@ -64,12 +111,32 @@ public class WeightMatrix {
         target.setActivationArray(source.getActivationArray().mmul(weightMatrix));
     }
 
+    /**
+     * Set the label. This prevents the group id being used as the label for
+     * new groups.  If null or empty labels are sent in then the group label is used.
+     */
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        if (label == null  || label.isEmpty()) {
+            useCustomLabel = false;
+        } else {
+            useCustomLabel = true;
+        }
+        String oldLabel = this.label;
+        this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
+    }
+
     @Override
     public String toString() {
         String ret = new String();
-        ret += "Weight Matrix [TODO]:";
-        ret += "  Connects " + source.getId() + " to " + target.getId();
+        ret += weightMatrix.rows() + "x" + weightMatrix.columns() + " matrix [" + getId() + "] ";
+        ret += "  Connects " + source.getId() + " to " + target.getId() + "\n";
         return ret;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     public ArrayConnectable getSource() {
@@ -84,11 +151,42 @@ public class WeightMatrix {
         return weightMatrix;
     }
 
+    @Producible
+    public double[] getWeights() {
+        return Nd4j.toFlattened(weightMatrix).toDoubleVector();
+    }
+
+    @Consumable
+    public void setWeights(double[] newWeights) {
+        weightMatrix.data().setData(newWeights);
+        changeSupport.firePropertyChange("updated", null , null);
+    }
+
     public boolean isEnableRendering() {
         return enableRendering;
     }
 
     public void setEnableRendering(boolean enableRendering) {
         this.enableRendering = enableRendering;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Notify listeners that this object has been deleted.
+     */
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", this, null);
+    }
+
+    /**
+     * Randomize weights in this matrix
+     */
+    public void randomize() {
+        weightMatrix = Nd4j.rand((int) source.arraySize(), (int) target.arraySize()).subi(0.5).mul(2);
+        changeSupport.firePropertyChange("updated", null , null);
     }
 }

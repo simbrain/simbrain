@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui;
 
+import org.deeplearning4j.nn.api.Layer;
+import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.StandardDialog;
@@ -284,6 +286,17 @@ public class KeyBindings {
                     panel.setWeightsVisible(false);
                 } else {
                     panel.setWeightsVisible(true);
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke("6"), "createDL4JGroup");
+        panel.getActionMap().put("createDL4JGroup", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DL4JMultiLayerNetwork thing = new DL4JMultiLayerNetwork(panel.getDL4JLayers());
+                System.out.println(thing);
+                for (Layer layer : thing.getNetwork().getLayers()) {
+                    System.out.println(layer);
                 }
             }
         });

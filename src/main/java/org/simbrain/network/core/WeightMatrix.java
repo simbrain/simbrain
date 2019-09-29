@@ -1,5 +1,9 @@
 package org.simbrain.network.core;
 
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.Layer;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
@@ -43,6 +47,14 @@ public class WeightMatrix {
     public WeightMatrix(ArrayConnectable source, ArrayConnectable target) {
         this.source = source;
         this.target = target;
+
+        if (source instanceof NeuronArray) {
+            ((NeuronArray) source).setFanOut(this);
+        }
+
+        if (target instanceof NeuronArray) {
+            ((NeuronArray) target).setFanIn(this);
+        }
 
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
@@ -90,5 +102,13 @@ public class WeightMatrix {
 
     public void setEnableRendering(boolean enableRendering) {
         this.enableRendering = enableRendering;
+    }
+
+    public Layer asLayer() {
+        return new DenseLayer.Builder().nIn(source.arraySize()).nOut(target.arraySize())
+                .activation(Activation.SOFTMAX)
+                // random initialize weights with values between 0 and 1
+                .weightInit(new UniformDistribution(0, 1))
+                .build();
     }
 }

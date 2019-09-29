@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.deeplearning4j.nn.conf.layers.Layer;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
@@ -2028,6 +2029,32 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(node);
         node.lowerToBottom();
         objectNodeMap.put(matrix, node);
+    }
+
+    public List<Layer> getDL4JLayers() {
+
+        List<Layer> ret = new ArrayList<>();
+
+        NeuronArray array = null;
+        for (NeuronArray selectedModelNeuronArray : getSelectedModelNeuronArrays()) {
+            if (selectedModelNeuronArray.getFanIn() == null) {
+                array = selectedModelNeuronArray;
+                break;
+            }
+        }
+
+        if (array == null) {
+            return null;
+        }
+
+        while (array.getFanOut() != null) {
+            ret.add(array.getFanOut().asLayer());
+            array = ((NeuronArray) array.getFanOut().getTarget());
+        }
+
+        ret.add(array.asLayer());
+
+        return ret;
     }
 
     /**

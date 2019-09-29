@@ -1,8 +1,13 @@
 package org.simbrain.network.core;
 
 
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
+import org.deeplearning4j.nn.conf.layers.Layer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -71,6 +76,10 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * If true, when the array is added to the network its id will not be used as its label.
      */
     private boolean useCustomLabel = false;
+
+    private WeightMatrix fanIn;
+
+    private WeightMatrix fanOut;
 
     /**
      * Render an image showing each activation when true.
@@ -197,6 +206,22 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     public void setRenderActivations(boolean renderActivations) {
         this.renderActivations = renderActivations;
+    }
+
+    public WeightMatrix getFanIn() {
+        return fanIn;
+    }
+
+    public void setFanIn(WeightMatrix fanIn) {
+        this.fanIn = fanIn;
+    }
+
+    public WeightMatrix getFanOut() {
+        return fanOut;
+    }
+
+    public void setFanOut(WeightMatrix fanOut) {
+        this.fanOut = fanOut;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -332,6 +357,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
                 task.run();
             }
         });
+    }
+
+    public Layer asLayer() {
+        return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .nOut(arraySize())
+                .activation(Activation.SOFTMAX)
+                .weightInit(new UniformDistribution(0, 1))
+                .build();
     }
 
     @Override

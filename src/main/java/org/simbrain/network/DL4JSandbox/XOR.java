@@ -1,5 +1,6 @@
 package org.simbrain.network.DL4JSandbox;
 
+import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
@@ -90,6 +91,11 @@ public class XOR {
                         // random initialize weights with values between 0 and 1
                         .weightInit(new UniformDistribution(0, 1))
                         .build())
+                .layer(new DenseLayer.Builder().nIn(4).nOut(3)
+                        .activation(Activation.SIGMOID)
+                        // random initialize weights with values between 0 and 1
+                        .weightInit(new UniformDistribution(0, 1))
+                        .build())
                 .layer(new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(2)
                         .activation(Activation.SOFTMAX)
@@ -99,6 +105,10 @@ public class XOR {
 
         MultiLayerNetwork net = new MultiLayerNetwork(conf);
         net.init();
+
+        for (Layer layer : net.getLayers()) {
+            System.out.println(layer);
+        }
 
         // add an listener which outputs the error every 100 parameter updates
         net.setListeners(new ScoreIterationListener(100));

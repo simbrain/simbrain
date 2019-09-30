@@ -28,7 +28,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     //TODO: See if data can be stored as an array. If not maybe used column instead of row.
 
     /**
-     * Reference to network this neuron is part of.
+     * Reference to network this array is part of.
      */
     private final Network parent;
 
@@ -271,6 +271,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void offset(final double offsetX, final double offsetY) {
         x += offsetX;
         y += offsetY;
+        changeSupport.firePropertyChange("updated", null , null);
+    }
+
+    /**
+     * Clear activations;
+     */
+    public void clear() {
+        neuronArray.assign(0);
         changeSupport.firePropertyChange("updated", null , null);
     }
 

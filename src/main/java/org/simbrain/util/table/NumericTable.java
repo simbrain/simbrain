@@ -168,6 +168,24 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     }
 
     /**
+     * Return the data as a flattened vector
+     *
+     * @return the data vector
+     */
+    public double[] getFlattenedData() {
+        int cols = this.getLogicalColumnCount();
+        int rows = this.getRowCount();
+        int totalCells = rows * cols;
+
+        double[] retVec = new double[totalCells];
+
+        for (int i = 0; i < totalCells; i++) {
+            retVec[i] = this.getLogicalValueAt(i/cols, i%cols);
+        }
+        return retVec;
+    }
+
+    /**
      * Set the values of the specified column in the current row.
      *
      * @param column column index

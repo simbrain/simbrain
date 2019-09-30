@@ -544,6 +544,8 @@ public class NetworkPanel extends JPanel {
                     addNeuronArray((NeuronArray) evt.getNewValue());
                 } else if ("naRemoved".equals(evt.getPropertyName())) {
                     ((NeuronArray)evt.getOldValue()).fireDeleted();
+                } else if ("wmRemoved".equals(evt.getPropertyName())) {
+                    ((WeightMatrix)evt.getOldValue()).fireDeleted();
                 } else if ("ncAdded".equals(evt.getPropertyName())) {
                     addNeuronCollection((NeuronCollection)evt.getNewValue());
                 } else if ("updateTimeDisplay".equals(evt.getPropertyName())) {
@@ -1501,6 +1503,9 @@ public class NetworkPanel extends JPanel {
             } else if (selectedNode instanceof NeuronArrayNode) {
                 NeuronArrayNode arrayNode = (NeuronArrayNode) selectedNode;
                 network.removeNeuronArray(arrayNode.getNeuronArray());
+            } else if (selectedNode instanceof WeightMatrixNode) {
+                WeightMatrixNode wmNode = (WeightMatrixNode) selectedNode;
+                network.removeWeightMatrix(wmNode.getWeightMatrix());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());
@@ -1915,6 +1920,19 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Returns selected weight matrices
+     *
+     * @return list of selected weight matrices
+     */
+    public List<WeightMatrix> getSelectedModelWeightMatrices() {
+        return getSelection().stream()
+                .filter(WeightMatrixNode.class::isInstance)
+                .map(WeightMatrixNode.class::cast)
+                .map(WeightMatrixNode::getWeightMatrix)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Returns selected synapses.
      *
      * @return list of selected synapses
@@ -1997,6 +2015,8 @@ public class NetworkPanel extends JPanel {
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
+            } else if (e instanceof WeightMatrixNode) {
+                ret.add(((WeightMatrixNode) e).getWeightMatrix());
             } else if (e instanceof NeuronArrayNode) {
                 ret.add(((NeuronArrayNode) e).getNeuronArray());
             } else if (e instanceof TextNode) {
@@ -2025,7 +2045,7 @@ public class NetworkPanel extends JPanel {
         if (objectNodeMap.get(matrix) != null) {
             return;
         }
-        WeightMatrixNode node = new WeightMatrixNode(matrix);
+        WeightMatrixNode node = new WeightMatrixNode(this, matrix);
         canvas.getLayer().addChild(node);
         node.lowerToBottom();
         objectNodeMap.put(matrix, node);
@@ -3187,6 +3207,9 @@ public class NetworkPanel extends JPanel {
         }
         for (SynapseNode node : getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
+        }
+        for (NeuronArray na : getSelectedModelNeuronArrays()) {
+            na.clear();
         }
     }
 

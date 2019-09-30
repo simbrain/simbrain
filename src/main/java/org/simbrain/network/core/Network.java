@@ -175,6 +175,11 @@ public class Network {
     private SimpleId arrayIdGenerator = new SimpleId("Array", 1);
 
     /**
+     * Weight Matrix Id generator.
+     */
+    private SimpleId weightMatrixGenerator = new SimpleId("Weight Matrix", 1);
+
+    /**
      * A variable telling the network not to fire events to any listeners during update.
      */
     private volatile boolean fireUpdates = true;
@@ -602,6 +607,11 @@ public class Network {
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
         changeSupport.firePropertyChange("naRemoved", na, null);
+    }
+
+    public void removeWeightMatrix(WeightMatrix wm) {
+        weightMatrices.remove(wm);
+        changeSupport.firePropertyChange("wmRemoved", wm, null);
     }
 
     /**
@@ -1461,6 +1471,10 @@ public class Network {
         return arrayIdGenerator;
     }
 
+    public SimpleId getWeightMatrixGenerator() {
+        return weightMatrixGenerator;
+    }
+
     /**
      * Add a network text object.
      *
@@ -1562,8 +1576,10 @@ public class Network {
      * @param target target neuron collection or nd4j array
      */
     public WeightMatrix addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
-        WeightMatrix newMatrix = new WeightMatrix(source, target);
+        WeightMatrix newMatrix = new WeightMatrix(this, source, target);
+        newMatrix.initializeId();
         weightMatrices.add(newMatrix);
+        //changeSupport.firePropertyChange("weightMatrixAdded", null, newMatrix);
         return newMatrix;
     }
 
@@ -1616,6 +1632,10 @@ public class Network {
 
     public List<NeuronArray> getNaList() {
         return naList;
+    }
+
+    public Set<WeightMatrix> getWeightMatrices() {
+        return weightMatrices;
     }
 
     public static int getSynapseVisibilityThreshold() {

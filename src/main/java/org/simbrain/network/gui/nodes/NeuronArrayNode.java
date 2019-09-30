@@ -108,14 +108,14 @@ public class NeuronArrayNode extends ScreenElement {
     /**
      * Create a new neuron array node.
      *
-     * @param net    Reference to NetworkPanel
+     * @param np    Reference to NetworkPanel
      * @param na reference to model neuron array
      */
-    public NeuronArrayNode(final NetworkPanel net, final NeuronArray na) {
-        super(net);
+    public NeuronArrayNode(final NetworkPanel np, final NeuronArray na) {
+        super(np);
         borderBox.setTransparency(0.2f);
         this.neuronArray = na;
-        networkPanel = net;
+        networkPanel = np;
 
         neuronArray.addPropertyChangeListener(evt -> {
             if ("updated".equals(evt.getPropertyName())) {
@@ -255,7 +255,7 @@ public class NeuronArrayNode extends ScreenElement {
 
     @Override
     protected String getToolTipText() {
-        return "" + neuronArray.getNeuronArray().sumNumber();
+        return neuronArray.toString();
     }
 
     @Override

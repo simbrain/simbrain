@@ -43,6 +43,7 @@ public class LatchCompletionSignal implements CompletionSignal {
      * Called when a task is done.
      */
     public void done() {
+        //System.out.println("LatchCompletionSignal.done");
         CountDownLatch latch = this.latch;
 
         latch.countDown();
@@ -62,11 +63,11 @@ public class LatchCompletionSignal implements CompletionSignal {
      */
     public void await() {
         try {
+            //System.out.println("LatchCompletionSignal.await");
             CountDownLatch latch = this.latch;
-
             latch.await();
         } catch (InterruptedException e) {
-            return;
+            e.printStackTrace();
         }
     }
 }

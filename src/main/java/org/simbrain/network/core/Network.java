@@ -84,10 +84,17 @@ public class Network {
      */
     private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
 
+    //TODO: Set back to final when backwards compatibility issue fixed
     /**
      * Set of weight matrices.
      */
-    private final Set<WeightMatrix> weightMatrices = new HashSet<>();
+    private Set<WeightMatrix> weightMatrices = new HashSet<>();
+
+    //TODO: Set back to final when backwards compatibility issue fixed
+    /**
+     * Neuron Collections. Can contain overlapping neurons.
+     */
+    private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -99,10 +106,6 @@ public class Network {
      */
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
-    /**
-     * Neuron Collections. Can contain overlapping neurons.
-     */
-    private final HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
     /**
      * Neuron Array objects (nd4j). Not yet implemented.
@@ -1081,6 +1084,14 @@ public class Network {
 
         fireUpdates = true;
 
+        // TODO: Temp code to handle xstream backwards compatibility issues
+        if(weightMatrices == null) {
+            weightMatrices = new HashSet<>();
+        }
+        if (neuronCollectionSet == null) {
+            neuronCollectionSet = new HashSet<>();
+        }
+
         changeSupport = new PropertyChangeSupport(this);
 
         // Initialize update manager
@@ -1369,6 +1380,7 @@ public class Network {
 
         String ret = "Root Network \n================= \n";
 
+        // Loose neurons
         for (Neuron n : this.getNeuronList()) {
             ret += (n + "\n");
         }

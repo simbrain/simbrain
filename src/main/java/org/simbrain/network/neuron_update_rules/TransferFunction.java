@@ -1,10 +1,10 @@
 package org.simbrain.network.neuron_update_rules;
 
-import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Interface for neuron update rules (referred to as the "parent rule" here) to
- * be used with an array-based library backing, currently jblas. Methods to
+ * be used with an array-based library backing. Methods to
  * apply the parent rule to an array, and to apply the derivative of the parent
  * rule to an array are supplied. Useful for backprop.
  *
@@ -17,7 +17,7 @@ public interface TransferFunction {
      *
      * @param input the matrix to be mutated.
      */
-    void applyFunctionInPlace(DoubleMatrix input);
+    void applyFunctionInPlace(INDArray input);
 
     /**
      * Applies the parent rule to the input and writes the result to output.
@@ -25,7 +25,7 @@ public interface TransferFunction {
      * @param input  usually the net input
      * @param output the output to be mutated
      */
-    void applyFunction(DoubleMatrix input, DoubleMatrix output);
+    void applyFunction(INDArray input, INDArray output);
 
     /**
      * Apply the derivative of the parent rule to the input and write the result
@@ -35,7 +35,7 @@ public interface TransferFunction {
      * @param input  the net input x
      * @param output the output y to be mutated
      */
-    void getDerivative(DoubleMatrix input, DoubleMatrix output);
+    void getDerivative(INDArray input, INDArray output);
 
     /**
      * Apply the transfer function to the input vector and store the result in output. Then apply the derivative
@@ -45,5 +45,5 @@ public interface TransferFunction {
      * @param output     The output vector.
      * @param derivative The derivative vector.
      */
-    void applyFunctionAndDerivative(DoubleMatrix input, DoubleMatrix output, DoubleMatrix derivative);
+    void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative);
 }

@@ -1,7 +1,7 @@
 package org.simbrain.network.trainers;
 
-import org.jblas.DoubleMatrix;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -78,12 +78,12 @@ public class BackpropTrainerTest {
         //         System.out.println();
         //         System.out.println(Arrays.deepToString(hidOutStrs));
 
-        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toArray2();
-        //System.out.println(Arrays.deepToString(inpHidStrs));
-        //System.out.println();
-        //System.out.println(Arrays.deepToString(inHidJBlas));
-        //System.out.println("-----");
-        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toArray2();
+        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toDoubleMatrix();
+        System.out.println(Arrays.deepToString(inpHidStrs));
+        System.out.println();
+        System.out.println(Arrays.deepToString(inHidJBlas));
+        System.out.println("-----");
+        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toDoubleMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));
@@ -98,9 +98,9 @@ public class BackpropTrainerTest {
             assertArrayEquals(hidOutJBlas[ii], hidOutStrs[ii], 0);
         }
 
-        List<DoubleMatrix> jblasBiases = trainer.getBiases();
-        double[] biasesOutJBlas = jblasBiases.get(1).data;
-        double[] biasesHidJBlas = jblasBiases.get(0).data;
+        List<INDArray> jblasBiases = trainer.getBiases();
+        double[] biasesOutJBlas = jblasBiases.get(1).toDoubleVector();
+        double[] biasesHidJBlas = jblasBiases.get(0).toDoubleVector();
 
         assertArrayEquals(biasesHidJBlas, hidBiases, 0);
         assertArrayEquals(biasesOutJBlas, outBiases, 0);
@@ -163,13 +163,13 @@ public class BackpropTrainerTest {
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutStrs));
 
-        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toArray2();
+        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toDoubleMatrix();
         //System.out.println(Arrays.deepToString(inpHidStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(inHidJBlas));
         //System.out.println("-----");
 
-        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toArray2();
+        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toDoubleMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));
@@ -182,9 +182,9 @@ public class BackpropTrainerTest {
             assertArrayEquals(hidOutJBlas[ii], hidOutStrs[ii], 0);
         }
 
-        List<DoubleMatrix> jblasBiases = trainer.getBiases();
-        double[] biasesOutJBlas = jblasBiases.get(1).data;
-        double[] biasesHidJBlas = jblasBiases.get(0).data;
+        List<INDArray> jblasBiases = trainer.getBiases();
+        double[] biasesOutJBlas = jblasBiases.get(1).toDoubleVector();
+        double[] biasesHidJBlas = jblasBiases.get(0).toDoubleVector();
 
         assertArrayEquals(biasesHidJBlas, hidBiases, 0);
         assertArrayEquals(biasesOutJBlas, outBiases, 0);

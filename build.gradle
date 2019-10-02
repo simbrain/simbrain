@@ -43,8 +43,6 @@ dependencies {
     compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
 
     // TODO: Migrate to nd4j
-    // https://mvnrepository.com/artifact/org.jblas/jblas
-    compile group: 'org.jblas', name: 'jblas', version: '1.2.4'
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
 

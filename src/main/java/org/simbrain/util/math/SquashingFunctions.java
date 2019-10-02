@@ -18,8 +18,8 @@
  */
 package org.simbrain.util.math;
 
-import org.jblas.DoubleMatrix;
-import org.jblas.MatrixFunctions;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 /**
  * Static squashing function methods.
@@ -47,13 +47,13 @@ public class SquashingFunctions {
         return (diff / 2) * Math.tanh(a * val) + ((ceil + floor) / 2);
     }
 
-    public static void tanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void tanh(INDArray in, INDArray out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
         if (in != out) {
-            out.copy(in);
+            out = in.dup();
         }
-        MatrixFunctions.tanhi(out.muli(a));
+        out = Transforms.tanh(out.muli(a));
         out.muli(diff / 2);
         out.addi((ceil + floor) / 2);
     }
@@ -85,7 +85,7 @@ public class SquashingFunctions {
     }
 
     /**
-     * Compute the scaled logistic function on a DoubleMatrix of input values.
+     * Compute the scaled logistic function on a INDArray of input values.
      *
      * @param in    The input array, will not be modified.
      * @param out   The output array, will be overwritten with the result.
@@ -93,11 +93,11 @@ public class SquashingFunctions {
      * @param floor The lower limit of the logistic curve.
      * @param slope The slope of the curve at val == 0.
      */
-    public static void logistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void logistic(INDArray in, INDArray out, double ceil, double floor, double slope) {
         // Same as double form above
         double s = 4 * slope / (ceil - floor);
         in.muli(s, out);
-        MatrixFunctions.expi(out.negi()).addi(1).rdivi(1);
+        out = Transforms.exp(out.negi()).addi(1).rdivi(1);
         out.muli(ceil - floor).addi(floor);
     }
 
@@ -118,14 +118,14 @@ public class SquashingFunctions {
         return (diff / Math.PI) * Math.atan(a * val) + ((ceil + floor) / 2);
     }
 
-    public static void atan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void atan(INDArray in, INDArray out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
         if (in != out) {
-            out.copy(in);
+            out = in.dup();
         }
         out.muli(a);
-        MatrixFunctions.atani(out);
+        out = Transforms.atan(out);
         out.muli(diff / Math.PI);
         out.addi((ceil + floor) / 2);
     }
@@ -155,17 +155,17 @@ public class SquashingFunctions {
         return Math.log((1 + z)) / (1 - z);
     }
 
-    public static void invTanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void invTanh(INDArray in, INDArray out, double ceil, double floor, double slope) {
         if (in != out) {
-            out.copy(in);
+            out = in.dup();
         }
         out.addi(-floor);
         out.rdivi(ceil - floor);
         out.addi(-0.5);
         out.muli(0.5);
         // One matrix allocation here could be expensive
-        DoubleMatrix denom = out.rsub(1);
-        MatrixFunctions.logi(out.addi(1)).divi(denom);
+        INDArray denom = out.rsub(1);
+        out = Transforms.log(out.addi(1)).divi(denom);
     }
 
     /**
@@ -187,9 +187,9 @@ public class SquashingFunctions {
         return diff * -Math.log(diff / (val - floor) - 1) / slope;
     }
 
-    public static void invLogistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-        for (int i = 0; i < in.length; ++i) {
-            out.data[i] = invLogistic(in.data[i], ceil, floor, slope);
+    public static void invLogistic(INDArray in, INDArray out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length(); ++i) {
+            out.putScalar(i, invLogistic(in.getDouble(i), ceil, floor, slope));
         }
     }
 
@@ -213,9 +213,9 @@ public class SquashingFunctions {
         return Math.tan(z) / a;
     }
 
-    public static void invAtan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-        for (int i = 0; i < in.length; ++i) {
-            out.data[i] = invAtan(in.data[i], ceil, floor, slope);
+    public static void invAtan(INDArray in, INDArray out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length(); ++i) {
+            out.putScalar(i, invAtan(in.getDouble(i), ceil, floor, slope));
         }
     }
 
@@ -246,12 +246,12 @@ public class SquashingFunctions {
         return slope * t * t;
     }
 
-    public static void derivTanh(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void derivTanh(INDArray in, INDArray out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
         in.muli(a, out);
-        MatrixFunctions.coshi(out).rdivi(1);
-        MatrixFunctions.powi(out, 2);
+        out = Transforms.cosh(out).rdivi(1);
+        out = Transforms.pow(out, 2);
         out.muli(a * diff / 2);
     }
 
@@ -284,12 +284,12 @@ public class SquashingFunctions {
      * @param floor The lower bound on the logistic function.
      * @param slope The slope of the logistic function.
      */
-    public static void derivLogistic(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
+    public static void derivLogistic(INDArray in, INDArray out, double ceil, double floor, double slope) {
         if (in != out) {
-            out.copy(in);
+            out = in.dup();
         }
-        for (int ii = 0; ii < out.data.length; ++ii) {
-            out.data[ii] = derivLogistic(out.data[ii], ceil, floor, slope);
+        for (int ii = 0; ii < out.length(); ++ii) {
+            out.putScalar(ii, derivLogistic(out.getDouble(ii), ceil, floor, slope));
         }
     }
 
@@ -304,7 +304,7 @@ public class SquashingFunctions {
      * @param floor The lower bound of the logistic function.
      * @param slope The slope of the logistic function.
      */
-    public static void logisticWithDerivative(DoubleMatrix in, DoubleMatrix out, DoubleMatrix deriv, double ceil, double floor, double slope) {
+    public static void logisticWithDerivative(INDArray in, INDArray out, INDArray deriv, double ceil, double floor, double slope) {
         logistic(in, out, ceil, floor, slope);
         // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
         out.rsubi(ceil, deriv);
@@ -334,9 +334,9 @@ public class SquashingFunctions {
         return a * (diff / Math.PI) * (1 / (1 + Math.pow(a * val, 2)));
     }
 
-    public static void derivAtan(DoubleMatrix in, DoubleMatrix out, double ceil, double floor, double slope) {
-        for (int i = 0; i < in.length; ++i) {
-            out.data[i] = derivAtan(in.data[i], ceil, floor, slope);
+    public static void derivAtan(INDArray in, INDArray out, double ceil, double floor, double slope) {
+        for (int i = 0; i < in.length(); ++i) {
+            out.putScalar(i, derivAtan(in.getDouble(i), ceil, floor, slope));
         }
     }
 

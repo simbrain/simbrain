@@ -79,27 +79,24 @@ public class BackpropTrainerTest {
         //         System.out.println(Arrays.deepToString(hidOutStrs));
 
         double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toArray2();
-        System.out.println(Arrays.deepToString(inpHidStrs));
-        System.out.println();
-        System.out.println(Arrays.deepToString(inHidJBlas));
-        System.out.println("-----");
+        //System.out.println(Arrays.deepToString(inpHidStrs));
+        //System.out.println();
+        //System.out.println(Arrays.deepToString(inHidJBlas));
+        //System.out.println("-----");
         double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toArray2();
-        System.out.println(Arrays.deepToString(hidOutStrs));
-        System.out.println();
-        System.out.println(Arrays.deepToString(hidOutJBlas));
-        System.out.println();
-        System.out.println("-----");
-        System.out.println();
+        //System.out.println(Arrays.deepToString(hidOutStrs));
+        //System.out.println();
+        //System.out.println(Arrays.deepToString(hidOutJBlas));
+        //System.out.println();
+        //System.out.println("-----");
+        //System.out.println();
 
-
-        //
         for (int ii = 0; ii < noInp; ++ii) {
             assertArrayEquals(inHidJBlas[ii], inpHidStrs[ii], 0);
         }
         for (int ii = 0; ii < noHid; ++ii) {
             assertArrayEquals(hidOutJBlas[ii], hidOutStrs[ii], 0);
         }
-
 
         List<DoubleMatrix> jblasBiases = trainer.getBiases();
         double[] biasesOutJBlas = jblasBiases.get(1).data;
@@ -167,14 +164,15 @@ public class BackpropTrainerTest {
         //System.out.println(Arrays.deepToString(hidOutStrs));
 
         double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toArray2();
-        System.out.println(Arrays.deepToString(inpHidStrs));
-        System.out.println();
-        System.out.println(Arrays.deepToString(inHidJBlas));
-        System.out.println("-----");
+        //System.out.println(Arrays.deepToString(inpHidStrs));
+        //System.out.println();
+        //System.out.println(Arrays.deepToString(inHidJBlas));
+        //System.out.println("-----");
+
         double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toArray2();
-        System.out.println(Arrays.deepToString(hidOutStrs));
-        System.out.println();
-        System.out.println(Arrays.deepToString(hidOutJBlas));
+        //System.out.println(Arrays.deepToString(hidOutStrs));
+        //System.out.println();
+        //System.out.println(Arrays.deepToString(hidOutJBlas));
 
         //
         for (int ii = 0; ii < noInp; ++ii) {

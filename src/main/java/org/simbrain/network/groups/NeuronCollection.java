@@ -77,6 +77,10 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
      */
     private double [] activations;
 
+    private WeightMatrix incomingWeightMatrix;
+
+    private WeightMatrix outgoingWeightMatrix;
+
     /**
      * Support for property change events.
      */
@@ -207,6 +211,24 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
             retList.addAll(neuron.getFanOut().values());
         }
         return retList;
+    }
+
+    @Override
+    public WeightMatrix getIncomingWeightMatrix() {
+        return incomingWeightMatrix;
+    }
+
+    public void setIncomingWeightMatrix(WeightMatrix incomingWeightMatrix) {
+        this.incomingWeightMatrix = incomingWeightMatrix;
+    }
+
+    @Override
+    public WeightMatrix getOutgoingWeightMatrix() {
+        return outgoingWeightMatrix;
+    }
+
+    public void setOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
+        this.outgoingWeightMatrix = outgoingWeightMatrix;
     }
 
     /**
@@ -696,6 +718,11 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public void setLocation(Point2D location) {
+
     }
 
     @Override

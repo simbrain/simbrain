@@ -29,6 +29,7 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetworkNode;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
@@ -186,6 +187,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         } else if (pickedNode.getParent() instanceof NeuronNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof NeuronArrayNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof DL4JMultiLayerNetworkNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof SynapseNode) {
             pickedNode = pickedNode.getParent();

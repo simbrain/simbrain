@@ -335,9 +335,7 @@ public class NeuronArrayNode extends ScreenElement {
         StandardDialog dialog = new AnnotatedPropertyEditor(neuronArray).getDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
-        dialog.addClosingTask(() -> {
-            NeuronArrayNode.this.updateInfoText();
-        });
+        dialog.addClosingTask(NeuronArrayNode.this::updateInfoText);
         return dialog;
     }
 

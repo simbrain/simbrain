@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -88,6 +89,8 @@ public class Network {
      * Set of weight matrices.
      */
     private final Set<WeightMatrix> weightMatrices = new HashSet<>();
+
+    private final List<DL4JMultiLayerNetwork> multiLayerNetworks = new ArrayList<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -531,6 +534,11 @@ public class Network {
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
+    public void addDL4JMultiLayerNetwork(DL4JMultiLayerNetwork network) {
+        multiLayerNetworks.add(network);
+        changeSupport.firePropertyChange("multiLayerNetworkAdded", null, network);
+    }
+
     /**
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
@@ -653,6 +661,10 @@ public class Network {
             // Notify listeners that this synapse has been deleted
             fireSynapseRemoved(toDelete);
         }
+    }
+
+    void removeArrayConnectable(ArrayConnectable arrayConnectable) {
+
     }
 
     /**
@@ -884,6 +896,10 @@ public class Network {
         // Notify listeners (mainly network panel) that the group has been
         // added.
         fireGroupAdded(group);
+    }
+
+    public void addMultiLayerNetwork(final DL4JMultiLayerNetwork multiLayerNetwork) {
+        multiLayerNetworks.add(multiLayerNetwork);
     }
 
     /**

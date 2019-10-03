@@ -85,18 +85,13 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
         this.source = source;
         this.target = target;
 
-        if (source instanceof NeuronArray) {
-            ((NeuronArray) source).setFanOut(this);
-        }
-
-        if (target instanceof NeuronArray) {
-            ((NeuronArray) target).setFanIn(this);
-        }
+        source.setOutgoingWeightMatrix(this);
+        target.setIncomingWeightMatrix(this);
 
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
-            weightMatrix = Nd4j.create(source.arraySize(), target.arraySize());
-            INDArray id = Nd4j.eye(Math.min(source.arraySize(), target.arraySize()));
+            weightMatrix = Nd4j.create(source.outputSize(), target.inputSize());
+            INDArray id = Nd4j.eye(Math.min(source.outputSize(), target.inputSize()));
             weightMatrix.get(NDArrayIndex.createCoveringShape(id.shape())).assign(id);
         } else {
             // For now randomize new matrices between arrays
@@ -198,7 +193,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
      * Randomize weights in this matrix
      */
     public void randomize() {
-        weightMatrix = Nd4j.rand((int) source.arraySize(), (int) target.arraySize()).subi(0.5).mul(2);
+        weightMatrix = Nd4j.rand((int) source.outputSize(), (int) target.inputSize()).subi(0.5).mul(2);
         changeSupport.firePropertyChange("updated", null , null);
     }
 

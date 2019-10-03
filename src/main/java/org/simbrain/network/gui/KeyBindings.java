@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import org.deeplearning4j.nn.api.Layer;
 import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
@@ -29,6 +28,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent  ;
+import java.util.Arrays;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -290,14 +290,50 @@ public class KeyBindings {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke("6"), "createDL4JGroup");
-        panel.getActionMap().put("createDL4JGroup", new AbstractAction() {
+        // inputMap.put(KeyStroke.getKeyStroke("6"), "createDL4JGroup");
+        // panel.getActionMap().put("createDL4JGroup", new AbstractAction() {
+        //     public void actionPerformed(ActionEvent e) {
+        //         List<WeightMatrix> matrices = panel.getWeightMatricesFromSelectedNeuronArrays();
+        //         if (matrices.size() < 1) {
+        //             return;
+        //         }
+        //         List<Layer> layers = DL4JMultiLayerNetwork.getLayerFromWeightMatrices(matrices);
+        //         DL4JMultiLayerNetwork newNetwork = new DL4JMultiLayerNetwork(layers);
+        //
+        //         System.out.println(newNetwork);
+        //
+        //         if (matrices.get(0).getSource().getIncomingWeightMatrix() == null) {
+        //             return;
+        //         }
+        //
+        //         ArrayConnectable source = matrices.get(0).getSource().getIncomingWeightMatrix().getSource();
+        //
+        //         if (source != null) {
+        //             panel.addWeightMatrix(source, newNetwork);
+        //             System.out.println("Connected to source");
+        //         }
+        //
+        //         if (matrices.get(matrices.size() - 1).getTarget().getOutgoingWeightMatrix() == null) {
+        //             return;
+        //         }
+        //
+        //         ArrayConnectable target =
+        //                 matrices.get(matrices.size() - 1).getTarget().getOutgoingWeightMatrix().getTarget();
+        //
+        //         if (target != null) {
+        //             panel.addWeightMatrix(newNetwork, target);
+        //             System.out.println("Connected to target");
+        //         }
+        //
+        //         panel.getSelectedModelNeuronArrays();
+        //     }
+        // });
+
+        inputMap.put(KeyStroke.getKeyStroke("7"), "showSynapses");
+        panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                DL4JMultiLayerNetwork thing = new DL4JMultiLayerNetwork(panel.getDL4JLayers());
-                System.out.println(thing);
-                for (Layer layer : thing.getNetwork().getLayers()) {
-                    System.out.println(layer);
-                }
+                DL4JMultiLayerNetwork network = new DL4JMultiLayerNetwork(Arrays.asList(2, 1));
+                panel.getNetwork().addDL4JMultiLayerNetwork(network);
             }
         });
 

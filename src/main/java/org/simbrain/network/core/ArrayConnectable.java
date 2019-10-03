@@ -31,10 +31,28 @@ public interface ArrayConnectable {
      */
     long arraySize();
 
+    default long inputSize() {
+        return arraySize();
+    }
+
+    default long outputSize() {
+        return arraySize();
+    }
+
+    WeightMatrix getIncomingWeightMatrix();
+
+    void setIncomingWeightMatrix(WeightMatrix weightMatrix);
+
+    WeightMatrix getOutgoingWeightMatrix();
+
+    void setOutgoingWeightMatrix(WeightMatrix weightMatrix);
+
     /**
      * Get the id associated with this source or target.
      */
     String getId();
+
+    void setLocation(Point2D location);
 
     /**
      * Get an location of this object where a {@link WeightMatrix} will connect to.

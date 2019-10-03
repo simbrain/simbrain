@@ -77,9 +77,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     private boolean useCustomLabel = false;
 
-    private WeightMatrix fanIn;
+    private WeightMatrix incomingWeightMatrix;
 
-    private WeightMatrix fanOut;
+    private WeightMatrix outgoingWeightMatrix;
 
     /**
      * Render an image showing each activation when true.
@@ -102,7 +102,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * @param net parent net
      * @param numNodes number of nodes
      */
-    private NeuronArray(Network net, int numNodes) {
+    public NeuronArray(Network net, int numNodes) {
         parent = net;
         this.numNodes = numNodes;
         randomize();
@@ -208,20 +208,22 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         this.renderActivations = renderActivations;
     }
 
-    public WeightMatrix getFanIn() {
-        return fanIn;
+    @Override
+    public WeightMatrix getIncomingWeightMatrix() {
+        return incomingWeightMatrix;
     }
 
-    public void setFanIn(WeightMatrix fanIn) {
-        this.fanIn = fanIn;
+    public void setIncomingWeightMatrix(WeightMatrix incomingWeightMatrix) {
+        this.incomingWeightMatrix = incomingWeightMatrix;
     }
 
-    public WeightMatrix getFanOut() {
-        return fanOut;
+    @Override
+    public WeightMatrix getOutgoingWeightMatrix() {
+        return outgoingWeightMatrix;
     }
 
-    public void setFanOut(WeightMatrix fanOut) {
-        this.fanOut = fanOut;
+    public void setOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
+        this.outgoingWeightMatrix = outgoingWeightMatrix;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -347,6 +349,12 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public void setLocation(Point2D location) {
+        this.x = location.getX();
+        this.y = location.getY();
     }
 
     @Override

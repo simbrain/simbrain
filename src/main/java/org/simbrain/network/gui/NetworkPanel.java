@@ -26,6 +26,8 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
+import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.*;
@@ -542,6 +544,8 @@ public class NetworkPanel extends JPanel {
                     addGroup((Group) evt.getNewValue());
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     addNeuronArray((NeuronArray) evt.getNewValue());
+                } else if ("multiLayerNetworkAdded".equals(evt.getPropertyName())) {
+                    addMultiLayerNetwork((DL4JMultiLayerNetwork) evt.getNewValue());
                 } else if ("naRemoved".equals(evt.getPropertyName())) {
                     ((NeuronArray)evt.getOldValue()).fireDeleted();
                 } else if ("wmRemoved".equals(evt.getPropertyName())) {
@@ -927,6 +931,14 @@ public class NetworkPanel extends JPanel {
         objectNodeMap.put(neuronArray, nad);
         repaint();
     }
+
+    private void addMultiLayerNetwork(DL4JMultiLayerNetwork multiLayerNetwork) {
+        DL4JMultiLayerNetworkNode node = new DL4JMultiLayerNetworkNode(this, multiLayerNetwork);
+        canvas.getLayer().addChild(node);
+        objectNodeMap.put(multiLayerNetwork, node);
+        repaint();
+    }
+
     /**
      * Add a representation of a neuron collection to this panel.
      *
@@ -2051,28 +2063,27 @@ public class NetworkPanel extends JPanel {
         objectNodeMap.put(matrix, node);
     }
 
-    public List<Layer> getDL4JLayers() {
+    public List<WeightMatrix> getWeightMatricesFromSelectedNeuronArrays() {
 
-        List<Layer> ret = new ArrayList<>();
-
-        NeuronArray array = null;
-        for (NeuronArray selectedModelNeuronArray : getSelectedModelNeuronArrays()) {
-            if (selectedModelNeuronArray.getFanIn() == null) {
-                array = selectedModelNeuronArray;
-                break;
-            }
-        }
-
-        if (array == null) {
+        if (getSelectedModelNeuronArrays().size() < 1) {
             return null;
         }
 
-        while (array.getFanOut() != null) {
-            ret.add(array.getFanOut().asLayer());
-            array = ((NeuronArray) array.getFanOut().getTarget());
+        List<WeightMatrix> ret = new ArrayList<>();
+
+        Set<NeuronArray> selectedNeuronArrays = new HashSet<>(getSelectedModelNeuronArrays());
+
+        NeuronArray array = getSelectedModelNeuronArrays().get(0);
+
+        // Traverse to the first node
+        while (array.getIncomingWeightMatrix() != null && selectedNeuronArrays.contains(array.getIncomingWeightMatrix().getSource())) {
+            array = (NeuronArray) array.getIncomingWeightMatrix().getSource();
         }
 
-        ret.add(array.asLayer());
+        while (array.getOutgoingWeightMatrix()!= null && selectedNeuronArrays.contains(array.getOutgoingWeightMatrix().getTarget())) {
+            ret.add(array.getOutgoingWeightMatrix());
+            array = ((NeuronArray) array.getOutgoingWeightMatrix().getTarget());
+        }
 
         return ret;
     }

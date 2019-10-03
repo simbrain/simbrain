@@ -9,6 +9,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer.UpdateMethod;
+import org.simbrain.util.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,14 +19,45 @@ import static org.junit.Assert.assertArrayEquals;
 public class BackpropTrainerTest {
 
     @Test
+    public void testBasicTraining() {
+
+        BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{2, 2, 2});
+        network.getTrainingSet().setInputData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
+        network.getTrainingSet().setTargetData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
+
+        BackpropTrainer trainer = new BackpropTrainer(network);
+        trainer.setUpdateMethod(UpdateMethod.SINGLE);
+        trainer.initData();
+        trainer.setLearningRate(0.1);
+
+        trainer.apply();
+        trainer.commitChanges();
+
+        try {
+            trainer.iterate();
+            System.out.println(trainer.getError());
+            trainer.iterate();
+            System.out.println(trainer.getError());
+            trainer.iterate();
+            System.out.println(trainer.getError());
+        } catch (Trainer.DataNotInitializedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void testCreation() {
-        int noOut = 1;
+
+        // Fails for noOut = 1, in 1.0.0-beta4.
+        // See https://github.com/eclipse/deeplearning4j/issues/7839
+        int noOut = 2;
         int noHid = 2;
         int noInp = 2;
         BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{noInp, noHid, noOut});
 
-        double str = 0.1;
-        double[][] hidOutStrs = new double[noHid][noOut];
+        float str = 0.1f;
+        float[][] hidOutStrs = new float[noHid][noOut];
         int row = 0, col = 0;
         for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
             row = 0;
@@ -38,8 +70,7 @@ public class BackpropTrainerTest {
             col++;
         }
 
-        str = 0.05;
-        double[][] inpHidStrs = new double[noInp][noHid];
+        float[][] inpHidStrs = new float[noInp][noHid];
         row = 0;
         col = 0;
         for (Neuron n : network.getHiddenLayer().getNeuronListUnsafe()) {
@@ -53,37 +84,32 @@ public class BackpropTrainerTest {
             col++;
         }
 
-        double biases = 0;
-        double[] outBiases = new double[noOut];
+        float biases = 0;
+        float[] outBiases = new float[noOut];
         int jj = 0;
         for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
             ((SigmoidalRule) n.getUpdateRule()).setBias(0.314);
             biases += 0.314;
-            outBiases[jj++] = ((SigmoidalRule) n.getUpdateRule()).getBias();
+            outBiases[jj++] = (float) ((SigmoidalRule) n.getUpdateRule()).getBias();
         }
 
-        biases = 0.11;
+        biases = 0.11f;
         jj = 0;
-        double[] hidBiases = new double[noHid];
+        float[] hidBiases = new float[noHid];
         for (Neuron n : network.getHiddenLayer().getNeuronList()) {
             ((SigmoidalRule) n.getUpdateRule()).setBias(biases);
             biases += 0.1;
-            hidBiases[jj++] = ((SigmoidalRule) n.getUpdateRule()).getBias();
+            hidBiases[jj++] = (float) ((SigmoidalRule) n.getUpdateRule()).getBias();
         }
 
         BackpropTrainer trainer = new BackpropTrainer(network);
 
-        //        trainer.printDebugInfo();
-        //         System.out.println(Arrays.deepToString(inpHidStrs));
-        //         System.out.println();
-        //         System.out.println(Arrays.deepToString(hidOutStrs));
-
-        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toDoubleMatrix();
-        System.out.println(Arrays.deepToString(inpHidStrs));
-        System.out.println();
-        System.out.println(Arrays.deepToString(inHidJBlas));
-        System.out.println("-----");
-        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toDoubleMatrix();
+        float[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toFloatMatrix();
+        //System.out.println(Arrays.deepToString(inpHidStrs));
+        //System.out.println();
+        //System.out.println(Arrays.deepToString(inHidJBlas));
+        //System.out.println("-----");
+        float[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));
@@ -99,8 +125,8 @@ public class BackpropTrainerTest {
         }
 
         List<INDArray> jblasBiases = trainer.getBiases();
-        double[] biasesOutJBlas = jblasBiases.get(1).toDoubleVector();
-        double[] biasesHidJBlas = jblasBiases.get(0).toDoubleVector();
+        float[] biasesOutJBlas = jblasBiases.get(1).toFloatVector();
+        float[] biasesHidJBlas = jblasBiases.get(0).toFloatVector();
 
         assertArrayEquals(biasesHidJBlas, hidBiases, 0);
         assertArrayEquals(biasesOutJBlas, outBiases, 0);
@@ -109,12 +135,14 @@ public class BackpropTrainerTest {
 
     @Test
     public void testCopyBack() {
-        int noOut = 1;
+        int noOut = 2; // Problem with 1d array from above
         int noHid = 2;
         int noInp = 2;
+
         BackpropNetwork network = new BackpropNetwork(new Network(), new int[]{noInp, noHid, noOut});
         network.getTrainingSet().setInputData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
-        network.getTrainingSet().setTargetData(new double[][]{{0}, {1}, {1}, {0}});
+        network.getTrainingSet().setTargetData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
+        //network.getTrainingSet().setTargetData(new double[][]{{0}, {1}, {1}, {0}});
         double str = 0.1;
         for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
             for (Synapse s : n.getFanIn()) {
@@ -151,25 +179,25 @@ public class BackpropTrainerTest {
         trainer.apply();
         trainer.commitChanges();
 
-        double[] hidBiases = network.getHiddenLayer().getBiases();
-        double[] outBiases = network.getOutputLayer().getBiases();
+        float[] hidBiases = Utils.castToFloat(network.getHiddenLayer().getBiases());
+        float[] outBiases = Utils.castToFloat(network.getOutputLayer().getBiases());
         Object[] tmp = network.getHiddenLayer().getIncomingSgs().toArray();
-        double[][] inpHidStrs = ((SynapseGroup) tmp[0]).getWeightMatrix();
+        float[][] inpHidStrs = Utils.castToFloat(((SynapseGroup) tmp[0]).getWeightMatrix());
         tmp = network.getOutputLayer().getIncomingSgs().toArray();
-        double[][] hidOutStrs = ((SynapseGroup) tmp[0]).getWeightMatrix();
+        float[][] hidOutStrs = Utils.castToFloat(((SynapseGroup) tmp[0]).getWeightMatrix());
 
         //trainer.printDebugInfo();
         //System.out.println(Arrays.deepToString(inpHidStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutStrs));
 
-        double[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toDoubleMatrix();
+        float[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(inpHidStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(inHidJBlas));
         //System.out.println("-----");
 
-        double[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toDoubleMatrix();
+        float[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));
@@ -183,12 +211,14 @@ public class BackpropTrainerTest {
         }
 
         List<INDArray> jblasBiases = trainer.getBiases();
-        double[] biasesOutJBlas = jblasBiases.get(1).toDoubleVector();
-        double[] biasesHidJBlas = jblasBiases.get(0).toDoubleVector();
+        float[] biasesOutJBlas = jblasBiases.get(1).toFloatVector();
+        float[] biasesHidJBlas = jblasBiases.get(0).toFloatVector();
 
         assertArrayEquals(biasesHidJBlas, hidBiases, 0);
         assertArrayEquals(biasesOutJBlas, outBiases, 0);
 
     }
+
+
 
 }

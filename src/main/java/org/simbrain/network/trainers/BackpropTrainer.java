@@ -27,6 +27,7 @@ import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -206,7 +207,8 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Synapse group list is ordered from input to output layers
         for (SynapseGroup synapseGroup : net.getSynapseGroupList()) {
-            INDArray weights = Nd4j.create(synapseGroup.getWeightMatrix()).transpose();
+            INDArray weights = Nd4j.create(
+                    Utils.castToFloat(synapseGroup.getWeightMatrix())).transpose();
             weightMatrices.add(weights);
             lastWeightUpdates.add(Nd4j.zeros(weights.rows(), weights.columns()));
             synapseGroups.add(synapseGroup);
@@ -219,7 +221,7 @@ public class BackpropTrainer extends IterableTrainer {
                 layers.add(Nd4j.zeros(neuronGroup.size()));
                 netInputs.add(Nd4j.zeros(neuronGroup.size()));
                 deltas.add(Nd4j.zeros(neuronGroup.size()));
-                INDArray bs = Nd4j.create(neuronGroup.getBiases());
+                INDArray bs = Nd4j.create(Utils.castToFloat(neuronGroup.getBiases()));
                 biases.add(bs);
                 lastBiasUpdates.add(Nd4j.zeros(bs.rows(), bs.columns()));
                 updateRules.add((TransferFunction) neuronGroup.getNeuronList().get(0).getUpdateRule());
@@ -290,7 +292,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the row
-        return (double) batchErrors.mul(batchErrors).sumNumber();
+        return (double) batchErrors.mul(batchErrors).sumNumber()/ network.getOutputNeurons().size();
     }
 
     /**
@@ -338,6 +340,7 @@ public class BackpropTrainer extends IterableTrainer {
             INDArray biasVec = biases.get(layerIndex);
             INDArray derivatives = derivs.get(layerIndex);
             // Take the inputs multiply them by the weight matrix get the netInput for the next layer
+
             weights.mmuli(inputs, netInput);
             // Add biases to the net input before biases were not part of the net input...
             netInput.addi(biasVec);
@@ -389,8 +392,8 @@ public class BackpropTrainer extends IterableTrainer {
             int kk = 0;
             for (int ii = 0; ii < prevLayer.length(); ii++) {
                 for (int jj = 0; jj < currentLayer.length(); jj++) {
-                    double deltaVal = learningRate * deltas.get(layerIndex).getDouble(jj)
-                            * prevLayer.getDouble(ii) + (momentum * lastDeltas.getDouble(kk));
+                    float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(jj)
+                                                * prevLayer.getDouble(ii) + (momentum * lastDeltas.getDouble(kk)));
                     wm.putScalar(kk, wm.getDouble(kk) + deltaVal);
                     lastDeltas.putScalar(kk,deltaVal);
                     kk++;
@@ -398,8 +401,8 @@ public class BackpropTrainer extends IterableTrainer {
             }
             // Update biases
             for (int ii = 0; ii < biasVector.length(); ii++) {
-                double deltaVal = learningRate * deltas.get(layerIndex).getDouble(ii)
-                        + (momentum * lastBiasDeltas.getDouble(ii));
+                float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(ii)
+                                        + (momentum * lastBiasDeltas.getDouble(ii)));
                 biasVector.putScalar(ii, biasVector.getDouble(ii) + deltaVal);
                 lastBiasDeltas.putScalar(ii, deltaVal);
             }
@@ -485,10 +488,15 @@ public class BackpropTrainer extends IterableTrainer {
     public void initData() {
         // Store data as columns since that's what everything else deals with so there is no need to transpose later.
         if (network.getTrainingSet().getInputData() != null) {
-            inputData = Nd4j.create(network.getTrainingSet().getInputData()).transpose();
+            inputData =
+                    Nd4j.create(
+                            Utils.castToFloat(network.getTrainingSet().getInputData())).
+                            transpose();
         }
         if (network.getTrainingSet().getTargetData() != null) {
-            targetData = Nd4j.create(network.getTrainingSet().getTargetData()).transpose();
+            targetData = Nd4j.create(
+                    Utils.castToFloat(network.getTrainingSet().getTargetData())).
+                            transpose();
         }
     }
 
@@ -570,6 +578,9 @@ public class BackpropTrainer extends IterableTrainer {
             wasColY = true;
         }
 
+        // TODO: Performance issue? Move outside of this method at the very least.
+        _x = _x.reshape(1,_x.length());
+        _y = _y.reshape(1,_y.length());
         _x.mmuli(_A, _y);
 
         if (wasColX) {

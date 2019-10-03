@@ -7,7 +7,7 @@ def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '[3.2,)'
 def log4jVer = '2.5'
 // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-def dl4j_version = "1.0.0-beta4"
+def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
@@ -43,8 +43,6 @@ dependencies {
     compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
 
     // TODO: Migrate to nd4j
-    // https://mvnrepository.com/artifact/org.jblas/jblas
-    compile group: 'org.jblas', name: 'jblas', version: '1.2.4'
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
 

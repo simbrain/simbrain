@@ -50,8 +50,7 @@ public class Utils {
     private static final String FS = System.getProperty("file.separator");
 
     /**
-     * Helper method that returns the date and time in a format that can be used
-     * to create filenames.
+     * Helper method that returns the date and time in a format that can be used to create filenames.
      *
      * @return the formatted time string
      */
@@ -150,16 +149,13 @@ public class Utils {
     }
 
     /**
-     * Helper method to create a relative path for use in saving simulation
-     * files which refer to files within directories. Subtracts the absolutePath
-     * of the local user directory from the absolute path of the file to be
-     * saved, and converts file-separators into forward slashes, which are used
-     * for saving simulation files.
+     * Helper method to create a relative path for use in saving simulation files which refer to files within
+     * directories. Subtracts the absolutePath of the local user directory from the absolute path of the file to be
+     * saved, and converts file-separators into forward slashes, which are used for saving simulation files.
      *
      * @param baseDir      absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
-     * @return the relative path from the local directory to the file to be
-     * saved
+     * @return the relative path from the local directory to the file to be saved
      */
     public static String getRelativePath(final String baseDir, final String absolutePath) {
         int localLength = baseDir.length();
@@ -197,17 +193,14 @@ public class Utils {
     }
 
     /**
-     * Tests whether the string in a text field is parsable into a double. If
-     * so, the double value is returned, if not Double.NaN is returned as a flag
-     * that the (double) parsing failed. This method compactly handles
-     * exceptions thrown by Double.parseDouble(String), so that try/catch fields
-     * do not have to be repeatedly written, and allows the program to continue
-     * in the case that the string is not parsable.
+     * Tests whether the string in a text field is parsable into a double. If so, the double value is returned, if not
+     * Double.NaN is returned as a flag that the (double) parsing failed. This method compactly handles exceptions
+     * thrown by Double.parseDouble(String), so that try/catch fields do not have to be repeatedly written, and allows
+     * the program to continue in the case that the string is not parsable.
      *
-     * @param tField The text field to read from and test if its text can be
-     *               parsed into a double value
-     * @return Either the double value of the String in the text field, if it
-     * can be parsed, or NaN, as a flag, if it cannot be.
+     * @param tField The text field to read from and test if its text can be parsed into a double value
+     * @return Either the double value of the String in the text field, if it can be parsed, or NaN, as a flag, if it
+     * cannot be.
      */
     public static double doubleParsable(JTextField tField) {
         try {
@@ -229,8 +222,7 @@ public class Utils {
     }
 
     /**
-     * Like {@link #doubleParsable(JTextField)} but checks for the formatting of
-     * a string rather than a text field.
+     * Like {@link #doubleParsable(JTextField)} but checks for the formatting of a string rather than a text field.
      *
      * @param text the text to check
      * @return NaN if invalid, the parsed double otherwise
@@ -245,16 +237,14 @@ public class Utils {
     }
 
     /**
-     * Parses the given String in the text field into an integer. If given a
-     * double value, <b>double_val</b> parsing will not fail, but rather, the
-     * result of <b><i>(int) double_val</i></b> will be returned. Returns a null
-     * Integer in cases where the string cannot be parsed into an instance of
+     * Parses the given String in the text field into an integer. If given a double value, <b>double_val</b> parsing
+     * will not fail, but rather, the result of <b><i>(int) double_val</i></b> will be returned. Returns a null Integer
+     * in cases where the string cannot be parsed into an instance of
      * <b>Number</b> or if something else went wrong. Parsing is done using the
      * default locale of the JVM being used to run Simbrain.
      *
      * @param tField the text field containing the String to be parsed.
-     * @return the integer value of the string or null if the String cannot be
-     * parsed into a <b>Number</b>
+     * @return the integer value of the string or null if the String cannot be parsed into a <b>Number</b>
      */
     public static Integer parseInteger(JTextField tField) {
         try {
@@ -266,8 +256,7 @@ public class Utils {
     }
 
     /**
-     * The same as {@link #parseInteger(JTextField)} except using a String
-     * directly as an input.
+     * The same as {@link #parseInteger(JTextField)} except using a String directly as an input.
      *
      * @param text
      * @return
@@ -293,8 +282,7 @@ public class Utils {
     }
 
     /**
-     * Convert an array of doubles into a String, represented to some specified
-     * precision.
+     * Convert an array of doubles into a String, represented to some specified precision.
      *
      * @param theVec    the array of doubles to convert
      * @param delimiter the delimiter
@@ -314,8 +302,7 @@ public class Utils {
     }
 
     /**
-     * Convert a delimited string of doubles into an array of doubles. Undoes
-     * String getVectorString.
+     * Convert a delimited string of doubles into an array of doubles. Undoes String getVectorString.
      *
      * @param theVec    string version of vector
      * @param delimiter delimiter used in that string
@@ -366,8 +353,7 @@ public class Utils {
     }
 
     /**
-     * Converts a matrix of doubles into a matrix of Strings representing those
-     * doubles. Used with writeMatrix.
+     * Converts a matrix of doubles into a matrix of Strings representing those doubles. Used with writeMatrix.
      *
      * @param matrix the matrix of doubles
      * @return the matrix of Strings
@@ -403,8 +389,8 @@ public class Utils {
     }
 
     /**
-     * Converts a String representation of a vector (e.g. "1,0,0,1,0") into a
-     * double array. Invalid characters are converted to 0.
+     * Converts a String representation of a vector (e.g. "1,0,0,1,0") into a double array. Invalid characters are
+     * converted to 0.
      *
      * @param vectorString the string to parse.
      * @return the parsed double array.
@@ -463,8 +449,7 @@ public class Utils {
     }
 
     /**
-     * Converts a floating point value into a color in HSB, with Saturation and
-     * Brightness 1.
+     * Converts a floating point value into a color in HSB, with Saturation and Brightness 1.
      *
      * @param fclr Float color
      * @return Hue, saturation, and brightness
@@ -484,14 +469,13 @@ public class Utils {
     }
 
     /**
-     * Sets the alpha of the color represented by rgBInt to the value specified
-     * in alpha and returns the resulting color.
+     * Sets the alpha of the color represented by rgBInt to the value specified in alpha and returns the resulting
+     * color.
      *
      * @param alpha       an opacity value on [0, 255]
-     * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
-     * @return the color expressed as an integer with the specified alpha and
-     * all other bits the same.
+     * @param rgbIntColor an integer representing a color where bits 0-7 are blue, 8-15 are green, 16-23 are red, and
+     *                    24-31 are alpha
+     * @return the color expressed as an integer with the specified alpha and all other bits the same.
      */
     public static int setAlpha(int alpha, int rgbIntColor) {
         int mask = 16777215;
@@ -500,14 +484,13 @@ public class Utils {
     }
 
     /**
-     * Sets the red value of the color represented by rgbIntColor to the value
-     * specified by red and returns the resulting color.
+     * Sets the red value of the color represented by rgbIntColor to the value specified by red and returns the
+     * resulting color.
      *
      * @param red         a red value on [0, 255]
-     * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
-     * @return the color expressed as an integer with the specified red and all
-     * other bits the same.
+     * @param rgbIntColor an integer representing a color where bits 0-7 are blue, 8-15 are green, 16-23 are red, and
+     *                    24-31 are alpha
+     * @return the color expressed as an integer with the specified red and all other bits the same.
      */
     public static int setRed(int red, int rgbIntColor) {
         int mask = (255 << 24) | 65535;
@@ -517,14 +500,13 @@ public class Utils {
     }
 
     /**
-     * Sets the green value of the color represented by rgbIntColor to the value
-     * specified by green and returns the resulting color.
+     * Sets the green value of the color represented by rgbIntColor to the value specified by green and returns the
+     * resulting color.
      *
      * @param green       a green value on [0, 255]
-     * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
-     * @return the color expressed as an integer with the specified green and
-     * all other bits the same.
+     * @param rgbIntColor an integer representing a color where bits 0-7 are blue, 8-15 are green, 16-23 are red, and
+     *                    24-31 are alpha
+     * @return the color expressed as an integer with the specified green and all other bits the same.
      */
     public static int setGreen(int green, int rgbIntColor) {
         int mask = (65535 << 16) | 255;
@@ -534,14 +516,13 @@ public class Utils {
     }
 
     /**
-     * Sets the blue value of the color represented by rgbIntColor to the value
-     * specified by blue and returns the resulting color.
+     * Sets the blue value of the color represented by rgbIntColor to the value specified by blue and returns the
+     * resulting color.
      *
      * @param blue        a blue value on [0, 255]
-     * @param rgbIntColor an integer representing a color where bits 0-7 are
-     *                    blue, 8-15 are green, 16-23 are red, and 24-31 are alpha
-     * @return the color expressed as an integer with the specified blue and all
-     * other bits the same.
+     * @param rgbIntColor an integer representing a color where bits 0-7 are blue, 8-15 are green, 16-23 are red, and
+     *                    24-31 are alpha
+     * @return the color expressed as an integer with the specified blue and all other bits the same.
      */
     public static int setBlue(int blue, int rgbIntColor) {
         int mask = 16777215 << 8;
@@ -594,9 +575,9 @@ public class Utils {
     }
 
     //TODO: Redo all this with streams?
+
     /**
-     * Reimplementation of same method from
-     * org.apache.commons.collections.CollectionUtils.
+     * Reimplementation of same method from org.apache.commons.collections.CollectionUtils.
      *
      * @param selection the collection to filter
      * @param filter    the predicate to be used in filtering.
@@ -613,8 +594,7 @@ public class Utils {
     }
 
     /**
-     * Re-implementation of same method from
-     * org.apache.commons.collections.CollectionUtils.
+     * Re-implementation of same method from org.apache.commons.collections.CollectionUtils.
      *
      * @param a Collection
      * @param b Collection
@@ -628,8 +608,7 @@ public class Utils {
     }
 
     /**
-     * Re-implementation of same method from
-     * org.apache.commons.collections.CollectionUtils.
+     * Re-implementation of same method from org.apache.commons.collections.CollectionUtils.
      *
      * @param a Collection
      * @param b Collection
@@ -690,8 +669,7 @@ public class Utils {
     }
 
     /**
-     * Concatenate two arrays A, B to produce a third array A + B. From Jean
-     * Nicolas https://chocolatapp.com/
+     * Concatenate two arrays A, B to produce a third array A + B. From Jean Nicolas https://chocolatapp.com/
      *
      * @param <T> type of the arrays to concatenate
      * @param A   first array
@@ -710,8 +688,7 @@ public class Utils {
     }
 
     /**
-     * True if collection A has a non-empty intersection with collection B,
-     * false otherwise.
+     * True if collection A has a non-empty intersection with collection B, false otherwise.
      *
      * @param <T>
      * @param A   first collection
@@ -731,10 +708,10 @@ public class Utils {
     /**
      * Helper to create abstract actions.
      *
-     * @param name Name to display in menus, etc.
+     * @param name        Name to display in menus, etc.
      * @param description tooltip
-     * @param iconFile name of icon.
-     * @param runnable the code to execute with this action
+     * @param iconFile    name of icon.
+     * @param runnable    the code to execute with this action
      * @return the formatted action
      */
     public static Action createAction(String name, String description, String iconFile, Runnable runnable) {
@@ -753,9 +730,8 @@ public class Utils {
     }
 
     /**
-     * Returns an XStream instance with default Simbrain settings, including
-     * backwards compatibility with earlier xml, and turning off security
-     * warning, and formatting xml as utf-8.
+     * Returns an XStream instance with default Simbrain settings, including backwards compatibility with earlier xml,
+     * and turning off security warning, and formatting xml as utf-8.
      *
      * @return the properly initialized XStream object
      */
@@ -772,7 +748,7 @@ public class Utils {
     /**
      * Returns a string that warps around to new line at the limit width.
      *
-     * @param str the string to convert
+     * @param str   the string to convert
      * @param limit the width limit in characters
      * @return the formatted string
      */
@@ -791,12 +767,12 @@ public class Utils {
      */
     public static String splitCamelCase(String s) {
         return s.replaceAll(
-            String.format("%s|%s|%s",
-                "(?<=[A-Z])(?=[A-Z][a-z])",
-                "(?<=[^A-Z])(?=[A-Z])",
-                "(?<=[A-Za-z])(?=[^A-Za-z])"
-            ),
-            " "
+                String.format("%s|%s|%s",
+                        "(?<=[A-Z])(?=[A-Z][a-z])",
+                        "(?<=[^A-Z])(?=[A-Z])",
+                        "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                " "
         );
     }
 
@@ -810,13 +786,37 @@ public class Utils {
     /**
      * https://stackoverflow.com/questions/7324991/see-if-field-exists-in-class
      *
-     * @param object object class
+     * @param object    object class
      * @param fieldName field name
      * @return true if the class contains the field, false otherwise
      */
     public static boolean containsField(Object object, String fieldName) {
         return Arrays.stream(object.getClass().getFields())
-            .anyMatch(f -> f.getName().equals(fieldName));
+                .anyMatch(f -> f.getName().equals(fieldName));
+    }
+
+    /**
+     * Cast a 2d double array to a 2d float array.
+     */
+    public static float[][] castToFloat(double[][] toCast) {
+        float[][] ret = new float[toCast.length][toCast[0].length];
+        for (int i = 0; i < toCast.length; i++) {
+            for (int j = 0; j < toCast[i].length; j++) {
+                ret[i][j] = (float) toCast[i][j];
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Cast a double array to a float array.
+     */
+    public static float[] castToFloat(double[] toCast) {
+        float[] ret = new float[toCast.length];
+        for (int i = 0; i < toCast.length; i++) {
+            ret[i] = (float) toCast[i];
+        }
+        return ret;
     }
 
 }

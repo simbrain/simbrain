@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunctionEnum;
@@ -115,22 +115,22 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     }
 
     @Override
-    public void applyFunctionInPlace(DoubleMatrix input) {
+    public void applyFunctionInPlace(INDArray input) {
         applyFunction(input, input);
     }
 
     @Override
-    public void applyFunction(DoubleMatrix input, DoubleMatrix output) {
+    public void applyFunction(INDArray input, INDArray output) {
         sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
     }
 
     @Override
-    public void getDerivative(DoubleMatrix input, DoubleMatrix output) {
+    public void getDerivative(INDArray input, INDArray output) {
         sFunction.derivVal(input, output, getUpperBound(), getLowerBound(), slope);
     }
 
     @Override
-    public void applyFunctionAndDerivative(DoubleMatrix input, DoubleMatrix output, DoubleMatrix derivative) {
+    public void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative) {
         sFunction.valueAndDeriv(input, output, derivative, getUpperBound(), getLowerBound(), slope);
     }
 

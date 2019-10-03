@@ -18,8 +18,9 @@
  */
 package org.simbrain.util.math;
 
-import org.jblas.DoubleMatrix;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import static org.junit.Assert.*;
 
@@ -89,44 +90,44 @@ public class SquashingFunctionsTest {
 
         // Check that the matrix forms are approximately equal to the singular forms
         double epsilon = 0.001;
-        DoubleMatrix inputs = DoubleMatrix.linspace(-10, 10, 1000);
-        inputs.put(0, 0);
-        inputs.put(1, -1e9);
-        inputs.put(2, 1e9);
+        INDArray inputs = Nd4j.linspace(-10, 10, 1000);
+        inputs.putScalar(0, 0);
+        inputs.putScalar(1, -1e9);
+        inputs.putScalar(2, 1e9);
 
-        DoubleMatrix actuals = DoubleMatrix.zeros(1000);
-        DoubleMatrix actualDerivs = DoubleMatrix.zeros(1000);
-        DoubleMatrix expecteds = DoubleMatrix.zeros(1000);
-        DoubleMatrix expectedDerivs = DoubleMatrix.zeros(1000);
+        INDArray actuals = Nd4j.zeros(1000);
+        INDArray actualDerivs = Nd4j.zeros(1000);
+        INDArray expecteds = Nd4j.zeros(1000);
+        INDArray expectedDerivs = Nd4j.zeros(1000);
 
         SquashingFunctions.logistic(inputs, actuals, 1, 0, 1);
         SquashingFunctions.derivLogistic(inputs, actualDerivs, 1, 0, 1);
         for (int i = 0; i < 1000; ++i) {
-            assertEquals(actuals.get(i), SquashingFunctions.logistic(inputs.get(i), 1, 0, 1), epsilon);
-            assertEquals(actualDerivs.get(i), SquashingFunctions.derivLogistic(inputs.get(i), 1, 0, 1), epsilon);
+            assertEquals(actuals.getDouble(i), SquashingFunctions.logistic(inputs.getDouble(i), 1, 0, 1), epsilon);
+            assertEquals(actualDerivs.getDouble(i), SquashingFunctions.derivLogistic(inputs.getDouble(i), 1, 0, 1), epsilon);
         }
-        expecteds.copy(actuals);
-        expectedDerivs.copy(actualDerivs);
+        expecteds = actuals.dup();
+        expectedDerivs = actualDerivs.dup();
         SquashingFunctions.logisticWithDerivative(inputs, actuals, actualDerivs, 1, 0, 1);
-        assertArrayEquals(actuals.data, expecteds.data, epsilon);
-        assertArrayEquals(actualDerivs.data, expectedDerivs.data, epsilon);
+        assertArrayEquals(actuals.toDoubleVector(), expecteds.toDoubleVector(), epsilon);
+        assertArrayEquals(actualDerivs.toDoubleVector(), expectedDerivs.toDoubleVector(), epsilon);
 
         SquashingFunctions.atan(inputs, actuals, 1, 0, 1);
         SquashingFunctions.derivAtan(inputs, actualDerivs, 1, 0, 1);
         for (int i = 0; i < 1000; ++i) {
-            double expected = SquashingFunctions.atan(inputs.get(i), 1, 0, 1);
-            double expectedDeriv = SquashingFunctions.derivAtan(inputs.get(i), 1, 0, 1);
-            assertEquals(actuals.get(i), expected, epsilon);
-            assertEquals(actualDerivs.get(i), expectedDeriv, epsilon);
+            double expected = SquashingFunctions.atan(inputs.getDouble(i), 1, 0, 1);
+            double expectedDeriv = SquashingFunctions.derivAtan(inputs.getDouble(i), 1, 0, 1);
+            assertEquals(actuals.getDouble(i), expected, epsilon);
+            assertEquals(actualDerivs.getDouble(i), expectedDeriv, epsilon);
         }
 
         SquashingFunctions.tanh(inputs, actuals, 1, 0, 1);
         SquashingFunctions.derivTanh(inputs, actualDerivs, 1, 0, 1);
         for (int i = 0; i < 1000; ++i) {
-            double expected = SquashingFunctions.tanh(inputs.get(i), 1, 0, 1);
-            double expectedDeriv = SquashingFunctions.derivTanh(inputs.get(i), 1, 0, 1);
-            assertEquals(actuals.get(i), expected, epsilon);
-            assertEquals(actualDerivs.get(i), expectedDeriv, epsilon);
+            double expected = SquashingFunctions.tanh(inputs.getDouble(i), 1, 0, 1);
+            double expectedDeriv = SquashingFunctions.derivTanh(inputs.getDouble(i), 1, 0, 1);
+            assertEquals(actuals.getDouble(i), expected, epsilon);
+            assertEquals(actualDerivs.getDouble(i), expectedDeriv, epsilon);
         }
     }
 }

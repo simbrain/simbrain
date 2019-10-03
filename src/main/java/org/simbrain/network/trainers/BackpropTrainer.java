@@ -18,7 +18,8 @@
  */
 package org.simbrain.network.trainers;
 
-import org.jblas.DoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -26,18 +27,19 @@ import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Array-backed backprop, currently using JBlas.
+ * Array-backed backprop. To be supplanted by new nd4j objects, but still allows backprop with "loose" neurons and
+ * old style neuron groups, which has some pedagogical purpose.
  * <p>
- * 50-50 co-authors
  *
- * @author Jeff Yoshimi
  * @author Zoë Tosi
+ * @author Jeff Yoshimi
  */
 public class BackpropTrainer extends IterableTrainer {
 
@@ -81,7 +83,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Weight matrices ordered input to output.
      */
-    public List<DoubleMatrix> weightMatrices = new ArrayList<DoubleMatrix>();
+    public List<INDArray> weightMatrices = new ArrayList<>();
 
     /**
      * Reference to synapse groups.
@@ -91,17 +93,17 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Memory of last weight updates for momentum.
      */
-    private List<DoubleMatrix> lastWeightUpdates = new ArrayList<DoubleMatrix>();
+    private List<INDArray> lastWeightUpdates = new ArrayList<>();
 
     /**
      * Memory of last bias updates for momentum.
      */
-    private List<DoubleMatrix> lastBiasUpdates = new ArrayList<DoubleMatrix>();
+    private List<INDArray> lastBiasUpdates = new ArrayList<>();
 
     /**
      * Activation vectors.
      */
-    private List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
+    private List<INDArray> layers = new ArrayList<>();
 
     /**
      * Reference to neuron groups.
@@ -111,53 +113,53 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Net inputs.
      */
-    private List<DoubleMatrix> netInputs = new ArrayList<DoubleMatrix>();
+    private List<INDArray> netInputs = new ArrayList<>();
 
     /**
      * Biases.
      */
-    private List<DoubleMatrix> biases = new ArrayList<DoubleMatrix>();
+    private List<INDArray> biases = new ArrayList<>();
 
     /**
      * Errors for a single input row.
      */
-    private DoubleMatrix errors;
+    private INDArray errors;
 
     /**
      * Aggregate errors for a batch of input rows.
      */
-    private DoubleMatrix batchErrors;
+    private INDArray batchErrors;
 
     /**
      * Deltas on on the neurons of the network (error times derivative).
      */
-    private List<DoubleMatrix> deltas = new ArrayList<DoubleMatrix>();
+    private List<INDArray> deltas = new ArrayList<INDArray>();
 
     /**
      * Holder for derivatives.
      */
-    private List<DoubleMatrix> derivs = new ArrayList<DoubleMatrix>();
+    private List<INDArray> derivs = new ArrayList<INDArray>();
 
     /**
      * Input layer. Holds current input vector from input dataset. Separate for
      * simpler indexing on other lists.
      */
-    private DoubleMatrix inputLayer;
+    private INDArray inputLayer;
 
     /**
      * Current target vector.
      */
-    private DoubleMatrix targetVector;
+    private INDArray targetVector;
 
     /**
      * Inputs.
      */
-    private DoubleMatrix inputData;
+    private INDArray inputData;
 
     /**
      * Targets.
      */
-    private DoubleMatrix targetData;
+    private INDArray targetData;
 
     /**
      * List of activation functions for easy reference.
@@ -205,9 +207,10 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Synapse group list is ordered from input to output layers
         for (SynapseGroup synapseGroup : net.getSynapseGroupList()) {
-            DoubleMatrix weights = new DoubleMatrix(synapseGroup.getWeightMatrix()).transpose();
+            INDArray weights = Nd4j.create(
+                    Utils.castToFloat(synapseGroup.getWeightMatrix())).transpose();
             weightMatrices.add(weights);
-            lastWeightUpdates.add(DoubleMatrix.zeros(weights.rows, weights.columns));
+            lastWeightUpdates.add(Nd4j.zeros(weights.rows(), weights.columns()));
             synapseGroups.add(synapseGroup);
         }
 
@@ -215,22 +218,22 @@ public class BackpropTrainer extends IterableTrainer {
         int ii = 0;
         for (NeuronGroup neuronGroup : net.getNeuronGroupList()) {
             if (ii > 0) {
-                layers.add(DoubleMatrix.zeros(neuronGroup.size()));
-                netInputs.add(DoubleMatrix.zeros(neuronGroup.size()));
-                deltas.add(DoubleMatrix.zeros(neuronGroup.size()));
-                DoubleMatrix bs = new DoubleMatrix(neuronGroup.getBiases());
+                layers.add(Nd4j.zeros(neuronGroup.size()));
+                netInputs.add(Nd4j.zeros(neuronGroup.size()));
+                deltas.add(Nd4j.zeros(neuronGroup.size()));
+                INDArray bs = Nd4j.create(Utils.castToFloat(neuronGroup.getBiases()));
                 biases.add(bs);
-                lastBiasUpdates.add(DoubleMatrix.zeros(bs.rows, bs.columns));
+                lastBiasUpdates.add(Nd4j.zeros(bs.rows(), bs.columns()));
                 updateRules.add((TransferFunction) neuronGroup.getNeuronList().get(0).getUpdateRule());
                 neuronGroups.add(neuronGroup);
-                derivs.add(DoubleMatrix.zeros(neuronGroup.size()));
+                derivs.add(Nd4j.zeros(neuronGroup.size()));
             } else {
-                inputLayer = DoubleMatrix.zeros(neuronGroup.size());
+                inputLayer = Nd4j.zeros(neuronGroup.size());
             }
             ii++;
         }
-        errors = DoubleMatrix.zeros(getOutputLayer().length);
-        batchErrors = DoubleMatrix.zeros(getOutputLayer().length);
+        errors = Nd4j.zeros(getOutputLayer().length());
+        batchErrors = Nd4j.zeros(getOutputLayer().length());
         setLearningRate(DEFAULT_LEARNING_RATE);
         setMomentum(DEFAULT_MOMENTUM);
     }
@@ -277,7 +280,7 @@ public class BackpropTrainer extends IterableTrainer {
      * @return mean squared error of the row
      */
     private double trainRow(int row) {
-        batchErrors.fill(0);
+        batchErrors.muli(0);
         // Get the inputs and feed them forward
         inputLayer = inputData.getColumn(row);
         updateNetwork();
@@ -289,7 +292,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the row
-        return batchErrors.mul(batchErrors).sum();
+        return (double) batchErrors.mul(batchErrors).sumNumber()/ network.getOutputNeurons().size();
     }
 
     /**
@@ -299,7 +302,7 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private double trainRows(int firstRow, int lastRow) {
         // Get inputs and feed them forward row-by-row
-        batchErrors.fill(0);
+        batchErrors.muli(0);
         for (int row = firstRow; row < lastRow; row++) {
             // Get the inputs and feed them forward
             inputLayer = inputData.getColumn(row);
@@ -316,7 +319,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the batch
-        return batchErrors.mul(batchErrors).sum() / network.getOutputNeurons().size();
+        return (double) batchErrors.mul(batchErrors).sumNumber() / network.getOutputNeurons().size();
     }
 
     /**
@@ -324,19 +327,20 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private void updateNetwork() {
         int layerIndex = 0;
-        for (DoubleMatrix weights : weightMatrices) {
+        for (INDArray weights : weightMatrices) {
             // Set up variables for easy reading
-            DoubleMatrix inputs;
+            INDArray inputs;
             if (layerIndex == 0) {
                 inputs = inputLayer;
             } else {
                 inputs = layers.get(layerIndex - 1);
             }
-            DoubleMatrix activations = layers.get(layerIndex);
-            DoubleMatrix netInput = netInputs.get(layerIndex);
-            DoubleMatrix biasVec = biases.get(layerIndex);
-            DoubleMatrix derivatives = derivs.get(layerIndex);
+            INDArray activations = layers.get(layerIndex);
+            INDArray netInput = netInputs.get(layerIndex);
+            INDArray biasVec = biases.get(layerIndex);
+            INDArray derivatives = derivs.get(layerIndex);
             // Take the inputs multiply them by the weight matrix get the netInput for the next layer
+
             weights.mmuli(inputs, netInput);
             // Add biases to the net input before biases were not part of the net input...
             netInput.addi(biasVec);
@@ -371,34 +375,36 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private void updateParameters() {
         int layerIndex = 0;
-        for (DoubleMatrix wm : weightMatrices) {
-            DoubleMatrix prevLayer;
-            DoubleMatrix lastDeltas = lastWeightUpdates.get(layerIndex);
-            DoubleMatrix lastBiasDeltas = lastBiasUpdates.get(layerIndex);
+        for (INDArray wm : weightMatrices) {
+            INDArray prevLayer;
+            INDArray lastDeltas = lastWeightUpdates.get(layerIndex);
+            INDArray lastBiasDeltas = lastBiasUpdates.get(layerIndex);
 
             if (layerIndex == 0) {
                 prevLayer = inputLayer;
             } else {
                 prevLayer = layers.get(layerIndex - 1);
             }
-            DoubleMatrix biasVector = biases.get(layerIndex);
-            DoubleMatrix currentLayer = layers.get(layerIndex);
+            INDArray biasVector = biases.get(layerIndex);
+            INDArray currentLayer = layers.get(layerIndex);
 
             // Update weights, traversing along weight matrix in column-major order
             int kk = 0;
-            for (int ii = 0; ii < prevLayer.length; ii++) {
-                for (int jj = 0; jj < currentLayer.length; jj++) {
-                    double deltaVal = learningRate * deltas.get(layerIndex).data[jj] * prevLayer.data[ii] + (momentum * lastDeltas.data[kk]);
-                    wm.data[kk] += deltaVal;
-                    lastDeltas.data[kk] = deltaVal;
+            for (int ii = 0; ii < prevLayer.length(); ii++) {
+                for (int jj = 0; jj < currentLayer.length(); jj++) {
+                    float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(jj)
+                                                * prevLayer.getDouble(ii) + (momentum * lastDeltas.getDouble(kk)));
+                    wm.putScalar(kk, wm.getDouble(kk) + deltaVal);
+                    lastDeltas.putScalar(kk,deltaVal);
                     kk++;
                 }
             }
             // Update biases
-            for (int ii = 0; ii < biasVector.length; ii++) {
-                double deltaVal = learningRate * deltas.get(layerIndex).data[ii] + (momentum * lastBiasDeltas.data[ii]);
-                biasVector.data[ii] += deltaVal;
-                lastBiasDeltas.data[ii] = deltaVal;
+            for (int ii = 0; ii < biasVector.length(); ii++) {
+                float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(ii)
+                                        + (momentum * lastBiasDeltas.getDouble(ii)));
+                biasVector.putScalar(ii, biasVector.getDouble(ii) + deltaVal);
+                lastBiasDeltas.putScalar(ii, deltaVal);
             }
             layerIndex++;
         }
@@ -407,7 +413,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Helper to get output layer.
      */
-    private DoubleMatrix getOutputLayer() {
+    private INDArray getOutputLayer() {
         return layers.get(layers.size() - 1);
     }
 
@@ -419,15 +425,15 @@ public class BackpropTrainer extends IterableTrainer {
     @Override
     public void randomize() {
         for (int kk = 0; kk < weightMatrices.size(); ++kk) {
-            for (int ii = 0; ii < weightMatrices.get(kk).data.length; ii++) {
-                weightMatrices.get(kk).data[ii] = getRandomizer().getRandom();
+            for (int ii = 0; ii < weightMatrices.get(kk).length(); ii++) {
+                weightMatrices.get(kk).putScalar(ii, getRandomizer().getRandom());
             }
         }
 
         // TODO: Separate bias randomizer
         for (int kk = 0; kk < biases.size(); ++kk) {
-            for (int ii = 0; ii < biases.get(kk).length; ii++) {
-                biases.get(kk).data[ii] = (Math.random() * 0.1) - 0.05;
+            for (int ii = 0; ii < biases.get(kk).length(); ii++) {
+                biases.get(kk).putScalar(ii,(Math.random() * 0.1) - 0.05);
             }
         }
     }
@@ -447,7 +453,7 @@ public class BackpropTrainer extends IterableTrainer {
             System.out.println("\tBiases: " + biases.get(i));
             System.out.println("\tDeltas: " + deltas.get(i));
             System.out.println("\tNet inputs: " + netInputs.get(i));
-            DoubleMatrix derivs = DoubleMatrix.zeros(layers.get(i).length);
+            INDArray derivs = Nd4j.zeros(layers.get(i).length());
             updateRules.get(i).getDerivative(layers.get(i), derivs);
             System.out.println("\tDerivatives: " + derivs);
         }
@@ -460,79 +466,84 @@ public class BackpropTrainer extends IterableTrainer {
     public void commitChanges() {
         for (int ii = 0; ii < layers.size(); ++ii) {
             for (int jj = 0; jj < neuronGroups.get(ii).size(); ++jj) {
-                neuronGroups.get(ii).getNeuron(jj).forceSetActivation(layers.get(ii).data[jj]);
-                ((BiasedUpdateRule) neuronGroups.get(ii).getNeuron(jj).getUpdateRule()).setBias(biases.get(ii).get(jj));
+                neuronGroups.get(ii).getNeuron(jj).forceSetActivation(layers.get(ii).getDouble(jj));
+                ((BiasedUpdateRule) neuronGroups.get(ii).getNeuron(jj).getUpdateRule()).setBias(biases.get(ii).getDouble(jj));
             }
         }
         for (int kk = 0; kk < weightMatrices.size(); ++kk) {
-            DoubleMatrix wm = weightMatrices.get(kk);
+            INDArray wm = weightMatrices.get(kk);
             NeuronGroup src = synapseGroups.get(kk).getSourceNeuronGroup();
             NeuronGroup tar = synapseGroups.get(kk).getTargetNeuronGroup();
-            for (int ii = 0; ii < wm.rows; ++ii) {
-                for (int jj = 0; jj < wm.columns; ++jj) {
-                    src.getNeuron(jj).getFanOutUnsafe().get(tar.getNeuron(ii)).forceSetStrength(wm.get(ii, jj));
+            for (int ii = 0; ii < wm.rows(); ++ii) {
+                for (int jj = 0; jj < wm.columns(); ++jj) {
+                    src.getNeuron(jj).getFanOutUnsafe().get(tar.getNeuron(ii)).forceSetStrength(wm.getDouble(ii, jj));
                 }
             }
         }
     }
 
     /**
-     * Initialize input and target datasets as JBlas matrices.
+     * Initialize input and target datasets ND4J matrices.
      */
     public void initData() {
         // Store data as columns since that's what everything else deals with so there is no need to transpose later.
         if (network.getTrainingSet().getInputData() != null) {
-            inputData = new DoubleMatrix(network.getTrainingSet().getInputData()).transpose();
+            inputData =
+                    Nd4j.create(
+                            Utils.castToFloat(network.getTrainingSet().getInputData())).
+                            transpose();
         }
         if (network.getTrainingSet().getTargetData() != null) {
-            targetData = new DoubleMatrix(network.getTrainingSet().getTargetData()).transpose();
+            targetData = Nd4j.create(
+                    Utils.castToFloat(network.getTrainingSet().getTargetData())).
+                            transpose();
         }
     }
 
-    /**
-     * Convenience method for in place "Forward" matrix multiplication (forward
-     * if vectors are assumed to be column-major) e.g.: Ax=y Transposes x and/or
-     * y if needed to make this the specific operation that happens (right
-     * multiply), and then transposes them back afterward. Thus the operation is
-     * unambiguous and one does not have to care if x/y are rows or columns.
-     * That is, regardless of if x or y are rows/columns Ax=y is performed,
-     * which can be considered a "forward" propagation in a column-major
-     * paradigm.
-     *
-     * @param inputs  the right-hand vector MUST be a vector
-     * @param weights the matrix
-     * @param outputs the result of a matrix-vector multiply MUST be a vector of the
-     *                same number of elements as inputs, can be equal to inputs.
-     */
-    public static void forwardPropagate(DoubleMatrix inputs, DoubleMatrix weights, DoubleMatrix outputs) {
-        boolean wasRowX = false;
-        boolean wasRowY = false;
-        if (inputs.isRowVector()) {
-            // Fast transpose
-            inputs.rows = inputs.columns;
-            inputs.columns = 1;
-            wasRowX = true;
-        }
-        if (inputs != outputs && outputs.isRowVector()) {
-            // Fast transpose
-            outputs.rows = outputs.columns;
-            outputs.columns = 1;
-            wasRowY = true;
-        }
-
-        weights.mmuli(inputs, outputs);
-
-        if (wasRowX) {
-            // Fast transpose back
-            inputs.columns = inputs.rows;
-            inputs.rows = 1;
-        }
-        if (wasRowY) {
-            // Fast transpose back
-            outputs.columns = outputs.rows;
-            outputs.rows = 1;
-        }
-    }
+    ///**
+    // * Convenience method for in place "Forward" matrix multiplication (forward
+    // * if vectors are assumed to be column-major) e.g.: Ax=y Transposes x and/or
+    // * y if needed to make this the specific operation that happens (right
+    // * multiply), and then transposes them back afterward. Thus the operation is
+    // * unambiguous and one does not have to care if x/y are rows or columns.
+    // * That is, regardless of if x or y are rows/columns Ax=y is performed,
+    // * which can be considered a "forward" propagation in a column-major
+    // * paradigm.
+    // *
+    // * @param inputs  the right-hand vector MUST be a vector
+    // * @param weights the matrix
+    // * @param outputs the result of a matrix-vector multiply MUST be a vector of the
+    // *                same number of elements as inputs, can be equal to inputs.
+    // */
+    //public static void forwardPropagate(INDArray inputs, INDArray weights, INDArray outputs) {
+    //    boolean wasRowX = false;
+    //    boolean wasRowY = false;
+    //    if (inputs.isRowVector()) {
+    //        // Fast transpose
+    //        inputs.rows = inputs.columns;
+    //        inputs.columns = 1;
+    //        wasRowX = true;
+    //    }
+    //    if (inputs != outputs && outputs.isRowVector()) {
+    //        // Fast transpose
+    //        outputs.rows = outputs.columns;
+    //        outputs.columns = 1;
+    //        wasRowY = true;
+    //    }
+    //
+    //    weights.mmuli(inputs, outputs);
+    //
+    //    if (wasRowX) {
+    //        // Fast transpose back
+    //        inputs.columns = inputs.rows;
+    //        inputs.rows = 1;
+    //    }
+    //    if (wasRowY) {
+    //        // Fast transpose back
+    //        outputs.columns = outputs.rows;
+    //        outputs.rows = 1;
+    //    }
+    //}
 
     /**
      * Convenience method for in place "Backward" matrix multiplication
@@ -549,33 +560,40 @@ public class BackpropTrainer extends IterableTrainer {
      * @param _y the result of a matrix-vector multiply MUST be a vector of the
      *           same number of elements as _x, can be equal to _x.
      */
-    public static void backwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
+    public static void backwardPropagate(INDArray _x, INDArray _A, INDArray _y) {
         boolean wasColX = false;
         boolean wasColY = false;
         if (_x.isColumnVector()) {
-            // Fast transpose
-            _x.columns = _x.rows;
-            _x.rows = 1;
+            _x.transposei();
+            //// Fast transpose
+            //_x.columns = _x.rows;
+            //_x.rows = 1;
             wasColX = true;
         }
         if (_x != _y && _y.isColumnVector()) {
             // Fast transpose
-            _y.columns = _y.rows;
-            _y.rows = 1;
+            _y.transposei();
+            //_y.columns = _y.rows;
+            //_y.rows = 1;
             wasColY = true;
         }
 
+        // TODO: Performance issue? Move outside of this method at the very least.
+        _x = _x.reshape(1,_x.length());
+        _y = _y.reshape(1,_y.length());
         _x.mmuli(_A, _y);
 
         if (wasColX) {
             // Fast transpose back
-            _x.rows = _x.columns;
-            _x.columns = 1;
+            //_x.rows = _x.columns;
+            //_x.columns = 1;
+            _x.transposei();
         }
         if (wasColY) {
             // Fast transpose back
-            _y.rows = _y.columns;
-            _y.columns = 1;
+            //_y.rows = _y.columns;
+            //_y.columns = 1;
+            _y.transposei();
         }
     }
 
@@ -599,19 +617,19 @@ public class BackpropTrainer extends IterableTrainer {
     // TODO: Temporarily exposing this stuff for quick testing
     //
 
-    public List<DoubleMatrix> getWeightMatrices() {
+    public List<INDArray> getWeightMatrices() {
         return weightMatrices;
     }
 
-    public void setWeightMatrices(List<DoubleMatrix> weightMatrices) {
+    public void setWeightMatrices(List<INDArray> weightMatrices) {
         this.weightMatrices = weightMatrices;
     }
 
-    public List<DoubleMatrix> getBiases() {
+    public List<INDArray> getBiases() {
         return biases;
     }
 
-    public void setBiases(List<DoubleMatrix> biases) {
+    public void setBiases(List<INDArray> biases) {
         this.biases = biases;
     }
 

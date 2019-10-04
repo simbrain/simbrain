@@ -1,11 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
-apply plugin: 'checkstyle'
+//apply plugin: 'checkstyle'
 
 def versionName = "Simbrain4Beta"
-def jmonkeyengine_version = '[3.2,)'
-def log4jVer = '2.5'
+def jmonkeyengine_version = '[3.2,)' // ) means it always gets the latest 3.2.X version
 // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
 def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
@@ -26,6 +25,7 @@ dependencies {
             'lib/utils.jar',
             'lib/ssj.jar')
 
+    // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
     compile group: 'org.tinylog', name: 'tinylog', version: '1.3.6'
 
     // https://mvnrepository.com/artifact/junit/junit

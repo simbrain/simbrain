@@ -25,7 +25,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.core.MultiLayerNetwork;
+import org.simbrain.network.core.MultiLayerNet;
 import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.*;
@@ -544,7 +544,7 @@ public class NetworkPanel extends JPanel {
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     addNeuronArray((NeuronArray) evt.getNewValue());
                 } else if ("multiLayerNetworkAdded".equals(evt.getPropertyName())) {
-                    addMultiLayerNetwork((MultiLayerNetwork) evt.getNewValue());
+                    addMultiLayerNetwork((MultiLayerNet) evt.getNewValue());
                 } else if ("naRemoved".equals(evt.getPropertyName())) {
                     ((NeuronArray)evt.getOldValue()).fireDeleted();
                 } else if ("wmRemoved".equals(evt.getPropertyName())) {
@@ -931,7 +931,7 @@ public class NetworkPanel extends JPanel {
         repaint();
     }
 
-    private void addMultiLayerNetwork(MultiLayerNetwork multiLayerNetwork) {
+    private void addMultiLayerNetwork(MultiLayerNet multiLayerNetwork) {
         MultiLayerNetworkNode node = new MultiLayerNetworkNode(this, multiLayerNetwork);
         canvas.getLayer().addChild(node);
         objectNodeMap.put(multiLayerNetwork, node);
@@ -1937,7 +1937,7 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
-    public List<MultiLayerNetwork> getSelectedModelMultiLayerNetworks() {
+    public List<MultiLayerNet> getSelectedModelMultiLayerNetworks() {
         return getSelection().stream()
                 .filter(MultiLayerNetworkNode.class::isInstance)
                 .map(MultiLayerNetworkNode.class::cast)
@@ -2750,7 +2750,7 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
-    public List<MultiLayerNetwork> getSourceModelMultiLayerNetworks() {
+    public List<MultiLayerNet> getSourceModelMultiLayerNetworks() {
         return sourceElements.stream()
                 .filter(MultiLayerNetworkNode.class::isInstance)
                 .map(MultiLayerNetworkNode.class::cast)
@@ -2986,11 +2986,11 @@ public class NetworkPanel extends JPanel {
     }
 
     public void showMultiLayerNetworkCreationDialog() {
-        MultiLayerNetwork.CreationTemplate creationTemplate = new MultiLayerNetwork.CreationTemplate();
+        MultiLayerNet.CreationTemplate creationTemplate = new MultiLayerNet.CreationTemplate();
         StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();
         and.addClosingTask( () -> SwingUtilities.invokeLater(() -> {
             Network network = getNetwork();
-            MultiLayerNetwork multiLayerNetwork = creationTemplate.create(network);
+            MultiLayerNet multiLayerNetwork = creationTemplate.create(network);
             multiLayerNetwork.setLocation(getLastClickedPosition());
             network.addDL4JMultiLayerNetwork(multiLayerNetwork);
         }));

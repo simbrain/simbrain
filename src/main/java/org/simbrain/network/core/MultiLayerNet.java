@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MultiLayerNetwork implements ArrayConnectable {
+public class MultiLayerNet implements ArrayConnectable {
 
     private org.deeplearning4j.nn.multilayer.MultiLayerNetwork network;
 
@@ -45,7 +45,7 @@ public class MultiLayerNetwork implements ArrayConnectable {
      */
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    // public MultiLayerNetwork(List<Layer> layers) {
+    // public MultiLayerNet(List<Layer> layers) {
     //     NeuralNetConfiguration.ListBuilder listBuilder = new NeuralNetConfiguration.Builder()
     //             .updater(new Sgd(0.1))
     //             .seed(1234)
@@ -69,11 +69,11 @@ public class MultiLayerNetwork implements ArrayConnectable {
     //
     //
     //
-    //     network = new MultiLayerNetwork(listBuilder.build());
+    //     network = new MultiLayerNet(listBuilder.build());
     //     network.init();
     // }
 
-    public MultiLayerNetwork(Network parent, List<Integer> sizes) {
+    public MultiLayerNet(Network parent, List<Integer> sizes) {
 
         if (sizes.size() < 2) {
             throw new IllegalArgumentException("Sizes must have least 2 elements");
@@ -229,7 +229,7 @@ public class MultiLayerNetwork implements ArrayConnectable {
         private String layerSize = "4 10 2";
 
 
-        public MultiLayerNetwork create(Network parent) {
+        public MultiLayerNet create(Network parent) {
 
             List<Integer> sizes;
 
@@ -243,8 +243,8 @@ public class MultiLayerNetwork implements ArrayConnectable {
                 sizes = Arrays.asList(4, 10, 2);
             }
 
-            MultiLayerNetwork net =
-                    new MultiLayerNetwork(parent, sizes);
+            MultiLayerNet net =
+                    new MultiLayerNet(parent, sizes);
             return net;
         }
 

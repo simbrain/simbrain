@@ -2,10 +2,8 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
-import org.simbrain.network.core.MultiLayerNetwork;
+import org.simbrain.network.core.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.ScreenElement;
-import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class MultiLayerNetworkNode extends ScreenElement {
 
-    private MultiLayerNetwork net;
+    private MultiLayerNet net;
 
     private NetworkPanel networkPanel;
 
@@ -41,7 +39,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
     private PPath box;
 
 
-    public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNetwork dl4jNet) {
+    public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNet dl4jNet) {
         super(networkPanel);
         this.net = dl4jNet;
 
@@ -137,7 +135,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
         pushViewPositionToModel();
     }
 
-    public MultiLayerNetwork getNet() {
+    public MultiLayerNet getNet() {
         return net;
     }
 }

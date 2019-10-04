@@ -96,7 +96,7 @@ public class Network {
      */
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
-    private final List<MultiLayerNetwork> multiLayerNetworks = new ArrayList<>();
+    private final List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -536,7 +536,7 @@ public class Network {
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
-    public void addDL4JMultiLayerNetwork(MultiLayerNetwork network) {
+    public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
         changeSupport.firePropertyChange("multiLayerNetworkAdded", null, network);
     }

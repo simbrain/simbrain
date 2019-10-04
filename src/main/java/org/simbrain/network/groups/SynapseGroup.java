@@ -1279,9 +1279,9 @@ public class SynapseGroup extends Group {
      *                             weights of excitatory synapses.
      */
     public void setExcitatoryRandomizer(ProbabilityDistribution excitatoryRandomizer) {
-        if(excitatoryRandomizer != null)
-            excitatoryRandomizer.setPolarity(Polarity.EXCITATORY);
-        this.exciteRand = excitatoryRandomizer;
+        this.exciteRand = excitatoryRandomizer == null ? null : excitatoryRandomizer.deepCopy();
+        if(exciteRand != null)
+            exciteRand.setPolarity(Polarity.EXCITATORY);
     }
 
     /**
@@ -1289,9 +1289,9 @@ public class SynapseGroup extends Group {
      *                             weights of inbihitory synapses.
      */
     public void setInhibitoryRandomizer(ProbabilityDistribution inhibitoryRandomizer) {
-        if(inhibitoryRandomizer != null)
-            inhibitoryRandomizer.setPolarity(Polarity.INHIBITORY);
-        this.inhibRand = inhibitoryRandomizer;
+        inhibRand = inhibitoryRandomizer == null ? null : inhibitoryRandomizer.deepCopy();
+        if(inhibRand != null)
+            inhibRand.setPolarity(Polarity.INHIBITORY);
     }
 
     public void setRandomizers(ProbabilityDistribution excitatoryRandomizer, ProbabilityDistribution inhibitoryRandomizer) {

@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
  * be made depends upon both sets of parameters. 
  * <p>
  * Currently this is not accessible in the GUI, and is only used by some
- * scripts.
+ * scripts. // TODO: Add full repetoire of probabilities EE,EI,IE,II...
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
@@ -259,12 +260,13 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
             if (conMethod == ConnectStyle.PROBABILISTIC) {
                 if (Math.random() < inhibitoryProbability) {
                     Synapse synapse;
-                    if (selectMethod == SelectionStyle.IN)
+                    if (selectMethod == SelectionStyle.IN) {
                         synapse = new Synapse(otherNeu, neuron);
-                    else {
+                        synapse.setStrength(Math.random());
+                    } else {
                         synapse = new Synapse(neuron, otherNeu);
                     }
-                    synapse.setStrength(-Math.random());
+
                     if (looseSynapses) {
                         network.addLooseSynapse(synapse);
                     } else {
@@ -368,27 +370,106 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         // No implementation yet.
         List<Neuron> target = synGroup.getTargetNeurons();
         List<Neuron> source = synGroup.getSourceNeurons();
-        List<Synapse> exSyns = new ArrayList<>();
-        List<Synapse> inSyns = new ArrayList<>();
-        excNeurons = target.stream().filter(neuron -> neuron.getPolarity()
-                == SimbrainConstants.Polarity.EXCITATORY).collect(Collectors.toList());
-        inhNeurons = target.stream().filter(neuron -> neuron.getPolarity()
-                == SimbrainConstants.Polarity.INHIBITORY).collect(Collectors.toList());
-        nonPolarNeurons = target.stream().filter(neuron -> neuron.getPolarity()
-                == SimbrainConstants.Polarity.BOTH).collect(Collectors.toList());
-        for (Neuron src : source) {
-            makeExcitatory(src, exSyns, false);
-            makeInhibitory(src, inSyns, false);
-        }
+        List<Synapse> syns = new ArrayList<>();
 
-        for(Synapse s : exSyns) {
-            synGroup.addNewExcitatorySynapse(s);
+        if(selectMethod == SelectionStyle.IN) {
+            for(Neuron tar : target) {
+                makeConnects(tar, source, syns);
+            }
+        } else {
+            for(Neuron src : source) {
+                makeConnects(src, target, syns);
+            }
         }
-
-        for(Synapse s : inSyns) {
-            synGroup.addNewInhibitorySynapse(s);
+        for(Synapse s : syns) {
+            synGroup.addNewSynapse(s);
         }
     }
+
+    /**
+     * Makes connections between a neuron and some other neurons and returns a synapse list.
+     * Accounts for connection and selection styles of various kinds and polarity.
+     * @param neu
+     * @param others
+     * @param retList
+     * @return
+     */
+    public List<Synapse> makeConnects(Neuron neu, List<Neuron> others, List<Synapse> retList) {
+
+        others = getNeuronsInRadius(neu, others, getExcitatoryRadius());
+        if(others.isEmpty()) {
+            return retList;
+        }
+
+        if(conMethod == ConnectStyle.PROBABILISTIC) {
+            double p = neu.getPolarity() != Polarity.INHIBITORY ?
+                    excitatoryProbability : inhibitoryProbability;
+            return connectProb(neu, others, retList, selectMethod, p);
+        } else {
+            int noCons = neu.getPolarity() != Polarity.INHIBITORY ?
+                    excCons : inhCons;
+            return connectDet(neu, others, retList, selectMethod, noCons);
+        }
+
+    }
+
+    /**
+     * Connects a neuron to a list of possible neurons to connect to probabilistically. Synapses
+     * are assigned weight values based on source polarity.
+     * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
+     *          connections to. If selection style is OUT, it is the neuron sending connections to the others.
+     * @param others
+     * @param retList
+     * @param selectionStyle
+     * @param p
+     * @return
+     */
+    private static List<Synapse> connectProb(Neuron n, List<Neuron> others,
+                                     List<Synapse> retList,
+                                     SelectionStyle selectionStyle, double p) {
+        for(Neuron o : others) {
+            if(Math.random() < p) {
+                if(selectionStyle == SelectionStyle.IN) {
+                    retList.add(new Synapse(o, n, o.getPolarity().value(Math.random())));
+                } else {
+                    retList.add(new Synapse(n, o, n.getPolarity().value(Math.random())));
+                }
+            }
+        }
+        return retList;
+    }
+
+    /**
+     * Connects a neuron to a list of possible neurons to connect to "deterministically".
+     * An exact number of neurons to connect with are chosen randomly, but the number itself
+     * is guaranteed. Synapses are assigned weight values based on source polarity.
+     * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
+     *          connections to. If selection style is OUT, it is the neuron sending connections to the others.
+     * @param others
+     * @param retList
+     * @param selectionStyle
+     * @param N
+     * @return
+     */
+    private static List<Synapse> connectDet(Neuron n, List<Neuron> others,
+                                     List<Synapse> retList,
+                                     SelectionStyle selectionStyle, int N) {
+        if(N > others.size()) {
+            N = others.size();
+        } else {
+            Collections.shuffle(others);
+        }
+        for(int ii=0; ii<N; ++ii) {
+            Neuron o = others.get(ii);
+            if (selectionStyle == SelectionStyle.IN) {
+                retList.add(new Synapse(o, n, o.getPolarity().value(Math.random())));
+            } else {
+                retList.add(new Synapse(n, o, n.getPolarity().value(Math.random())));
+            }
+        }
+        return retList;
+    }
+
 
     @Override
     public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
@@ -423,6 +504,14 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
             }
         }
         return ret;
+    }
+
+    public void setConMethod(ConnectStyle conMethod) {
+        this.conMethod = conMethod;
+    }
+
+    public ConnectStyle getConMethod() {
+        return conMethod;
     }
 
     public boolean isAllowSelfConnections() {

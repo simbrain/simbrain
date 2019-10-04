@@ -131,7 +131,6 @@ public class PatternsOfActivity extends RegisteredSimulation {
         addProjection(recurrentNetwork, 368, 562, 24, "getSubsampledActivations");
         addProjection(outputNeurons, 723, 562, .1, "getActivations");
 
-
     }
 
     private OdorWorldEntity buildWorld() {

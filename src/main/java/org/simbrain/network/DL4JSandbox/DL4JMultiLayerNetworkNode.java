@@ -9,7 +9,7 @@ import javax.swing.*;
 
 public class DL4JMultiLayerNetworkNode extends ScreenElement {
 
-    private DL4JMultiLayerNetwork network;
+    private DL4JMultiLayerNetwork net;
 
     private NetworkPanel networkPanel;
 
@@ -26,12 +26,13 @@ public class DL4JMultiLayerNetworkNode extends ScreenElement {
     private PPath box;
 
 
-    public DL4JMultiLayerNetworkNode(NetworkPanel networkPanel, DL4JMultiLayerNetwork network) {
+    public DL4JMultiLayerNetworkNode(NetworkPanel networkPanel, DL4JMultiLayerNetwork dl4jNet) {
         super(networkPanel);
-        this.network = network;
-        box = PPath.createRectangle(network.getLocation().getX(), network.getLocation().getY(), boxWidth, boxHeight);
+        this.net = dl4jNet;
+        box = PPath.createRectangle(net.getLocation().getX(), net.getLocation().getY(), boxWidth, boxHeight);
         addChild(box);
-        box.setPickable(true);
+        setPickable(true);
+        this.setBounds(box.getFullBounds());
     }
 
     @Override
@@ -82,5 +83,9 @@ public class DL4JMultiLayerNetworkNode extends ScreenElement {
     @Override
     public void resetColors() {
 
+    }
+
+    public DL4JMultiLayerNetwork getNet() {
+        return net;
     }
 }

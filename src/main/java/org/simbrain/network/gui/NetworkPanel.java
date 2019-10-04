@@ -2031,6 +2031,8 @@ public class NetworkPanel extends JPanel {
                 ret.add(((WeightMatrixNode) e).getWeightMatrix());
             } else if (e instanceof NeuronArrayNode) {
                 ret.add(((NeuronArrayNode) e).getNeuronArray());
+            } else if (e instanceof DL4JMultiLayerNetworkNode) {
+                ret.add(((DL4JMultiLayerNetworkNode) e).getNet());
             } else if (e instanceof TextNode) {
                 ret.add(((TextNode) e).getTextObject());
             } else if (e instanceof InteractionBox) {

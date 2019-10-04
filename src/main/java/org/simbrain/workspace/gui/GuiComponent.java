@@ -20,7 +20,7 @@ package org.simbrain.workspace.gui;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -64,11 +64,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     private GenericFrame parentFrame;
 
     /**
-     * Log4j logger.
-     */
-    private Logger logger = Logger.getLogger(GuiComponent.class);
-
-    /**
      * Reference to parent desktop.
      */
     private SimbrainDesktop desktop;
@@ -105,7 +100,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
             }
         });
 
-        logger.trace(this.getClass().getCanonicalName() + " created");
+        Logger.trace(this.getClass().getCanonicalName() + " created");
     }
 
 

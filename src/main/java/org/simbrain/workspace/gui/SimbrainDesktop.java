@@ -20,7 +20,7 @@ package org.simbrain.workspace.gui;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.util.ResourceManager;
@@ -71,11 +71,6 @@ public class SimbrainDesktop {
      * The default serial version ID.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Log4j logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /**
      * Initial indent of entire workspace.
@@ -901,7 +896,7 @@ public class SimbrainDesktop {
      */
     @SuppressWarnings("unchecked")
     public void addDesktopComponent(final WorkspaceComponent workspaceComponent) {
-        LOGGER.trace("Adding workspace component: " + workspaceComponent);
+        Logger.trace("Adding workspace component: " + workspaceComponent);
 
         final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
         componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("simbrain-icon.png")));

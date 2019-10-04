@@ -19,7 +19,7 @@
 package org.simbrain.util.projection;
 
 import com.Ostermiller.util.CSVParser;
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
@@ -41,11 +41,6 @@ import java.util.*;
  * Cf. {@url https://en.wikipedia.org/wiki/Dimensionality_reduction}
  */
 public class Projector implements AttributeContainer {
-
-    /**
-     * Log4j logger.
-     */
-    private static transient Logger logger = Logger.getLogger(Projector.class);
 
     /**
      * Listener list.
@@ -173,7 +168,6 @@ public class Projector implements AttributeContainer {
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
-        logger = Logger.getLogger(ProjectionMethod.class);
         listeners = new ArrayList<ProjectorListener>();
         upstairs.postOpenInit();
         downstairs.postOpenInit();
@@ -186,7 +180,7 @@ public class Projector implements AttributeContainer {
      */
     public void addDatapoint(final DataPointColored point) {
 
-        logger.debug("addDatapoint called");
+        Logger.debug("addDatapoint called");
         if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
             return;
         }

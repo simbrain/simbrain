@@ -20,7 +20,7 @@ package org.simbrain.util.projection;
 
 import Jama.Matrix;
 import com.Ostermiller.util.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,10 +39,6 @@ import java.util.List;
 public class Dataset {
 
     // TODO: Consider migrating this to ND4J and friends.
-    /**
-     * Logger.
-     */
-    private transient Logger logger = Logger.getLogger(Dataset.class);
 
     /**
      * The data.
@@ -155,7 +151,7 @@ public class Dataset {
      * @return null if point added, overlapping point otherwise
      */
     public DataPoint addPoint(final DataPoint point, final double tolerance) {
-        logger.debug("addPoint called with tolerance " + tolerance);
+        Logger.debug("addPoint called with tolerance " + tolerance);
         checkDimension(point);
         DataPoint existingPoint = isUniquePoint(point, tolerance);
 
@@ -205,7 +201,7 @@ public class Dataset {
         // TODO: Rename to unsafe or no-check or force or
         // something to communicate that the tolerance check
         // does not happen?
-        logger.debug("addPoint called");
+        Logger.debug("addPoint called");
 
         checkDimension(point);
 
@@ -507,7 +503,7 @@ public class Dataset {
      * @return null if the point is new, reference to overlapping point otherwise
      */
     private DataPoint isUniquePoint(final DataPoint toCheck, final double tolerance) {
-        logger.debug("checking for uniqueness with tolerance: " + tolerance);
+        Logger.debug("checking for uniqueness with tolerance: " + tolerance);
 
         if (toCheck.getDimension() != dimensions) {
             throw new IllegalArgumentException("point to check has " + toCheck.getDimension() + " dimensions.  This dataset requires " + dimensions);
@@ -813,7 +809,6 @@ public class Dataset {
      * Initializes Dataset from persistent data.
      */
     public void postOpenInit() {
-        logger = Logger.getLogger(Dataset.class);
         clear();
         for (DataPoint point : persistentData) {
             //point.setLabel("");

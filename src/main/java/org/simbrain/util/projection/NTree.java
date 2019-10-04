@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.projection;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 
 import java.util.*;
 
@@ -46,16 +46,6 @@ import java.util.*;
  * @author James Matthew Watson - July 2, 2007
  */
 public class NTree implements Iterable<DataPoint> {
-
-    /**
-     * The static logger for this class
-     */
-    private static final transient Logger LOGGER = Logger.getLogger(NTree.class);
-
-    /**
-     * An instance specific logger
-     */
-    private transient Logger logger = LOGGER;
 
     /**
      * An enumeration for quick switching on the node type
@@ -96,9 +86,8 @@ public class NTree implements Iterable<DataPoint> {
      * @param dimensions the number of dimensions
      */
     public NTree(int dimensions) {
-        LOGGER.debug("Creating an NTree with " + dimensions + " dimensions.");
+        Logger.debug("Creating an NTree with " + dimensions + " dimensions.");
         this.dimensions = dimensions;
-        logger = Logger.getLogger(logger.getName() + '.' + dimensions);
     }
 
     /**
@@ -118,9 +107,7 @@ public class NTree implements Iterable<DataPoint> {
      */
     public DataPoint add(DataPoint point) {
         //System.out.println(point.getDimension());
-        if (logger.isDebugEnabled()) {
-            logger.debug("adding point " + point);
-        }
+        Logger.debug("adding point " + point);
 
         /* Keeps track of the most recent parent branch, if any */
         Branch parent = null;
@@ -143,14 +130,14 @@ public class NTree implements Iterable<DataPoint> {
             parent = branch;
 
             if (point.get(branch.splitDimension) < branch.midPoint) {
-                if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch + " - going left");
+                Logger.debug("at branch : " + branch + " - going left");
+
                 /* To the left */
                 current = branch.left;
                 onLeft = true;
             } else {
-                if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch + " - going right");
+                Logger.debug("at branch : " + branch + " - going right");
+
                 /* To the right */
                 current = branch.right;
                 onLeft = false;
@@ -160,8 +147,8 @@ public class NTree implements Iterable<DataPoint> {
         /* Cast the current node to a leaf */
         Leaf leaf = (Leaf) current;
 
-        if (logger.isDebugEnabled())
-            logger.debug("adding point to leaf : " + leaf);
+        Logger.debug("adding point to leaf : " + leaf);
+
 
         /* Add the point to the leaf and the list and map */
         leaf.points.add(point);
@@ -171,8 +158,7 @@ public class NTree implements Iterable<DataPoint> {
         /* check the number of points in the leaf */
         int size = leaf.points.size();
 
-        if (logger.isDebugEnabled())
-            logger.debug("leaf size : " + size);
+        Logger.debug("leaf size : " + size);
 
         if (size > MAX) {
             /*
@@ -180,13 +166,13 @@ public class NTree implements Iterable<DataPoint> {
              * split
              */
             int splitOn = parent == null ? 0 : (parent.splitDimension + 1) % dimensions;
-            if (logger.isDebugEnabled())
-                logger.debug("splitting leaf on dimension: " + splitOn);
+            Logger.debug("splitting leaf on dimension: " + splitOn);
+
 
             /* Get the middle point index */
             int middle = size / 2;
-            if (logger.isTraceEnabled())
-                logger.trace("middle: " + middle);
+            Logger.trace("middle: " + middle);
+
 
             /* Sort the points based on the split dimension */
             Collections.sort(leaf.points, new PointComparator(splitOn));
@@ -196,20 +182,17 @@ public class NTree implements Iterable<DataPoint> {
              * right
              */
             DataPoint leftPoint = leaf.points.get(middle);
-            if (logger.isTraceEnabled())
-                logger.trace("leftPoint: " + leftPoint);
+            Logger.trace("leftPoint: " + leftPoint);
 
             DataPoint rightPoint = leaf.points.get(middle + 1);
-            if (logger.isTraceEnabled())
-                logger.trace("rightPoint: " + rightPoint);
+            Logger.trace("rightPoint: " + rightPoint);
 
             /*
              * Get the average between the points on the split dimension. this
              * is the midpoint
              */
             double midPoint = (leftPoint.get(splitOn) + rightPoint.get(splitOn)) / 2;
-            if (logger.isTraceEnabled())
-                logger.trace("midPoint: " + midPoint);
+            Logger.trace("midPoint: " + midPoint);
 
             /* instantiate the new branch with the midpoint and split-dimension */
             Branch newBranch = new Branch(midPoint, splitOn);
@@ -223,13 +206,11 @@ public class NTree implements Iterable<DataPoint> {
                 DataPoint p = leaf.points.get(i);
 
                 if (p.get(splitOn) < midPoint) {
-                    if (logger.isTraceEnabled())
-                        logger.trace("adding to left: " + p);
+                    Logger.trace("adding to left: " + p);
                     left.points.add(p);
                     all.put(p, left);
                 } else {
-                    if (logger.isTraceEnabled())
-                        logger.trace("adding to right: " + p);
+                    Logger.trace("adding to right: " + p);
                     right.points.add(p);
                     all.put(p, right);
                 }
@@ -244,16 +225,13 @@ public class NTree implements Iterable<DataPoint> {
              * the new root
              */
             if (parent == null) {
-                if (logger.isTraceEnabled())
-                    logger.debug("setting new branch as root");
+                Logger.debug("setting new branch as root");
                 root = newBranch;
             } else if (onLeft) {
-                if (logger.isTraceEnabled())
-                    logger.debug("setting new branch as left");
+                Logger.debug("setting new branch as left");
                 parent.left = newBranch;
             } else {
-                if (logger.isTraceEnabled())
-                    logger.debug("setting new branch as right");
+                Logger.debug("setting new branch as right");
                 parent.right = newBranch;
             }
         }
@@ -332,8 +310,7 @@ public class NTree implements Iterable<DataPoint> {
      */
     private DataPoint isUnique(Node from, DataPoint point, double tolerance) {
 
-        if (logger.isDebugEnabled())
-            logger.debug("is unique? tolerance " + tolerance + " - " + point);
+        Logger.debug("is unique? tolerance " + tolerance + " - " + point);
 
         /* loop over the from node while it's a branch */
         while (from.type == Type.branch) {
@@ -348,8 +325,7 @@ public class NTree implements Iterable<DataPoint> {
              * otherwise continue branching
              */
             if (Math.abs(d - branch.midPoint) < tolerance) {
-                if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch + " - recursing both paths");
+                Logger.debug("at branch : " + branch + " - recursing both paths");
                 DataPoint leftCheck = isUnique(branch.left, point, tolerance);
                 DataPoint rightCheck = isUnique(branch.right, point, tolerance);
                 if ((leftCheck == null) && (rightCheck == null)) {
@@ -362,12 +338,10 @@ public class NTree implements Iterable<DataPoint> {
                     }
                 }
             } else if (point.getVector()[branch.splitDimension] < branch.midPoint) {
-                if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch + " - going left");
+                Logger.debug("at branch : " + branch + " - going left");
                 from = branch.left;
             } else {
-                if (logger.isDebugEnabled())
-                    logger.debug("at branch : " + branch + " - going right");
+                Logger.debug("at branch : " + branch + " - going right");
                 from = branch.right;
             }
         }

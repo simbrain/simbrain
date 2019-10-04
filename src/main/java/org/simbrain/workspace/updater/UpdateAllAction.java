@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.util.List;
@@ -39,10 +39,6 @@ public class UpdateAllAction implements UpdateAction {
      */
     private transient WorkspaceUpdater updater;
 
-    /**
-     * The static logger for the class.
-     */
-    static Logger LOGGER = Logger.getLogger(UpdateAllAction.class);
 
     /**
      * The executor service for doing the component updates.
@@ -77,19 +73,19 @@ public class UpdateAllAction implements UpdateAction {
             return;
         }
 
-        LOGGER.trace("updating couplings");
+        Logger.trace("updating couplings");
         updateCouplings();
 
-        LOGGER.trace("creating latch");
+        Logger.trace("creating latch");
         LatchCompletionSignal latch = new LatchCompletionSignal(componentCount);
 
-        LOGGER.trace("updating components");
+        Logger.trace("updating components");
         for (WorkspaceComponent component : components) {
             updateComponent(component, latch);
         }
-        LOGGER.trace("waiting");
+        Logger.trace("waiting");
         latch.await();
-        LOGGER.trace("update complete");
+        Logger.trace("update complete");
     }
 
     /**
@@ -121,7 +117,7 @@ public class UpdateAllAction implements UpdateAction {
      */
     public void updateCouplings() {
         updater.getWorkspace().getCouplingManager().updateCouplings();
-        LOGGER.trace("couplings updated");
+        Logger.trace("couplings updated");
         updater.notifyCouplingsUpdated();
     }
 

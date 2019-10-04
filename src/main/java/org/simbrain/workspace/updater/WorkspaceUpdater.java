@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -46,11 +46,6 @@ import java.util.function.Consumer;
  * @author Jeff Yoshimi
  */
 public class WorkspaceUpdater {
-
-    /**
-     * The static logger for the class.
-     */
-    static final Logger LOGGER = Logger.getLogger(WorkspaceUpdater.class);
 
     /**
      * The parent workspace.
@@ -277,14 +272,14 @@ public class WorkspaceUpdater {
      */
     private void doUpdate() {
         time++;
-        LOGGER.trace("starting: " + time);
+        Logger.trace("starting: " + time);
         for (UpdateAction action : updateActionManager.getActionList()) {
             notifyBeforeUpdateAction(action);
             action.invoke();
             notifyAfterUpdateAction(action);
         }
         notifyWorkspaceUpdated();
-        LOGGER.trace("done: " + time);
+        Logger.trace("done: " + time);
     }
 
     /**

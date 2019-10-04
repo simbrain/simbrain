@@ -23,7 +23,7 @@ import com.Ostermiller.util.CSVPrinter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,10 +39,6 @@ import java.util.*;
  * <b>Utils</b>. Utility class for simbrain package.
  */
 public class Utils {
-    /**
-     * Logger.
-     */
-    private static Logger logger = Logger.getLogger(Utils.class);
 
     /**
      * File system separator.
@@ -636,7 +632,7 @@ public class Utils {
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             } else {
-                logger.info("Could not find properties file at " + file.getAbsolutePath());
+                Logger.info("Could not find properties file at " + file.getAbsolutePath());
             }
             return properties;
         } catch (IOException ex) {

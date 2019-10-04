@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -48,11 +48,6 @@ public abstract class WorkspaceComponent {
      * The workspace that 'owns' this component.
      */
     private Workspace workspace;
-
-    /**
-     * Log4j logger.
-     */
-    private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     /**
      * The set of all WorkspaceComponentListeners on this component.
@@ -118,7 +113,7 @@ public abstract class WorkspaceComponent {
      */
     public WorkspaceComponent(final String name) {
         this.name = name;
-        logger.trace(getClass().getCanonicalName() + ": " + name + " created");
+        Logger.trace(getClass().getCanonicalName() + ": " + name + " created");
     }
 
     /**
@@ -480,7 +475,7 @@ public abstract class WorkspaceComponent {
      *                             last save.
      */
     public void setChangedSinceLastSave(boolean changedSinceLastSave) {
-        logger.debug("component changed");
+        Logger.debug("component changed");
         this.changedSinceLastSave = changedSinceLastSave;
     }
 
@@ -497,14 +492,6 @@ public abstract class WorkspaceComponent {
 
     public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
-    }
-
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public void setLogger(Logger logger) {
-        this.logger = logger;
     }
 
     public boolean isGuiOn() {

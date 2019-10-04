@@ -11,6 +11,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.pmw.tinylog.Logger;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -238,6 +239,7 @@ public class MultiLayerNetwork implements ArrayConnectable {
                         .collect(Collectors.toList());
             } catch (Exception e) {
                 e.printStackTrace();
+                Logger.warn("Incorrect layer size list.");
                 sizes = Arrays.asList(4, 10, 2);
             }
 

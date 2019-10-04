@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.dataworld;
 
-import org.apache.log4j.Logger;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.*;
 
@@ -36,10 +35,6 @@ import java.util.List;
  */
 public class DataWorldComponent extends WorkspaceComponent implements AttributeContainer {
 
-    /**
-     * The static logger for this class.
-     */
-    private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /**
      * Table model.

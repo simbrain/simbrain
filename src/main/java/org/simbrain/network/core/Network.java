@@ -900,10 +900,6 @@ public class Network {
         fireGroupAdded(group);
     }
 
-    public void addMultiLayerNetwork(final MultiLayerNetwork multiLayerNetwork) {
-        multiLayerNetworks.add(multiLayerNetwork);
-    }
-
     /**
      * Remove the specified group.
      *

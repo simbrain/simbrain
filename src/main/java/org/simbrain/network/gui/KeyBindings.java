@@ -332,8 +332,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("7"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                MultiLayerNetwork network = new MultiLayerNetwork(Arrays.asList(2, 1));
-                panel.getNetwork().addDL4JMultiLayerNetwork(network);
+                panel.showMultiLayerNetworkCreationDialog();
             }
         });
 

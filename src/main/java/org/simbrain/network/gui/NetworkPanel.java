@@ -1893,6 +1893,13 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
+    public List<MultiLayerNetworkNode> getSelectedMultiLayerNetworks() {
+        return getSelection().stream()
+                .filter(MultiLayerNetworkNode.class::isInstance)
+                .map(MultiLayerNetworkNode.class::cast)
+                .collect(Collectors.toList());
+    }
+
     /**
      * Returns the selected Text objects.
      *
@@ -1928,6 +1935,22 @@ public class NetworkPanel extends JPanel {
                 .map(NeuronArrayNode.class::cast)
                 .map(NeuronArrayNode::getNeuronArray)
                 .collect(Collectors.toList());
+    }
+
+    public List<MultiLayerNetwork> getSelectedModelMultiLayerNetworks() {
+        return getSelection().stream()
+                .filter(MultiLayerNetworkNode.class::isInstance)
+                .map(MultiLayerNetworkNode.class::cast)
+                .map(MultiLayerNetworkNode::getNet)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArrayConnectable> getSelectedModelArrayConnectables() {
+        List<ArrayConnectable> ret = new ArrayList<>();
+        ret.addAll(getSelectedModelNeuronArrays());
+        ret.addAll(getSelectedModelNeuronCollections());
+        ret.addAll(getSelectedModelMultiLayerNetworks());
+        return ret;
     }
 
     /**
@@ -1989,7 +2012,7 @@ public class NetworkPanel extends JPanel {
         return ret;
     }
 
-    public List<NeuronCollection> getSelectedModelNeuronCollection() {
+    public List<NeuronCollection> getSelectedModelNeuronCollections() {
         return getSelection().stream()
                 .filter(n -> n.getParent() instanceof NeuronCollectionNode)
                 .map(PNode::getParent)
@@ -2093,33 +2116,16 @@ public class NetworkPanel extends JPanel {
      * Add a weight matrix between neuron collections or arrays.
      */
     public void addWeightMatricesFromSelection() {
-        if (!(getSelectedModelNeuronArrays().isEmpty()) || !(getSourceModelNeuronArrays().isEmpty())) {
 
-            List<NeuronCollection> sourceCollection = getSourceModelNeuronCollections();
-            List<NeuronArray> sourceArray = getSourceModelNeuronArrays();
+        List<ArrayConnectable> sources = getSourceModelArrayConnectables();
+        List<ArrayConnectable> targets = getSelectedModelArrayConnectables();
 
-            List<NeuronCollection> targetCollection = getSelectedModelNeuronCollection();
-            List<NeuronArray> targetArray = getSelectedModelNeuronArrays();
-
-            // array -> array
-            for (NeuronArray source : sourceArray) {
-                for (NeuronArray target : targetArray) {
-                    addWeightMatrix(source, target);
+        for (ArrayConnectable source : sources) {
+            for (ArrayConnectable target : targets) {
+                if (source instanceof NeuronCollection && target instanceof NeuronCollection) {
+                    continue;
                 }
-            }
-
-            // neuron collection -> array
-            for (NeuronCollection source : sourceCollection) {
-                for (NeuronArray target : targetArray) {
-                    addWeightMatrix(source, target);
-                }
-            }
-
-            // array -> neuron collection
-            for (NeuronArray source : sourceArray) {
-                for (NeuronCollection target : targetCollection) {
-                    addWeightMatrix(source, target);
-                }
+                addWeightMatrix(source, target);
             }
         }
     }
@@ -2663,6 +2669,10 @@ public class NetworkPanel extends JPanel {
             sourceElements.add(node);
             SourceHandle.addSourceHandleTo(node);
         }
+        for (MultiLayerNetworkNode node : getSelectedMultiLayerNetworks()) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
+        }
         selectionModel.fireSelectionChanged();
     }
 
@@ -2738,6 +2748,22 @@ public class NetworkPanel extends JPanel {
                 .map(NeuronArrayNode.class::cast)
                 .map(NeuronArrayNode::getNeuronArray)
                 .collect(Collectors.toList());
+    }
+
+    public List<MultiLayerNetwork> getSourceModelMultiLayerNetworks() {
+        return sourceElements.stream()
+                .filter(MultiLayerNetworkNode.class::isInstance)
+                .map(MultiLayerNetworkNode.class::cast)
+                .map(MultiLayerNetworkNode::getNet)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArrayConnectable> getSourceModelArrayConnectables() {
+        List<ArrayConnectable> ret = new ArrayList<>();
+        ret.addAll(getSourceModelNeuronArrays());
+        ret.addAll(getSourceModelNeuronCollections());
+        ret.addAll(getSourceModelMultiLayerNetworks());
+        return ret;
     }
 
     /**
@@ -2953,6 +2979,20 @@ public class NetworkPanel extends JPanel {
             neuronArray.setX(getLastClickedPosition().getX());
             neuronArray.setY(getLastClickedPosition().getY());
             network.addNeuronArray(neuronArray);
+        }));
+        and.pack();
+        and.setLocationRelativeTo(null);
+        and.setVisible(true);
+    }
+
+    public void showMultiLayerNetworkCreationDialog() {
+        MultiLayerNetwork.CreationTemplate creationTemplate = new MultiLayerNetwork.CreationTemplate();
+        StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();
+        and.addClosingTask( () -> SwingUtilities.invokeLater(() -> {
+            Network network = getNetwork();
+            MultiLayerNetwork multiLayerNetwork = creationTemplate.create(network);
+            multiLayerNetwork.setLocation(getLastClickedPosition());
+            network.addDL4JMultiLayerNetwork(multiLayerNetwork);
         }));
         and.pack();
         and.setLocationRelativeTo(null);

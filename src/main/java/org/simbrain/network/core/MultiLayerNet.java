@@ -6,6 +6,7 @@ import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -22,22 +23,51 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A Simbrain wrapper for a DL4J {@link MultiLayerNetwork}.
+ *
+ * @see {https://deeplearning4j.org/docs/latest/deeplearning4j-nn-multilayernetwork}
+ */
 public class MultiLayerNet implements ArrayConnectable {
 
-    private org.deeplearning4j.nn.multilayer.MultiLayerNetwork network;
+    /**
+     * The main dl4j object being wrapped
+     */
+    private MultiLayerNetwork network;
 
+    /**
+     * Reference to parent network
+     */
     private Network parent;
 
+    /**
+     * Buffer for inputs to this network
+     */
     private INDArray input;
 
+    /**
+     * Reference to incoming weight matrix.
+     */
     private WeightMatrix incomingWeightMatrix;
 
+    /**
+     * Reference to outgoing weight matrix.
+     */
     private WeightMatrix outgoingWeightMatrix;
 
-    private long outputSize;
+    /**
+     * Cached size of the output layer.
+     */
+    private int outputSize;
 
+    /**
+     * Cached sizes of the layers of the network.
+     */
     private List<Integer> sizes;
 
+    /**
+     * Location of the upper-left of the network.
+     */
     private Point2D location = new Point2D.Double();
 
     /**
@@ -73,6 +103,15 @@ public class MultiLayerNet implements ArrayConnectable {
     //     network.init();
     // }
 
+    /**
+     * Construct a multi layer network from a specification of its topology. E.g. 4,3,5 is a network with 4 units in the
+     * input layer, 3 in the hidden layer, and 5 in the output layer.
+     *
+     * Note that in the dl4j terminology this would be one 4,5 dense layer, and a "5" output layer
+     *
+     * @param parent parent network
+     * @param sizes  sizes of layers
+     */
     public MultiLayerNet(Network parent, List<Integer> sizes) {
 
         if (sizes.size() < 2) {
@@ -111,42 +150,37 @@ public class MultiLayerNet implements ArrayConnectable {
 
         listBuilder
                 .layer(new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                .nOut(sizes.get(sizes.size() - 1))
-                .activation(Activation.SOFTMAX)
-                .weightInit(new UniformDistribution(0, 1))
-                .build());
+                        .nOut(sizes.get(sizes.size() - 1))
+                        .activation(Activation.SOFTMAX)
+                        .weightInit(new UniformDistribution(0, 1))
+                        .build());
 
         MultiLayerConfiguration conf = listBuilder.build();
 
-        org.deeplearning4j.nn.multilayer.MultiLayerNetwork net = new org.deeplearning4j.nn.multilayer.MultiLayerNetwork(conf);
+        MultiLayerNetwork net = new MultiLayerNetwork(conf);
         net.init();
 
         network = net;
     }
 
-    public static List<Layer> getLayerFromWeightMatrices(List<WeightMatrix> matrices) {
-        List<Layer> ret = matrices.stream().map(WeightMatrix::asLayer).collect(Collectors.toList());
-        ret.add(((NeuronArray) matrices.get(matrices.size() - 1).getTarget()).asLayer());
-        return ret;
-    }
+    //public static List<Layer> getLayerFromWeightMatrices(List<WeightMatrix> matrices) {
+    //    List<Layer> ret = matrices.stream().map(WeightMatrix::asLayer).collect(Collectors.toList());
+    //    ret.add(((NeuronArray) matrices.get(matrices.size() - 1).getTarget()).asLayer());
+    //    return ret;
+    //}
 
-    public org.deeplearning4j.nn.multilayer.MultiLayerNetwork getNetwork() {
+    public MultiLayerNetwork getNetwork() {
         return network;
     }
 
     @Override
-    public INDArray getActivationArray() {
+    public INDArray getOutputArray() {
         return network.output(input);
     }
 
     @Override
-    public void setActivationArray(INDArray activations) {
+    public void setInputArray(INDArray activations) {
         input = activations;
-    }
-
-    @Override
-    public long arraySize() {
-        return input.length();
     }
 
     public List<Integer> getSizes() {
@@ -195,7 +229,7 @@ public class MultiLayerNet implements ArrayConnectable {
     }
 
     @Override
-    public Point2D getLocation() {
+    public Point2D getAttachmentPoint() {
         return new Point2D.Double(location.getX() + 150 / 2.0, location.getY() + 50 / 2.0);
     }
 
@@ -221,6 +255,9 @@ public class MultiLayerNet implements ArrayConnectable {
         return Arrays.stream(network.getLayers()).map(l -> l.getClass().getSimpleName()).collect(Collectors.joining(", "));
     }
 
+    /**
+     * For creation using an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     */
     public static class CreationTemplate implements EditableObject {
 
         @UserParameter(

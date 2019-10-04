@@ -1,15 +1,15 @@
-package org.simbrain.network.DL4JSandbox;
+package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.core.MultiLayerNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.ScreenElement;
 
 import javax.swing.*;
 
-public class DL4JMultiLayerNetworkNode extends ScreenElement {
+public class MultiLayerNetworkNode extends ScreenElement {
 
-    private DL4JMultiLayerNetwork net;
+    private MultiLayerNetwork net;
 
     private NetworkPanel networkPanel;
 
@@ -26,7 +26,7 @@ public class DL4JMultiLayerNetworkNode extends ScreenElement {
     private PPath box;
 
 
-    public DL4JMultiLayerNetworkNode(NetworkPanel networkPanel, DL4JMultiLayerNetwork dl4jNet) {
+    public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNetwork dl4jNet) {
         super(networkPanel);
         this.net = dl4jNet;
         box = PPath.createRectangle(net.getLocation().getX(), net.getLocation().getY(), boxWidth, boxHeight);
@@ -85,7 +85,7 @@ public class DL4JMultiLayerNetworkNode extends ScreenElement {
 
     }
 
-    public DL4JMultiLayerNetwork getNet() {
+    public MultiLayerNetwork getNet() {
         return net;
     }
 }

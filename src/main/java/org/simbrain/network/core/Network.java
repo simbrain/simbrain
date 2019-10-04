@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -97,7 +96,7 @@ public class Network {
      */
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
-    private final List<DL4JMultiLayerNetwork> multiLayerNetworks = new ArrayList<>();
+    private final List<MultiLayerNetwork> multiLayerNetworks = new ArrayList<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -537,7 +536,7 @@ public class Network {
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
-    public void addDL4JMultiLayerNetwork(DL4JMultiLayerNetwork network) {
+    public void addDL4JMultiLayerNetwork(MultiLayerNetwork network) {
         multiLayerNetworks.add(network);
         changeSupport.firePropertyChange("multiLayerNetworkAdded", null, network);
     }
@@ -901,7 +900,7 @@ public class Network {
         fireGroupAdded(group);
     }
 
-    public void addMultiLayerNetwork(final DL4JMultiLayerNetwork multiLayerNetwork) {
+    public void addMultiLayerNetwork(final MultiLayerNetwork multiLayerNetwork) {
         multiLayerNetworks.add(multiLayerNetwork);
     }
 

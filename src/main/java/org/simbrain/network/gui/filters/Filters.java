@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.filters;
 
 import org.piccolo2d.PNode;
-import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetworkNode;
+import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.gui.nodes.*;
 
 /**
@@ -116,7 +116,7 @@ public final class Filters {
                     || ((node instanceof SynapseNode) && (!isGrouped(node)))
                     || ((node instanceof WeightMatrixNode) && (!isGrouped(node)))
                     || ((node instanceof NeuronArrayNode) && (!isGrouped(node)))
-                    || ((node instanceof DL4JMultiLayerNetworkNode) && (!isGrouped(node)))
+                    || ((node instanceof MultiLayerNetworkNode) && (!isGrouped(node)))
                     || ((node instanceof TextNode) && (!isGrouped(node)))
                     || (node instanceof ViewGroupNode));
         }

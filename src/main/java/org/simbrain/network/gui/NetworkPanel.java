@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
@@ -26,8 +25,8 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
-import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetworkNode;
+import org.simbrain.network.core.MultiLayerNetwork;
+import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.*;
@@ -545,7 +544,7 @@ public class NetworkPanel extends JPanel {
                 } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                     addNeuronArray((NeuronArray) evt.getNewValue());
                 } else if ("multiLayerNetworkAdded".equals(evt.getPropertyName())) {
-                    addMultiLayerNetwork((DL4JMultiLayerNetwork) evt.getNewValue());
+                    addMultiLayerNetwork((MultiLayerNetwork) evt.getNewValue());
                 } else if ("naRemoved".equals(evt.getPropertyName())) {
                     ((NeuronArray)evt.getOldValue()).fireDeleted();
                 } else if ("wmRemoved".equals(evt.getPropertyName())) {
@@ -932,8 +931,8 @@ public class NetworkPanel extends JPanel {
         repaint();
     }
 
-    private void addMultiLayerNetwork(DL4JMultiLayerNetwork multiLayerNetwork) {
-        DL4JMultiLayerNetworkNode node = new DL4JMultiLayerNetworkNode(this, multiLayerNetwork);
+    private void addMultiLayerNetwork(MultiLayerNetwork multiLayerNetwork) {
+        MultiLayerNetworkNode node = new MultiLayerNetworkNode(this, multiLayerNetwork);
         canvas.getLayer().addChild(node);
         objectNodeMap.put(multiLayerNetwork, node);
         repaint();
@@ -2031,8 +2030,8 @@ public class NetworkPanel extends JPanel {
                 ret.add(((WeightMatrixNode) e).getWeightMatrix());
             } else if (e instanceof NeuronArrayNode) {
                 ret.add(((NeuronArrayNode) e).getNeuronArray());
-            } else if (e instanceof DL4JMultiLayerNetworkNode) {
-                ret.add(((DL4JMultiLayerNetworkNode) e).getNet());
+            } else if (e instanceof MultiLayerNetworkNode) {
+                ret.add(((MultiLayerNetworkNode) e).getNet());
             } else if (e instanceof TextNode) {
                 ret.add(((TextNode) e).getTextObject());
             } else if (e instanceof InteractionBox) {

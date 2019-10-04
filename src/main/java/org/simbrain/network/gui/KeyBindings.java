@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.DL4JSandbox.DL4JMultiLayerNetwork;
+import org.simbrain.network.core.MultiLayerNetwork;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.StandardDialog;
@@ -297,8 +297,8 @@ public class KeyBindings {
         //         if (matrices.size() < 1) {
         //             return;
         //         }
-        //         List<Layer> layers = DL4JMultiLayerNetwork.getLayerFromWeightMatrices(matrices);
-        //         DL4JMultiLayerNetwork newNetwork = new DL4JMultiLayerNetwork(layers);
+        //         List<Layer> layers = MultiLayerNetwork.getLayerFromWeightMatrices(matrices);
+        //         MultiLayerNetwork newNetwork = new MultiLayerNetwork(layers);
         //
         //         System.out.println(newNetwork);
         //
@@ -332,7 +332,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("7"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                DL4JMultiLayerNetwork network = new DL4JMultiLayerNetwork(Arrays.asList(2, 1));
+                MultiLayerNetwork network = new MultiLayerNetwork(Arrays.asList(2, 1));
                 panel.getNetwork().addDL4JMultiLayerNetwork(network);
             }
         });

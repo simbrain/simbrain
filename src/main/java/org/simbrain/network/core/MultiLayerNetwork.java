@@ -1,33 +1,27 @@
-package org.simbrain.network.DL4JSandbox;
+package org.simbrain.network.core;
 
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.simbrain.network.core.ArrayConnectable;
-import org.simbrain.network.core.NeuronArray;
-import org.simbrain.network.core.WeightMatrix;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class DL4JMultiLayerNetwork implements ArrayConnectable {
+public class MultiLayerNetwork implements ArrayConnectable {
 
 
-    private MultiLayerNetwork network;
+    private org.deeplearning4j.nn.multilayer.MultiLayerNetwork network;
 
     private INDArray input;
 
@@ -39,7 +33,7 @@ public class DL4JMultiLayerNetwork implements ArrayConnectable {
 
     private Point2D location = new Point2D.Double();
 
-    // public DL4JMultiLayerNetwork(List<Layer> layers) {
+    // public MultiLayerNetwork(List<Layer> layers) {
     //     NeuralNetConfiguration.ListBuilder listBuilder = new NeuralNetConfiguration.Builder()
     //             .updater(new Sgd(0.1))
     //             .seed(1234)
@@ -67,7 +61,7 @@ public class DL4JMultiLayerNetwork implements ArrayConnectable {
     //     network.init();
     // }
 
-    public DL4JMultiLayerNetwork(List<Integer> sizes) {
+    public MultiLayerNetwork(List<Integer> sizes) {
 
         if (sizes.size() < 2) {
             throw new IllegalArgumentException("Sizes must have least 2 elements");
@@ -111,7 +105,7 @@ public class DL4JMultiLayerNetwork implements ArrayConnectable {
         return ret;
     }
 
-    public MultiLayerNetwork getNetwork() {
+    public org.deeplearning4j.nn.multilayer.MultiLayerNetwork getNetwork() {
         return network;
     }
 
@@ -192,9 +186,9 @@ public class DL4JMultiLayerNetwork implements ArrayConnectable {
         )
         private String layerSize;
 
-        public DL4JMultiLayerNetwork create() {
-            DL4JMultiLayerNetwork net =
-                    new DL4JMultiLayerNetwork(
+        public MultiLayerNetwork create() {
+            MultiLayerNetwork net =
+                    new MultiLayerNetwork(
                             Arrays.stream(layerSize.split(" "))
                                     .map(Integer::valueOf)
                                     .collect(Collectors.toList()

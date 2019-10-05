@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BackpropTrainerTest {
 
@@ -39,7 +40,8 @@ public class BackpropTrainerTest {
             trainer.iterate();
             System.out.println(trainer.getError());
             trainer.iterate();
-            System.out.println(trainer.getError());
+            // TOOD: Currently failing.  Weights are growing rapidly.
+            assertTrue(trainer.getError() < 10_000);
         } catch (Trainer.DataNotInitializedException e) {
             e.printStackTrace();
         }

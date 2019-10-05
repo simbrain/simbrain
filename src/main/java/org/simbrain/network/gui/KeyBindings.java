@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.core.MultiLayerNetwork;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.StandardDialog;
@@ -28,7 +27,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent  ;
-import java.util.Arrays;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -297,8 +295,8 @@ public class KeyBindings {
         //         if (matrices.size() < 1) {
         //             return;
         //         }
-        //         List<Layer> layers = MultiLayerNetwork.getLayerFromWeightMatrices(matrices);
-        //         MultiLayerNetwork newNetwork = new MultiLayerNetwork(layers);
+        //         List<Layer> layers = MultiLayerNet.getLayerFromWeightMatrices(matrices);
+        //         MultiLayerNet newNetwork = new MultiLayerNet(layers);
         //
         //         System.out.println(newNetwork);
         //
@@ -332,8 +330,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("7"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                MultiLayerNetwork network = new MultiLayerNetwork(Arrays.asList(2, 1));
-                panel.getNetwork().addDL4JMultiLayerNetwork(network);
+                panel.showMultiLayerNetworkCreationDialog();
             }
         });
 

@@ -96,7 +96,7 @@ public class Network {
      */
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
-    private final List<MultiLayerNetwork> multiLayerNetworks = new ArrayList<>();
+    private final List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
 
     /**
      * Since groups span all levels of the hierarchy they are stored here.
@@ -536,7 +536,7 @@ public class Network {
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
-    public void addDL4JMultiLayerNetwork(MultiLayerNetwork network) {
+    public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
         changeSupport.firePropertyChange("multiLayerNetworkAdded", null, network);
     }
@@ -611,15 +611,19 @@ public class Network {
 
     /**
      * Remove a neuron array.
-     *
-     * @param na the neuron array to remove
      */
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
         changeSupport.firePropertyChange("naRemoved", na, null);
     }
 
+    /**
+     * Remove a weight matrix
+     */
     public void removeWeightMatrix(WeightMatrix wm) {
+        if (wm == null) {
+            return;
+        }
         weightMatrices.remove(wm);
         changeSupport.firePropertyChange("wmRemoved", wm, null);
     }
@@ -898,10 +902,6 @@ public class Network {
         // Notify listeners (mainly network panel) that the group has been
         // added.
         fireGroupAdded(group);
-    }
-
-    public void addMultiLayerNetwork(final MultiLayerNetwork multiLayerNetwork) {
-        multiLayerNetworks.add(multiLayerNetwork);
     }
 
     /**

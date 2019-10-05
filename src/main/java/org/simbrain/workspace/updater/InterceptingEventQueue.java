@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.Workspace;
 
 import java.awt.*;
@@ -38,11 +38,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Matt Watson
  */
 public class InterceptingEventQueue extends EventQueue implements TaskSynchronizationManager {
-
-    /**
-     * the static logger for this class.
-     */
-    private static final Logger LOGGER = Logger.getLogger(InterceptingEventQueue.class);
 
     /**
      * The workspace this object is associated with.
@@ -115,7 +110,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
      */
     @Override
     public void runTasks() {
-        LOGGER.debug("starting runTasks");
+        Logger.debug("starting runTasks");
 
         Collection<AWTEvent> events = new ArrayList<AWTEvent>();
 
@@ -129,7 +124,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
 
         // Post all events
         for (AWTEvent event : events) {
-            LOGGER.debug("event unqueued: " + event);
+            Logger.debug("event unqueued: " + event);
             super.postEvent(event);
         }
 
@@ -138,7 +133,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
 
         this.signal = null;
 
-        LOGGER.debug("finished runTasks");
+        Logger.debug("finished runTasks");
     }
 
     /**
@@ -150,14 +145,14 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
      */
     @Override
     public void postEvent(final AWTEvent event) {
-        LOGGER.trace("event posted: " + event);
+        Logger.trace("event posted: " + event);
         if (event instanceof InvocationEvent) {
             synchronized (lock) {
                 if (paused) {
-                    LOGGER.trace("event queued: " + event);
+                    Logger.trace("event queued: " + event);
                     queue.add(new SynchronizingInvocationEvent((InvocationEvent) event, workspace, deQueueSignal));
                 } else {
-                    LOGGER.trace("event passed: " + event);
+                    Logger.trace("event passed: " + event);
                     super.postEvent(new SynchronizingInvocationEvent((InvocationEvent) event, workspace, CompletionSignal.IGNORE));
                 }
             }

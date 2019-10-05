@@ -253,6 +253,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
+        ArrayConnectable.super.fireDeleted();
         changeSupport.firePropertyChange("delete", this, null);
     }
 
@@ -331,19 +332,24 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     @Override
-    public INDArray getActivationArray() {
+    public INDArray getOutputArray() {
         return neuronArray;
     }
 
     @Override
-    public void setActivationArray(INDArray activations) {
-        setNeuronArray(activations);
-        //update();
+    public long inputSize() {
+        return neuronArray.length();
     }
 
     @Override
-    public long arraySize() {
+    public long outputSize() {
         return neuronArray.length();
+    }
+
+    @Override
+    public void setInputArray(INDArray activations) {
+        setNeuronArray(activations);
+        //update();
     }
 
     @Override
@@ -358,7 +364,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     @Override
-    public Point2D getLocation() {
+    public Point2D getAttachmentPoint() {
         return new Point2D.Double(x + 150 / 2.0, y + 50 / 2.0);
     }
 
@@ -375,16 +381,21 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         });
     }
 
-    public Layer asLayer() {
-        return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                .nOut(arraySize())
-                .activation(Activation.SOFTMAX)
-                .weightInit(new UniformDistribution(0, 1))
-                .build();
+    @Override
+    public Network getNetwork() {
+        return parent;
     }
+
+    //public Layer asLayer() {
+    //    return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+    //            .nOut(inputSize())
+    //            .activation(Activation.SOFTMAX)
+    //            .weightInit(new UniformDistribution(0, 1))
+    //            .build();
+    //}
 
     @Override
     public String toString() {
-        return "Array [" + getId() + "] with " + arraySize() + " components\n";
+        return "Array [" + getId() + "] with " + inputSize() + " components\n";
     }
 }

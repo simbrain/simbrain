@@ -11,40 +11,43 @@ import java.awt.geom.Point2D;
 public interface ArrayConnectable {
 
     /**
-     * Returns an ND4J array object representing activations.
-     *
-     * @return the activation array
+     * Set input activations.
      */
-    INDArray getActivationArray();
+    void setInputArray(INDArray activations);
 
     /**
-     * Set the activations using an ND4J array.
-     *
-     * @param activations the activations to pass in.
+     * Returns "output" activations.
      */
-    void setActivationArray(INDArray activations);
+    INDArray getOutputArray();
 
     /**
-     * Size of the activation array.
-     *
-     * @return
+     * (Possibly cached) input array size.
      */
-    long arraySize();
+    long inputSize();
 
-    default long inputSize() {
-        return arraySize();
-    }
+    /**
+     * (Possibly cached) output array size.
+     */
+    long outputSize();
 
-    default long outputSize() {
-        return arraySize();
-    }
-
+    /**
+     * Connection from another ArrayConncetable to this one.
+     */
     WeightMatrix getIncomingWeightMatrix();
 
+    /**
+     * Connection from another ArrayConncetable to this one.
+     */
     void setIncomingWeightMatrix(WeightMatrix weightMatrix);
 
+    /**
+     * Connection from this ArrayConncetable to another one
+     */
     WeightMatrix getOutgoingWeightMatrix();
 
+    /**
+     * Connection from this ArrayConncetable to another one
+     */
     void setOutgoingWeightMatrix(WeightMatrix weightMatrix);
 
     /**
@@ -52,20 +55,29 @@ public interface ArrayConnectable {
      */
     String getId();
 
+    /**
+     * Set the upper-left location of this object.
+     */
     void setLocation(Point2D location);
 
     /**
-     * Get an location of this object where a {@link WeightMatrix} will connect to.
-     *
-     * @return a location of this object
+     * Get a graphical attachment point for this object, where the line representing a {@link WeightMatrix} will attach.
      */
-    Point2D getLocation();
+    Point2D getAttachmentPoint();
 
     /**
      * Register a callback function to run when the location of this object is updated.
-     *
-     * @param task a callback function
      */
     void onLocationChange(Runnable task);
+
+    Network getNetwork();
+
+    /**
+     * Call this when deleting the object.
+     */
+    default void fireDeleted() {
+        getNetwork().removeWeightMatrix(getIncomingWeightMatrix());
+        getNetwork().removeWeightMatrix(getOutgoingWeightMatrix());
+    };
 
 }

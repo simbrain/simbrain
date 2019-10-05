@@ -9,7 +9,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -115,7 +114,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
      * result to target.
      */
     public void update() {
-        target.setActivationArray(source.getActivationArray().mmul(weightMatrix));
+        target.setInputArray(source.getOutputArray().mmul(weightMatrix));
     }
 
     /**
@@ -186,6 +185,8 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
+        source.setOutgoingWeightMatrix(null);
+        target.setIncomingWeightMatrix(null);
         changeSupport.firePropertyChange("delete", this, null);
     }
 
@@ -197,11 +198,11 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
         changeSupport.firePropertyChange("updated", null , null);
     }
 
-    public Layer asLayer() {
-        return new DenseLayer.Builder().nIn(source.arraySize()).nOut(target.arraySize())
-                .activation(Activation.SOFTMAX)
-                // random initialize weights with values between 0 and 1
-                .weightInit(new UniformDistribution(0, 1))
-                .build();
-    }
+    //public Layer asLayer() {
+    //    return new DenseLayer.Builder().nIn(source.arraySize()).nOut(target.arraySize())
+    //            .activation(Activation.SOFTMAX)
+    //            // random initialize weights with values between 0 and 1
+    //            .weightInit(new UniformDistribution(0, 1))
+    //            .build();
+    //}
 }

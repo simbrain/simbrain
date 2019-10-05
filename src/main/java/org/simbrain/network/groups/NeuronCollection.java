@@ -138,6 +138,7 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     public void delete() {
         changeSupport.firePropertyChange("delete", this, null);
         parentNetwork.removePropertyChangeListener(networkListener);
+        fireDeleted();
     }
 
     /**
@@ -726,7 +727,7 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     }
 
     @Override
-    public Point2D getLocation() {
+    public Point2D getAttachmentPoint() {
         return getPosition();
     }
 
@@ -739,6 +740,10 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
         });
     }
 
+    @Override
+    public Network getNetwork() {
+        return parentNetwork;
+    }
 
     /**
      * Set input values of neurons using an array of doubles. Assumes the order
@@ -829,7 +834,7 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     }
 
     @Override
-    public INDArray getActivationArray() {
+    public INDArray getOutputArray() {
         float[] floatActivation = new float[getActivations().length];
         // Potential performance cost, but no clear way around this
         for (int i = 0; i < getActivations().length; i++) {
@@ -840,12 +845,18 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     }
 
     @Override
-    public void setActivationArray(INDArray activations) {
-        setActivations(activations.toDoubleVector());
+    public long inputSize() {
+        return neuronList.size();
     }
 
     @Override
-    public long arraySize() {
+    public long outputSize() {
         return neuronList.size();
     }
+
+    @Override
+    public void setInputArray(INDArray activations) {
+        setActivations(activations.toDoubleVector());
+    }
+
 }

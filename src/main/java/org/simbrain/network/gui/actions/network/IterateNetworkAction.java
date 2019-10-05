@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.actions.network;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
 
@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
  * Iterate network action.
  */
 public final class IterateNetworkAction extends AbstractAction {
-    Logger LOGGER = Logger.getLogger(IterateNetworkAction.class);
 
     /**
      * Network panel.
@@ -61,7 +60,7 @@ public final class IterateNetworkAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        LOGGER.debug("actionPerformed called");
+        Logger.debug("actionPerformed called");
         networkPanel.getNetwork().setOneOffRun(true);
         networkPanel.getNetwork().update();
         networkPanel.getNetwork().setOneOffRun(false);

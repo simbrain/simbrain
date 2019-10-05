@@ -3,7 +3,6 @@ package org.simbrain.network.gui.nodes;
 import org.nd4j.linalg.factory.Nd4j;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.ArrayConnectable;
 import org.simbrain.network.core.WeightMatrix;
@@ -19,7 +18,6 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
-import umontreal.iro.lecuyer.simevents.Sim;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,7 +86,7 @@ public class WeightMatrixNode extends ScreenElement {
         this.weightMatrix = wm;
         ArrayConnectable source = wm.getSource();
         ArrayConnectable target = wm.getTarget();
-        line2D = new Line2D.Double(source.getLocation(), target.getLocation());
+        line2D = new Line2D.Double(source.getAttachmentPoint(), target.getAttachmentPoint());
         line = new PPath.Double(line2D);
         source.onLocationChange(() -> {
             updateImageBoxLocation();
@@ -126,7 +124,7 @@ public class WeightMatrixNode extends ScreenElement {
         ArrayConnectable source = weightMatrix.getSource();
         ArrayConnectable target = weightMatrix.getTarget();
         removeChild(line);
-        line2D.setLine(source.getLocation(), target.getLocation());
+        line2D.setLine(source.getAttachmentPoint(), target.getAttachmentPoint());
         line = new PPath.Double(line2D);
         line.setStroke(new BasicStroke(3.0f));
         addChild(line);

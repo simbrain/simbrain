@@ -18,19 +18,12 @@
  */
 package org.simbrain.util.projection;
 
-import org.apache.log4j.Logger;
-
 /**
  * <b>ProjectionMethod</b> is a superclass for all specific projection
  * algorithms used. by the projector. Subclasses correspond to different
  * dimensionality reduction techniques.
  */
 public abstract class ProjectionMethod {
-
-    /**
-     * Logger.
-     */
-    private transient Logger logger = Logger.getLogger(ProjectionMethod.class);
 
     /**
      * Reference to parent projector.

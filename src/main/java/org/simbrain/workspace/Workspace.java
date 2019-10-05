@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace;
 
-import org.apache.log4j.Logger;
+import org.pmw.tinylog.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
@@ -64,11 +64,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Tim Shea
  */
 public class Workspace {
-
-    /**
-     * The static logger for this class.
-     */
-    private static transient final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /**
      * List of workspace components.
@@ -202,7 +197,7 @@ public class Workspace {
      * @param component The component to add.
      */
     public void addWorkspaceComponent(final WorkspaceComponent component) {
-        LOGGER.debug("adding component: " + component);
+        Logger.debug("adding component: " + component);
         componentList.add(component);
         component.setWorkspace(this);
         component.setChangedSinceLastSave(false);
@@ -236,7 +231,7 @@ public class Workspace {
      * @param component The component to remove.
      */
     public void removeWorkspaceComponent(final WorkspaceComponent component) {
-        LOGGER.debug("removing component: " + component);
+        Logger.debug("removing component: " + component);
 
         // Remove all couplings associated with this component
         // this.getCouplingManager().removeCouplings(component);

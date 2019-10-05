@@ -1,15 +1,18 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.nodes.PPath;
-import org.simbrain.network.core.MultiLayerNetwork;
+import org.piccolo2d.nodes.PText;
+import org.simbrain.network.core.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.ScreenElement;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.stream.Collectors;
 
 public class MultiLayerNetworkNode extends ScreenElement {
 
-    private MultiLayerNetwork net;
+    private MultiLayerNet net;
 
     private NetworkPanel networkPanel;
 
@@ -23,16 +26,48 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     private final float boxHeight = 50;
 
+    /**
+     * Text showing info about the array.
+     */
+    private PText infoText;
+
+    /**
+     * Font for info text.
+     */
+    public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 8);
+
     private PPath box;
 
 
-    public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNetwork dl4jNet) {
+    public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNet dl4jNet) {
         super(networkPanel);
         this.net = dl4jNet;
-        box = PPath.createRectangle(net.getLocation().getX(), net.getLocation().getY(), boxWidth, boxHeight);
+
+        box = PPath.createRectangle(0, 0, boxWidth, boxHeight);
         addChild(box);
         setPickable(true);
         this.setBounds(box.getFullBounds());
+
+        // Info text
+        infoText = new PText();
+        infoText.setFont(INFO_FONT);
+        addChild(infoText);
+        infoText.offset(8, 8);
+        updateInfoText();
+
+        pushViewPositionToModel();
+    }
+
+    /**
+     * Update status text.
+     */
+    private void updateInfoText() {
+        infoText.setText(
+                "Layer Sizes:\n" + net.getSizes()
+                        .stream()
+                        .map(Number::toString)
+                        .collect(Collectors.joining(", "))
+        );
     }
 
     @Override
@@ -85,7 +120,22 @@ public class MultiLayerNetworkNode extends ScreenElement {
 
     }
 
-    public MultiLayerNetwork getNet() {
+    /**
+     * Update the position of the model neuron based on the global coordinates
+     * of this pnode.
+     */
+    public void pushViewPositionToModel() {
+        Point2D p = this.getGlobalTranslation();
+        net.setLocation(p);
+    }
+
+    @Override
+    public void offset(double dx, double dy) {
+        super.offset(dx, dy);
+        pushViewPositionToModel();
+    }
+
+    public MultiLayerNet getNet() {
         return net;
     }
 }

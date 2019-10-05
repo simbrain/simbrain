@@ -79,10 +79,10 @@ public class LayeredNetworkCreationPanel extends JPanel {
     static {
         DEFAULT_NEURON_TYPES.put("Linear", new LinearRule());
         SigmoidalRule sig0 = new SigmoidalRule();
-        sig0.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
+        sig0.setSquashFunctionType(SquashingFunctionEnum.ARCTAN);
         DEFAULT_NEURON_TYPES.put("Logistic", sig0);
         SigmoidalRule sig1 = new SigmoidalRule();
-        sig1.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
+        sig1.setSquashFunctionType(SquashingFunctionEnum.ARCTAN);
         DEFAULT_NEURON_TYPES.put("Logistic", sig1);
     }
 

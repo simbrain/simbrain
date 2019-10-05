@@ -40,8 +40,11 @@ public class BackpropTrainerTest {
             trainer.iterate();
             System.out.println(trainer.getError());
             trainer.iterate();
-            // TOOD: Currently failing.  Weights are growing rapidly.
+            // Make sure things don't blow up
             assertTrue(trainer.getError() < 10_000);
+
+            // TODO: Test that training actually converges.
+            // TODO: Test for different types of sigmoid, etc.
         } catch (Trainer.DataNotInitializedException e) {
             e.printStackTrace();
         }

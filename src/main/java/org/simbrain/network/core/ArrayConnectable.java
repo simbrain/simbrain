@@ -67,9 +67,17 @@ public interface ArrayConnectable {
 
     /**
      * Register a callback function to run when the location of this object is updated.
-     *
-     * @param task a callback function
      */
     void onLocationChange(Runnable task);
+
+    Network getNetwork();
+
+    /**
+     * Call this when deleting the object.
+     */
+    default void fireDeleted() {
+        getNetwork().removeWeightMatrix(getIncomingWeightMatrix());
+        getNetwork().removeWeightMatrix(getOutgoingWeightMatrix());
+    };
 
 }

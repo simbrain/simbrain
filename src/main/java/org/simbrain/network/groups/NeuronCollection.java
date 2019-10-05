@@ -138,6 +138,7 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     public void delete() {
         changeSupport.firePropertyChange("delete", this, null);
         parentNetwork.removePropertyChangeListener(networkListener);
+        fireDeleted();
     }
 
     /**
@@ -739,6 +740,10 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
         });
     }
 
+    @Override
+    public Network getNetwork() {
+        return parentNetwork;
+    }
 
     /**
      * Set input values of neurons using an array of doubles. Assumes the order

@@ -611,15 +611,19 @@ public class Network {
 
     /**
      * Remove a neuron array.
-     *
-     * @param na the neuron array to remove
      */
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
         changeSupport.firePropertyChange("naRemoved", na, null);
     }
 
+    /**
+     * Remove a weight matrix
+     */
     public void removeWeightMatrix(WeightMatrix wm) {
+        if (wm == null) {
+            return;
+        }
         weightMatrices.remove(wm);
         changeSupport.firePropertyChange("wmRemoved", wm, null);
     }

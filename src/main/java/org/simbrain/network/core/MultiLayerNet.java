@@ -169,7 +169,8 @@ public class MultiLayerNet implements ArrayConnectable {
     //    return ret;
     //}
 
-    public MultiLayerNetwork getNetwork() {
+
+    public MultiLayerNetwork getMultiLayernet() {
         return network;
     }
 
@@ -240,6 +241,11 @@ public class MultiLayerNet implements ArrayConnectable {
                 task.run();
             }
         });
+    }
+
+    @Override
+    public Network getNetwork() {
+        return parent;
     }
 
     public void fireLocationChange() {

@@ -185,6 +185,8 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
+        source.setOutgoingWeightMatrix(null);
+        target.setIncomingWeightMatrix(null);
         changeSupport.firePropertyChange("delete", this, null);
     }
 

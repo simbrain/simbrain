@@ -253,6 +253,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
+        ArrayConnectable.super.fireDeleted();
         changeSupport.firePropertyChange("delete", this, null);
     }
 
@@ -378,6 +379,11 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
                 task.run();
             }
         });
+    }
+
+    @Override
+    public Network getNetwork() {
+        return parent;
     }
 
     //public Layer asLayer() {

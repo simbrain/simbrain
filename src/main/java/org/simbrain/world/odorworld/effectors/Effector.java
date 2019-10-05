@@ -24,6 +24,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
+import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -155,6 +156,15 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
 
     @Override
     public abstract Effector copy();
+
+    /**
+     * Perform initialization of objects after de-serializing.
+     * Called when odor world is de-serialized.  Effectors should override
+     * if needed.
+     */
+    public void postSerializationInit() {
+    }
+
 
     public static class EffectorCreator implements EditableObject {
 

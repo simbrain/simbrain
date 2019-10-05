@@ -202,6 +202,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.threshold = threshold;
     }
 
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }
@@ -222,6 +223,12 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
 
     public void setCharactersPerRow(int charactersPerRow) {
         this.charactersPerRow = charactersPerRow;
+    }
+
+    @Override
+    public void postSerializationInit() {
+        changeSupport = new PropertyChangeSupport(this);
+        super.postSerializationInit();
     }
 
     @Override

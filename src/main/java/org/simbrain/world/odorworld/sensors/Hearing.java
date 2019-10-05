@@ -170,6 +170,12 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         }
     }
 
+    @Override
+    public void postSerializationInit() {
+        changeSupport = new PropertyChangeSupport(this);
+        super.postSerializationInit();
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }

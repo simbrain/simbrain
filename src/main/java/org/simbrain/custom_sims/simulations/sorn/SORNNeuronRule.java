@@ -19,14 +19,14 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     /** The noise generating randomizer. */
     private ProbabilityDistribution noiseGenerator =
             NormalDistribution.builder()
-                    .standardDeviation(0.05)
+                    .standardDeviation(0.05).mean(0)
                 .build();
 
     /** Whether or not to add noise to the inputs . */
     private boolean addNoise;
 
     /** The target rate. */
-    private double hIP = 0.1;
+    private double hIP = 0.01;
 
     /** The learning rate for homeostatic plasticity. */
     private double etaIP = 0.001;
@@ -77,9 +77,9 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
      */
     public void plasticUpdate(Neuron neuron) {
         setThreshold(getThreshold() + (etaIP * ((neuron.isSpike()?1:0) - hIP)));
-        if (getThreshold() > maxThreshold) {
-            setThreshold(maxThreshold);
-        }
+//        if (getThreshold() > maxThreshold) {
+//            setThreshold(maxThreshold);
+//        }
     }
     
     public void init(Neuron n) {

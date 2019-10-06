@@ -77,11 +77,11 @@ public class SORN extends RegisteredSimulation {
         ArrayList<Neuron> neurons = new ArrayList<>();
         ArrayList<Neuron> inhibitoryNeurons = new ArrayList<>();
         SORNNeuronRule sornRule = new SORNNeuronRule();
-        sornRule.sethIP(400.0/numNeurons);
+      //  sornRule.sethIP(400.0/numNeurons);
         for (int i = 0; i < numNeurons; i++) {
             Neuron n = new Neuron(network);
-            sornRule.setMaxThreshold(0.5);
-            sornRule.setThreshold(0.5 * Math.random() + 0.01);
+         //   sornRule.setMaxThreshold(0.5);
+         //   sornRule.setThreshold(0.5 * Math.random() + 0.01);
             sornRule.setRefractoryPeriod(1);
             sornRule.setAddNoise(true);
             n.setPolarity(Polarity.EXCITATORY);
@@ -91,7 +91,7 @@ public class SORN extends RegisteredSimulation {
         SORNNeuronRule str = new SORNNeuronRule();
         for (int i = 0; i < (int) (numNeurons * 0.2); i++) {
             Neuron n = new Neuron(network);
-            str.setThreshold(0.8 * Math.random() + 0.01);
+           // str.setThreshold(0.8 * Math.random() + 0.01);
             str.setEtaIP(0); // No Homeostatic Plasticity
             str.setRefractoryPeriod(1);
             str.setAddNoise(true);

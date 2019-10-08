@@ -20,6 +20,8 @@ package org.simbrain.network.groups;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.core.*;
+import org.simbrain.network.dl4j.ArrayConnectable;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;

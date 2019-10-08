@@ -1,13 +1,11 @@
 package org.simbrain.network.gui.dialogs.dl4j;
 
-import org.simbrain.network.core.MultiLayerNet;
-import org.simbrain.network.core.Network;
+import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class MultiLayerNetCreationDialog extends StandardDialog {
 

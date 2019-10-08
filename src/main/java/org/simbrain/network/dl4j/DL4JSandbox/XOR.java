@@ -1,4 +1,4 @@
-package org.simbrain.network.DL4JSandbox;
+package org.simbrain.network.dl4j.DL4JSandbox;
 
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;

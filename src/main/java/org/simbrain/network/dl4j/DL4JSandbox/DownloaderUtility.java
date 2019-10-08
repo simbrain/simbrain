@@ -1,4 +1,4 @@
-package org.simbrain.network.DL4JSandbox;
+package org.simbrain.network.dl4j.DL4JSandbox;
 
 /*******************************************************************************
  * Copyright (c) 2015-2019 Skymind, Inc.

@@ -19,6 +19,10 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.connections.ConnectionStrategy;
+import org.simbrain.network.dl4j.ArrayConnectable;
+import org.simbrain.network.dl4j.MultiLayerNet;
+import org.simbrain.network.dl4j.NeuronArray;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;

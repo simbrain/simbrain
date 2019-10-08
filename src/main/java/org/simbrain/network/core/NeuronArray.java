@@ -10,6 +10,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -123,7 +125,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Consumable()
     public void setValues(double[] values) {
-        neuronArray = Nd4j.create(values).reshape(neuronArray.rows(), neuronArray.columns());
+        float[] floatValues = Utils.castToFloat(values);
+        neuronArray = Nd4j.create(floatValues).reshape(neuronArray.rows(), neuronArray.columns());
     }
 
     @Producible()

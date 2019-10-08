@@ -157,6 +157,7 @@ public class HistogramModel implements AttributeContainer {
      * @param index    data index
      * @param histData the data to add at that index
      */
+    @Consumable()
     public void addData(double[] histData, Integer index) {
         data.remove(index.intValue());
         data.add(index.intValue(), histData);
@@ -265,25 +266,20 @@ public class HistogramModel implements AttributeContainer {
         return dataSet.getDataSeries();
     }
 
-    /**
-     * @return the dataNames
-     */
     public List<String> getDataNames() {
         return dataNames;
     }
 
-    /**
-     * @return the bins
-     */
     public int getBins() {
         return bins;
     }
 
-    /**
-     * @return the dataSet
-     */
     public IntervalXYDataset getDataSet() {
         return dataSet;
     }
 
+    @Override
+    public String getId() {
+        return "Histogram";
+    }
 }

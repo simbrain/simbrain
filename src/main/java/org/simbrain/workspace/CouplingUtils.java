@@ -187,7 +187,8 @@ public abstract class CouplingUtils {
     public static Consumer<?> getConsumer(AttributeContainer container, Method method) {
         Consumable annotation = method.getAnnotation(Consumable.class);
         if (annotation == null) {
-            throw new IllegalArgumentException(String.format("Method %s is not consumable.", method.getName()));
+            throw new IllegalArgumentException(String.format("Method %s in class %s is not consumable.",
+                    method.getName(), method.getDeclaringClass().getSimpleName()));
         }
 
         return Consumer.builder(container, method)

@@ -110,5 +110,9 @@ public class PieChartModel implements AttributeContainer, EditableObject {
         this.sliceNames = names;
     }
 
+    @Override
+    public String getId() {
+        return "Pie Chart";
+    }
 
 }

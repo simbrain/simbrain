@@ -221,4 +221,10 @@ public class ProjectionModel implements AttributeContainer {
         return isUpdateCompleted;
     }
 
+
+    @Override
+    public String getId() {
+        return "Projection";
+    }
+
 }

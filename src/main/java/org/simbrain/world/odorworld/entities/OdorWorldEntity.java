@@ -714,9 +714,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         motionEventListeners = new ArrayList<>();
         collisionEventHandlers = new ArrayList<>();
         currentlyHeardPhrases = new ArrayList<>();
-        for(Sensor sensor : sensors) {
-            sensor.postSerializationInit();
-        }
+        sensors.forEach(Sensor::postSerializationInit);
+        effectors.forEach(Effector::postSerializationInit);
     }
 
     public List<Sensor> getSensors() {

@@ -346,6 +346,7 @@ public class BackpropTrainer extends IterableTrainer {
             netInput.addi(biasVec);
             // Apply the transfer function to net input to get the activation values for the next layer and store
             // that value in the activations vector, also calculate derivatives.
+            // TODO Below leads to blow up in derivs when using logistic activation function
             updateRules.get(layerIndex).applyFunctionAndDerivative(netInput, activations, derivatives);
             layerIndex++;
         }

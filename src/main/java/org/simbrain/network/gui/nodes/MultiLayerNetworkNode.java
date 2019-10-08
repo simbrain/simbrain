@@ -63,7 +63,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     private void updateInfoText() {
         infoText.setText(
-                "Layer Sizes:\n" + net.getSizes()
+                "Layer Sizes:\n" + net.getTopology()
                         .stream()
                         .map(Number::toString)
                         .collect(Collectors.joining(", "))

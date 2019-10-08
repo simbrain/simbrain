@@ -307,7 +307,7 @@ public class SquashingFunctions {
     public static void logisticWithDerivative(INDArray in, INDArray out, INDArray deriv, double ceil, double floor, double slope) {
         logistic(in, out, ceil, floor, slope);
         // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
-        out.rsubi(ceil, deriv);
+        out.rsubi(ceil, deriv); // <-- main source of blowup
         out.subi(floor);
         deriv.muli(out).muli((4 * slope) / ((ceil - floor) * (ceil - floor)));
         // Restore out after calculating the derivative

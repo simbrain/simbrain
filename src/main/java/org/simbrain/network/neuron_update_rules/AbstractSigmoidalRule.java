@@ -36,7 +36,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * The default squashing function, informs the default upper and lower bounds.
      */
-    public static final SquashingFunctionEnum DEFAULT_SQUASHING_FUNCTION = SquashingFunctionEnum.LOGISTIC;
+    public static final SquashingFunctionEnum DEFAULT_SQUASHING_FUNCTION = SquashingFunctionEnum.ARCTAN;
 
     /**
      * The Default upper bound.

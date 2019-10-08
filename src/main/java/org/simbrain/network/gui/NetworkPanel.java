@@ -26,6 +26,7 @@ import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.MultiLayerNet;
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
 import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.*;
@@ -2986,17 +2987,10 @@ public class NetworkPanel extends JPanel {
     }
 
     public void showMultiLayerNetworkCreationDialog() {
-        MultiLayerNet.CreationTemplate creationTemplate = new MultiLayerNet.CreationTemplate();
-        StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();
-        and.addClosingTask( () -> SwingUtilities.invokeLater(() -> {
-            Network network = getNetwork();
-            MultiLayerNet multiLayerNetwork = creationTemplate.create(network);
-            multiLayerNetwork.setLocation(getLastClickedPosition());
-            network.addDL4JMultiLayerNetwork(multiLayerNetwork);
-        }));
-        and.pack();
-        and.setLocationRelativeTo(null);
-        and.setVisible(true);
+        MultiLayerNetCreationDialog mlncd = new MultiLayerNetCreationDialog(this);
+        mlncd.pack();
+        mlncd.setLocationRelativeTo(null);
+        mlncd.setVisible(true);
     }
 
     public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {

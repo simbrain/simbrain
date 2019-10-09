@@ -21,6 +21,7 @@ package org.simbrain.network.gui.trainer;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
@@ -45,17 +46,12 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * Reference to trainer object.
      */
-    private IterableTrainer trainer;
+    private IterableTrainerTemp trainer;
 
     /**
      * Current number of iterations.
      */
     private JLabel iterationsLabel = new JLabel("--- ");
-
-    /**
-     * Reference to network panel.
-     */
-    private final NetworkPanel panel;
 
     /** Flag for showing updates in GUI. */
     //private final JCheckBox showUpdates = new JCheckBox("Show updates");
@@ -98,15 +94,14 @@ public class IterativeControlsPanel extends JPanel {
      */
     private Action setPropertiesAction = Utils.createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
 
+
     /**
      * Construct the panel.
      *
-     * @param networkPanel the parent network panel
      * @param trainer      the trainer this panel represents
      */
-    public IterativeControlsPanel(NetworkPanel networkPanel, IterableTrainer trainer) {
+    public IterativeControlsPanel(IterableTrainerTemp trainer) {
         this.trainer = trainer;
-        this.panel = networkPanel;
 
         //setBorder(BorderFactory.createTitledBorder("Controls"));
 
@@ -155,8 +150,8 @@ public class IterativeControlsPanel extends JPanel {
         propsBox.add(Box.createVerticalStrut(20));
 
         // Time series for error
-        ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
-        propsBox.add(graphPanel);
+        //ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
+        //propsBox.add(graphPanel);
 
         add(propsBox);
         addErrorListener();
@@ -196,19 +191,19 @@ public class IterativeControlsPanel extends JPanel {
     protected void initTrainer(boolean forceReinit) {
     }
 
-    /**
-     * @return the trainer
-     */
-    public IterableTrainer getTrainer() {
-        return trainer;
-    }
-
-    /**
-     * @param trainer the trainer to set
-     */
-    public void setTrainer(IterableTrainer trainer) {
-        this.trainer = trainer;
-    }
+    ///**
+    // * @return the trainer
+    // */
+    //public IterableTrainer getTrainer() {
+    //    return trainer;
+    //}
+    //
+    ///**
+    // * @param trainer the trainer to set
+    // */
+    //public void setTrainer(IterableTrainer trainer) {
+    //    this.trainer = trainer;
+    //}
 
     private void run() {
         if (trainer.isUpdateCompleted()) {
@@ -237,7 +232,7 @@ public class IterativeControlsPanel extends JPanel {
 
     private void stopRunning() {
         trainer.setUpdateCompleted(true);
-        trainer.revalidateSynapseGroups();
+        //trainer.revalidateSynapseGroups();
         trainer.commitChanges();
     }
 
@@ -245,7 +240,7 @@ public class IterativeControlsPanel extends JPanel {
         initTrainer(false);
         try {
             trainer.iterate();
-            trainer.revalidateSynapseGroups();
+            //trainer.revalidateSynapseGroups();
         } catch (DataNotInitializedException e) {
             JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
         }

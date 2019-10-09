@@ -4,16 +4,38 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetTrainerDialog;
+import org.simbrain.network.gui.trainer.IterativeControlsPanel;
+import org.simbrain.util.ResourceManager;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.stream.Collectors;
 
+/**
+ * GUI representation of dl4j network.
+ */
 public class MultiLayerNetworkNode extends ScreenElement {
 
+    /**
+     * The dl4j being represented.
+     */
     private MultiLayerNet net;
 
+    /**
+     * Parent panel.
+     */
     private NetworkPanel networkPanel;
 
     /**
@@ -97,12 +119,72 @@ public class MultiLayerNetworkNode extends ScreenElement {
 
     @Override
     protected boolean hasContextMenu() {
-        return false;
+        return true;
     }
 
     @Override
     protected JPopupMenu getContextMenu() {
-        return null;
+
+        JPopupMenu contextMenu = new JPopupMenu();
+
+        contextMenu.add(new CutAction(getNetworkPanel()));
+        contextMenu.add(new CopyAction(getNetworkPanel()));
+        contextMenu.add(new PasteAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        // Edit Submenu
+        Action editArray = new AbstractAction("Edit...") {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                //StandardDialog dialog = getArrayDialog();
+                //dialog.setVisible(true);
+            }
+        };
+        contextMenu.add(editArray);
+        contextMenu.add(new DeleteAction(getNetworkPanel()));
+
+        //contextMenu.addSeparator();
+        //Action randomizeAction = new AbstractAction("Randomize") {
+        //
+        //    {
+        //        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+        //        putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
+        //    }
+        //
+        //    @Override
+        //    public void actionPerformed(final ActionEvent event) {
+        //        neuronArray.randomize();
+        //    }
+        //};
+        //contextMenu.add(randomizeAction);
+
+        contextMenu.addSeparator();
+        Action trainAction = new AbstractAction("Train...") {
+
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Properties.png"));
+                putValue(SHORT_DESCRIPTION, "Train multi layer network");
+            }
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                MultiLayerNetTrainerDialog trainerDialog = new MultiLayerNetTrainerDialog(net);
+                trainerDialog.pack();
+                trainerDialog.setLocationRelativeTo(null);
+                trainerDialog.setVisible(true);
+            }
+        };
+        contextMenu.add(trainAction);
+        //contextMenu.addSeparator();
+
+        // Coupling menu
+        //contextMenu.addSeparator();
+        //JMenu couplingMenu = networkPanel.getCouplingMenu(neuronArray);
+        //if (couplingMenu != null) {
+        //    contextMenu.add(couplingMenu);
+        //}
+
+        return contextMenu;
     }
 
     @Override

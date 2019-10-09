@@ -14,6 +14,10 @@ import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.pmw.tinylog.Logger;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.trainers.ErrorListener;
+import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.IterableTrainerTemp;
+import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -29,7 +33,7 @@ import java.util.stream.Collectors;
  *
  * @see {https://deeplearning4j.org/docs/latest/deeplearning4j-nn-multilayernetwork}
  */
-public class MultiLayerNet implements ArrayConnectable {
+public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
 
     /**
      * The main dl4j object being wrapped
@@ -228,6 +232,51 @@ public class MultiLayerNet implements ArrayConnectable {
     @Override
     public String toString() {
         return Arrays.stream(network.getLayers()).map(l -> l.getClass().getSimpleName()).collect(Collectors.joining(", "));
+    }
+
+    @Override
+    public void removeErrorListener(ErrorListener errorListener) {
+
+    }
+
+    @Override
+    public int getIteration() {
+        return 0;
+    }
+
+    @Override
+    public void addErrorListener(ErrorListener e) {
+
+    }
+
+    @Override
+    public double getError() {
+        return 0;
+    }
+
+    @Override
+    public boolean isUpdateCompleted() {
+        return false;
+    }
+
+    @Override
+    public void setUpdateCompleted(boolean b) {
+
+    }
+
+    @Override
+    public void iterate() throws Trainer.DataNotInitializedException {
+
+    }
+
+    @Override
+    public void commitChanges() {
+
+    }
+
+    @Override
+    public void randomize() {
+
     }
 
     // TODO: Separate class?

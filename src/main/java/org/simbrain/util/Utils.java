@@ -815,4 +815,20 @@ public class Utils {
         return ret;
     }
 
+    /**
+     * Flatten a 2d matrix to 1d.
+     *
+     * @param toFlatten matrix to flatten
+     * @return flattened matrix
+     */
+    public static double[] flatten(double toFlatten[][]) {
+        double[] newArray = new double[toFlatten.length * toFlatten[0].length ];
+        for (int i = 0; i < toFlatten.length; i++) {
+            for (int j = 0; j < toFlatten[0].length; j++) {
+                newArray[i * toFlatten[0].length + j] = toFlatten[i][j];
+            }
+        }
+        return newArray;
+    }
+
 }

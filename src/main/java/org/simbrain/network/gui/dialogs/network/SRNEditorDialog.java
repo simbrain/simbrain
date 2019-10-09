@@ -66,7 +66,7 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
 
         // Trainer tab
         trainer = new SRNTrainer(srn);
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
+        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(trainer);
         addTab("Train", iterativeControls);
 
         // Set up help

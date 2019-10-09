@@ -68,9 +68,6 @@ public class XOR {
         labels.putScalar(new int[]{3, 0}, 1);
         labels.putScalar(new int[]{3, 1}, 0);
 
-        // create dataset object
-        DataSet ds = new DataSet(input, labels);
-
         log.info("Network configuration and training...");
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -116,6 +113,9 @@ public class XOR {
         // C&P from LSTMCharModellingExample
         // Print the number of parameters in the network (and for each layer)
         System.out.println(net.summary());
+
+        // create dataset object
+        DataSet ds = new DataSet(input, labels);
 
         // here the actual learning takes place
         for (int i = 0; i < nEpochs; i++) {

@@ -112,7 +112,7 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         trainerContainer.removeAll();
         if (selectType.getSelectedIndex() == 0) {
             trainer = new LMSIterative(lms);
-            IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
+            IterativeControlsPanel iterativeControls = new IterativeControlsPanel(trainer);
             trainerContainer.add(iterativeControls, BorderLayout.CENTER);
             trainerContainer.setPreferredSize(iterativeControls.getPreferredSize());
         } else {

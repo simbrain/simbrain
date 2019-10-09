@@ -59,7 +59,7 @@ public class IterativeTrainingPanel extends JPanel {
      */
     public IterativeTrainingPanel(final NetworkPanel networkPanel, final IterableTrainer trainer) {
 
-        iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
+        iterativeControls = new IterativeControlsPanel(trainer);
 
         // Training Set Panel
         if (trainer != null) {

@@ -44,7 +44,6 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     // TODO: Is this needed? Are there choices?
     private IterableTrainer currentTrainer;
 
-
     /**
      * An update action to update the backprop trainer when the network is updated.
      */
@@ -92,7 +91,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         // Trainer tab
         currentTrainer = new BackpropTrainer(backprop);
         networkPanel.getNetwork().getUpdateManager().addAction(updater);
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(networkPanel, currentTrainer);
+        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(currentTrainer);
         addTab("Train", iterativeControls);
         addWindowListener(new WindowAdapter() {
             @Override

@@ -25,6 +25,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -69,6 +70,28 @@ public class DataPanel extends JPanel {
      * The toolbar panel.
      */
     protected JPanel toolbars;
+
+    //TODO
+    // This was done quickly and it's not clear it's taking advantage of the dl4j dataset's features
+    public DataPanel(final NumericMatrix dataHolder, int numNeurons, final int numVisibleColumns, final String name) {
+        this.dataHolder = dataHolder;
+        this.inputNeurons = Collections.EMPTY_LIST;
+        // If no data exists, create it!
+        if (dataHolder.getData() == null) {
+            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, numNeurons));
+        } else {
+            table = SimbrainJTable.createTable(new NumericTable(dataHolder.getData()));
+        }
+
+        // Set up scrollbar
+        scroller = new SimbrainJTableScrollPanel(table);
+        scroller.setMinimumSize(new Dimension(200, 500));
+        scroller.setMaxVisibleColumns(numVisibleColumns);
+
+        setLayout(new BorderLayout());
+        add("Center", scroller);
+
+    }
 
     /**
      * Panel which represents input or target data. Can be created without data

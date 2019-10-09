@@ -79,7 +79,7 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
 
     private WeightMatrix incomingWeightMatrix;
 
-    private WeightMatrix outgoingWeightMatrix;
+    private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
     /**
      * Support for property change events.
@@ -224,12 +224,18 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
     }
 
     @Override
-    public WeightMatrix getOutgoingWeightMatrix() {
-        return outgoingWeightMatrix;
+    public List<WeightMatrix> getOutgoingWeightMatrices() {
+        return outgoingWeightMatrices;
     }
 
-    public void setOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
-        this.outgoingWeightMatrix = outgoingWeightMatrix;
+    @Override
+    public void addOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
+        this.outgoingWeightMatrices.add(outgoingWeightMatrix);
+    }
+
+    @Override
+    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
+        this.outgoingWeightMatrices.remove(weightMatrix);
     }
 
     /**

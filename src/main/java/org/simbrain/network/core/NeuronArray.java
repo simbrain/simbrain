@@ -20,6 +20,8 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * High performance immutable array backed by ND4J Array.
@@ -81,7 +83,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     private WeightMatrix incomingWeightMatrix;
 
-    private WeightMatrix outgoingWeightMatrix;
+    private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
     /**
      * Render an image showing each activation when true.
@@ -221,12 +223,18 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     @Override
-    public WeightMatrix getOutgoingWeightMatrix() {
-        return outgoingWeightMatrix;
+    public List<WeightMatrix> getOutgoingWeightMatrices() {
+        return outgoingWeightMatrices;
     }
 
-    public void setOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
-        this.outgoingWeightMatrix = outgoingWeightMatrix;
+    @Override
+    public void addOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
+        this.outgoingWeightMatrices.add(outgoingWeightMatrix);
+    }
+
+    @Override
+    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
+        this.outgoingWeightMatrices.remove(weightMatrix);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

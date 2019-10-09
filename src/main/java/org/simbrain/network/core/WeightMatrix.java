@@ -84,7 +84,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
         this.source = source;
         this.target = target;
 
-        source.setOutgoingWeightMatrix(this);
+        source.addOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(this);
 
         // Default for "adapter" cases is 1-1
@@ -185,7 +185,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
-        source.setOutgoingWeightMatrix(null);
+        source.removeOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(null);
         changeSupport.firePropertyChange("delete", this, null);
     }

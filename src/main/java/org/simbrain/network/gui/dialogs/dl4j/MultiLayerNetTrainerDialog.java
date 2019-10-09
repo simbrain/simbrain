@@ -83,16 +83,16 @@ public class MultiLayerNetTrainerDialog extends JDialog {
         // Training data tab
 
         // Set up initial data
-        INDArray training = Nd4j.zeros(100, multiLayer.outputSize());
+        INDArray targets = Nd4j.zeros(100, multiLayer.outputSize());
         NumericMatrix trainingMatrix = new NumericMatrix() {
             @Override
             public void setData(double[][] data) {
-                training.data().setData(Utils.flatten(data));
+                targets.data().setData(Utils.flatten(data));
             }
 
             @Override
             public double[][] getData() {
-                return training.toDoubleMatrix();
+                return targets.toDoubleMatrix();
             }
         };
 
@@ -137,6 +137,7 @@ public class MultiLayerNetTrainerDialog extends JDialog {
                     // When entering training tab, commit table changes
                     inputPanel.commitChanges();
                     trainingPanel.commitChanges();
+                    multiLayer.initData(inputs, targets);
                 } else if (index == 3) {
                     // Set validation data to whatever input data currently is
                     if (inputPanel.getTable().getData() != null) {

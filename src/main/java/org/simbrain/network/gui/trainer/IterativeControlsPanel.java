@@ -150,8 +150,8 @@ public class IterativeControlsPanel extends JPanel {
         propsBox.add(Box.createVerticalStrut(20));
 
         // Time series for error
-        //ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
-        //propsBox.add(graphPanel);
+        ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
+        propsBox.add(graphPanel);
 
         add(propsBox);
         addErrorListener();
@@ -232,7 +232,7 @@ public class IterativeControlsPanel extends JPanel {
 
     private void stopRunning() {
         trainer.setUpdateCompleted(true);
-        //trainer.revalidateSynapseGroups();
+        trainer.revalidateSynapseGroups();
         trainer.commitChanges();
     }
 
@@ -240,7 +240,7 @@ public class IterativeControlsPanel extends JPanel {
         initTrainer(false);
         try {
             trainer.iterate();
-            //trainer.revalidateSynapseGroups();
+            trainer.revalidateSynapseGroups();
         } catch (DataNotInitializedException e) {
             JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
         }

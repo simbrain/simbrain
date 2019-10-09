@@ -15,6 +15,7 @@ package org.simbrain.network.gui.trainer;
 
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
 import org.simbrain.util.Utils;
@@ -32,7 +33,7 @@ public class ErrorPlotPanel extends JPanel {
     /**
      * Reference to trainer object.
      */
-    private IterableTrainer trainer;
+    private IterableTrainerTemp trainer;
 
     /**
      * Data for the error graph.
@@ -54,7 +55,7 @@ public class ErrorPlotPanel extends JPanel {
      *
      * @param trainer the trainer this panel represents
      */
-    public ErrorPlotPanel(IterableTrainer trainer) {
+    public ErrorPlotPanel(IterableTrainerTemp trainer) {
         this.trainer = trainer;
         JPanel mainPanel = new JPanel();
 

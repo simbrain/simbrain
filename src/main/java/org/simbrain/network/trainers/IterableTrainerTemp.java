@@ -24,4 +24,5 @@ public interface IterableTrainerTemp extends EditableObject {
 
     void randomize();
 
+    void revalidateSynapseGroups();
 }

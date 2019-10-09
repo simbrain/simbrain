@@ -9,6 +9,7 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -26,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,34 +83,11 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
      */
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
-    // public MultiLayerNet(List<Layer> layers) {
-    //     NeuralNetConfiguration.ListBuilder listBuilder = new NeuralNetConfiguration.Builder()
-    //             .updater(new Sgd(0.1))
-    //             .seed(1234)
-    //             .biasInit(0) // init the bias with 0 - empirical value, too
-    //             // from "http://deeplearning4j.org/architecture": The networks can
-    //             // process the input more quickly and more accurately by ingesting
-    //             // minibatches 5-10 elements at a time in parallel.
-    //             // this example runs better without, because the dataset is smaller than
-    //             // the mini batch size
-    //             .miniBatch(false)
-    //             .list();
-    //
-    //     for (Layer layer : layers) {
-    //         listBuilder = listBuilder.layer(layer);
-    //         if (layer instanceof OutputLayer) {
-    //             outputSize = ((OutputLayer) layer).getNOut();
-    //         }
-    //     }
-    //
-    //     input = Nd4j.zeros(1, ((DenseLayer) layers.get(0)).getNIn());
-    //
-    //
-    //
-    //     network = new MultiLayerNet(listBuilder.build());
-    //     network.init();
-    // }
-
+    // todo
+    private DataSet dataset;
+    private int iteration = 0;
+    private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
+    private boolean updateCompleted = true;
     /**
      * Construct a multi layer network from a specification of its topology. E.g. 4,3,5 is a network with 4 units in the
      * input layer, 3 in the hidden layer, and 5 in the output layer.
@@ -134,15 +113,9 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
         net.init();
 
         network = net;
+
+        dataset = new DataSet(input, getOutputArray());
     }
-
-
-    //public static List<Layer> getLayerFromWeightMatrices(List<WeightMatrix> matrices) {
-    //    List<Layer> ret = matrices.stream().map(WeightMatrix::asLayer).collect(Collectors.toList());
-    //    ret.add(((NeuronArray) matrices.get(matrices.size() - 1).getTarget()).asLayer());
-    //    return ret;
-    //}
-
 
     public MultiLayerNetwork getMultiLayernet() {
         return network;
@@ -241,51 +214,77 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
     }
 
     @Override
-    public void removeErrorListener(ErrorListener errorListener) {
+    public void iterate() throws Trainer.DataNotInitializedException {
+        network.fit(dataset);
+        iteration++;
+        fireErrorUpdated();
+    }
 
+    @Override
+    public void addErrorListener(final ErrorListener errorListener) {
+        if (errorListeners == null) {
+            errorListeners = new ArrayList<ErrorListener>();
+        }
+        errorListeners.add(errorListener);
+    }
+
+
+    /**
+     * Notify listeners that the error value has been updated. Only makes sense
+     * for iterable methods.
+     */
+    public void fireErrorUpdated() {
+        for (ErrorListener listener : errorListeners) {
+            listener.errorUpdated();
+        }
+    }
+
+    @Override
+    public void removeErrorListener(ErrorListener errorListener) {
+        errorListeners.remove(errorListener);
     }
 
     @Override
     public int getIteration() {
-        return 0;
-    }
-
-    @Override
-    public void addErrorListener(ErrorListener e) {
-
+        return iteration;
     }
 
     @Override
     public double getError() {
-        return 0;
+        return network.score();
     }
 
     @Override
     public boolean isUpdateCompleted() {
-        return false;
+        return updateCompleted;
     }
 
     @Override
-    public void setUpdateCompleted(boolean b) {
-
+    public void setUpdateCompleted(boolean uc) {
+        this.updateCompleted = uc;
     }
 
-    @Override
-    public void iterate() throws Trainer.DataNotInitializedException {
-
+    // TODO
+    public void initData(INDArray input, INDArray targets) {
+        dataset.setFeatures(input);
+        dataset.setLabels(targets);
     }
 
     @Override
     public void commitChanges() {
-
+        System.out.println("MultiLayerNet.commitChanges");
     }
 
     @Override
     public void randomize() {
+        // todo
+    }
+
+    @Override
+    public void revalidateSynapseGroups() {
 
     }
 
-    // TODO: Separate class?
     /**
      * For creation using an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
@@ -391,7 +390,5 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
                     .build();
         }
     }
-
-
 
 }

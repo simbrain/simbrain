@@ -1,6 +1,7 @@
-package org.simbrain.network.core;
+package org.simbrain.network.dl4j;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.simbrain.network.core.Network;
 
 import java.awt.geom.Point2D;
 import java.util.List;

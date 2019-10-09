@@ -1,9 +1,10 @@
-package org.simbrain.network.core;
+package org.simbrain.network.dl4j;
 
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.activations.Activation;
@@ -12,6 +13,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.pmw.tinylog.Logger;
+import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -246,7 +248,8 @@ public class MultiLayerNet implements ArrayConnectable {
         @UserParameter( label = "Use minibatch", order = 10)
         private boolean minibatch;
 
-        public MultiLayerNet create(Network parent) {
+        public MultiLayerNet create(Network parent, LayerCreationTemplate lct,
+                                    OutputLayerCreationTemplate oct) {
 
             List<Integer> netTopology;
 
@@ -272,21 +275,13 @@ public class MultiLayerNet implements ArrayConnectable {
                     .miniBatch(minibatch)
                     .list();
 
+            // Set up main layers using layer creation template
             for (int i = 0; i < netTopology.size() - 2; i++) {
-                lb = lb.layer(
-                        new DenseLayer.Builder().nIn(netTopology.get(i)).nOut(netTopology.get(i + 1))
-                                .activation(Activation.SIGMOID)
-                                // random initialize weights with values between 0 and 1
-                                .weightInit(new UniformDistribution(0, 1))
-                                .build()
-                );
+                lb = lb.layer(lct.create(netTopology.get(i), netTopology.get(i+1)));
             }
 
-            lb.layer(new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                    .nOut(netTopology.get(netTopology.size() - 1))
-                    .activation(Activation.SOFTMAX)
-                    .weightInit(new UniformDistribution(0, 1))
-                    .build());
+            // Set up output layers using output layer creation template
+            lb.layer(oct.create(netTopology.size() - 1));
 
             MultiLayerConfiguration conf = lb.build();
             MultiLayerNet net =
@@ -300,4 +295,54 @@ public class MultiLayerNet implements ArrayConnectable {
         }
 
     }
+
+    public static class LayerCreationTemplate implements EditableObject {
+
+        @UserParameter(label = "Activation Function", order = 1)
+        private Activation actFunc = Activation.SIGMOID;
+
+        @UserParameter(label = "Use bias", order = 10)
+        private boolean hasBias = true;
+
+        // TODO: Weight Init, and a bajillion other thigns
+
+        public Layer create(int numSrc, int numTar) {
+            return new DenseLayer.Builder()
+                    .nIn(numSrc)
+                    .nOut(numTar)
+                    .hasBias(hasBias)
+                    .activation(actFunc)
+                    // random initialize weights with values between 0 and 1
+                    .weightInit(new UniformDistribution(0, 1))
+                    .build();
+        }
+    }
+
+    public static class OutputLayerCreationTemplate implements EditableObject {
+
+        @UserParameter(label = "Loss Function", order = 1)
+        private LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.MSE;
+
+        @UserParameter(label = "Activation Function", order = 2)
+        private Activation actFunc = Activation.SIGMOID;
+
+
+        @UserParameter(label = "Use bias", order = 10)
+        private boolean hasBias = true;
+
+        // TODO: Weight Init, and a bajillion other thigns
+        // TODO: Not all loss functions are compatible with all layer types.
+        // Somehow deal with DL4JInvalidConfigException here
+
+        public Layer create(int numNodes) {
+            return new OutputLayer.Builder(lossFunc)
+                    .nOut(numNodes)
+                    .activation(actFunc)
+                    .weightInit(new UniformDistribution(0, 1))
+                    .build();
+        }
+    }
+
+
+
 }

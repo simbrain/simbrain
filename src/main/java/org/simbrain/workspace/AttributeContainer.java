@@ -28,9 +28,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public interface AttributeContainer {
 
     /**
-     * Returns an id that can be used to identify this container. Used in persistence
+     * Returns an attribute id that can be used to identify this container. Used in persistence
      * (see {@link org.simbrain.workspace.serialization.ArchivedAttribute} and in displaying
-     * Producers and consumers.
+     * Producers and Consumers. Attributes are persisted as a triple <component id, attribute id, methodname>.
+     * If there is only a single attribute in component, the id can be simple.  Compare "neuron_1" in networkcomponent
+     * with "pie chart" in PieChartCompnent.
      *
      * @return the String id.
      */

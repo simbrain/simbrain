@@ -20,11 +20,7 @@ package org.simbrain.network.desktop;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronArray;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;

@@ -19,6 +19,7 @@ e * Part of Simbrain--a java-based neural network kit
 package org.simbrain.network.util;
 
 import org.simbrain.network.core.*;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.CopyableGroup;
 
 import java.util.ArrayList;

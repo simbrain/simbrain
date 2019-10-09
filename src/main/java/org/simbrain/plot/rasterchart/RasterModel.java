@@ -247,6 +247,7 @@ public class RasterModel implements AttributeContainer, EditableObject {
             }
         }
 
+        @Override
         public String getId() {
             return "Raster " + (index + 1);
         }

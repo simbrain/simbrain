@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.nd4j.linalg.api.buffer.FloatBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.dl4j.NeuronArray;
 
 import static org.junit.Assert.*;
 

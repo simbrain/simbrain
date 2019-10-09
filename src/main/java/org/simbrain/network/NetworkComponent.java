@@ -18,10 +18,9 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.*;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.NeuronArrayNode;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;

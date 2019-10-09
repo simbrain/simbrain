@@ -1,4 +1,4 @@
-package org.simbrain.network.DL4JSandbox;
+package org.simbrain.network.dl4j.DL4JSandbox;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;

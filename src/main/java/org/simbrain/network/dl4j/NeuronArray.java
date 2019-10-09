@@ -1,17 +1,11 @@
-package org.simbrain.network.core;
+package org.simbrain.network.dl4j;
 
 
-import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
-import org.deeplearning4j.nn.conf.layers.Layer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;

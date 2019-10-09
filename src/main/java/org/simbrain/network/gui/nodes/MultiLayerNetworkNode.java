@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
-import org.simbrain.network.core.MultiLayerNet;
+import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
 
 import javax.swing.*;

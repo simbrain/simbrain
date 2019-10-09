@@ -24,6 +24,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
     /**
      * Reference to outgoing weight matrix.
      */
-    private WeightMatrix outgoingWeightMatrix;
+    private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
     /**
      * Cached size of the output layer.
@@ -182,13 +183,18 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
     }
 
     @Override
-    public WeightMatrix getOutgoingWeightMatrix() {
-        return outgoingWeightMatrix;
+    public List<WeightMatrix> getOutgoingWeightMatrices() {
+        return outgoingWeightMatrices;
     }
 
     @Override
-    public void setOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
-        this.outgoingWeightMatrix = outgoingWeightMatrix;
+    public void addOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
+        this.outgoingWeightMatrices.add(outgoingWeightMatrix);
+    }
+
+    @Override
+    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
+        this.outgoingWeightMatrices.remove(weightMatrix);
     }
 
     @Override

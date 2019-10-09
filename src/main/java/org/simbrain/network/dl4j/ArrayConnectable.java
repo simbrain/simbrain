@@ -4,6 +4,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 
 /**
  * Classes that implement this interface can be the source or target of an
@@ -44,12 +45,14 @@ public interface ArrayConnectable {
     /**
      * Connection from this ArrayConncetable to another one
      */
-    WeightMatrix getOutgoingWeightMatrix();
+    List<WeightMatrix> getOutgoingWeightMatrices();
 
     /**
      * Connection from this ArrayConncetable to another one
      */
-    void setOutgoingWeightMatrix(WeightMatrix weightMatrix);
+    void addOutgoingWeightMatrix(WeightMatrix weightMatrix);
+
+    void removeOutgoingWeightMatrix(WeightMatrix weightMatrix);
 
     /**
      * Get the id associated with this source or target.
@@ -78,7 +81,7 @@ public interface ArrayConnectable {
      */
     default void fireDeleted() {
         getNetwork().removeWeightMatrix(getIncomingWeightMatrix());
-        getNetwork().removeWeightMatrix(getOutgoingWeightMatrix());
+        getOutgoingWeightMatrices().forEach(getNetwork()::removeWeightMatrix);
     };
 
 }

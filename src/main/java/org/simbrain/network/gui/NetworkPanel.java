@@ -2091,31 +2091,6 @@ public class NetworkPanel extends JPanel {
         objectNodeMap.put(matrix, node);
     }
 
-    public List<WeightMatrix> getWeightMatricesFromSelectedNeuronArrays() {
-
-        if (getSelectedModelNeuronArrays().size() < 1) {
-            return null;
-        }
-
-        List<WeightMatrix> ret = new ArrayList<>();
-
-        Set<NeuronArray> selectedNeuronArrays = new HashSet<>(getSelectedModelNeuronArrays());
-
-        NeuronArray array = getSelectedModelNeuronArrays().get(0);
-
-        // Traverse to the first node
-        while (array.getIncomingWeightMatrix() != null && selectedNeuronArrays.contains(array.getIncomingWeightMatrix().getSource())) {
-            array = (NeuronArray) array.getIncomingWeightMatrix().getSource();
-        }
-
-        while (array.getOutgoingWeightMatrix()!= null && selectedNeuronArrays.contains(array.getOutgoingWeightMatrix().getTarget())) {
-            ret.add(array.getOutgoingWeightMatrix());
-            array = ((NeuronArray) array.getOutgoingWeightMatrix().getTarget());
-        }
-
-        return ret;
-    }
-
     /**
      * Add a weight matrix between neuron collections or arrays.
      */

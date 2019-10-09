@@ -1607,9 +1607,6 @@ public class Network {
      * @param target target neuron collection or nd4j array
      */
     public WeightMatrix addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
-        if (source.getOutgoingWeightMatrix() != null) {
-            removeWeightMatrix(source.getOutgoingWeightMatrix());
-        }
         if (target.getIncomingWeightMatrix() != null) {
             removeWeightMatrix(target.getIncomingWeightMatrix());
         }

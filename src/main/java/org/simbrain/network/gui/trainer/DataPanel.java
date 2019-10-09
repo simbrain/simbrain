@@ -91,6 +91,27 @@ public class DataPanel extends JPanel {
         setLayout(new BorderLayout());
         add("Center", scroller);
 
+        // Toolbars
+        toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // Open / Save Tools
+        JToolBar fileToolBar = new JToolBar();
+        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
+        fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
+        toolbars.add(fileToolBar);
+
+        // Randomize tools
+        toolbars.add(table.getToolbarRandomize());
+
+        add("North", toolbars);
+
+        table.getData().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                resizePanel();
+            }
+        });
+
     }
 
     /**

@@ -8,14 +8,8 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
-import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetTrainerDialog;
-import org.simbrain.network.gui.trainer.IterativeControlsPanel;
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerTrainerDialog;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.table.NumericTable;
-import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -168,7 +162,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
 
             @Override
             public void actionPerformed(final ActionEvent event) {
-                MultiLayerNetTrainerDialog trainerDialog = new MultiLayerNetTrainerDialog(net);
+                MultiLayerTrainerDialog trainerDialog = new MultiLayerTrainerDialog(net);
                 trainerDialog.pack();
                 trainerDialog.setLocationRelativeTo(null);
                 trainerDialog.setVisible(true);

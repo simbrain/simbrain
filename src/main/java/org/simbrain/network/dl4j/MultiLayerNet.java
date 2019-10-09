@@ -1,5 +1,6 @@
 package org.simbrain.network.dl4j;
 
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
@@ -291,9 +292,12 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
     public static class CreationTemplate implements EditableObject {
 
         @UserParameter( label = "Network topology", order = 1)
-        private String topologyString = "4,10,2";
+        private String topologyString = "5,10,5";
 
-        @UserParameter( label = "Use minibatch", order = 10)
+        @UserParameter( label = "Optimizer", order = 10)
+        private OptimizationAlgorithm optimizationAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
+
+        @UserParameter( label = "Use minibatch", order = 20)
         private boolean minibatch;
 
         public MultiLayerNet create(Network parent, LayerCreationTemplate lct,
@@ -312,8 +316,8 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
             }
 
             NeuralNetConfiguration.ListBuilder lb = new NeuralNetConfiguration.Builder()
-                    .updater(new Sgd(0.1))
                     .seed(1234)
+                    .optimizationAlgo(optimizationAlgorithm)
                     .biasInit(0) // init the bias with 0 - empirical value, too
                     // from "http://deeplearning4j.org/architecture": The networks can
                     // process the input more quickly and more accurately by ingesting
@@ -329,7 +333,7 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
             }
 
             // Set up output layers using output layer creation template
-            lb.layer(oct.create(netTopology.size() - 1));
+            lb.layer(oct.create(netTopology.get(netTopology.size() - 1)));
 
             MultiLayerConfiguration conf = lb.build();
             MultiLayerNet net =
@@ -374,11 +378,10 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
         @UserParameter(label = "Activation Function", order = 2)
         private Activation actFunc = Activation.SIGMOID;
 
-
         @UserParameter(label = "Use bias", order = 10)
         private boolean hasBias = true;
 
-        // TODO: Weight Init, and a bajillion other thigns
+        // TODO: Weight Init, and a bajillion other things
         // TODO: Not all loss functions are compatible with all layer types.
         // Somehow deal with DL4JInvalidConfigException here
 

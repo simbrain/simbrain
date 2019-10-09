@@ -24,8 +24,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Merge with SupervisedTrainingDialog?  Or abstract the tab handling if used
-public class MultiLayerNetTrainerDialog extends JDialog {
+/**
+ * Train a dl4j network.
+ */
+public class MultiLayerTrainerDialog extends JDialog {
+
+    // TODO: Merge with SupervisedTrainingDialog?  Or abstract the tab handling if used
 
     /**
      * Main tabbed pane.
@@ -48,7 +52,10 @@ public class MultiLayerNetTrainerDialog extends JDialog {
     private List<Component> tabs = new ArrayList<Component>();
 
 
-    public MultiLayerNetTrainerDialog(MultiLayerNet multiLayer) {
+    /**
+     * Construct the dialog.
+     */
+    public MultiLayerTrainerDialog(MultiLayerNet multiLayer) {
 
 
         JPanel mainPanel = new JPanel();

@@ -37,6 +37,9 @@ public class MultiLayerNetCreationDialog extends StandardDialog {
 
         // Handle closing
         this.addClosingTask( () -> SwingUtilities.invokeLater(() -> {
+            netCreator.commitChanges();
+            layerCreator.commitChanges();
+            outputCreator.commitChanges();
             MultiLayerNet multiLayerNetwork = creationTemplate.create(np.getNetwork(), lct, oct);
             multiLayerNetwork.setLocation(np.getLastClickedPosition());
             np.getNetwork().addDL4JMultiLayerNetwork(multiLayerNetwork);

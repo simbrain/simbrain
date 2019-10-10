@@ -4,7 +4,9 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Classes that implement this interface can be the source or target of an
@@ -81,7 +83,8 @@ public interface ArrayConnectable {
      */
     default void fireDeleted() {
         getNetwork().removeWeightMatrix(getIncomingWeightMatrix());
-        getOutgoingWeightMatrices().forEach(getNetwork()::removeWeightMatrix);
-    };
+        List<WeightMatrix> toDelete = new ArrayList<>(getOutgoingWeightMatrices());
+        toDelete.forEach(WeightMatrix::fireDeleted);
+    }
 
 }

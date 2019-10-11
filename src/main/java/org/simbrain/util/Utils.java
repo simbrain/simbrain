@@ -570,25 +570,6 @@ public class Utils {
         return Utils.getOSMatches("Mac OS X");
     }
 
-    //TODO: Redo all this with streams?
-
-    /**
-     * Reimplementation of same method from org.apache.commons.collections.CollectionUtils.
-     *
-     * @param selection the collection to filter
-     * @param filter    the predicate to be used in filtering.
-     * @return those members of the selection to which the predicate applies
-     */
-    public static Collection select(final Collection selection, final Predicate filter) {
-        Collection ret = new ArrayList();
-        for (Object object : selection) {
-            if (filter.evaluate(object)) {
-                ret.add(object);
-            }
-        }
-        return ret;
-    }
-
     /**
      * Re-implementation of same method from org.apache.commons.collections.CollectionUtils.
      *

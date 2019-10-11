@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Font dialog. Adapted from a post on website from a long time ago...
@@ -22,7 +23,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     /**
      * Selection list.
      */
-    private ArrayList<TextNode> selectionList = new ArrayList<TextNode>();
+    private List<TextNode> selectionList;
 
     /**
      * Tabbed pane for font and color effects.
@@ -155,7 +156,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      * @param selectedTextNodes currently selected text nodes in the network
      *                          panel.
      */
-    public TextDialog(final ArrayList<TextNode> selectedTextNodes) {
+    public TextDialog(final List<TextNode> selectedTextNodes) {
         selectionList = selectedTextNodes;
         init();
         fillFieldValues();

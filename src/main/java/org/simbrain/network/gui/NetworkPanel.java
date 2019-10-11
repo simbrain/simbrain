@@ -49,7 +49,6 @@ import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
-import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
@@ -1848,24 +1847,6 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    /**
-     * Returns selected Neurons.
-     *
-     * @return list of selectedNeurons
-     */
-    public Collection<NeuronNode> getSelectedNeurons() {
-        return Utils.select(getSelection(), Filters.getNeuronNodeFilter());
-    }
-
-    /**
-     * Returns selected Synapses.
-     *
-     * @return list of selected Synapses
-     */
-    public Collection<SynapseNode> getSelectedSynapses() {
-        return Utils.select(getSelection(), Filters.getSynapseNodeFilter());
-    }
-
     public Collection<NeuronGroupNode> getSelectedNeuronGroups() {
         return getSelection().stream()
             .filter(n -> n.getParent() instanceof NeuronGroupNode)
@@ -1904,14 +1885,6 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Returns the selected Text objects.
-     *
-     * @return list of selected Text objects
-     */
-    public ArrayList<TextNode> getSelectedText() {
-        return new ArrayList(Utils.select(getSelection(), Filters.getTextNodeFilter()));
-    }
 
     /**
      * Returns selected Neurons.
@@ -1957,11 +1930,6 @@ public class NetworkPanel extends JPanel {
         return ret;
     }
 
-    /**
-     * Returns selected weight matrices
-     *
-     * @return list of selected weight matrices
-     */
     public List<WeightMatrix> getSelectedModelWeightMatrices() {
         return getSelection().stream()
                 .filter(WeightMatrixNode.class::isInstance)
@@ -1970,11 +1938,7 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Returns selected synapses.
-     *
-     * @return list of selected synapses
-     */
+
     public ArrayList<Synapse> getSelectedModelSynapses() {
         ArrayList<Synapse> ret = new ArrayList<Synapse>();
         for (PNode e : getSelection()) {
@@ -1985,11 +1949,6 @@ public class NetworkPanel extends JPanel {
         return ret;
     }
 
-    /**
-     * Returns selected neuron groups.
-     *
-     * @return list of neuron groups.
-     */
     public ArrayList<NeuronGroup> getSelectedModelNeuronGroups() {
         ArrayList<NeuronGroup> ng = new ArrayList<NeuronGroup>();
         for (PNode e : getSelection()) {
@@ -2109,61 +2068,64 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    /**
-     * Return a collection of all neuron nodes.
-     *
-     * @return a collection of all neuron nodes
-     */
-    public Collection<NeuronNode> getNeuronNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
+    public List<SynapseNode> getSelectedSynapses() {
+        return getSelection().stream()
+                .filter(SynapseNode.class::isInstance)
+                .map(SynapseNode.class::cast)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Return a collection of all synapse nodes.
-     *
-     * @return a collection of all synapse nodes
-     */
-    public Collection<SynapseNode> getSynapseNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
+    public List<NeuronNode> getSelectedNeurons() {
+        return getSelection().stream()
+                .filter(NeuronNode.class::isInstance)
+                .map(NeuronNode.class::cast)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Return a collection of all text nodes.
-     *
-     * @return a collection of all text nodes
-     */
+    public List<NeuronNode> getNeuronNodes() {
+        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+            .filter(NeuronNode.class::isInstance)
+            .map(NeuronNode.class::cast)
+            .collect(Collectors.toList());
+    }
+
+    public List<SynapseNode> getSynapseNodes() {
+        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+                .filter(SynapseNode.class::isInstance)
+                .map(SynapseNode.class::cast)
+                .collect(Collectors.toList());
+    }
+
     public Collection<TextNode> getTextNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getTextNodeFilter(), null);
+        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+                .filter(TextNode.class::isInstance)
+                .map(TextNode.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    public List<TextNode> getSelectedText() {
+        Collection<TextNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+                .filter(TextNode.class::isInstance)
+                .map(TextNode.class::cast)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Return a collection of all parent nodes.
-     *
-     * @return a collection of all p nodes
+     * Return a collection of all selectable {@link ScreenElement}
      */
-    public Collection getParentNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getParentNodeFilter(), null);
+    public List<ScreenElement> getSelectableNodes() {
+        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+                .filter(ScreenElement.class::isInstance)
+                .map(ScreenElement.class::cast)
+                .filter(ScreenElement::isSelectable)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Return a collection of all persistent nodes, that is all neuron nodes and
-     * all synapse nodes.
-     *
-     * @return a collection of all persistent nodes
-     */
-    public Collection<ScreenElement> getSelectableNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSelectableFilter(), null);
-    }
-
-    /**
-     * Return a collection of all persistent nodes, that is all neuron nodes and
-     * all synapse nodes.
-     *
-     * @return a collection of all persistent nodes
-     */
-    public Collection<ScreenElement> getSelectedScreenElements() {
-        return new ArrayList<ScreenElement>(Utils.select(getSelection(), Filters.getSelectableFilter()));
-    }
 
     /**
      * Called by Network preferences as preferences are changed. Iterates

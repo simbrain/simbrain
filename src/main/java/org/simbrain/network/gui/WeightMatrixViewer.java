@@ -84,8 +84,8 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     public WeightMatrixViewer(NetworkPanel panel) {
 
         // Get source and target lists
-        ArrayList<Neuron> sourceList = panel.getSourceModelNeurons();
-        ArrayList<Neuron> targetList = panel.getSelectedModelNeurons();
+        List<Neuron> sourceList = panel.getSourceModelNeurons();
+        List<Neuron> targetList = panel.getSelectedModelNeurons();
         init(sourceList, targetList, panel);
     }
 

@@ -180,21 +180,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // "Start drag" is thus a bit of a misnomer
 
         // This code transfers the "picked" object to the object that will be dragged
-        // Must be careful no to add too much hierarchy in pnodes because then it's hard to pick them
-        // Currently most pnodes have just a single layer of children.
-        if (pickedNode.getParent() instanceof TextNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof NeuronNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof NeuronArrayNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof MultiLayerNetworkNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof SynapseNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof WeightMatrixNode) {
-            pickedNode = pickedNode.getParent();
-        } else if (pickedNode.getParent() instanceof InteractionBox) {
+        if (pickedNode.getParent() instanceof ScreenElement) {
             pickedNode = pickedNode.getParent();
         }
 
@@ -276,11 +262,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // Handle interaction box dragging
         if (pickedNode instanceof InteractionBox) {
             delta = event.getDeltaRelativeTo(pickedNode.getParent());
-            if (pickedNode.getParent() instanceof NeuronGroupNode) {
-                pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
-            } else if (pickedNode.getParent() instanceof NeuronCollectionNode) {
-                pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
-            } else if (pickedNode.getParent() instanceof SubnetworkNode) {
+            if (pickedNode.getParent() instanceof GroupNode ) {
                 pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
             }
         }
@@ -365,8 +347,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         /**
-         * @param node
-         * @return
+         * Return true if the PNode should be dragged
+         *
+         * @param node the node to check
+         * @return true if it should be dragged
          * @see PNodeFilter
          */
         public boolean accept(final PNode node) {
@@ -399,8 +383,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         /**
-         * @param node
-         * @return
+         * Return true if the the children of the given node should be dragged
+         *
+         * @param  node the node to test
+         * @return true if the children should be dragged
          * @see PNodeFilter
          */
         public boolean acceptChildrenOf(final PNode node) {
@@ -427,9 +413,6 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         /**
-         * @param event
-         * @param type
-         * @return
          * @see PInputEventFilter
          */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -41,7 +42,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronCollectionNode extends PNode  {
+public class NeuronCollectionNode extends PNode implements GroupNode {
 
     /**
      * Parent network panel.
@@ -233,6 +234,15 @@ public class NeuronCollectionNode extends PNode  {
 
     public NeuronCollection getNeuronCollection() {
         return neuronCollection;
+    }
+
+    @Override
+    public void updateConstituentNodes() {
+    }
+
+    @Override
+    public List<InteractionBox> getInteractionBoxes() {
+        return Collections.singletonList(interactionBox);
     }
 
     /**

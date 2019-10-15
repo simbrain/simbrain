@@ -100,7 +100,7 @@ public class CouplingMenu extends JMenu {
     // Note: this is not currently used.  It is enough to build all couplings using a producer / "send" menu.
     // However, if it is reinvoked it should be updated to be similar to the createProducerMenu
     private void createConsumerSubmenu(Consumer<?> consumer) {
-        JMenu consumerSubmenu = new JMenu(consumer.getDescription() + " receive " + consumer.getTypeName() + " from");
+        JMenu consumerSubmenu = new JMenu(consumer.getSimpleDescription() + " receive " + consumer.getTypeName() + " from");
         boolean hasItems = false;
         for (WorkspaceComponent targetComponent : sourceComponent.getWorkspace().getComponentList()) {
             List<CouplingMenuItem> couplings = new ArrayList<>();
@@ -110,7 +110,7 @@ public class CouplingMenu extends JMenu {
                     couplings.add(
                             new CouplingMenuItem(
                                     sourceComponent.getWorkspace(),
-                                    targetComponent.getName() + "/" + producer.getDescription(),
+                                    targetComponent.getName() + "/" + producer.getSimpleDescription(),
                                     producer,
                                     consumer
                             )

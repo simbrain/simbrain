@@ -91,7 +91,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         this.component = component;
         setLayout(new BorderLayout());
 
-        // Even the data has not been initialized, initialize it to zero values
+        // Even if the data has not been initialized, initialize it to zero values
         if (component.getDataModel() == null) {
             component.getDataModel().fill(new Double(0));
         }

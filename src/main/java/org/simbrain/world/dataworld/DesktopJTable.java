@@ -57,10 +57,17 @@ public class DesktopJTable extends SimbrainJTable {
 
         JPopupMenu ret = super.buildPopupMenu();
 
-        CouplingMenu couplingMenu = new CouplingMenu(component, component);
-        couplingMenu.setCustomName("Create Row Coupling");
+        CouplingMenu rowCouplingMenu = new CouplingMenu(component, component);
+        rowCouplingMenu.setCustomName("Create Vector Coupling");
         ret.addSeparator();
-        ret.add(couplingMenu);
+        ret.add(rowCouplingMenu);
+
+        int selectedLogicalColumn = getSelectedColumn()-1;
+        DataWorldComponent.TableColumn tc = component.getTableColumn(selectedLogicalColumn);
+        CouplingMenu columnMenu = new CouplingMenu(component, tc);
+        columnMenu.setCustomName("Create Scalar Coupling");
+        ret.add(columnMenu);
+
         return ret;
     }
 }

@@ -41,9 +41,11 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
      */
     private NumericTable dataTable;
 
-    // Note this class used to contain code for scalar valued column couplings.
-    // It would not be hard to get back.
-    // See revision 765ac647917d0859e98da47a6a1d0c54b238a7bc
+    /**
+     * List of column {@link TableColumn} object that can be used
+     * to couple to the current row of a specific column.
+     */
+    private List<TableColumn> tableColumns = new ArrayList<>();
 
     /**
      * Recreates an instance of this class from a saved component.
@@ -72,6 +74,18 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         return component;
     }
 
+    /**
+     * Construct data world from a model. Used (for example) in deserializing.
+     *
+     * @param dataTable the underlying data
+     * @param name      the name of this component
+     */
+    private DataWorldComponent(NumericTable dataTable, String name) {
+        super(name);
+        this.dataTable = dataTable;
+        updateTableColumns();
+    }
+
     @Override
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
@@ -89,26 +103,33 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     }
 
     /**
-     * Construct data world from a model. Used (for example) in deserializing.
-     *
-     * @param dataTable the underlying data
-     * @param name      the name of this component
-     */
-    private DataWorldComponent(NumericTable dataTable, String name) {
-        super(name);
-        this.dataTable = dataTable;
-    }
-
-    /**
      * Initialize consumers and producers.
      */
     private void initializeModelListener() {
         dataTable.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent evt) {
+                // TODO. Below is intended to capture column inserts and
+                // deletes, though it captures other stuff too.
+                if (dataTable.getColumnCount() != tableColumns.size()) {
+                    updateTableColumns();
+                }
                 setChangedSinceLastSave(true);
             }
         });
+    }
+
+    /**
+     * Update the list of {@link TableColumn} objects.
+     */
+    private void updateTableColumns() {
+        while (dataTable.getLogicalColumnCount() < tableColumns.size()) {
+            tableColumns.remove(tableColumns.size() - 1);
+        }
+        while (dataTable.getLogicalColumnCount() > tableColumns.size()) {
+            TableColumn column = new TableColumn(tableColumns.size());
+            tableColumns.add(column);
+        }
     }
 
     /**
@@ -122,6 +143,7 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> models = new ArrayList<>();
         models.add(this);
+        models.addAll(tableColumns);
         return models;
     }
 
@@ -171,4 +193,49 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         return dataTable.getVectorCurrentRow();
     }
 
+    public TableColumn getTableColumn(int index) {
+        return tableColumns.get(index);
+    }
+
+    /**
+     * TableColumn writes to a specific column of the outer DataWorld.
+     */
+    public class TableColumn implements AttributeContainer {
+
+        /**
+         * The index of the column.
+         */
+        private int index;
+
+        /**
+         * Construct a TableColumn.
+         *
+         * @param index index of the column to set.
+         */
+        public TableColumn(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public String getId() {
+            return "Column " + (index+1);
+        }
+
+        /**
+         * Return the value of the current cell of the column.
+         */
+        @Producible()
+        public double getValue() {
+            return dataTable.getValueCurrentRow(index);
+        }
+
+        /**
+         * Set the value of the current cell of the column.
+         */
+        @Consumable()
+        public void setValue(double value) {
+            dataTable.setValueCurrentRow(index, value);
+        }
+
+    }
 }

@@ -508,6 +508,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     public void setUpperBound(final double d) {
         upperBound = d;
+        fireStrengthUpdated(); // to force a graphics update
     }
 
     /**
@@ -524,6 +525,7 @@ public class Synapse implements EditableObject, AttributeContainer {
      */
     public void setLowerBound(final double d) {
         lowerBound = d;
+        fireStrengthUpdated(); // to force a graphics update
     }
 
     /**

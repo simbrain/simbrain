@@ -142,6 +142,9 @@ public class TimeSeriesPlotPanel extends JPanel {
 
     private void updateChartSettings() {
 
+        // No idea why this is needed, but it makes the width get updated upon closing the settings dialog
+        model.setFixedWidth(model.isFixedWidth());
+
         chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
         if (!model.isAutoRange()) {
             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());

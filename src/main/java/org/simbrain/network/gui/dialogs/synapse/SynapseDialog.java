@@ -173,11 +173,10 @@ public final class SynapseDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-
         synapseEditingPanel.commitChanges();
-
-        // Notify the network that changes have been made
-        synapseList.get(0).getNetwork().fireSynapsesUpdated(synapseList);
+        // Call twice, since the display of the synapse relies on multiple field values
+        // which fire separate events. Ugly solution but works.
+        synapseEditingPanel.commitChanges();
     }
 
     /**

@@ -22,8 +22,10 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.awt.image.*;
+import java.util.stream.Collectors;
 
 /**
  * A visual representation of a weight matrix
@@ -38,7 +40,7 @@ public class WeightMatrixNode extends ScreenElement {
     /**
      * The line model connecting the source and the target
      */
-    private Line2D line2D;
+    private QuadCurve2D line2D;
 
     /**
      * The visual component of the {@link #line2D}.
@@ -86,7 +88,19 @@ public class WeightMatrixNode extends ScreenElement {
         this.weightMatrix = wm;
         ArrayConnectable source = wm.getSource();
         ArrayConnectable target = wm.getTarget();
-        line2D = new Line2D.Double(source.getAttachmentPoint(), target.getAttachmentPoint());
+
+        Point2D sourceLocation = source.getAttachmentPoint();
+        Point2D targetLocation = target.getAttachmentPoint();
+        Point2D midLocation = SimbrainMath.midpoint(sourceLocation, targetLocation);
+
+        line2D = new QuadCurve2D.Double(
+                sourceLocation.getX(),
+                sourceLocation.getY(),
+                midLocation.getX(),
+                midLocation.getY(),
+                targetLocation.getX(),
+                targetLocation.getY()
+                );
         line = new PPath.Double(line2D);
         source.onLocationChange(() -> {
             updateImageBoxLocation();
@@ -96,6 +110,16 @@ public class WeightMatrixNode extends ScreenElement {
             updateImageBoxLocation();
             updateLine();
         });
+
+
+        target.getOutgoingWeightMatrices().stream()
+                .filter(m -> m.getTarget() == this.weightMatrix.getSource())
+                .forEach(m -> { // Even though this is for each but there should only be one m.
+                    m.setCurve(true);
+                    this.getWeightMatrix().setCurve(true);
+                });
+
+
         updateLine();
 
         renderMatrixToImage();
@@ -111,6 +135,9 @@ public class WeightMatrixNode extends ScreenElement {
                 renderMatrixToImage();
             } else if("delete".equals(evt.getPropertyName())) {
                 WeightMatrixNode.this.removeFromParent();
+            } else if("lineUpdated".equals(evt.getPropertyName())) {
+                updateLine();
+                updateImageBoxLocation();
             }
         });
 
@@ -121,27 +148,52 @@ public class WeightMatrixNode extends ScreenElement {
      * Redraw the {@link #line} based on the new source and target location.
      */
     private void updateLine() {
-        ArrayConnectable source = weightMatrix.getSource();
-        ArrayConnectable target = weightMatrix.getTarget();
+        Point2D source = weightMatrix.getSource().getAttachmentPoint();
+        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        Point2D mid = SimbrainMath.add(
+                SimbrainMath.midpoint(source, target),
+                getCurveControlVector()
+                );
         removeChild(line);
-        line2D.setLine(source.getAttachmentPoint(), target.getAttachmentPoint());
+        line2D.setCurve(source, mid, target);
         line = new PPath.Double(line2D);
         line.setStroke(new BasicStroke(3.0f));
+        line.setPaint(null);
         addChild(line);
         line.lowerToBottom();
+    }
+
+    private Point2D getCurveControlVector() {
+        float offset = weightMatrix.isCurve() ? 150 : 0;
+        Point2D source = weightMatrix.getSource().getAttachmentPoint();
+        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        Point2D unitNormal = SimbrainMath.unitNormal(source, target);
+        return SimbrainMath.scale(unitNormal, offset);
     }
 
     /**
      * Update the {@link #weightsImage} and its {@link #box} to the updated location (center of the {@link #line}.
      */
     private void updateImageBoxLocation() {
+
+        Point2D source = weightMatrix.getSource().getAttachmentPoint();
+        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+
+        Point2D midPoint = SimbrainMath.midpoint(source, target);
+
+        Point2D offset = new Point2D.Double(-50.0, -50.0);
+
+        Point2D curveOffset = getCurveControlVector();
+
+        curveOffset = SimbrainMath.scale(curveOffset, 0.5);
+
+        offset = SimbrainMath.add(offset, curveOffset);
+
         weightsImage.setOffset(
-                line.getBounds().getCenterX() - 50,
-                line.getBounds().getCenterY() - 50
+                SimbrainMath.add(midPoint, offset)
         );
         box.setOffset(
-                line.getBounds().getCenterX() - 50,
-                line.getBounds().getCenterY() - 50
+                SimbrainMath.add(midPoint, offset)
         );
         this.setBounds(box.getFullBounds());
     }

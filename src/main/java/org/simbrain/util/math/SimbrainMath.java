@@ -61,6 +61,10 @@ public class SimbrainMath {
         return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
+    public static Point2D scale(final Point2D vector, double scalingFactor) {
+        return new Point2D.Double(vector.getX() * scalingFactor, vector.getY() * scalingFactor);
+    }
+
     /**
      * Returns a random permutation of all the integers between floor
      * (inclusive) and ceil (exclusive).
@@ -308,6 +312,19 @@ public class SimbrainMath {
      */
     public static Point2D midpoint(Point2D pt1, Point2D pt2) {
         return new java.awt.geom.Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
+    }
+
+    public static Point2D unitNormal(Point2D point1, Point2D point2) {
+        double dx = point2.getX() - point1.getX();
+        double dy = point2.getY() - point1.getY();
+
+        double magnitude = point1.distance(point2);
+
+        return new Point2D.Double(-dy / magnitude, dx / magnitude);
+    }
+
+    public static Point2D add(Point2D point1, Point2D point2) {
+        return new Point2D.Double(point1.getX() + point2.getX(), point1.getY() + point2.getY());
     }
 
     /**

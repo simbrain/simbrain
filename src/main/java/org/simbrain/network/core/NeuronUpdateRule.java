@@ -28,6 +28,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -61,12 +62,14 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
     private static final int MAX_DIGITS = 9;
 
     /**
-     * If true, use a custom zero point. Currently this is set to be between upper and lower bounds.  In the future more
+     * Rules in this list use a custom zero point.
+     * Currently this is set to be between upper and lower bounds.  In the future more
      * options could be added and this could become an enum.
      * <p>
-     * Override and set to true if a neuron should use a custom zero point
+     * Add an update type to this list if a neuron should use a custom zero point
      */
-    protected static boolean useCustomZeroPoint = false;
+    private static HashSet<Class> usesCustomZeroPoint =
+            new HashSet<>(Arrays.asList(IntegrateAndFireRule.class, AdExIFRule.class, IzhikevichRule.class));
 
     /**
      * Returns the type of time update (discrete or continuous) associated with this neuron.
@@ -208,7 +211,10 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
         return n.getActivation();
     }
 
-    public static boolean isUseCustomZeroPoint() {
-        return useCustomZeroPoint;
+    /**
+     * Checks if the provided rule uses a custom zero point or not.
+     */
+    public static boolean usesCustomZeroPoint(NeuronUpdateRule rule) {
+        return usesCustomZeroPoint.contains(rule.getClass());
     }
 }

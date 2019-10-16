@@ -225,10 +225,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
 
     private double[] ei = new double[2];
 
-    static {
-        useCustomZeroPoint = true;
-    }
-
     @Override
     public void update(Neuron neuron) {
         if (v_mem >= v_Peak) {

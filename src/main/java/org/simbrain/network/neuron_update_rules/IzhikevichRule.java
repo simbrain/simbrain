@@ -121,10 +121,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     private double timeStep;
     private double val;
 
-    static {
-        useCustomZeroPoint = true;
-    }
-
     @Override
     public IzhikevichRule deepCopy() {
         IzhikevichRule in = new IzhikevichRule();

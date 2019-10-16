@@ -23,6 +23,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
@@ -360,7 +361,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // A "graphical zero point" that shows as white
         double gZeroPoint = 0;
-        if (neuron.getUpdateRule().isUseCustomZeroPoint()) {
+        if (NeuronUpdateRule.usesCustomZeroPoint(neuron.getUpdateRule())) {
             // Current custom choice is between upper and lower bounds.
             // For example useful to capture whether a biological neuron is
             // depolarized or hyperpolarized

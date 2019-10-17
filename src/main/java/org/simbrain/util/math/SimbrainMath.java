@@ -320,6 +320,10 @@ public class SimbrainMath {
 
         double magnitude = point1.distance(point2);
 
+        if (magnitude == 0) {
+            return new Point2D.Double(0, -1);
+        }
+
         return new Point2D.Double(-dy / magnitude, dx / magnitude);
     }
 

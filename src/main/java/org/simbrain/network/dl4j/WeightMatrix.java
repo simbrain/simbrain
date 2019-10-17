@@ -36,9 +36,11 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
     private final Network parent;
 
     /**
-     * When true, the WeightMatrixNode will draw a curve line instead of a straight line.
+     * When true, the WeightMatrixNode will draw a curve instead of a straight line.
+     * Set to true when there are weight matrices going in both directions between
+     * neuron arrays so that they would block each other with a straight line.
      */
-    private boolean curve = false;
+    private boolean useCurve = false;
 
     /**
      * A label for this Neuron Array for display purpose.
@@ -165,12 +167,12 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
         return Nd4j.toFlattened(weightMatrix).toDoubleVector();
     }
 
-    public boolean isCurve() {
-        return curve;
+    public boolean isUseCurve() {
+        return useCurve;
     }
 
-    public void setCurve(boolean curve) {
-        this.curve = curve;
+    public void setUseCurve(boolean useCurve) {
+        this.useCurve = useCurve;
         changeSupport.firePropertyChange("lineUpdated", null , null);
     }
 
@@ -202,8 +204,8 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
         target.getOutgoingWeightMatrices().stream()
                 .filter(m -> m.getTarget() == source)
                 .forEach(m -> { // Even though this is for each but should happen only once.
-                    m.setCurve(false);
-                    setCurve(false);
+                    m.setUseCurve(false);
+                    setUseCurve(false);
                 });
         changeSupport.firePropertyChange("delete", this, null);
     }

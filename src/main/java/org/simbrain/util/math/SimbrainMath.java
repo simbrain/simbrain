@@ -61,6 +61,11 @@ public class SimbrainMath {
         return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
+    /**
+     * Scale a vector by the providing scaling factor
+     *
+     * @return the scaled vector
+     */
     public static Point2D scale(final Point2D vector, double scalingFactor) {
         return new Point2D.Double(vector.getX() * scalingFactor, vector.getY() * scalingFactor);
     }
@@ -68,10 +73,6 @@ public class SimbrainMath {
     /**
      * Returns a random permutation of all the integers between floor
      * (inclusive) and ceil (exclusive).
-     *
-     * @param floor
-     * @param ceil
-     * @return
      */
     public static int[] randPermute(int floor, int ceil) {
         int[] permute = new int[ceil - floor];
@@ -92,11 +93,6 @@ public class SimbrainMath {
      * (excluded) which is intentionally excluded.
      * <p>
      * This method will fail if excluded
-     *
-     * @param floor
-     * @param ceil
-     * @param excluded
-     * @return
      */
     public static int[] randPermuteWithExclusion(int floor, int ceil, int excluded) {
         int[] permute = new int[ceil - floor - 1];
@@ -314,7 +310,13 @@ public class SimbrainMath {
         return new java.awt.geom.Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
     }
 
-    public static Point2D unitNormal(Point2D point1, Point2D point2) {
+    /**
+     * Given a vector v, returns a vector perpinducular to v, that has unit length
+     * @param point1 head of vector v
+     * @param point2 tail of vector v
+     * @return the unit normal vector.
+     */
+    public static Point2D getUnitNormalVector(Point2D point1, Point2D point2) {
         double dx = point2.getX() - point1.getX();
         double dy = point2.getY() - point1.getY();
 
@@ -327,6 +329,9 @@ public class SimbrainMath {
         return new Point2D.Double(-dy / magnitude, dx / magnitude);
     }
 
+    /**
+     * Component-wise addition of the provided points
+     */
     public static Point2D add(Point2D point1, Point2D point2) {
         return new Point2D.Double(point1.getX() + point2.getX(), point1.getY() + point2.getY());
     }

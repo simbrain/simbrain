@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.*;
-import java.util.stream.Collectors;
 
 /**
  * A visual representation of a weight matrix
@@ -100,7 +99,7 @@ public class WeightMatrixNode extends ScreenElement {
                 midLocation.getY(),
                 targetLocation.getX(),
                 targetLocation.getY()
-                );
+        );
         line = new PPath.Double(line2D);
         source.onLocationChange(() -> {
             updateImageBoxLocation();
@@ -115,8 +114,8 @@ public class WeightMatrixNode extends ScreenElement {
         target.getOutgoingWeightMatrices().stream()
                 .filter(m -> m.getTarget() == this.weightMatrix.getSource())
                 .forEach(m -> { // Even though this is for each but there should only be one m.
-                    m.setCurve(true);
-                    this.getWeightMatrix().setCurve(true);
+                    m.setUseCurve(true);
+                    this.getWeightMatrix().setUseCurve(true);
                 });
 
 
@@ -133,9 +132,9 @@ public class WeightMatrixNode extends ScreenElement {
         weightMatrix.addPropertyChangeListener(evt -> {
             if ("updated".equals(evt.getPropertyName())) {
                 renderMatrixToImage();
-            } else if("delete".equals(evt.getPropertyName())) {
+            } else if ("delete".equals(evt.getPropertyName())) {
                 WeightMatrixNode.this.removeFromParent();
-            } else if("lineUpdated".equals(evt.getPropertyName())) {
+            } else if ("lineUpdated".equals(evt.getPropertyName())) {
                 updateLine();
                 updateImageBoxLocation();
             }
@@ -153,7 +152,7 @@ public class WeightMatrixNode extends ScreenElement {
         Point2D mid = SimbrainMath.add(
                 SimbrainMath.midpoint(source, target),
                 getCurveControlVector()
-                );
+        );
         removeChild(line);
         line2D.setCurve(source, mid, target);
         line = new PPath.Double(line2D);
@@ -163,11 +162,17 @@ public class WeightMatrixNode extends ScreenElement {
         line.lowerToBottom();
     }
 
+    /**
+     * When you draw a curve you need a start, end, and control point.
+     * This returns the vector used to obtain the control point.
+     *
+     * @see <a href="https://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/QuadCurve.html">Quad Curve Docs</a>
+     */
     private Point2D getCurveControlVector() {
-        float offset = weightMatrix.isCurve() ? 150 : 0;
+        float offset = weightMatrix.isUseCurve() ? 150 : 0;
         Point2D source = weightMatrix.getSource().getAttachmentPoint();
         Point2D target = weightMatrix.getTarget().getAttachmentPoint();
-        Point2D unitNormal = SimbrainMath.unitNormal(source, target);
+        Point2D unitNormal = SimbrainMath.getUnitNormalVector(source, target);
         return SimbrainMath.scale(unitNormal, offset);
     }
 
@@ -221,7 +226,7 @@ public class WeightMatrixNode extends ScreenElement {
             float saturation = activations[i];
             saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
             if (saturation < 0) {
-                raster[i] = Color.HSBtoRGB(2/3f, -saturation, 1.0f);
+                raster[i] = Color.HSBtoRGB(2 / 3f, -saturation, 1.0f);
             } else {
                 raster[i] = Color.HSBtoRGB(0.0f, saturation, 1.0f);
             }
@@ -317,7 +322,7 @@ public class WeightMatrixNode extends ScreenElement {
         contextMenu.add(randomizeAction);
 
         contextMenu.addSeparator();
-        Action editComponents= new AbstractAction("Edit Components...") {
+        Action editComponents = new AbstractAction("Edit Components...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();

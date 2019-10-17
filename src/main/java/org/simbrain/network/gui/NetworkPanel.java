@@ -2636,16 +2636,10 @@ public class NetworkPanel extends JPanel {
         this.beginPosition = beginPosition;
     }
 
-    /**
-     * @return Returns the endPosition.
-     */
     public Point2D getEndPosition() {
         return endPosition;
     }
 
-    /**
-     * @param endPosition The endPosition to set.
-     */
     public void setEndPosition(final Point2D endPosition) {
         // System.out.println("End position: " + endPosition);
         this.endPosition = endPosition;

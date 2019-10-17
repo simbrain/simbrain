@@ -226,7 +226,7 @@ public class Clipboard {
             } else if (object instanceof NeuronGroup) {
                 NeuronGroup group = (NeuronGroup) object;
                 group.offset(offsetX, offsetY);
-            } else if (object instanceof NeuronGroup) {
+            } else if (object instanceof NeuronArray) {
                 NeuronArray array = (NeuronArray) object;
                 array.offset(offsetX, offsetY);
             }

@@ -21,6 +21,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.NeuronArray;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -205,6 +206,9 @@ public class SimnetUtils {
                         y = neuron.getY();
                     }
                 }
+            } else if (object instanceof NeuronArray) {
+                x = ((NeuronArray)object).getX();
+                y = ((NeuronArray)object).getY();
             }
         }
         if (x == Double.POSITIVE_INFINITY) {

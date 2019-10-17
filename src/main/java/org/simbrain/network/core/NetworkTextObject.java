@@ -191,4 +191,12 @@ public class NetworkTextObject {
     public void fireDeleted() {
         changeSupport.firePropertyChange("delete", this, null);
     }
+
+    /**
+     * Perform any initialization required when creating a text object, but after the
+     * parent network has been added.
+     */
+    public void postUnmarshallingInit() {
+        changeSupport = new PropertyChangeSupport(this);
+    }
 }

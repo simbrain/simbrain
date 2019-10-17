@@ -1117,19 +1117,16 @@ public class Network {
         updateManager.postUnmarshallingInit();
 
         // Initialize neurons
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            neuron.postUnmarshallingInit();
-        }
+        getFlatNeuronList().forEach(Neuron::postUnmarshallingInit);
+
+        // Initialize text objects
+        textList.forEach(NetworkTextObject::postUnmarshallingInit);
 
         // Uncompress compressed matrix rep if needed
-        for (SynapseGroup group : this.getSynapseGroups()) {
-            group.postUnmarshallingInit();
-        }
+        getSynapseGroups().forEach(SynapseGroup::postUnmarshallingInit);
 
         // Re-populate fan-in / fan-out for loose synapses
-        for (Synapse synapse : this.getSynapseList()) {
-            synapse.postUnmarshallingInit();
-        }
+        getSynapseList().forEach(Synapse::postUnmarshallingInit);
 
         updateCompleted = new AtomicBoolean(false);
         return this;

@@ -142,11 +142,6 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     }
 
     @Override
-    public TextNode getNode() {
-        return this;
-    }
-
-    @Override
     public NetworkTextObject getModel() {
         return getTextObject();
     }

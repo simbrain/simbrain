@@ -1899,7 +1899,6 @@ public class NetworkPanel extends JPanel {
                 .collect(Collectors.toList());
     }
 
-
     /**
      * Get a list of network element nodes of a specific type.
      * @param cls the class of the type of node to get

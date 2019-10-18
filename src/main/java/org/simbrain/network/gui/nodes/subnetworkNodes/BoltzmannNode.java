@@ -113,8 +113,6 @@ public class BoltzmannNode extends SubnetworkNode {
         }
     }
 
-    ;
-
     @Override
     public void updateText() {
         BoltzmannMachine bm = (BoltzmannMachine) getSubnetwork();

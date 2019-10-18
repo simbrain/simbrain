@@ -127,11 +127,6 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     }
 
     @Override
-    public ViewGroupNode getNode() {
-        return this;
-    }
-
-    @Override
     public ArrayList<ScreenElement> getModel() {
         return getGroupedObjects();
     }

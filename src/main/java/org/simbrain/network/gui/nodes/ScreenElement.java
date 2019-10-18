@@ -392,7 +392,17 @@ public abstract class ScreenElement extends PPath.Float {
         this.isGrouped = isGrouped;
     }
 
-    public abstract PNode getNode();
+    /**
+     * Returns a reference to the the top level PNode of this Screen Element.
+     * Usually the ScreenElement is the top level PNode, but in some cases
+     * e.g. an interaction box, it's not.  Override in those cases.
+     */
+    public PNode getNode() {
+        return this;
+    }
 
+    /**
+     * Returns a reference to the model object this node represents.
+     */
     public abstract Object getModel();
 }

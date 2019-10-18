@@ -507,11 +507,6 @@ public final class SynapseNode extends ScreenElement {
     }
 
     @Override
-    public SynapseNode getNode() {
-        return this;
-    }
-
-    @Override
     public Synapse getModel() {
         return getSynapse();
     }

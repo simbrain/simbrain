@@ -198,11 +198,6 @@ public class MultiLayerNetworkNode extends ScreenElement {
     }
 
     @Override
-    public MultiLayerNetworkNode getNode() {
-        return this;
-    }
-
-    @Override
     public MultiLayerNet getModel() {
         return getNet();
     }

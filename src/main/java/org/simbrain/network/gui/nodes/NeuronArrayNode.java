@@ -354,11 +354,6 @@ public class NeuronArrayNode extends ScreenElement {
     }
 
     @Override
-    public NeuronArrayNode getNode() {
-        return this;
-    }
-
-    @Override
     public NeuronArray getModel() {
         return getNeuronArray();
     }

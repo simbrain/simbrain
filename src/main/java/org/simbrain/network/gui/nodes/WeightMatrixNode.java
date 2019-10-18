@@ -381,11 +381,6 @@ public class WeightMatrixNode extends ScreenElement {
     }
 
     @Override
-    public WeightMatrixNode getNode() {
-        return this;
-    }
-
-    @Override
     public WeightMatrix getModel() {
         return weightMatrix;
     }

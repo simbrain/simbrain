@@ -29,7 +29,6 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
@@ -155,7 +154,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // Cases where nothing was clicked on
         if (noObjectWasClickedOn()) {
             if (event.isShiftDown()) {
-                priorSelection = new ArrayList(networkPanel.getSelection());
+                priorSelection = new ArrayList(networkPanel.getSelectedNodes());
             } else {
                 // Don't clear selection when panning screen
                 if (!event.isMetaDown()) {
@@ -268,7 +267,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         }
 
         // Continue to drag nodes that have already been selected
-        for (PNode node : networkPanel.getSelection()) {
+        for (PNode node : networkPanel.getSelectedNodes()) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.isDraggable()) {
@@ -300,12 +299,12 @@ final class DragEventHandler extends PDragSequenceEventHandler {
         // paste-offset. This occurs when pasting a sequence, and moving one set
         // of objects to a new location
         if (networkPanel.getNumberOfPastes() != 1) {
-            networkPanel.setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
+            networkPanel.setBeginPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
         }
 
         // End drag selected node(s)
         pickedNode = null;
-        networkPanel.setEndPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
+        networkPanel.setEndPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
 
         // Reset the place new neurons and groups should be added
         networkPanel.getWhereToAdd().setLocation(event.getPosition().getX() + NetworkPanel.DEFAULT_SPACING, event.getPosition().getY());

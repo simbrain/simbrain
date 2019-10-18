@@ -56,7 +56,7 @@
 //    /** @see AbstractAction */
 //    public void actionPerformed(final ActionEvent event) {
 //        List<Synapse> synapseList = networkPanel
-//                .getSelectedModelSynapses();
+//                .getSelectedModels(Synapse.class);
 //        if (synapseList.size() > 0) {
 //            SynapseGroup group = new SynapseGroup(networkPanel.getNetwork());
 //            networkPanel.getNetwork().transferSynapsesToGroup(synapseList,

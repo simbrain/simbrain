@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.actions.selection;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronNode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -58,6 +59,6 @@ public final class SelectAllNeuronsAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.clearSelection();
-        networkPanel.setSelection(networkPanel.getNeuronNodes());
+        networkPanel.setSelection(networkPanel.getNodes(NeuronNode.class));
     }
 }

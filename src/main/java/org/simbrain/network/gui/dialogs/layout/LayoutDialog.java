@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
@@ -59,7 +60,7 @@ public class LayoutDialog extends StandardDialog {
         super.closeDialogOk();
         commitChanges();
         layoutObject.getLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
-        layoutObject.getLayout().layoutNeurons(networkPanel.getSelectedModelNeurons());
+        layoutObject.getLayout().layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
         networkPanel.repaint();
     }
 

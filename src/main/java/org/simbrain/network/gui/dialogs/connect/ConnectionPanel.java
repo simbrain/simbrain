@@ -22,6 +22,7 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -182,7 +183,7 @@ public final class ConnectionPanel extends JPanel {
     public void commitChanges(NetworkPanel networkPanel) {
 
         commitSettings();
-        List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
+        List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(), networkPanel.getSourceModels(Neuron.class), networkPanel.getSelectedModels(Neuron.class));
         if (synapses.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Chosen connection" +
                             " parameters resulted in no synapses being created." +

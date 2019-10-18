@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -43,16 +44,19 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      */
     private final SynapseGroup synapseGroup;
 
+
+    private final SynapseGroupNode synapseGroupNode;
+
     /**
      * Construct the custom interaction box.
      *
      * @param net          parent network panel
      * @param synapseGroup
      */
-    public SynapseGroupInteractionBox(NetworkPanel net, SynapseGroup synapseGroup) {
+    public SynapseGroupInteractionBox(NetworkPanel net, SynapseGroup synapseGroup, SynapseGroupNode synapseGroupNode) {
         super(net);
         this.synapseGroup = synapseGroup;
-
+        this.synapseGroupNode = synapseGroupNode;
     }
 
     /**
@@ -65,6 +69,16 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     @Override
     protected JDialog getPropertyDialog() {
         return this.getNetworkPanel().getSynapseGroupDialog(this);
+    }
+
+    @Override
+    public SynapseGroupNode getNode() {
+        return synapseGroupNode;
+    }
+
+    @Override
+    public SynapseGroup getModel() {
+        return synapseGroup;
     }
 
     @Override

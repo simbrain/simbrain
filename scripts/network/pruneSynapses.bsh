@@ -7,7 +7,7 @@ import org.simbrain.network.core.*;
 {
     double THRESHOLD = .5;
 
-    for (Synapse synapse: networkPanel.getSelectedModelSynapses()) {
+    for (Synapse synapse: networkPanel.getSelectedModels(Synapse.class)) {
         if (Math.abs(synapse.getStrength()) < THRESHOLD) {
             network.removeSynapse(synapse);
         }

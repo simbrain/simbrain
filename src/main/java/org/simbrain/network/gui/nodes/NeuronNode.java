@@ -699,6 +699,16 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         }
     }
 
+    @Override
+    public NeuronNode getNode() {
+        return this;
+    }
+
+    @Override
+    public Neuron getModel() {
+        return getNeuron();
+    }
+
     /**
      * @return the hotColor
      */

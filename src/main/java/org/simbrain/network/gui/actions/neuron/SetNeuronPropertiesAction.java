@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions.neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.nodes.NeuronNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,7 +72,7 @@ public final class SetNeuronPropertiesAction extends AbstractAction {
      * Set action text based on number of selected neurons.
      */
     private void updateAction() {
-        int numNeurons = networkPanel.getSelectedNeurons().size();
+        int numNeurons = networkPanel.getSelectedNodes(NeuronNode.class).size();
 
         if (numNeurons > 0) {
             String text = new String(("Edit " + numNeurons + ((numNeurons > 1) ? " Selected Neurons" : " Selected Neuron")));

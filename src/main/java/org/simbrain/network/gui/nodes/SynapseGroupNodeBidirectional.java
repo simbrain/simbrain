@@ -194,8 +194,8 @@ public class SynapseGroupNodeBidirectional extends PNode implements PropertyChan
         this.networkPanel = networkPanel;
         this.synGroup1 = synGroup1;
         this.synGroup2 = synGroup2;
-        synGroup1Box = new SynapseGroupInteractionBox(networkPanel, synGroup1);
-        synGroup2Box = new SynapseGroupInteractionBox(networkPanel, synGroup2);
+        synGroup1Box = new SynapseGroupInteractionBox(networkPanel, synGroup1, null); // TODO: fix null
+        synGroup2Box = new SynapseGroupInteractionBox(networkPanel, synGroup2, null);
         srcNGroup = synGroup1.getSourceNeuronGroup();
         tarNGroup = synGroup1.getTargetNeuronGroup();
         srcGroupNode = (NeuronGroupNode) networkPanel.getObjectNodeMap().get(srcNGroup);

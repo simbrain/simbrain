@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.nd4j.linalg.factory.Nd4j;
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PPaintContext;
@@ -377,6 +378,16 @@ public class WeightMatrixNode extends ScreenElement {
 
     @Override
     public void resetColors() {
+    }
+
+    @Override
+    public WeightMatrixNode getNode() {
+        return this;
+    }
+
+    @Override
+    public WeightMatrix getModel() {
+        return weightMatrix;
     }
 
     public WeightMatrix getWeightMatrix() {

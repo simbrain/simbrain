@@ -32,7 +32,7 @@ import java.beans.PropertyChangeListener;
 /**
  * Interaction Box: graphical element for interacting with a group.
  */
-public class InteractionBox extends ScreenElement {
+public abstract class InteractionBox extends ScreenElement {
 
     /**
      * Width of interaction box.

@@ -74,7 +74,7 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         // networkpanel and added externally to outlined objects
         outlinedObjects = new OutlinedObjects();
         outlinedObjects.setDrawOutline(false);
-        interactionBox = new SynapseGroupInteractionBox(networkPanel, group);
+        interactionBox = new SynapseGroupInteractionBox(networkPanel, group, this);
         interactionBox.setText(synapseGroup.getLabel());
         addChild(outlinedObjects);
         addChild(interactionBox);

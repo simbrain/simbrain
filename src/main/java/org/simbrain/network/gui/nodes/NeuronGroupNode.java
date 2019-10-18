@@ -425,6 +425,16 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         }
 
         @Override
+        public NeuronGroupNode getNode() {
+            return NeuronGroupNode.this;
+        }
+
+        @Override
+        public NeuronGroup getModel() {
+            return NeuronGroupNode.this.getNeuronGroup();
+        }
+
+        @Override
         protected boolean hasPropertyDialog() {
             return true;
         }

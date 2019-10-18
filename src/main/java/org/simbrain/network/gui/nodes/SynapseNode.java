@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
@@ -438,7 +439,8 @@ public final class SynapseNode extends ScreenElement {
      * @see ScreenElement
      */
     protected JDialog getPropertyDialog() {
-        SynapseDialog dialog = (SynapseDialog) getNetworkPanel().getSynapseDialog(getNetworkPanel().getSelectedSynapses());
+        SynapseDialog dialog =
+                (SynapseDialog) getNetworkPanel().getSynapseDialog(getNetworkPanel().getSelectedNodes(SynapseNode.class));
         return dialog;
     }
 
@@ -502,6 +504,16 @@ public final class SynapseNode extends ScreenElement {
         line.setStrokePaint(lineColor);
         updateColor();
         updateDiameter();
+    }
+
+    @Override
+    public SynapseNode getNode() {
+        return this;
+    }
+
+    @Override
+    public Synapse getModel() {
+        return getSynapse();
     }
 
     /**

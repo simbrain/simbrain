@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.actions;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
@@ -67,8 +68,8 @@ public final class ShowTrainerAction extends AbstractAction {
      * neuron.
      */
     private void updateAction() {
-        boolean atLeastOneSourceSelected = (networkPanel.getSourceModelNeurons().size() > 0);
-        boolean atLeastOneTargetSelected = (networkPanel.getSelectedModelElements().size() > 0);
+        boolean atLeastOneSourceSelected = (networkPanel.getSourceModels(Neuron.class).size() > 0);
+        boolean atLeastOneTargetSelected = (networkPanel.getSelectedModels().size() > 0);
         if (atLeastOneSourceSelected && atLeastOneTargetSelected) {
             setEnabled(true);
         } else {
@@ -82,8 +83,8 @@ public final class ShowTrainerAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
         // Trainer trainer = new Trainer(networkPanel.getNetwork(),
-        // networkPanel.getSourceModelNeurons(),
-        // networkPanel.getSelectedModelNeurons(), new Backprop());
+        // networkPanel.getSourceModels(Neuron.class),
+        // networkPanel.getSelectedModels(Neuron.class), new Backprop());
         // TrainerPanel trainerPanel = new TrainerPanel(networkPanel, trainer);
         // GenericFrame frame = networkPanel.displayPanel(trainerPanel,
         // "Trainer panel");

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.StandardDialog;
@@ -263,8 +264,8 @@ public class KeyBindings {
                     AddSynapseGroupAction.displaySynapseGroupDialog(panel);
                 } else {
                     panel.getQuickConnector().applyCurrentConnection(panel.getNetwork(),
-                            panel.getSourceModelNeurons(),
-                            panel.getSelectedModelNeurons());
+                            panel.getSourceModels(Neuron.class),
+                            panel.getSelectedModels(Neuron.class));
                 }
             }
         });

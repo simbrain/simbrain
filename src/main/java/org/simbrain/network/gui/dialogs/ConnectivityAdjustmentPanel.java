@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs;
 
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.Utils;
 
@@ -66,7 +67,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
     public ConnectivityAdjustmentPanel(final Sparse connection, final NetworkPanel networkPanel) {
         this.connection = connection;
-        numTargs = networkPanel.getSelectedModelNeurons().size();
+        numTargs = networkPanel.getSelectedModels(Neuron.class).size();
         // fillFieldValues();
         initializeSparseSlider();
         addChangeListeners();

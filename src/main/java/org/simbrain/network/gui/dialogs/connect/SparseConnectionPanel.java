@@ -201,8 +201,8 @@ public class SparseConnectionPanel extends EditablePanel {
 //
 //                } else {
 //                    // Called when Quick Properties (see QuickConnectDialog) is used
-//                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModelNeurons());
-//                    List<Neuron> targets = networkPanel.getSelectedModelNeurons();
+//                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModels(Neuron.class));
+//                    List<Neuron> targets = networkPanel.getSelectedModels(Neuron.class);
 //                    numTargs = targets.size();
 //                    int sourcesSize = sources.size();
 //                    sources.retainAll(targets);

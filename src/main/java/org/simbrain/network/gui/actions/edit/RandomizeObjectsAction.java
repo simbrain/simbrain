@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.gui.NetworkPanel;
@@ -55,27 +57,25 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        for (NeuronNode node : networkPanel.getSelectedNeurons()) {
+        for (NeuronNode node : networkPanel.getSelectedNodes(NeuronNode.class)) {
             node.getNeuron().randomize();
         }
-        for (SynapseNode node : networkPanel.getSelectedSynapses()) {
+        for (SynapseNode node : networkPanel.getSelectedNodes(SynapseNode.class)) {
             node.getSynapse().randomize();
         }
-        for (NeuronGroupNode node : networkPanel.getSelectedNeuronGroups()) {
+        for (NeuronGroupNode node : networkPanel.getSelectedNodes(NeuronGroupNode.class)) {
             node.getNeuronGroup().randomize();
         }
-        for (NeuronArray na: networkPanel.getSelectedModelNeuronArrays()) {
+        for (NeuronArray na: networkPanel.getSelectedModels(NeuronArray.class)) {
             na.randomize();
         }
-        for (WeightMatrix wm: networkPanel.getSelectedModelWeightMatrices()) {
+        for (WeightMatrix wm: networkPanel.getSelectedModels(WeightMatrix.class)) {
             wm.randomize();
         }
         // Show Synapse Group Randomization dialog for one synapse group only
-        Optional<SynapseGroupNode> sg = networkPanel.getSelectedSynapseGroups().stream().findFirst();
-        if(sg.isPresent()) {
-            sg.get().showRandomizationDialog();
-        }
-        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModelNeurons());
-        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModelSynapses());
+        Optional<SynapseGroupNode> sg = networkPanel.getSelectedNodes(SynapseGroupNode.class).stream().findFirst();
+        sg.ifPresent(SynapseGroupNode::showRandomizationDialog);
+        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModels(Neuron.class));
+        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModels(Synapse.class));
     }
 }

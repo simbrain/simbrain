@@ -38,7 +38,7 @@ public class Clipboard {
     // 1) all elseifs here,
     // 2) CopyPaste.getCopy()
     // 3) Network.addObjects
-    // 4) NetworkPanel.getSelectedModelElements()
+    // 4) NetworkPanel.getSelectedModels()
 
     /**
      * Static list of cut or copied objects.

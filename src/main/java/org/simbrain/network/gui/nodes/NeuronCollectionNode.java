@@ -271,6 +271,16 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
         }
 
         @Override
+        public NeuronCollectionNode getNode() {
+            return NeuronCollectionNode.this;
+        }
+
+        @Override
+        public NeuronCollection getModel() {
+            return NeuronCollectionNode.this.getNeuronCollection();
+        }
+
+        @Override
         protected boolean hasPropertyDialog() {
             return false;
         }

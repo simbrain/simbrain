@@ -19,6 +19,7 @@
 
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.NetworkPanel;
@@ -118,7 +119,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 
-        if (getNetworkPanel().getSelectedText().size() > 0) {
+        if (getNetworkPanel().getSelectedNodes(TextNode.class).size() > 0) {
             contextMenu.addSeparator();
             contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
         }
@@ -138,6 +139,16 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
     @Override
     public void resetColors() {
+    }
+
+    @Override
+    public TextNode getNode() {
+        return this;
+    }
+
+    @Override
+    public NetworkTextObject getModel() {
+        return getTextObject();
     }
 
     @Override

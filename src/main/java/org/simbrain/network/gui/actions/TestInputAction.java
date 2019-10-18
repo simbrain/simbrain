@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.actions;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
@@ -61,7 +62,7 @@ public class TestInputAction extends ConditionallyEnabledAction {
      * @param event
      */
     public void actionPerformed(ActionEvent event) {
-        TestInputPanel panel = TestInputPanel.createTestInputPanel(networkPanel, networkPanel.getSelectedModelNeurons());
+        TestInputPanel panel = TestInputPanel.createTestInputPanel(networkPanel, networkPanel.getSelectedModels(Neuron.class));
         networkPanel.displayPanel(panel, "Test Input Panel");
     }
 }

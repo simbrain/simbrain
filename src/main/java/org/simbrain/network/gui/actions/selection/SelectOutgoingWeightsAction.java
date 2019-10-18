@@ -61,7 +61,7 @@ public final class SelectOutgoingWeightsAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        List<Neuron> list = networkPanel.getSelectedModelNeurons();
+        List<Neuron> list = networkPanel.getSelectedModels(Neuron.class);
         List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();
         for (Neuron neuron : list) {
             for (Synapse synapse : neuron.getFanOut().values()) {

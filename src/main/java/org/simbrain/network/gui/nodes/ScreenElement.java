@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
@@ -390,4 +391,8 @@ public abstract class ScreenElement extends PPath.Float {
     public void setGrouped(boolean isGrouped) {
         this.isGrouped = isGrouped;
     }
+
+    public abstract PNode getNode();
+
+    public abstract Object getModel();
 }

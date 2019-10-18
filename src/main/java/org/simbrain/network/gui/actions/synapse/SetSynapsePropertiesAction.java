@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions.synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.nodes.SynapseNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,7 +72,7 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
      * Set action text based on number of selected neurons.
      */
     private void updateAction() {
-        int numSynapses = networkPanel.getSelectedSynapses().size();
+        int numSynapses = networkPanel.getSelectedNodes(SynapseNode.class).size();
 
         if (numSynapses > 0) {
             String text = new String(("Edit " + numSynapses + ((numSynapses > 1) ? " Selected Synapses" : " Selected Synapse")));

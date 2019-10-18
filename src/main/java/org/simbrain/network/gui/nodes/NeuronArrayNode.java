@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.nd4j.linalg.factory.Nd4j;
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
@@ -350,6 +351,16 @@ public class NeuronArrayNode extends ScreenElement {
 
     @Override
     public void resetColors() {
+    }
+
+    @Override
+    public NeuronArrayNode getNode() {
+        return this;
+    }
+
+    @Override
+    public NeuronArray getModel() {
+        return getNeuronArray();
     }
 
     @Override

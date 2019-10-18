@@ -59,7 +59,6 @@ import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -266,7 +265,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Source elements (when setting a source node or group and then connecting to a target).
      */
-    private Collection<PNode> sourceElements = new ArrayList<PNode>();
+    private List<ScreenElement> sourceElements = new ArrayList<>();
 
     /**
      * Toggle button for neuron clamping.
@@ -464,7 +463,7 @@ public class NetworkPanel extends JPanel {
         PropertyChangeListener zoomListener = new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                for (NeuronNode node : getNeuronNodes()) {
+                for (NeuronNode node : getNodes(NeuronNode.class)) {
                     node.updateTextVisibility();
                 }
 
@@ -562,7 +561,7 @@ public class NetworkPanel extends JPanel {
      */
     private void updateNeuronNodes() {
         // System.out.println("In update neuron nodes");
-        for (NeuronNode node : getNeuronNodes()) {
+        for (NeuronNode node : getNodes(NeuronNode.class)) {
             node.update();
         }
         timeLabel.update();
@@ -618,7 +617,7 @@ public class NetworkPanel extends JPanel {
     private void updateSynapseNodes() {
 
         // System.out.println("In update synapse nodes");
-        for (SynapseNode node : this.getSynapseNodes()) {
+        for (SynapseNode node : this.getNodes(SynapseNode.class)) {
             if (node.getVisible()) {
                 node.updateColor();
                 node.updateDiameter();
@@ -724,12 +723,12 @@ public class NetworkPanel extends JPanel {
 
         layout.setInitialLocation(whereToAdd);
 
-        layout.layoutNeurons(getSelectedModelNeurons());
+        layout.layoutNeurons(getSelectedModels(Neuron.class));
 
         // New objects are added to the right of the last group of
         // neurons added.
         whereToAdd.setLocation(neurons.get(neurons.size() - 1).getX() + DEFAULT_SPACING + 10, whereToAdd.getY());
-        network.fireNeuronsUpdated(getSelectedModelNeurons());
+        network.fireNeuronsUpdated(getSelectedModels(Neuron.class));
         repaint();
 
     }
@@ -1479,7 +1478,7 @@ public class NetworkPanel extends JPanel {
      * Delete selected items.
      */
     public void deleteSelectedObjects() {
-        for (PNode selectedNode : getSelection()) {
+        for (PNode selectedNode : getSelectedNodes()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 final Neuron neuron = selectedNeuronNode.getNeuron();
@@ -1551,8 +1550,8 @@ public class NetworkPanel extends JPanel {
     public void copy() {
         Clipboard.clear();
         setNumberOfPastes(0);
-        setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) getSelectedModelElements()));
-        ArrayList deepCopy = CopyPaste.getCopy(this.getNetwork(), (ArrayList) getSelectedModelElements());
+        setBeginPosition(SimnetUtils.getUpperLeft(getSelectedModels()));
+        ArrayList deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
         Clipboard.add(deepCopy);
     }
 
@@ -1585,12 +1584,13 @@ public class NetworkPanel extends JPanel {
      */
     public void alignHorizontal() {
         double min = Double.MAX_VALUE;
-        for (Neuron neuron : getSelectedModelNeurons()) {
+        List<Neuron> selectedNeurons = getSelectedModels(Neuron.class);
+        for (Neuron neuron : selectedNeurons) {
             if (neuron.getY() < min) {
                 min = neuron.getY();
             }
         }
-        for (Neuron neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : selectedNeurons) {
             neuron.setY(min);
         }
         repaint();
@@ -1602,12 +1602,15 @@ public class NetworkPanel extends JPanel {
     public void alignVertical() {
 
         double min = Double.MAX_VALUE;
-        for (Neuron neuron : getSelectedModelNeurons()) {
+
+        List<Neuron> selectedNeurons = getSelectedModels(Neuron.class);
+
+        for (Neuron neuron : selectedNeurons) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
             }
         }
-        for (Neuron neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : selectedNeurons) {
             neuron.setX(min);
         }
         repaint();
@@ -1617,11 +1620,11 @@ public class NetworkPanel extends JPanel {
      * TODO: Push this and related methods to model? Spaces neurons horizontally.
      */
     public void spaceHorizontal() {
-        if (getSelectedNeurons().size() <= 1) {
+        if (getSelectedNodes(NeuronNode.class).size() <= 1) {
             return;
         }
-        List<Neuron> sortedNeurons = getSelectedModelNeurons();
-        Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_X));
+        List<Neuron> sortedNeurons = getSelectedModels(Neuron.class);
+        sortedNeurons.sort(new NeuronComparator(NeuronComparator.Type.COMPARE_X));
 
         double min = sortedNeurons.get(0).getX();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getX();
@@ -1640,10 +1643,10 @@ public class NetworkPanel extends JPanel {
      * Spaces neurons vertically.
      */
     public void spaceVertical() {
-        if (getSelectedNeurons().size() <= 1) {
+        if (getSelectedNodes(NeuronNode.class).size() <= 1) {
             return;
         }
-        List<Neuron> sortedNeurons = getSelectedModelNeurons();
+        List<Neuron> sortedNeurons = getSelectedModels(Neuron.class);
         Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_Y));
 
         double min = sortedNeurons.get(0).getY();
@@ -1663,7 +1666,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the neuron properties dialog.
      */
     public void showSelectedNeuronProperties() {
-        NeuronDialog dialog = new NeuronDialog(getSelectedModelNeurons());
+        NeuronDialog dialog = new NeuronDialog(getSelectedModels(Neuron.class));
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
@@ -1671,10 +1674,10 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates and displays the neuron properties dialog.
+     * Creates and displays the neuron array properties dialog.
      */
     public void showSelectedNeuronArrayProperties() {
-        StandardDialog dialog = new AnnotatedPropertyEditor(getSelectedModelNeurons()).getDialog();
+        StandardDialog dialog = new AnnotatedPropertyEditor(getSelectedModels(NeuronArray.class)).getDialog();
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
@@ -1685,7 +1688,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the synapse properties dialog.
      */
     public void showSelectedSynapseProperties() {
-        SynapseDialog dialog = SynapseDialog.createSynapseDialog(this.getSelectedModelSynapses());
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(this.getSelectedModels(Synapse.class));
         dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
@@ -1697,7 +1700,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the text properties dialog.
      */
     public void showTextPropertyDialog() {
-        TextDialog dialog = new TextDialog(getSelectedText());
+        TextDialog dialog = new TextDialog(getSelectedNodes(TextNode.class));
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -1736,12 +1739,17 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Return the selection as a collection of selected elements.
+     * Return the selection as a collection of selected screen elements.
      *
-     * @return the selection as a collection of selected elements
+     * @return the selection as a collection of selected screen elements
      */
-    public Collection<PNode> getSelection() {
-        return selectionModel.getSelection();
+    @SuppressWarnings("unchecked")
+    public List<ScreenElement> getSelectedNodes() {
+        Collection<PNode> nodes = selectionModel.getSelection();
+        return nodes.stream()
+                .filter(ScreenElement.class::isInstance)
+                .map(ScreenElement.class::cast)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1804,7 +1812,7 @@ public class NetworkPanel extends JPanel {
         Set<PNode> selection = event.getSelection();
         Set<PNode> oldSelection = event.getOldSelection();
 
-        Set<PNode> difference = new HashSet<PNode>(oldSelection);
+        Set<PNode> difference = new HashSet<>(oldSelection);
         difference.removeAll(selection);
 
         for (PNode node : difference) {
@@ -1841,8 +1849,8 @@ public class NetworkPanel extends JPanel {
      * Add a weight matrix between neuron collections or arrays.
      */
     public void addWeightMatricesFromSelection() {
-        List<ArrayConnectable> sources = getSourceModelArrayConnectables();
-        List<ArrayConnectable> targets = getSelectedModelArrayConnectables();
+        List<ArrayConnectable> sources = getSourceModels(ArrayConnectable.class);
+        List<ArrayConnectable> targets = getSelectedModels(ArrayConnectable.class);
         for (ArrayConnectable source : sources) {
             for (ArrayConnectable target : targets) {
                 if (source instanceof NeuronCollection && target instanceof NeuronCollection) {
@@ -1853,282 +1861,115 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    public Collection<NeuronGroupNode> getSelectedNeuronGroups() {
-        return getSelection().stream()
-                .filter(n -> n.getParent() instanceof NeuronGroupNode)
-                .map(PNode::getParent)
-                .map(n -> (NeuronGroupNode) n)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronCollectionNode> getSelectedNeuronCollections() {
-        return getSelection().stream()
-                .filter(n -> n.getParent() instanceof NeuronCollectionNode)
-                .map(PNode::getParent)
-                .map(NeuronCollectionNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public Collection<SynapseGroupNode> getSelectedSynapseGroups() {
-        return getSelection().stream()
-                .filter(n -> n.getParent() instanceof SynapseGroupNode)
-                .map(PNode::getParent)
-                .map(n -> (SynapseGroupNode) n)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronArrayNode> getSelectedNeuronArrays() {
-        return getSelection().stream()
-                .filter(NeuronArrayNode.class::isInstance)
-                .map(NeuronArrayNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<MultiLayerNetworkNode> getSelectedMultiLayerNetworks() {
-        return getSelection().stream()
-                .filter(MultiLayerNetworkNode.class::isInstance)
-                .map(MultiLayerNetworkNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<Neuron> getSelectedModelNeurons() {
-        return getSelection().stream()
-                .filter(NeuronNode.class::isInstance)
-                .map(NeuronNode.class::cast)
-                .map(NeuronNode::getNeuron)
-                .collect(Collectors.toList());
-    }
-
-    public List<Neuron> getSourceModelNeurons() {
-        return sourceElements.stream()
-                .filter(NeuronNode.class::isInstance)
-                .map(NeuronNode.class::cast)
-                .map(NeuronNode::getNeuron)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronArray> getSelectedModelNeuronArrays() {
-        return getSelection().stream()
-                .filter(NeuronArrayNode.class::isInstance)
-                .map(NeuronArrayNode.class::cast)
-                .map(NeuronArrayNode::getNeuronArray)
-                .collect(Collectors.toList());
-    }
-
-    public List<MultiLayerNet> getSelectedModelMultiLayerNetworks() {
-        return getSelection().stream()
-                .filter(MultiLayerNetworkNode.class::isInstance)
-                .map(MultiLayerNetworkNode.class::cast)
-                .map(MultiLayerNetworkNode::getNet)
-                .collect(Collectors.toList());
-    }
-
-    public List<ArrayConnectable> getSelectedModelArrayConnectables() {
-        List<ArrayConnectable> ret = new ArrayList<>();
-        ret.addAll(getSelectedModelNeuronArrays());
-        ret.addAll(getSelectedModelNeuronCollections());
-        ret.addAll(getSelectedModelMultiLayerNetworks());
-        return ret;
-    }
-
-    public List<WeightMatrix> getSelectedModelWeightMatrices() {
-        return getSelection().stream()
-                .filter(WeightMatrixNode.class::isInstance)
-                .map(WeightMatrixNode.class::cast)
-                .map(WeightMatrixNode::getWeightMatrix)
-                .collect(Collectors.toList());
-    }
-
-    public List<Synapse> getSelectedModelSynapses() {
-        return getSelection().stream()
-                .filter(SynapseNode.class::isInstance)
-                .map(SynapseNode.class::cast)
-                .map(SynapseNode::getSynapse)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronGroup> getSelectedModelNeuronGroups() {
-        return getSelection().stream()
-                .filter(NeuronGroupNode.class::isInstance)
-                .map(NeuronGroupNode.class::cast)
-                .map(NeuronGroupNode::getNeuronGroup)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Returns neuron groups which are "source elements" that can be connected to other neuron groups.
-     *
-     * @return the source model group
-     */
-    public List<NeuronGroup> getSourceModelGroups() {
-        return sourceElements.stream()
-                .filter(NeuronGroupNode.class::isInstance)
-                .map(NeuronGroupNode.class::cast)
-                .map(NeuronGroupNode::getNeuronGroup)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronCollection> getSelectedModelNeuronCollections() {
-        return getSelection().stream()
-                .filter(n -> n.getParent() instanceof NeuronCollectionNode)
-                .map(PNode::getParent)
-                .map(NeuronCollectionNode.class::cast)
-                .map(NeuronCollectionNode::getNeuronCollection)
-                .collect(Collectors.toList());
-    }
-
-    public List<SynapseNode> getSelectedSynapses() {
-        return getSelection().stream()
-                .filter(SynapseNode.class::isInstance)
-                .map(SynapseNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronNode> getSelectedNeurons() {
-        return getSelection().stream()
-                .filter(NeuronNode.class::isInstance)
-                .map(NeuronNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronNode> getNeuronNodes() {
-        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(NeuronNode.class::isInstance)
-                .map(NeuronNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<SynapseNode> getSynapseNodes() {
-        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(SynapseNode.class::isInstance)
-                .map(SynapseNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public Collection<TextNode> getTextNodes() {
-        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(TextNode.class::isInstance)
-                .map(TextNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    public List<TextNode> getSelectedText() {
-        Collection<TextNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(TextNode.class::isInstance)
-                .map(TextNode.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Return a collection of all selectable {@link ScreenElement}
-     */
-    public List<ScreenElement> getSelectableNodes() {
-        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(ScreenElement.class::isInstance)
-                .map(ScreenElement.class::cast)
-                .filter(ScreenElement::isSelectable)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronCollection> getSourceModelNeuronCollections() {
-        return sourceElements.stream()
-                .filter(NeuronCollectionNode.NeuronCollectionInteractionBox.class::isInstance)
-                .map(PNode::getParent)
-                .map(NeuronCollectionNode.class::cast)
-                .map(NeuronCollectionNode::getNeuronCollection)
-                .collect(Collectors.toList());
-    }
-
-    public List<NeuronArray> getSourceModelNeuronArrays() {
-        return sourceElements.stream()
-                .filter(NeuronArrayNode.class::isInstance)
-                .map(NeuronArrayNode.class::cast)
-                .map(NeuronArrayNode::getNeuronArray)
-                .collect(Collectors.toList());
-    }
-
-    public List<MultiLayerNet> getSourceModelMultiLayerNetworks() {
-        return sourceElements.stream()
-                .filter(MultiLayerNetworkNode.class::isInstance)
-                .map(MultiLayerNetworkNode.class::cast)
-                .map(MultiLayerNetworkNode::getNet)
-                .collect(Collectors.toList());
-    }
-
-    public List<ArrayConnectable> getSourceModelArrayConnectables() {
-        List<ArrayConnectable> ret = new ArrayList<>();
-        ret.addAll(getSourceModelNeuronArrays());
-        ret.addAll(getSourceModelNeuronCollections());
-        ret.addAll(getSourceModelMultiLayerNetworks());
-        return ret;
-    }
-
-
-    /**
-     * Set selected elements to be source elements (with red rectangles around them).
-     */
-    public void setSourceElements() {
-        clearSourceElements();
-        for (PNode node : this.getSelectedNeurons()) {
-            sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
-        }
-        for (NeuronGroupNode node : this.getSelectedNeuronGroups()) {
-            sourceElements.add(node.getInteractionBox());
-            SourceHandle.addSourceHandleTo(node.getInteractionBox());
-        }
-        for (NeuronCollectionNode node : getSelectedNeuronCollections()) {
-            sourceElements.add(node.getInteractionBox());
-            SourceHandle.addSourceHandleTo(node.getInteractionBox());
-        }
-        for (NeuronArrayNode node : this.getSelectedNeuronArrays()) {
-            sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
-        }
-        for (MultiLayerNetworkNode node : getSelectedMultiLayerNetworks()) {
-            sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
-        }
-        selectionModel.fireSelectionChanged();
-    }
 
     /**
      * Returns model Network elements corresponding to selected screen elements.
      *
      * @return list of selected model elements
      */
-    public Collection getSelectedModelElements() {
-        Collection ret = new ArrayList();
-        for (PNode e : getSelection()) {
-            // System.out.println("=="+e);
-            if (e instanceof NeuronNode) {
-                ret.add(((NeuronNode) e).getNeuron());
-            } else if (e instanceof SynapseNode) {
-                ret.add(((SynapseNode) e).getSynapse());
-            } else if (e instanceof WeightMatrixNode) {
-                ret.add(((WeightMatrixNode) e).getWeightMatrix());
-            } else if (e instanceof NeuronArrayNode) {
-                ret.add(((NeuronArrayNode) e).getNeuronArray());
-            } else if (e instanceof MultiLayerNetworkNode) {
-                ret.add(((MultiLayerNetworkNode) e).getNet());
-            } else if (e instanceof TextNode) {
-                ret.add(((TextNode) e).getTextObject());
-            } else if (e instanceof InteractionBox) {
-                if (e.getParent() instanceof NeuronGroupNode) {
-                    ret.add(((NeuronGroupNode) e.getParent()).getNeuronGroup());
-                } else if (e.getParent() instanceof SynapseGroupNode) {
-                    ret.add(((SynapseGroupNode) e.getParent()).getSynapseGroup());
-                } else if (e.getParent() instanceof SubnetworkNode) {
-                    ret.add(((SubnetworkNode) e.getParent()).getSubnetwork());
-                }
-            }
+    public List<Object> getSelectedModels() {
+        return getSelectedNodes().stream()
+                .filter(Objects::nonNull)
+                .map(ScreenElement::getModel)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of selected network element models.
+     * @param cls the class of the model
+     * @return the list of selected network element models
+     */
+    public <T> List<T> getSelectedModels(Class<T> cls) {
+        return getSelectedModels().stream()
+                .filter(cls::isInstance)
+                .map(cls::cast)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of network element nodes.
+     * @param cls the class of the node
+     */
+    public <T extends PNode> List<T> getSelectedNodes(Class<T> cls) {
+        return getSelectedNodes().stream()
+                .map(ScreenElement::getNode)
+                .filter(Objects::nonNull)  // TODO: remove. here because of synapse interaction box
+                .filter(cls::isInstance)
+                .map(cls::cast)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Get a list of network element nodes of a specific type.
+     * @param cls the class of the type of node to get
+     * @return the list of network element nodes.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends PNode> List<T> getNodes(Class<T> cls) {
+        Collection<PNode> nodes = canvas.getLayer().getAllNodes();
+        return nodes.stream()
+                .filter(cls::isInstance)
+                .map(cls::cast)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of all network elements that are marked as source
+     */
+    public List<Object> getSourceModels() {
+        return sourceElements.stream()
+                .map(ScreenElement::getModel)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of network elements model of a specific type.
+     * @param cls the class of the type of node to get
+     */
+    public <T> List<T> getSourceModels(Class<T> cls) {
+        return getSourceModels().stream()
+                .filter(cls::isInstance)
+                .map(cls::cast)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Return a collection of all selectable {@link ScreenElement}
+     */
+    public List<ScreenElement> getSelectableNodes() {
+        return getNodes(ScreenElement.class).stream()
+                .filter(ScreenElement::isSelectable)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Set selected elements to be source elements (with red rectangles around them).
+     */
+    public void setSourceElements() {
+        clearSourceElements();
+        for (NeuronNode node : this.getSelectedNodes(NeuronNode.class)) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
         }
-        return ret;
+        for (NeuronGroupNode node : this.getSelectedNodes(NeuronGroupNode.class)) {
+            sourceElements.add(node.getInteractionBox());
+            SourceHandle.addSourceHandleTo(node.getInteractionBox());
+        }
+        for (NeuronCollectionNode node : getSelectedNodes(NeuronCollectionNode.class)) {
+            sourceElements.add(node.getInteractionBox());
+            SourceHandle.addSourceHandleTo(node.getInteractionBox());
+        }
+        for (NeuronArrayNode node : getSelectedNodes(NeuronArrayNode.class)) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
+        }
+        for (MultiLayerNetworkNode node : getSelectedNodes(MultiLayerNetworkNode.class)) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
+        }
+        selectionModel.fireSelectionChanged();
     }
 
 
@@ -2151,7 +1992,7 @@ public class NetworkPanel extends JPanel {
      * colors.
      */
     public void resetSynapseDiameters() {
-        for (SynapseNode synapse : getSynapseNodes()) {
+        for (SynapseNode synapse : this.getNodes(SynapseNode.class)) {
             synapse.updateDiameter();
         }
         repaint();
@@ -2306,7 +2147,7 @@ public class NetworkPanel extends JPanel {
         ArrayList<ScreenElement> toSearch = new ArrayList<ScreenElement>();
 
         // Ungroup selected groups
-        for (PNode node : this.getSelection()) {
+        for (PNode node : this.getSelectedNodes()) {
             if (node instanceof ViewGroupNode) {
                 unGroup((ViewGroupNode) node, false);
                 elements.addAll(((ViewGroupNode) node).getGroupedObjects());
@@ -2441,17 +2282,14 @@ public class NetworkPanel extends JPanel {
      * Increases neuron and synapse activation levels.
      */
     public void incrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
-            PNode node = (PNode) i.next();
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.getNeuron().getUpdateRule().incrementActivation(neuronNode.getNeuron());
-            } else if (node instanceof SynapseNode) {
-                SynapseNode synapseNode = (SynapseNode) node;
-                synapseNode.getSynapse().incrementWeight();
-                synapseNode.updateColor();
-                synapseNode.updateDiameter();
-            }
+        for (Neuron neuron : getSelectedModels(Neuron.class)) {
+            neuron.getUpdateRule().incrementActivation(neuron);
+        }
+
+        for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
+            synapseNode.getSynapse().incrementWeight();
+            synapseNode.updateColor();
+            synapseNode.updateDiameter();
         }
     }
 
@@ -2459,18 +2297,16 @@ public class NetworkPanel extends JPanel {
      * Decreases neuron and synapse activation levels.
      */
     public void decrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
-            PNode node = (PNode) i.next();
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.getNeuron().getUpdateRule().decrementActivation(neuronNode.getNeuron());
-                neuronNode.update();
-            } else if (node instanceof SynapseNode) {
-                SynapseNode synapseNode = (SynapseNode) node;
-                synapseNode.getSynapse().decrementWeight();
-                synapseNode.updateColor();
-                synapseNode.updateDiameter();
-            }
+
+        for (NeuronNode neuronNode : getSelectedNodes(NeuronNode.class)) {
+            neuronNode.getNeuron().getUpdateRule().decrementActivation(neuronNode.getNeuron());
+            neuronNode.update();
+        }
+
+        for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
+            synapseNode.getSynapse().decrementWeight();
+            synapseNode.updateColor();
+            synapseNode.updateDiameter();
         }
     }
 
@@ -2478,11 +2314,8 @@ public class NetworkPanel extends JPanel {
      * Invoke contextual increment (which respects neuron specific rules) on selected objects.
      */
     public void contextualIncrementSelectedObjects() {
-        for (PNode node : getSelection()) {
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.getNeuron().getUpdateRule().contextualIncrement(neuronNode.getNeuron());
-            }
+        for (Neuron neuron : getSelectedModels(Neuron.class)) {
+            neuron.getUpdateRule().contextualIncrement(neuron);
         }
     }
 
@@ -2490,11 +2323,8 @@ public class NetworkPanel extends JPanel {
      * Invoke contextual decrement (which respects neuron specific rules) on selected objects.
      */
     public void contextualDecrementSelectedObjects() {
-        for (PNode node : getSelection()) {
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.getNeuron().getUpdateRule().contextualDecrement(neuronNode.getNeuron());
-            }
+        for (Neuron neuron : getSelectedModels(Neuron.class)) {
+            neuron.getUpdateRule().contextualDecrement(neuron);
         }
     }
 
@@ -2505,7 +2335,7 @@ public class NetworkPanel extends JPanel {
      * @param offsetY amount to nudge in the y direction (multiplied by nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
-        for (Neuron neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : getSelectedModels(Neuron.class)) {
             neuron.offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
         }
     }
@@ -2514,28 +2344,20 @@ public class NetworkPanel extends JPanel {
      * Clamped / unclamped or freeze / unfreeze selected nodes.
      */
     public void toggleClamping() {
-        for (PNode node : getSelection()) {
-            if (node instanceof NeuronNode) {
-                Neuron neuron = ((NeuronNode) node).getNeuron();
-                if (neuron.isClamped()) {
-                    neuron.setClamped(false);
-                } else {
-                    neuron.setClamped(true);
-                }
-            }
-            if (node instanceof SynapseNode) {
-                Synapse synapse = ((SynapseNode) node).getSynapse();
-                if (synapse.isFrozen()) {
-                    synapse.setFrozen(false);
-                } else {
-                    synapse.setFrozen(true);
-                }
-                // TODO: this should happen via an event
-                //   but firing events from setFrozen causes problems
-                //   when opening saved networks
-                ((SynapseNode) node).updateClampStatus();
-            }
+        for (Neuron neuron : getSelectedModels(Neuron.class)) {
+            neuron.setClamped(!neuron.isClamped());
         }
+
+        for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
+            Synapse synapse = synapseNode.getSynapse();
+            synapse.setFrozen(!synapse.isFrozen());
+
+            // TODO: this should happen via an event
+            //   but firing events from setFrozen causes problems
+            //   when opening saved networks
+            synapseNode.updateClampStatus();
+        }
+
         this.revalidate();
     }
 
@@ -2576,7 +2398,7 @@ public class NetworkPanel extends JPanel {
     public void setWeightsVisible(final boolean weightsVisible) {
         this.looseWeightsVisible = weightsVisible;
         actionManager.getShowWeightsAction().setState(looseWeightsVisible);
-        for (SynapseNode node : getSynapseNodes()) {
+        for (SynapseNode node : getNodes(SynapseNode.class)) {
             if (node != null) {
                 node.setVisible(weightsVisible);
             }
@@ -2598,7 +2420,7 @@ public class NetworkPanel extends JPanel {
     public void setPrioritiesVisible(final boolean prioritiesOn) {
         this.prioritiesVisible = prioritiesOn;
         actionManager.getShowPrioritiesAction().setState(prioritiesOn);
-        for (Iterator<NeuronNode> neuronNodes = this.getNeuronNodes().iterator(); neuronNodes.hasNext(); ) {
+        for (Iterator<NeuronNode> neuronNodes = this.getNodes(NeuronNode.class).iterator(); neuronNodes.hasNext(); ) {
             NeuronNode node = neuronNodes.next();
             node.setPriorityView(prioritiesVisible);
         }
@@ -2767,7 +2589,7 @@ public class NetworkPanel extends JPanel {
      */
     public NeuronDialog getNeuronDialog() {
 
-        List<Neuron> neurons = getSelectedModelNeurons();
+        List<Neuron> neurons = getSelectedModels(Neuron.class);
         if (neurons == null || neurons.isEmpty()) {
             return null;
         }
@@ -2932,7 +2754,7 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getNeuronCollectionAction());
         contextMenu.addSeparator();
         // Add align and space menus if objects are selected
-        if (this.getSelectedNeurons().size() > 1) {
+        if (this.getSelectedNodes(NeuronNode.class).size() > 1) {
             contextMenu.add(this.createAlignMenu());
             contextMenu.add(this.createSpacingMenu());
             contextMenu.addSeparator();
@@ -3027,26 +2849,26 @@ public class NetworkPanel extends JPanel {
      * Set all node activations to 0.
      */
     public void clearNeurons() {
-        for (NeuronNode node : getNeuronNodes()) {
+        for (NeuronNode node : getNodes(NeuronNode.class)) {
             node.getNeuron().clear();
         }
-        this.setSelection(getNeuronNodes());
+        this.setSelection(getNodes(NeuronNode.class));
     }
 
     /**
      * Set all selected items (nodes / weights) to 0. Dangerous for weights!
      */
     public void clearSelectedObjects() {
-        for (NeuronGroupNode node : getSelectedNeuronGroups()) {
+        for (NeuronGroupNode node : getSelectedNodes(NeuronGroupNode.class)) {
             node.getNeuronGroup().clearActivations();
         }
-        for (NeuronNode node : getSelectedNeurons()) {
+        for (NeuronNode node : getSelectedNodes(NeuronNode.class)) {
             node.getNeuron().clear();
         }
-        for (SynapseNode node : getSelectedSynapses()) {
+        for (SynapseNode node : getSelectedNodes(SynapseNode.class)) {
             node.getSynapse().forceSetStrength(0);
         }
-        for (NeuronArray na : getSelectedModelNeuronArrays()) {
+        for (NeuronArray na : getSelectedModels(NeuronArray.class)) {
             na.clear();
         }
     }
@@ -3055,7 +2877,7 @@ public class NetworkPanel extends JPanel {
      * Select nodes in selected neuron groups.
      */
     public void selectNeuronsInNeuronGroups() {
-        for (NeuronGroupNode ng : getSelectedNeuronGroups()) {
+        for (NeuronGroupNode ng : getSelectedNodes(NeuronGroupNode.class)) {
             ng.selectNeurons();
         }
     }

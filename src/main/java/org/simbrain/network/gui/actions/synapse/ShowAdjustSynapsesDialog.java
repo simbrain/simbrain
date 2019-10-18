@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
@@ -72,7 +73,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
      * Only enable the action if there is at least one synapse selected.
      */
     private void updateAction() {
-        boolean atLeastOneSynapseSelected = (networkPanel.getSelectedModelSynapses().size() > 0);
+        boolean atLeastOneSynapseSelected = (networkPanel.getSelectedModels(Synapse.class).size() > 0);
         if (atLeastOneSynapseSelected) {
             setEnabled(true);
         } else {
@@ -86,7 +87,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel.createSynapseAdjustmentPanel(networkPanel, networkPanel.getSelectedModelSynapses());
+        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel.createSynapseAdjustmentPanel(networkPanel, networkPanel.getSelectedModels(Synapse.class));
         JDialog dialog = new JDialog();
         dialog.setTitle("Adjust selected synapses");
         dialog.setContentPane(synapsePanel);

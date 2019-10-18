@@ -263,7 +263,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         JPopupMenu contextMenu = super.getNeuronContextMenu(neuron);
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-        if (getSelectedNeurons().size() == 1) {
+        if (getSelectedNodes(NeuronNode.class).size() == 1) {
             contextMenu.addSeparator();
             CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), neuron);
             contextMenu.add(menu);
@@ -286,7 +286,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         contextMenu.add(new SetSynapsePropertiesAction(this));
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
-        if (getSelectedSynapses().size() == 1) {
+        if (getSelectedNodes(SynapseNode.class).size() == 1) {
             contextMenu.addSeparator();
             CouplingMenu menu = new CouplingMenu(component.getWorkspaceComponent(), synapse);
             contextMenu.add(menu);
@@ -347,7 +347,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     @Override
     public void showSelectedSynapseProperties() {
-        StandardDialog dialog = getSynapseDialog(getSelectedSynapses());
+        StandardDialog dialog = getSynapseDialog(getSelectedNodes(SynapseNode.class));
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

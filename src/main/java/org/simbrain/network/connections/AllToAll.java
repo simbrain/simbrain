@@ -154,7 +154,7 @@ public class AllToAll extends ConnectionStrategy implements EditableObject {
 
     @Override
     public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-       List<Synapse> retList = new ArrayList();
+       List<Synapse> retList = new ArrayList<>();
         for(Neuron src : source) {
            for(Neuron tar : target) {
                if(src == tar && !selfConnectionAllowed) {

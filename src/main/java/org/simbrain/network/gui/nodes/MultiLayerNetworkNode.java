@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.network.dl4j.MultiLayerNet;
@@ -194,6 +195,16 @@ public class MultiLayerNetworkNode extends ScreenElement {
     @Override
     public void resetColors() {
 
+    }
+
+    @Override
+    public MultiLayerNetworkNode getNode() {
+        return this;
+    }
+
+    @Override
+    public MultiLayerNet getModel() {
+        return getNet();
     }
 
     /**

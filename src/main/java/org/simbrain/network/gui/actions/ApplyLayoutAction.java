@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.actions;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
 
@@ -52,7 +53,7 @@ public final class ApplyLayoutAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
+        layout.layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
         networkPanel.repaint();
     }
 }

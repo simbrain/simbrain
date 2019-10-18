@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui.actions;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
@@ -93,19 +96,19 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
     private void updateAction() {
         boolean enabled = false;
         if (enableCondition == EnablingCondition.ALLITEMS) {
-            if (networkPanel.getSelectedModelElements().size() > 0) {
+            if (networkPanel.getSelectedModels().size() > 0) {
                 enabled = true;
             }
         } else if (enableCondition == EnablingCondition.NEURONS) {
-            if (networkPanel.getSelectedModelNeurons().size() > 0) {
+            if (networkPanel.getSelectedModels(Neuron.class).size() > 0) {
                 enabled = true;
             }
         } else if (enableCondition == EnablingCondition.SYNAPSES) {
-            if (networkPanel.getSelectedModelSynapses().size() > 0) {
+            if (networkPanel.getSelectedModels(Synapse.class).size() > 0) {
                 enabled = true;
             }
         } else if (enableCondition == EnablingCondition.SOURCE_NEURONS) {
-            if (networkPanel.getSourceModelNeurons().size() > 0) {
+            if (networkPanel.getSourceModels(Neuron.class).size() > 0) {
                 enabled = true;
             }
         } else if (enableCondition == EnablingCondition.SOURCE_AND_TARGET_NEURONS) {
@@ -125,7 +128,7 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
     public static boolean sourceAndTargetNeuronGroupsSelected(NetworkPanel networkPanel) {
         // Available as a method here since it is reused elsewhere.  Can
         // do something similar for other conditions as needed.
-        if ((networkPanel.getSourceModelGroups().size() > 0) && (networkPanel.getSelectedModelNeuronGroups().size() > 0)) {
+        if ((networkPanel.getSourceModels(NeuronGroup.class).size() > 0) && (networkPanel.getSelectedModels(NeuronGroup.class).size() > 0)) {
             return true;
         }
         return false;
@@ -138,7 +141,7 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
      * @return true if the condition is met, false otherwise.
      */
     public static boolean sourceAndTargetNeuronSelected(NetworkPanel networkPanel) {
-        if ((networkPanel.getSourceModelNeurons().size() > 0) && (networkPanel.getSelectedModelNeurons().size() > 0)) {
+        if ((networkPanel.getSourceModels(Neuron.class).size() > 0) && (networkPanel.getSelectedModels(Neuron.class).size() > 0)) {
             return true;
         }
         return false;

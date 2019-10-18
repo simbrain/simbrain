@@ -24,6 +24,7 @@ import org.simbrain.network.groups.CopyableGroup;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
@@ -45,7 +46,7 @@ public class CopyPaste {
      * @param items     the list of items to copy.
      * @return the list of copied items.
      */
-    public static ArrayList<?> getCopy(final Network newParent, final ArrayList<?> items) {
+    public static ArrayList<?> getCopy(final Network newParent, final List<?> items) {
 
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
@@ -92,7 +93,7 @@ public class CopyPaste {
      * @param allItems includes neurons to check
      * @return true if this synapse is stranded, false otherwise
      */
-    private static boolean isStranded(final Synapse synapse, final ArrayList<?> allItems) {
+    private static boolean isStranded(final Synapse synapse, final List<?> allItems) {
 
         // The list of checked neurons should include neurons in the list
         // as well as all neurons contained in networks in the list

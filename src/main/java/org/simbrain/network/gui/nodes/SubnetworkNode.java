@@ -199,6 +199,16 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         }
 
         @Override
+        public SubnetworkNode getNode() {
+            return SubnetworkNode.this;
+        }
+
+        @Override
+        public Subnetwork getModel() {
+            return SubnetworkNode.this.getSubnetwork();
+        }
+
+        @Override
         protected boolean hasPropertyDialog() {
             return true;
         }

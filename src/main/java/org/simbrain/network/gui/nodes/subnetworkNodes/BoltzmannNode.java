@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.BoltzmannTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
@@ -100,6 +101,16 @@ public class BoltzmannNode extends SubnetworkNode {
         protected boolean hasToolTipText() {
             return true;
         }
+
+        @Override
+        public BoltzmannNode getNode() {
+            return BoltzmannNode.this;
+        }
+
+        @Override
+        public BoltzmannMachine getModel() {
+            return (BoltzmannMachine) BoltzmannNode.this.getSubnetwork();
+        }
     }
 
     ;
@@ -143,5 +154,7 @@ public class BoltzmannNode extends SubnetworkNode {
     //            }
     //        }));
     //    }
+
+
 
 }

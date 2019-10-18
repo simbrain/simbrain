@@ -42,18 +42,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Handle simbrain drag events, which pan the canvas, create lassos for selection. handles selection an, toggle
- * selection, drags objects as appropriate, updates relevant graphics parameters like "last clicked position".
- * <p>
- * Coding this properly requires tracking picked nodes and their parents fairly closely. To see the scene graph
- * hierarchy for debugging this use ctrl-c while a network panel is open.
+ * Handle network mouse events, which  drag objects, select objects, toggle selections,
+ * pan the canvas, create lassos for selection, etc.
  *
  * @author Michael Heuer
  * @author Jeff Yoshimi
  */
-final class DragEventHandler extends PDragSequenceEventHandler {
-
-    //TODO: Rename to selection event handler? Regular selection events are also handled here.
+final class MouseEventHandler extends PDragSequenceEventHandler {
 
     /**
      * Selection marquee.
@@ -90,7 +85,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
      *
      * @param networkPanel parent panel
      */
-    public DragEventHandler(NetworkPanel networkPanel) {
+    public MouseEventHandler(NetworkPanel networkPanel) {
         super();
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
@@ -172,11 +167,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        // System.out.println("start:" + pickedNode);
-        // System.out.println("start-parent:" + pickedNode.getParent());
-
         // Single click selection of entities happens here.
-        // "Start drag" is thus a bit of a misnomer
 
         // This code transfers the "picked" object to the object that will be dragged
         if (pickedNode.getParent() instanceof ScreenElement) {

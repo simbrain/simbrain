@@ -98,14 +98,11 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
 
         // Set last clicked position, used in many areas for "placement" of
         // objects in the last clicked position on screen.
-        networkPanel.setLastClickedPosition(event.getPosition());
-
-        networkPanel.getWhereToAdd().setLocation(event.getPosition());
-
+        networkPanel.getPlacementManager().setLastClickedPosition(event.getPosition());
 
         // Set pressed position for use in double clicking
         if (event.getPath().getPickedNode() instanceof PCamera) {
-            networkPanel.setBeginPosition(event.getPosition());
+            networkPanel.getPlacementManager().setBeginPosition(event.getPosition());
         }
     }
 
@@ -286,19 +283,12 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        // Reset the beginning of a sequence of pastes, but keep the old
-        // paste-offset. This occurs when pasting a sequence, and moving one set
-        // of objects to a new location
-        if (networkPanel.getNumberOfPastes() != 1) {
-            networkPanel.setBeginPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
-        }
+
 
         // End drag selected node(s)
         pickedNode = null;
-        networkPanel.setEndPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
-
-        // Reset the place new neurons and groups should be added
-        networkPanel.getWhereToAdd().setLocation(event.getPosition().getX() + NetworkPanel.DEFAULT_SPACING, event.getPosition().getY());
+        networkPanel.getPlacementManager()
+                .setEndPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
 
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();

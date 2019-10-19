@@ -109,7 +109,9 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
         CompetitiveGroup competitive = (CompetitiveGroup) compPropertiesPanel.getGroup();
         competitive.setLayout(layoutObject.getLayout());
         competitive.applyLayout();
-        competitive.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
+        competitive.offset(
+                networkPanel.getPlacementManager().getLocation().getX(),
+                networkPanel.getPlacementManager().getLocation().getY());
         networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();
         networkPanel.repaint();

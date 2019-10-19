@@ -98,7 +98,8 @@ public class BoltzmannMachineDialog extends StandardDialog {
 
     @Override
     protected void closeDialogOk() {
-        BoltzmannMachine boltzmannMachine = new BoltzmannMachine(networkPanel.getNetwork(), visibleNeurons, hiddenNeurons, networkPanel.getLastClickedPosition());
+        BoltzmannMachine boltzmannMachine = new BoltzmannMachine(networkPanel.getNetwork(),
+                visibleNeurons, hiddenNeurons, networkPanel.getPlacementManager().getLocation());
         layoutPanel.commitChanges();
 
         networkPanel.getNetwork().addGroup(boltzmannMachine);

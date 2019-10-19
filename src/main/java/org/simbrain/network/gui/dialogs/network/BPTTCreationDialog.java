@@ -79,7 +79,8 @@ public class BPTTCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-            BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputsOutputs.getText()), Integer.parseInt(tfNumHidden.getText()), Integer.parseInt(tfNumInputsOutputs.getText()), panel.getLastClickedPosition());
+            BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputsOutputs.getText()), Integer.parseInt(tfNumHidden.getText()),
+                    Integer.parseInt(tfNumInputsOutputs.getText()), panel.getPlacementManager().getLocation());
 
             bptt.getParentNetwork().addGroup(bptt);
             dispose();

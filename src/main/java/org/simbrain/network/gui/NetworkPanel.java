@@ -133,31 +133,6 @@ public class NetworkPanel extends JPanel {
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
 
     /**
-     * Default offset for new points.
-     */
-    private static final int DEFAULT_NEWPOINT_OFFSET = 100;
-
-    /**
-     * Default spacing for new points.
-     */
-    public static final int DEFAULT_SPACING = 45;
-
-    /**
-     * Offset for update label.
-     */
-    private static final int UPDATE_LABEL_OFFSET = 20;
-
-    /**
-     * Offset for time label.
-     */
-    private static final int TIME_LABEL_V_OFFSET = 35;
-
-    /**
-     * Offset for time label.
-     */
-    private static final int TIME_LABEL_H_OFFSET = 10;
-
-    /**
      * Build mode.
      */
     private EditMode editMode;
@@ -186,16 +161,6 @@ public class NetworkPanel extends JPanel {
      * Cached alternate context menu.
      */
     private JPopupMenu contextMenuAlt;
-
-    /**
-     * Last clicked position.
-     */
-    private Point2D lastClickedPosition;
-
-    /**
-     * Tracks number of pastes that have occurred; used to correctly position pasted objects.
-     */
-    private double numberOfPastes;
 
     /**
      * Last selected Neuron.
@@ -288,26 +253,6 @@ public class NetworkPanel extends JPanel {
     protected JCheckBoxMenuItem synapseClampMenuItem = new JCheckBoxMenuItem();
 
     /**
-     * Beginning position used in calculating offsets for multiple pastes.
-     */
-    private Point2D beginPosition = new Point2D.Double(0, 0);
-
-    /**
-     * End position used in calculating offsets for multiple pastes.
-     */
-    private Point2D endPosition;
-
-    /**
-     * x-offset for multiple pastes.
-     */
-    private double pasteX = 0;
-
-    /**
-     * y-offset for multiple pastes.
-     */
-    private double pasteY = 0;
-
-    /**
      * Turn GUI on or off.
      */
     private boolean guiOn = true;
@@ -350,23 +295,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Map associating network model objects with Piccolo Pnodes.
      */
-    // TODO: Phase this out? After moving to changesupport,
-    // only seems to be used in Clipboard.getPostPasteSelectionObjects
     private final Map<Object, PNode> objectNodeMap = Collections.synchronizedMap(new HashMap<Object, PNode>());
-
-    /**
-     * Point where new neurons, neurongroups, and subnetworks should be added. Reset when the user clicks anywhere on
-     * screen, to the location clicked. Neurons are placed to the right of one another, groups and nets are placed
-     * diagonally below one another. The setup is not ideal, because objects are not always built up from an initial
-     * location in the same way, but works well enough for now.
-     * <p>
-     * This is not the same as the paste apparatus, which handles multiple pastes, as opposed to adding multiple
-     * instances of a new object.
-     */
-    // Perhaps there is a better solution. Would be nice to translate stuff
-    // after placing it. Annoying that every network has to have an argument for
-    // "initial position". Cries out for some more encapsulated solution.
-    private Point2D.Double whereToAdd = new Point2D.Double(0, 0);
 
     /**
      * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
@@ -374,27 +303,9 @@ public class NetworkPanel extends JPanel {
     private AtomicInteger updateComplete = new AtomicInteger(0);
 
     /**
-     * Display the provided network in a dialog
-     *
-     * @param network the model network to show
+     * Manages placement of new nodes, groups, etc.
      */
-    public static void showNetwork(Network network) {
-        // TODO: Creation outside of desktop lacks menus
-        NetworkPanel np = new NetworkPanel(network);
-        np.syncToModel();
-        JFrame frame = new JFrame();
-        frame.setContentPane(np);
-        frame.setPreferredSize(new Dimension(500, 500));
-        frame.pack();
-        frame.setVisible(true);
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
-                System.exit(0);
-            }
-        });
-        //System.out.println(np.debugString());
-    }
-
+    private PlacementManager placementManager = new PlacementManager();;
 
     //TODO: Make constructor private and just use static creation method?
 
@@ -505,6 +416,7 @@ public class NetworkPanel extends JPanel {
                 repaint();
             }
         });
+
 
     }
 
@@ -654,15 +566,17 @@ public class NetworkPanel extends JPanel {
     public void addNeuron(final NeuronUpdateRule baseRule) {
 
         final Neuron neuron = new Neuron(getNetwork(), baseRule);
-        Point2D p = whereToAdd;
+        Point2D p = placementManager.getLocation();
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.forceSetActivation(0);
         getNetwork().addLooseNeuron(neuron);
+
+        placementManager.update();
+
         // New objects are added to the right of the last neuron added.
         // Convenient for quickly making "lines" of neurons by repeatedly
         // adding neurons.
-        whereToAdd.setLocation(neuron.getX() + DEFAULT_SPACING, neuron.getY());
 
         undoManager.addUndoableAction(new UndoableAction() {
 
@@ -721,13 +635,13 @@ public class NetworkPanel extends JPanel {
 
         setSelection(nodes);
 
-        layout.setInitialLocation(whereToAdd);
+        layout.setInitialLocation(placementManager.getLocation());
 
         layout.layoutNeurons(getSelectedModels(Neuron.class));
 
         // New objects are added to the right of the last group of
         // neurons added.
-        whereToAdd.setLocation(neurons.get(neurons.size() - 1).getX() + DEFAULT_SPACING + 10, whereToAdd.getY());
+        placementManager.update();
         network.fireNeuronsUpdated(getSelectedModels(Neuron.class));
         repaint();
 
@@ -860,15 +774,12 @@ public class NetworkPanel extends JPanel {
             // New objects are added diagonally below and to the right of the
             // last neuron group added
             if (ng.isTopLevelGroup()) {
-                whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING, whereToAdd.getY() + DEFAULT_SPACING);
+                placementManager.update();
             }
         } else if (group instanceof SynapseGroup) {
             addSynapseGroup((SynapseGroup) group);
         } else if (group instanceof Subnetwork) {
             addSubnetwork((Subnetwork) group);
-            // New objects are added diagonally below and to the right of the
-            // last subnetwork added
-            whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING, whereToAdd.getY() + DEFAULT_SPACING);
         }
         clearSelection();
     }
@@ -1549,8 +1460,8 @@ public class NetworkPanel extends JPanel {
      */
     public void copy() {
         Clipboard.clear();
-        setNumberOfPastes(0);
-        setBeginPosition(SimnetUtils.getUpperLeft(getSelectedModels()));
+        placementManager.resetPastes();
+        placementManager.setBeginPosition(SimnetUtils.getUpperLeft(getSelectedModels()));
         ArrayList deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
         Clipboard.add(deepCopy);
     }
@@ -1568,7 +1479,7 @@ public class NetworkPanel extends JPanel {
      */
     public void paste() {
         Clipboard.paste(this);
-        numberOfPastes++;
+        placementManager.incrementPastes();
     }
 
     /**
@@ -2040,15 +1951,7 @@ public class NetworkPanel extends JPanel {
         this.network = network;
     }
 
-    /**
-     * @return Returns the lastClickedPosition.
-     */
-    public Point2D getLastClickedPosition() {
-        if (lastClickedPosition == null) {
-            lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
-        }
-        return lastClickedPosition;
-    }
+
 
     /**
      * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
@@ -2064,21 +1967,6 @@ public class NetworkPanel extends JPanel {
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 10, filtered.getY() - 10, filtered.getWidth() + 20, filtered.getHeight() + 20);
             camera.setViewBounds(adjustedFiltered);
         }
-    }
-
-    /**
-     * Set the last position clicked on screen.
-     *
-     * @param lastLeftClicked The lastClickedPosition to set.
-     */
-    public void setLastClickedPosition(final Point2D lastLeftClicked) {
-        // If left clicking somewhere assume not multiple pasting, except after
-        // the first paste,
-        // when one is setting the offset for a string of pastes
-        if (this.getNumberOfPastes() != 1) {
-            this.setNumberOfPastes(0);
-        }
-        this.lastClickedPosition = lastLeftClicked;
     }
 
     /**
@@ -2228,14 +2116,6 @@ public class NetworkPanel extends JPanel {
 
     public boolean getInOutMode() {
         return inOutMode;
-    }
-
-    public double getNumberOfPastes() {
-        return numberOfPastes;
-    }
-
-    public void setNumberOfPastes(final double numberOfPastes) {
-        this.numberOfPastes = numberOfPastes;
     }
 
     public boolean getShowSubnetOutline() {
@@ -2435,62 +2315,6 @@ public class NetworkPanel extends JPanel {
         return prioritiesVisible;
     }
 
-    /**
-     * Set the offset used in multiple pastes.
-     */
-    public void setPasteDelta() {
-        if ((beginPosition != null) && (endPosition != null)) {
-            setPasteX(beginPosition.getX() - endPosition.getX());
-            setPasteY(beginPosition.getY() - endPosition.getY());
-            // System.out.println("-->" + getPasteX() + " , " + getPasteY());
-        }
-    }
-
-    /**
-     * @return Returns the beginPosition.
-     */
-    public Point2D getBeginPosition() {
-        return beginPosition;
-    }
-
-    /**
-     * Beginning position used in calculating offsets for multiple pastes.
-     *
-     * @param beginPosition The beginPosition to set.
-     */
-    public void setBeginPosition(final Point2D beginPosition) {
-        // System.out.println("Begin position: " + beginPosition);
-        this.beginPosition = beginPosition;
-    }
-
-    public Point2D getEndPosition() {
-        return endPosition;
-    }
-
-    public void setEndPosition(final Point2D endPosition) {
-        // System.out.println("End position: " + endPosition);
-        this.endPosition = endPosition;
-        if (this.getNumberOfPastes() == 1) {
-            setPasteDelta();
-        }
-    }
-
-    public void setPasteX(final double pasteX) {
-        this.pasteX = pasteX;
-    }
-
-    public double getPasteX() {
-        return pasteX;
-    }
-
-    public void setPasteY(final double pasteY) {
-        this.pasteY = pasteY;
-    }
-
-    public double getPasteY() {
-        return pasteY;
-    }
-
     public boolean isGuiOn() {
         return guiOn && network.isRedrawTime();
     }
@@ -2510,8 +2334,6 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Overridden so that multi-line tooltips can be used.
-     *
-     * @return
      */
     public JToolTip createToolTip() {
         return new JMultiLineToolTip();
@@ -2609,8 +2431,8 @@ public class NetworkPanel extends JPanel {
         and.addClosingTask(() -> SwingUtilities.invokeLater(() -> {
             Network network = getNetwork();
             NeuronArray neuronArray = creationTemplate.create(network);
-            neuronArray.setX(getLastClickedPosition().getX());
-            neuronArray.setY(getLastClickedPosition().getY());
+            neuronArray.setX(placementManager.getLocation().getX());
+            neuronArray.setY(placementManager.getLocation().getY());
             network.addNeuronArray(neuronArray);
         }));
         and.pack();
@@ -2813,10 +2635,6 @@ public class NetworkPanel extends JPanel {
         return null;
     }
 
-    public Point2D.Double getWhereToAdd() {
-        return whereToAdd;
-    }
-
     public QuickConnectionManager getQuickConnector() {
         return quickConnector;
     }
@@ -2886,4 +2704,33 @@ public class NetworkPanel extends JPanel {
             ng.selectNeurons();
         }
     }
+
+    public PlacementManager getPlacementManager() {
+        return placementManager;
+    }
+
+
+    /**
+     * Display the provided network in a dialog
+     *
+     * @param network the model network to show
+     */
+    public static void showNetwork(Network network) {
+        // TODO: Creation outside of desktop lacks menus
+        NetworkPanel np = new NetworkPanel(network);
+        np.syncToModel();
+        JFrame frame = new JFrame();
+        frame.setContentPane(np);
+        frame.setPreferredSize(new Dimension(500, 500));
+        frame.pack();
+        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                System.exit(0);
+            }
+        });
+        //System.out.println(np.debugString());
+    }
+
+
 }

@@ -75,7 +75,8 @@ public class LMSCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
 
         // Create the layered network
-        LMSNetwork lms = new LMSNetwork(networkPanel.getNetwork(), inputLayer.getNumNeurons(), outputLayer.getNumNeurons(), networkPanel.getWhereToAdd());
+        LMSNetwork lms = new LMSNetwork(networkPanel.getNetwork(), inputLayer.getNumNeurons(),
+                outputLayer.getNumNeurons(), networkPanel.getPlacementManager().getLocation());
         lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
         lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
         networkPanel.getNetwork().addGroup(lms);

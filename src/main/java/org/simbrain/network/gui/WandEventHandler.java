@@ -66,10 +66,10 @@ final class WandEventHandler extends PDragSequenceEventHandler {
      */
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
-        networkPanel.setLastClickedPosition(event.getPosition());
-        if (event.getPath().getPickedNode() instanceof PCamera) {
-            networkPanel.setBeginPosition(event.getPosition());
-        }
+        //networkPanel.setLastClickedPosition(event.getPosition());
+        //if (event.getPath().getPickedNode() instanceof PCamera) {
+        //    networkPanel.setBeginPosition(event.getPosition());
+        //}
     }
 
     /**

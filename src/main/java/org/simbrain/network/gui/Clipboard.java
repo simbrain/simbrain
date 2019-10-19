@@ -90,7 +90,9 @@ public class Clipboard {
         // Gather data for translating the object then add the objects to the
         // network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(copiedObjects);
-        translate(copy, getPasteOffset(net, upperLeft, "X"), getPasteOffset(net, upperLeft, "Y"));
+
+        //TODO
+        //translate(copy, getPasteOffset(net, upperLeft, "X"), getPasteOffset(net, upperLeft, "Y"));
         net.getNetwork().addObjects(copy);
 
         // Select pasted items
@@ -130,57 +132,7 @@ public class Clipboard {
         return copiedObjects.isEmpty();
     }
 
-    /**
-     * Returns the paste offset. Handles complexities of paste-trails.
-     * <p>
-     * Begin where the last object was pasted (default to a standard position if
-     * none has). Add the size of the object. Add the number of recent clicks
-     * times the paste increment.
-     *
-     * @param net       reference to network panel.
-     * @param upperLeft the upper left of the group of objects to be pasted
-     * @param xOrY      whether to return x or y offset.
-     * @return the offset for the pasted items.
-     */
-    private static double getPasteOffset(final NetworkPanel net, final Point2D upperLeft, final String xOrY) {
 
-        if (xOrY.equals("X")) {
-            return (net.getBeginPosition().getX() - upperLeft.getX() - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
-        } else {
-            return (net.getBeginPosition().getY() - upperLeft.getY() - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
-        }
-    }
-
-    /**
-     * Private method for handling complexities of paste-trails.
-     * <p>
-     * When first pasting, paste at the default location relative to the
-     * original paste. Otherwise use the paste increment computed by the
-     * network.
-     *
-     * @param net  Reference to network
-     * @param xOrY Whether to look at x or y values
-     * @return the proper paste increment
-     */
-    private static double getPasteIncrement(final NetworkPanel net, final String xOrY) {
-
-        if (xOrY.equals("X")) {
-            if (net.getPasteX() != 0) {
-                return net.getPasteX();
-            } else {
-                return -PASTE_INCREMENT;
-            }
-        }
-
-        if (xOrY.equals("Y")) {
-            if (net.getPasteY() != 0) {
-                return net.getPasteY();
-            } else {
-                return -PASTE_INCREMENT;
-            }
-        }
-        return 0;
-    }
 
     /**
      * Add the specified clipboard listener.

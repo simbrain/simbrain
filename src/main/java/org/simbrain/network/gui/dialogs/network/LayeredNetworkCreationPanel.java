@@ -174,13 +174,16 @@ public class LayeredNetworkCreationPanel extends JPanel {
         FeedForward net;
         switch (type) {
             case "Backprop":
-                net = new BackpropNetwork(panel.getNetwork(), topology, panel.getWhereToAdd());
+                net = new BackpropNetwork(panel.getNetwork(), topology,
+                        panel.getPlacementManager().getLocation());
                 break;
             case "FeedForward":
-                net = new FeedForward(panel.getNetwork(), topology, panel.getWhereToAdd());
+                net = new FeedForward(panel.getNetwork(), topology,
+                        panel.getPlacementManager().getLocation());
                 break;
             default:
-                net = new FeedForward(panel.getNetwork(), topology, panel.getWhereToAdd());
+                net = new FeedForward(panel.getNetwork(), topology,
+                        panel.getPlacementManager().getLocation());
                 break;
         }
 

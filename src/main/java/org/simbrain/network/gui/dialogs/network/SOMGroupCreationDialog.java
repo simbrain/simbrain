@@ -110,7 +110,9 @@ public class SOMGroupCreationDialog extends StandardDialog {
         som.setLayout(layoutObject.getLayout());
         networkPanel.getNetwork().addGroup(som);
         som.applyLayout();
-        som.offset(networkPanel.getWhereToAdd().getX(), networkPanel.getWhereToAdd().getY());
+        som.offset(
+                networkPanel.getPlacementManager().getLocation().getX(),
+                networkPanel.getPlacementManager().getLocation().getY());
         super.closeDialogOk();
 
     }

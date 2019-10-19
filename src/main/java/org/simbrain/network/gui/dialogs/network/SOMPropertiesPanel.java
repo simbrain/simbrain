@@ -215,7 +215,9 @@ public class SOMPropertiesPanel extends GroupPropertiesPanel {
                 som = new SOMGroup(networkPanel.getNetwork(), Integer.parseInt(tfNumSOMNeurons.getText()));
                 commitSOMGroupFieldValues();
             } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-                som = new SOMNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumSOMNeurons.getText()), Integer.parseInt(tfNumInputNeurons.getText()), networkPanel.getWhereToAdd());
+                som = new SOMNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumSOMNeurons.getText()),
+                        Integer.parseInt(tfNumInputNeurons.getText()),
+                        networkPanel.getPlacementManager().getLocation());
                 commitSOMNetworkFieldValues();
             } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
                 commitSOMGroupFieldValues();

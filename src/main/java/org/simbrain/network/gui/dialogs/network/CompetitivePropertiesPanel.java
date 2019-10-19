@@ -249,7 +249,8 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
             fillCompetitiveGroupFieldValues();
         } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
-            competitive = new CompetitiveNetwork(null, 1, 1, networkPanel.getWhereToAdd());
+            competitive = new CompetitiveNetwork(null, 1, 1,
+                    networkPanel.getPlacementManager().getLocation());
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);
             fillCompetitiveNetworkFieldValues();
@@ -333,7 +334,8 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
                 competitive = new CompetitiveGroup(networkPanel.getNetwork(), Integer.parseInt(tfNumCompetitiveNeurons.getText()));
                 commitCompetitiveGroupFieldValues();
             } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
-                competitive = new CompetitiveNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumCompetitiveNeurons.getText()), Integer.parseInt(tfNumInputNeurons.getText()), networkPanel.getWhereToAdd());
+                competitive = new CompetitiveNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumCompetitiveNeurons.getText()), Integer.parseInt(tfNumInputNeurons.getText()),
+                        networkPanel.getPlacementManager().getLocation());
                 commitCompetitiveNetworkFieldValues();
             } else if (panelType == CompetitivePropsPanelType.EDIT_GROUP) {
                 commitCompetitiveGroupFieldValues();

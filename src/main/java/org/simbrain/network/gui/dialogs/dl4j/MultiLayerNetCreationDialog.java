@@ -41,7 +41,7 @@ public class MultiLayerNetCreationDialog extends StandardDialog {
             layerCreator.commitChanges();
             outputCreator.commitChanges();
             MultiLayerNet multiLayerNetwork = creationTemplate.create(np.getNetwork(), lct, oct);
-            multiLayerNetwork.setLocation(np.getLastClickedPosition());
+            multiLayerNetwork.setLocation(np.getPlacementManager().getLocation());
             np.getNetwork().addDL4JMultiLayerNetwork(multiLayerNetwork);
         }));
     }

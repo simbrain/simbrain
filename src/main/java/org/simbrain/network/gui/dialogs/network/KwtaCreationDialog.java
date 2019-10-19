@@ -90,7 +90,7 @@ public class KwtaCreationDialog extends StandardDialog {
         KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()));
         layoutPanel.commitChanges();
         Layout layout = layoutObject.getLayout();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        layout.setInitialLocation(networkPanel.getPlacementManager().getLocation());
         layout.layoutNeurons(kWTA.getNeuronList());
         networkPanel.getNetwork().addGroup(kWTA);
         networkPanel.repaint();

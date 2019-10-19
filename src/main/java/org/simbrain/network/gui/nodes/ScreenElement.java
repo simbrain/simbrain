@@ -310,7 +310,8 @@ public abstract class ScreenElement extends PPath.Float {
             event.setHandled(true);
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
-            networkPanel.setLastClickedPosition(canvasPosition);
+            // TODO
+            //networkPanel.getPlacementManager().setLastClickedPosition(canvasPosition);
             contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 

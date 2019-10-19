@@ -1,6 +1,7 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.awt.geom.Point2D;
 
@@ -52,14 +53,9 @@ public class PlacementManager {
     private Point2D endPosition;
 
     /**
-     * x-offset for multiple pastes.
+     * Delta for offset
      */
-    private double pasteX = 0;
-
-    /**
-     * y-offset for multiple pastes.
-     */
-    private double pasteY = 0;
+    private Point2D pasteOffset = new Point2D.Double(DEFAULT_SPACING, 0);
 
     /**
      * Construct a new placement manager.
@@ -106,39 +102,27 @@ public class PlacementManager {
      */
     public void setPasteDelta() {
         if ((beginPosition != null) && (endPosition != null)) {
-            setPasteX(beginPosition.getX() - endPosition.getX());
-            setPasteY(beginPosition.getY() - endPosition.getY());
+            pasteOffset.setLocation(
+                    beginPosition.getX() - endPosition.getX(),
+                    beginPosition.getY() - endPosition.getY());
         }
     }
 
-    public Point2D getBeginPosition() {
-        return beginPosition;
-    }
-
+    //TODO: Rename
     public void setBeginPosition(final Point2D beginPosition) {
         this.beginPosition = beginPosition;
     }
 
     public void setEndPosition(final Point2D endPosition) {
         this.endPosition = endPosition;
+        System.out.println(numberOfPastes);
         if (numberOfPastes == 1) {
             setPasteDelta();
         }
     }
 
-    public void setPasteX(final double pasteX) {
-        this.pasteX = pasteX;
-    }
-
-    public void setPasteY(final double pasteY) {
-        this.pasteY = pasteY;
-    }
-
-    public Point2D getLastClickedPosition() {
-        if (lastClickedPosition == null) {
-            lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
-        }
-        return lastClickedPosition;
+    public Point2D getPasteOffset() {
+        return pasteOffset;
     }
 
     public void setLastClickedPosition(final Point2D lastLeftClicked) {
@@ -234,6 +218,14 @@ public class PlacementManager {
     //layoutObject.getLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
 
     // See WandEventHandler.mousepressed
+
+    //public Point2D getLastClickedPosition() {
+    //    if (lastClickedPosition == null) {
+    //        lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
+    //    }
+    //    return lastClickedPosition;
+    //}
+
 
 
 }

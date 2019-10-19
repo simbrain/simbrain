@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
@@ -28,6 +29,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -91,8 +93,7 @@ public class Clipboard {
         // network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(copiedObjects);
 
-        //TODO
-        //translate(copy, getPasteOffset(net, upperLeft, "X"), getPasteOffset(net, upperLeft, "Y"));
+        translate(copy, net.getPlacementManager().getPasteOffset());
         net.getNetwork().addObjects(copy);
 
         // Select pasted items
@@ -132,8 +133,6 @@ public class Clipboard {
         return copiedObjects.isEmpty();
     }
 
-
-
     /**
      * Add the specified clipboard listener.
      *
@@ -154,34 +153,13 @@ public class Clipboard {
     }
 
     /**
-     * Translate a set of objects.
-     *
-     * @param objects list of network objects to translate
-     * @param offsetX x offset for translation.
-     * @param offsetY y offset for translation.
+     * Translate a set of network model object.
      */
-    public static void translate(final ArrayList objects, final double offsetX, final double offsetY) {
-        for (Object object : objects) {
-            if (object instanceof Neuron) {
-                Neuron neuron = (Neuron) object;
-                neuron.setX(neuron.getX() + offsetX);
-                neuron.setY(neuron.getY() + offsetY);
-            } else if (object instanceof Network) {
-                for (Neuron neuron : ((Network) object).getFlatNeuronList()) {
-                    neuron.setX(neuron.getX() + offsetX);
-                    neuron.setY(neuron.getY() + offsetY);
-                }
-            } else if (object instanceof NetworkTextObject) {
-                NetworkTextObject text = (NetworkTextObject) object;
-                text.setX(text.getX() + offsetX);
-                text.setY(text.getY() + offsetY);
-            } else if (object instanceof NeuronGroup) {
-                NeuronGroup group = (NeuronGroup) object;
-                group.offset(offsetX, offsetY);
-            } else if (object instanceof NeuronArray) {
-                NeuronArray array = (NeuronArray) object;
-                array.offset(offsetX, offsetY);
-            }
+    public static void translate(final List<NetworkModel> networkObjects, final Point2D pasteOffset) {
+        System.out.println("networkObjects = [" + networkObjects + "], pasteOffset = [" + pasteOffset + "]");
+        for (NetworkModel model: networkObjects) {
+            model.setCenterX(model.getCenterX() + pasteOffset.getX());
+            model.setCenterY(model.getCenterY() + pasteOffset.getY());
         }
     }
 }

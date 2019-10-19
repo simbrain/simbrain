@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -47,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
+public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>, NetworkModel {
 
     /**
      * The default for how often {@link #writeActsToFile()} should flush
@@ -873,6 +874,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the center x coordinate.
      */
+    @Override
     public double getCenterX() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
@@ -893,6 +895,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *
      * @return the center y coordinate.
      */
+    @Override
     public double getCenterY() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
@@ -905,6 +908,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             }
         }
         return min + (max - min) / 2;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+        setLocation(newx, getCenterY());
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+        setLocation(getCenterX(), newy);
     }
 
     /**

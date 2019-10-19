@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.*;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron implements EditableObject, AttributeContainer {
+public class Neuron implements EditableObject, AttributeContainer, NetworkModel {
 
     /**
      * The default neuron update rule. Neurons which are constructed without a
@@ -786,6 +787,27 @@ public class Neuron implements EditableObject, AttributeContainer {
         return (fanIn.contains(s) || fanOut.get(s.getTarget()) != null);
     }
 
+    @Override
+    public double getCenterX() {
+        return x;
+    }
+
+    @Override
+    public double getCenterY() {
+        return x;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+        setX(newx);
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+        setY(newy);
+    }
+
+    // TODO: Remove below / replace with get centerX/Y
     public double getX() {
         return x;
     }

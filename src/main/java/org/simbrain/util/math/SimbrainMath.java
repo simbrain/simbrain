@@ -46,19 +46,19 @@ public class SimbrainMath {
     }
 
     /**
-     * Calculates the Euclidean distance between two points. Used in World.
+     * Calculates the Euclidean distance between two points.
      *
      * @param src source point
      * @param tar target point
      * @return distance between source and target
      */
-    public static int distance(final Point src, final Point tar) {
-        int x1 = src.x;
-        int x2 = tar.x;
-        int y1 = src.y;
-        int y2 = tar.y;
+    public static double distance(final Point2D src, final Point2D tar) {
+        double x1 = src.getX();
+        double x2 = tar.getX();
+        double y1 = src.getY();
+        double y2 = tar.getY();
 
-        return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+        return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
     /**

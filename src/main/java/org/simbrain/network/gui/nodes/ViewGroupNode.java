@@ -75,7 +75,7 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         // TODO Auto-generated method stub
         return true;
     }

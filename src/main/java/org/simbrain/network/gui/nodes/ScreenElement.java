@@ -39,7 +39,7 @@ import java.awt.geom.Point2D;
  * <pre>
  * protected abstract boolean isSelectable();
  *
- * protected abstract boolean showSelectionHandle();
+ * protected abstract boolean showNodeHandle();
  *
  * protected abstract boolean isDraggable();
  *
@@ -178,7 +178,7 @@ public abstract class ScreenElement extends PPath.Float {
      * @see org.piccolo2d.PNode#setPickable
      * @see #isSelectable
      */
-    public abstract boolean showSelectionHandle();
+    public abstract boolean showNodeHandle();
 
     /**
      * Return <code>true</code> if this screen element is draggable.

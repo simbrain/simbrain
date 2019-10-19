@@ -81,7 +81,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

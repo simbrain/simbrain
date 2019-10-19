@@ -25,7 +25,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
-import org.simbrain.network.gui.nodes.SelectionHandle;
+import org.simbrain.network.gui.nodes.NodeHandle;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 import org.simbrain.util.piccolo.Tile;
@@ -168,7 +168,7 @@ public class OdorWorldPanel extends JPanel {
 
         selectionModel = new WorldSelectionModel(this);
         selectionModel.addSelectionListener((e) -> {
-            updateSelectionHandles(e);
+            updateNodeHandles(e);
         });
 
         // Add key bindings
@@ -498,7 +498,7 @@ public class OdorWorldPanel extends JPanel {
      *
      * @param event the NetworkSelectionEvent
      */
-    private void updateSelectionHandles(final WorldSelectionEvent event) {
+    private void updateNodeHandles(final WorldSelectionEvent event) {
 
         Set<PNode> selection = event.getSelection();
         Set<PNode> oldSelection = event.getOldSelection();
@@ -507,11 +507,11 @@ public class OdorWorldPanel extends JPanel {
         difference.removeAll(selection);
 
         for (PNode node : difference) {
-            SelectionHandle.removeSelectionHandleFrom(node);
+            NodeHandle.removeSelectionHandleFrom(node);
         }
         for (PNode node : selection) {
             // TODO: Move that to util class!
-            SelectionHandle.addSelectionHandleTo(node);
+            NodeHandle.addSelectionHandleTo(node);
 
         }
     }

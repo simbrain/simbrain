@@ -237,7 +237,7 @@ public class NeuronArrayNode extends ScreenElement {
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

@@ -190,7 +190,7 @@ public abstract class InteractionBox extends ScreenElement {
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

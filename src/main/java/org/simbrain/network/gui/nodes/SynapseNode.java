@@ -364,7 +364,7 @@ public final class SynapseNode extends ScreenElement {
      * @return
      * @see ScreenElement
      */
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

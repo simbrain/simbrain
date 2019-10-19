@@ -93,7 +93,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

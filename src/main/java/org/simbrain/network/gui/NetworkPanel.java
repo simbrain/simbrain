@@ -474,7 +474,7 @@ public class NetworkPanel extends JPanel {
         selectionModel.addSelectionListener(new NetworkSelectionListener() {
             /** @see NetworkSelectionListener */
             public void selectionChanged(final NetworkSelectionEvent e) {
-                updateSelectionHandles(e);
+                updateNodeHandles(e);
             }
         });
 
@@ -1807,7 +1807,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param event the NetworkSelectionEvent
      */
-    private void updateSelectionHandles(final NetworkSelectionEvent event) {
+    private void updateNodeHandles(final NetworkSelectionEvent event) {
 
         Set<PNode> selection = event.getSelection();
         Set<PNode> oldSelection = event.getOldSelection();
@@ -1816,13 +1816,19 @@ public class NetworkPanel extends JPanel {
         difference.removeAll(selection);
 
         for (PNode node : difference) {
-            SwingUtilities.invokeLater(() -> SelectionHandle.removeSelectionHandleFrom(node));
+            SwingUtilities.invokeLater(() -> NodeHandle.removeSelectionHandleFrom(node));
         }
         for (PNode node : selection) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
-                if (screenElement.showSelectionHandle()) {
-                    SwingUtilities.invokeLater(() -> SelectionHandle.addSelectionHandleTo(node));
+                if (screenElement.showNodeHandle()) {
+                    if (screenElement instanceof InteractionBox) {
+                        SwingUtilities.invokeLater(
+                                () -> NodeHandle.addSelectionHandleTo(node, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                        );
+                    } else {
+                        SwingUtilities.invokeLater(() -> NodeHandle.addSelectionHandleTo(node));
+                    }
                 }
             }
         }
@@ -1950,23 +1956,23 @@ public class NetworkPanel extends JPanel {
         clearSourceElements();
         for (NeuronNode node : this.getSelectedNodes(NeuronNode.class)) {
             sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
+            NodeHandle.addSourceHandleTo(node);
         }
         for (NeuronGroupNode node : this.getSelectedNodes(NeuronGroupNode.class)) {
             sourceElements.add(node.getInteractionBox());
-            SourceHandle.addSourceHandleTo(node.getInteractionBox());
+            NodeHandle.addSourceHandleTo(node.getInteractionBox(), NodeHandle.INTERACTION_BOX_SOURCE_STYLE);
         }
         for (NeuronCollectionNode node : getSelectedNodes(NeuronCollectionNode.class)) {
             sourceElements.add(node.getInteractionBox());
-            SourceHandle.addSourceHandleTo(node.getInteractionBox());
+            NodeHandle.addSourceHandleTo(node.getInteractionBox(), NodeHandle.INTERACTION_BOX_SOURCE_STYLE);
         }
         for (NeuronArrayNode node : getSelectedNodes(NeuronArrayNode.class)) {
             sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
+            NodeHandle.addSourceHandleTo(node);
         }
         for (MultiLayerNetworkNode node : getSelectedNodes(MultiLayerNetworkNode.class)) {
             sourceElements.add(node);
-            SourceHandle.addSourceHandleTo(node);
+            NodeHandle.addSourceHandleTo(node);
         }
         selectionModel.fireSelectionChanged();
     }
@@ -2383,7 +2389,7 @@ public class NetworkPanel extends JPanel {
      */
     public void clearSourceElements() {
         for (PNode node : sourceElements) {
-            SourceHandle.removeSourceHandleFrom(node);
+            NodeHandle.removeSourceHandleFrom(node);
         }
         sourceElements.clear();
         selectionModel.fireSelectionChanged();

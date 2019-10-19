@@ -489,7 +489,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @return screen element show a selection handle
      * @see ScreenElement
      */
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

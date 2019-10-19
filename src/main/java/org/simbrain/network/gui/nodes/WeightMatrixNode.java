@@ -263,7 +263,7 @@ public class WeightMatrixNode extends ScreenElement {
     }
 
     @Override
-    public boolean showSelectionHandle() {
+    public boolean showNodeHandle() {
         return true;
     }
 

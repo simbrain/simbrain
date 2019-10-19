@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.SelectionHandle;
+import org.simbrain.network.gui.nodes.NodeHandle;
 import org.simbrain.util.piccolo.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
@@ -374,7 +374,7 @@ public class NetworkPropertiesPanel extends JPanel {
         } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
             colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
-            colorIndicator.setBackground(SelectionHandle.getSelectionColor());
+            colorIndicator.setBackground(NodeHandle.SELECTION_STYLE.getSelectionColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
             colorIndicator.setBackground(NeuronNode.getSpikingColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {

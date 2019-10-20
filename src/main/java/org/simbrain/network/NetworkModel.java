@@ -15,10 +15,10 @@ public interface NetworkModel {
     public void setCenterY(double newy);
 
     // TODO: ScreenElement getModel should return these.
+    // SimnetUtils.getUpperLeft
+    // Clipboard.getPostPasteSelectionObjects
+    // setx > setcenterx, etc.
 
     // TODO: Handle deletion here
-
-    //TODO: get / setZ?
-
 
 }

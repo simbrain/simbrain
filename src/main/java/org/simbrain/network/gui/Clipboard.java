@@ -24,6 +24,7 @@ import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -51,11 +52,6 @@ public class Clipboard {
      * List of components which listen for changes to this clipboard.
      */
     private static HashSet listenerList = new HashSet();
-
-    /**
-     * Distance between pasted elemeents.
-     */
-    private static final double PASTE_INCREMENT = 15;
 
     /**
      * Clear the clipboard.
@@ -88,12 +84,11 @@ public class Clipboard {
 
         // Create a copy of the clipboard objects.
         ArrayList copy = CopyPaste.getCopy(net.getNetwork(), copiedObjects);
+        Point2D currentPosition = SimnetUtils.getUpperLeft(copy);
+        Point2D targetLocation = net.getPlacementManager().getLocation();
+        SimnetUtils.translate(copy, SimbrainMath.subtract(targetLocation, currentPosition));
 
-        // Gather data for translating the object then add the objects to the
-        // network.
-        Point2D upperLeft = SimnetUtils.getUpperLeft(copiedObjects);
-
-        translate(copy, net.getPlacementManager().getPasteOffset());
+        // Add the copied object
         net.getNetwork().addObjects(copy);
 
         // Select pasted items
@@ -152,14 +147,4 @@ public class Clipboard {
         }
     }
 
-    /**
-     * Translate a set of network model object.
-     */
-    public static void translate(final List<NetworkModel> networkObjects, final Point2D pasteOffset) {
-        System.out.println("networkObjects = [" + networkObjects + "], pasteOffset = [" + pasteOffset + "]");
-        for (NetworkModel model: networkObjects) {
-            model.setCenterX(model.getCenterX() + pasteOffset.getX());
-            model.setCenterY(model.getCenterY() + pasteOffset.getY());
-        }
-    }
 }

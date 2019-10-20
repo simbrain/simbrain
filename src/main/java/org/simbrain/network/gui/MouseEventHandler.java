@@ -95,19 +95,14 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
     @Override
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
-
-        // Set last clicked position, used in many areas for "placement" of
-        // objects in the last clicked position on screen.
-        networkPanel.getPlacementManager().setLastClickedPosition(event.getPosition());
-
-        // Set pressed position for use in double clicking
-        if (event.getPath().getPickedNode() instanceof PCamera) {
-            networkPanel.getPlacementManager().setBeginPosition(event.getPosition());
-        }
     }
 
     @Override
     public void mouseClicked(final PInputEvent event) {
+
+        // A click without a drag, e.g. making a lasso
+        // Reset placement manager's anchor point
+        networkPanel.getPlacementManager().setAnchorPoint(event.getPosition());
 
         // System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
@@ -283,12 +278,15 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-
-
         // End drag selected node(s)
         pickedNode = null;
-        networkPanel.getPlacementManager()
-                .setEndPosition(SimnetUtils.getUpperLeft(networkPanel.getSelectedModels()));
+
+        // Set the paste delta
+        Point2D upperLeft = SimnetUtils.getUpperLeft(networkPanel.getSelectedModels());
+        networkPanel.getPlacementManager().setPasteDelta(upperLeft);
+        // Also reset the anchor point, so that new points emerge from here
+        // with the delta that was just set
+        networkPanel.getPlacementManager().setAnchorPoint(upperLeft);
 
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();

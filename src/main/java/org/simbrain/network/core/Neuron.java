@@ -794,7 +794,7 @@ public class Neuron implements EditableObject, AttributeContainer, NetworkModel 
 
     @Override
     public double getCenterY() {
-        return x;
+        return y;
     }
 
     @Override

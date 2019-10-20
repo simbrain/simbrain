@@ -330,10 +330,17 @@ public class SimbrainMath {
     }
 
     /**
-     * Component-wise addition of the provided points
+     * Component-wise addition of the provided points.
      */
     public static Point2D add(Point2D point1, Point2D point2) {
         return new Point2D.Double(point1.getX() + point2.getX(), point1.getY() + point2.getY());
+    }
+
+    /**
+     * Component wise subtraction of provided points.
+     */
+    public static Point2D subtract(Point2D point1, Point2D point2) {
+        return new Point2D.Double(point1.getX() - point2.getX(), point1.getY() - point2.getY());
     }
 
     /**

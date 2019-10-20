@@ -116,6 +116,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
         NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
+        copy.setCenterX(orig.getCenterX());
+        copy.setCenterY(orig.getCenterY());
         copy.setValues(orig.getValues());
         return copy;
     }
@@ -194,12 +196,12 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public void setCenterX(double newx) {
-        x = newx;
+        setX(newx);
     }
 
     @Override
     public void setCenterY(double newy) {
-        y = newy;
+        setY(newy);
     }
 
     // TODO: Remove get/setX and replace with "center"

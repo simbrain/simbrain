@@ -18,6 +18,7 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.scalar.ComplexNumber;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -35,9 +36,8 @@ import java.util.*;
 public class SimnetUtils {
 
     /**
-     * Returns the weights connecting two lists of neurons as an N x M matrix of
-     * doubles, where N is the number of source neurons, and M is the number of
-     * target neurons. That is, each row of the matrix corresponds to a source
+     * Returns the weights connecting two lists of neurons as an N x M matrix of doubles, where N is the number of
+     * source neurons, and M is the number of target neurons. That is, each row of the matrix corresponds to a source
      * neuron's fan-out weight vector.
      *
      * @param srcLayer    source layer
@@ -64,11 +64,9 @@ public class SimnetUtils {
     }
 
     /**
-     * Set the weights connecting two lists of neurons using a weight matrix.
-     * Assumes that each row of the matrix corresponds to a source neuron's
-     * fan-out weight vector, as above. If a weight is missing it is added to
-     * the root network (from where it can in some cases be routed to a
-     * SynapseGroup)
+     * Set the weights connecting two lists of neurons using a weight matrix. Assumes that each row of the matrix
+     * corresponds to a source neuron's fan-out weight vector, as above. If a weight is missing it is added to the root
+     * network (from where it can in some cases be routed to a SynapseGroup)
      *
      * @param src the list of source neurons
      * @param tar the list of target neurons
@@ -90,8 +88,8 @@ public class SimnetUtils {
     }
 
     /**
-     * Gets a matrix of Synapse objects, formatted like the getWeights method.
-     * Non-existence synapses are given a null value.
+     * Gets a matrix of Synapse objects, formatted like the getWeights method. Non-existence synapses are given a null
+     * value.
      *
      * @param srcLayer    source neurons
      * @param targetLayer target neurons
@@ -138,8 +136,7 @@ public class SimnetUtils {
     /**
      * Find the largest eigenvalue for the provided matrix.
      *
-     * @param weightMatrix a matrix representation of the weights for use in
-     *                     linear algebraic operations
+     * @param weightMatrix a matrix representation of the weights for use in linear algebraic operations
      * @return the largest eigenvalue of this matrix by absolute value
      */
     public static double findMaxEig(double[][] weightMatrix) {
@@ -170,8 +167,7 @@ public class SimnetUtils {
     /**
      * @param src          list of source neurons
      * @param tar          list of target neurons
-     * @param desiredEigen : the new max eig or spectral radius for the weight
-     *                     matrix
+     * @param desiredEigen : the new max eig or spectral radius for the weight matrix
      */
     public static void scaleEigenvalue(List<Neuron> src, List<Neuron> tar, double desiredEigen) {
         double maxEigen = findMaxEig(getWeights(src, tar));
@@ -181,52 +177,53 @@ public class SimnetUtils {
     /**
      * Return the upper left corner of a list of objects, based on neurons.
      *
-     * @param objects list of objects
+     * @param networkObjects list of network model objecs
      * @return the point corresponding to the upper left corner of the objects
      */
-    public static Point2D getUpperLeft(final List<Object> objects) {
+    public static Point2D getUpperLeft(final List<Object> networkObjects) {
+        // TODO: Make List<NetworkModel>
+
         double x = Double.POSITIVE_INFINITY;
         double y = Double.POSITIVE_INFINITY;
 
-        for (final Object object : objects) {
-            if (object instanceof Neuron) {
-                Neuron neuron = (Neuron) object;
-                if (neuron.getX() < x) {
-                    x = neuron.getX();
+        for (final Object object : networkObjects) {
+            if (object instanceof NetworkModel) {
+                NetworkModel networkObject = (NetworkModel) object;
+                if (networkObject.getCenterX() < x) {
+                    x = networkObject.getCenterX();
                 }
-                if (neuron.getY() < y) {
-                    y = neuron.getY();
+                if (networkObject.getCenterY() < y) {
+                    y = networkObject.getCenterY();
                 }
-            } else if (object instanceof Network) {
-                for (Neuron neuron : ((Network) object).getFlatNeuronList()) {
-                    if (neuron.getX() < x) {
-                        x = neuron.getX();
-                    }
-                    if (neuron.getY() < y) {
-                        y = neuron.getY();
-                    }
+
+                if (x == Double.POSITIVE_INFINITY) {
+                    x = 0;
                 }
-            } else if (object instanceof NeuronArray) {
-                x = ((NeuronArray)object).getX();
-                y = ((NeuronArray)object).getY();
+                if (y == Double.POSITIVE_INFINITY) {
+                    y = 0;
+                }
             }
-        }
-        if (x == Double.POSITIVE_INFINITY) {
-            x = 0;
-        }
-        if (y == Double.POSITIVE_INFINITY) {
-            y = 0;
         }
         return new Point2D.Double(x, y);
     }
 
     /**
-     * Given a source and target set of neurons, find all layers of neurons
-     * connecting them, as follows. Assumes a sequence of layers from source to
-     * target, each fully connected to the next, and no other connections (e.g.
-     * recurrent connections). If a path from the source to target layer is not
-     * found then a list containing only the source and target layers is
-     * returned.
+     * Translate a set of network model object.
+     */
+    public static void translate(final List<NetworkModel> networkObjects, final Point2D translation) {
+        for (NetworkModel model: networkObjects) {
+            //System.out.println(model.getCenterX() + "," + model.getCenterY()
+            //        + ":" + translation.getX() + "," + translation.getY());
+            model.setCenterX(model.getCenterX() + translation.getX());
+            model.setCenterY(model.getCenterY() + translation.getY());
+        }
+    }
+
+    /**
+     * Given a source and target set of neurons, find all layers of neurons connecting them, as follows. Assumes a
+     * sequence of layers from source to target, each fully connected to the next, and no other connections (e.g.
+     * recurrent connections). If a path from the source to target layer is not found then a list containing only the
+     * source and target layers is returned.
      *
      * @param network     the neural network
      * @param sourceLayer the source neurons
@@ -245,13 +242,11 @@ public class SimnetUtils {
     }
 
     /**
-     * Helper method for getIntermedateLayers. Add the "next layer down" in the
-     * hierarchy.
+     * Helper method for getIntermedateLayers. Add the "next layer down" in the hierarchy.
      *
      * @param layers       the current set of layers
      * @param sourceLayer  the source layer
-     * @param layerToCheck the current layer. Look for previous layers and if
-     *                     one is found add it to the layers.
+     * @param layerToCheck the current layer. Look for previous layers and if one is found add it to the layers.
      */
     private static void addPreviousLayer(List<List<Neuron>> layers, List<Neuron> sourceLayer, List<Neuron> layerToCheck) {
 
@@ -294,8 +289,7 @@ public class SimnetUtils {
     }
 
     /**
-     * Prints a group of layers (a list of lists of neurons), typically for
-     * debugging.
+     * Prints a group of layers (a list of lists of neurons), typically for debugging.
      *
      * @param layers the layers to print
      */

@@ -572,12 +572,6 @@ public class NetworkPanel extends JPanel {
         neuron.forceSetActivation(0);
         getNetwork().addLooseNeuron(neuron);
 
-        placementManager.update();
-
-        // New objects are added to the right of the last neuron added.
-        // Convenient for quickly making "lines" of neurons by repeatedly
-        // adding neurons.
-
         undoManager.addUndoableAction(new UndoableAction() {
 
             @Override
@@ -639,9 +633,6 @@ public class NetworkPanel extends JPanel {
 
         layout.layoutNeurons(getSelectedModels(Neuron.class));
 
-        // New objects are added to the right of the last group of
-        // neurons added.
-        placementManager.update();
         network.fireNeuronsUpdated(getSelectedModels(Neuron.class));
         repaint();
 
@@ -771,11 +762,9 @@ public class NetworkPanel extends JPanel {
         if (group instanceof NeuronGroup) {
             NeuronGroup ng = (NeuronGroup) group;
             addNeuronGroup(ng);
-            // New objects are added diagonally below and to the right of the
-            // last neuron group added
-            if (ng.isTopLevelGroup()) {
-                placementManager.update();
-            }
+            //if (ng.isTopLevelGroup()) {
+            //    placementManager.update();
+            //}
         } else if (group instanceof SynapseGroup) {
             addSynapseGroup((SynapseGroup) group);
         } else if (group instanceof Subnetwork) {
@@ -1459,9 +1448,11 @@ public class NetworkPanel extends JPanel {
      * Copy to the clipboard.
      */
     public void copy() {
+        if(getSelectedModels().isEmpty()) {
+            return;
+        }
         Clipboard.clear();
-        placementManager.resetPastes();
-        placementManager.setBeginPosition(SimnetUtils.getUpperLeft(getSelectedModels()));
+        placementManager.setAnchorPoint(SimnetUtils.getUpperLeft(getSelectedModels()));
         ArrayList deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
         Clipboard.add(deepCopy);
     }
@@ -1479,13 +1470,15 @@ public class NetworkPanel extends JPanel {
      */
     public void paste() {
         Clipboard.paste(this);
-        placementManager.incrementPastes();
     }
 
     /**
      * Duplicates selected objects.
      */
     public void duplicate() {
+        if(getSelectedModels().isEmpty()) {
+            return;
+        }
         copy();
         paste();
     }
@@ -2731,6 +2724,5 @@ public class NetworkPanel extends JPanel {
         });
         //System.out.println(np.debugString());
     }
-
 
 }

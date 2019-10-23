@@ -117,7 +117,7 @@ public class NodeHandle extends PHandle {
     }
 
     public static void addSourceHandleTo(final PNode node) {
-        addSelectionHandleTo(node, SOURCE_STYLE);
+        addSourceHandleTo(node, SOURCE_STYLE);
     }
 
     /**

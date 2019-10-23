@@ -34,9 +34,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * A label for this Neuron Array for display purpose.
      */
-    @UserParameter(
-            label = "Label"
-    )
+    @UserParameter(label = "Label")
     private String label = "";
 
     /**
@@ -70,11 +68,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * y-coordinate of this neuron in 2-space.
      */
     private double y;
-
-    /**
-     * If true, when the array is added to the network its id will not be used as its label.
-     */
-    private boolean useCustomLabel = false;
 
     private WeightMatrix incomingWeightMatrix;
 
@@ -116,6 +109,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
         NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
+        copy.setLabel(newParent.getArrayIdGenerator().getProposedId());
         copy.setCenterX(orig.getCenterX());
         copy.setCenterY(orig.getCenterY());
         copy.setValues(orig.getValues());
@@ -139,11 +133,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
-        if (label == null  || label.isEmpty()) {
-            useCustomLabel = false;
-        } else {
-            useCustomLabel = true;
-        }
         String oldLabel = this.label;
         this.label = label;
         changeSupport.firePropertyChange("label", oldLabel , label);
@@ -155,17 +144,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void randomize() {
         neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
         changeSupport.firePropertyChange("updated", null , null);
-    }
-
-    /**
-     * Initialize the id for this array. A default label based
-     * on the id is also set.
-     */
-    public void initializeId() {
-        id = parent.getArrayIdGenerator().getId();
-        if (!useCustomLabel) {
-            label = id.replaceAll("_", " ");
-        }
     }
 
     public void update() {
@@ -287,14 +265,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         changeSupport.firePropertyChange("delete", this, null);
     }
 
-    public boolean isUseCustomLabel() {
-        return useCustomLabel;
-    }
-
-    public void setUseCustomLabel(boolean useCustomLabel) {
-        this.useCustomLabel = useCustomLabel;
-    }
-
     /**
      * Offset this neuron array
      *
@@ -320,17 +290,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public static class CreationTemplate implements EditableObject {
 
-        // See NeuronGroup.NeuronGroupCreator. Possibly reuse.
-
-        /**
-         * A label for this Neuron Array for display purpose.
-         */
-        @UserParameter(
-                label = "Label",
-                description = "If left blank, a default label will be created."
-        )
-        private String label = "";
-
         /**
          * Number of columns in the under laying ND4J Array.
          */
@@ -342,6 +301,23 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         private int numNodes = 100;
 
         /**
+         * A label for this Neuron Array for display purpose.
+         */
+        @UserParameter(
+                label = "Label",
+                description = "If left blank, a default label will be created.",
+                initialValueMethod = "getLabel"
+        )
+        private String label;
+
+        /**
+         * Create the template with a proposed label
+         */
+        public CreationTemplate(String proposedLabel) {
+            this.label = proposedLabel;
+        }
+
+        /**
          * Add a neuron array to network created from field values which should be setup by an Annotated Property
          * Editor.
          *
@@ -351,8 +327,15 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
          */
         public NeuronArray create(Network network) {
             NeuronArray na = new NeuronArray(network, numNodes);
-            na.setLabel(label);
+            na.label = label;
             return na;
+        }
+
+        /**
+         * Getter called by reflection by {@link UserParameter#initialValueMethod}
+         */
+        public String getLabel() {
+            return label;
         }
 
         @Override

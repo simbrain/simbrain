@@ -47,7 +47,7 @@ public class CopyPaste {
      * @return the list of copied items.
      */
     public static ArrayList<?> getCopy(final Network newParent, final List<?> items) {
-
+        // TODO: This gets called twice in a duplicate or paste...
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
         Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();

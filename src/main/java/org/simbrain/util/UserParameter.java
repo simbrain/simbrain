@@ -68,6 +68,14 @@ public @interface UserParameter {
     double maximumValue() default Double.NaN;
 
     /**
+     * Name of a method which returns a String, which is the initial value for the String widget.
+     * Note: Currently only supported for setting a String field for a single object.
+     */
+    // TODO: Possibly generalize to objects of any type. Currently only works with String based fields.
+    // TODO: Think about multi-object case.
+    String initialValueMethod() default "";
+
+    /**
      * Amount that the {@link org.simbrain.util.widgets.SpinnerNumberModelWithNull}
      * changes when clicked up or down. Note that it is up to the user of the
      * annotation to set this so that it makes sense.

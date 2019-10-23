@@ -160,41 +160,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     }
 
     /**
-     * Add a ParameterWidget to its corresponding tab panel.
-     *
-     * @param pw the ParameterWidget to add
-     */
-    private void addItemToTabPanel(ParameterWidget pw) {
-        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addTabPanel(parameterWidgetTabName);
-        tabPanels.get(parameterWidgetTabName).addSpanningItem(pw.getComponent());
-    }
-
-    /**
-     * Add a labeled ParameterWidget to its corresponding tab panel.
-     *
-     * @param pw the ParameterWidget to add
-     */
-    private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
-        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addTabPanel(parameterWidgetTabName);
-        tabPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
-    }
-
-    /**
-     * Creates if not exists a tab panel with a specified name.
-     *
-     * @param tabName the name for the tab
-     */
-    private void addTabPanel(String tabName) {
-        if (!tabPanels.containsKey(tabName)) {
-            LabelledItemPanel newLabelledItemPanel = new LabelledItemPanel();
-            tabPanels.put(tabName, newLabelledItemPanel);
-            ((JTabbedPane) mainPanel).addTab(tabName, newLabelledItemPanel);
-        }
-    }
-
-    /**
      * Fill all field values for the edited objects.
      */
     public void fillFieldValues() {
@@ -228,6 +193,13 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         // Check to see if the field values are consistent over all given
         // instances.
         for (ParameterWidget pw : widgets) {
+
+            // When using a custom initial value then don't do the consistency check.
+            // (The objects themselves have not yet been set so custom initial values automatically trigger
+            // inconsistency here).
+            if (pw.isCustomInitialValue() && objectList.size() == 1) {
+                continue;
+            }
 
             boolean consistent = true;
 
@@ -278,8 +250,11 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         if (objectsToCheck.isEmpty()) {
             return false;
         }
-        boolean objectsSameType = objectsToCheck.stream().allMatch(m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
-        boolean objectsSameTypeAsInternal = objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
+        boolean objectsSameType =
+                objectsToCheck.stream()
+                .allMatch(m -> m.getClass().equals(objectsToCheck.get(0).getClass()));
+        boolean objectsSameTypeAsInternal =
+                objectsToCheck.get(0).getClass().equals(editedObjects.get(0).getClass());
         if (!objectsSameType || !objectsSameTypeAsInternal) {
             String exceptionString = "Objects of type " + objectsToCheck.get(0).getClass()
                 + " do not match edited object of type" + editedObjects.get(0).getClass();
@@ -352,7 +327,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         }
 
         objectsToEdit.forEach(EditableObject::onCommit);
-
     }
 
     /**
@@ -475,6 +449,41 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             }
         }
         return null;
+    }
+
+    /**
+     * Add a ParameterWidget to its corresponding tab panel.
+     *
+     * @param pw the ParameterWidget to add
+     */
+    private void addItemToTabPanel(ParameterWidget pw) {
+        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addSpanningItem(pw.getComponent());
+    }
+
+    /**
+     * Add a labeled ParameterWidget to its corresponding tab panel.
+     *
+     * @param pw the ParameterWidget to add
+     */
+    private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
+        String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
+    }
+
+    /**
+     * Creates if not exists a tab panel with a specified name.
+     *
+     * @param tabName the name for the tab
+     */
+    private void addTabPanel(String tabName) {
+        if (!tabPanels.containsKey(tabName)) {
+            LabelledItemPanel newLabelledItemPanel = new LabelledItemPanel();
+            tabPanels.put(tabName, newLabelledItemPanel);
+            ((JTabbedPane) mainPanel).addTab(tabName, newLabelledItemPanel);
+        }
     }
 
 

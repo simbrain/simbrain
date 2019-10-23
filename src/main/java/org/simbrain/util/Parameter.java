@@ -233,6 +233,8 @@ public class Parameter implements Comparable<Parameter> {
      *                                  null.
      */
     public void setFieldValue(Object object, Object value) {
+        //System.out.println("object = " + object.getClass().getSimpleName()
+        //        + ", field = " + field.getName() + ", value = " + value);
         value = interpretValue(value);
 
         String validationError = validateValue(value);

@@ -530,13 +530,12 @@ public class Network {
         fireNeuronAdded(neuron);
     }
 
-
     /**
      * Add an ND4J array object.
      */
     public void addNeuronArray(NeuronArray na) {
-        na.initializeId();
         naList.add(na);
+        arrayIdGenerator.incrementId();
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 

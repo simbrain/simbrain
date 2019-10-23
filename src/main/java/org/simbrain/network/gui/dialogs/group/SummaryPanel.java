@@ -274,7 +274,7 @@ public class SummaryPanel extends EditablePanel {
         // End Temporary fixes.
         inputMode.setSelected(ng.isInputMode());
         if (ng.getId() == null || ng.getId().isEmpty()) {
-            idField.setText(ng.getParentNetwork().getGroupIdGenerator().getHypotheticalId()); // ng hasn't been added to the
+            idField.setText(ng.getParentNetwork().getGroupIdGenerator().getProposedId()); // ng hasn't been added to the
             // network
             // yet
         } else {
@@ -339,7 +339,7 @@ public class SummaryPanel extends EditablePanel {
      */
     public void fillFieldValues(final SynapseGroup sg) {
         if (sg.getId() == null || sg.getId().isEmpty()) {
-            idField.setText(sg.getParentNetwork().getGroupIdGenerator().getHypotheticalId()); // sg hasn't been added to the
+            idField.setText(sg.getParentNetwork().getGroupIdGenerator().getProposedId()); // sg hasn't been added to the
             // network
             // yet
         } else {

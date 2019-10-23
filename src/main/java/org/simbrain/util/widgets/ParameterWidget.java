@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.util.*;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
@@ -53,9 +54,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      */
     private final JComponent component;
 
-
     /**
-     * The list of object this parameter is editing.
+     * The list of objects this parameter is editing.
      */
     private List<? extends EditableObject> editableObjects;
 
@@ -64,6 +64,11 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * ObjectTypeEditor}, which must be initialized with edited objects.
      */
     private List<CopyableObject> objectTypeList;
+
+    /**
+     * If true, then a custom value has been used to initialize the widget.
+     */
+    public boolean customInitialValue = false;
 
     /**
      * Construct a parameter widget from a parameter, which in turn represents a
@@ -85,6 +90,27 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         }
         component = makeWidget();
+        setInitialValue();
+    }
+
+    /**
+     * Set the initial value of this widget if the {@link UserParameter#initialValueMethod()}
+     * is set.
+     */
+    private void setInitialValue() {
+        String initialValueMethod = parameter.getAnnotation().initialValueMethod();
+        if (!initialValueMethod.isEmpty()) {
+            // TODO: type check, or generalize to any object type
+            try {
+                Method method = editableObjects.get(0).getClass().
+                        getDeclaredMethod(initialValueMethod);
+                String initValue = (String) method.invoke(editableObjects.get(0));
+                ((TextWithNull) component).setText(initValue);
+                customInitialValue = true;
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -365,5 +391,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
 
         return false;
+    }
+
+    public boolean isCustomInitialValue() {
+        return customInitialValue;
     }
 }

@@ -45,7 +45,7 @@ public class SimpleId {
     }
 
     /**
-     * Returns a simple identifier.
+     * Returns a simple identifier and increments id index.
      *
      * @return a unique identification
      */
@@ -55,15 +55,16 @@ public class SimpleId {
     }
 
     /**
-     * Returns what the simple identifier would be if a hypothetical construct
-     * requiring such an id were constructed and put into the network.
-     *
-     * @return a hypothetical unique identification
+     * Get the next id that will be made if {@link #getId()} is called.
      */
-    public String getHypotheticalId() {
-        int ind = index;
-        String id = rootName + "_" + ind;
-        return id;
+    public String getProposedId() {
+        return rootName + "_" + index;
     }
 
+    /**
+     * Increment the id index. Can be used if a proposed id is set to an actual id.
+     */
+    public void incrementId() {
+        index++;
+    }
 }

@@ -150,6 +150,10 @@ public class WeightMatrixNode extends ScreenElement {
     private void updateLine() {
         Point2D source = weightMatrix.getSource().getAttachmentPoint();
         Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        if (weightMatrix.getSource() == weightMatrix.getTarget()) {
+            source = SimbrainMath.add(source, new Point2D.Double(-60, 0));
+            target = SimbrainMath.add(target, new Point2D.Double(60, 0));
+        }
         Point2D mid = SimbrainMath.add(
                 SimbrainMath.midpoint(source, target),
                 getCurveControlVector()
@@ -170,7 +174,7 @@ public class WeightMatrixNode extends ScreenElement {
      * @see <a href="https://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/QuadCurve.html">Quad Curve Docs</a>
      */
     private Point2D getCurveControlVector() {
-        float offset = weightMatrix.isUseCurve() ? 150 : 0;
+        float offset = weightMatrix.isUseCurve() ? 200 : 0;
         Point2D source = weightMatrix.getSource().getAttachmentPoint();
         Point2D target = weightMatrix.getTarget().getAttachmentPoint();
         Point2D unitNormal = SimbrainMath.getUnitNormalVector(source, target);

@@ -28,6 +28,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.*;
 
+import static java.awt.BasicStroke.CAP_SQUARE;
+
 /**
  * A visual representation of a weight matrix
  */
@@ -48,7 +50,21 @@ public class WeightMatrixNode extends ScreenElement {
      */
     private PPath line;
 
-    private Arrow arrow;
+    /**
+     * Arrow-head symbol indicating direction of the connection.
+     */
+    private Arrow arrowHead;
+
+    /**
+     * Length in pixels of the two parts of the arrow-head.
+     */
+    private static final double headLength = 10.0;
+
+    /**
+     * How far proportionally along the {@link #line} to place the arrowhead.
+     * Ranges from 0 to 1.
+     */
+    private static final double arrowLocation = .85;
 
     /**
      * An image showing individuals weightMatrix strength
@@ -162,18 +178,18 @@ public class WeightMatrixNode extends ScreenElement {
                 getCurveControlVector()
         );
         removeChild(line);
-        removeChild(arrow);
+        removeChild(arrowHead);
         line2D.setCurve(source, mid, target);
         line = new PPath.Double(line2D);
         line.setStroke(new BasicStroke(3.0f));
         line.setPaint(null);
-        arrow = new Arrow();
-        arrow.rotate(SimbrainMath.approximateTangentAngleOfBezierCurve(line2D, 0.75) - Math.PI / 4);
-        arrow.setOffset(SimbrainMath.findPointOnBezierCurve(line2D, 0.75));
+        arrowHead = new Arrow();
+        arrowHead.rotate(SimbrainMath.approximateTangentAngleOfBezierCurve(line2D, arrowLocation) - Math.PI / 4);
+        arrowHead.setOffset(SimbrainMath.findPointOnBezierCurve(line2D, arrowLocation));
         addChild(line);
-        addChild(arrow);
+        addChild(arrowHead);
         line.lowerToBottom();
-        arrow.lowerToBottom();
+        arrowHead.lowerToBottom();
     }
 
     /**
@@ -402,16 +418,23 @@ public class WeightMatrixNode extends ScreenElement {
         return weightMatrix;
     }
 
+    /**
+     * Two lines making up a simple arrow.  Just the arrow head or "chevron" part.
+     */
     class Arrow extends PNode {
+
         public Arrow() {
             super();
-            PPath line1 = new PPath.Double(new Line2D.Double(0, 0, 25, 0));
-            line1.setStroke(new BasicStroke(3));
+
+            Stroke lineStroke = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+
+            PPath line1 = new PPath.Double(new Line2D.Double(0, 0, headLength, 0));
+            line1.setStroke(lineStroke);
             line1.setPaint(null);
             addChild(line1);
 
-            PPath line2 = new PPath.Double(new Line2D.Double(0, 0, 0, 25));
-            line2.setStroke(new BasicStroke(3));
+            PPath line2 = new PPath.Double(new Line2D.Double(0, 0, 0, headLength));
+            line2.setStroke(lineStroke);
             line2.setPaint(null);
             addChild(line2);
 

@@ -526,4 +526,25 @@ public abstract class Subnetwork extends Group {
         return this.copy();
     }
 
+
+    @Override
+    public double getCenterX() {
+        return 0;
+    }
+
+    @Override
+    public double getCenterY() {
+        return 0;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+
+    }
+
 }

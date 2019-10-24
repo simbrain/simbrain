@@ -3,6 +3,7 @@ package org.simbrain.network.dl4j;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.UserParameter;
@@ -18,7 +19,7 @@ import java.beans.PropertyChangeSupport;
  * An ND4J weight matrix that connects a source and target {@link ArrayConnectable}
  * object.
  */
-public class WeightMatrix implements EditableObject, AttributeContainer {
+public class WeightMatrix implements EditableObject, AttributeContainer, NetworkModel {
 
     /**
      * The source "layer" / activation vector for this weight matrix.
@@ -216,6 +217,26 @@ public class WeightMatrix implements EditableObject, AttributeContainer {
     public void randomize() {
         weightMatrix = Nd4j.rand((int) source.outputSize(), (int) target.inputSize()).subi(0.5).mul(2);
         changeSupport.firePropertyChange("updated", null , null);
+    }
+
+    @Override
+    public double getCenterX() {
+        return 0;
+    }
+
+    @Override
+    public double getCenterY() {
+        return 0;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+
     }
 
     //public Layer asLayer() {

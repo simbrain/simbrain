@@ -18,6 +18,7 @@ e * Part of Simbrain--a java-based neural network kit
  */
 package org.simbrain.network.util;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.CopyableGroup;
@@ -46,9 +47,9 @@ public class CopyPaste {
      * @param items     the list of items to copy.
      * @return the list of copied items.
      */
-    public static ArrayList<?> getCopy(final Network newParent, final List<?> items) {
+    public static List<NetworkModel> getCopy(final Network newParent, final List<NetworkModel> items) {
         // TODO: This gets called twice in a duplicate or paste...
-        ArrayList<Object> ret = new ArrayList<Object>();
+        List<NetworkModel> ret = new ArrayList<>();
         // Match new to old neurons for synapse adding
         Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
         ArrayList<Synapse> synapses = new ArrayList<Synapse>();
@@ -68,10 +69,10 @@ public class CopyPaste {
                 NetworkTextObject newText = new NetworkTextObject(newParent, text);
                 ret.add(newText);
             } else if (item instanceof CopyableGroup) {
-                Object copy = ((CopyableGroup<?>) item).deepCopy(newParent);
+                NetworkModel copy = ((CopyableGroup<?>) item).deepCopy(newParent);
                 ret.add(copy);
             } else if (item instanceof NeuronArray) {
-                Object copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
+                NetworkModel copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
                 ret.add(copy);
             }
         }

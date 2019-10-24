@@ -15,6 +15,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.pmw.tinylog.Logger;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @see {https://deeplearning4j.org/docs/latest/deeplearning4j-nn-multilayernetwork}
  */
-public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
+public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, NetworkModel {
 
     /**
      * The main dl4j object being wrapped
@@ -283,6 +284,27 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp {
 
     @Override
     public void revalidateSynapseGroups() {
+
+    }
+
+    // TODO
+    @Override
+    public double getCenterX() {
+        return 0;
+    }
+
+    @Override
+    public double getCenterY() {
+        return 0;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+
+    }
+
+    @Override
+    public void setCenterY(double newy) {
 
     }
 

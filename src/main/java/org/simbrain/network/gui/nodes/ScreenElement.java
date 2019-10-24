@@ -23,6 +23,7 @@ import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.gui.NetworkPanel;
 
 import javax.swing.*;
@@ -405,5 +406,5 @@ public abstract class ScreenElement extends PPath.Float {
     /**
      * Returns a reference to the model object this node represents.
      */
-    public abstract Object getModel();
+    public abstract NetworkModel getModel();
 }

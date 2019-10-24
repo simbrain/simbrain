@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.NetworkModel;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -26,7 +28,7 @@ import java.beans.PropertyChangeSupport;
  * used to label elements of a neural network simulation. Contains basic text
  * properties as well.
  */
-public class NetworkTextObject {
+public class NetworkTextObject implements NetworkModel {
 
     /**
      * Reference to parent root network of this text object.
@@ -198,5 +200,25 @@ public class NetworkTextObject {
      */
     public void postUnmarshallingInit() {
         changeSupport = new PropertyChangeSupport(this);
+    }
+
+    @Override
+    public double getCenterX() {
+        return x;
+    }
+
+    @Override
+    public double getCenterY() {
+        return y;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+        x = newx;
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+        y = newy;
     }
 }

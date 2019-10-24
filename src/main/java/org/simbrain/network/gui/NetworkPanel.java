@@ -25,6 +25,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
@@ -1453,7 +1454,7 @@ public class NetworkPanel extends JPanel {
         }
         Clipboard.clear();
         placementManager.setAnchorPoint(SimnetUtils.getUpperLeft(getSelectedModels()));
-        ArrayList deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
+        List<NetworkModel> deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
         Clipboard.add(deepCopy);
     }
 
@@ -1777,7 +1778,7 @@ public class NetworkPanel extends JPanel {
      *
      * @return list of selected model elements
      */
-    public List<Object> getSelectedModels() {
+    public List<NetworkModel> getSelectedModels() {
         return getSelectedNodes().stream()
                 .filter(Objects::nonNull)
                 .map(ScreenElement::getModel)

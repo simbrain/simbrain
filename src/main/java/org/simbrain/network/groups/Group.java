@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.UserParameter;
@@ -33,7 +34,7 @@ import java.beans.PropertyChangeSupport;
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
  * representation is {@link org.simbrain.network.gui.nodes.GroupNode}.
  */
-public abstract class Group implements CopyableObject, AttributeContainer {
+public abstract class Group implements CopyableObject, AttributeContainer, NetworkModel {
 
     /**
      * Reference to the network this group is a part of.

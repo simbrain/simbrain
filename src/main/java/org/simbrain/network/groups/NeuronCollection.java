@@ -19,6 +19,7 @@ package org.simbrain.network.groups;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
@@ -41,7 +42,7 @@ import java.util.List;
  * Allows them to be labelled, moved around as a unit, coupled to, etc.   However no special processing
  * occurs in neuron collections.  They are a convenience.  NeuronCollections can overlap each other.
  */
-public class NeuronCollection implements AttributeContainer, ArrayConnectable {
+public class NeuronCollection implements AttributeContainer, ArrayConnectable, NetworkModel {
 
     /**
      * Reference to the network this group is a part of.
@@ -405,6 +406,16 @@ public class NeuronCollection implements AttributeContainer, ArrayConnectable {
             }
         }
         return min + (max - min) / 2;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+        // todo
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+        //todo
     }
 
     /**

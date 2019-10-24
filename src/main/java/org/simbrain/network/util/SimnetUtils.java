@@ -180,28 +180,24 @@ public class SimnetUtils {
      * @param networkObjects list of network model objecs
      * @return the point corresponding to the upper left corner of the objects
      */
-    public static Point2D getUpperLeft(final List<Object> networkObjects) {
-        // TODO: Make List<NetworkModel>
+    public static Point2D getUpperLeft(final List<NetworkModel> networkObjects) {
 
         double x = Double.POSITIVE_INFINITY;
         double y = Double.POSITIVE_INFINITY;
 
-        for (final Object object : networkObjects) {
-            if (object instanceof NetworkModel) {
-                NetworkModel networkObject = (NetworkModel) object;
-                if (networkObject.getCenterX() < x) {
-                    x = networkObject.getCenterX();
-                }
-                if (networkObject.getCenterY() < y) {
-                    y = networkObject.getCenterY();
-                }
+        for (NetworkModel model : networkObjects) {
+            if (model.getCenterX() < x) {
+                x = model.getCenterX();
+            }
+            if (model.getCenterY() < y) {
+                y = model.getCenterY();
+            }
 
-                if (x == Double.POSITIVE_INFINITY) {
-                    x = 0;
-                }
-                if (y == Double.POSITIVE_INFINITY) {
-                    y = 0;
-                }
+            if (x == Double.POSITIVE_INFINITY) {
+                x = 0;
+            }
+            if (y == Double.POSITIVE_INFINITY) {
+                y = 0;
             }
         }
         return new Point2D.Double(x, y);
@@ -211,7 +207,7 @@ public class SimnetUtils {
      * Translate a set of network model object.
      */
     public static void translate(final List<NetworkModel> networkObjects, final Point2D translation) {
-        for (NetworkModel model: networkObjects) {
+        for (NetworkModel model : networkObjects) {
             //System.out.println(model.getCenterX() + "," + model.getCenterY()
             //        + ":" + translation.getX() + "," + translation.getY());
             model.setCenterX(model.getCenterX() + translation.getX());

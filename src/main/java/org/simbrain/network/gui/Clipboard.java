@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.NeuronArray;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -46,7 +48,7 @@ public class Clipboard {
     /**
      * Static list of cut or copied objects.
      */
-    private static ArrayList copiedObjects = new ArrayList();
+    private static List<NetworkModel> copiedObjects = new ArrayList<>();
 
     /**
      * List of components which listen for changes to this clipboard.
@@ -57,7 +59,7 @@ public class Clipboard {
      * Clear the clipboard.
      */
     public static void clear() {
-        copiedObjects = new ArrayList();
+        copiedObjects = new ArrayList<>();
         fireClipboardChanged();
     }
 
@@ -66,7 +68,7 @@ public class Clipboard {
      *
      * @param objects objects to add
      */
-    public static void add(final ArrayList objects) {
+    public static void add(final List<NetworkModel> objects) {
         copiedObjects = objects;
         //System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged();
@@ -83,7 +85,7 @@ public class Clipboard {
         }
 
         // Create a copy of the clipboard objects.
-        ArrayList copy = CopyPaste.getCopy(net.getNetwork(), copiedObjects);
+        List<NetworkModel> copy = CopyPaste.getCopy(net.getNetwork(), copiedObjects);
         Point2D currentPosition = SimnetUtils.getUpperLeft(copy);
         Point2D targetLocation = net.getPlacementManager().getLocation();
         SimnetUtils.translate(copy, SimbrainMath.subtract(targetLocation, currentPosition));
@@ -91,34 +93,12 @@ public class Clipboard {
         // Add the copied object
         net.getNetwork().addObjects(copy);
 
-        // Select pasted items
-        net.setSelection(getPostPasteSelectionObjects(net, copy));
+        // Select copied objects after pasting them
+        List<PNode> toSelect = copy.stream()
+                .map(net.getObjectNodeMap()::get)
+                .collect(Collectors.toList());
+        net.setSelection(toSelect);
         net.repaint();
-    }
-
-    /**
-     * Returns those objects that should be selected after a paste.
-     *
-     * @param net  reference to network panel.
-     * @param list list of objects.
-     * @return list of objects to be selected after pasting.
-     */
-    private static ArrayList getPostPasteSelectionObjects(final NetworkPanel net, final ArrayList list) {
-        ArrayList<Object> ret = new ArrayList<Object>();
-        for (Object object : list) {
-            if (object instanceof Neuron) {
-                ret.add(net.getObjectNodeMap().get(object));
-            } else if (object instanceof Synapse) {
-                ret.add(net.getObjectNodeMap().get(object));
-            } else if (object instanceof NetworkTextObject) {
-                ret.add(net.getObjectNodeMap().get(object));
-            } else if (object instanceof NeuronGroup) {
-                ret.add(net.getObjectNodeMap().get(object));
-            } else if (object instanceof NeuronArray) {
-                ret.add(net.getObjectNodeMap().get(object));
-            }
-        }
-        return ret;
     }
 
     /**

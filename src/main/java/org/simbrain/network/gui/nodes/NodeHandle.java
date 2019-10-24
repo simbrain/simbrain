@@ -8,23 +8,50 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 
+/**
+ * "Selection" handle for PNodes,
+ */
 public class NodeHandle extends PHandle {
 
 
+    /**
+     * Green selection handle.
+     */
     public static final Config SELECTION_STYLE = new Config();
 
+    /**
+     * Red "source style" selection handle.
+     */
     public static final Config SOURCE_STYLE = new Config(0.2f, Color.RED);
 
+    /**
+     * Style used with interaction box selection.
+     */
     public static final Config INTERACTION_BOX_SELECTION_STYLE = new Config(0.01f, 2, Color.green);
 
+    /**
+     * Style used with interaction box source selection.
+     */
     public static final Config INTERACTION_BOX_SOURCE_STYLE = new Config(0.09f, Color.RED);
 
+    /**
+     * Regular selections associated with a node.
+     */
     private static final Map<PNode, NodeHandle> selections = new HashMap<>();
 
+    /**
+     * Source selections associated with a node.
+     */
     private static final Map<PNode, NodeHandle> sources = new HashMap<>();
 
+    /**
+     * Style of a node handle. Thickness, color, etc.
+     */
     private Config style;
 
+    /**
+     * Create with a specified style.
+     */
     public NodeHandle(PNodeLocator locator, Config style) {
         super(locator);
 
@@ -47,9 +74,7 @@ public class NodeHandle extends PHandle {
         relocateHandle();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void parentBoundsChanged() {
         updateBounds();
         super.parentBoundsChanged();

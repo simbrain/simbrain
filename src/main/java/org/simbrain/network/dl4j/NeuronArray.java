@@ -69,8 +69,16 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     private double y;
 
+    /**
+     * Reference to incoming weight matrix.
+     * TODO: Consider making this a list, prior to implementing serialization. But note that
+     * there is no support currently for many-to-one connections.
+     */
     private WeightMatrix incomingWeightMatrix;
 
+    /**
+     * "Fan-out" of outgoing weight matrices.
+     */
     private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
     /**

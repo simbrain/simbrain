@@ -23,6 +23,7 @@ import umontreal.iro.lecuyer.rng.RandomStream;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -825,5 +826,30 @@ public class SimbrainMath {
         // System.out.println(Arrays.toString(randPermute(1, 10)));
         // System.out.println(Arrays.toString(randPermuteWithExclusion(1, 10,
         // 6)));
+    }
+
+    /**
+     * Approximate the angle of the tangent at a given parameter t on a Bezier curve
+     *
+     * @return theta in radian
+     */
+    public static double approximateTangentAngleOfBezierCurve(QuadCurve2D curve2D, double t) {
+        Point2D p1 = findPointOnBezierCurve(curve2D, t + 0.01);
+        Point2D p2 = findPointOnBezierCurve(curve2D, t - 0.01);
+        Point2D vec = subtract(p2, p1);
+        return Math.atan2(vec.getY(), vec.getX());
+    }
+
+    /**
+     * Find the point on a Bezier curve at parameter t
+     */
+    public static Point2D findPointOnBezierCurve(QuadCurve2D curve2D, double t) {
+        Point2D p1 = findEndPointOfLineSegmentAfterScaling(curve2D.getP1(), curve2D.getCtrlPt(), t);
+        Point2D p2 = findEndPointOfLineSegmentAfterScaling(curve2D.getCtrlPt(), curve2D.getP2(), t);
+        return findEndPointOfLineSegmentAfterScaling(p1, p2, t);
+    }
+
+    private static  Point2D findEndPointOfLineSegmentAfterScaling(Point2D p1, Point2D p2, double scalingFactor) {
+        return add(scale(subtract(p2, p1), scalingFactor), p1);
     }
 }

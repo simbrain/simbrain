@@ -23,6 +23,7 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.*;
@@ -46,6 +47,8 @@ public class WeightMatrixNode extends ScreenElement {
      * The visual component of the {@link #line2D}.
      */
     private PPath line;
+
+    private Arrow arrow;
 
     /**
      * An image showing individuals weightMatrix strength
@@ -159,12 +162,18 @@ public class WeightMatrixNode extends ScreenElement {
                 getCurveControlVector()
         );
         removeChild(line);
+        removeChild(arrow);
         line2D.setCurve(source, mid, target);
         line = new PPath.Double(line2D);
         line.setStroke(new BasicStroke(3.0f));
         line.setPaint(null);
+        arrow = new Arrow();
+        arrow.rotate(SimbrainMath.approximateTangentAngleOfBezierCurve(line2D, 0.75) - Math.PI / 4);
+        arrow.setOffset(SimbrainMath.findPointOnBezierCurve(line2D, 0.75));
         addChild(line);
+        addChild(arrow);
         line.lowerToBottom();
+        arrow.lowerToBottom();
     }
 
     /**
@@ -391,5 +400,23 @@ public class WeightMatrixNode extends ScreenElement {
 
     public WeightMatrix getWeightMatrix() {
         return weightMatrix;
+    }
+
+    class Arrow extends PNode {
+        public Arrow() {
+            super();
+            PPath line1 = new PPath.Double(new Line2D.Double(0, 0, 25, 0));
+            line1.setStroke(new BasicStroke(3));
+            line1.setPaint(null);
+            addChild(line1);
+
+            PPath line2 = new PPath.Double(new Line2D.Double(0, 0, 0, 25));
+            line2.setStroke(new BasicStroke(3));
+            line2.setPaint(null);
+            addChild(line2);
+
+            setVisible(true);
+            setPickable(false);
+        }
     }
 }

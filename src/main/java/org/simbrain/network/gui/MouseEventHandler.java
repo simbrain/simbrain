@@ -281,11 +281,11 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
         // End drag selected node(s)
         pickedNode = null;
 
-        // Set the paste delta
+        // End of an object dragging event. Set the target location of paste delta
         Point2D upperLeft = SimnetUtils.getUpperLeft(networkPanel.getSelectedModels());
-        networkPanel.getPlacementManager().setPasteDelta(upperLeft);
-        // Also reset the anchor point, so that new points emerge from here
-        // with the delta that was just set
+        networkPanel.getPlacementManager().setPasteDeltaEnd(upperLeft);
+
+        // Also reset the anchor point, so that new points emerge from we just dragged
         networkPanel.getPlacementManager().setAnchorPoint(upperLeft);
 
         priorSelection = Collections.EMPTY_LIST;

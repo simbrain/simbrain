@@ -306,7 +306,12 @@ public class NetworkPanel extends JPanel {
     /**
      * Manages placement of new nodes, groups, etc.
      */
-    private PlacementManager placementManager = new PlacementManager();;
+    private PlacementManager placementManager = new PlacementManager();
+
+    /**
+     * Reference to last neuronGroup added.  For setting distances between neuron groups when adding them.
+     */
+    private NeuronGroup lastNgAdded;
 
     //TODO: Make constructor private and just use static creation method?
 
@@ -567,7 +572,7 @@ public class NetworkPanel extends JPanel {
     public void addNeuron(final NeuronUpdateRule baseRule) {
 
         final Neuron neuron = new Neuron(getNetwork(), baseRule);
-        Point2D p = placementManager.getLocation();
+        Point2D p = placementManager.getLocation(45,0);
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.forceSetActivation(0);
@@ -801,6 +806,12 @@ public class NetworkPanel extends JPanel {
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
+
+        // Position new neuron group
+        neuronGroup.applyLayout();
+        double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 30;
+        lastNgAdded = neuronGroup;
+        neuronGroup.setLocation(placementManager.getLocation(offset,0));
 
         repaint();
     }
@@ -1453,7 +1464,7 @@ public class NetworkPanel extends JPanel {
             return;
         }
         Clipboard.clear();
-        placementManager.setAnchorPoint(SimnetUtils.getUpperLeft(getSelectedModels()));
+        placementManager.setPasteDeltaBegin(SimnetUtils.getUpperLeft(getSelectedModels()));
         List<NetworkModel> deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
         Clipboard.add(deepCopy);
     }
@@ -2426,8 +2437,10 @@ public class NetworkPanel extends JPanel {
         and.addClosingTask(() -> SwingUtilities.invokeLater(() -> {
             Network network = getNetwork();
             NeuronArray neuronArray = creationTemplate.create(network);
-            neuronArray.setX(placementManager.getLocation().getX());
-            neuronArray.setY(placementManager.getLocation().getY());
+            // Place new neuron arrays far anough above one another that the intervening weight matrix shows
+            Point2D newLocation = placementManager.getLocation(0,-210);
+            neuronArray.setX(newLocation.getX());
+            neuronArray.setY(newLocation.getY());
             network.addNeuronArray(neuronArray);
         }));
         and.pack();

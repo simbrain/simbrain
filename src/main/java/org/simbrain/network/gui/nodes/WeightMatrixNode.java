@@ -28,8 +28,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.*;
 
-import static java.awt.BasicStroke.CAP_SQUARE;
-
 /**
  * A visual representation of a weight matrix
  */
@@ -54,6 +52,21 @@ public class WeightMatrixNode extends ScreenElement {
      * Arrow-head symbol indicating direction of the connection.
      */
     private Arrow arrowHead;
+
+    /**
+     * The line representing the self connection.
+     */
+    private PPath selfDirectedLine;
+
+    /**
+     * The second arrow head on the {@link #selfDirectedLine}. {@link #arrowHead} is reused as the first arrow head.
+     */
+    private Arrow selfDirectedArrowHead;
+
+    /**
+     * The radius of the self connection circle.
+     */
+    private static final double selfDirectedLineRadius = 100;
 
     /**
      * Length in pixels of the two parts of the arrow-head.
@@ -167,28 +180,71 @@ public class WeightMatrixNode extends ScreenElement {
      * Redraw the {@link #line} based on the new source and target location.
      */
     private void updateLine() {
+
+        removeChild(line);
+        removeChild(arrowHead);
+        removeChild(selfDirectedLine);
+        removeChild(selfDirectedArrowHead);
+
+        boolean isSelfDirected = weightMatrix.getSource() == weightMatrix.getTarget();
+
+        if (isSelfDirected) {
+            updateSelfDirectedLine();
+        } else {
+            updateDirectionalLine();
+        }
+
+
+    }
+
+    private void updateDirectionalLine() {
         Point2D source = weightMatrix.getSource().getAttachmentPoint();
         Point2D target = weightMatrix.getTarget().getAttachmentPoint();
-        if (weightMatrix.getSource() == weightMatrix.getTarget()) {
-            source = SimbrainMath.add(source, new Point2D.Double(-60, 0));
-            target = SimbrainMath.add(target, new Point2D.Double(60, 0));
-        }
         Point2D mid = SimbrainMath.add(
                 SimbrainMath.midpoint(source, target),
                 getCurveControlVector()
         );
-        removeChild(line);
-        removeChild(arrowHead);
+
         line2D.setCurve(source, mid, target);
+
         line = new PPath.Double(line2D);
         line.setStroke(new BasicStroke(3.0f));
         line.setPaint(null);
+
         arrowHead = new Arrow();
         arrowHead.rotate(SimbrainMath.approximateTangentAngleOfBezierCurve(line2D, arrowLocation) - Math.PI / 4);
         arrowHead.setOffset(SimbrainMath.findPointOnBezierCurve(line2D, arrowLocation));
+
+
         addChild(line);
         addChild(arrowHead);
+
+
         line.lowerToBottom();
+        arrowHead.lowerToBottom();
+    }
+
+    private void updateSelfDirectedLine() {
+        Point2D source = weightMatrix.getSource().getAttachmentPoint();
+        selfDirectedLine = PPath.createEllipse(source.getX(), source.getY() - selfDirectedLineRadius,
+                selfDirectedLineRadius * 2, selfDirectedLineRadius * 2);
+        selfDirectedLine.setStroke(new BasicStroke(3.0f));
+        selfDirectedLine.setPaint(null);
+        arrowHead = new Arrow();
+        arrowHead.rotate(- Math.PI / 4);
+        arrowHead.setOffset(source.getX() + selfDirectedLineRadius, source.getY() + selfDirectedLineRadius);
+
+        selfDirectedArrowHead = new Arrow();
+        selfDirectedArrowHead.rotate( 3 * Math.PI / 4);
+        selfDirectedArrowHead.setOffset(source.getX() + selfDirectedLineRadius, source.getY() - selfDirectedLineRadius);
+
+        addChild(selfDirectedLine);
+        addChild(selfDirectedArrowHead);
+        addChild(arrowHead);
+
+
+        selfDirectedLine.lowerToBottom();
+        selfDirectedArrowHead.lowerToBottom();
         arrowHead.lowerToBottom();
     }
 
@@ -213,22 +269,28 @@ public class WeightMatrixNode extends ScreenElement {
 
         Point2D source = weightMatrix.getSource().getAttachmentPoint();
         Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        boolean isSelfDirected = weightMatrix.getSource() == weightMatrix.getTarget();
 
         Point2D midPoint = SimbrainMath.midpoint(source, target);
 
-        Point2D offset = new Point2D.Double(-50.0, -50.0);
+        Point2D imageCenterLocationOffset = new Point2D.Double(-50.0, -50.0);
 
-        Point2D curveOffset = getCurveControlVector();
+        Point2D offset;
 
-        curveOffset = SimbrainMath.scale(curveOffset, 0.5);
+        if (isSelfDirected) {
+            offset = new Point2D.Double(selfDirectedLineRadius * 2, 0);
+        } else {
+            offset = getCurveControlVector();
+            offset = SimbrainMath.scale(offset, 0.5);
+        }
 
-        offset = SimbrainMath.add(offset, curveOffset);
+        imageCenterLocationOffset = SimbrainMath.add(imageCenterLocationOffset, offset);
 
         weightsImage.setOffset(
-                SimbrainMath.add(midPoint, offset)
+                SimbrainMath.add(midPoint, imageCenterLocationOffset)
         );
         box.setOffset(
-                SimbrainMath.add(midPoint, offset)
+                SimbrainMath.add(midPoint, imageCenterLocationOffset)
         );
         this.setBounds(box.getFullBounds());
     }

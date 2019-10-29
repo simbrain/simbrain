@@ -812,12 +812,6 @@ public class SimbrainDesktop {
 
             @Override
             public void internalFrameClosing(final InternalFrameEvent e) {
-                if (workspaceComponent.hasChangedSinceLastSave()) {
-                    boolean hasCancelled = guiComponent.showHasChangedDialog();
-                    if (hasCancelled) {
-                        return;
-                    }
-                }
                 guiComponent.close();
                 guiComponents.remove(workspaceComponent);
             }

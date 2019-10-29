@@ -73,7 +73,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             if ("entityAdded".equals(evt.getPropertyName())) {
                 OdorWorldEntity entity = (OdorWorldEntity) evt.getNewValue();
                 fireAttributeContainerAdded(entity);
-
+                setChangedSinceLastSave(true);
                 // Add / remove sensors to an entity
                 entity.addPropertyChangeListener(new PropertyChangeListener() {
                     @Override
@@ -94,6 +94,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
             if ("entityDeleted".equals(evt.getPropertyName())) {
                 fireAttributeContainerRemoved((AttributeContainer) evt.getNewValue());
+                setChangedSinceLastSave(true);
             }
         });
     }

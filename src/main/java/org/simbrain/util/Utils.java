@@ -571,6 +571,15 @@ public class Utils {
     }
 
     /**
+     * Determines whether the system is a Mac os x.
+     *
+     * @return whether the system is a Mac os x.
+     */
+    public static boolean isLinux() {
+        return Utils.getOSMatches("Linux");
+    }
+
+    /**
      * Re-implementation of same method from org.apache.commons.collections.CollectionUtils.
      *
      * @param a Collection

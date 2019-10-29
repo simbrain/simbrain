@@ -1094,6 +1094,11 @@ public class SimbrainDesktop {
         final Workspace workspace = new Workspace();
 
         try {
+            // Line below for Ubuntu so that icons don't turn on by default
+            // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
+            if (Utils.isLinux()) {
+                UIManager.put("DesktopPaneUI","javax.swing.plaf.basic.BasicDesktopPaneUI");
+            }
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {

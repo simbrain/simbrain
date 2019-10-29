@@ -21,6 +21,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.extras.nodes.PStyledText;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
@@ -28,6 +29,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -73,6 +75,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
             }
         });
         update();
+        pushViewPositionToModel();
     }
 
     @Override
@@ -183,8 +186,9 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        getTextObject().setX(p.getX());
-        getTextObject().setY(p.getY());
+        PBounds bound = this.getBounds();
+        getTextObject().setCenterX(p.getX() + bound.getWidth() / 2);
+        getTextObject().setCenterY(p.getY() + bound.getHeight() / 2);
     }
 
     @Override
@@ -198,7 +202,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * text object.
      */
     private void pullViewPositionFromModel() {
-        Point2D p = new Point2D.Double(getTextObject().getX(), getTextObject().getY());
+        Point2D p = new Point2D.Double(getTextObject().getCenterX(), getTextObject().getCenterY());
         this.setGlobalTranslation(p);
     }
 

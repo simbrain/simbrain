@@ -2439,8 +2439,8 @@ public class NetworkPanel extends JPanel {
             NeuronArray neuronArray = creationTemplate.create(network);
             // Place new neuron arrays far anough above one another that the intervening weight matrix shows
             Point2D newLocation = placementManager.getLocation(0,-210);
-            neuronArray.setX(newLocation.getX());
-            neuronArray.setY(newLocation.getY());
+            neuronArray.setCenterX(newLocation.getX());
+            neuronArray.setCenterY(newLocation.getY());
             network.addNeuronArray(neuronArray);
         }));
         and.pack();

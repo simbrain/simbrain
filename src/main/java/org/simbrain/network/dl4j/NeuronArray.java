@@ -182,31 +182,13 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public void setCenterX(double newx) {
-        setX(newx);
+        x = newx;
+        fireLocationChange();
     }
 
     @Override
     public void setCenterY(double newy) {
-        setY(newy);
-    }
-
-    // TODO: Remove get/setX and replace with "center"
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-        fireLocationChange();
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
+        y = newy;
         fireLocationChange();
     }
 
@@ -386,7 +368,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public Point2D getAttachmentPoint() {
-        return new Point2D.Double(x + 150 / 2.0, y + 50 / 2.0);
+        return new Point2D.Double(x, y);
     }
 
     public void fireLocationChange() {

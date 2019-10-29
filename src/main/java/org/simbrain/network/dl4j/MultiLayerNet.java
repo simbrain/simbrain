@@ -185,7 +185,7 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Net
 
     @Override
     public Point2D getAttachmentPoint() {
-        return new Point2D.Double(location.getX() + 150 / 2.0, location.getY() + 50 / 2.0);
+        return new Point2D.Double(location.getX(), location.getY());
     }
 
     @Override
@@ -290,22 +290,24 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Net
     // TODO
     @Override
     public double getCenterX() {
-        return 0;
+        return location.getX();
     }
 
     @Override
     public double getCenterY() {
-        return 0;
+        return location.getY();
     }
 
     @Override
     public void setCenterX(double newx) {
-
+        location.setLocation(newx, location.getY());
+        fireLocationChange();
     }
 
     @Override
     public void setCenterY(double newy) {
-
+        location.setLocation(location.getX(), newy);
+        fireLocationChange();
     }
 
     /**

@@ -328,10 +328,20 @@ public class KeyBindings {
         //     }
         // });
 
-        inputMap.put(KeyStroke.getKeyStroke("7"), "showSynapses");
-        panel.getActionMap().put("showSynapses", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke("7"), "multiLayerNet");
+        panel.getActionMap().put("multiLayerNet", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.showMultiLayerNetworkCreationDialog();
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke("8"), "printCenterXY");
+        panel.getActionMap().put("printCenterXY", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.getSelectedModels().forEach(m -> {
+                    System.out.println(m.getCenterX() + ", " + m.getCenterY());
+                });
             }
         });
 

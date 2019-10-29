@@ -127,7 +127,7 @@ public class NeuronArrayNode extends ScreenElement {
             }
         });
 
-        this.centerFullBoundsOnPoint(na.getX(), na.getY());
+        this.centerFullBoundsOnPoint(na.getCenterX(), na.getCenterY());
 
         // Set up main items
         borderBox.setPickable(true);
@@ -157,8 +157,8 @@ public class NeuronArrayNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        neuronArray.setX(p.getX());
-        neuronArray.setY(p.getY());
+        neuronArray.setCenterX(p.getX() + boxWidth / 2);
+        neuronArray.setCenterY(p.getY() + boxHeight / 2);
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerTrainerDialog;
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -208,7 +209,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        net.setLocation(p);
+        net.setLocation(SimbrainMath.add(p, new Point2D.Double(boxWidth / 2, boxHeight / 2)));
     }
 
     @Override

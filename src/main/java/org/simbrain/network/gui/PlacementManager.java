@@ -49,7 +49,7 @@ public class PlacementManager {
         // TODO: Not sure why below is needed.  Copy / pasting a neuron collection
         // sets something to infinity
         if (anchorPoint.getX() > Double.MAX_VALUE || anchorPoint.getY() > Double.MAX_VALUE) {
-            anchorPoint = DEFAULT_OFFSET;
+            setAnchorPoint(DEFAULT_OFFSET);
             pasteDelta.setLocation(45, 0);
         }
         return anchorPoint;
@@ -61,7 +61,7 @@ public class PlacementManager {
      * repeated use.
      */
     public Point2D getLocation(double offsetX, double offsetY) {
-        anchorPoint.setLocation(anchorPoint.getX()+offsetX,anchorPoint.getY()+offsetY);
+        setAnchorPoint(new Point2D.Double(anchorPoint.getX()+offsetX,anchorPoint.getY()+offsetY));
         return anchorPoint;
     }
 

@@ -807,11 +807,13 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
 
-        // Position new neuron group
-        neuronGroup.applyLayout();
-        double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 30;
-        lastNgAdded = neuronGroup;
-        neuronGroup.setLocation(placementManager.getLocation(offset,0));
+        // Position new neuron group (but not if it's inside a subnetwork)
+        if (neuronGroup.isTopLevelGroup()) {
+            neuronGroup.applyLayout();
+            double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 30;
+            lastNgAdded = neuronGroup;
+            neuronGroup.setLocation(placementManager.getLocation(offset,0));
+        }
 
         repaint();
     }

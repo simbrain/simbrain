@@ -41,10 +41,12 @@ public class PlacementManager {
     private Point2D pasteDelta = DEFAULT_OFFSET;
 
     /**
-     * Returns where the next object should be added to the network panel. Also updates the anchor point.
+     * Returns where the next object should be added to the network panel.
+     * Also updates the anchor point.
      */
     public Point2D getLocation() {
-        anchorPoint = SimbrainMath.add(anchorPoint, pasteDelta);
+
+        setAnchorPoint(SimbrainMath.add(anchorPoint, pasteDelta));
 
         // TODO: Not sure why below is needed.  Copy / pasting a neuron collection
         // sets something to infinity
@@ -93,6 +95,7 @@ public class PlacementManager {
      * @param anchorPoint the new anchor point
      */
     public void setAnchorPoint(Point2D anchorPoint) {
+        System.out.println("anchorPoint = " + anchorPoint);
         this.anchorPoint = anchorPoint;
     }
 

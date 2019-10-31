@@ -810,9 +810,10 @@ public class NetworkPanel extends JPanel {
         // Position new neuron group (but not if it's inside a subnetwork)
         if (neuronGroup.isTopLevelGroup()) {
             neuronGroup.applyLayout();
-            double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 30;
+            double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 70;
             lastNgAdded = neuronGroup;
-            neuronGroup.setLocation(placementManager.getLocation(offset,0));
+            // TODO Using a fixed offset to help debug. 
+            neuronGroup.setLocation(placementManager.getLocation(50,50));
         }
 
         repaint();

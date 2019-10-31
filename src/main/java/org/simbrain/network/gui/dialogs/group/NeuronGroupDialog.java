@@ -280,7 +280,7 @@ public final class NeuronGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             neuronGroupCreationEditor.commitChanges();
             neuronGroup = ngCreator.create();
-            neuronGroup.setLocation(networkPanel.getPlacementManager().getLocation());
+            //neuronGroup.setLocation(networkPanel.getPlacementManager().getLocation());
             neuronGroup.setLayoutObject(layoutObject);
             networkPanel.getNetwork().addGroup(neuronGroup);
             networkPanel.repaint();

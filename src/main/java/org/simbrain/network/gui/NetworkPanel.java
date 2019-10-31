@@ -30,6 +30,7 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
 import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
@@ -40,7 +41,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.neuronarray.AddNeuronArrayAction;
+import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
@@ -812,7 +813,7 @@ public class NetworkPanel extends JPanel {
             neuronGroup.applyLayout();
             double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 70;
             lastNgAdded = neuronGroup;
-            // TODO Using a fixed offset to help debug. 
+            // TODO Using a fixed offset to help debug.
             neuronGroup.setLocation(placementManager.getLocation(50,50));
         }
 
@@ -1224,6 +1225,7 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(new AddNeuronsAction(this));
         contextMenu.add(new AddNeuronArrayAction(this));
+        contextMenu.add(new AddMultiLayerNet(this));
         contextMenu.add(actionManager.getNewGroupMenu());
         contextMenu.add(actionManager.getNewNetworkMenu());
 

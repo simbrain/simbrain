@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.util.PBounds;
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.UngroupAction;
 
@@ -12,7 +12,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * A group of screen elements.
@@ -131,7 +130,7 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     }
 
     @Override
-    public NetworkModel getModel() {
+    public LocatableModel getModel() {
         // TODO: if this is ever brought back to life
         return null;
     }

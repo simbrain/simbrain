@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.UserParameter;
@@ -1070,24 +1070,4 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         changeSupport.firePropertyChange("strength", null, null);
     }
 
-
-    @Override
-    public double getCenterX() {
-        return 0;
-    }
-
-    @Override
-    public double getCenterY() {
-        return 0;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-
-    }
 }

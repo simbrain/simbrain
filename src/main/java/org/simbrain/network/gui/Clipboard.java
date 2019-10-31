@@ -20,9 +20,6 @@ package org.simbrain.network.gui;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.*;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.SimbrainMath;

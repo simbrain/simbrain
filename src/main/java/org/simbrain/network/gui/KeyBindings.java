@@ -339,7 +339,7 @@ public class KeyBindings {
         panel.getActionMap().put("printCenterXY", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panel.getSelectedModels().forEach(m -> {
+                panel.getSelectedLocatableModels().forEach(m -> {
                     System.out.println(m.getCenterX() + ", " + m.getCenterY());
                 });
             }

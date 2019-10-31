@@ -12,6 +12,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
@@ -46,7 +47,7 @@ import java.util.function.Function;
  *
  * @author Zoë Tosi
  */
-public class SynapseGroup extends Group {
+public class SynapseGroup extends Group implements NetworkModel {
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
@@ -1820,25 +1821,5 @@ public class SynapseGroup extends Group {
      */
     private void fireSynapseRemoved(Synapse synapse) {
         changeSupport.firePropertyChange("synapseRemoved", synapse, null);
-    }
-
-    @Override
-    public double getCenterX() {
-        return 0;
-    }
-
-    @Override
-    public double getCenterY() {
-        return 0;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-
     }
 }

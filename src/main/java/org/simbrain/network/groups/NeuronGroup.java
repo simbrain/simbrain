@@ -17,7 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>, NetworkModel {
+public class NeuronGroup extends Group implements  LocatableModel {
 
     /**
      * The default for how often {@link #writeActsToFile()} should flush
@@ -272,7 +272,12 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>, Ne
         resetSubsamplingIndices();
     }
 
-    @Override
+    /**
+     * Returns a deep copy of the neuron group with a new network parent
+     *
+     * @param newParent the new parent network for this group, potentially different from the original (used when
+     *                  copying and pasting from one network to another)
+     */
     public NeuronGroup deepCopy(Network newParent) {
         return new NeuronGroup(newParent, this);
     }

@@ -25,6 +25,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
@@ -1470,7 +1471,7 @@ public class NetworkPanel extends JPanel {
         }
         Clipboard.clear();
         placementManager.setPasteDeltaBegin(SimnetUtils.getUpperLeft(getSelectedModels()));
-        List<NetworkModel> deepCopy = CopyPaste.getCopy(this.getNetwork(), getSelectedModels());
+        List<NetworkModel> deepCopy = CopyPaste.getCopy(this.getNetwork(),getSelectedModels());
         Clipboard.add(deepCopy);
     }
 
@@ -1790,14 +1791,24 @@ public class NetworkPanel extends JPanel {
 
 
     /**
-     * Returns model Network elements corresponding to selected screen elements.
-     *
-     * @return list of selected model elements
+     * Returns selected {@link NetworkModel} items.
      */
     public List<NetworkModel> getSelectedModels() {
         return getSelectedNodes().stream()
                 .filter(Objects::nonNull)
                 .map(ScreenElement::getModel)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns selected {@link LocatableModel} items.
+     */
+    public List<LocatableModel> getSelectedLocatableModels() {
+        return getSelectedNodes().stream()
+                .filter(Objects::nonNull)
+                .map(ScreenElement::getModel)
+                .filter(LocatableModel.class::isInstance)
+                .map(LocatableModel.class::cast)
                 .collect(Collectors.toList());
     }
 

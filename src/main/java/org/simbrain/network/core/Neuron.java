@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.*;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron implements EditableObject, AttributeContainer, NetworkModel {
+public class Neuron implements EditableObject, AttributeContainer, LocatableModel {
 
     /**
      * The default neuron update rule. Neurons which are constructed without a

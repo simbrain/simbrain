@@ -12,13 +12,11 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.pmw.tinylog.Logger;
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.trainers.ErrorListener;
-import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.UserParameter;
@@ -29,7 +27,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +35,7 @@ import java.util.stream.Collectors;
  *
  * @see {https://deeplearning4j.org/docs/latest/deeplearning4j-nn-multilayernetwork}
  */
-public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, NetworkModel {
+public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, LocatableModel {
 
     /**
      * The main dl4j object being wrapped

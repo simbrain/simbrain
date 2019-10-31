@@ -3,7 +3,7 @@ package org.simbrain.network.dl4j;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * High performance immutable array backed by ND4J Array.
  */
-public class NeuronArray implements EditableObject, AttributeContainer, ArrayConnectable, NetworkModel {
+public class NeuronArray implements EditableObject, AttributeContainer, ArrayConnectable, LocatableModel {
 
     //TODO: Rename ideas: Array, Layer, ND4J Array, Double Array
     //TODO: See if data can be stored as an array. If not maybe used column instead of row.

@@ -18,14 +18,15 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.scalar.ComplexNumber;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.dl4j.NeuronArray;
 
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
@@ -175,17 +176,20 @@ public class SimnetUtils {
     }
 
     /**
-     * Return the upper left corner of a list of objects, based on neurons.
-     *
-     * @param networkObjects list of network model objecs
-     * @return the point corresponding to the upper left corner of the objects
+     * Return the center position of the upper-left-most object in a list of network objects.
      */
     public static Point2D getUpperLeft(final List<NetworkModel> networkObjects) {
 
         double x = Double.POSITIVE_INFINITY;
         double y = Double.POSITIVE_INFINITY;
 
-        for (NetworkModel model : networkObjects) {
+        List<LocatableModel> locatableModels =
+                networkObjects.stream()
+                .filter(LocatableModel.class::isInstance)
+                .map(LocatableModel.class::cast)
+                .collect(Collectors.toList());
+
+        for (LocatableModel model : locatableModels) {
             if (model.getCenterX() < x) {
                 x = model.getCenterX();
             }
@@ -207,7 +211,13 @@ public class SimnetUtils {
      * Translate a set of network model object.
      */
     public static void translate(final List<NetworkModel> networkObjects, final Point2D translation) {
-        for (NetworkModel model : networkObjects) {
+        List<LocatableModel> locatableModels =
+                networkObjects.stream()
+                        .filter(LocatableModel.class::isInstance)
+                        .map(LocatableModel.class::cast)
+                        .collect(Collectors.toList());
+
+        for (LocatableModel model : locatableModels) {
             //System.out.println(model.getCenterX() + "," + model.getCenterY()
             //        + ":" + translation.getX() + "," + translation.getY());
             model.setCenterX(model.getCenterX() + translation.getX());

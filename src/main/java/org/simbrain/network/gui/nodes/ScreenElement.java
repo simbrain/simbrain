@@ -23,6 +23,7 @@ import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.gui.NetworkPanel;
 
@@ -267,9 +268,6 @@ public abstract class ScreenElement extends PPath.Float {
      */
     public abstract void resetColors();
 
-    //
-    // bound properties
-
     /**
      * Return the network panel for this screen element.
      *
@@ -316,10 +314,7 @@ public abstract class ScreenElement extends PPath.Float {
             contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
-        /**
-         * @param event
-         * @see PBasicInputEventHandler
-         */
+        @Override
         public void mousePressed(final PInputEvent event) {
 
             if (event.isPopupTrigger()) {
@@ -327,10 +322,7 @@ public abstract class ScreenElement extends PPath.Float {
             }
         }
 
-        /**
-         * @param event
-         * @see PBasicInputEventHandler
-         */
+        @Override
         public void mouseReleased(final PInputEvent event) {
 
             if (event.isPopupTrigger()) {
@@ -359,10 +351,7 @@ public abstract class ScreenElement extends PPath.Float {
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
         }
 
-        /**
-         * @param event
-         * @see PBasicInputEventHandler
-         */
+        @Override
         public void mouseClicked(final PInputEvent event) {
 
             if (event.getClickCount() == 2) {
@@ -380,16 +369,10 @@ public abstract class ScreenElement extends PPath.Float {
         }
     }
 
-    /**
-     * @return the isGrouped
-     */
     public boolean isGrouped() {
         return isGrouped;
     }
 
-    /**
-     * @param isGrouped the isGrouped to set
-     */
     public void setGrouped(boolean isGrouped) {
         this.isGrouped = isGrouped;
     }

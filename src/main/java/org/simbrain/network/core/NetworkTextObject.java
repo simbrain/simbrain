@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.NetworkModel;
+import org.simbrain.network.LocatableModel;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -28,7 +28,7 @@ import java.beans.PropertyChangeSupport;
  * used to label elements of a neural network simulation. Contains basic text
  * properties as well.
  */
-public class NetworkTextObject implements NetworkModel {
+public class NetworkTextObject implements LocatableModel {
 
     /**
      * Reference to parent root network of this text object.

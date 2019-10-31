@@ -18,10 +18,11 @@ e * Part of Simbrain--a java-based neural network kit
  */
 package org.simbrain.network.util;
 
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.groups.CopyableGroup;
+import org.simbrain.network.groups.NeuronGroup;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -68,11 +69,10 @@ public class CopyPaste {
                 NetworkTextObject text = ((NetworkTextObject) item);
                 NetworkTextObject newText = new NetworkTextObject(newParent, text);
                 ret.add(newText);
-            } else if (item instanceof CopyableGroup) {
-                NetworkModel copy = ((CopyableGroup<?>) item).deepCopy(newParent);
-                ret.add(copy);
+            } else if (item instanceof NeuronGroup) {
+                ret.add(((NeuronGroup) item).deepCopy(newParent));
             } else if (item instanceof NeuronArray) {
-                NetworkModel copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
+                LocatableModel copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
                 ret.add(copy);
             }
         }

@@ -12,6 +12,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
@@ -29,7 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A collection of neuron groups and synapse groups which functions as a
  * subnetwork within the main root network, with its own update rules.
  */
-public abstract class Subnetwork extends Group {
+public abstract class Subnetwork extends Group implements NetworkModel {
 
     /**
      * List of neuron groups.
@@ -440,20 +441,10 @@ public abstract class Subnetwork extends Group {
         return ret;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
     public boolean getEnabled() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param enabled
-     */
     public void setEnabled(boolean enabled) {
     }
 
@@ -520,31 +511,8 @@ public abstract class Subnetwork extends Group {
         }
     }
 
-    //TODO
     @Override
     public EditableObject copy() {
-        return this.copy();
+        return null;
     }
-
-
-    @Override
-    public double getCenterX() {
-        return 0;
-    }
-
-    @Override
-    public double getCenterY() {
-        return 0;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-
-    }
-
 }

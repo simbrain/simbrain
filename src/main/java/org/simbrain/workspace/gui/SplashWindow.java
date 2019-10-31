@@ -33,6 +33,7 @@ import org.simbrain.util.ResourceManager;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 /**
  * <b>SplashWindow</b>
@@ -110,7 +111,14 @@ public final class SplashWindow extends Window {
 
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
-        setIconImage(ResourceManager.getImage("simbrain-icon.png"));
+        setIconImages(Arrays.asList(
+                ResourceManager.getImage("icons/20.png"),
+                ResourceManager.getImage("icons/32.png"),
+                ResourceManager.getImage("icons/40.png"),
+                ResourceManager.getImage("icons/64.png"),
+                ResourceManager.getImage("icons/128.png"),
+                ResourceManager.getImage("icons/512.png")
+        ));
 
         // Users shall be able to close the splash window by
         // clicking on its display area. This mouse listener

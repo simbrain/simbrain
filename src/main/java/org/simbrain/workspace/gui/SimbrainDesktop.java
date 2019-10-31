@@ -293,7 +293,14 @@ public class SimbrainDesktop {
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
         frame = new JFrame(FRAME_TITLE);
-        frame.setIconImage(ResourceManager.getImage("simbrain-icon.png"));
+        frame.setIconImages(Arrays.asList(
+                ResourceManager.getImage("icons/20.png"),
+                ResourceManager.getImage("icons/32.png"),
+                ResourceManager.getImage("icons/40.png"),
+                ResourceManager.getImage("icons/64.png"),
+                ResourceManager.getImage("icons/128.png"),
+                ResourceManager.getImage("icons/512.png")
+        ));
         actionManager = new WorkspaceActionManager(this);
         createAndAttachMenus();
         wsToolBar = createToolBar();
@@ -893,7 +900,8 @@ public class SimbrainDesktop {
         Logger.trace("Adding workspace component: " + workspaceComponent);
 
         final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
-        componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("simbrain-icon.png")));
+        // componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("icons/20.png")));
+
         GuiComponent<?> guiComponent = createDesktopComponent(componentFrame, workspaceComponent);
         componentFrame.setGuiComponent(guiComponent);
 

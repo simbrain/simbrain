@@ -294,12 +294,12 @@ public class SimbrainDesktop {
         this.workspace = workspace;
         frame = new JFrame(FRAME_TITLE);
         frame.setIconImages(Arrays.asList(
-                ResourceManager.getImage("icons/20.png"),
-                ResourceManager.getImage("icons/32.png"),
-                ResourceManager.getImage("icons/40.png"),
-                ResourceManager.getImage("icons/64.png"),
-                ResourceManager.getImage("icons/128.png"),
-                ResourceManager.getImage("icons/512.png")
+                ResourceManager.getImage("icons" + Utils.FS + "20.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "32.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "40.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "64.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "128.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "512.png")
         ));
         actionManager = new WorkspaceActionManager(this);
         createAndAttachMenus();
@@ -353,7 +353,7 @@ public class SimbrainDesktop {
 
         // Set the "dock" image.
         if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
-            Taskbar.getTaskbar().setIconImage((ResourceManager.getImage("simbrain-icon.png")));
+            Taskbar.getTaskbar().setIconImage((ResourceManager.getImage("icons" + Utils.FS + "128.png")));
         }
 
         // Start terminal

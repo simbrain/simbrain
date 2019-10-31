@@ -43,7 +43,7 @@ public class Utils {
     /**
      * File system separator.
      */
-    private static final String FS = System.getProperty("file.separator");
+    public static final String FS = System.getProperty("file.separator");
 
     /**
      * Helper method that returns the date and time in a format that can be used to create filenames.

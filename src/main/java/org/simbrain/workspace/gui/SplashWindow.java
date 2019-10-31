@@ -29,6 +29,7 @@ package org.simbrain.workspace.gui;
  */
 
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.Utils;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -112,12 +113,12 @@ public final class SplashWindow extends Window {
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
         setIconImages(Arrays.asList(
-                ResourceManager.getImage("icons/20.png"),
-                ResourceManager.getImage("icons/32.png"),
-                ResourceManager.getImage("icons/40.png"),
-                ResourceManager.getImage("icons/64.png"),
-                ResourceManager.getImage("icons/128.png"),
-                ResourceManager.getImage("icons/512.png")
+                ResourceManager.getImage("icons" + Utils.FS + "20.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "32.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "40.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "64.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "128.png"),
+                ResourceManager.getImage("icons" + Utils.FS + "512.png")
         ));
 
         // Users shall be able to close the splash window by

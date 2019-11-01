@@ -1539,6 +1539,10 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     @Producible()
     public double[] getSubsampledActivations() {
+        if (numSubSamples >= neuronList.size()) {
+            return getActivations();
+        }
+
         if (subSampledValues == null || subSampledValues.length != numSubSamples) {
             subSampledValues = new double[numSubSamples];
         }

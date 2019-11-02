@@ -95,7 +95,7 @@ public class PlacementManager {
      * @param anchorPoint the new anchor point
      */
     public void setAnchorPoint(Point2D anchorPoint) {
-        System.out.println("anchorPoint = " + anchorPoint);
+        //System.out.println("anchorPoint = " + anchorPoint);
         this.anchorPoint = anchorPoint;
     }
 

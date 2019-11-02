@@ -244,9 +244,10 @@ public class Network {
         // Main update
         updateManager.invokeAllUpdates();
 
+        // Update neuron arrays
         naList.forEach(NeuronArray::update);
 
-        clearInputs();
+        //clearInputs();
         updateTime();
         changeSupport.firePropertyChange("updateTimeDisplay", null, false);
         iterCount++;
@@ -288,14 +289,11 @@ public class Network {
     public void bufferedUpdateAllNeurons() {
 
         // First update the activation buffers
-        for (Neuron n : looseNeurons) {
-            n.update(); // update neuron buffers
-        }
+        looseNeurons.forEach(Neuron::update);
 
         // Then update the activations themselves
-        for (Neuron n : looseNeurons) {
-            n.setToBufferVals();
-        }
+        looseNeurons.forEach(Neuron::setToBufferVals);
+
     }
 
     /**

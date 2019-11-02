@@ -120,6 +120,7 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
         return network;
     }
 
+    //TODO: Currently the below is the only place an actual update occurs
     @Override
     public INDArray getOutputArray() {
         return network.output(input);

@@ -46,6 +46,7 @@ public class BufferedUpdate implements NetworkUpdateAction {
         network.bufferedUpdateAllNeurons();
         network.updateNeuronArrayConnections();
         network.updateLooseSynapses();
+        network.clearInputs();
     }
 
     @Override

@@ -713,6 +713,15 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     /**
+     * Called in couplings (by reflection) to allow multiple values to be added each time step to a neuron.
+     * Inputs are cleared each time step.
+     */
+    @Consumable
+    public void addInputValue(double toAdd) {
+        inputValue += toAdd;
+    }
+
+    /**
      * The name of the update rule of this neuron; it's "type". Used via
      * reflection for consistency checking in the gui. (Open multiple neurons
      * and if they are of the different types the dialog is different).

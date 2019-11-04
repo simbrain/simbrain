@@ -188,7 +188,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         recurrentNetwork = new NeuronGroup(network, neuronList);
         recurrentNetwork.setLabel("Recurrent network");
         new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
-            .layoutNeurons(recurrentNetwork.getNeuronListUnsafe());
+            .layoutNeurons(recurrentNetwork.getNeuronList());
         sensoryNetL.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
         sensoryNetR.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
 

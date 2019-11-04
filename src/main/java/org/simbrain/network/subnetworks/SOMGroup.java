@@ -129,9 +129,11 @@ public class SOMGroup extends NeuronGroup {
      */
     public SOMGroup(final Network root, final int numNeurons) {
         super(root);
+        List<Neuron> neurons = new ArrayList<>();
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(getParentNetwork(), new LinearRule()));
+            neurons.add(new Neuron(getParentNetwork(), new LinearRule()));
         }
+        addNeurons(neurons);
         setLabel("SOM");
         this.setLayout(DEFAULT_LAYOUT);
     }

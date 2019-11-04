@@ -21,6 +21,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
@@ -48,7 +49,7 @@ import java.util.*;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeListener {
+public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
     public enum Port {
         NORTH, SOUTH, EAST, WEST,;
@@ -86,25 +87,11 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         return dockingPorts;
     }
 
-    /**
-     * Parent network panel.
-     */
-    private final NetworkPanel networkPanel;
 
     /**
      * Reference to represented group node.
      */
     private final NeuronGroup neuronGroup;
-
-    /**
-     * The interaction box for this neuron group.
-     */
-    private NeuronGroupInteractionBox interactionBox;
-
-    /**
-     * The outlined objects (neurons) for this neuron group.
-     */
-    private final OutlinedObjects outlinedObjects;
 
     /**
      * List of custom menu items added by subclasses.
@@ -119,57 +106,39 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
 
-        this.networkPanel = networkPanel;
+        super(networkPanel, group);
         this.neuronGroup = group;
 
-        outlinedObjects = new OutlinedObjects();
-        outlinedObjects.setFillBackground(false);
-        interactionBox = new NeuronGroupInteractionBox(networkPanel);
-        interactionBox.setText(neuronGroup.getLabel());
-        addChild(outlinedObjects);
-        addChild(interactionBox);
+        setInteractionBox(new NeuronGroupInteractionBox(networkPanel));
+        getInteractionBox().setText(neuronGroup.getLabel());
         // Must do this after it's added to properly locate it
-        interactionBox.updateText();
+        getInteractionBox().updateText();
         if (group.getParentGroup() instanceof Subnetwork) {
             if (!((Subnetwork) group.getParentGroup()).displayNeuronGroups()) {
-                interactionBox.setVisible(false);
-                outlinedObjects.setOutlinePadding(0);
-                outlinedObjects.setDrawOutline(false);
+                getInteractionBox().setVisible(false);
+                getOutlinedObjects().setOutlinePadding(0);
+                getOutlinedObjects().setDrawOutline(false);
             }
         }
         //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
-        group.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
+        group.addPropertyChangeListener(evt -> {
 
-                if ("delete".equals(evt.getPropertyName())) {
-                    NeuronGroupNode.this.removeFromParent();
-                } else if ("label".equals(evt.getPropertyName())) {
-                    NeuronGroupNode.this.updateText();
-                } else if ("recordingStarted".equals(evt.getPropertyName())) {
-                    NeuronGroupNode.this.updateText();
-                } else if ("recordingStopped".equals(evt.getPropertyName())) {
-                    NeuronGroupNode.this.updateText();
-                } else if ("moved".equals(evt.getPropertyName())) {
-                    NeuronGroupNode.this.syncToModel();
-                }
+            if ("delete".equals(evt.getPropertyName())) {
+                NeuronGroupNode.this.removeFromParent();
+            } else if ("label".equals(evt.getPropertyName())) {
+                NeuronGroupNode.this.updateText();
+            } else if ("recordingStarted".equals(evt.getPropertyName())) {
+                NeuronGroupNode.this.updateText();
+            } else if ("recordingStopped".equals(evt.getPropertyName())) {
+                NeuronGroupNode.this.updateText();
+            } else if ("moved".equals(evt.getPropertyName())) {
+                NeuronGroupNode.this.syncToModel();
             }
         });
 
     }
 
-    /**
-     * Override PNode layoutChildren method in order to properly set the
-     * positions of children nodes.
-     */
-    @Override
-    public void layoutChildren() {
-        if (this.getVisible() && !networkPanel.isRunning()) {
-            interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2,
-                    outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
-        }
-    }
 
     /**
      * Select the neurons in this group.
@@ -182,10 +151,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         }
         getNetworkPanel().clearSelection();
         getNetworkPanel().setSelection(nodes);
-    }
-
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
     }
 
     /**
@@ -206,73 +171,22 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         customMenuItems.add(item);
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        updateSynapseNodePositions();
-    }
-
     /**
      * Call update synapse node positions on all constituent neuron nodes.
      * Ensures synapse nodes are updated properly when this is moved.
      */
     public void updateSynapseNodePositions() {
-        if (networkPanel.isRunning()) {
+        if (getNetworkPanel().isRunning()) {
             return;
         }
-        for (Object node : outlinedObjects.getChildrenReference()) {
-            ((NeuronNode) node).updateSynapseNodePositions();
-        }
-    }
-
-    /**
-     * Sync all neuron nodes in the group to the model.
-     */
-    public void syncToModel() {
-        for (Object object : outlinedObjects.getChildrenReference()) {
-            ((NeuronNode) object).pullViewPositionFromModel();
+        for (NeuronNode neuronNode : getNeuronNodes()) {
+            neuronNode.updateSynapseNodePositions();
         }
     }
 
     @Override
-    public void updateConstituentNodes() {
-        for (Object object : outlinedObjects.getChildrenReference()) {
-            ((NeuronNode) object).update();
-        }
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        updateText();
-    }
-
-    @Override
-    public void offset(double dx, double dy) {
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        for (Object object : outlinedObjects.getChildrenReference()) {
-            ((NeuronNode) object).offset(dx, dy);
-        }
-    }
-
-    /**
-     * Add a neuron node to the group node.
-     *
-     * @param node to add
-     */
-    public void addNeuronNode(NeuronNode node) {
-        outlinedObjects.addChild(node);
-    }
-
-    /**
-     * Remove a neuron node from the group node.
-     *
-     * @param node to remove
-     */
-    public void removeNeuronNode(NeuronNode node) {
-        outlinedObjects.removeChild(node);
+    protected NeuronGroup getModel() {
+        return neuronGroup;
     }
 
     /**
@@ -401,7 +315,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         menu.add(recordingAction);
 
         // Coupling menu
-        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronGroup);
+        JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronGroup);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }
@@ -458,46 +372,16 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     }
 
     /**
-     * @return the interactionBox
-     */
-    public NeuronGroupInteractionBox getInteractionBox() {
-        return interactionBox;
-    }
-
-    /**
-     * Set a custom interaction box.  Subclasses can call this to customize its behavior.
-     *
-     * @param newBox the newBox to set.
-     */
-    protected void setInteractionBox(NeuronGroupInteractionBox newBox) {
-        this.removeChild(interactionBox);
-        this.interactionBox = newBox;
-        this.addChild(interactionBox);
-        updateText();
-    }
-
-    /**
      * Update the text in the interaction box.
      */
     public void updateText() {
         if (neuronGroup.isRecording()) {
-            interactionBox.setText(neuronGroup.getLabel() + " -- RECORDING");
+            getInteractionBox().setText(neuronGroup.getLabel() + " -- RECORDING");
         } else {
-            interactionBox.setText(neuronGroup.getLabel());
+            getInteractionBox().setText(neuronGroup.getLabel());
         }
-        interactionBox.updateText();
+        getInteractionBox().updateText();
     }
-
-    /**
-     * Action for editing the group name.
-     */
-    protected Action renameAction = new AbstractAction("Rename Group...") {
-        @Override
-        public void actionPerformed(final ActionEvent event) {
-            String newName = JOptionPane.showInputDialog("Name:", neuronGroup.getLabel());
-            neuronGroup.setLabel(newName);
-        }
-    };
 
     /**
      * Action for removing this group.
@@ -588,8 +472,9 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
                     return neuronGroup.getTestData();
                 }
             };
-            final TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
-            networkPanel.displayPanel(testInputPanel, "Inputs for neuron group: " + neuronGroup.getLabel());
+            final TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(),
+                    neuronGroup.getNeuronList(), matrix);
+            getNetworkPanel().displayPanel(testInputPanel, "Inputs for neuron group: " + neuronGroup.getLabel());
         }
     };
 
@@ -926,10 +811,5 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 
     private boolean samePoint(Point2D a, Point2D b) {
         return a.getX() == b.getX() && a.getY() == b.getY();
-    }
-
-    @Override
-    public List<InteractionBox> getInteractionBoxes() {
-        return Collections.singletonList((InteractionBox) interactionBox);
     }
 }

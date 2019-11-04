@@ -138,7 +138,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         NeuronGroup ng = netWrapper.addNeuronGroup(x, y, numNeurons);
         BinaryRule rule = new BinaryRule();
         ng.setNeuronType(rule);
-        HexagonalGridLayout.layoutNeurons(ng.getNeuronListUnsafe(), 40, 40);
+        HexagonalGridLayout.layoutNeurons(ng.getNeuronList(), 40, 40);
         ng.setLocation(x, y);
         ng.setLabel(name);
         return ng;
@@ -157,7 +157,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
                 neuron.setPolarity(SimbrainConstants.Polarity.INHIBITORY);
             }
         }
-        HexagonalGridLayout.layoutNeurons(ng.getNeuronListUnsafe(), 40, 40);
+        HexagonalGridLayout.layoutNeurons(ng.getNeuronList(), 40, 40);
         ng.setLocation(x, y);
         ng.setLabel(name);
         return ng;

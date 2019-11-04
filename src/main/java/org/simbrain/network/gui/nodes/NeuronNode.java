@@ -59,7 +59,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /**
      * Diameter of neuron.
      */
-    private static final int DIAMETER = 24;
+    public static final int DIAMETER = 24;
 
     /**
      * Font for input and output labels.

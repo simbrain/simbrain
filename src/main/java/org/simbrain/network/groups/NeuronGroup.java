@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group implements  LocatableModel {
+public class NeuronGroup extends AbstractNeuronCollection {
 
     /**
      * The default for how often {@link #writeActsToFile()} should flush
@@ -73,11 +73,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
      * {@link #readNextInputUnsafe}.
      */
     private boolean isSpikingNeuronGroup = false;
-
-    /**
-     * The neurons in this group.
-     */
-    private List<Neuron> neuronList = new ArrayList<Neuron>(500);
 
     /**
      * Default layout for neuron groups.
@@ -185,14 +180,9 @@ public class NeuronGroup extends Group implements  LocatableModel {
      * @param net     the network
      * @param neurons the neurons
      */
-    public NeuronGroup(final Network net, final List<? extends Neuron> neurons) {
+    public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
-        neuronList = new ArrayList<Neuron>(neurons.size());
-        for (Neuron neuron : neurons) {
-            addNeuron(neuron, false);
-        }
-        // Very slow to add to a copy on write array list so do it this way
-        neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
+        addNeurons(neurons);
         updateRule = getNeuronType();
         resetSubsamplingIndices();
     }
@@ -216,12 +206,14 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public NeuronGroup(final Network net, Point2D initialPosition, final int numNeurons) {
         super(net);
-        neuronList = new ArrayList<Neuron>(numNeurons);
+        List<Neuron> newNeurons = new ArrayList<>();
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(net), false);
+            Neuron newNeuron = new Neuron(net);
+            newNeurons.add(newNeuron);
+            addNeuron(newNeuron, false);
         }
         // Very slow to add to a copy on write array list so do it this way
-        neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
+        addNeurons(newNeurons);
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(this.getNeuronList());
         updateRule = getNeuronType();
@@ -260,9 +252,11 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
+        List<Neuron> newNeurons = new ArrayList<>();
         for (Neuron neuron : toCopy.getNeuronList()) {
-            this.addNeuron(new Neuron(network, neuron), false);
+            newNeurons.add(new Neuron(network, neuron));
         }
+        addNeurons(newNeurons);
         this.setUseCustomLabel(toCopy.isUseCustomLabel());
         if(isUseCustomLabel()) {
             this.setLabel(toCopy.getLabel());
@@ -289,7 +283,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         } else {
             setMarkedForDeletion(true);
         }
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             neuron.setParentGroup(null);
             neuron.getNetwork().removeNeuron(neuron, false);
         }
@@ -302,7 +296,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
             }
         }
         stopRecording();
-        neuronList.clear();
+        removeAllNeurons();
         Runtime.getRuntime().gc();
         changeSupport.firePropertyChange("delete", this, null);
     }
@@ -322,20 +316,12 @@ public class NeuronGroup extends Group implements  LocatableModel {
             // Surrounded by checks, so actually safe.
             readNextInputUnsafe();
         } else {
-            Network.updateNeurons(neuronList);
+            Network.updateNeurons(getNeuronList());
         }
         if (isRecording()) {
             writeActsToFile();
         }
         fireLabelUpdated();
-    }
-
-    /**
-     * Node positions within group changed and GUI should be notified of this
-     * change.
-     */
-    public void firePositionChanged() {
-        changeSupport.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -375,7 +361,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         if (isSpikingNeuronGroup()) {
             setInputValues(testData[inputIndex]);
             for (int i = 0; i < size(); i++) {
-                neuronList.get(i).setToBufferVals();
+                getNeuron(i).setToBufferVals();
             }
         } else {
             forceSetActivations(testData[inputIndex]);
@@ -398,7 +384,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public void startRecording(final File outputFile) {
         boolean spikeRecord = true;
-        for (Neuron n : neuronList) {
+        for (Neuron n : getNeuronList()) {
             if (!n.getUpdateRule().isSpikingNeuron()) {
                 spikeRecord = false;
                 break;
@@ -449,7 +435,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
             if (recordAsSpikes) {
                 int start = 0;
                 for (int i = 0, n = size(); i < n; i++) {
-                    if (neuronList.get(i).isSpike()) {
+                    if (getNeuron(i).isSpike()) {
                         write = true;
                         start = i;
                         break;
@@ -459,7 +445,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
                     valueWriter.print(this.getParentNetwork().getTime());
                     valueWriter.print(" ");
                     for (int i = start, n = size(); i < n; i++) {
-                        if (neuronList.get(i).isSpike()) {
+                        if (getNeuron(i).isSpike()) {
                             valueWriter.print(i);
                             valueWriter.print(" ");
                         }
@@ -469,9 +455,9 @@ public class NeuronGroup extends Group implements  LocatableModel {
                 }
             } else {
                 for (int i = 0, n = size() - 1; i < n; i++) {
-                    valueWriter.print(neuronList.get(i).getActivation() + ", ");
+                    valueWriter.print(getNeuron(i).getActivation() + ", ");
                 }
-                valueWriter.print(neuronList.get(size() - 1).getActivation());
+                valueWriter.print(getNeuron(size() - 1).getActivation());
                 valueWriter.println();
                 writeCounter++;
             }
@@ -490,7 +476,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         if (size() == 0) {
             return nType;
         }
-        Iterator<Neuron> nIter = neuronList.iterator();
+        Iterator<Neuron> nIter = getNeuronList().iterator();
         NeuronUpdateRule nur = nIter.next().getUpdateRule();
         boolean conflict = false;
         while (nIter.hasNext() && !conflict) {
@@ -503,27 +489,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
         }
     }
 
-    public Neuron getNeuron(int neuNo) {
-        return neuronList.get(neuNo);
-    }
-
-    /**
-     * @return a copy of the list neurons in this group as an unmodifiable list.
-     */
-    public List<Neuron> getNeuronList() {
-        return Collections.unmodifiableList(neuronList);
-    }
-
-    /**
-     * Returns a modifiable list of neuron list. Modifications made to this list
-     * change the group because this is the underlying list of the group.
-     *
-     * @return a _reference_ to the list of neurons underlying this object.
-     */
-    public List<Neuron> getNeuronListUnsafe() {
-        return neuronList;
-    }
-
     /**
      * Set the update rule for the neurons in this group.
      *
@@ -531,7 +496,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public void setNeuronType(NeuronUpdateRule base) {
         isSpikingNeuronGroup = base.isSpikingNeuron();
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             neuron.setUpdateRule(base.deepCopy());
         }
     }
@@ -548,7 +513,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             neuron.setUpdateRule(rule);
         }
     }
@@ -572,7 +537,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public boolean inFanInOfSomeNode(final Synapse synapse) {
         boolean ret = false;
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             if (neuron.getFanIn().contains(synapse)) {
                 ret = true;
             }
@@ -654,7 +619,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
      * @param fireEvent whether to fire a neuron added event
      */
     public void addNeuron(Neuron neuron, boolean fireEvent) {
-        neuronList.add(neuron);
+        super.addNeuron(neuron);
         neuron.setParentGroup(this);
         if (getParentNetwork() != null) {
             neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
@@ -667,6 +632,8 @@ public class NeuronGroup extends Group implements  LocatableModel {
         }
     }
 
+
+
     /**
      * Add neuron to group.
      *
@@ -677,23 +644,10 @@ public class NeuronGroup extends Group implements  LocatableModel {
     }
 
     /**
-     * Delete the provided neuron.
-     *
-     * @param toDelete the neuron to delete
-     */
-    public void removeNeuron(Neuron toDelete) {
-        neuronList.remove(toDelete);
-        if (isEmpty()) {
-            delete();
-        }
-        resetSubsamplingIndices();
-    }
-
-    /**
      * Removes all neurons with no incoming or outgoing synapses from the group.
      */
     public void prune() {
-        Iterator<Neuron> reaper = neuronList.iterator();
+        Iterator<Neuron> reaper = getNeuronList().iterator();
         while (reaper.hasNext()) {
             Neuron n = reaper.next();
             if (n.getFanIn().size() == 0 && n.getFanOut().size() == 0) {
@@ -710,84 +664,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         return ret;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return neuronList.isEmpty();
-    }
 
-    /**
-     * Set input values of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param inputs the input vector as a double array.
-     */
-    @Consumable()
-    public void setInputValues(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).setInputValue(inputs[i]);
-        }
-    }
-
-    /**
-     * Set activations of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param inputs the input vector as a double array.
-     */
-    @Consumable()
-    public void setActivations(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).setActivation(inputs[i]);
-        }
-    }
-
-    /**
-     * Force set activations of neurons using an array of doubles. Assumes the
-     * order of the items in the array should match the order of items in the
-     * neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param inputs the input vector as a double array.
-     */
-    @Consumable()
-    public void forceSetActivations(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).forceSetActivation(inputs[i]);
-        }
-    }
-
-    /**
-     * Return activations as a double array in place.
-     *
-     * @return the activation array
-     */
-    @Producible(arrayDescriptionMethod = "getLabelArray")
-    public double[] getActivations() {
-        if (activations == null) {
-            activations = new double[size()];
-        }
-        for (int ii=0; ii<size(); ++ii) {
-            activations[ii] = neuronList.get(ii).getActivation();
-        }
-        return activations;
-    }
 
     /**
      * Returns an array of spike indices used in couplings, (e.g. to a raster
@@ -800,7 +677,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
     public double[] getSpikeIndexes() {
         List<Double> inds = new ArrayList<Double>(size());
         int i = 0;
-        for (Neuron n : neuronList) {
+        for (Neuron n : getNeuronList()) {
             if (n.isSpike()) {
                 inds.add((double) i);
             }
@@ -809,7 +686,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         double[] vals = new double[inds.size()];
         int j = 0;
         for (Double d : inds) {
-            vals[j++] = d.doubleValue();
+            vals[j++] = d;
         }
         return vals;
     }
@@ -820,224 +697,14 @@ public class NeuronGroup extends Group implements  LocatableModel {
      * @return the bias array
      */
     public double[] getBiases() {
-        double[] retArray = new double[neuronList.size()];
+        double[] retArray = new double[getNeuronList().size()];
         int i = 0;
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
                 retArray[i++] = ((BiasedUpdateRule) neuron.getUpdateRule()).getBias();
             }
         }
         return retArray;
-    }
-
-    /**
-     * True if the group contains the specified neuron.
-     *
-     * @param n neuron to check for.
-     * @return true if the group contains this neuron, false otherwise
-     */
-    public boolean containsNeuron(final Neuron n) {
-        return neuronList.contains(n);
-    }
-
-    /**
-     * @return the number of neurons in the group
-     */
-    @Override
-    public int size() {
-        return neuronList.size();
-    }
-
-    /**
-     * Returns all the neurons in this group within a certain radius of the
-     * given neuron. This method will never return the given neuron as part
-     * of the list of neurons within the given radius, nor will it return
-     * neurons with the exact same position as the given neuron as a part
-     * of the returned list.
-     *
-     * @param n      the neurons
-     * @param radius the radius to search within.
-     * @return neurons in the group within a certain radius
-     */
-    public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>((int) (size() / 0.75f));
-        for (Neuron potN : neuronList) {
-            double dist = Network.getEuclideanDist(n, potN);
-            if (dist <= radius && dist != 0) {
-                ret.add(potN);
-            }
-        }
-        return ret;
-    }
-
-    // TODO: Below don't take account of the actual width of neurons themselves.
-    // Treats them as points.
-
-    /**
-     * Get the central x coordinate of this group, based on the positions of the
-     * neurons that comprise it.
-     *
-     * @return the center x coordinate.
-     */
-    @Override
-    public double getCenterX() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return min + (max - min) / 2;
-    }
-
-    /**
-     * Get the central y coordinate of this group, based on the positions of the
-     * neurons that comprise it.
-     *
-     * @return the center y coordinate.
-     */
-    @Override
-    public double getCenterY() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return min + (max - min) / 2;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-        setLocation(newx, getCenterY());
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        setLocation(getCenterX(), newy);
-    }
-
-    /**
-     * Returns the maximum X position of this group based on the neurons that
-     * comprise it.
-     *
-     * @return the x position of the farthest right neuron in the group.
-     */
-    public double getMaxX() {
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Returns the minimum X position of this group based on the neurons that
-     * comprise it.
-     *
-     * @return the x position of the farthest left neuron in the group.
-     */
-    public double getMinX() {
-        double min = Double.POSITIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Returns the maximum Y position of this group based on the neurons that
-     * comprise it.
-     *
-     * @return the y position of the farthest north neuron in the group.
-     */
-    public double getMaxY() {
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Returns the minimum Y position of this group based on the neurons that
-     * comprise it.
-     *
-     * @return the y position of the farthest south neuron in the group.
-     */
-    public double getMinY() {
-        double min = Double.POSITIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Return the width of this group, based on the positions of the neurons
-     * that comprise it.
-     *
-     * @return the width of the group
-     */
-    public double getWidth() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return max - min;
-    }
-
-    /**
-     * Return the height of this group, based on the positions of the neurons
-     * that comprise it.
-     *
-     * @return the height of the group
-     */
-    public double getHeight() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return max - min;
-    }
-
-    /**
-     * @return the longest dimensions upon which neurons are laid out.
-     */
-    public double getMaxDim() {
-        if (getWidth() > getHeight()) {
-            return getWidth();
-        } else {
-            return getHeight();
-        }
     }
 
     /**
@@ -1071,85 +738,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
         setLocation(point.getX(), point.getY());
     }
 
-    /**
-     * Translate all neurons (the only objects with position information).
-     *
-     * @param offsetX x offset for translation.
-     * @param offsetY y offset for translation.
-     */
-    public void offset(final double offsetX, final double offsetY) {
-        for (Neuron neuron : neuronList) {
-            neuron.setX(neuron.getX() + offsetX);
-            neuron.setY(neuron.getY() + offsetY);
-        }
-        firePositionChanged();
-    }
-
-    /**
-     * Set all activations to 0.
-     */
-    public void clearActivations() {
-        for (Neuron n : this.getNeuronList()) {
-            n.clear();
-        }
-    }
-
-    /**
-     * Set clamping on all neurons in this group.
-     *
-     * @param clamp true to clamp them, false otherwise
-     */
-    public void setClamped(final boolean clamp) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setClamped(clamp);
-        }
-    }
-
-    /**
-     * Set all activations to a specified value.
-     *
-     * @param value the value to set the neurons to
-     */
-    public void setActivationLevels(final double value) {
-        for (Neuron n : getNeuronList()) {
-            n.setActivation(value);
-        }
-    }
-
-    /**
-     * Force set all activations to a specified value.
-     *
-     * @param value the value to set the neurons to
-     */
-    public void forceSetActivationLevels(final double value) {
-        for (Neuron n : getNeuronList()) {
-            n.forceSetActivation(value);
-        }
-    }
-
-    /**
-     * Copy activations from one neuron group to this one.
-     *
-     * @param toCopy the group to copy activations from.
-     */
-    public void copyActivations(NeuronGroup toCopy) {
-        int i = 0;
-        for (Neuron neuron : toCopy.getNeuronList()) {
-            if (i < neuronList.size()) {
-                neuronList.get(i).setActivation(neuron.getInputValue() + neuron.getActivation());
-                neuronList.get(i++).setSpike(neuron.isSpike());
-
-            }
-        }
-    }
-
-    /**
-     * Print activations as a vector.
-     */
-    public void printActivations() {
-        System.out.println(Utils.doubleArrayToString(Network.getActivationVector(neuronList)));
-    }
-
     @Override
     public String getUpdateMethodDescription() {
         return "Update neurons";
@@ -1180,16 +768,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
         this.layout.setLayout(layout);
     }
 
-    /**
-     * Return current position (upper left corner of neuron in the farthest
-     * north-west position.
-     *
-     * @return position upper left position of group
-     */
-    public Point2D.Double getPosition() {
-        return new Point2D.Double(getMinX(), getMinY());
-    }
-
     public void setXYZCoordinatesFromFile(String filename) {
         try (Scanner rowSc = new Scanner(new File(filename));) {
             Scanner colSc = null;
@@ -1203,11 +781,11 @@ public class NeuronGroup extends Group implements  LocatableModel {
                     while (colSc.hasNext()) {
                         double coordinate = colSc.nextDouble();
                         if (i == 0) {
-                            neuronList.get(j++).setX(coordinate);
+                            getNeuron(j++).setX(coordinate);
                         } else if (i == 1) {
-                            neuronList.get(j++).setY(coordinate);
+                            getNeuron(j++).setY(coordinate);
                         } else if (i == 2) {
-                            neuronList.get(j++).setZ(coordinate);
+                            getNeuron(j++).setZ(coordinate);
                         } else {
                             return;
                         }
@@ -1280,69 +858,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
     }
 
     /**
-     * Returns true if all the neurons in this group are clamped.
-     *
-     * @return true if all neurons are clamped, false otherwise
-     */
-    public boolean isAllClamped() {
-        boolean ret = true;
-        for (Neuron n : getNeuronList()) {
-            if (!n.isClamped()) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns true if all the neurons in this group are unclamped.
-     *
-     * @return true if all neurons are unclamped, false otherwise
-     */
-    public boolean isAllUnclamped() {
-        boolean ret = true;
-        for (Neuron n : getNeuronList()) {
-            if (n.isClamped()) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Set the lower bound on all neurons in this group.
-     *
-     * @param lb the lower bound to set.
-     */
-    public void setLowerBound(double lb) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setLowerBound(lb);
-        }
-    }
-
-    /**
-     * Set the upper bound on all neurons in this group.
-     *
-     * @param ub the upper bound to set.
-     */
-    public void setUpperBound(double ub) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setUpperBound(ub);
-        }
-    }
-
-    /**
-     * Set the increment on all neurons in this group.
-     *
-     * @param increment the increment to set.
-     */
-    public void setIncrement(double increment) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setIncrement(increment);
-        }
-    }
-
-    /**
      * @return the testData
      */
     public double[][] getTestData() {
@@ -1373,7 +888,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public void testAndSetIfSpiking() {
         boolean spiking = true;
-        for (Neuron n : neuronList) {
+        for (Neuron n : getNeuronList()) {
             if (!n.getUpdateRule().isSpikingNeuron()) {
                 spiking = false;
                 break;
@@ -1402,7 +917,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
         }
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval, LineOrientation.HORIZONTAL);
         GridLayout gridLayout = new GridLayout(betweenNeuronInterval, betweenNeuronInterval);
-        if (neuronList.size() < gridThreshold) {
+        if (getNeuronList().size() < gridThreshold) {
             lineLayout.setInitialLocation(initialPosition);
             setLayout(lineLayout);
         } else {
@@ -1410,7 +925,7 @@ public class NeuronGroup extends Group implements  LocatableModel {
             setLayout(gridLayout);
         }
         // Used rather than apply layout to make sure initial position is used.
-        getLayout().layoutNeurons(neuronList);
+        getLayout().layoutNeurons(getNeuronList());
     }
 
     /**
@@ -1439,47 +954,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
      */
     public void setGridThreshold(int gridThreshold) {
         this.gridThreshold = gridThreshold;
-    }
-
-    /**
-     * Clear the neuron list.
-     */
-    public void clearNeuronList() {
-        neuronList.clear();
-    }
-
-    /**
-     * Utility to method (used in couplings) to get a string showing the labels
-     * of all "active" neurons (neurons with activation above a threshold).
-     *
-     * @param threshold threshold above which to consider a neuron "active"
-     * @return the "active labels"
-     */
-    public String getLabelsOfActiveNeurons(double threshold) {
-        StringBuilder strBuilder = new StringBuilder("");
-        for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > threshold) && (!neuron.getLabel().isEmpty())) {
-                strBuilder.append(neuron.getLabel() + " ");
-            }
-        }
-        return strBuilder.toString();
-    }
-
-    /**
-     * Returns the label of the most active neuron.
-     *
-     * @return the label of the most active neuron
-     */
-    public String getMostActiveNeuron() {
-        double min = Double.MIN_VALUE;
-        String result = "";
-        for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > min) && (!neuron.getLabel().isEmpty())) {
-                result = neuron.getLabel();
-                min = neuron.getActivation();
-            }
-        }
-        return result + " ";
     }
 
     public boolean isRecording() {
@@ -1547,19 +1021,9 @@ public class NeuronGroup extends Group implements  LocatableModel {
             subSampledValues = new double[numSubSamples];
         }
         for (int ii = 0; ii < numSubSamples; ii++) {
-            subSampledValues[ii] = neuronList.get(subsamplingIndices[ii]).getActivation();
+            subSampledValues[ii] = getNeuron(subsamplingIndices[ii]).getActivation();
         }
         return subSampledValues;
-    }
-
-    /**
-     * Sets the polarities of every neuron in the group.
-     * @param p
-     */
-    public void setPolarity(SimbrainConstants.Polarity p) {
-        for(Neuron n : neuronList) {
-            n.setPolarity(p);
-        }
     }
 
     public int getNumSubSamples() {
@@ -1574,21 +1038,6 @@ public class NeuronGroup extends Group implements  LocatableModel {
        this.numSubSamples = _numSubSamples;
     }
 
-    /**
-     * Get the neuron with the specified label, or null if none found.
-     *
-     * @param label label to search for
-     * @return the associated neuron
-     */
-    public Neuron getNeuronByLabel(String label) {
-        // TODO: Share code with Network level method with same name.
-        for (Neuron neuron : this.getNeuronList()) {
-            if (neuron.getLabel().equalsIgnoreCase(label)) {
-                return neuron;
-            }
-        }
-        return null;
-    }
 
     @Override
     public EditableObject copy() {
@@ -1600,10 +1049,10 @@ public class NeuronGroup extends Group implements  LocatableModel {
      * Release the neurons as loose neurons.
      */
     public void releaseNeurons() {
-        for (Neuron neuron : neuronList) {
+        for (Neuron neuron : getNeuronList()) {
             getParentNetwork().addLooseNeuron(neuron);
         }
-        neuronList.clear();
+        removeAllNeurons();
         stopRecording();
         // NOT YET WORKING.
         //TODO: Fire special event which results in new pnodes being created in the canvas.
@@ -1628,39 +1077,23 @@ public class NeuronGroup extends Group implements  LocatableModel {
          */
         public NeuronGroup create() {
             NeuronGroup ng = deepCopy(this.getParentNetwork());
+            List<Neuron> neurons = new ArrayList<>();
             for(int i = 0; i < numNeurons; i++) {
-                ng.addNeuron(new Neuron(this.getParentNetwork()));
+                neurons.add(new Neuron(this.getParentNetwork()));
             }
+            ng.addNeurons(neurons);
             ng.applyLayout();
             return ng;
         }
     }
 
-    /**
-     * Returns an array of labels, one for each neuron this group.
-     * Called by reflection for some coupling related events.
-     *
-     * @return the label array
-     */
-    public String[] getLabelArray() {
-        String[] retArray = new String[getNeuronList().size()];
-        int i = 0;
-        for(Neuron neuron : getNeuronList()) {
-            if (neuron.getLabel().isEmpty()) {
-                retArray[i++] = neuron.getId();
-            } else {
-                retArray[i++] = neuron.getLabel();
-            }
-        }
-        return retArray;
-    }
 
     /**
      * Reset the indices used for subsampling.
      */
     public void resetSubsamplingIndices() {
-        if (neuronList != null) {
-            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());
+        if (getNeuronList() != null) {
+            subsamplingIndices = SimbrainMath.randPermute(0, getNeuronList().size());
         }
     }
 

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
@@ -42,27 +43,12 @@ import java.util.List;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronCollectionNode extends PNode implements GroupNode {
-
-    /**
-     * Parent network panel.
-     */
-    private final NetworkPanel networkPanel;
+public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
     /**
      * Reference to represented neuron collection
      */
     private final NeuronCollection neuronCollection;
-
-    /**
-     * The interaction box for this neuron colection
-     */
-    private NeuronCollectionInteractionBox interactionBox;
-
-    /**
-     * The outlined objects (neurons) for this neuron group.
-     */
-    private final NeuronCollectionOutline outlinedObjects;
 
     /**
      * Create a Neuron Group PNode.
@@ -72,15 +58,13 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
      */
     public NeuronCollectionNode(NetworkPanel networkPanel, NeuronCollection nc) {
 
-        this.networkPanel = networkPanel;
+        super(networkPanel, nc);
+
         this.neuronCollection = nc;
 
-        outlinedObjects = new NeuronCollectionOutline();
-        addChild(outlinedObjects);
-
-        interactionBox = new NeuronCollectionInteractionBox(networkPanel);
+        NeuronCollectionInteractionBox interactionBox = new NeuronCollectionInteractionBox(networkPanel);
         interactionBox.setText(nc.getLabel());
-        addChild(interactionBox);
+        setInteractionBox(interactionBox);
 
         //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
@@ -90,12 +74,13 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
                 //System.out.println(evt.getPropertyName());
                 if ("delete".equals(evt.getPropertyName())) {
                     NeuronCollectionNode.this.removeFromParent();
+                    updateOutline();
                 } else if ("label".equals(evt.getPropertyName())) {
                     interactionBox.setText(nc.getLabel());
                     NeuronCollectionNode.this.updateText();
                 } else if ("moved".equals(evt.getPropertyName())) {
-                    // TODO: Is the below even used?
                     NeuronCollectionNode.this.syncToModel();
+                    updateOutline();
                 }
             }
         });
@@ -103,45 +88,23 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
     }
 
     /**
-     * Override PNode layoutChildren method in order to properly set the positions of children nodes.
-     */
-    @Override
-    public void layoutChildren() {
-        if (this.getVisible() && !networkPanel.isRunning()) {
-            //TODO: Magic numbers below empirically set to fit.  Why? What diff from neuron group?
-            interactionBox.setOffset(
-                    outlinedObjects.getFullBounds().getX(),
-                    outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() - 8);
-        }
-    }
-
-    /**
      * Sync all neuron nodes in the group to the model.
      */
     public void syncToModel() {
-        for (Object object : outlinedObjects.getNeuronNodeRefs()) {
-            ((NeuronNode) object).pullViewPositionFromModel();
+        for (NeuronNode neuronNode : getNeuronNodes()) {
+            neuronNode.pullViewPositionFromModel();
         }
     }
 
     @Override
     public void offset(double dx, double dy) {
-        if (networkPanel.isRunning()) {
-            return;
-        }
-        for (Object object : outlinedObjects.getNeuronNodeRefs()) {
-            ((NeuronNode) object).offset(dx, dy);
-        }
+        super.offset(dx, dy);
         neuronCollection.firePositionChanged();
     }
 
-    /**
-     * Add a neuron node to the group node.
-     *
-     * @param node to add
-     */
-    public void addNeuronNode(NeuronNode node) {
-        outlinedObjects.addChildRef(node);
+    @Override
+    protected AbstractNeuronCollection getModel() {
+        return neuronCollection;
     }
 
     /**
@@ -208,7 +171,7 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
         menu.add(unclampNeuronsAction);
 
         // Coupling menu
-        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronCollection);
+        JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronCollection);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }
@@ -228,21 +191,8 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
         getNetworkPanel().setSelection(nodes);
     }
 
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
-    }
-
     public NeuronCollection getNeuronCollection() {
         return neuronCollection;
-    }
-
-    @Override
-    public void updateConstituentNodes() {
-    }
-
-    @Override
-    public List<InteractionBox> getInteractionBoxes() {
-        return Collections.singletonList(interactionBox);
     }
 
     /**
@@ -253,7 +203,7 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
         /**
          * Color for the neuron collection interaction box
          */
-        private final Color BOX_COLOR= new Color(209,255, 204);
+        private final Color BOX_COLOR = new Color(209, 255, 204);
 
         /**
          * Construct the interaction box
@@ -304,30 +254,11 @@ public class NeuronCollectionNode extends PNode implements GroupNode {
     }
 
     /**
-     * @return the interactionBox
-     */
-    public NeuronCollectionInteractionBox getInteractionBox() {
-        return interactionBox;
-    }
-
-    /**
      * Update the text in the interaction box.
      */
     public void updateText() {
-        interactionBox.updateText();
+        getInteractionBox().updateText();
     }
-
-
-    /**
-     * Action for editing the group name.
-     */
-    protected Action renameAction = new AbstractAction("Rename Neuron Collection...") {
-        @Override
-        public void actionPerformed(final ActionEvent event) {
-            String newName = JOptionPane.showInputDialog("Name:", neuronCollection.getLabel());
-            neuronCollection.setLabel(newName);
-        }
-    };
 
     /**
      * Action for removing this group.

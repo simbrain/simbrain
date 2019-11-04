@@ -800,10 +800,7 @@ public class NetworkPanel extends JPanel {
         // Create the neuron group node.
         NeuronGroupNode neuronGroupNode = createNeuronGroupNode(neuronGroup);
 
-        // Add the pnodes to the neuron group
-        for (NeuronNode node : neuronNodes) {
-            neuronGroupNode.addNeuronNode(node);
-        }
+        neuronGroupNode.addNeuronNodes(neuronNodes);
 
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
@@ -853,9 +850,7 @@ public class NetworkPanel extends JPanel {
         for (Neuron neuron : nc.getNeuronList()) {
             neuronNodes.add((NeuronNode) objectNodeMap.get(neuron));
         }
-        for (NeuronNode node : neuronNodes) {
-            ncn.addNeuronNode(node);
-        }
+        ncn.addNeuronNodes(neuronNodes);
         canvas.getLayer().addChild(ncn);
         objectNodeMap.put(nc, ncn);
         repaint();

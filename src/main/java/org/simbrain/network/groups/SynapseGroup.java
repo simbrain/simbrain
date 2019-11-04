@@ -1785,14 +1785,14 @@ public class SynapseGroup extends Group implements NetworkModel {
 
         clear();
 
-        List<Neuron> srcNeurons = sgToCopy.sourceNeuronGroup.getNeuronListUnsafe();
-        List<Neuron> tarNeurons = sgToCopy.targetNeuronGroup.getNeuronListUnsafe();
+        List<Neuron> srcNeurons = sgToCopy.sourceNeuronGroup.getNeuronList();
+        List<Neuron> tarNeurons = sgToCopy.targetNeuronGroup.getNeuronList();
         for (int ii = 0; ii < sourceNeuronGroup.size(); ii++) {
             for (int jj = 0; jj < targetNeuronGroup.size(); jj++) {
                 // Does a synapse exist here?
                 if (srcNeurons.get(ii).getFanOut().containsKey(tarNeurons.get(jj))) {
                     //TODO: Check that such a synapse actually exists in this group
-                    Synapse newSyn = new Synapse(sourceNeuronGroup.getNeuronListUnsafe().get(ii), targetNeuronGroup.getNeuronListUnsafe().get(jj));
+                    Synapse newSyn = new Synapse(sourceNeuronGroup.getNeuronList().get(ii), targetNeuronGroup.getNeuronList().get(jj));
                     newSyn.setStrength(srcNeurons.get(ii).getFanOut().get(tarNeurons.get(jj)).getStrength());
                     this.addSynapseUnsafe(newSyn);
                 }

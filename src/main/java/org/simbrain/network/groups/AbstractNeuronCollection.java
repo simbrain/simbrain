@@ -2,6 +2,7 @@ package org.simbrain.network.groups;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -22,7 +23,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class AbstractNeuronCollection extends Group implements AttributeContainer, ArrayConnectable, NetworkModel {
+public abstract class AbstractNeuronCollection extends Group implements AttributeContainer, ArrayConnectable, LocatableModel {
 
     /**
      * References to neurons in this collection

@@ -1013,7 +1013,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Producible()
     public double[] getSubsampledActivations() {
-        if (numSubSamples >= neuronList.size()) {
+        if (numSubSamples >= getNeuronList().size()) {
             return getActivations();
         }
 

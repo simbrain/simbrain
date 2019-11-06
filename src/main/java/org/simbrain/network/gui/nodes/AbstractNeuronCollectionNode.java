@@ -1,16 +1,13 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.*;
 
 public abstract class AbstractNeuronCollectionNode extends PNode implements GroupNode {
@@ -23,7 +20,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     /**
      * The outlined objects (neurons) for this neuron group.
      */
-    private final NeuronGroupingOutline outlinedObjects;
+    private final Outline outlinedObjects;
 
     /**
      * The interaction box for this neuron colection
@@ -35,15 +32,15 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     public AbstractNeuronCollectionNode(NetworkPanel networkPanel, Group group) {
         this.networkPanel = networkPanel;
 
-        outlinedObjects = new NeuronGroupingOutline();
+        outlinedObjects = new Outline();
         addChild(outlinedObjects);
 
         group.addPropertyChangeListener(evt -> {
             //System.out.println(evt.getPropertyName());
             if ("delete".equals(evt.getPropertyName())) {
-                updateOutline();
+                outlinedObjects.update(neuronNodes);
             } else if ("moved".equals(evt.getPropertyName())) {
-                updateOutline();
+                outlinedObjects.update(neuronNodes);
             }
         });
     }
@@ -55,7 +52,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     @Override
     public void layoutChildren() {
         if (this.getVisible() && !networkPanel.isRunning()) {
-            interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + NeuronGroupingOutline.ARC_SIZE / 2,
+            interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + Outline.ARC_SIZE / 2,
                     outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
         }
     }
@@ -77,35 +74,16 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.offset(dx, dy);
         }
-        updateOutline();
-    }
-
-    /**
-     * Add a neuron node to the group node.
-     *
-     * @param node to add
-     */
-    public void addNeuronNode(NeuronNode node) {
-        neuronNodes.add(node);
-        updateOutline();
+        outlinedObjects.update(neuronNodes);
     }
 
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
-        updateOutline();
+        outlinedObjects.update(neuronNodes);
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {
         neuronNodes.remove(neuronNode);
-    }
-
-    public void updateOutline() {
-        outlinedObjects.updateBound(
-                getModel().getMinX(),
-                getModel().getMinY(),
-                getModel().getWidth(),
-                getModel().getHeight()
-        );
     }
 
     protected abstract AbstractNeuronCollection getModel();
@@ -126,7 +104,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
         this.addChild(interactionBox);
     }
 
-    public NeuronGroupingOutline getOutlinedObjects() {
+    public Outline getOutlinedObjects() {
         return outlinedObjects;
     }
 

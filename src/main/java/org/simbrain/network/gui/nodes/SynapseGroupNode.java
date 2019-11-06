@@ -52,11 +52,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
     protected final SynapseGroup synapseGroup;
 
     /**
-     * The outlined objects (synapses) for this node.
-     */
-    protected final OutlinedObjects outlinedObjects;
-
-    /**
      * The interaction box for this neuron group.
      */
     protected SynapseGroupInteractionBox interactionBox;
@@ -72,14 +67,12 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         this.synapseGroup = group;
         // Note the children pnodes to outlined objects are created in
         // networkpanel and added externally to outlined objects
-        outlinedObjects = new OutlinedObjects();
-        outlinedObjects.setDrawOutline(false);
         interactionBox = new SynapseGroupInteractionBox(networkPanel, group, this);
         interactionBox.setText(synapseGroup.getLabel());
-        addChild(outlinedObjects);
         addChild(interactionBox);
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
+
         group.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {

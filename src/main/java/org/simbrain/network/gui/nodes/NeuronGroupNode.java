@@ -113,14 +113,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         getInteractionBox().setText(neuronGroup.getLabel());
         // Must do this after it's added to properly locate it
         getInteractionBox().updateText();
-        if (group.getParentGroup() instanceof Subnetwork) {
-            if (!((Subnetwork) group.getParentGroup()).displayNeuronGroups()) {
-                getInteractionBox().setVisible(false);
-                getOutlinedObjects().setOutlinePadding(0);
-                getOutlinedObjects().setDrawOutline(false);
-            }
-        }
-        //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         group.addPropertyChangeListener(evt -> {
 
@@ -812,4 +804,5 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     private boolean samePoint(Point2D a, Point2D b) {
         return a.getX() == b.getX() && a.getY() == b.getY();
     }
+    
 }

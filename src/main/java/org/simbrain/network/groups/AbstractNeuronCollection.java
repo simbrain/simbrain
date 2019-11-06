@@ -23,6 +23,9 @@ import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Superclass for all neuron collection and neuron group.
+ */
 public abstract class AbstractNeuronCollection extends Group implements AttributeContainer, ArrayConnectable, LocatableModel {
 
     /**
@@ -119,66 +122,6 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     @Override
     public void setCenterY(double newy) {
         //todo
-    }
-
-    /**
-     * Returns the maximum X position of this group based on the neurons that comprise it.
-     *
-     * @return the x position of the farthest right neuron in the group.
-     */
-    public double getMaxX() {
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Returns the minimum X position of this group based on the neurons that comprise it.
-     *
-     * @return the x position of the farthest left neuron in the group.
-     */
-    public double getMinX() {
-        double min = Double.POSITIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Returns the maximum Y position of this group based on the neurons that comprise it.
-     *
-     * @return the y position of the farthest north neuron in the group.
-     */
-    public double getMaxY() {
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Returns the minimum Y position of this group based on the neurons that comprise it.
-     *
-     * @return the y position of the farthest south neuron in the group.
-     */
-    public double getMinY() {
-        double min = Double.POSITIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-        }
-        return min;
     }
 
     /**
@@ -499,7 +442,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     @Override
     public Point2D getAttachmentPoint() {
-        return new Point2D.Double(getMinX(), getMaxY());
+        return new Point2D.Double(Utils.getMinX(neuronList), Utils.getMaxX(neuronList));
     }
 
     @Override
@@ -517,7 +460,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
      * @return position upper left position of group
      */
     public Point2D.Double getPosition() {
-        return new Point2D.Double(getMinX(), getMinY());
+        return new Point2D.Double(Utils.getMinX(neuronList), Utils.getMaxX(neuronList));
     }
 
     /**
@@ -739,5 +682,33 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * See {@link Utils#getMinX(List)}
+     */
+    public double getMinX() {
+        return Utils.getMinX(neuronList);
+    }
+
+    /**
+     * See {@link Utils#getMaxX(List)}
+     */
+    public double getMaxX() {
+        return Utils.getMaxX(neuronList);
+    }
+
+    /**
+     * See {@link Utils#getMinY(List)}
+     */
+    public double getMinY() {
+        return Utils.getMinY(neuronList);
+    }
+
+    /**
+     * See {@link Utils#getMaxY(List)}
+     */
+    public double getMaxY() {
+        return Utils.getMaxY(neuronList);
     }
 }

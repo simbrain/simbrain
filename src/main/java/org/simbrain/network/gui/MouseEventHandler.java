@@ -29,6 +29,7 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
@@ -244,7 +245,7 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
         // Handle interaction box dragging
         if (pickedNode instanceof InteractionBox) {
             delta = event.getDeltaRelativeTo(pickedNode.getParent());
-            if (pickedNode.getParent() instanceof GroupNode ) {
+            if (((InteractionBox) pickedNode).isDraggable()) {
                 pickedNode.getParent().offset(delta.getWidth(), delta.getHeight());
             }
         }

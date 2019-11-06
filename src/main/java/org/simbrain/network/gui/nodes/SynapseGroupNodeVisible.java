@@ -37,9 +37,7 @@ public class SynapseGroupNodeVisible extends SynapseGroupNode {
      */
     public SynapseGroupNodeVisible(final NetworkPanel networkPanel, final SynapseGroup group) {
         super(networkPanel, group);
-        outlinedObjects.setPaint(null);
     }
-
 
     /**
      * Override PNode layoutChildren method in order to properly set the
@@ -54,66 +52,6 @@ public class SynapseGroupNodeVisible extends SynapseGroupNode {
         double x = (srcX + tarX) / 2;
         double y = (srcY + tarY) / 2;
         interactionBox.centerFullBoundsOnPoint(x, y);
-
-        // Old layout code.  Some maybe useful so not removing it yet.
-        //          PBounds bounds = new PBounds();
-        //          if (getOutlinedObjects().size() > 0) {
-        //              for (PNode node : getOutlinedObjects()) {
-        //                  PBounds childBounds = node.getGlobalBounds();
-        //                  bounds.add(childBounds);
-        //                  if (node instanceof SynapseNode) {
-        //                      // Recurrent synapses screw things up when they have area 0
-        //                      Rectangle synapseBounds = ((SynapseNode) node).getLine()
-        //                              .getBounds();
-        //                      double area = synapseBounds.getHeight()
-        //                              * synapseBounds.getWidth();
-        //                      if (area > 0) {
-        //                          bounds.add(((SynapseNode) node).getLine().getBounds());
-        //                      }
-        //                  }
-        //              }
-        //
-        //              double inset = getOutlinePadding();
-        //              bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
-        //                      bounds.getWidth() + (2 * inset), bounds.getHeight()
-        //                              + (2 * inset));
-        //
-        //              // Can also use setPathToEllipse
-        //              setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-        //                      (float) bounds.getWidth(), (float) bounds.getHeight());
-        //
-        //          } else {
-        //              // TODO Need to get reference to parent nodes.
-        //              System.err.println("Bounds are null");
-        //              bounds = null;
-        //          }
-
-    }
-
-    @Override
-    public void updateConstituentNodes() {
-        for (Object node : outlinedObjects.getChildrenReference()) {
-            ((SynapseNode) node).updateColor();
-            ((SynapseNode) node).updateDiameter();
-        }
-    }
-
-    /**
-     * Add a synapse node to the group node.
-     *
-     * @param node to add
-     */
-    public void addSynapseNode(SynapseNode node) {
-        outlinedObjects.addChild(node);
-    }
-
-    /**
-     * Remove a synapse node from the group node.
-     *
-     * @param node to remove
-     */
-    public void removeSynapseNode(SynapseNode node) {
-        outlinedObjects.removeChild(node);
     }
 
 }

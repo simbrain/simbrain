@@ -174,9 +174,12 @@ public abstract class InteractionBox extends ScreenElement {
         return false;
     }
 
+    /**
+     * Return true if the _parent_ this interaction box is attached to is draggable.
+     */
     @Override
     public boolean isDraggable() {
-        return !getNetworkPanel().isRunning();
+        return true;
     }
 
     @Override

@@ -44,7 +44,6 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      */
     private final SynapseGroup synapseGroup;
 
-
     private final SynapseGroupNode synapseGroupNode;
 
     /**
@@ -392,5 +391,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     protected boolean hasToolTipText() {
         return true;
     }
+
+
 
 }

@@ -27,17 +27,19 @@ import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
- * an {@link OutlinedObjects} node (containing neuron groups and synapse groups)
+ * an {@link Outline} node (containing neuron groups and synapse groups)
  * as children. The outlinedobjects node draws the boundary around the contained
  * nodes. The interaction box is the point of contact. Layout happens in the
  * overridden layoutchildren method.
@@ -64,7 +66,12 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     /**
      * The outlined objects (neuron and synapse groups) for this node.
      */
-    private final OutlinedObjects outlinedObjects;
+    private final Outline outline = new Outline();
+
+    /**
+     * The outlined objects
+     */
+    private List<PNode> outlinedObjects = new ArrayList<>();
 
     /**
      * Create a subnetwork node.
@@ -75,11 +82,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
         this.networkPanel = networkPanel;
         this.subnetwork = group;
-        outlinedObjects = new OutlinedObjects();
-        outlinedObjects.setFillBackground(false);
         interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
         interactionBox.setText(group.getLabel());
-        addChild(outlinedObjects);
+        addChild(outline);
         addChild(interactionBox);
         // Must do this after it's added to properly locate the text
         interactionBox.updateText();
@@ -104,17 +109,16 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
      */
     @Override
     public void layoutChildren() {
-        interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2, outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
+        interactionBox.setOffset(outline.getFullBounds().getX()
+                + Outline.ARC_SIZE / 2,
+                outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
     }
 
     /**
-     * Add a node (neuron or synapse group to the subnetwork's outline)
-     * and move synapsegroup nodes to the back.
-     *
-     * @param node the node to add
+     * Need to maintain a list of nodes which are outlined
      */
     public void addNode(PNode node) {
-        outlinedObjects.addChild(node);
+        outlinedObjects.add(node);
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
         }
@@ -156,19 +160,15 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         return subnetwork;
     }
 
-    /**
-     * @return the outlinedObjects
-     */
-    public OutlinedObjects getOutlinedObjects() {
-        return outlinedObjects;
+    public Outline getOutline() {
+        return outline;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        outline.update(outlinedObjects);
         updateSynapseNodePositions();
     }
-
-    ;
 
     /**
      * Call update synapse node positions on all constituent neuron group nodes,
@@ -176,7 +176,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
      * nodes are updated properly when this is moved.
      */
     public void updateSynapseNodePositions() {
-        for (Object node : outlinedObjects.getChildrenReference()) {
+        for (Object node : outline.getChildrenReference()) {
             if (node instanceof NeuronGroupNode) {
                 ((NeuronGroupNode) node).updateSynapseNodePositions();
             }
@@ -214,8 +214,6 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         }
 
     }
-
-    ;
 
     /**
      * Helper class to create the subnetwork dialog. Subclasses override this
@@ -346,7 +344,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
 
     @Override
     public void updateConstituentNodes() {
-        for (Object object : outlinedObjects.getChildrenReference()) {
+        for (Object object : outline.getChildrenReference()) {
             if (object instanceof GroupNode) {
                 ((GroupNode) object).updateConstituentNodes();
             }
@@ -360,15 +358,14 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         //        }
     }
 
-
     @Override
     public void offset(double dx, double dy) {
-        //super.offset(dx, dy);
-        for (Object object : outlinedObjects.getChildrenReference()) {
-            if (object instanceof NeuronGroupNode) {
-                ((NeuronGroupNode) object).offset(dx, dy);
+        for (PNode node : outlinedObjects) {
+            if (node instanceof NeuronGroupNode) {
+                node.offset(dx, dy);
             }
         }
+        outline.update(outlinedObjects);
     }
 
     @Override

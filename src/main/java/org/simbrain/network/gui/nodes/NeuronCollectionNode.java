@@ -74,13 +74,13 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
                 //System.out.println(evt.getPropertyName());
                 if ("delete".equals(evt.getPropertyName())) {
                     NeuronCollectionNode.this.removeFromParent();
-                    updateOutline();
+                    getOutlinedObjects().update(getNeuronNodes());
                 } else if ("label".equals(evt.getPropertyName())) {
                     interactionBox.setText(nc.getLabel());
                     NeuronCollectionNode.this.updateText();
                 } else if ("moved".equals(evt.getPropertyName())) {
                     NeuronCollectionNode.this.syncToModel();
-                    updateOutline();
+                    getOutlinedObjects().update(getNeuronNodes());
                 }
             }
         });

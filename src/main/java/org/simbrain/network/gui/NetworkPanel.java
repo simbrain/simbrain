@@ -737,12 +737,12 @@ public class NetworkPanel extends JPanel {
             // If synapsenode exists in a visible synapse group node, remove it
             if (synapse.getParentGroup() != null) {
                 SynapseGroupNode parentGroupNode = (SynapseGroupNode) objectNodeMap.get(synapse.getParentGroup());
-                if (parentGroupNode != null) {
-                    if (parentGroupNode instanceof SynapseGroupNodeVisible) {
-                        ((SynapseGroupNodeVisible) parentGroupNode).removeSynapseNode(synapseNode);
-
-                    }
-                }
+                //if (parentGroupNode != null) {
+                //    if (parentGroupNode instanceof SynapseGroupNodeVisible) {
+                //        ((SynapseGroupNodeVisible) parentGroupNode).removeSynapseNode(synapseNode);
+                //
+                //    }
+                //}
             }
         }
     }
@@ -960,9 +960,9 @@ public class NetworkPanel extends JPanel {
         }
 
         // Add the synapse nodes to the synapse group node
-        for (SynapseNode node : nodes) {
-            synapseGroupNode.addSynapseNode(node);
-        }
+        //for (SynapseNode node : nodes) {
+        //    synapseGroupNode.addSynapseNode(node);
+        //}
         synapseGroupNode.lowerToBottom();
     }
 
@@ -1101,7 +1101,7 @@ public class NetworkPanel extends JPanel {
                 PNode parentGroupNode = objectNodeMap.get(group.getParentGroup());
                 if (parentGroupNode != null) {
                     if (parentGroupNode instanceof SubnetworkNode) {
-                        ((SubnetworkNode) parentGroupNode).getOutlinedObjects().removeChild(node);
+                        ((SubnetworkNode) parentGroupNode).getOutline().removeChild(node);
                     }
                 }
             }

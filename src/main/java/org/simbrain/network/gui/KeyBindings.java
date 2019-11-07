@@ -256,22 +256,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-
-                // TODO: Move to network panel and provide support for collection <-> loose
-                // and collection <-> neuron group
-
-                panel.addWeightMatricesFromSelection();
-
-                if (ConditionallyEnabledAction
-                        .sourceAndTargetNeuronGroupsSelected(panel)) {
-                    AddSynapseGroupAction.displaySynapseGroupDialog(panel);
-                } else {
-                    // List<Neuron> sourceNeurons = sourceNeurons +  source neurons in collections and groups
-                    // List<Neuron> targetNeurons = selectedNeurons + neurons in collections and groups
-                    panel.getQuickConnector().applyCurrentConnection(panel.getNetwork(),
-                            panel.getSourceModels(Neuron.class),
-                            panel.getSelectedModels(Neuron.class));
-                }
+                panel.addSynapsesFromSelection();
             }
         });
 

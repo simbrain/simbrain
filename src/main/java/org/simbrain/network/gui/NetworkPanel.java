@@ -31,7 +31,9 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
 import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
 import org.simbrain.network.connections.QuickConnectionManager;
@@ -84,6 +86,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the network. Creation, deletion, and state
@@ -907,12 +910,12 @@ public class NetworkPanel extends JPanel {
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap.get(synapseGroup);
 
         // TODO: Clean up listeners if the synapsegroup is removed.
-        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap.get(synapseGroup.getSourceNeuronGroup());
+        PNode srcNode = objectNodeMap.get(synapseGroup.getSourceNeuronGroup());
         // System.out.println("Source" + srcNode);
         if (srcNode != null) {
             srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
         }
-        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap.get(synapseGroup.getTargetNeuronGroup());
+        PNode tarNode = objectNodeMap.get(synapseGroup.getTargetNeuronGroup());
         // System.out.println("Target" + tarNode);
         if (tarNode != null) {
             tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
@@ -926,30 +929,17 @@ public class NetworkPanel extends JPanel {
      * @param synapseGroup the model synapse group being represented
      */
     private void addSynapseGroupVisible(SynapseGroup synapseGroup) {
-        // List of neuron and synapse nodes
-        List<SynapseNode> nodes = new ArrayList<SynapseNode>();
-        // Add excitatory synapse nodes to canvas
-        for (Synapse synapse : synapseGroup.getExcitatorySynapses()) {
-            addSynapse(synapse);
-            SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-            if (node != null) {
-                canvas.getLayer().addChild(node);
-                nodes.add(node);
-            }
-        }
-        // Add inhibitory synapse nodes to canvas
-        for (Synapse synapse : synapseGroup.getInhibitorySynapses()) {
-            addSynapse(synapse);
-            SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-            if (node != null) {
-                canvas.getLayer().addChild(node);
-                nodes.add(node);
-            }
-        }
+
+        List<Synapse> allSynapse = Stream.concat(synapseGroup.getExcitatorySynapses().stream(),
+                synapseGroup.getInhibitorySynapses().stream()).collect(Collectors.toList());
+
+        allSynapse.forEach(this::addSynapse);
+
         // Add synapse nodes to group node
         SynapseGroupNodeVisible synapseGroupNode = new SynapseGroupNodeVisible(this, synapseGroup);
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
+
 
         // Make this a child node of parent, if any
         if (synapseGroup.hasParentGroup()) {
@@ -958,12 +948,6 @@ public class NetworkPanel extends JPanel {
                 parentNode.addNode(synapseGroupNode);
             }
         }
-
-        // Add the synapse nodes to the synapse group node
-        //for (SynapseNode node : nodes) {
-        //    synapseGroupNode.addSynapseNode(node);
-        //}
-        synapseGroupNode.lowerToBottom();
     }
 
     /**
@@ -1768,6 +1752,21 @@ public class NetworkPanel extends JPanel {
         objectNodeMap.put(matrix, node);
     }
 
+    public void addSynapsesFromSelection() {
+        addWeightMatricesFromSelection();
+
+        if (ConditionallyEnabledAction
+                .sourceAndTargetNeuronGroupsSelected(this)) {
+            AddSynapseGroupAction.displaySynapseGroupDialog(this);
+        } else {
+            getQuickConnector().applyCurrentConnection(getNetwork(),
+                    getSourceModels(Neuron.class),
+                    getSelectedModels(Neuron.class)
+            );
+        }
+
+    }
+
     /**
      * Add a weight matrix between neuron collections or arrays.
      */
@@ -1776,7 +1775,10 @@ public class NetworkPanel extends JPanel {
         List<ArrayConnectable> targets = getSelectedModels(ArrayConnectable.class);
         for (ArrayConnectable source : sources) {
             for (ArrayConnectable target : targets) {
-                if (source instanceof NeuronCollection && target instanceof NeuronCollection) {
+
+                // If connection does not involve any ND4J component, don't use weight matrix
+                if ((source instanceof NeuronCollection || source instanceof NeuronGroup)
+                && (target instanceof NeuronCollection || target instanceof NeuronGroup)) {
                     continue;
                 }
                 addWeightMatrix(source, target);

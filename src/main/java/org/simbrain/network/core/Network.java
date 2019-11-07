@@ -1122,6 +1122,9 @@ public class Network {
         // Uncompress compressed matrix rep if needed
         getSynapseGroups().forEach(SynapseGroup::postUnmarshallingInit);
 
+        // Generic group unmarshalling
+        getGroupList().forEach(Group::postUnmarshallingInit);
+
         // Re-populate fan-in / fan-out for loose synapses
         getSynapseList().forEach(Synapse::postUnmarshallingInit);
 

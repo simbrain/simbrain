@@ -242,6 +242,13 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         changeSupport.firePropertyChange("label", null , null);
     }
 
+    /**
+     * Perform any initialization required when unmarhsalling a group
+     */
+    public void postUnmarshallingInit() {
+        changeSupport = new PropertyChangeSupport(this);
+    }
+
     public void setUseCustomLabel(boolean useCustomLabel) {
         this.useCustomLabel = useCustomLabel;
     }

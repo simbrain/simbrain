@@ -157,8 +157,7 @@ public class HistogramModel implements AttributeContainer {
      * @param index    data index
      * @param histData the data to add at that index
      */
-    @Consumable()
-    public void addData(double[] histData, Integer index) {
+    public void addDataToDataSeries(double[] histData, Integer index) {
         data.remove(index.intValue());
         data.add(index.intValue(), histData);
         redraw();
@@ -173,7 +172,7 @@ public class HistogramModel implements AttributeContainer {
      */
     @Consumable()
     public void addData(double[] histData) {
-        addData(histData, 0);
+        addDataToDataSeries(histData, 0);
     }
 
     /**

@@ -36,6 +36,7 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -1042,20 +1043,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @Override
     public EditableObject copy() {
         return this.deepCopy(this.getParentNetwork());
-    }
-
-    /**
-     * Remove a neuron group, but not the neurons inside it.
-     * Release the neurons as loose neurons.
-     */
-    public void releaseNeurons() {
-        for (Neuron neuron : getNeuronList()) {
-            getParentNetwork().addLooseNeuron(neuron);
-        }
-        removeAllNeurons();
-        stopRecording();
-        // NOT YET WORKING.
-        //TODO: Fire special event which results in new pnodes being created in the canvas.
     }
 
     /**

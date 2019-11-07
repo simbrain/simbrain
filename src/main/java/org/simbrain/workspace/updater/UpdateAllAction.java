@@ -103,11 +103,16 @@ public class UpdateAllAction implements UpdateAction {
         }
 
         componentUpdateExecutor.submit(() -> {
-            UpdateThread thread = (UpdateThread) Thread.currentThread();
-            thread.setCurrentTask(component);
-            component.update();
-            thread.clearCurrentTask(component);
-            signal.done();
+            try {
+                UpdateThread thread = (UpdateThread) Thread.currentThread();
+                thread.setCurrentTask(component);
+                component.update();
+                thread.clearCurrentTask(component);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                signal.done();
+            }
         });
 
     }

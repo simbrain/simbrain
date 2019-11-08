@@ -113,6 +113,38 @@ public class OdorWorldPanel extends JPanel {
      */
     private List<PImage> layerImageList;
 
+    void debugToolTips() {
+
+        if (tileSelectionModel != null) {
+            if (!tileSelectionModel.contains(world.getLastClickedPosition())) {
+                canvas.getLayer().removeChild(tileSelectionBox);
+                tileSelectionModel = null;
+                tileSelectionBox = null;
+            }
+        }
+
+        if (tileSelectionBox == null) {
+            int tileCoordinateX =
+                    (int) (world.getLastClickedPosition().getX() / world.getTileMap().getTilewidth());
+            int tileCoordinateY =
+                    (int) (world.getLastClickedPosition().getY() / world.getTileMap().getTileheight());
+            tileSelectionModel = new Rectangle(
+                    tileCoordinateX * world.getTileMap().getTilewidth(),
+                    tileCoordinateY * world.getTileMap().getTileheight(),
+                    world.getTileMap().getTilewidth(),
+                    world.getTileMap().getTileheight()
+            );
+            tileSelectionBox = PPath.createRectangle(
+                    tileSelectionModel.getX(),
+                    tileSelectionModel.getY(),
+                    tileSelectionModel.getWidth(),
+                    tileSelectionModel.getHeight()
+            );
+            ((PPath) tileSelectionBox).setStrokePaint(Color.ORANGE);
+            tileSelectionBox.setPaint(null);
+            canvas.getLayer().addChild(tileSelectionBox);
+        }    }
+
     /**
      * Extend PCanvas for custom handling of tooltips
      */
@@ -172,7 +204,7 @@ public class OdorWorldPanel extends JPanel {
         });
 
         // Add key bindings
-        addKeyBindings(world);
+        KeyBindings.addBindings(this);
 
         // Mouse events
         canvas.addInputEventListener(new WorldMouseHandler(this, world));
@@ -345,7 +377,7 @@ public class OdorWorldPanel extends JPanel {
     /**
      * Show the PNode debugging tool.
      */
-    private void showPNodeDebugger() {
+    void showPNodeDebugger() {
         SceneGraphBrowser sgb = new SceneGraphBrowser(
             canvas.getRoot());
         StandardDialog dialog = new StandardDialog();
@@ -402,7 +434,7 @@ public class OdorWorldPanel extends JPanel {
     /**
      * Delete all current selected entities.
      */
-    private void deleteSelectedEntities() {
+    void deleteSelectedEntities() {
         for (OdorWorldEntity e : getSelectedModelEntities()) {
             e.delete();
         }
@@ -569,7 +601,7 @@ public class OdorWorldPanel extends JPanel {
         return mask;
     }
 
-    private void setManualMovementState(String key, boolean state) {
+    void setManualMovementState(String key, boolean state) {
         byte mask = getManualMovementStateMask(key);
         if (state) {
             manualMovementState |= mask;
@@ -578,7 +610,7 @@ public class OdorWorldPanel extends JPanel {
         }
     }
 
-    private boolean getManualMovementState(String key) {
+    boolean getManualMovementState(String key) {
         byte mask = getManualMovementStateMask(key);
         return (manualMovementState & mask) > 0;
     }
@@ -587,7 +619,8 @@ public class OdorWorldPanel extends JPanel {
         return manualMovementState > 0;
     }
 
-    private void releaseManualMovement(OdorWorldEntity entity) {
+
+    void releaseManualMovement(OdorWorldEntity entity) {
         if (!getManualMovementState()) {
             entity.setManualMode(false);
         }
@@ -596,221 +629,5 @@ public class OdorWorldPanel extends JPanel {
         }
     }
 
-
-    //TODO: Maybe move to a new class like in network
-    private void addKeyBindings(OdorWorld world) {
-
-        // Add / delete
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "addEntity");
-        canvas.getActionMap().put("addEntity", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                world.addEntity();
-                // TODO: Reuse network panel "click stream" logic
-            }
-        });
-
-        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.SHIFT_MASK), "addAgent");
-        canvas.getActionMap().put("addAgent", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                world.addAgent();
-            }
-        });
-
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
-        canvas.getActionMap().put("deleteSelection", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedEntities();
-            }
-        });
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
-        canvas.getActionMap().put("deleteSelection", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedEntities();
-            }
-        });
-
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("B"), "tooltipTest");
-        canvas.getActionMap().put("tooltipTest", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-
-                if (tileSelectionModel != null) {
-                    if (!tileSelectionModel.contains(world.getLastClickedPosition())) {
-                        canvas.getLayer().removeChild(tileSelectionBox);
-                        tileSelectionModel = null;
-                        tileSelectionBox = null;
-                    }
-                }
-
-                if (tileSelectionBox == null) {
-                    int tileCoordinateX =
-                        (int) (world.getLastClickedPosition().getX() / world.getTileMap().getTilewidth());
-                    int tileCoordinateY =
-                        (int) (world.getLastClickedPosition().getY() / world.getTileMap().getTileheight());
-                    tileSelectionModel = new Rectangle(
-                        tileCoordinateX * world.getTileMap().getTilewidth(),
-                        tileCoordinateY * world.getTileMap().getTileheight(),
-                        world.getTileMap().getTilewidth(),
-                        world.getTileMap().getTileheight()
-                    );
-                    tileSelectionBox = PPath.createRectangle(
-                        tileSelectionModel.getX(),
-                        tileSelectionModel.getY(),
-                        tileSelectionModel.getWidth(),
-                        tileSelectionModel.getHeight()
-                    );
-                    ((PPath) tileSelectionBox).setStrokePaint(Color.ORANGE);
-                    tileSelectionBox.setPaint(null);
-                    canvas.getLayer().addChild(tileSelectionBox);
-                }
-            }
-        });
-
-        // Example of getting press and release events
-        // See https://docs.oracle.com/javase/8/docs/api/javax/swing/KeyStroke.html#getKeyStroke-java.lang.String-
-
-        //
-        // Manual Forward Motion
-        //
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed W"), "start moving forward");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "start moving forward");
-        canvas.getActionMap().put("start moving forward", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("w", true);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.goStraight();
-                }
-            }
-        });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released W"), "stop moving forward");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released UP"), "stop moving forward");
-        canvas.getActionMap().put("stop moving forward", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("w", false);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    // case where w and s are both being pressed
-                    if (getManualMovementState("s")) {
-                        entity.goBackwards();
-                    } else {
-                        releaseManualMovement(entity);
-                    }
-                }
-            }
-        });
-
-        //
-        // Manual Backward Motion
-        //
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed S"), "start moving backward");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "start moving backward");
-        canvas.getActionMap().put("start moving backward", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("s", true);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.goBackwards();
-                }
-            }
-        });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released S"), "stop moving backward");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released DOWN"), "stop moving backward");
-        canvas.getActionMap().put("stop moving backward", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("s", false);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    // case where w and s are both being pressed
-                    if (getManualMovementState("w")) {
-                        entity.goStraight();
-                    } else {
-                        releaseManualMovement(entity);
-                    }
-                }
-            }
-        });
-
-
-        //
-        // Manual Left Turn
-        //
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed A"), "start turning left");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed LEFT"), "start turning left");
-        canvas.getActionMap().put("start turning left", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("a", true);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.turnLeft();
-                }
-            }
-        });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released A"), "stopTurningLeft");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released LEFT"), "stopTurningLeft");
-        canvas.getActionMap().put("stopTurningLeft", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("a", false);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    // case where a and d are both being pressed
-                    if (getManualMovementState("d")) {
-                        entity.turnRight();
-                    } else {
-                        entity.stopTurning();
-                        releaseManualMovement(entity);
-                    }
-                }
-            }
-        });
-
-        //
-        // Manual Right Turn
-        //
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed D"), "start turning right");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed RIGHT"), "start turning right");
-        canvas.getActionMap().put("start turning right", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("d", true);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.turnRight();
-                }
-            }
-        });
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released D"), "stopTurningRight");
-        canvas.getInputMap().put(KeyStroke.getKeyStroke("released RIGHT"), "stopTurningRight");
-        canvas.getActionMap().put("stopTurningRight", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                setManualMovementState("d", false);
-                OdorWorldEntity entity = getFirstSelectedRotatingEntity();
-                if (entity != null) {
-                    // case where a and d are both being pressed
-                    if (getManualMovementState("a")) {
-                        entity.turnLeft();
-                    } else {
-                        entity.stopTurning();
-                        releaseManualMovement(entity);
-                    }
-                }
-            }
-        });
-
-
-        // Debug Piccolo
-        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK), "debug");
-        canvas.getActionMap().put("debug", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                showPNodeDebugger();
-            }
-        });
-
-
-    }
 
 }

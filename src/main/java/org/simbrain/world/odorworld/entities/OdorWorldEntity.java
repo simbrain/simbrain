@@ -1188,6 +1188,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
                     (direction, parentWorld.getWorldBoundary());
         }
 
+        if(!parentWorld.isObjectsBlockMovement()) {
+            // If not blocking movement then there are no collisions
+            return false;
+        }
+
         for (OdorWorldEntity i : getEntitiesInCollisionRadius()) {
             if (i != this) {
                 if (collideOn(direction, i)) {

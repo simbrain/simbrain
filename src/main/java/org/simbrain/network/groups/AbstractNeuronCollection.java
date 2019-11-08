@@ -605,6 +605,19 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     }
 
     /**
+     * Adds input values.  Useful when doing a many to one coupling.
+     */
+    @Consumable()
+    public void addInputValues(double[] inputs) {
+        for (int i = 0, n = size(); i < n; i++) {
+            if (i >= inputs.length) {
+                break;
+            }
+            neuronList.get(i).addInputValue(inputs[i]);
+        }
+    }
+
+    /**
      * Set activations of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
      * <p>

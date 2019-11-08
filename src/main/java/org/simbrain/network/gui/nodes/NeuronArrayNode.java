@@ -78,7 +78,7 @@ public class NeuronArrayNode extends ScreenElement {
     private PText infoText;
 
     /**
-     * Square shape for representing activity generators.  Shown as a gray border.
+     * Square shape around array node.
      */
     private PPath borderBox = PPath.createRectangle(0, 0, boxWidth, boxHeight);
 

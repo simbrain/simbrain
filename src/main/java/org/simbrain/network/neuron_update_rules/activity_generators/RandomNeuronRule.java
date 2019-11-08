@@ -30,9 +30,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuronRule extends ActivityGenerator implements BoundedUpdateRule, NoisyUpdateRule {
-
-    // TODO: Make editable
+public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenerator, BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * Noise source.

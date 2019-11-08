@@ -221,6 +221,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                     NeuronNode.this.updateClampStatus();
                 } else if ("moved".equals(evt.getPropertyName())) {
                     NeuronNode.this.pullViewPositionFromModel();
+                } else if ("updateRule".equals(evt.getPropertyName())) {
+                    NeuronNode.this.updateShape();
                 }
             }
         });
@@ -237,6 +239,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         updateColor();
         updateText();
         updateClampStatus();
+    }
+
+    /**
+     * Update the shape (square or circle) of the neuron based on whether it's an activity generator or not.
+     */
+    public void updateShape() {
+        if (neuron.getUpdateRule() instanceof ActivityGenerator) {
+            removeChild(circle);
+            addChild(square);
+            mainShape = square;
+        } else {
+            removeChild(square);
+            addChild(circle);
+            mainShape = circle;
+        }
+        mainShape.lowerToBottom();
     }
 
     /**

@@ -31,7 +31,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
  */
-public class SinusoidalRule extends ActivityGenerator implements BoundedUpdateRule, NoisyUpdateRule {
+public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerator, BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * Phase.

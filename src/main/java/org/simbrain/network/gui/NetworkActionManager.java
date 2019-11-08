@@ -214,11 +214,6 @@ public final class NetworkActionManager {
     private final Action neuronCollectionAction;
 
     /**
-     * Create an activity generator.
-     */
-    private final Action activityGeneratorAction;
-
-    /**
      * Connection types.
      */
     private Action allToAll, oneToOne, radial, radialSimple, radialSelf, sparse;
@@ -321,7 +316,6 @@ public final class NetworkActionManager {
         wandEditModeAction = new WandEditModeAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
-        activityGeneratorAction = new NewActivityGeneratorAction(networkPanel);
         clearNodesAction = new ClearNodeActivationsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
@@ -520,15 +514,6 @@ public final class NetworkActionManager {
      */
     public Action getNewNeuronAction() {
         return newNeuronAction;
-    }
-
-    /**
-     * Return the new activity generator
-     *
-     * @return the new activity generator
-     */
-    public Action getNewActivityGeneratorAction() {
-        return activityGeneratorAction;
     }
 
     /**

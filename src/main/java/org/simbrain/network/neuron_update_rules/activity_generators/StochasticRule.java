@@ -31,7 +31,7 @@ import org.simbrain.util.UserParameter;
  * <p>
  * TODO: Separate spiking from non-spiking version?
  */
-public class StochasticRule extends ActivityGenerator {
+public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityGenerator {
 
     /**
      * The default firing probability for the Neuron.

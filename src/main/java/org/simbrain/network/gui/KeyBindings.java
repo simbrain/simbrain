@@ -18,9 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 
@@ -256,7 +253,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.addSynapsesFromSelection();
+                panel.connectSelectedModels();
             }
         });
 

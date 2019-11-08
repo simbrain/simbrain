@@ -940,7 +940,6 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
 
-
         // Make this a child node of parent, if any
         if (synapseGroup.hasParentGroup()) {
             SubnetworkNode parentNode = (SubnetworkNode) objectNodeMap.get(synapseGroup.getParentGroup());
@@ -1752,18 +1751,42 @@ public class NetworkPanel extends JPanel {
         objectNodeMap.put(matrix, node);
     }
 
-    public void addSynapsesFromSelection() {
+    /**
+     * Connect source and target model items.
+     * <br>
+     * If a either source or target model items are ND4J, connect with a weight matrix
+     * <br>
+     * If a pair of source and target items are neuron groups, connect with a synapse group
+     * <br>
+     * If either member of a pair is a neuron collection or a set of loose neurons, then connect using
+     * neurons on both sides, using quick connect (e.g. if connecting neuron collection to neuron group,
+     * connect to the neurons "inside" of neuron group).
+     */
+    public void connectSelectedModels() {
+
+        // Handle weight matrices to and from nd4j objects
         addWeightMatricesFromSelection();
 
-        if (ConditionallyEnabledAction
-                .sourceAndTargetNeuronGroupsSelected(this)) {
-            AddSynapseGroupAction.displaySynapseGroupDialog(this);
-        } else {
-            getQuickConnector().applyCurrentConnection(getNetwork(),
-                    getSourceModels(Neuron.class),
-                    getSelectedModels(Neuron.class)
-            );
+        // Handle adding synapse groups betwee neuron groups
+        AddSynapseGroupAction.displaySynapseGroupDialog(this);
+
+        // Handle loose neurons and neuron collections
+        List<Neuron> sourceNeurons = getSourceModels(Neuron.class);
+        for (NeuronCollection nc : getSourceModels(NeuronCollection.class)) {
+            sourceNeurons.addAll(nc.getNeuronList());
         }
+        for (NeuronGroup ng : getSourceModels(NeuronGroup.class)) {
+            sourceNeurons.addAll(ng.getNeuronList());
+        }
+
+        List<Neuron> targetNeurons = getSelectedModels(Neuron.class);
+        for (NeuronCollection nc : getSelectedModels(NeuronCollection.class)) {
+            targetNeurons.addAll(nc.getNeuronList());
+        }
+        for (NeuronGroup ng : getSelectedModels(NeuronGroup.class)) {
+            targetNeurons.addAll(ng.getNeuronList());
+        }
+        getQuickConnector().applyCurrentConnection(getNetwork(), sourceNeurons, targetNeurons);
 
     }
 
@@ -2012,27 +2035,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Find the upper left corner of the subnet nodes.
-     *
-     * @param neuronList the set of neurons to check
-     * @return the upper left corner
-     */
-    private Point2D getUpperLeft(final ArrayList neuronList) {
-        double x = Double.MAX_VALUE;
-        double y = Double.MAX_VALUE;
-        for (Iterator neurons = neuronList.iterator(); neurons.hasNext(); ) {
-            NeuronNode neuronNode = (NeuronNode) neurons.next();
-            if (neuronNode.getNeuron().getX() < x) {
-                x = neuronNode.getNeuron().getX();
-            }
-            if (neuronNode.getNeuron().getY() < y) {
-                y = neuronNode.getNeuron().getY();
-            }
-        }
-        return new Point2D.Double(x, y);
-    }
-
-    /**
      * Ungroup specified object.
      *
      * @param vgn                the group to remove.
@@ -2105,18 +2107,6 @@ public class NetworkPanel extends JPanel {
      */
     public void repaint() {
         super.repaint();
-        // if (timeLabel != null) {
-        // timeLabel.setBounds(TIME_LABEL_H_OFFSET,
-        // canvas.getCamera().getHeight() - getToolbarOffset(),
-        // timeLabel.getHeight(), timeLabel.getWidth());
-        // }
-        //
-        // if (updateStatusLabel != null) {
-        // updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET,
-        // canvas.getCamera().getHeight() - getToolbarOffset(),
-        // updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
-        // }
-
         if ((network != null) && (canvas.getLayer().getChildrenCount() > 0)) {
             zoomToFitPage(false);
         }
@@ -2152,34 +2142,6 @@ public class NetworkPanel extends JPanel {
         this.showTime = showTime;
         timeLabel.setVisible(showTime);
     }
-
-    // /**
-    // * Update clamp toolbar buttons and menu items.
-    // */
-    // public void clampBarChanged() {
-    // for (Iterator j = toggleButton.iterator(); j.hasNext(); ) {
-    // JToggleButton box = (JToggleButton) j.next();
-    // if (box.getAction() instanceof ClampWeightsAction) {
-    // box.setSelected(Network.getClampWeights());
-    // } else if (box.getAction() instanceof ClampNeuronsAction) {
-    // box.setSelected(Network.getClampNeurons());
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * Update clamp toolbar buttons and menu items.
-    // */
-    // public void clampMenuChanged() {
-    // for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
-    // JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
-    // if (box.getAction() instanceof ClampWeightsAction) {
-    // box.setSelected(Network.getClampWeights());
-    // } else if (box.getAction() instanceof ClampNeuronsAction) {
-    // box.setSelected(Network.getClampNeurons());
-    // }
-    // }
-    // }
 
     /**
      * Increases neuron and synapse activation levels.
@@ -2629,15 +2591,6 @@ public class NetworkPanel extends JPanel {
 
         contextMenu.add(new DeleteAction(this));
         contextMenu.addSeparator();
-
-        // contextMenu.add(this.getActionManager().getNeuronCollectionAction());
-        // contextMenu.addSeparator();
-
-        // Workspace workspace = getNetworkPanel().getWorkspace();
-        // if (workspace.getGaugeList().size() > 0) {
-        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-        // contextMenu.addSeparator();
-        // }
 
         contextMenu.add(new SetSynapsePropertiesAction(this));
         return contextMenu;

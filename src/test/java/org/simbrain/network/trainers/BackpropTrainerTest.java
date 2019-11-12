@@ -64,7 +64,7 @@ public class BackpropTrainerTest {
         float str = 0.1f;
         float[][] hidOutStrs = new float[noHid][noOut];
         int row = 0, col = 0;
-        for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getOutputLayer().getNeuronList()) {
             row = 0;
             for (Synapse s : n.getFanIn()) {
                 s.forceSetStrength(str);
@@ -78,7 +78,7 @@ public class BackpropTrainerTest {
         float[][] inpHidStrs = new float[noInp][noHid];
         row = 0;
         col = 0;
-        for (Neuron n : network.getHiddenLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getHiddenLayer().getNeuronList()) {
             row = 0;
             for (Synapse s : n.getFanIn()) {
                 s.forceSetStrength(str);
@@ -92,7 +92,7 @@ public class BackpropTrainerTest {
         float biases = 0;
         float[] outBiases = new float[noOut];
         int jj = 0;
-        for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getOutputLayer().getNeuronList()) {
             ((SigmoidalRule) n.getUpdateRule()).setBias(0.314);
             biases += 0.314;
             outBiases[jj++] = (float) ((SigmoidalRule) n.getUpdateRule()).getBias();
@@ -149,7 +149,7 @@ public class BackpropTrainerTest {
         network.getTrainingSet().setTargetData(new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}});
         //network.getTrainingSet().setTargetData(new double[][]{{0}, {1}, {1}, {0}});
         double str = 0.1;
-        for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getOutputLayer().getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.forceSetStrength(str);
                 str += 0.1;
@@ -157,7 +157,7 @@ public class BackpropTrainerTest {
         }
 
         str = 0.05;
-        for (Neuron n : network.getHiddenLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getHiddenLayer().getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.forceSetStrength(str);
                 str += 0.1;
@@ -165,7 +165,7 @@ public class BackpropTrainerTest {
         }
 
         double biases = 0;
-        for (Neuron n : network.getOutputLayer().getNeuronListUnsafe()) {
+        for (Neuron n : network.getOutputLayer().getNeuronList()) {
             ((SigmoidalRule) n.getUpdateRule()).setBias(0.314);
             biases += 0.314;
         }

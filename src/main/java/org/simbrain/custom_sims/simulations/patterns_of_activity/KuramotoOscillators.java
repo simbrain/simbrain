@@ -131,7 +131,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
 
         // Prediction net
         // predictionRes = net.addNeuronGroup(1,1,  netSize);
-        // HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronListUnsafe(), spacing, spacing);
+        // HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronList(), spacing, spacing);
         // predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
         // predictionRes.setLabel("Predicted States");
         // predictionRes.setLowerBound(-10);

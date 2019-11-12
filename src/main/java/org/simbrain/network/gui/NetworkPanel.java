@@ -947,6 +947,9 @@ public class NetworkPanel extends JPanel {
                 parentNode.addNode(synapseGroupNode);
             }
         }
+
+        synapseGroupNode.getInteractionBox().raiseToTop();
+        synapseGroupNode.raiseToTop();
     }
 
     /**
@@ -1036,15 +1039,6 @@ public class NetworkPanel extends JPanel {
         // are properly positioned
         network.fireNeuronsUpdated(subnet.getFlatNeuronList());
 
-        // Add synapse groups
-        for (SynapseGroup synapseGroup : ((Subnetwork) subnet).getSynapseGroupList()) {
-            addSynapseGroup(synapseGroup);
-        }
-        for (SynapseGroup synapseGroup : ((Subnetwork) subnet).getSynapseGroupList()) {
-            PNode synapseGroupNode = objectNodeMap.get(synapseGroup);
-            nodes.add(synapseGroupNode);
-        }
-
         // Add neuron and synapse group nodes to subnetwork node
         SubnetworkNode subnetNode = createSubnetworkNode(subnet);
         for (PNode node : nodes) {
@@ -1054,6 +1048,17 @@ public class NetworkPanel extends JPanel {
         // Add subnetwork node to canvas
         canvas.getLayer().addChild(subnetNode);
         objectNodeMap.put(subnet, subnetNode);
+
+        // Add synapse groups
+        for (SynapseGroup synapseGroup : ((Subnetwork) subnet).getSynapseGroupList()) {
+            addSynapseGroup(synapseGroup);
+        }
+        for (SynapseGroup synapseGroup : ((Subnetwork) subnet).getSynapseGroupList()) {
+            PNode synapseGroupNode = objectNodeMap.get(synapseGroup);
+            nodes.add(synapseGroupNode);
+            synapseGroupNode.raiseToTop();
+        }
+
 
         subnet.fireLabelUpdated();
 

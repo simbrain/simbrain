@@ -285,8 +285,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             setMarkedForDeletion(true);
         }
         for (Neuron neuron : getNeuronList()) {
-            neuron.setParentGroup(null);
-            neuron.getNetwork().removeNeuron(neuron, false);
+            neuron.getNetwork().removeNeuron(neuron, true);
         }
         if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {

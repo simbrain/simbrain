@@ -22,3 +22,5 @@ gradle/*
 *.iws
 gradlew
 gradlew.bat
+.DS_Store
+

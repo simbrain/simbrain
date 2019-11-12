@@ -26,6 +26,7 @@ import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
 import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
+import org.simbrain.custom_sims.simulations.test.ConvertSim;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public abstract class RegisteredSimulation {
         // REGISTERED_SIMS.add(new SimpleOperant());
         // REGISTERED_SIMS.add(new OperantConditioning());
         REGISTERED_SIMS.add(new OperantWithEnvironment());
+        REGISTERED_SIMS.add(new ConvertSim());
 
         // Alphabetize
         REGISTERED_SIMS

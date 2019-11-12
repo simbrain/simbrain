@@ -18,11 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -58,7 +56,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
      */
     public NeuronCollectionNode(NetworkPanel networkPanel, NeuronCollection nc) {
 
-        super(networkPanel, nc);
+        super(networkPanel);
 
         this.neuronCollection = nc;
 

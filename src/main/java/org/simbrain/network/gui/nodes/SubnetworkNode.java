@@ -112,6 +112,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         interactionBox.setOffset(outline.getFullBounds().getX()
                 + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
+        outline.update(outlinedObjects);
     }
 
     /**

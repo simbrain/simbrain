@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
@@ -29,7 +30,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
 
     private Set<NeuronNode> neuronNodes = new HashSet<>();
 
-    public AbstractNeuronCollectionNode(NetworkPanel networkPanel, Group group) {
+    public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         this.networkPanel = networkPanel;
 
         outlinedObjects = new Outline();
@@ -79,6 +80,15 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
 
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
+        for (NeuronNode neuronNode : neuronNodes) {
+            Neuron neuron = neuronNode.getNeuron();
+            neuron.addPropertyChangeListener(evt -> {
+                if ("delete".equals(evt.getPropertyName())) {
+                    this.neuronNodes.remove(neuronNode);
+                    outlinedObjects.update(this.neuronNodes);
+                }
+            });
+        }
         outlinedObjects.update(neuronNodes);
     }
 

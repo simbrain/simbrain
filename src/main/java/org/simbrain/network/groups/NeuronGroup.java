@@ -633,6 +633,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         }
     }
 
+    @Override
+    public void addNeurons(Collection<Neuron> neurons) {
+        super.addNeurons(neurons);
+        neurons.forEach(n -> n.setParentGroup(this));
+    }
+
 
 
     /**

@@ -30,11 +30,20 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
 
     private Set<NeuronNode> neuronNodes = new HashSet<>();
 
-    public AbstractNeuronCollectionNode(NetworkPanel networkPanel) {
+    public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         this.networkPanel = networkPanel;
 
         outlinedObjects = new Outline();
         addChild(outlinedObjects);
+
+        group.addPropertyChangeListener(evt -> {
+            //System.out.println(evt.getPropertyName());
+            if ("delete".equals(evt.getPropertyName())) {
+                outlinedObjects.update(neuronNodes);
+            } else if ("moved".equals(evt.getPropertyName())) {
+                outlinedObjects.update(neuronNodes);
+            }
+        });
     }
 
     /**
@@ -47,7 +56,6 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
             interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + Outline.ARC_SIZE / 2,
                     outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
         }
-        outlinedObjects.update(neuronNodes);
     }
 
     /**
@@ -77,9 +85,11 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
             neuron.addPropertyChangeListener(evt -> {
                 if ("delete".equals(evt.getPropertyName())) {
                     this.neuronNodes.remove(neuronNode);
+                    outlinedObjects.update(this.neuronNodes);
                 }
             });
         }
+        outlinedObjects.update(neuronNodes);
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {

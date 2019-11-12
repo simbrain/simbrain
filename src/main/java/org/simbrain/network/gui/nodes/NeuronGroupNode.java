@@ -18,9 +18,12 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
@@ -33,6 +36,8 @@ import org.simbrain.util.math.SimbrainMath;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.*;
 
@@ -101,7 +106,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
 
-        super(networkPanel);
+        super(networkPanel, group);
         this.neuronGroup = group;
 
         setInteractionBox(new NeuronGroupInteractionBox(networkPanel));

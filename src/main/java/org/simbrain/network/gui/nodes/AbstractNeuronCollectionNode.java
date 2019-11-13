@@ -24,7 +24,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     private final Outline outlinedObjects;
 
     /**
-     * The interaction box for this neuron colection
+     * The interaction box for this neuron collection
      */
     private InteractionBox interactionBox;
 

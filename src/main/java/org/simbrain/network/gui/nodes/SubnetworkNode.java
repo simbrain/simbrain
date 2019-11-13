@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyChangeListener {
+public class SubnetworkNode extends PPath.Float implements GroupNode {
 
     /**
      * Parent network panel.
@@ -91,15 +91,11 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
 
         setContextMenu(this.getDefaultContextMenu());
 
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-        group.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("delete".equals(evt.getPropertyName())) {
-                    SubnetworkNode.this.removeFromParent();
-                } else if ("label".equals(evt.getPropertyName())) {
-                    SubnetworkNode.this.updateText();
-                }
+        group.addPropertyChangeListener(evt -> {
+            if ("delete".equals(evt.getPropertyName())) {
+                SubnetworkNode.this.removeFromParent();
+            } else if ("label".equals(evt.getPropertyName())) {
+                SubnetworkNode.this.updateText();
             }
         });
     }
@@ -109,10 +105,10 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
      */
     @Override
     public void layoutChildren() {
+        outline.update(outlinedObjects);
         interactionBox.setOffset(outline.getFullBounds().getX()
                 + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
-        outline.update(outlinedObjects);
     }
 
     /**
@@ -132,6 +128,8 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
             ((NeuronGroupNode) node).getNeuronGroup().addPropertyChangeListener(evt -> {
                 if ("delete".equals(evt.getPropertyName())) {
                     outlinedObjects.remove(node);
+                    outline.update(outlinedObjects);
+                } else if ("moved".equals(evt.getPropertyName())) {
                     outline.update(outlinedObjects);
                 }
             });
@@ -176,11 +174,6 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
 
     public Outline getOutline() {
         return outline;
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        outline.update(outlinedObjects);
     }
 
     /**

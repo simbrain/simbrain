@@ -36,8 +36,6 @@ public class NetworkLayoutManager {
         NORTH, SOUTH, EAST, WEST
     }
 
-    ;
-
     // TODO: Make a version of the method below that takes arbitrary lists of
     // neurons as arguments.
 

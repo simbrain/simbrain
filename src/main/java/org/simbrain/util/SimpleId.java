@@ -61,10 +61,4 @@ public class SimpleId {
         return rootName + "_" + index;
     }
 
-    /**
-     * Increment the id index. Can be used if a proposed id is set to an actual id.
-     */
-    public void incrementId() {
-        index++;
-    }
 }

@@ -66,7 +66,7 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
      * Public label of this effector.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this effector",
-            order = 2)
+            initialValueMethod = "getLabel", order = 2)
     private String label = "";
 
     /**
@@ -170,6 +170,10 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
 
         @UserParameter(label="Effector", isObjectType = true)
         private Effector effector = new StraightMovement();
+
+        public EffectorCreator(String proposedLabel) {
+            effector.label = proposedLabel;
+        }
 
         public Effector getEffector() {
             return effector;

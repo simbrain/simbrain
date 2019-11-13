@@ -98,7 +98,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      * Public label of this sensor.
      */
     @UserParameter(label = "Label", description = "Optional string description associated with this sensor",
-            order = 1)
+            initialValueMethod = "getLabel", order = 1)
     private String label = "";
 
     /**
@@ -258,6 +258,10 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
 
         @UserParameter(label="Sensor", isObjectType = true)
         private Sensor sensor = new SmellSensor();
+
+        public SensorCreator(String proposedLabel) {
+            sensor.label = proposedLabel;
+        }
 
         public Sensor getSensor() {
             return sensor;

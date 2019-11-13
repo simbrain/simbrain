@@ -31,7 +31,6 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
@@ -60,7 +59,6 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.subnetworkNodes.*;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.*;
-import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.StandardDialog;
@@ -1438,8 +1436,7 @@ public class NetworkPanel extends JPanel {
         }
         Clipboard.clear();
         placementManager.setPasteDeltaBegin(SimnetUtils.getUpperLeft(getSelectedModels()));
-        List<NetworkModel> deepCopy = CopyPaste.getCopy(this.getNetwork(),getSelectedModels());
-        Clipboard.add(deepCopy);
+        Clipboard.add(getSelectedModels());
     }
 
     /**

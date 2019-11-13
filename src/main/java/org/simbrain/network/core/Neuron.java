@@ -215,6 +215,19 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
+     * Construct a specific type of neuron.
+     *
+     * @param parent     The parent network. Be careful not to set this to root network
+     *                   if the root network is not the parent.
+     * @param updateRule the update method
+     */
+    public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
+        this.parent = parent;
+        setUpdateRule(updateRule);
+        id = parent.getNeuronIdGenerator().getId();
+    }
+
+    /**
      * Construct a neuron with all default values in the specified network.
      * Sometimes used as the basis for a template neuron which will be edited
      * and then copied. Also used in scripts.
@@ -222,8 +235,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param parent The parent network of this neuron.
      */
     public Neuron(final Network parent) {
-        this.parent = parent;
-        setUpdateRule(DEFAULT_UPDATE_RULE.deepCopy());
+        this(parent, DEFAULT_UPDATE_RULE.deepCopy());
     }
 
     /**
@@ -236,19 +248,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final String updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
+        id = parent.getNeuronIdGenerator().getId();
     }
 
-    /**
-     * Construct a specific type of neuron.
-     *
-     * @param parent     The parent network. Be careful not to set this to root network
-     *                   if the root network is not the parent.
-     * @param updateRule the update method
-     */
-    public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
-        this.parent = parent;
-        setUpdateRule(updateRule);
-    }
 
     /**
      * Copy constructor.
@@ -259,6 +261,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
+        setId(parent.getNeuronIdGenerator().getId());
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());

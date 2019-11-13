@@ -523,7 +523,6 @@ public class Network {
      */
     public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);
-        neuron.setId(getNeuronIdGenerator().getId());
         updatePriorityList();
         fireNeuronAdded(neuron);
     }
@@ -533,7 +532,6 @@ public class Network {
      */
     public void addNeuronArray(NeuronArray na) {
         naList.add(na);
-        arrayIdGenerator.incrementId();
         changeSupport.firePropertyChange("neuronArrayAdded", null, na);
     }
 
@@ -1564,7 +1562,7 @@ public class Network {
                 addText((NetworkTextObject) object);
             } else if (object instanceof NeuronGroup) {
                 addGroup((NeuronGroup) object);
-            }  else if (object instanceof NeuronArray) {
+            } else if (object instanceof NeuronArray) {
                 addNeuronArray((NeuronArray) object);
             }
         }

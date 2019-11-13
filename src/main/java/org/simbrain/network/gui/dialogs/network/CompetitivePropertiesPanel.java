@@ -39,6 +39,7 @@ import java.awt.event.ActionListener;
 @SuppressWarnings("serial")
 public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements ActionListener{
 
+    // TODO: This could be redone using annotated property editor, but may not be worth it...
     /**
      * Default number of competitive neurons.
      */
@@ -126,8 +127,6 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
     public static enum CompetitivePropsPanelType {
         CREATE_GROUP, CREATE_NETWORK, EDIT_GROUP
     }
-
-    ;
 
     /**
      * The type of this panel.
@@ -245,11 +244,12 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
         // For creation panels use an "empty" competitive network to harvest
         // default values
         if (panelType == CompetitivePropsPanelType.CREATE_GROUP) {
-            competitive = new CompetitiveGroup(null, 1);
+            // TODO: This creation pattern isn't working...
+            competitive = new CompetitiveGroup(networkPanel.getNetwork(), 1);
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
             fillCompetitiveGroupFieldValues();
         } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
-            competitive = new CompetitiveNetwork(null, 1, 1,
+            competitive = new CompetitiveNetwork(networkPanel.getNetwork(), 1, 1,
                     networkPanel.getPlacementManager().getLocation());
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);

@@ -138,7 +138,7 @@ public class DataPanel extends JPanel {
         // Set up column headings
         List<String> colHeaders = new ArrayList<String>();
         for (Neuron neuron : neurons) {
-            colHeaders.add(new String(neuron.getId()));
+            colHeaders.add(neuron.getId());
         }
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();

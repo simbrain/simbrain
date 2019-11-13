@@ -41,7 +41,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Id of this array.
      */
     @UserParameter(label = "ID", description = "Id of this array", order = -1, editable = false)
-    private String id;
+    private final String id;
 
     /**
      * Number of columns in the under laying ND4J Array.
@@ -97,13 +97,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
-     * Create a neuron array.
+     * Construct a neuron array.
      *
      * @param net parent net
      * @param numNodes number of nodes
      */
-    public NeuronArray(Network net, int numNodes) {
+    public NeuronArray(Network net, int numNodes, String id) {
         parent = net;
+        this.id = id;
         this.numNodes = numNodes;
         randomize();
     }
@@ -116,8 +117,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * @return the deep copy
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
-        copy.setLabel(newParent.getArrayIdGenerator().getProposedId());
+        NeuronArray copy = new NeuronArray(newParent,
+                orig.getNumNodes(), newParent.getArrayIdGenerator().getId());
+        copy.setLabel(copy.getId());
         copy.setCenterX(orig.getCenterX());
         copy.setCenterY(orig.getCenterY());
         copy.setValues(orig.getValues());
@@ -316,7 +318,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray na = new NeuronArray(network, numNodes);
+            NeuronArray na = new NeuronArray(network, numNodes,
+                    network.getArrayIdGenerator().getId());
             na.label = label;
             return na;
         }

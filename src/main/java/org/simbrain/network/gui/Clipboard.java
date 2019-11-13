@@ -20,7 +20,6 @@ package org.simbrain.network.gui;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -37,10 +36,9 @@ import java.util.stream.Collectors;
 public class Clipboard {
 
     // To add new copy-pastable items, must update:
-    // 1) all elseifs here,
-    // 2) CopyPaste.getCopy()
-    // 3) Network.addObjects
-    // 4) NetworkPanel.getSelectedModels()
+    // 1) SimnetUtils.getCopy()
+    // 2) Network.addObjects
+    // 3) NetworkPanel.getSelectedModels()
 
     /**
      * Static list of cut or copied objects.
@@ -82,7 +80,7 @@ public class Clipboard {
         }
 
         // Create a copy of the clipboard objects.
-        List<NetworkModel> copy = CopyPaste.getCopy(net.getNetwork(), copiedObjects);
+        List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
         Point2D currentPosition = SimnetUtils.getUpperLeft(copy);
         Point2D targetLocation = net.getPlacementManager().getLocation();
         SimnetUtils.translate(copy, SimbrainMath.subtract(targetLocation, currentPosition));

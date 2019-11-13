@@ -21,8 +21,11 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.NeuronArray;
+import org.simbrain.network.groups.NeuronGroup;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -303,6 +306,81 @@ public class SimnetUtils {
         for (List<Neuron> layer : layers) {
             System.out.println("Layer " + layers.indexOf(layer) + " has " + layer.size() + " elements");
         }
+    }
+
+    /**
+     * Creates a deep copy of a list of network model elements: neurons, synapses,
+     * and groups.  This is called first when a copy happens, then again when paste happens
+     * (Need to be able to have a copy in case the copied object is deleted.   Needs
+     * to be copied again on paste in case the parent network changes).
+     *
+     * @param newParent parent network for these objects. May be a root network
+     *                  or a subnetwork.
+     * @param items     the list of items to copy.
+     * @return the list of copied items.
+     */
+    public static List<NetworkModel> getCopy(final Network newParent, final List<NetworkModel> items) {
+        List<NetworkModel> ret = new ArrayList<>();
+        // Match new to old neurons for synapse adding
+        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
+        ArrayList<Synapse> synapses = new ArrayList<Synapse>();
+
+        for (Object item : items) {
+            if (item instanceof Neuron) {
+                Neuron oldNeuron = ((Neuron) item);
+                Neuron newNeuron = new Neuron(newParent, oldNeuron);
+                ret.add(newNeuron);
+                neuronMappings.put(oldNeuron, newNeuron);
+            } else if (item instanceof Synapse) {
+                if (!isStranded((Synapse) item, items)) {
+                    synapses.add((Synapse) item);
+                }
+            } else if (item instanceof NetworkTextObject) {
+                NetworkTextObject text = ((NetworkTextObject) item);
+                NetworkTextObject newText = new NetworkTextObject(newParent, text);
+                ret.add(newText);
+            } else if (item instanceof NeuronGroup) {
+                ret.add(((NeuronGroup) item).deepCopy(newParent));
+            } else if (item instanceof NeuronArray) {
+                LocatableModel copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
+                ret.add(copy);
+            }
+        }
+
+        // Copy synapses
+        for (Synapse synapse : synapses) {
+            Synapse newSynapse = new Synapse(newParent, neuronMappings.get(synapse.getSource()), neuronMappings.get(synapse.getTarget()), synapse.getLearningRule().deepCopy(), synapse);
+            ret.add(newSynapse);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Returns true if this synapse is not connected to two neurons (i.e. is
+     * "stranded"), false otherwise.
+     *
+     * @param synapse  synapse to check
+     * @param allItems includes neurons to check
+     * @return true if this synapse is stranded, false otherwise
+     */
+    public static boolean isStranded(final Synapse synapse, final List<?> allItems) {
+
+        // The list of checked neurons should include neurons in the list
+        // as well as all neurons contained in networks in the list
+        ArrayList<Neuron> check = new ArrayList<Neuron>();
+        for (Object object : allItems) {
+            if (object instanceof Neuron) {
+                check.add((Neuron) object);
+            } else if (object instanceof Network) {
+                check.addAll(((Network) object).getFlatNeuronList());
+            }
+        }
+
+        if (check.contains(synapse.getSource()) && (check.contains(synapse.getTarget()))) {
+            return false;
+        }
+        return true;
     }
 
 }

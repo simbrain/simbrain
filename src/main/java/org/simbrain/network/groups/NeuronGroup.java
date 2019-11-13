@@ -258,10 +258,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
             newNeurons.add(new Neuron(network, neuron));
         }
         addNeurons(newNeurons);
-        this.setUseCustomLabel(toCopy.isUseCustomLabel());
-        if(isUseCustomLabel()) {
-            this.setLabel(toCopy.getLabel());
-        }
         this.setLayout(toCopy.getLayout());
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();
@@ -1060,6 +1056,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
         public NeuronGroupCreator(Network network) {
             super(network);
+            setLabel(network.getGroupIdGenerator().getProposedId());
         }
 
         /**
@@ -1068,14 +1065,13 @@ public class NeuronGroup extends AbstractNeuronCollection {
          * @return the new neuron group
          */
         public NeuronGroup create() {
-            NeuronGroup ng = deepCopy(this.getParentNetwork());
             List<Neuron> neurons = new ArrayList<>();
             for(int i = 0; i < numNeurons; i++) {
                 neurons.add(new Neuron(this.getParentNetwork()));
             }
-            ng.addNeurons(neurons);
-            ng.applyLayout();
-            return ng;
+            addNeurons(neurons);
+            applyLayout();
+            return this;
         }
     }
 

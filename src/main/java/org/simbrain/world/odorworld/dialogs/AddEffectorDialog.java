@@ -18,6 +18,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 import javax.swing.*;
 
@@ -37,12 +38,12 @@ public class AddEffectorDialog extends StandardDialog {
     /**
      * The editable object APE is going to edit.
      */
-    private Effector.EffectorCreator effectorCreator = new Effector.EffectorCreator();
+    private Effector.EffectorCreator effectorCreator;
 
     /**
      * Main editing panel.
      */
-    private AnnotatedPropertyEditor effectorCreatorPanel = new AnnotatedPropertyEditor(effectorCreator);
+    private AnnotatedPropertyEditor effectorCreatorPanel;
 
     /**
      * Main dialog box.
@@ -66,6 +67,9 @@ public class AddEffectorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/effectors.html");
         addButton(new JButton(helpAction));
+        effectorCreator = new Effector.EffectorCreator(
+                entity.getParentWorld().getEffectorIDGenerator().getProposedId());
+        effectorCreatorPanel = new AnnotatedPropertyEditor(effectorCreator);
         mainPanel.add(effectorCreatorPanel);
         setContentPane(mainPanel);
     }

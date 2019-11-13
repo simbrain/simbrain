@@ -50,7 +50,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * Name of this group. Null strings lead to default labeling conventions.
      */
     @UserParameter(label = "Label", description = "Group label", useSetter = true,
-        order = 10)
+            order = 10)
     private String label = "";
 
     /**
@@ -115,11 +115,6 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public abstract String getUpdateMethodDescription();
 
-    /**
-     * If true, when the group is added to the network its id will not be used as its label.
-     */
-    private boolean useCustomLabel = false;
-
     @Override
     public String toString() {
         if (label != null) {
@@ -150,11 +145,6 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
-        if (label == null  || label.isEmpty()) {
-            useCustomLabel = false;
-        } else {
-            useCustomLabel = true;
-        }
         String oldLabel = this.label;
         this.label = label;
         changeSupport.firePropertyChange("label", oldLabel , label);
@@ -219,9 +209,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public void initializeId() {
         id = getParentNetwork().getGroupIdGenerator().getId();
-        if (!useCustomLabel) {
-            label = id.replaceAll("_", " ");
-        }
+        label = id.replaceAll("_", " ");
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -247,14 +235,6 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      */
     public void postUnmarshallingInit() {
         changeSupport = new PropertyChangeSupport(this);
-    }
-
-    public void setUseCustomLabel(boolean useCustomLabel) {
-        this.useCustomLabel = useCustomLabel;
-    }
-
-    public boolean isUseCustomLabel() {
-        return useCustomLabel;
     }
 
 }

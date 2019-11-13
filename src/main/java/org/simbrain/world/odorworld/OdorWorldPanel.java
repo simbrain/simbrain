@@ -171,6 +171,9 @@ public class OdorWorldPanel extends JPanel {
      */
     public OdorWorldPanel(OdorWorldComponent component, OdorWorld world) {
 
+        this.component = component;
+        this.world = world;
+
         canvas = new OdorWorldCanvas();
         ToolTipManager.sharedInstance().registerComponent(canvas);
 
@@ -283,9 +286,6 @@ public class OdorWorldPanel extends JPanel {
                 canvas.getLayer().addChild(newImage);
             }
         });
-
-        this.component = component;
-        this.world = world;
 
         movementTimer = new Timer();
         movementTimer.schedule(new TimerTask() {

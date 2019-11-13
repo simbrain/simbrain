@@ -37,12 +37,12 @@ public class AddSensorDialog extends StandardDialog {
     /**
      * The editable object APE is going to edit.
      */
-    private Sensor.SensorCreator sensorCreator = new Sensor.SensorCreator();
+    private Sensor.SensorCreator sensorCreator;
 
     /**
      * Main editing panel.
      */
-    private AnnotatedPropertyEditor sensorCreatorPanel = new AnnotatedPropertyEditor(sensorCreator);
+    private AnnotatedPropertyEditor sensorCreatorPanel;
 
     /**
      * Main dialog box.
@@ -66,6 +66,9 @@ public class AddSensorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
+        sensorCreator = new Sensor.SensorCreator(
+                entity.getParentWorld().getSensorIDGenerator().getProposedId());
+        sensorCreatorPanel = new AnnotatedPropertyEditor(sensorCreator);
         mainPanel.add(sensorCreatorPanel);
         setContentPane(mainPanel);
     }

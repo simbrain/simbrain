@@ -24,8 +24,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.pmw.tinylog.Logger;
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.core.Neuron;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +34,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * <b>Utils</b>. Utility class for simbrain package.
@@ -824,45 +821,5 @@ public class Utils {
         return newArray;
     }
 
-    /**
-     * Returns the min X position of these model elements
-     */
-    public static double getMinX(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterX).min(Double::compareTo).get();
-    }
 
-    /**
-     * Returns the maximum X position of these model elements
-     */
-    public static double getMaxX(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterX).max(Double::compareTo).get();
-    }
-
-    /**
-     * Returns the min Y position of these model elements
-     */
-    public static double getMinY(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterY).min(Double::compareTo).get();
-    }
-
-    /**
-     * Returns the max Y position of these model elements
-     */
-    public static double getMaxY(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterY).max(Double::compareTo).get();
-    }
-
-    /**
-     * Returns the height (max y - min y) of a list of objects
-     */
-    public static double getHeight(List<? extends LocatableModel> models) {
-        return getMaxY(models) - getMinY(models);
-    }
-
-    /**
-     * Returns the height (max x - min x) of a list of objects
-     */
-    public static double getWidth(List<? extends LocatableModel> models) {
-        return getMaxX(models) - getMinX(models);
-    }
 }

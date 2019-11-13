@@ -3,16 +3,14 @@ package org.simbrain.network.groups;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -442,7 +440,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     @Override
     public Point2D getAttachmentPoint() {
-        return new Point2D.Double(Utils.getMinX(neuronList), Utils.getMaxX(neuronList));
+        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMaxX(neuronList));
     }
 
     @Override
@@ -460,7 +458,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
      * @return position upper left position of group
      */
     public Point2D.Double getPosition() {
-        return new Point2D.Double(Utils.getMinX(neuronList), Utils.getMaxX(neuronList));
+        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMaxX(neuronList));
     }
 
     /**
@@ -698,30 +696,30 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     }
 
     /**
-     * See {@link Utils#getMinX(List)}
+     * See {@link SimnetUtils#getMinX(List)}
      */
     public double getMinX() {
-        return Utils.getMinX(neuronList);
+        return SimnetUtils.getMinX(neuronList);
     }
 
     /**
-     * See {@link Utils#getMaxX(List)}
+     * See {@link SimnetUtils#getMaxX(List)}
      */
     public double getMaxX() {
-        return Utils.getMaxX(neuronList);
+        return SimnetUtils.getMaxX(neuronList);
     }
 
     /**
-     * See {@link Utils#getMinY(List)}
+     * See {@link SimnetUtils#getMinY(List)}
      */
     public double getMinY() {
-        return Utils.getMinY(neuronList);
+        return SimnetUtils.getMinY(neuronList);
     }
 
     /**
-     * See {@link Utils#getMaxY(List)}
+     * See {@link SimnetUtils#getMaxY(List)}
      */
     public double getMaxY() {
-        return Utils.getMaxY(neuronList);
+        return SimnetUtils.getMaxY(neuronList);
     }
 }

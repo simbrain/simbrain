@@ -87,37 +87,21 @@ public class CouplingManager {
      *
      * @param producer producer part of the coupling
      * @param consumer consumer part of the coupling
-     * @param <T> type of the coupling
+     * @param <T>      type of the coupling
      * @return the newly creating coupling
-     * @throws MismatchedAttributesException exception if type of producer and
-     *  consumer don't match
      */
-    private <T> Coupling<T> createCoupling(
+    public <T> Coupling<T> createCoupling(
             Producer<T> producer,
-            Consumer<T> consumer)
-        throws MismatchedAttributesException {
-        Coupling<T> coupling = Coupling.create(producer, consumer);
-        addCoupling(coupling);
-        return coupling;
-    }
-
-    //TODO: Consider removing this. It seems to just be a convenience method to avoid dealing with exceptions.
-    /**
-     * Try to create a coupling from a producer and consumer of the same type, but
-     * do nothing if the types do not match and return null.
-     */
-    @SuppressWarnings("unchecked")
-    public Coupling tryCoupling(Producer producer, Consumer consumer) {
-        if (producer.getType() == consumer.getType()) {
-            try {
-                return createCoupling(producer, consumer);
-            } catch (MismatchedAttributesException ex) {
-                // Should never happen
-                throw new AssertionError(ex);
-            }
-        } else {
+            Consumer<T> consumer) {
+        Coupling<T> coupling = null;
+        try {
+            coupling = Coupling.create(producer, consumer);
+            addCoupling(coupling);
+        } catch (MismatchedAttributesException e) {
+            e.printStackTrace();
             return null;
         }
+        return coupling;
     }
 
     /**
@@ -143,8 +127,6 @@ public class CouplingManager {
      *
      * @param producers A collection of producers to couple
      * @param consumers A collection of consumers to couple
-     * @throws MismatchedAttributesException An exception indicating that a pair of attributes did not match
-     *                                       types. This will be thrown for the first such pair encountered.
      */
     public void createOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) throws MismatchedAttributesException {
         Iterator<Consumer<?>> consumerIterator = consumers.iterator();
@@ -152,24 +134,6 @@ public class CouplingManager {
             if (consumerIterator.hasNext()) {
                 Consumer consumer = consumerIterator.next();
                 createCoupling(producer, consumer);
-            } else {
-                break;
-            }
-        }
-    }
-
-    /**
-     * Try to create a coupling from each attribute in the smaller collection, but ignore any mismatched types.
-     *
-     * @param producers A collection of producers to couple
-     * @param consumers A collection of consumers to couple
-     */
-    public void tryOneToOneCouplings(Collection<Producer<?>> producers, Collection<Consumer<?>> consumers) {
-        Iterator<Consumer<?>> consumerIterator = consumers.iterator();
-        for (Producer producer : producers) {
-            if (consumerIterator.hasNext()) {
-                Consumer consumer = consumerIterator.next();
-                tryCoupling(producer, consumer);
             } else {
                 break;
             }

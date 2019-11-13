@@ -272,7 +272,7 @@ public class Simulation {
      * to the consumer if possible, ignores mismatch exceptions for simplicity.
      */
     public Coupling tryCoupling(Producer producer, Consumer consumer) {
-        return workspace.getCouplingManager().tryCoupling(producer, consumer);
+        return workspace.getCouplingManager().createCoupling(producer, consumer);
     }
 
     /**

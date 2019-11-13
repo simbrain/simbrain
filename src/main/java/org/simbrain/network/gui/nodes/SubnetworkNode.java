@@ -122,6 +122,19 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         outlinedObjects.add(node);
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
+            ((SynapseGroupNode) node).getSynapseGroup().addPropertyChangeListener(evt -> {
+                if ("delete".equals(evt.getPropertyName())) {
+                    outlinedObjects.remove(node);
+                    outline.update(outlinedObjects);
+                }
+            });
+        } else if (node instanceof NeuronGroupNode) {
+            ((NeuronGroupNode) node).getNeuronGroup().addPropertyChangeListener(evt -> {
+                if ("delete".equals(evt.getPropertyName())) {
+                    outlinedObjects.remove(node);
+                    outline.update(outlinedObjects);
+                }
+            });
         }
     }
 
@@ -168,20 +181,6 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         outline.update(outlinedObjects);
-        updateSynapseNodePositions();
-    }
-
-    /**
-     * Call update synapse node positions on all constituent neuron group nodes,
-     * which does the same on all constituent neuron nodes. Ensures synapse
-     * nodes are updated properly when this is moved.
-     */
-    public void updateSynapseNodePositions() {
-        for (Object node : outline.getChildrenReference()) {
-            if (node instanceof NeuronGroupNode) {
-                ((NeuronGroupNode) node).updateSynapseNodePositions();
-            }
-        }
     }
 
     /**

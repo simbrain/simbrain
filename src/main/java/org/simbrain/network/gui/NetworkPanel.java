@@ -518,22 +518,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Update visible state of group nodes.
-     *
-     * @param groups the group to update
-     */
-    private void updateGroupNodes(Collection<Group> groups) {
-        // System.out.println("In update group node. Updating group " + group);
-        for (Group group : groups) {
-            PNode groupNode = objectNodeMap.get(group);
-            if (groupNode != null) {
-                ((GroupNode) groupNode).updateConstituentNodes();
-            }
-        }
-        updateComplete.decrementAndGet();
-    }
-
-    /**
      * Update visible state of all synapse nodes. This is not used much internally, because it is preferred to updated
      * the specific nodes that need to be updated. It is here mainly for convenience (e.g. for use in scripts).
      */

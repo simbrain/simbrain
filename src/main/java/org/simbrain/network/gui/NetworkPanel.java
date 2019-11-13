@@ -1387,6 +1387,8 @@ public class NetworkPanel extends JPanel {
                     network.removeGroup(((SynapseGroupNode) selectedNode.getParent()).getSynapseGroup());
                 } else if (selectedNode.getParent() instanceof SubnetworkNode) {
                     network.removeGroup(((SubnetworkNode) selectedNode.getParent()).getSubnetwork());
+                } else if (selectedNode.getParent() instanceof NeuronCollectionNode) {
+                    network.removeGroup(((NeuronCollectionNode) selectedNode.getParent()).getNeuronCollection());
                 }
             }
         }

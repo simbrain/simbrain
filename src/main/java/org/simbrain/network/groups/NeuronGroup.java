@@ -211,7 +211,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         for (int i = 0; i < numNeurons; i++) {
             Neuron newNeuron = new Neuron(net);
             newNeurons.add(newNeuron);
-            addNeuron(newNeuron, false);
         }
         // Very slow to add to a copy on write array list so do it this way
         addNeurons(newNeurons);
@@ -291,9 +290,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
+
         stopRecording();
         removeAllNeurons();
-        Runtime.getRuntime().gc();
         changeSupport.firePropertyChange("delete", this, null);
     }
 

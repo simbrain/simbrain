@@ -138,10 +138,6 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
 
     }
 
-    /**
-     * @param pt1
-     * @param pt2
-     */
     public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
         if (getNetworkPanel().isRunning()) {
             return;
@@ -166,10 +162,6 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         halt.getAndSet(false);
     }
 
-    /**
-     * @param src
-     * @param tar
-     */
     public void layout(Point2D src, Point2D tar) {
         if (networkPanel.isRunning()) {
             return;
@@ -189,11 +181,6 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
 
     }
 
-    /**
-     * @param src
-     * @param tar
-     * @return
-     */
     public Point2D midpoint(Point2D src, Point2D tar) {
         Point2D.Float bez = arrow.getTemplate().getBez1(src, tar, startPort);
         Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
@@ -420,30 +407,18 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         return group;
     }
 
-    /**
-     * @return the sourceNode
-     */
     public NeuronGroupNode getSourceNode() {
         return sourceNode;
     }
 
-    /**
-     * @return the targetNode
-     */
     public NeuronGroupNode getTargetNode() {
         return targetNode;
     }
 
-    /**
-     * @return the source
-     */
     public NeuronGroup getSource() {
         return source;
     }
 
-    /**
-     * @return the target
-     */
     public NeuronGroup getTarget() {
         return target;
     }

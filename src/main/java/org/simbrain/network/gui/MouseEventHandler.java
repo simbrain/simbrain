@@ -151,6 +151,9 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             }
 
             SwingUtilities.invokeLater(() -> {
+                if (marqueeStartPosition == null) {
+                    return;
+                }
                 // Create a new selection marquee at the mouse position
                 marquee = new SelectionMarquee((float) marqueeStartPosition.getX(), (float) marqueeStartPosition.getY());
 

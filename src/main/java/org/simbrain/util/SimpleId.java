@@ -18,6 +18,8 @@
  */
 package org.simbrain.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * <b>SimpleId</b> provides an id based on a base name and an integer index.
  */
@@ -31,7 +33,7 @@ public class SimpleId {
     /**
      * The starting index.
      */
-    private int index;
+    private AtomicInteger index;
 
     /**
      * Construct simpleId.
@@ -41,7 +43,7 @@ public class SimpleId {
      */
     public SimpleId(final String rootName, final int index) {
         this.rootName = rootName;
-        this.index = index;
+        this.index = new AtomicInteger(index);
     }
 
     /**
@@ -50,7 +52,7 @@ public class SimpleId {
      * @return a unique identification
      */
     public String getId() {
-        String id = rootName + "_" + index++;
+        String id = rootName + "_" + index.getAndIncrement();
         return id;
     }
 

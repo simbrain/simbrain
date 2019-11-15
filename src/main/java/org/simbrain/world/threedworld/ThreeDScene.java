@@ -15,7 +15,9 @@ import org.simbrain.world.threedworld.engine.ThreeDEngine;
  * ThreeDScene encapsulate scene loading and unloading behavior from the ThreeDWorld class.
  */
 public class ThreeDScene {
+
     private String name;
+
     private transient Node node;
 
     /**

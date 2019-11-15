@@ -11,6 +11,7 @@ import java.io.File;
  * ModelEditor wraps the properties of a ModelEntity in an Editor form.
  */
 public class ModelEditor extends EntityEditor {
+
     private ModelEntity model;
     private JComboBox<String> fileNameCombo = new JComboBox<String>();
     private JFileChooser fileChooser = new JFileChooser();

@@ -9,6 +9,7 @@ import org.simbrain.workspace.AttributeContainer;
  * @author Tim Shea
  */
 public interface Sensor extends EditableObject, AttributeContainer {
+
     String getName();
 
     Agent getAgent();

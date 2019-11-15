@@ -25,25 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreeDWorld implements AppState {
 
-    /**
-     * Listener receives notifications when a ThreeDWorld is initialized or updated.
-     */
-    public interface Listener {
-        /**
-         * @param world The world which has been initialized.
-         */
-        void onWorldInitialize(ThreeDWorld world);
-
-        /**
-         * @param world The world which has been updated.
-         */
-        void onWorldUpdate(ThreeDWorld world);
-
-        /**
-         * @param world The world which is closing.
-         */
-        void onWorldClosing(ThreeDWorld world);
-    }
+    // TODO: Add javadocs with Tim
 
     private transient boolean initialized;
     private ThreeDEngine engine;
@@ -69,9 +51,9 @@ public class ThreeDWorld implements AppState {
         selectionController = new SelectionController(this);
         agentController = new AgentController(this);
         clipboardController = new ClipboardController(this);
-        listeners = new ArrayList<Listener>();
+        listeners = new ArrayList<>();
         scene = new ThreeDScene();
-        entities = new ArrayList<Entity>();
+        entities = new ArrayList<>();
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         idCounter = new AtomicInteger();
@@ -269,6 +251,26 @@ public class ThreeDWorld implements AppState {
      */
     public String getId() {
         return null;
+    }
+
+    /**
+     * Listener receives notifications when a ThreeDWorld is initialized or updated.
+     */
+    public interface Listener {
+        /**
+         * @param world The world which has been initialized.
+         */
+        void onWorldInitialize(ThreeDWorld world);
+
+        /**
+         * @param world The world which has been updated.
+         */
+        void onWorldUpdate(ThreeDWorld world);
+
+        /**
+         * @param world The world which is closing.
+         */
+        void onWorldClosing(ThreeDWorld world);
     }
 
 }

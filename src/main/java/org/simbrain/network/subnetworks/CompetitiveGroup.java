@@ -38,41 +38,50 @@ public class CompetitiveGroup extends NeuronGroup {
 
     // TODO: Add "recall" function as with SOM
 
+    public static final double DEFAULT_LEARNING_RATE  = .1;
+    public static final double DEFAULT_WIN_VALUE  = 1;
+    public static final double DEFAULT_LOSE_VALUE  = 0;
+    public static final boolean DEFAULT_NORM_INPUTS  = true;
+    public static final boolean DEFAULT_USE_LEAKY  = false;
+    public static final double DEFAULT_LEAKY_RATE  = DEFAULT_LEARNING_RATE/4;
+    public static final double DEFAULT_DECAY_PERCENT  = .0008;
+    public static final UpdateMethod DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER;
+
     /**
      * Learning rate.
      */
-    private double learningRate = .1;
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Winner value.
      */
-    private double winValue = 1;
+    private double winValue = DEFAULT_WIN_VALUE;
 
     /**
      * loser value.
      */
-    private double loseValue = 0;
+    private double loseValue = DEFAULT_LOSE_VALUE;
 
     /**
      * Normalize inputs boolean.
      */
-    private boolean normalizeInputs = true;
+    private boolean normalizeInputs = DEFAULT_NORM_INPUTS;
 
     /**
      * Use leaky learning boolean.
      */
-    private boolean useLeakyLearning = false;
+    private boolean useLeakyLearning = DEFAULT_USE_LEAKY;
 
     /**
      * Leaky learning rate .
      */
-    private double leakyLearningRate = learningRate / 4;
+    private double leakyLearningRate = DEFAULT_LEAKY_RATE;
 
     /**
      * Percentage by which to decay synapses on each update for for
      * Alvarez-Squire update.
      */
-    private double synpaseDecayPercent = .0008;
+    private double synpaseDecayPercent = DEFAULT_DECAY_PERCENT;
 
     /**
      * Max, value and activation values.
@@ -87,7 +96,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Current update method.
      */
-    private UpdateMethod updateMethod = UpdateMethod.RUMM_ZIPSER;
+    private UpdateMethod updateMethod = DEFAULT_UPDATE_METHOD;
 
     /**
      * Specific implementation of competitive learning.

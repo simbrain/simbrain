@@ -124,7 +124,7 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
      * Whether the panel is for creating a competitive group, network, or
      * editing a competitive group.
      */
-    public static enum CompetitivePropsPanelType {
+    public enum CompetitivePropsPanelType {
         CREATE_GROUP, CREATE_NETWORK, EDIT_GROUP
     }
 
@@ -144,7 +144,6 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
      *                                  constructor as the panelType parameter
      */
     public static CompetitivePropertiesPanel createCompetitivePropertiesPanel(final NetworkPanel np, final CompetitivePropsPanelType panelType) throws IllegalArgumentException {
-
         CompetitivePropertiesPanel cpp = new CompetitivePropertiesPanel(np, panelType);
         cpp.addListeners();
         return cpp;
@@ -241,55 +240,49 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
 
     @Override
     public void fillFieldValues() {
-        // For creation panels use an "empty" competitive network to harvest
-        // default values
+
         if (panelType == CompetitivePropsPanelType.CREATE_GROUP) {
-            // TODO: This creation pattern isn't working...
-            competitive = new CompetitiveGroup(networkPanel.getNetwork(), 1);
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
-            fillCompetitiveGroupFieldValues();
+            fillDefaultValues();
         } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
-            competitive = new CompetitiveNetwork(networkPanel.getNetwork(), 1, 1,
-                    networkPanel.getPlacementManager().getLocation());
             tfNumCompetitiveNeurons.setText("" + DEFAULT_NUM_COMPETITIVE_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);
-            fillCompetitiveNetworkFieldValues();
+            fillDefaultValues();
         } else if (panelType == CompetitivePropsPanelType.EDIT_GROUP) {
-            fillCompetitiveGroupFieldValues();
+            fillExistingalues();
         }
     }
 
     /**
-     * Fill field values for a Competitive Group.
+     * Fill field values for a new Competitive Group.
      */
-    private void fillCompetitiveGroupFieldValues() {
-        updateMethod.setSelectedItem(((CompetitiveGroup) competitive).getUpdateMethod());
-        tfEpsilon.setText(Double.toString(((CompetitiveGroup) competitive).getLearningRate()));
-        tfLoserValue.setText(Double.toString(((CompetitiveGroup) competitive).getLoseValue()));
-        tfWinnerValue.setText(Double.toString(((CompetitiveGroup) competitive).getWinValue()));
-        tfLeakyEpsilon.setText(Double.toString(((CompetitiveGroup) competitive).getLeakyLearningRate()));
-        tfSynpaseDecayPercent.setText(Double.toString(((CompetitiveGroup) competitive).getSynpaseDecayPercent()));
-        cbUseLeakyLearning.setSelected(((CompetitiveGroup) competitive).getUseLeakyLearning());
-        cbNormalizeInputs.setSelected(((CompetitiveGroup) competitive).getNormalizeInputs());
+    private void fillDefaultValues() {
+        updateMethod.setSelectedItem(CompetitiveGroup.DEFAULT_UPDATE_METHOD);
+        tfEpsilon.setText("" + CompetitiveGroup.DEFAULT_LEARNING_RATE);
+        tfLoserValue.setText("" + CompetitiveGroup.DEFAULT_LOSE_VALUE);
+        tfWinnerValue.setText("" + CompetitiveGroup.DEFAULT_WIN_VALUE);
+        tfLeakyEpsilon.setText("" + CompetitiveGroup.DEFAULT_LEAKY_RATE);
+        tfSynpaseDecayPercent.setText("" + CompetitiveGroup.DEFAULT_DECAY_PERCENT);
+        cbUseLeakyLearning.setSelected(CompetitiveGroup.DEFAULT_USE_LEAKY);
+        cbNormalizeInputs.setSelected(CompetitiveGroup.DEFAULT_NORM_INPUTS);
     }
 
     /**
-     * Fill field values for a Competitive Network.
+     * Fill field values for a existing Competitive group
      */
-    private void fillCompetitiveNetworkFieldValues() {
-        updateMethod.setSelectedItem(((CompetitiveNetwork) competitive).getCompetitive().getUpdateMethod());
-        tfEpsilon.setText(Double.toString(((CompetitiveNetwork) competitive).getCompetitive().getLearningRate()));
-        tfLoserValue.setText(Double.toString(((CompetitiveNetwork) competitive).getCompetitive().getLoseValue()));
-        tfWinnerValue.setText(Double.toString(((CompetitiveNetwork) competitive).getCompetitive().getWinValue()));
-        tfLeakyEpsilon.setText(Double.toString(((CompetitiveNetwork) competitive).getCompetitive().getLeakyLearningRate()));
-        tfSynpaseDecayPercent.setText(Double.toString(((CompetitiveNetwork) competitive).getCompetitive().getSynpaseDecayPercent()));
-        cbUseLeakyLearning.setSelected(((CompetitiveNetwork) competitive).getCompetitive().getUseLeakyLearning());
-        cbNormalizeInputs.setSelected(((CompetitiveNetwork) competitive).getCompetitive().getNormalizeInputs());
+    private void fillExistingalues() {
+        CompetitiveGroup prototype = competitive instanceof CompetitiveNetwork ? ((CompetitiveNetwork) competitive).getCompetitive() :
+                (CompetitiveGroup) competitive;
+        updateMethod.setSelectedItem(prototype.getUpdateMethod());
+        tfEpsilon.setText(Double.toString(prototype.getLearningRate()));
+        tfLoserValue.setText(Double.toString(prototype.getLoseValue()));
+        tfWinnerValue.setText(Double.toString(prototype.getWinValue()));
+        tfLeakyEpsilon.setText(Double.toString(prototype.getLeakyLearningRate()));
+        tfSynpaseDecayPercent.setText(Double.toString(prototype.getSynpaseDecayPercent()));
+        cbUseLeakyLearning.setSelected(prototype.getUseLeakyLearning());
+        cbNormalizeInputs.setSelected(prototype.getNormalizeInputs());
     }
 
-    /**
-     * @see java.awt.event.ActionListener
-     */
     @Override
     public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();

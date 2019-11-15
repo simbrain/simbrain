@@ -10,7 +10,7 @@ public class NeuronTest {
 
     @Test
     public void basicTest() {
-        Neuron neuron = new Neuron(null);
+        Neuron neuron = new Neuron(new Network(), "LinearRule");
         neuron.setActivation(1);
         assert (neuron.getActivation() == 1);
     }

@@ -143,8 +143,10 @@ public class ImageWorldDesktopPanel extends JPanel {
         //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
         // }
 
-        // Update status of buttons
-        updateButtons();
+        // Update status of buttons for image album worlds
+        if (world instanceof ImageAlbumWorld) {
+            updateButtons();
+        }
 
     }
 

@@ -42,11 +42,6 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
-    /**
-     * Support for property change events.
-     */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
     public AbstractNeuronCollection(Network net) {
         super(net);
     }

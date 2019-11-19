@@ -100,7 +100,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * neurons in the group, above which to use grid layout instead of line
      * layout.
      */
-    private int gridThreshold = 10;
+    private int gridThreshold = 9;
 
     /**
      * Space between neurons within a layer.

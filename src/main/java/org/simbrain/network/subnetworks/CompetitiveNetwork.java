@@ -70,14 +70,6 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
         inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
-        inputLayer.setLayoutBasedOnSize();
-
-        // In this case the network object is being used by to store default
-        // values for the competitive network creation panel
-        if (net == null) {
-            return;
-        }
-
         this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
@@ -85,20 +77,22 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         }
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
+
         this.connectNeuronGroups(inputLayer, competitive);
-        // TODO: Check if all positive synapses was the intention
         for (Synapse synapse : getSynapseGroup().getAllSynapses()) {
             synapse.setLowerBound(0);
         }
+
         layoutNetwork();
     }
 
     /**
-     * Set the layout of the network.
+     * Lay out groups
      */
     public void layoutNetwork() {
-        // TODO: Would be easy to set the layout and redo it...
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 200);
+        inputLayer.setLayoutBasedOnSize();
+        competitive.setLayoutBasedOnSize();
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 100);
     }
 
     @Override

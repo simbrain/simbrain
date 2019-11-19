@@ -64,11 +64,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     private INDArray weightMatrix;
 
     /**
-     * If true, when the weight matrix is added to the network its id will not be used as its label.
-     */
-    private boolean useCustomLabel = false;
-
-    /**
      * WeightMatrixNode will render an image of this matrix if set to true
      */
     private boolean enableRendering = true;
@@ -112,9 +107,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      */
     public void initializeId() {
         id = parent.getWeightMatrixGenerator().getId();
-        if (!useCustomLabel) {
-            label = id.replaceAll("_", " ");
-        }
+        label = id.replaceAll("_", " ");
     }
     /**
      * Default update simply matrix multiplies source times matrix and sets
@@ -130,11 +123,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      */
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
-        if (label == null  || label.isEmpty()) {
-            useCustomLabel = false;
-        } else {
-            useCustomLabel = true;
-        }
         String oldLabel = this.label;
         this.label = label;
         changeSupport.firePropertyChange("label", oldLabel , label);

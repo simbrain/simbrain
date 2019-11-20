@@ -809,7 +809,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.getLayout().setInitialLocation(getPosition());
         layout.getLayout().layoutNeurons(getNeuronList());
         firePositionChanged();
     }

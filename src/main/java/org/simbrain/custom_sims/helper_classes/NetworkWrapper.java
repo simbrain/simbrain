@@ -196,8 +196,8 @@ public class NetworkWrapper {
         ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons);
         ng.setNeuronType(rule);
 
-        layoutNeuronGroup(ng, x, y, layoutName);
         network.addGroup(ng);
+        layoutNeuronGroup(ng, x, y, layoutName);
         return ng;
 
     }

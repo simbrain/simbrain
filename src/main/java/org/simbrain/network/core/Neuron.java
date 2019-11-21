@@ -21,6 +21,7 @@ package org.simbrain.network.core;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
@@ -61,7 +62,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * neuron it is.
      */
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
-        order = 100)
+        conditionalEnablingMethod = "notInNeuronGroup", order = 100)
     private NeuronUpdateRule updateRule;
 
     /**
@@ -1077,9 +1078,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
     }
 
-    /**
-     * TODO: Possibly make this be a NeuronGroup. See design notes.
-     */
     public Group getParentGroup() {
         return parentGroup;
     }
@@ -1143,30 +1141,24 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     /**
-     * @return the increment
+     * Used by reflection by {@link #updateRule} to determine if the update rule should be editable or not.
      */
+    public boolean notInNeuronGroup() {
+        return !(this.getParentGroup() instanceof NeuronGroup);
+    }
+
     public double getIncrement() {
         return increment;
     }
 
-    /**
-     * @param increment the increment to set
-     */
     public void setIncrement(double increment) {
         this.increment = increment;
     }
 
-
-    /**
-     * @return the auxValue
-     */
     public double getAuxValue() {
         return auxValue;
     }
 
-    /**
-     * @param auxValue the auxValue to set
-     */
     public void setAuxValue(double auxValue) {
         this.auxValue = auxValue;
     }

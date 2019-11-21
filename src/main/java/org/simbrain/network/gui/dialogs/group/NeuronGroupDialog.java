@@ -92,7 +92,7 @@ public final class NeuronGroupDialog extends StandardDialog {
     /**
      * Neuron group summary.
      */
-    private SummaryPanel summaryPanel;
+    private AnnotatedPropertyEditor summaryPanel;
 
     /**
      * Special object to create new neuron groups.
@@ -152,12 +152,12 @@ public final class NeuronGroupDialog extends StandardDialog {
         // Summary Info
         JPanel firstTab = new JPanel();
         if (!isCreationDialog) {
-            summaryPanel = new SummaryPanel(neuronGroup, false);
+            summaryPanel = new AnnotatedPropertyEditor(neuronGroup);
             firstTab = summaryPanel;
 
         } else {
             ngCreator =
-                new NeuronGroup.NeuronGroupCreator(networkPanel.getNetwork());
+                new NeuronGroup.NeuronGroupCreator(networkPanel.getNetwork().getGroupIdGenerator().getProposedId());
             neuronGroupCreationEditor = new AnnotatedPropertyEditor(ngCreator);
             firstTab = neuronGroupCreationEditor;
         }
@@ -279,7 +279,7 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         if (isCreationDialog) {
             neuronGroupCreationEditor.commitChanges();
-            neuronGroup = ngCreator.create();
+            neuronGroup = ngCreator.create(networkPanel.getNetwork());
             neuronGroup.setLayoutObject(layoutObject);
             layoutPanel.commitChanges();
             neuronGroup.applyLayout();

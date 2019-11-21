@@ -18,11 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.util.*;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.util.propertyeditor.NumericWidget;
@@ -90,8 +86,26 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         }
         component = makeWidget();
+        checkConditionalEnabling();
         setInitialValue();
     }
+
+    /**
+     * If this component should be disabled (based on the {@link UserParameter#conditionalEnablingMethod()}
+     * annotation, disable it.
+     */
+    private void checkConditionalEnabling() {
+        String conditionalEnableMethod = parameter.getAnnotation().conditionalEnablingMethod();
+        if (!conditionalEnableMethod.isEmpty()) {
+            try {
+                Method method = editableObjects.get(0).getClass().
+                        getDeclaredMethod(conditionalEnableMethod);
+                Boolean enabled  = (Boolean) method.invoke(editableObjects.get(0));
+                component.setEnabled(enabled);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }    }
 
     /**
      * Set the initial value of this widget if the {@link UserParameter#initialValueMethod()}

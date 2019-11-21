@@ -27,17 +27,21 @@ public class SynapseGroupTest {
     @Test
     public void spikeResponderTest() {
         Network net = new Network();
-        NeuronGroup spikingSource = new NeuronGroup(net, 2);
-        NeuronGroup nonSpikingTarget = new NeuronGroup(net, 2);
 
+        NeuronGroup spikingNg = new NeuronGroup(net, 2);
+        spikingNg.setNeuronType(new IntegrateAndFireRule());
+        NeuronGroup nonSpikingNg = new NeuronGroup(net, 2);
 
-        spikingSource.setNeuronType(new IntegrateAndFireRule());
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(spikingSource,nonSpikingTarget, new AllToAll());
+        // Spike to non-spiking synapse group should have spike responders
+        SynapseGroup sg1 = SynapseGroup.createSynapseGroup(spikingNg,nonSpikingNg, new AllToAll());
+        assertTrue(sg1.getExcitatoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
+        assertTrue(sg1.getInhibitoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
 
-        // TODO: failing.
-        assertTrue(sg.getExcitatoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
-        assertTrue(sg.getInhibitoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
-
+        // Non-spiking to to non-spiking synapse group should have non-responders
+        SynapseGroup sg2 = SynapseGroup.createSynapseGroup(nonSpikingNg, spikingNg, new AllToAll());
+        assertTrue(sg2.getExcitatoryPrototype().getSpikeResponder().getClass() == NonResponder.class);
+        assertTrue(sg2.getInhibitoryPrototype().getSpikeResponder().getClass() == NonResponder.class);
+        
     }
 
 }

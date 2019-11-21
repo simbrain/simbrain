@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -26,28 +25,33 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
+ *<br>
+ * Updating is done using a collection of neurons, but in a NeuronGroup they must all be the same type. This allows
+ * the group to be characterized as spiking vs. non-spiking, for example, and serves other functions.
+ * Because this constraint was added after neuron groups were first introduced, it is not yet rigorously enforced
+ * in the code.
+ *
  */
 public class NeuronGroup extends AbstractNeuronCollection {
 
@@ -63,9 +67,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public static final int DEFAULT_GROUP_SIZE = 10;
 
     /**
-     * The description of the update rule governing the group.
+     * "Prototype" update rule.
      */
-    private String updateRule;
+    @UserParameter(label = "Group Update Rule", useSetter = true, order = 20)
+    private UpdateRuleEnum groupUpdateRule;
 
     /**
      * Used when reading inputs from an input file, so it knows how to parse
@@ -134,6 +139,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * directly setting the activation of the neurons in the group based on
      * the values in test data, ignoring all other inputs.
      */
+    @UserParameter(label = "Input mode", order = 40)
     private boolean inputMode = false;
 
     /**
@@ -154,7 +160,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * turned on, a vector with this many components is returned by (
      * {@link #getSubsampledActivations()}
      */
-    @UserParameter(label = "Number of subsamples", useSetter = true)
+    //@UserParameter(label = "Number of subsamples", useSetter = true)
+    // TODO
     private int numSubSamples = 100;
 
     /**
@@ -184,7 +191,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
         addNeurons(neurons);
-        updateRule = getNeuronType();
         resetSubsamplingIndices();
     }
 
@@ -216,7 +222,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         addNeurons(newNeurons);
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(this.getNeuronList());
-        updateRule = getNeuronType();
         resetSubsamplingIndices();
     }
 
@@ -258,8 +263,16 @@ public class NeuronGroup extends AbstractNeuronCollection {
         }
         addNeurons(newNeurons);
         this.setLayout(toCopy.getLayout());
-        this.updateRule = toCopy.updateRule;
+        this.setGroupUpdateRule(toCopy.groupUpdateRule);
         resetSubsamplingIndices();
+    }
+
+    public NeuronGroup(Network network, int numNeurons, String id) {
+        super(network);
+        for (int i = 0; i < numNeurons ; i++) {
+            addNeuron(new Neuron(network, new LinearRule()));
+        }
+        super.id = id;
     }
 
     /**
@@ -495,6 +508,19 @@ public class NeuronGroup extends AbstractNeuronCollection {
             neuron.setUpdateRule(base.deepCopy());
         }
     }
+
+    /**
+     * Set the update rule using a class.
+     */
+    public void setGroupUpdateRule(UpdateRuleEnum rule) {
+        groupUpdateRule = rule;
+        try {
+            setNeuronType(rule.getRule().getConstructor().newInstance());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Set the string update rule for the neurons in this group.
@@ -1038,41 +1064,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
        this.numSubSamples = _numSubSamples;
     }
 
-
     @Override
     public EditableObject copy() {
         return this.deepCopy(this.getParentNetwork());
     }
-
-    /**
-     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     */
-    public static class NeuronGroupCreator extends NeuronGroup {
-
-        @UserParameter(label = "Number of neurons", description = "How many neurons this neuron group should have", order = -1)
-        int numNeurons = 20;
-
-        public NeuronGroupCreator(Network network) {
-            super(network);
-            setLabel(network.getGroupIdGenerator().getProposedId());
-        }
-
-        /**
-         * Create a neuron group with {@link #numNeurons} neurons.
-         *
-         * @return the new neuron group
-         */
-        public NeuronGroup create() {
-            List<Neuron> neurons = new ArrayList<>();
-            for(int i = 0; i < numNeurons; i++) {
-                neurons.add(new Neuron(this.getParentNetwork()));
-            }
-            addNeurons(neurons);
-            applyLayout();
-            return this;
-        }
-    }
-
 
     /**
      * Reset the indices used for subsampling.
@@ -1080,6 +1075,65 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void resetSubsamplingIndices() {
         if (getNeuronList() != null) {
             subsamplingIndices = SimbrainMath.randPermute(0, getNeuronList().size());
+        }
+    }
+    /**
+     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     */
+    public static class NeuronGroupCreator implements EditableObject {
+
+        @UserParameter(label = "Number of neurons", description = "How many neurons this neuron group should have", order = -1)
+        int numNeurons = 20;
+
+        /**
+         * A label for this Neuron Group for display purposes.
+         */
+        @UserParameter(
+                label = "Label",
+                initialValueMethod = "getLabel"
+        )
+        private String label;
+
+        /**
+         * Initial update rule
+         */
+        @UserParameter(label = "Update Rule")
+        private UpdateRuleEnum updateRule = UpdateRuleEnum.LINEAR;
+
+        /**
+         * Create the template with a proposed label
+         */
+        public NeuronGroupCreator(String proposedLabel) {
+            this.label = proposedLabel;
+        }
+
+        /**
+         * Add a neuron array to network created from field values which should be setup by an Annotated Property
+         * Editor.
+         *
+         * @param network the network this neuron array adds to
+         *
+         * @return the created neuron array
+         */
+        public NeuronGroup create(Network network) {
+            NeuronGroup ng = new NeuronGroup(network, numNeurons,
+                    network.getArrayIdGenerator().getId());
+            ng.setLabel(label);
+            ng.setGroupUpdateRule(updateRule);
+            ng.applyLayout();
+            return ng;
+        }
+
+        /**
+         * Getter called by reflection by {@link UserParameter#initialValueMethod}
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        @Override
+        public String getName() {
+            return "Neuron Group";
         }
     }
 

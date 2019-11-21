@@ -164,6 +164,11 @@ public @interface UserParameter {
     boolean editable() default true;
 
     /**
+     * Name of a method whose value determines whether this component is {@link java.awt.Component#setEnabled(boolean)}
+     */
+    String conditionalEnablingMethod() default "";
+
+    /**
      * Regular expression to validate (String) values against. This is only
      * applied to parameters that are provided as strings. Optional.
      */

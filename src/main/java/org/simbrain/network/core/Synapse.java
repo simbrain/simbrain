@@ -54,7 +54,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     /**
      * A default spike responder.
      */
-    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new ConvolvedJumpAndDecay();
+    public static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new ConvolvedJumpAndDecay();
 
 
     /**
@@ -351,10 +351,14 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
 
     /**
      * Set a default spike responder if the spike responder has not been initialized.
+     *
+     * When a source neuron is spiking, the synapse should have a spike responder,
+     * otherwise not.
      */
     public void initSpikeResponder() {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+                // If target neuron is already spiking, don't change the spike responder
                 if (spikeResponder instanceof NonResponder) {
                     spikeResponder = DEFAULT_SPIKE_RESPONDER.deepCopy();
                 }

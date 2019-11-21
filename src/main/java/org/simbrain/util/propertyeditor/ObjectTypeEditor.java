@@ -430,4 +430,14 @@ public class ObjectTypeEditor extends JComponent {
 //        frame.pack();
 //    }
 
+    /**
+     * If disabled then the combo box is enabled.  To get rid of the detail triangle it can be set to invisible
+     * but that is not needed in the one use case for this so far.
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        cbObjectType.setEnabled(enabled);
+    }
+
+
 }

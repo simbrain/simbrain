@@ -21,6 +21,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.io_utilities.GroupDeserializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer;
@@ -289,6 +290,7 @@ public class SynapseGroup extends Group implements NetworkModel {
         // Ensure that displayed ratio is consistent with actual ratio.
         // Process of determining synapse polarity is stochastic.
         synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
+
         return synGroup;
     }
 
@@ -356,6 +358,7 @@ public class SynapseGroup extends Group implements NetworkModel {
         this.targetNeuronGroup = target;
         recurrent = testRecurrent();
         initializeSynapseVisibility();
+        initSpikeResponders();
     }
 
     /**
@@ -375,6 +378,26 @@ public class SynapseGroup extends Group implements NetworkModel {
         this.connectionManager = connectionManager;
         recurrent = testRecurrent();
         initializeSynapseVisibility();
+        initSpikeResponders();
+    }
+
+    /**
+     * Group level analog of {@link Synapse#initSpikeResponder()}
+     */
+    private void initSpikeResponders() {
+        //When the source neuron group is prototype synapses should have spike responders.
+        if(sourceNeuronGroup.isSpikingNeuronGroup()) {
+            // Do not change existing spike responders if they are there already there
+            if (excitatoryPrototype.getSpikeResponder() instanceof NonResponder) {
+                excitatoryPrototype.setSpikeResponder(Synapse.DEFAULT_SPIKE_RESPONDER.deepCopy());
+            } if (inhibitoryPrototype.getSpikeResponder() instanceof NonResponder) {
+                inhibitoryPrototype.setSpikeResponder(Synapse.DEFAULT_SPIKE_RESPONDER.deepCopy());
+            }
+        } else {
+            excitatoryPrototype.setSpikeResponder(new NonResponder());
+            inhibitoryPrototype.setSpikeResponder(new NonResponder());
+        }
+
     }
 
     /**
@@ -398,6 +421,7 @@ public class SynapseGroup extends Group implements NetworkModel {
             delete();
             throw new IllegalStateException(errMessage);
         }
+        changeSupport.firePropertyChange("synapseVisibilityChanged", null, displaySynapses);
     }
 
     /**
@@ -566,7 +590,7 @@ public class SynapseGroup extends Group implements NetworkModel {
 
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
-        changeSupport.firePropertyChange("synapseVisibilityChanged", null, this);
+        changeSupport.firePropertyChange("synapseVisibilityChanged", null, displaySynapses);
     }
 
     public boolean isDisplaySynapses() {
@@ -1411,17 +1435,10 @@ public class SynapseGroup extends Group implements NetworkModel {
         return useGroupLevelSettings;
     }
 
-    /**
-     * @param useGroupLevelSettings
-     */
     public void setUseGroupLevelSettings(boolean useGroupLevelSettings) {
         this.useGroupLevelSettings = useGroupLevelSettings;
     }
 
-    /**
-     * @param template the set synapse template
-     * @param polarity
-     */
     public void setAndConformToTemplate(Synapse template, Polarity polarity) {
         setDelay(template.getDelay(), polarity);
         setEnabled(template.isEnabled(), polarity);

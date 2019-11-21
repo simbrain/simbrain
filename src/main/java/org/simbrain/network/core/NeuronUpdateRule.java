@@ -20,10 +20,6 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
-import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
-import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
-import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -34,6 +30,7 @@ import org.simbrain.workspace.AttributeContainer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A rule for updating a neuron.
@@ -46,14 +43,9 @@ public abstract class NeuronUpdateRule implements CopyableObject, AttributeConta
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor} to set the update rule
      * on a neuron.
      */
-    public static List<Class> RULE_LIST = Arrays.asList(
-            LogisticRule.class, StochasticRule.class,
-            SinusoidalRule.class, RandomNeuronRule.class,
-            AdExIFRule.class, BinaryRule.class, DecayRule.class, FitzhughNagumo.class, IACRule.class,
-            IntegrateAndFireRule.class, IzhikevichRule.class, KuramotoRule.class,
-            LinearRule.class, MorrisLecarRule.class, NakaRushtonRule.class,
-            ProductRule.class, ContinuousSigmoidalRule.class, SigmoidalRule.class,
-            SpikingThresholdRule.class, ThreeValueRule.class, TimedAccumulatorRule.class);
+    public static List<Class> RULE_LIST = Arrays.stream(UpdateRuleEnum.values())
+            .map(UpdateRuleEnum::getRule)
+            .collect(Collectors.toList());
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.

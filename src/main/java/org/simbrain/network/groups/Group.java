@@ -44,7 +44,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * Id of this group.
      */
     @UserParameter(label = "ID", description = "Id of this group", order = -1, editable = false)
-    private String id;
+    protected String id;
 
     /**
      * Name of this group. Null strings lead to default labeling conventions.
@@ -237,4 +237,7 @@ public abstract class Group implements CopyableObject, AttributeContainer {
         changeSupport = new PropertyChangeSupport(this);
     }
 
+    public void fireUpdated() {
+        changeSupport.firePropertyChange("label", null , null);
+    }
 }

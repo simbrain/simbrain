@@ -26,11 +26,12 @@ public class SynapseTest {
         Synapse nonSpikingToNonSpiking = new Synapse(nonSpiking, nonSpiking);
         Synapse spikingToNonspiking = new Synapse(spiking, nonSpiking);
 
-        // Source neuron is non spiking.
+        // If source neuron is non spiking, the synapse should not have a spike responder
+        // (i.e. it's spike responder should be NonResponder)
         assertEquals(nonSpikingToNonSpiking.getSpikeResponder().getClass(), NonResponder.class);
         assertEquals(nonSpikingtoSpiking.getSpikeResponder().getClass(),  NonResponder.class);
 
-        // Source neuron is spiking
+        // If source neuron is spiking, the synapse should have a spike responder
         assertNotEquals(spikingToNonspiking.getSpikeResponder().getClass(), NonResponder.class);
         assertNotEquals(spikingToSpiking.getSpikeResponder().getClass(), NonResponder.class);
     }

@@ -31,6 +31,7 @@ public interface BiasedUpdateRule {
     @UserParameter(
             label = "Bias",
             description = "A fixed amount of input to this node.",
+            increment = .1,
             order = 2)
     double getBias();
 

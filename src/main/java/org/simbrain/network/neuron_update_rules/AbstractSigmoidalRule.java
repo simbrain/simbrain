@@ -54,13 +54,8 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     protected SquashingFunctionEnum sFunction;
 
     /**
-     * Bias.
+     * See {@link BiasedUpdateRule}. In a sigmoidal node, shifts the inflection point to the left or right of the origin.
      */
-    @UserParameter(
-            label = "Bias",
-            description = "The bias is a fixed amount of input to the node. This shifts the "
-                    + "inflection point to the left or right of the origin.",
-             increment=.1, order = 2)
     protected double bias;
 
     /**
@@ -170,6 +165,8 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         sr.setSquashFunctionType(getSquashFunctionType());
         sr.setSlope(getSlope());
         sr.setAddNoise(getAddNoise());
+        sr.setLowerBound(getLowerBound());
+        sr.setUpperBound(getUpperBound());
         sr.noiseGenerator = noiseGenerator.deepCopy();
         return sr;
     }

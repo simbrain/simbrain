@@ -67,6 +67,12 @@ public class Parameter implements Comparable<Parameter> {
     private Method setter;
 
     /**
+     *  Static cache of annotated fields for a class.
+     *  Avoids multiple runs of expensive reflection code.
+     */
+    private static Map<Class<?>, Set<Parameter>> classParameters = new HashMap<>();
+
+    /**
      * Construct a parameter object from a field.
      *
      * @param field the field
@@ -113,7 +119,6 @@ public class Parameter implements Comparable<Parameter> {
                 "corresponding setter (" + setterName + ")");
         }
     }
-
 
     /**
      * Returns true if this is an annotation for an object type field to be
@@ -345,10 +350,6 @@ public class Parameter implements Comparable<Parameter> {
         return null;
     }
 
-    // Static cache of annotated fields for a class.
-    // Avoids multiple runs of expensive reflection code.
-    private static Map<Class<?>, Set<Parameter>> classParameters = new HashMap<>();
-
     /**
      * Get the available {@link Parameter}s ({@link UserParameter} annotated
      * Fields) defined in the specified class. The available Parameters are
@@ -358,7 +359,6 @@ public class Parameter implements Comparable<Parameter> {
      * UserParameter#order()}()}.
      */
     public static Set<Parameter> getParameters(final Class<?> paramClass) {
-
         if (!classParameters.containsKey(paramClass)) {
 
             Set<Parameter> params = new TreeSet<>();
@@ -378,17 +378,17 @@ public class Parameter implements Comparable<Parameter> {
                         params.add(new Parameter(f));
                     }
                 }
-            }
 
-            // Gather method-based annotations in interfaces
-            for (Class<?> i : paramClass.getInterfaces()) {
-                for (Method m : i.getDeclaredMethods()) {
-                    if (m.isAnnotationPresent(UserParameter.class)) {
-                        if (fieldAndMethodNames.contains(m.getName())) {
-                            throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
+                // Gather method-based annotations in interfaces
+                for (Class<?> i : clazz.getInterfaces()) {
+                    for (Method m : i.getDeclaredMethods()) {
+                        if (m.isAnnotationPresent(UserParameter.class)) {
+                            if (fieldAndMethodNames.contains(m.getName())) {
+                                throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
+                            }
+                            fieldAndMethodNames.add(m.getName());
+                            params.add(new Parameter(m));
                         }
-                        fieldAndMethodNames.add(m.getName());
-                        params.add(new Parameter(m));
                     }
                 }
             }

@@ -86,8 +86,6 @@ public class SensorEffectorPanel extends JPanel {
 
     /**
      * Construct the SensorEffectorPanel.
-     *
-     * @param type
      */
     public SensorEffectorPanel(OdorWorldEntity parentEntity, final PanelType type, final Window parentWindow) {
 

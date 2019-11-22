@@ -74,7 +74,7 @@ public class EntityDialog extends StandardDialog {
 
         fillFieldValues();
 
-        tabbedPane.addTab("Main", mainEditor);
+        tabbedPane.addTab("Main", new JScrollPane(mainEditor));
 
         // Smell tabs
         if (entityRef.getSmellSource() != null) {
@@ -91,8 +91,7 @@ public class EntityDialog extends StandardDialog {
             tabbedPane.addTab("Effectors", new SensorEffectorPanel(entityRef, SensorEffectorPanel.PanelType.Effector, this));
         }
 
-        JScrollPane sp = new JScrollPane(tabbedPane);
-        setContentPane(sp);
+        setContentPane(tabbedPane);
 
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/OdorWorld.html");
         addButton(new JButton(helpAction));

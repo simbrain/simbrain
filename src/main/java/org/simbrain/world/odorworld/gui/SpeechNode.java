@@ -143,7 +143,7 @@ public class SpeechNode extends EntityAttributeNode {
     private void updateText() {
         if (!effector.getPhrase().equals(speechTextString)) {
             this.speechTextString = effector.getPhrase();
-            speechText.setText(Utils.getWarpAroundString(speechTextString, effector.getCharactersPerRow()));
+            speechText.setText(Utils.getWrapAroundString(speechTextString, effector.getCharactersPerRow()));
             shape.removeChild(speechBubble);
             speechBubble =
                     PPath.createRoundRectangle(

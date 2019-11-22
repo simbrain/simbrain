@@ -29,6 +29,7 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -389,16 +390,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (Math.abs(activation - gZeroPoint) < 0.001) {
             mainShape.setPaint(Color.white);
         } else if (activation > gZeroPoint) {
-            float saturation = checkSaturationValid((float) Math.abs(activation / neuron.getUpdateRule().getGraphicalUpperBound()));
-            mainShape.setPaint(Color.getHSBColor(hotColor, saturation, 1));
+            double saturation = SimbrainMath.rescale(activation, 0.0, gUp,0.0,1.0);
+            mainShape.setPaint(Color.getHSBColor(hotColor, (float) saturation, 1));
         } else if (activation < gZeroPoint) {
-            float saturation;
-            if (activation <= gLow) {
-                saturation = 1.0f;
-            } else {
-                saturation = checkSaturationValid((float) ((gZeroPoint - activation) / (gZeroPoint - gLow)));
-            }
-            mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
+            double saturation = SimbrainMath.rescale(activation, 0,gLow,0,1);
+            mainShape.setPaint(Color.getHSBColor(coolColor, (float) saturation, 1));
         }
 
         if (!customStrokeColor) {
@@ -436,26 +432,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             setBounds(bounds);
 
         }
-    }
-
-    /**
-     * Check whether the specified saturation is valid or not.
-     *
-     * @param val the saturation value to check.
-     * @return whether it is valid or not.
-     */
-    private float checkSaturationValid(final float val) {
-        float tempval = val;
-
-        if (val > 1) {
-            tempval = 1;
-        }
-
-        if (val < 0) {
-            tempval = 0;
-        }
-
-        return tempval;
     }
 
     /**

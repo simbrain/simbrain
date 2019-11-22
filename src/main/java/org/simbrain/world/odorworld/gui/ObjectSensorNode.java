@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
 import java.awt.*;
@@ -64,13 +65,8 @@ public class ObjectSensorNode extends EntityAttributeNode {
     @Override
     public void update() {
         shape.setOffset(sensor.getRelativeLocation());
-        float saturation = (float) (sensor.getCurrentValue() / sensor.getBaseValue());
-        if (saturation > 1) {
-            saturation = 1;
-        }
-        if (saturation < 0) {
-            saturation = 0;
-        }
+        float saturation = (float) SimbrainMath.rescale(sensor.getCurrentValue(), 0, sensor.getBaseValue(),
+                0,1);
         shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));
     }
 
@@ -79,7 +75,7 @@ public class ObjectSensorNode extends EntityAttributeNode {
      */
     public void updateLabel() {
         if (sensor.isShowLabel()) {
-            labelText.setText(Utils.getWarpAroundString(sensor.getLabel(), 10));
+            labelText.setText(Utils.getWrapAroundString(sensor.getLabel(), 10));
             labelText.setOffset(
                     labelBottomCenterLocation.getX() - labelText.getWidth() / 2,
                     labelBottomCenterLocation.getY() - labelText.getHeight()

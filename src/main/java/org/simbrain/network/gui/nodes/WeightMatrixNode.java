@@ -313,9 +313,9 @@ public class WeightMatrixNode extends ScreenElement {
 
         int[] raster = new int[(int) weightMatrix.getWeightMatrix().length()];
 
-        // TODO: Use standardized Simbrain library for these color scalings
         for (int i = 0; i < activations.length; i++) {
             float saturation = activations[i];
+            // Assume activations between -1 and 1.  If larger values are allowed used SimbrainMath.rescale
             saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
             if (saturation < 0) {
                 raster[i] = Color.HSBtoRGB(2 / 3f, -saturation, 1.0f);

@@ -27,8 +27,8 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     private double value = 0;
 
     @UserParameter(
-            label = "Base Value",
-            description = "Base value of the output before decay function applies",
+            description = "Maximum value of the sensor when agent is right on top of the associated object type",
+            label = "Max Value",
             order = 10)
     private double baseValue = 1;
 

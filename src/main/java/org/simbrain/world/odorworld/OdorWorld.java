@@ -32,9 +32,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -56,7 +56,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
      */
-    private double totalSmellVectorLength;
+    private transient double maxVectorNorm;
 
     /**
      * Whether or not sprites wrap around or are halted at the borders
@@ -161,7 +161,7 @@ public class OdorWorld implements EditableObject {
         changeSupport.firePropertyChange("entityAdded", null, entity);
 
         // Recompute max stimulus length
-        recomputeMaxStimulusLength();
+        recomputeMaxVectorNorm();
     }
 
     /**
@@ -323,7 +323,7 @@ public class OdorWorld implements EditableObject {
             for (Effector effector : entity.getEffectors()) {
                 //fireEffectorRemoved(effector);
             }
-            recomputeMaxStimulusLength();
+            recomputeMaxVectorNorm();
             changeSupport.firePropertyChange("entityDeleted", null, entity);
         }
 
@@ -339,16 +339,14 @@ public class OdorWorld implements EditableObject {
     }
 
     /**
-     * Computes maximum stimulus length. This is used for scaling the color in
-     * the graphical display of the agent sensors.
+     * Caches the maximum vector norm, which is used for scaling the color smell sensors.
      */
-    private void recomputeMaxStimulusLength() {
-        totalSmellVectorLength = 0;
-        for (OdorWorldEntity entity : entityList) {
-            if (entity.getSmellSource() != null) {
-                totalSmellVectorLength += SimbrainMath.getVectorNorm(entity.getSmellSource().getStimulusVector());
-            }
-        }
+    private void recomputeMaxVectorNorm() {
+        maxVectorNorm = entityList.stream()
+                .filter(Objects::nonNull)
+                .map(e -> SimbrainMath.getVectorNorm(e.getSmellSource().getStimulusVector()))
+                .max(Double::compareTo)
+                .orElse(0.0);
     }
 
     /**
@@ -368,7 +366,7 @@ public class OdorWorld implements EditableObject {
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
         }
-        recomputeMaxStimulusLength();
+        recomputeMaxVectorNorm();
         return this;
     }
 
@@ -479,8 +477,8 @@ public class OdorWorld implements EditableObject {
         this.objectsBlockMovement = objectsBlockMovement;
     }
 
-    public double getTotalSmellVectorLength() {
-        return totalSmellVectorLength;
+    public double getMaxVectorNorm() {
+        return maxVectorNorm;
     }
 
     /**

@@ -545,10 +545,9 @@ public class Utils {
     }
 
     /**
-     * <p>
      * Decides if the operating system matches.
      * </p>
-     * Source adapted from org.apache.commons.lang.SystemUtils
+     * Adapted from org.apache.commons.lang.SystemUtils
      *
      * @param osNamePrefix the prefix for the os name
      * @return true if matches, or false if not or can't determine
@@ -732,13 +731,13 @@ public class Utils {
     }
 
     /**
-     * Returns a string that warps around to new line at the limit width.
+     * Returns a string that wraps around to new line at the limit width.
      *
      * @param str   the string to convert
      * @param limit the width limit in characters
      * @return the formatted string
      */
-    public static String getWarpAroundString(String str, int limit) {
+    public static String getWrapAroundString(String str, int limit) {
         str += "\n"; // Needed to handle last line correctly
         if (limit < 1) {
             limit = 1;

@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes;
 
 import org.nd4j.linalg.factory.Nd4j;
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
@@ -186,8 +185,8 @@ public class NeuronArrayNode extends ScreenElement {
 
         int[] raster = new int[neuronArray.getNumNodes()];
 
-        // TODO: Use standardized Simbrain library for these color scalings
         for (int i = 0; i < activations.length; i++) {
+            // Assume activations between -1 and 1.  If larger values are allowed used SimbrainMath.rescale
             float saturation = activations[i];
             saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
             if (saturation < 0) {

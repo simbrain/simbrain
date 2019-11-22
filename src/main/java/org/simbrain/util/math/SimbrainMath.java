@@ -21,7 +21,6 @@ package org.simbrain.util.math;
 import umontreal.iro.lecuyer.rng.LFSR258;
 import umontreal.iro.lecuyer.rng.RandomStream;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
@@ -787,14 +786,14 @@ public class SimbrainMath {
     /**
      * Returns a bounded value of a number.
      * 
-     * @param number the number to check
-     * @param upperBound upper bound
-     * @param lowerBound lower bound
      * @param <T> T has to be a number
      *
+     * @param number the number to check
+     * @param lowerBound lower bound
+     * @param upperBound upper bound
      * @return the clipped value
      */
-    public static <T extends Number & Comparable<T>> T clip(T number, T upperBound, T lowerBound) {
+    public static <T extends Number & Comparable<T>> T clip(T number, T lowerBound, T upperBound) {
         if (upperBound.compareTo(lowerBound) < 0) {
             T temp = upperBound;
             upperBound = lowerBound;
@@ -831,7 +830,7 @@ public class SimbrainMath {
     /**
      * Approximate the angle of the tangent at a given parameter t on a Bezier curve
      *
-     * @return theta in radian
+     * @return theta in radians
      */
     public static double approximateTangentAngleOfBezierCurve(QuadCurve2D curve2D, double t) {
         Point2D p1 = findPointOnBezierCurve(curve2D, t + 0.01);
@@ -849,7 +848,27 @@ public class SimbrainMath {
         return findEndPointOfLineSegmentAfterScaling(p1, p2, t);
     }
 
-    private static  Point2D findEndPointOfLineSegmentAfterScaling(Point2D p1, Point2D p2, double scalingFactor) {
+    /**
+     * Creates a vector from p1 to p2, and scales it.  Returns the endpoint of the new vector.
+     */
+    private static Point2D findEndPointOfLineSegmentAfterScaling(Point2D p1, Point2D p2, double scalingFactor) {
         return add(scale(subtract(p2, p1), scalingFactor), p1);
     }
+
+    /**
+     * Takes a value in one interval and returns the proportional value in another interval.
+     * E.g. .5 in 0,1 will be mapped to 2 in 0,4. Think of it as a function from a source to a target interval.
+     *
+     * @param val source value
+     * @param low low end of source interval
+     * @param high high end of source interval
+     * @param targetLow low end of target interval
+     * @param targetHigh high end of target interval
+     * @return rescaled value in the target interval
+     */
+    public static double rescale(double val, double low, double high, double targetLow, double targetHigh) {
+        double clipped = clip(val, low, high);
+        return ((high - clipped) * targetLow + (clipped - low) * targetHigh) / (high - low);
+    }
+
 }

@@ -56,14 +56,9 @@ public class SmellSensorNode extends EntityAttributeNode {
         shape.setOffset(sensor.getRelativeLocation());
         double val = SimbrainMath.getVectorNorm(sensor.getCurrentValues());
         float saturation = 0;
-        if (world.getTotalSmellVectorLength() > 0) {
-            saturation = (float) Math.abs(val / (1 * world.getTotalSmellVectorLength()));
-        }
-        if (saturation > 1) {
-            saturation = 1;
-        }
-        if (saturation < 0) {
-            saturation = 0;
+        if (world.getMaxVectorNorm() > 0) {
+            saturation = (float) SimbrainMath.rescale(val, 0, world.getMaxVectorNorm(),
+                    0,1);
         }
         shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));
     }

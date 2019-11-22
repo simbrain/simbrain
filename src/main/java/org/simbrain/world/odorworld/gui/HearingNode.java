@@ -128,7 +128,7 @@ public class HearingNode extends EntityAttributeNode {
     private void updateText() {
         if (!sensor.getPhrase().equals(hearingTextString)) {
             this.hearingTextString = sensor.getPhrase();
-            hearingText.setText(Utils.getWarpAroundString(hearingTextString, sensor.getCharactersPerRow()));
+            hearingText.setText(Utils.getWrapAroundString(hearingTextString, sensor.getCharactersPerRow()));
             shape.removeChild(hearingBubble);
             hearingBubble =
                     PPath.createRoundRectangle(

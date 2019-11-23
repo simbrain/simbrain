@@ -59,7 +59,6 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.subnetworkNodes.*;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.*;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -309,7 +308,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Manages placement of new nodes, groups, etc.
      */
-    private PlacementManager2 placementManager = new PlacementManager2();
+    private PlacementManager placementManager = new PlacementManager();
 
     /**
      * Reference to last neuronGroup added.  For setting distances between neuron groups when adding them.
@@ -2677,7 +2676,7 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    public PlacementManager2 getPlacementManager() {
+    public PlacementManager getPlacementManager() {
         return placementManager;
     }
 

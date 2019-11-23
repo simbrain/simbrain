@@ -126,8 +126,6 @@ public class NeuronArrayNode extends ScreenElement {
             }
         });
 
-        this.centerFullBoundsOnPoint(na.getCenterX(), na.getCenterY());
-
         // Set up main items
         borderBox.setPickable(true);
         addChild(backgroundImage);
@@ -144,6 +142,8 @@ public class NeuronArrayNode extends ScreenElement {
         addChild(infoText);
         infoText.offset(8, 8);
         updateInfoText();
+
+        this.centerFullBoundsOnPoint(na.getCenterX(), na.getCenterY());
 
         // Image array
         renderArrayToActivationsImage();

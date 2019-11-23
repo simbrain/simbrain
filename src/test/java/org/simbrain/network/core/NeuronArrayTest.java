@@ -50,4 +50,14 @@ public class NeuronArrayTest {
         neuronArray.update();
         assertTrue(neuronArray.getNeuronArray().data() instanceof FloatBuffer);
     }
+
+    @Test
+    public void testSetLocation() {
+        double x = neuronArray.getCenterX();
+        double y = neuronArray.getCenterY();
+        neuronArray.setCenterX(neuronArray.getCenterX());
+        neuronArray.setCenterY(neuronArray.getCenterY());
+        assertEquals(x, neuronArray.getCenterX(), 0.001);
+        assertEquals(y, neuronArray.getCenterY(), 0.001);
+    }
 }

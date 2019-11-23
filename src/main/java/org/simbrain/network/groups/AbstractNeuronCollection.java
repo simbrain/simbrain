@@ -435,7 +435,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     @Override
     public Point2D getAttachmentPoint() {
-        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMaxX(neuronList));
+        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMinY(neuronList));
     }
 
     @Override

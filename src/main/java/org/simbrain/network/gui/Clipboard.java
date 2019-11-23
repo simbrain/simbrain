@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.SimbrainMath;
@@ -81,9 +82,12 @@ public class Clipboard {
 
         // Create a copy of the clipboard objects.
         List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
-        Point2D currentPosition = SimnetUtils.getUpperLeft(copy);
-        Point2D targetLocation = net.getPlacementManager().getLocation();
-        SimnetUtils.translate(copy, SimbrainMath.subtract(targetLocation, currentPosition));
+
+        net.getPlacementManager().setNextPasteLocationOnto(copy.stream()
+                .filter(LocatableModel.class::isInstance)
+                .map(LocatableModel.class::cast)
+                .collect(Collectors.toList())
+        );
 
         // Add the copied object
         net.getNetwork().addObjects(copy);

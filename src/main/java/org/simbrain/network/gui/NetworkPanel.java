@@ -309,7 +309,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Manages placement of new nodes, groups, etc.
      */
-    private PlacementManager placementManager = new PlacementManager();
+    private PlacementManager2 placementManager = new PlacementManager2();
 
     /**
      * Reference to last neuronGroup added.  For setting distances between neuron groups when adding them.
@@ -454,7 +454,10 @@ public class NetworkPanel extends JPanel {
                     } else if ("textRemoved".equals(evt.getPropertyName())) {
                         ((NetworkTextObject) evt.getOldValue()).fireDeleted();
                     } else if ("groupAdded".equals(evt.getPropertyName())) {
-                        addGroup((Group) evt.getNewValue());
+                        Group group = (Group) evt.getNewValue();
+                        if (group.getId() != null) {
+                            addGroup(group);
+                        }
                     } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
                         addNeuronArray((NeuronArray) evt.getNewValue());
                     } else if ("multiLayerNetworkAdded".equals(evt.getPropertyName())) {
@@ -559,9 +562,7 @@ public class NetworkPanel extends JPanel {
     public void addNeuron(final NeuronUpdateRule baseRule) {
 
         final Neuron neuron = new Neuron(getNetwork(), baseRule);
-        Point2D p = placementManager.getLocation(45,0);
-        neuron.setX(p.getX());
-        neuron.setY(p.getY());
+        placementManager.setNextLocationOnto(neuron);
         neuron.forceSetActivation(0);
         getNetwork().addLooseNeuron(neuron);
 
@@ -613,6 +614,11 @@ public class NetworkPanel extends JPanel {
      * @param layout  the layout to use in adding them
      */
     public void addNeuronsToPanel(final List<Neuron> neurons, final Layout layout) {
+
+        if (neurons.isEmpty()) {
+            return;
+        }
+
         Network net = getNetwork();
         ArrayList<NeuronNode> nodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : neurons) {
@@ -622,7 +628,9 @@ public class NetworkPanel extends JPanel {
 
         setSelection(nodes);
 
-        layout.setInitialLocation(placementManager.getLocation());
+        Point2D p = placementManager.setNextLocationOnto(neurons.get(0));
+
+        layout.setInitialLocation(p);
 
         layout.layoutNeurons(getSelectedModels(Neuron.class));
 
@@ -797,7 +805,7 @@ public class NetworkPanel extends JPanel {
             double offset = (lastNgAdded == null) ? 30 : lastNgAdded.getWidth() + 70;
             lastNgAdded = neuronGroup;
             // TODO Using a fixed offset to help debug.
-            neuronGroup.setLocation(placementManager.getLocation(50,50));
+            placementManager.setNextLocationOnto(neuronGroup);
         }
 
         repaint();
@@ -1437,8 +1445,12 @@ public class NetworkPanel extends JPanel {
             return;
         }
         Clipboard.clear();
-        placementManager.setPasteDeltaBegin(SimnetUtils.getUpperLeft(getSelectedModels()));
         Clipboard.add(getSelectedModels());
+        placementManager.setCopyModels(getSelectedModels().stream()
+                .filter(LocatableModel.class::isInstance)
+                .map(LocatableModel.class::cast)
+                .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -2401,9 +2413,7 @@ public class NetworkPanel extends JPanel {
             Network network = getNetwork();
             NeuronArray neuronArray = creationTemplate.create(network);
             // Place new neuron arrays far anough above one another that the intervening weight matrix shows
-            Point2D newLocation = placementManager.getLocation(0,-210);
-            neuronArray.setCenterX(newLocation.getX());
-            neuronArray.setCenterY(newLocation.getY());
+            placementManager.setNextLocationOnto(neuronArray);
             network.addNeuronArray(neuronArray);
         }));
         and.pack();
@@ -2667,7 +2677,7 @@ public class NetworkPanel extends JPanel {
         }
     }
 
-    public PlacementManager getPlacementManager() {
+    public PlacementManager2 getPlacementManager() {
         return placementManager;
     }
 

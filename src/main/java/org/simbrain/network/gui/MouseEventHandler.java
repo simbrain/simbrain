@@ -103,7 +103,7 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
 
         // A click without a drag, e.g. making a lasso
         // Reset placement manager's anchor point
-        networkPanel.getPlacementManager().setAnchorPoint(event.getPosition());
+        networkPanel.getPlacementManager().setNextLocationFixed(event.getPosition());
 
         // System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
@@ -287,10 +287,6 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
 
         // End of an object dragging event. Set the target location of paste delta
         Point2D upperLeft = SimnetUtils.getUpperLeft(networkPanel.getSelectedModels());
-        networkPanel.getPlacementManager().setPasteDeltaEnd(upperLeft);
-
-        // Also reset the anchor point, so that new points emerge from we just dragged
-        networkPanel.getPlacementManager().setAnchorPoint(upperLeft);
 
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();

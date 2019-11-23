@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
@@ -54,17 +55,20 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 8);
 
-    private PPath box;
+    private PPath box = PPath.createRectangle(0, 0, boxWidth, boxHeight);
 
 
     public MultiLayerNetworkNode(NetworkPanel networkPanel, MultiLayerNet dl4jNet) {
         super(networkPanel);
         this.net = dl4jNet;
 
-        box = PPath.createRectangle(0, 0, boxWidth, boxHeight);
+
+        box.setPickable(true);
         addChild(box);
-        setPickable(true);
-        this.setBounds(box.getFullBounds());
+
+        // Border box determines bounds
+        PBounds bounds = box.getBounds();
+        setBounds(bounds);
 
         // Info text
         infoText = new PText();
@@ -72,6 +76,9 @@ public class MultiLayerNetworkNode extends ScreenElement {
         addChild(infoText);
         infoText.offset(8, 8);
         updateInfoText();
+
+        this.centerFullBoundsOnPoint(net.getCenterX(), net.getCenterY());
+        System.out.printf("(%f, %f)", net.getCenterX(), net.getCenterY());
 
         pushViewPositionToModel();
     }
@@ -209,13 +216,14 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        net.setLocation(SimbrainMath.add(p, new Point2D.Double(boxWidth / 2, boxHeight / 2)));
+        net.setCenterX(p.getX() + boxWidth / 2);
+        net.setCenterY(p.getY() + boxHeight / 2);
     }
 
     @Override
     public void offset(double dx, double dy) {
-        super.offset(dx, dy);
         pushViewPositionToModel();
+        super.offset(dx, dy);
     }
 
     public MultiLayerNet getNet() {

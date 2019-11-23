@@ -454,7 +454,7 @@ public class ESNCreationDialog extends StandardDialog {
         }
 
         // Make a bare ESN (no neuron or synapse groups)
-        EchoStateNetwork esn = new EchoStateNetwork(net, networkPanel.getPlacementManager().getLocation());
+        EchoStateNetwork esn = new EchoStateNetwork(net, networkPanel.getPlacementManager().getLocationAndIncrement());
 
         // Set gloabl ESN settings
         esn.setBackWeights(allowOutToRes.isSelected());

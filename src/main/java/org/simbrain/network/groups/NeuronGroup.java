@@ -761,6 +761,11 @@ public class NeuronGroup extends AbstractNeuronCollection {
         offset(x, y);
     }
 
+    @Override
+    public Point2D getLocation() {
+        return new Point2D.Double(getMinX(), getMinY());
+    }
+
     public void setLocation(Point2D point) {
         setLocation(point.getX(), point.getY());
     }
@@ -1068,6 +1073,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public EditableObject copy() {
         return this.deepCopy(this.getParentNetwork());
     }
+
 
     /**
      * Reset the indices used for subsampling.

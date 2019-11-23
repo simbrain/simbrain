@@ -80,7 +80,7 @@ public class BPTTCreationDialog extends StandardDialog {
         try {
 
             BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputsOutputs.getText()), Integer.parseInt(tfNumHidden.getText()),
-                    Integer.parseInt(tfNumInputsOutputs.getText()), panel.getPlacementManager().getLocation());
+                    Integer.parseInt(tfNumInputsOutputs.getText()), panel.getPlacementManager().getLocationAndIncrement());
 
             bptt.getParentNetwork().addGroup(bptt);
             dispose();

@@ -113,7 +113,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = (Hopfield) hopPropertiesPanel.getGroup();
         layoutPanel.commitChanges();
-        layoutObject.getLayout().setInitialLocation(networkPanel.getPlacementManager().getLocation());
+        layoutObject.getLayout().setInitialLocation(networkPanel.getPlacementManager().getLocationAndIncrement());
         hopfield.getNeuronGroup().setLayout(layoutObject.getLayout());
         hopfield.getNeuronGroup().applyLayout();
         networkPanel.getNetwork().addGroup(hopfield);

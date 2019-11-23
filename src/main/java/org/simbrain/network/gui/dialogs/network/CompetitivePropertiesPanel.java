@@ -328,7 +328,7 @@ public class CompetitivePropertiesPanel extends GroupPropertiesPanel implements 
                 commitCompetitiveGroupFieldValues();
             } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
                 competitive = new CompetitiveNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumCompetitiveNeurons.getText()), Integer.parseInt(tfNumInputNeurons.getText()),
-                        networkPanel.getPlacementManager().getLocation());
+                        networkPanel.getPlacementManager().getLocationAndIncrement());
                 commitCompetitiveNetworkFieldValues();
             } else if (panelType == CompetitivePropsPanelType.EDIT_GROUP) {
                 commitCompetitiveGroupFieldValues();

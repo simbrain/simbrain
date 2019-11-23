@@ -192,7 +192,7 @@ public class SRNCreationDialog extends StandardDialog {
             NeuronUpdateRule hidType = boxMap.get(hiddenNeuronTypes.getSelectedItem());
             NeuronUpdateRule outType = boxMap.get(outputNeuronTypes.getSelectedItem());
             SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputs.getText()), Integer.parseInt(tfNumHidden.getText()), Integer.parseInt(tfNumOutputs.getText()), hidType, outType,
-                    panel.getPlacementManager().getLocation());
+                    panel.getPlacementManager().getLocationAndIncrement());
 
             srn.getParentNetwork().addGroup(srn);
             dispose();

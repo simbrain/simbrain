@@ -283,7 +283,7 @@ public final class NeuronGroupDialog extends StandardDialog {
             neuronGroup.setLayoutObject(layoutObject);
             layoutPanel.commitChanges();
             neuronGroup.applyLayout();
-            neuronGroup.setLocation(networkPanel.getPlacementManager().getLocation(50, 50));
+            networkPanel.getPlacementManager().setNextLocationOnto(neuronGroup);
             networkPanel.getNetwork().addGroup(neuronGroup);
         } else {
             summaryPanel.commitChanges();

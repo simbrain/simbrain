@@ -27,6 +27,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
+import java.awt.geom.Point2D;
 
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
@@ -217,7 +218,7 @@ public class SOMPropertiesPanel extends GroupPropertiesPanel {
             } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
                 som = new SOMNetwork(networkPanel.getNetwork(), Integer.parseInt(tfNumSOMNeurons.getText()),
                         Integer.parseInt(tfNumInputNeurons.getText()),
-                        networkPanel.getPlacementManager().getLocation());
+                        new Point2D.Double(0, 0));
                 commitSOMNetworkFieldValues();
             } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
                 commitSOMGroupFieldValues();

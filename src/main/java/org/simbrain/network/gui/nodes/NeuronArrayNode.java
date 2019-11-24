@@ -123,6 +123,8 @@ public class NeuronArrayNode extends ScreenElement {
                 //interactionBox.updateText();
             } else if("delete".equals(evt.getPropertyName())) {
                 NeuronArrayNode.this.removeFromParent();
+            } else if ("moved".equals(evt.getPropertyName())) {
+                pullViewPositionFromModel();
             }
         });
 
@@ -148,6 +150,11 @@ public class NeuronArrayNode extends ScreenElement {
         // Image array
         renderArrayToActivationsImage();
         pushViewPositionToModel();
+    }
+
+    public void pullViewPositionFromModel() {
+        Point2D p = new Point2D.Double(neuronArray.getCenterX() - boxWidth / 2, neuronArray.getCenterY() - boxHeight / 2);
+        this.setGlobalTranslation(p);
     }
 
     /**

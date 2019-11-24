@@ -83,12 +83,6 @@ public class Clipboard {
         // Create a copy of the clipboard objects.
         List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
 
-        net.getPlacementManager().setNextPasteLocationOnto(copy.stream()
-                .filter(LocatableModel.class::isInstance)
-                .map(LocatableModel.class::cast)
-                .collect(Collectors.toList())
-        );
-
         // Add the copied object
         net.getNetwork().addObjects(copy);
 
@@ -97,6 +91,13 @@ public class Clipboard {
                 .map(net.getObjectNodeMap()::get)
                 .collect(Collectors.toList());
         net.setSelection(toSelect);
+
+        net.getPlacementManager().setNextPasteLocationOnto(copy.stream()
+                .filter(LocatableModel.class::isInstance)
+                .map(LocatableModel.class::cast)
+                .collect(Collectors.toList())
+        );
+
         net.repaint();
     }
 

@@ -367,6 +367,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void setLocation(Point2D location) {
         this.x = location.getX();
         this.y = location.getY();
+        fireLocationChange();
     }
 
     @Override
@@ -375,7 +376,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     public void fireLocationChange() {
-        changeSupport.firePropertyChange("moved", null, null);
+        changeSupport.firePropertyChange("moved", null, this.getLocation());
     }
 
     @Override

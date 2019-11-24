@@ -78,7 +78,12 @@ public class MultiLayerNetworkNode extends ScreenElement {
         updateInfoText();
 
         this.centerFullBoundsOnPoint(net.getCenterX(), net.getCenterY());
-        System.out.printf("(%f, %f)", net.getCenterX(), net.getCenterY());
+
+        net.addPropertyChangeListener(evt -> {
+            if ("moved".equals(evt.getPropertyName())) {
+                pullViewPositionFromModel();
+            }
+        });
 
         pushViewPositionToModel();
     }
@@ -208,6 +213,11 @@ public class MultiLayerNetworkNode extends ScreenElement {
     @Override
     public MultiLayerNet getModel() {
         return getNet();
+    }
+
+    public void pullViewPositionFromModel() {
+        Point2D p = new Point2D.Double(net.getCenterX() - boxWidth / 2, net.getCenterY() - boxHeight / 2);
+        this.setGlobalTranslation(p);
     }
 
     /**

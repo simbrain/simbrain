@@ -4,7 +4,9 @@ import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.SimbrainMath;
+import umontreal.iro.lecuyer.simevents.Sim;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -33,23 +35,21 @@ public class PlacementManager {
 
     private Supplier<Point2D> current = () -> new Point2D.Double(0, 0);
 
-    private boolean resetSequence = false;
+    private boolean placeOnLastClick = false;
+
+    private boolean copyInit = false;
 
     public Point2D setNextLocationOnto(LocatableModel model) {
-        // TODO: neuron group creation template should not use placement manager.
-        if (model instanceof NeuronGroup && ((NeuronGroup) model).getId() == null) {
-            return current.get();
-        }
         previous = current.get();
         Point2D nextLocation;
-        if (resetSequence) {
+        if (placeOnLastClick) {
             nextLocation = current.get();
-            resetSequence = false;
+            placeOnLastClick = false;
         } else {
             nextLocation = SimbrainMath.add(current.get(), defaultOffsets.getOrDefault(model.getClass(), DEFAULT_OFFSET));
         }
         model.setLocation(nextLocation);
-        current = () -> new Point2D.Double(model.getCenterX(), model.getCenterY());
+        current = model::getLocation;
         return nextLocation;
     }
 
@@ -59,11 +59,22 @@ public class PlacementManager {
         }
 
         Supplier<Point2D> modelLocation =
-                () -> new Point2D.Double(models.get(0).getCenterX(), models.get(0).getCenterY());
+                () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
 
-        Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(current.get(), previous), current.get());
+        Point2D delta;
 
-        Point2D delta = SimbrainMath.subtract(newLocation, modelLocation.get());
+        if (placeOnLastClick) {
+            delta = SimbrainMath.subtract(current.get(), modelLocation.get());
+            placeOnLastClick = false;
+            copyInit = true;
+        } else if (copyInit) {
+            Point2D newLocation = SimbrainMath.add(getInitialPasteDelta(models), current.get());
+            delta = SimbrainMath.subtract(newLocation, modelLocation.get());
+            copyInit = false;
+        } else {
+            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(current.get(), previous), current.get());
+            delta = SimbrainMath.subtract(newLocation, modelLocation.get());
+        }
 
         previous = current.get();
         for (LocatableModel model : models) {
@@ -75,9 +86,9 @@ public class PlacementManager {
 
     public Point2D getLocationAndIncrement() {
         Point2D nextLocation;
-        if (resetSequence) {
+        if (placeOnLastClick) {
             nextLocation = current.get();
-            resetSequence = false;
+            placeOnLastClick = false;
         } else {
             nextLocation = SimbrainMath.add(current.get(), offset);
         }
@@ -87,12 +98,45 @@ public class PlacementManager {
     }
 
     public void setNextLocationFixed(Point2D location) {
+        System.out.println("PlacementManager.setNextLocationFixed");
         current = () -> location;
-        resetSequence = true;
+        placeOnLastClick = true;
     }
 
     public void setCopyModels(List<LocatableModel> models) {
+        System.out.println("PlacementManager.setCopyModels");
         previous = current.get();
-        current = () -> new Point2D.Double(models.get(0).getCenterX(), models.get(0).getCenterY());
+        current = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
+        placeOnLastClick = false;
+        copyInit = true;
+    }
+
+    private Point2D getInitialPasteDelta(List<LocatableModel> models) {
+        Point2D offset = defaultOffsets.getOrDefault(models.get(0).getClass(), DEFAULT_OFFSET);
+        Point2D ret = new Point2D.Double();
+
+        double width = SimnetUtils.getWidth(models);
+        double dx = offset.getX();
+
+        double height = SimnetUtils.getHeight(models);
+        double dy = offset.getY();
+
+        if (offset.getX() < 0) {
+            ret.setLocation(-width + dx, ret.getY());
+        } else if (offset.getX() == 0) {
+            ret.setLocation(0, ret.getY());
+        } else {
+            ret.setLocation(width + dx, ret.getY());
+        }
+
+        if (offset.getY() < 0) {
+            ret.setLocation(ret.getX(), -height + dy);
+        } else if (offset.getY() == 0) {
+            ret.setLocation(ret.getX(), 0);
+        } else {
+            ret.setLocation(ret.getX(), height + dy);
+        }
+
+        return ret;
     }
 }

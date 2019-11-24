@@ -387,28 +387,28 @@ public class SimnetUtils {
      * Returns the minimum X position of these model elements
      */
     public static double getMinX(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterX).min(Double::compareTo).get();
+        return models.stream().map(m -> m.getLocation().getX()).min(Double::compareTo).orElse(0.0);
     }
 
     /**
      * Returns the maximum X position of these model elements
      */
     public static double getMaxX(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterX).max(Double::compareTo).get();
+        return models.stream().map(m -> m.getLocation().getX()).max(Double::compareTo).orElse(0.0);
     }
 
     /**
      * Returns the min Y position of these model elements
      */
     public static double getMinY(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterY).min(Double::compareTo).get();
+        return models.stream().map(m -> m.getLocation().getY()).min(Double::compareTo).orElse(0.0);
     }
 
     /**
      * Returns the max Y position of these model elements
      */
     public static double getMaxY(List<? extends LocatableModel> models) {
-        return models.stream().map(LocatableModel::getCenterY).max(Double::compareTo).get();
+        return models.stream().map(m -> m.getLocation().getY()).max(Double::compareTo).orElse(0.0);
     }
 
     /**

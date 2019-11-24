@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Enum of update rules that is used for several GUI purposes.
+ * Enum of {@link NeuronUpdateRule}'s that is used for several GUI purposes.
  */
 public enum UpdateRuleEnum {
 
@@ -50,8 +50,23 @@ public enum UpdateRuleEnum {
         this.rule = rule;
     }
 
+    /**
+     * Return the rule associate with an enum value.
+     */
     public Class<? extends NeuronUpdateRule> getRule() {
         return rule;
+    }
+
+    /**
+     * Returns the enum member based on a provided {@link NeuronUpdateRule}
+     */
+    public static UpdateRuleEnum get(NeuronUpdateRule toCheck) {
+        for (int i = 0; i < UpdateRuleEnum.values().length ; i++) {
+           if (UpdateRuleEnum.values()[i].getRule() == toCheck.getClass()) {
+               return UpdateRuleEnum.values()[i];
+           }
+        }
+        return null;
     }
 
     @Override

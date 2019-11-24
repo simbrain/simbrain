@@ -21,6 +21,7 @@ package org.simbrain.util.propertyeditor;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -345,7 +346,9 @@ public class ObjectTypeEditor extends JComponent {
         if (parent == null) {
             parent = SwingUtilities.getWindowAncestor(ObjectTypeEditor.this);
         }
-        parent.pack();
+        if (parent != null) {
+            parent.pack();
+        }
     }
 
     /**
@@ -439,5 +442,14 @@ public class ObjectTypeEditor extends JComponent {
         cbObjectType.setEnabled(enabled);
     }
 
+    /**
+     * Set the state of the detail triangle on the object type editor
+     *
+     * @param isOpen if true the detail triangle is open, else closed.
+     */
+    public void setDetailTriangleOpen(boolean isOpen) {
+        detailTriangle.setState(isOpen);
+        syncPanelToTriangle();
+    }
 
 }

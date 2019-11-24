@@ -28,8 +28,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,11 +40,6 @@ import java.util.List;
  * @author jyoshimi
  */
 public class AddNeuronsDialog extends StandardDialog {
-
-    /**
-     * Default.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The default layout.
@@ -78,11 +71,6 @@ public class AddNeuronsDialog extends StandardDialog {
      * update rule.
      */
     private final JButton helpButton = new JButton("Help");
-
-    /**
-     * Show Help Action. The action executed by the help button
-     */
-    private ShowHelpAction helpAction;
 
     /**
      * Item panel where options will be displayed.
@@ -174,10 +162,12 @@ public class AddNeuronsDialog extends StandardDialog {
 
         // Neuron Properties Panel
         addNeuronsPanel.add(combinedNeuronInfoPanel);
+        combinedNeuronInfoPanel.setDetailTrianglesOpen(false);
 
         // Layout Panel
         layoutObject.setLayout(DEFAULT_LAYOUT);
         selectLayout = new AnnotatedPropertyEditor(layoutObject);
+        selectLayout.setDetailTrianglesOpen(false);
         addNeuronsPanel.add(selectLayout);
 
         // Group Panel
@@ -191,44 +181,35 @@ public class AddNeuronsDialog extends StandardDialog {
 
     /**
      * Adds the neurons to the panel.
+     *
+     * @param inGroup if true, add them in a group.
      */
-    private void addNeurons() {
+    private void addNeurons(boolean inGroup) {
         double number = Utils.doubleParsable(numNeurons);
         if (!Double.isNaN(number)) {
-            number = (int) number;
             Network net = networkPanel.getNetwork();
             for (int i = 0; i < number; i++) {
                 addedNeurons.add(new Neuron(net, baseNeuron));
             }
-            networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
+            if (inGroup) {
+                NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork(), addedNeurons);
+                ng.setLayout(layoutObject.getLayout());
+                networkPanel.getNetwork().addGroup(ng);
+                ng.applyLayout();
+                ng.setLabel(groupPanel.tfGroupName.getText());
+            } else {
+                networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
+            }
         }
     }
 
-    /**
-     * Adds the neurons to the panel as a group.
-     */
-    private void addGroup() {
-        addNeurons();
-        NeuronGroup ng = groupPanel.generateNeuronGroup();
-        if (ng != null) {
-            // TODO: Rewrite after refactoring neuron groups
-            networkPanel.getNetwork().transferNeuronsToGroup(addedNeurons, ng);
-            networkPanel.getNetwork().addGroup(ng);
-            ng.setLayout(layoutObject.getLayout());
-            networkPanel.repaint();
-        }
-    }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         combinedNeuronInfoPanel.commitChanges();
         selectLayout.commitChanges();
-        if (groupPanel.getAddToGroup().isSelected()) {
-            addGroup();
-        } else {
-            addNeurons();
-        }
+        addNeurons(groupPanel.getAddToGroup().isSelected());
         dispose();
     }
 
@@ -295,26 +276,9 @@ public class AddNeuronsDialog extends StandardDialog {
         private void addListeners() {
             addToGroup.addActionListener(evt -> {
                 tfGroupName.setEnabled(addToGroup.isSelected());
-                String dName = networkPanel.getNetwork().getGroupIdGenerator().getId();
+                String dName = networkPanel.getNetwork().getGroupIdGenerator().getProposedId();
                 tfGroupName.setText(dName);
             });
-        }
-
-        /**
-         * Generates the neuron group with the attributes from the panel.
-         * Returns null if the {@link #addToGroup addToGroup} check-box is not
-         * selected.
-         *
-         * @return the new neuron group
-         */
-        public NeuronGroup generateNeuronGroup() {
-            if (addToGroup.isSelected()) {
-                NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork());
-                ng.setLabel(tfGroupName.getText());
-                return ng;
-            } else {
-                return null;
-            }
         }
 
         public JCheckBox getAddToGroup() {

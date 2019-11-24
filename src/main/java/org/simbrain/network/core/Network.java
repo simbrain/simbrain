@@ -718,15 +718,6 @@ public class Network {
         changeSupport.firePropertyChange("ncAdded", null, nc);
     }
 
-    //TODO: Remove after neuron group refactor
-    public void transferNeuronsToGroup(List<Neuron> list, NeuronGroup group) {
-        for (Neuron neuron : list) {
-            looseNeurons.remove(neuron);
-            group.addNeuron(neuron, false);
-        }
-    }
-
-
     /**
      * Set the activation level of all neurons to zero.
      */

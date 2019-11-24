@@ -37,6 +37,7 @@ import java.awt.event.MouseListener;
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
+
     //TODO: Some wrappers would be nice here, like a panel where you add a
     // component and the triangle is already there ready to be used
     /**
@@ -138,7 +139,16 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      */
     public void changeState() {
         // Whatever state it's in, change it to the other state.
-        down = !down;
+        setState(!down);
+    }
+
+    /**
+     * Set the state of the drop down triangle.
+     *
+     * @param isDown if true, the triangle should be "open". False is closed.
+     */
+     public void setState(boolean isDown) {
+        down = isDown;
         ddTriangle.setState(down);
         removeAll();
         initLayout();
@@ -168,8 +178,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -181,8 +189,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Sets the color of the label when the triangle is in the up state.
-     *
-     * @param color
      */
     public void setUpLabelColor(Color color) {
         upTriLabel.setForeground(color);
@@ -190,8 +196,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Sets the color of the label when the triangle is in the down state.
-     *
-     * @param color
      */
     public void setDownLabelColor(Color color) {
         downTriLabel.setForeground(color);
@@ -199,8 +203,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed when the triangle is in the "up" state
-     *
-     * @param upText
      */
     public void setUpText(String upText) {
         upTriLabel.setText(upText);
@@ -208,8 +210,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed when the triangle is in the down state
-     *
-     * @param downText
      */
     public void setDownText(String downText) {
         downTriLabel.setText(downText);
@@ -217,9 +217,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Changes the text displayed next to the triangle.
-     *
-     * @param upText
-     * @param downText
      */
     public void setBothTexts(String upText, String downText) {
         setUpText(upText);
@@ -259,8 +256,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         private Image triangle;
 
         /**
-         * @param upState
-         * @param down
+         * Construct the triangle
          */
         public ClickableTriangle(UpDirection upState, boolean down) {
 
@@ -301,9 +297,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
             setSize();
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void paintComponent(Graphics g) {
             removeAll();
             super.paintComponent(g);
@@ -319,6 +313,5 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         f.setContentPane(ddt);
         f.pack();
         f.setVisible(true);
-
     }
 }

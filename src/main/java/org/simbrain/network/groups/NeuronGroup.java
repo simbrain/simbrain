@@ -33,6 +33,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
+import org.simbrain.world.odorworld.entities.EntityType;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -655,6 +656,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
     @Override
     public void addNeurons(Collection<Neuron> neurons) {
+        groupUpdateRule = UpdateRuleEnum.get(neurons.iterator().next().getUpdateRule());
+        // TODO: Throw exception if not same type
         super.addNeurons(neurons);
         neurons.forEach(n -> n.setParentGroup(this));
     }

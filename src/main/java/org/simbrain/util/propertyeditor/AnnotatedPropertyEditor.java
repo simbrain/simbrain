@@ -499,4 +499,17 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         return null;
     }
 
+    /**
+     * Open or close all the detail triangles in any {@link ObjectTypeEditor} widgets this editor contains.
+     *
+     * @param open if true, open the detail triangles; else close them
+     */
+    public void setDetailTrianglesOpen(boolean open) {
+        widgets.stream()
+                .map(ParameterWidget::getComponent)
+                .filter(ObjectTypeEditor.class::isInstance)
+                .map(ObjectTypeEditor.class::cast)
+                .forEach(oe -> oe.setDetailTriangleOpen(open));
+    }
+
 }

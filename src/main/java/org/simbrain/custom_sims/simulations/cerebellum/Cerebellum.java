@@ -72,7 +72,7 @@ public class Cerebellum extends RegisteredSimulation {
         setUpControlPanel();
 
         // Add docviewer
-        //sim.addDocViewer(0, 279, 261, 325, "Information", "cerebellum.html");
+        sim.addDocViewer(0, 279, 261, 325, "Information", "cerebellum.html");
 
     }
 

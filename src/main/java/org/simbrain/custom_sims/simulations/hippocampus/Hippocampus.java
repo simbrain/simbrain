@@ -91,8 +91,8 @@ public class Hippocampus extends RegisteredSimulation {
         setUpControlPanel();
 
         // Add docviewer
-        //sim.addDocViewer(807, 12, 307, 591, "Information",
-        //    "Hippocampus.html");
+        sim.addDocViewer(807, 12, 307, 591, "Information",
+            "Hippocampus.html");
 
     }
 

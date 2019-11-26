@@ -27,6 +27,7 @@ import java.net.URL;
  * the rest of the program.
  */
 public class ResourceManager {
+
     private static int smallIconSize = 18;
 
     /**

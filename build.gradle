@@ -1,7 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'application'
-//apply plugin: 'checkstyle'
+plugins {
+    id 'java'
+    id 'idea'
+    id 'application'
+    // id 'checkstyle'
+
+    // Build executable jar using <code>gradle shadowJar</code>. The result is placed in be in build/libs
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+
+}
 
 def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '[3.2,)' // ) means it always gets the latest 3.2.X version
@@ -84,98 +90,6 @@ dependencies {
 
 }
 
-// TODO: Add docs to these as they are uncommented
-
-// sourceSets {
-//     main {
-//         java {
-//             srcDir 'src'
-//         }
-//         resources {
-//             srcDirs 'src/org/simbrain/resource',
-//                     'src/org/simbrain/world/odorworld/resources',
-//                     'src/org/simbrain/world/threedworld/threedassets/',
-//                     'src/org/simbrain/custom_sims/resources/'
-//             exclude '**/*.java'
-//         }
-//     }
-// }
-
-// compileJava {
-//     // https://discuss.gradle.org/t/regarding-the-annotation-processors-on-compile-classpath-warning-in-gradle-4-6/26144
-//     options.compilerArgs += '-proc:none'
-//     options.encoding = 'UTF-8'
-// }
-
-// task pathingJar(type: Jar) {
-//     dependsOn configurations.runtime
-//     appendix = 'pathing'
-
-//     doFirst {
-//         manifest {
-//             attributes "Class-Path": configurations.runtime.files.collect {
-//                 it.toURL().toString().replaceFirst(/file:\/+/ , '/' )
-//             }.join(' ')
-//             attributes (
-//                 'Main-Class': 'org.simbrain.workspace.gui.SimbrainDesktop'
-//             )
-//         }
-
-//     }
-// }
-
-// run {
-//     dependsOn pathingJar
-//     doFirst {
-//         classpath = files(sourceSets.main.output.files, pathingJar.archivePath)
-//     }
-// }
-
-// checkstyle{
-//     configFile rootProject.file('etc/checkstyle.xml')
-// }
-
-
-// // Define a custom simbrain distribution task. Invoke with <code>gradle sb_distZip</code>
-// distributions {
-//     sb_ {
-//         description 
-//         baseName = versionName
-//         contents {
-//             from {
-//                 uberJar
-//             }
-//             from {projectDir} {
-//                 include 'scripts/**'
-//                 include 'etc/Readme.txt'
-//                 include 'etc/ReleaseNotes.txt'
-//                 include 'etc/License.txt'
-//                 include 'etc/config.properties'
-//                 include 'simulations/**'
-//                 include 'utils/**'
-//                 include 'docs/**'
-//             }
-//         }
-//     }
-
-// }
-
-// // TODO: Create a custom distribution that loads up this together with other stuff
-// task uberJar(type: Jar) {
-
-//     archivesBaseName = versionName
-//     manifest {
-//         attributes(
-//                 'Main-Class': mainClassName
-//         )
-//     }
-
-//     from sourceSets.main.output
-//     from configurations.runtimeClasspath.
-//             findAll { it.name.endsWith('jar') }.
-//             collect { zipTree(it) }
-// }
-
 
 // Sample call: gradle runSim -PsimName='Evolve Mouse Pursuer'
 task runSim(type: JavaExec) {
@@ -185,7 +99,6 @@ task runSim(type: JavaExec) {
         args simName
     }
 }
-
 
 task printStuff {
     group 'Misc'
@@ -199,3 +112,8 @@ task printStuff {
         println projectDir
     }
 }
+
+// Uncomment to minimize the JAR.  Currently only reduces < 10%, and the jar does not execute.
+//shadowJar {
+//    minimize()
+//}

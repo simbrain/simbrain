@@ -43,6 +43,7 @@ public class PlacementManager {
      * Offsets associated with specfic types of objects.
      */
     private static Map<Class<? extends LocatableModel>, Point2D> defaultOffsets = new HashMap<>();
+
     static {
         defaultOffsets.put(Neuron.class, new Point2D.Double(45, 0));
         defaultOffsets.put(NeuronArray.class, new Point2D.Double(0, -145));
@@ -74,6 +75,8 @@ public class PlacementManager {
      * Second paste after changing location
      */
     private boolean secondPaste = false;
+
+    private boolean newCopy = false;
 
     /**
      * Resets the anchor point and tells the placement manager to place object(s) there.
@@ -128,11 +131,16 @@ public class PlacementManager {
             secondPaste = true;
         } else if (secondPaste) {
             // Location was changed during a paste trail
-            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint),lastClickedLocation);
+            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint), lastClickedLocation);
             delta = SimbrainMath.subtract(newLocation, modelLocation.get());
             previousAnchorPoint = lastClickedLocation;
             anchorPoint = modelLocation;
             secondPaste = false;
+        } else if (newCopy) {
+            delta = SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint);
+            previousAnchorPoint = modelLocation.get();
+            anchorPoint = modelLocation;
+            newCopy = false;
         } else {
             // Standard case: Offset by delta between last and current anchor point
             Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint), anchorPoint.get());
@@ -161,6 +169,10 @@ public class PlacementManager {
         previousAnchorPoint = anchorPoint.get();
         anchorPoint = () -> nextLocation;
         return nextLocation;
+    }
+
+    public void setNewCopy() {
+        newCopy = true;
     }
 
     /**

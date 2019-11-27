@@ -1444,6 +1444,7 @@ public class NetworkPanel extends JPanel {
         }
         Clipboard.clear();
         Clipboard.add(getSelectedModels());
+        placementManager.setNewCopy();
     }
 
     /**

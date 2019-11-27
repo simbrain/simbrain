@@ -56,7 +56,7 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
         networkPanel.getCanvas().getCamera().localToView(canvasPosition);
         // Set this position so that new objects are added here
-        networkPanel.getPlacementManager().setNextLocationFixed(canvasPosition);
+        networkPanel.getPlacementManager().setLastClickedLocation(canvasPosition);
     }
 
     /**

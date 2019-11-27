@@ -1,12 +1,12 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.LocatableModel;
+import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.SimbrainMath;
-import umontreal.iro.lecuyer.simevents.Sim;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -14,48 +14,102 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Manage intelligent placement of new model elements in a {@link org.simbrain.network.gui.NetworkPanel}.
+ * <br>
+ * Placement is managed using two concepts. First, an anchor point. Second, a delta between the current anchor point and
+ * previous anchor point.  There are cases to keep in mind.
+ * <br>
+ * (1) The anchor point is reset when you click on the screen, to the point you clicked on.
+ * <br>
+ * (2) Repeatedly adding an object (using new Neuron, etc) adds them at a fixed offset from the anchor point using
+ * {@link #defaultOffsets}. With each addition, the current and previous anchor points are updated. See
+ * {@link #addNewModelObject(LocatableModel)}.
+ * <br>
+ * (3) Adding an object using copy-paste or duplicate, adds them using the delta between the current anchor point and
+ * the previous anchor point. This allows custom "paste trails" to be created.
+ *
+ * @author Yulin Li
+ * @author Jeff Yoshimi
+ */
 public class PlacementManager {
 
     /**
-     * Default offset for new points.
+     * A default offset used for subnetworks and other objects not covered in the list below.
      */
     private static Point2D DEFAULT_OFFSET = new Point2D.Double(45, 0);
 
+    /**
+     * Offsets associated with specfic types of objects.
+     */
     private static Map<Class<? extends LocatableModel>, Point2D> defaultOffsets = new HashMap<>();
-
     static {
         defaultOffsets.put(Neuron.class, new Point2D.Double(45, 0));
         defaultOffsets.put(NeuronArray.class, new Point2D.Double(0, -145));
         defaultOffsets.put(NeuronGroup.class, new Point2D.Double(50, 50));
+        defaultOffsets.put(NetworkTextObject.class, new Point2D.Double(45, 50));
     }
 
-    private Point2D offset = DEFAULT_OFFSET;
+    /**
+     * Tells you location of the most recently placed object.
+     */
+    private Supplier<Point2D> anchorPoint = () -> new Point2D.Double(0, 0);
 
-    private Point2D previous = new Point2D.Double(0, 0);
+    /**
+     * Last used anchor point.
+     */
+    private Point2D previousAnchorPoint = new Point2D.Double(0, 0);
 
-    private Supplier<Point2D> current = () -> new Point2D.Double(0, 0);
+    /**
+     * Last location clicked on screen.
+     */
+    private Point2D lastClickedLocation = new Point2D.Double(0, 0);
 
-    private boolean placeOnLastClick = false;
+    /**
+     * Set to true when a location on the screen is clicked.
+     */
+    private boolean useLastClickedLocation = false;
 
+    /**
+     * Set to true when you copy.
+     */
     private boolean copyInit = false;
 
-    public Point2D setNextLocationOnto(LocatableModel model) {
-        previous = current.get();
+    /**
+     * Resets the anchor point and tells the placement manager to place object(s) there.
+     */
+    public void setLastClickedLocation(Point2D location) {
+        lastClickedLocation = location;
+        useLastClickedLocation = true;
+    }
+
+    /**
+     * Add a new model object and use default offsets.
+     */
+    public Point2D addNewModelObject(LocatableModel model) {
+        previousAnchorPoint = anchorPoint.get();
         Point2D nextLocation;
-        if (placeOnLastClick) {
-            nextLocation = current.get();
-            placeOnLastClick = false;
+        if (useLastClickedLocation) {
+            nextLocation = lastClickedLocation;
+            useLastClickedLocation = false;
         } else {
-            nextLocation = SimbrainMath.add(current.get(), defaultOffsets.getOrDefault(model.getClass(), DEFAULT_OFFSET));
+            // Use "default" offset
+            nextLocation = SimbrainMath.add(anchorPoint.get(), defaultOffsets.getOrDefault(model.getClass(), DEFAULT_OFFSET));
         }
         model.setLocation(nextLocation);
-        current = model::getLocation;
+        anchorPoint = model::getLocation;
         return nextLocation;
     }
 
-    public Point2D setNextPasteLocationOnto(List<LocatableModel> models) {
+    /**
+     * Paste a list of objects and place it using the delta between the current anchor point and the
+     * previous anchor point.
+     */
+    public void setNextPasteLocationOnto(List<LocatableModel> models) {
+
         if (models.isEmpty()) {
-            return current.get();
+            anchorPoint.get();
+            return;
         }
 
         Supplier<Point2D> modelLocation =
@@ -63,61 +117,62 @@ public class PlacementManager {
 
         Point2D delta;
 
-        if (placeOnLastClick) {
-            delta = SimbrainMath.subtract(current.get(), modelLocation.get());
-            placeOnLastClick = false;
+        if (useLastClickedLocation) {
+            delta = SimbrainMath.subtract(lastClickedLocation, modelLocation.get());
+            useLastClickedLocation = false;
             copyInit = true;
         } else if (copyInit) {
-            Point2D newLocation = SimbrainMath.add(getInitialPasteDelta(models), current.get());
+
+            Point2D newLocation = SimbrainMath.add(getDefaultOffset(models), anchorPoint.get());
             delta = SimbrainMath.subtract(newLocation, modelLocation.get());
             copyInit = false;
         } else {
-            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(current.get(), previous), current.get());
+
+            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint), anchorPoint.get());
             delta = SimbrainMath.subtract(newLocation, modelLocation.get());
         }
 
-        previous = current.get();
+        previousAnchorPoint = anchorPoint.get();
         for (LocatableModel model : models) {
             model.setLocation(SimbrainMath.add(model.getLocation(), delta));
         }
-        current = modelLocation;
-        return current.get();
+        anchorPoint = modelLocation;
+        anchorPoint.get();
     }
 
+    /**
+     * When an explicit location is needed. TODO: Phase out use of this method and remove when no longer called.
+     */
     public Point2D getLocationAndIncrement() {
         Point2D nextLocation;
-        if (placeOnLastClick) {
-            nextLocation = current.get();
-            placeOnLastClick = false;
+        if (useLastClickedLocation) {
+            nextLocation = anchorPoint.get();
+            useLastClickedLocation = false;
         } else {
-            nextLocation = SimbrainMath.add(current.get(), offset);
+            nextLocation = SimbrainMath.add(anchorPoint.get(), DEFAULT_OFFSET);
         }
-        previous = current.get();
-        current = () -> nextLocation;
+        previousAnchorPoint = anchorPoint.get();
+        anchorPoint = () -> nextLocation;
         return nextLocation;
     }
 
-    public void setNextLocationFixed(Point2D location) {
-        System.out.println("PlacementManager.setNextLocationFixed");
-        current = () -> location;
-        placeOnLastClick = true;
-    }
-
-    public void setCopyModels(List<LocatableModel> models) {
-        setCopyModels(models, true);
-    }
-
+    /**
+     * Set...
+     */
     public void setCopyModels(List<LocatableModel> models, boolean resetSequence) {
         if (resetSequence) {
-            System.out.println("PlacementManager.setCopyModels");
-            previous = current.get();
-            current = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
-            placeOnLastClick = false;
+            previousAnchorPoint = anchorPoint.get();
+            anchorPoint = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
+            useLastClickedLocation = false;
             copyInit = resetSequence;
         }
     }
 
-    private Point2D getInitialPasteDelta(List<LocatableModel> models) {
+    /**
+     * Get offsets for lists of model objects.  Adds the relevant {@link #defaultOffsets} to the width and height of
+     * the list of objects.
+     */
+    private Point2D getDefaultOffset(List<LocatableModel> models) {
         Point2D offset = defaultOffsets.getOrDefault(models.get(0).getClass(), DEFAULT_OFFSET);
         Point2D ret = new Point2D.Double();
 

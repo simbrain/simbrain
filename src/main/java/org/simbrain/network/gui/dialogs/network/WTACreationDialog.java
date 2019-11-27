@@ -108,7 +108,7 @@ public class WTACreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         wta.setLayout(layoutObject.getLayout());
         wta.applyLayout();
-        networkPanel.getPlacementManager().setNextLocationOnto(wta);
+        networkPanel.getPlacementManager().addNewModelObject(wta);
         networkPanel.getNetwork().addGroup(wta);
         networkPanel.repaint();
         super.closeDialogOk();

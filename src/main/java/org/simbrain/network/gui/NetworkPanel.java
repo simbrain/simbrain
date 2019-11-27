@@ -561,7 +561,7 @@ public class NetworkPanel extends JPanel {
     public void addNeuron(final NeuronUpdateRule baseRule) {
 
         final Neuron neuron = new Neuron(getNetwork(), baseRule);
-        placementManager.setNextLocationOnto(neuron);
+        placementManager.addNewModelObject(neuron);
         neuron.forceSetActivation(0);
         getNetwork().addLooseNeuron(neuron);
 
@@ -627,7 +627,7 @@ public class NetworkPanel extends JPanel {
 
         setSelection(nodes);
 
-        Point2D p = placementManager.setNextLocationOnto(neurons.get(0));
+        Point2D p = placementManager.addNewModelObject(neurons.get(0));
 
         layout.setInitialLocation(p);
 
@@ -2416,7 +2416,7 @@ public class NetworkPanel extends JPanel {
             Network network = getNetwork();
             NeuronArray neuronArray = creationTemplate.create(network);
             // Place new neuron arrays far anough above one another that the intervening weight matrix shows
-            placementManager.setNextLocationOnto(neuronArray);
+            placementManager.addNewModelObject(neuronArray);
             network.addNeuronArray(neuronArray);
         }));
         and.pack();

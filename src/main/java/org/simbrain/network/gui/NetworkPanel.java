@@ -1439,6 +1439,10 @@ public class NetworkPanel extends JPanel {
      * Copy to the clipboard.
      */
     public void copy() {
+        copy(true);
+    }
+
+    public void copy(boolean resetSequence) {
         if(getSelectedModels().isEmpty()) {
             return;
         }
@@ -1447,7 +1451,8 @@ public class NetworkPanel extends JPanel {
         placementManager.setCopyModels(getSelectedModels().stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)
-                .collect(Collectors.toList())
+                .collect(Collectors.toList()),
+            resetSequence
         );
     }
 
@@ -1473,7 +1478,7 @@ public class NetworkPanel extends JPanel {
         if(getSelectedModels().isEmpty()) {
             return;
         }
-        copy();
+        copy(false);
         paste();
     }
 

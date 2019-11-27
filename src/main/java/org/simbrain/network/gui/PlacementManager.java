@@ -104,11 +104,17 @@ public class PlacementManager {
     }
 
     public void setCopyModels(List<LocatableModel> models) {
-        System.out.println("PlacementManager.setCopyModels");
-        previous = current.get();
-        current = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
-        placeOnLastClick = false;
-        copyInit = true;
+        setCopyModels(models, true);
+    }
+
+    public void setCopyModels(List<LocatableModel> models, boolean resetSequence) {
+        if (resetSequence) {
+            System.out.println("PlacementManager.setCopyModels");
+            previous = current.get();
+            current = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
+            placeOnLastClick = false;
+            copyInit = resetSequence;
+        }
     }
 
     private Point2D getInitialPasteDelta(List<LocatableModel> models) {

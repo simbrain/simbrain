@@ -1439,21 +1439,11 @@ public class NetworkPanel extends JPanel {
      * Copy to the clipboard.
      */
     public void copy() {
-        copy(true);
-    }
-
-    public void copy(boolean resetSequence) {
         if(getSelectedModels().isEmpty()) {
             return;
         }
         Clipboard.clear();
         Clipboard.add(getSelectedModels());
-        placementManager.setCopyModels(getSelectedModels().stream()
-                .filter(LocatableModel.class::isInstance)
-                .map(LocatableModel.class::cast)
-                .collect(Collectors.toList()),
-            resetSequence
-        );
     }
 
     /**
@@ -1478,7 +1468,7 @@ public class NetworkPanel extends JPanel {
         if(getSelectedModels().isEmpty()) {
             return;
         }
-        copy(false);
+        copy();
         paste();
     }
 

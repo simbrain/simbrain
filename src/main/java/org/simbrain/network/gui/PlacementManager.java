@@ -51,7 +51,7 @@ public class PlacementManager {
     }
 
     /**
-     * Tells you location of the most recently placed object.
+     * Tells you the location of the most recently placed object.
      */
     private Supplier<Point2D> anchorPoint = () -> new Point2D.Double(0, 0);
 
@@ -71,9 +71,9 @@ public class PlacementManager {
     private boolean useLastClickedLocation = false;
 
     /**
-     * Set to true when you copy.
+     * Second paste after changing location
      */
-    private boolean copyInit = false;
+    private boolean secondPaste = false;
 
     /**
      * Resets the anchor point and tells the placement manager to place object(s) there.
@@ -101,11 +101,15 @@ public class PlacementManager {
         return nextLocation;
     }
 
+    //// Place a group of objects using default offsets
+    //Point2D newLocation = SimbrainMath.add(getDefaultOffset(models), anchorPoint.get());
+    //delta = SimbrainMath.subtract(newLocation, modelLocation.get());
+
     /**
      * Paste a list of objects and place it using the delta between the current anchor point and the
      * previous anchor point.
      */
-    public void setNextPasteLocationOnto(List<LocatableModel> models) {
+    public void pasteObjects(List<LocatableModel> models) {
 
         if (models.isEmpty()) {
             anchorPoint.get();
@@ -118,26 +122,29 @@ public class PlacementManager {
         Point2D delta;
 
         if (useLastClickedLocation) {
+            // Paste objects at last clicked location
             delta = SimbrainMath.subtract(lastClickedLocation, modelLocation.get());
             useLastClickedLocation = false;
-            copyInit = true;
-        } else if (copyInit) {
-
-            Point2D newLocation = SimbrainMath.add(getDefaultOffset(models), anchorPoint.get());
+            secondPaste = true;
+        } else if (secondPaste) {
+            // Location was changed during a paste trail
+            Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint),lastClickedLocation);
             delta = SimbrainMath.subtract(newLocation, modelLocation.get());
-            copyInit = false;
+            previousAnchorPoint = lastClickedLocation;
+            anchorPoint = modelLocation;
+            secondPaste = false;
         } else {
-
+            // Standard case: Offset by delta between last and current anchor point
             Point2D newLocation = SimbrainMath.add(SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint), anchorPoint.get());
             delta = SimbrainMath.subtract(newLocation, modelLocation.get());
+            previousAnchorPoint = anchorPoint.get();
+            anchorPoint = modelLocation;
         }
 
-        previousAnchorPoint = anchorPoint.get();
+        // Update the locations
         for (LocatableModel model : models) {
             model.setLocation(SimbrainMath.add(model.getLocation(), delta));
         }
-        anchorPoint = modelLocation;
-        anchorPoint.get();
     }
 
     /**
@@ -154,18 +161,6 @@ public class PlacementManager {
         previousAnchorPoint = anchorPoint.get();
         anchorPoint = () -> nextLocation;
         return nextLocation;
-    }
-
-    /**
-     * Set...
-     */
-    public void setCopyModels(List<LocatableModel> models, boolean resetSequence) {
-        if (resetSequence) {
-            previousAnchorPoint = anchorPoint.get();
-            anchorPoint = () -> new Point2D.Double(SimnetUtils.getMinX(models), SimnetUtils.getMinY(models));
-            useLastClickedLocation = false;
-            copyInit = resetSequence;
-        }
     }
 
     /**

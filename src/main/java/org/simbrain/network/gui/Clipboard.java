@@ -22,9 +22,7 @@ import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.util.SimnetUtils;
-import org.simbrain.util.math.SimbrainMath;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -92,7 +90,7 @@ public class Clipboard {
                 .collect(Collectors.toList());
         net.setSelection(toSelect);
 
-        net.getPlacementManager().setNextPasteLocationOnto(copy.stream()
+        net.getPlacementManager().pasteObjects(copy.stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)
                 .collect(Collectors.toList())

@@ -29,6 +29,7 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.gui.nodes.*;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
@@ -100,16 +101,18 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
     @Override
     public void mouseClicked(final PInputEvent event) {
 
-        // A click without a drag, e.g. making a lasso
-        // Reset placement manager's anchor point
-        networkPanel.getPlacementManager().setLastClickedLocation(event.getPosition());
-
         // System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
 
         // Set picked node
         PNode node = event.getPath().getPickedNode();
         //System.out.println("Mouse clicked / Picked node: " + node);
+
+        // Reset placement manager's anchor point
+        if (node instanceof PCamera) {
+            // A click without dragging objects
+            networkPanel.getPlacementManager().setLastClickedLocation(event.getPosition());
+        }
 
         // Double click on text objects to edit them
         if (event.getClickCount() != 1) {

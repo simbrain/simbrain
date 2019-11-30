@@ -26,6 +26,8 @@ package org.simbrain.network.trainers;
 
 import Jama.Matrix;
 import org.ojalgo.access.Access2D.Builder;
+import org.ojalgo.access.*;
+
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;

@@ -1,12 +1,12 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import java.util.concurrent.ThreadLocalRandom;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
-
 import org.simbrain.util.math.ProbabilityDistribution;
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.NormalDist;
+import umontreal.ssj.probdist.Distribution;
+import umontreal.ssj.probdist.NormalDist;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NormalDistribution extends ProbabilityDistribution {
 

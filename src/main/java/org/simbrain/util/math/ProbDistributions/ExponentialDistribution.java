@@ -3,10 +3,10 @@ package org.simbrain.util.math.ProbDistributions;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
+import umontreal.ssj.probdist.Distribution;
+import umontreal.ssj.probdist.ExponentialDist;
+import umontreal.ssj.randvar.ExponentialGen;
 
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.ExponentialDist;
-import umontreal.iro.lecuyer.randvar.ExponentialGen;
 
 public class ExponentialDistribution extends ProbabilityDistribution {
 

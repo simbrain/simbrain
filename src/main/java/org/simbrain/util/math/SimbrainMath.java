@@ -18,8 +18,8 @@
  */
 package org.simbrain.util.math;
 
-import umontreal.iro.lecuyer.rng.LFSR258;
-import umontreal.iro.lecuyer.rng.RandomStream;
+import umontreal.ssj.rng.LFSR258;
+import umontreal.ssj.rng.RandomStream;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;

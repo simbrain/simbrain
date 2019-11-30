@@ -3,7 +3,7 @@ package org.simbrain.util.math.ProbDistributions;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import umontreal.iro.lecuyer.randvar.LognormalGen;
+import umontreal.ssj.randvar.LognormalGen;
 
 public class LogNormalDistribution extends ProbabilityDistribution {
 

@@ -5,8 +5,8 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
-import umontreal.iro.lecuyer.rng.LFSR113;
-import umontreal.iro.lecuyer.rng.RandomStream;
+import umontreal.ssj.rng.LFSR113;
+import umontreal.ssj.rng.RandomStream;
 
 import java.util.Arrays;
 import java.util.List;

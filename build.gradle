@@ -25,11 +25,16 @@ repositories {
 
 dependencies {
 
-    // TODO: Remove these dependencies
-    compile files(
-            'lib/ojalgo-35.0.jar',
-            'lib/utils.jar',
-            'lib/ssj.jar')
+
+    // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
+    compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
+
+    //https://mvnrepository.com/artifact/org.ostermiller/utils
+    compile group: 'org.ostermiller', name: 'utils', version: '1.07.00'
+
+    // https://mvnrepository.com/artifact/org.ojalgo/ojalgo
+    compile group: 'org.ojalgo', name: 'ojalgo', version: '37.1.1'
+
 
     // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
     compile group: 'org.tinylog', name: 'tinylog', version: '1.3.6'

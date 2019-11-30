@@ -1,13 +1,11 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.ojalgo.random.Gamma;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.SimbrainConstants.Polarity;
-
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.GammaDist;
-import umontreal.iro.lecuyer.randvar.GammaGen;
+import umontreal.ssj.probdist.Distribution;
+import umontreal.ssj.probdist.GammaDist;
+import umontreal.ssj.randvar.GammaGen;
 
 public class GammaDistribution extends ProbabilityDistribution {
 

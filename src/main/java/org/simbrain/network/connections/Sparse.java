@@ -23,9 +23,12 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
-import umontreal.iro.lecuyer.randvar.BinomialGen;
+import umontreal.ssj.randvar.BinomialGen;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * A superclass for all connectors whose primary parameter is related to base

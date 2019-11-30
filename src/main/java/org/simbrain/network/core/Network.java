@@ -1717,6 +1717,9 @@ public class Network {
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
         changeSupport.addPropertyChangeListener(listener);
     }
 

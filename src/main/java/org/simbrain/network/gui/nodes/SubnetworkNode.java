@@ -20,6 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
@@ -46,7 +47,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends PPath.Float implements GroupNode {
+public class SubnetworkNode extends ScreenElement implements GroupNode {
 
     /**
      * Parent network panel.
@@ -80,6 +81,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode {
      * @param group        the layered network
      */
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
+        super(networkPanel);
         this.networkPanel = networkPanel;
         this.subnetwork = group;
         interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
@@ -156,11 +158,9 @@ public class SubnetworkNode extends PPath.Float implements GroupNode {
         interactionBox.updateText();
     }
 
-    /**
-     * @return the networkPanel
-     */
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
+    @Override
+    public NetworkModel getModel() {
+        return null;
     }
 
     /**
@@ -208,6 +208,46 @@ public class SubnetworkNode extends PPath.Float implements GroupNode {
 
     }
 
+    @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
+    public boolean showNodeHandle() {
+        return false;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+        return false;
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasContextMenu() {
+        return false;
+    }
+
+    @Override
+    protected JPopupMenu getContextMenu() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
     /**
      * Helper class to create the subnetwork dialog. Subclasses override this
      * class to create custom property dialogs.
@@ -230,6 +270,11 @@ public class SubnetworkNode extends PPath.Float implements GroupNode {
             }
         };
         return dialog;
+    }
+
+    @Override
+    public void resetColors() {
+
     }
 
 

@@ -103,7 +103,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     }
 
     @Override
-    protected AbstractNeuronCollection getModel() {
+    public AbstractNeuronCollection getModel() {
         return neuronCollection;
     }
 
@@ -112,7 +112,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
      *
      * @return the neuron group property dialog.
      */
-    private StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return null;
     }
 

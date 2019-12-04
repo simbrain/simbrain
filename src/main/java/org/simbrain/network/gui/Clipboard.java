@@ -21,6 +21,7 @@ package org.simbrain.network.gui;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.util.SimnetUtils;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class Clipboard {
         net.getNetwork().addObjects(copy);
 
         // Select copied objects after pasting them
-        List<PNode> toSelect = copy.stream()
+        List<ScreenElement> toSelect = copy.stream()
                 .map(net.getObjectNodeMap()::get)
                 .collect(Collectors.toList());
         net.setSelection(toSelect);

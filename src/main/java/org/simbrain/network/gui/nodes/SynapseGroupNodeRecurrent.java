@@ -100,7 +100,7 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         }
 
         qRatio = quarterSize / (quarterSizeX + quarterSizeY);
-        if (Float.isNaN(qRatio)) {
+        if (java.lang.Float.isNaN(qRatio)) {
             qRatio = 1;
         }
         Arc2D.Float recArc = new Arc2D.Float((float) ng.getCenterX() - 3 * quarterSize / 2, (float) ng.getCenterY() - 3 * quarterSize / 2, quarterSize * 3, quarterSize * 3, 30, 300, Arc2D.OPEN);

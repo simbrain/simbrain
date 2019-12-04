@@ -298,7 +298,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Map associating network model objects with Piccolo Pnodes.
      */
-    private final Map<Object, PNode> objectNodeMap = Collections.synchronizedMap(new HashMap<Object, PNode>());
+    private final Map<NetworkModel, ScreenElement> objectNodeMap = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
@@ -1628,7 +1628,7 @@ public class NetworkPanel extends JPanel {
      * @param element element
      * @return true if the specified element is selected
      */
-    public boolean isSelected(final Object element) {
+    public boolean isSelected(final ScreenElement element) {
         return selectionModel.isSelected(element);
     }
 
@@ -1651,7 +1651,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param elements elements
      */
-    public void setSelection(final Collection elements) {
+    public void setSelection(final Collection<? extends ScreenElement> elements) {
         selectionModel.setSelection(elements);
     }
 
@@ -1661,7 +1661,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param element element
      */
-    public void toggleSelection(final Object element) {
+    public void toggleSelection(final ScreenElement element) {
         if (isSelected(element)) {
             selectionModel.remove(element);
         } else {
@@ -1674,7 +1674,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param element the element to "select."
      */
-    public void addSelection(final Object element) {
+    public void addSelection(final ScreenElement element) {
         selectionModel.add(element);
     }
 
@@ -1857,7 +1857,7 @@ public class NetworkPanel extends JPanel {
      * @return the list of network element nodes.
      */
     @SuppressWarnings("unchecked")
-    public <T extends PNode> List<T> getNodes(Class<T> cls) {
+    public <T extends ScreenElement> List<T> getNodes(Class<T> cls) {
         Collection<PNode> nodes = canvas.getLayer().getAllNodes();
         return nodes.stream()
                 .filter(cls::isInstance)
@@ -2509,7 +2509,7 @@ public class NetworkPanel extends JPanel {
         return frame;
     }
 
-    public Map<Object, PNode> getObjectNodeMap() {
+    public Map<NetworkModel, ScreenElement> getObjectNodeMap() {
         return objectNodeMap;
     }
 

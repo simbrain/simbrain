@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.Group;
@@ -11,7 +12,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
-public abstract class AbstractNeuronCollectionNode extends PNode implements GroupNode {
+public abstract class AbstractNeuronCollectionNode extends ScreenElement implements GroupNode {
 
     /**
      * Parent network panel.
@@ -31,6 +32,7 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     private Set<NeuronNode> neuronNodes = new HashSet<>();
 
     public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
+        super(networkPanel);
         this.networkPanel = networkPanel;
 
         outlinedObjects = new Outline();
@@ -96,12 +98,11 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
         neuronNodes.remove(neuronNode);
     }
 
-    protected abstract AbstractNeuronCollection getModel();
+    public abstract AbstractNeuronCollection getModel();
 
     public InteractionBox getInteractionBox() {
         return interactionBox;
     }
-
 
     /**
      * Set a custom interaction box.  Subclasses can call this to customize its behavior.
@@ -116,10 +117,6 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
 
     public Outline getOutlinedObjects() {
         return outlinedObjects;
-    }
-
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
     }
 
     @Override
@@ -154,4 +151,57 @@ public abstract class AbstractNeuronCollectionNode extends PNode implements Grou
     public Set<NeuronNode> getNeuronNodes() {
         return neuronNodes;
     }
+
+
+    @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
+    public boolean showNodeHandle() {
+        return false;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+        return false;
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasContextMenu() {
+        return false;
+    }
+
+    @Override
+    protected JPopupMenu getContextMenu() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
+    @Override
+    protected JDialog getPropertyDialog() {
+        return null;
+    }
+
+    @Override
+    public void resetColors() {
+
+    }
+
+
 }

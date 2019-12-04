@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -45,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Zoë Tosi
  */
 @SuppressWarnings("serial")
-public class SynapseGroupNodeBidirectional extends PNode implements PropertyChangeListener, SynapseGroupArrow, GroupNode {
+public class SynapseGroupNodeBidirectional extends ScreenElement implements PropertyChangeListener, SynapseGroupArrow, GroupNode {
 
     /**
      * The default thickness.
@@ -187,9 +188,9 @@ public class SynapseGroupNodeBidirectional extends PNode implements PropertyChan
      * Create a bidirectional simple synapse group PNode.
      *
      * @param networkPanel parent panel
-     * @param group        the synapse group
      */
     private SynapseGroupNodeBidirectional(final NetworkPanel networkPanel, final SynapseGroup synGroup1, final SynapseGroup synGroup2) {
+        super((networkPanel));
         consistencyCheck(synGroup1, synGroup2);
         this.networkPanel = networkPanel;
         this.synGroup1 = synGroup1;
@@ -619,4 +620,58 @@ public class SynapseGroupNodeBidirectional extends PNode implements PropertyChan
         synGroup2Box.updateText();
     }
 
+    @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
+    public boolean showNodeHandle() {
+        return false;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+        return false;
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasContextMenu() {
+        return false;
+    }
+
+    @Override
+    protected JPopupMenu getContextMenu() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
+    @Override
+    protected JDialog getPropertyDialog() {
+        return null;
+    }
+
+    @Override
+    public void resetColors() {
+
+    }
+
+    @Override
+    public SynapseGroup getModel() {
+        return null;
+    }
 }

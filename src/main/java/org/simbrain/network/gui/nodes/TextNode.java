@@ -71,6 +71,8 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("delete".equals(evt.getPropertyName())) {
                     TextNode.this.removeFromParent();
+                } else if ("moved".equals(evt.getPropertyName())) {
+                    TextNode.this.pullViewPositionFromModel();
                 }
             }
         });
@@ -186,15 +188,15 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        PBounds bound = this.getBounds();
+        PBounds bound = this.getFullBounds();
         getTextObject().setCenterX(p.getX() + bound.getWidth() / 2);
         getTextObject().setCenterY(p.getY() + bound.getHeight() / 2);
     }
 
     @Override
     public void offset(double dx, double dy) {
-        super.offset(dx, dy);
         pushViewPositionToModel();
+        super.offset(dx, dy);
     }
 
     /**
@@ -202,7 +204,10 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * text object.
      */
     private void pullViewPositionFromModel() {
-        Point2D p = new Point2D.Double(getTextObject().getCenterX(), getTextObject().getCenterY());
+        PBounds bound = this.getFullBounds();
+        Point2D p = new Point2D.Double(
+                getTextObject().getCenterX() - bound.getWidth() / 2,
+                getTextObject().getCenterY() - bound.getHeight() / 2);
         this.setGlobalTranslation(p);
     }
 

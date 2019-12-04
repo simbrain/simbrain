@@ -200,10 +200,12 @@ public class NetworkTextObject implements LocatableModel {
     @Override
     public void setCenterX(double newx) {
         x = newx;
+        changeSupport.firePropertyChange("moved", null, x);
     }
 
     @Override
     public void setCenterY(double newy) {
         y = newy;
+        changeSupport.firePropertyChange("moved", null, y);
     }
 }

@@ -18,12 +18,16 @@
  */
 package org.simbrain.network.gui;
 
+import com.jogamp.newt.Screen;
+import org.simbrain.network.gui.nodes.ScreenElement;
+
 import javax.swing.event.EventListenerList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 /**
  * Network selection model.
@@ -48,7 +52,7 @@ final class NetworkSelectionModel {
     /**
      * Set of selected elements.
      */
-    private final CopyOnWriteArraySet selection;
+    private final CopyOnWriteArraySet<ScreenElement> selection;
 
     /**
      * Adjusting.
@@ -105,7 +109,7 @@ final class NetworkSelectionModel {
      *
      * @param element element to add
      */
-    public void add(final Object element) {
+    public void add(final ScreenElement element) {
 
         Set oldSelection = new HashSet(selection);
         boolean rv = selection.add(element);
@@ -120,11 +124,11 @@ final class NetworkSelectionModel {
      *
      * @param elements elements to add
      */
-    public void addAll(final Collection elements) {
-
+    public void addAll(final Collection<? extends ScreenElement> elements) {
         adjusting = true;
-        Set oldSelection = new HashSet(selection);
-        boolean rv = selection.addAll(elements);
+        Set<ScreenElement> oldSelection = new HashSet<>(selection);
+        boolean rv = selection.
+                addAll(elements.stream().map(ScreenElement::getSelectionTarget).collect(Collectors.toList()));
         adjusting = false;
 
         if (rv) {
@@ -138,7 +142,7 @@ final class NetworkSelectionModel {
      *
      * @param element element to remove
      */
-    public void remove(final Object element) {
+    public void remove(final ScreenElement element) {
 
         Set oldSelection = new HashSet(selection);
         boolean rv = selection.remove(element);
@@ -153,7 +157,7 @@ final class NetworkSelectionModel {
      *
      * @param elements elements to remove
      */
-    public void removeAll(final Collection elements) {
+    public void removeAll(final Collection<? extends ScreenElement> elements) {
 
         adjusting = true;
         Set oldSelection = new HashSet(selection);
@@ -171,7 +175,7 @@ final class NetworkSelectionModel {
      * @param element element
      * @return true if the specified element is selected
      */
-    public boolean isSelected(final Object element) {
+    public boolean isSelected(final ScreenElement element) {
         return selection.contains(element);
     }
 
@@ -189,16 +193,18 @@ final class NetworkSelectionModel {
      *
      * @param elements elements
      */
-    public void setSelection(final Collection elements) {
+    public void setSelection(final Collection<? extends ScreenElement> elements) {
 
         if (selection.isEmpty() && elements.isEmpty()) {
             return;
         }
 
         adjusting = true;
-        Set oldSelection = new HashSet(selection);
+        Set<ScreenElement> oldSelection = new HashSet<>(selection);
         selection.clear();
-        boolean rv = selection.addAll(elements);
+        boolean rv = selection.
+                addAll(elements.stream()
+                        .map(ScreenElement::getSelectionTarget).collect(Collectors.toList()));
         adjusting = false;
 
         if (rv || elements.isEmpty()) {

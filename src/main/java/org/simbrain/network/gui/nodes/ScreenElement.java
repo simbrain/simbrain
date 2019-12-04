@@ -390,4 +390,11 @@ public abstract class ScreenElement extends PPath.Float {
      * Returns a reference to the model object this node represents.
      */
     public abstract NetworkModel getModel();
+
+    /**
+     * Override if selection events should select something besides this PNode.
+     */
+    public ScreenElement getSelectionTarget() {
+        return this;
+    }
 }

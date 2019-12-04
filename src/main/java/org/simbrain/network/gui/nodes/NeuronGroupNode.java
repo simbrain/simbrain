@@ -176,8 +176,43 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     }
 
     @Override
-    protected NeuronGroup getModel() {
-        return neuronGroup;
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
+    public boolean showNodeHandle() {
+        return false;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+        return false;
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasContextMenu() {
+        return false;
+    }
+
+    @Override
+    protected JPopupMenu getContextMenu() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return false;
     }
 
     /**
@@ -186,8 +221,13 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      *
      * @return the neuron group property dialog.
      */
-    private StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return getNetworkPanel().getNeuronGroupDialog(this);
+    }
+
+    @Override
+    public void resetColors() {
+
     }
 
     /**
@@ -360,6 +400,11 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         protected boolean hasToolTipText() {
             return true;
         }
+    }
+
+    @Override
+    public NeuronGroup getModel() {
+        return neuronGroup;
     }
 
     /**
@@ -624,7 +669,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      */
     public LinkedHashMap<Point2D, Point2D> proposeMapping(List<Point2D> dockPoints, Set<SynapseGroupArrow> groups, Port port) {
 
-        TreeMap<Double, Point2D> sortedTermina = new TreeMap<Double, Point2D>();
+        TreeMap<java.lang.Double, Point2D> sortedTermina = new TreeMap<>();
 
         Point2D terminus;
         for (SynapseGroupArrow synGN : groups) {
@@ -677,8 +722,8 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             sortedTermina.put(area, terminus);
         }
         LinkedHashMap<Point2D, Point2D> connectionMap = new LinkedHashMap<Point2D, Point2D>();
-        for (Double d : sortedTermina.keySet()) {
-            float min = Float.MAX_VALUE;
+        for (java.lang.Double d : sortedTermina.keySet()) {
+            float min = java.lang.Float.MAX_VALUE;
             float dist = 0;
             terminus = sortedTermina.get(d);
             Point2D closest = null;
@@ -707,7 +752,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         for (Point2D pt : map.keySet()) {
             originCopy.add(pt);
         }
-        double min = Double.MAX_VALUE;
+        double min = java.lang.Double.MAX_VALUE;
         Point2D tradePt = null;
         int count = 0;
         do {
@@ -803,5 +848,9 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     private boolean samePoint(Point2D a, Point2D b) {
         return a.getX() == b.getX() && a.getY() == b.getY();
     }
-    
+
+    @Override
+    public ScreenElement getSelectionTarget() {
+        return getInteractionBox();
+    }
 }

@@ -41,6 +41,7 @@ import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * Handle network mouse events, which  drag objects, select objects, toggle selections,
@@ -178,17 +179,21 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             //((NeuronNode) pickedNode).setMoving(true);
         }
 
+        if (! (pickedNode instanceof ScreenElement)) {
+            return;
+        }
+
         // Either start dragging selected node(s) or toggle selection (if shift
         // is pressed).
-        if (networkPanel.isSelected(pickedNode)) {
+        if (networkPanel.isSelected((ScreenElement) pickedNode)) {
             if (event.isShiftDown()) {
-                networkPanel.toggleSelection(pickedNode);
+                networkPanel.toggleSelection((ScreenElement) pickedNode);
             }
         } else {
             if (event.isShiftDown()) {
-                networkPanel.toggleSelection(pickedNode);
+                networkPanel.toggleSelection((ScreenElement) pickedNode);
             } else {
-                networkPanel.setSelection(Collections.singleton(pickedNode));
+                networkPanel.setSelection(Collections.singleton(((ScreenElement) pickedNode)));
             }
         }
     }
@@ -229,7 +234,13 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             marquee.reset(); //todo: better way?
             marquee.append(new Rectangle2D.Float((float) rect.getX(), (float) rect.getY(), (float) rect.getWidth(), (float) rect.getHeight()), false);
             boundsFilter.setBounds(rect);
-            Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
+            Collection highlightedNodes =
+                    networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
+
+            highlightedNodes = (Collection) highlightedNodes.stream()
+                    .filter(ScreenElement.class::isInstance)
+                    .collect(Collectors.toList());
+
             // Toggle things if shift is being pressed
             if (event.isShiftDown()) {
                 Collection selection = Utils.union(priorSelection, highlightedNodes);

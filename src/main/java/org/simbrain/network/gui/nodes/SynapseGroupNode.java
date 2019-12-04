@@ -19,12 +19,14 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
 import org.simbrain.util.StandardDialog;
 
+import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
@@ -39,7 +41,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends PNode implements GroupNode, PropertyChangeListener {
+public class SynapseGroupNode extends ScreenElement implements GroupNode, PropertyChangeListener {
 
     /**
      * Parent network panel.
@@ -63,6 +65,7 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
      * @param group        the synapse group
      */
     protected SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
+        super(networkPanel);
         this.networkPanel = networkPanel;
         this.synapseGroup = group;
         // Note the children pnodes to outlined objects are created in
@@ -97,10 +100,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         // This is needed for synapse groups within subnetworks
         // to be updated properly when neuron groups are moved.
         layoutChildren();
-    }
-
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
     }
 
     public SynapseGroupInteractionBox getInteractionBox() {
@@ -142,4 +141,57 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
         dialog.setVisible(true);
     }
 
+    @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
+    public boolean showNodeHandle() {
+        return false;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+        return false;
+    }
+
+    @Override
+    protected String getToolTipText() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasContextMenu() {
+        return false;
+    }
+
+    @Override
+    protected JPopupMenu getContextMenu() {
+        return null;
+    }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
+    @Override
+    protected JDialog getPropertyDialog() {
+        return null;
+    }
+
+    @Override
+    public void resetColors() {
+    }
+
+    @Override
+    public SynapseGroup getModel() {
+        return synapseGroup;
+    }
 }

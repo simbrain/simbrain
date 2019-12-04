@@ -176,6 +176,9 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         for (Neuron neuron : neuronList) {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
+            // TODO Below improves performance but there is a problem when creating neuron groups
+            //neuron.setX(neuron.getX() + offsetX, false);
+            //neuron.setY(neuron.getY() + offsetY, false);
         }
         firePositionChanged();
     }

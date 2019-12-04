@@ -833,16 +833,28 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return z;
     }
 
-    public void setX(final double x) {
+    public void setX(final double x, boolean fireEvent) {
         double old_x = this.x;
         this.x = x;
-        changeSupport.firePropertyChange("moved", old_x, x);
+        if(fireEvent) {
+            changeSupport.firePropertyChange("moved", old_x, x);
+        }
+    }
+
+    public void setX(final double x) {
+        setX(x, true);
+    }
+
+    public void setY(final double y, boolean fireEvent) {
+        double old_y = this.y;
+        this.y = y;
+        if(fireEvent) {
+            changeSupport.firePropertyChange("moved", old_y, y);
+        }
     }
 
     public void setY(final double y) {
-        double old_y = this.y;
-        this.y = y;
-        changeSupport.firePropertyChange("moved", old_y, y);
+        setY(y, true);
     }
 
     public void setZ(final double z) {

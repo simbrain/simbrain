@@ -40,7 +40,7 @@ public class PlacementManager {
     private static Point2D DEFAULT_OFFSET = new Point2D.Double(45, 0);
 
     /**
-     * Offsets associated with specfic types of objects.
+     * Offsets associated with specific types of objects.
      */
     private static Map<Class<? extends LocatableModel>, Point2D> defaultOffsets = new HashMap<>();
 
@@ -48,7 +48,6 @@ public class PlacementManager {
         defaultOffsets.put(Neuron.class, new Point2D.Double(45, 0));
         defaultOffsets.put(NeuronArray.class, new Point2D.Double(0, -145));
         defaultOffsets.put(NeuronGroup.class, new Point2D.Double(50, 50));
-        defaultOffsets.put(NetworkTextObject.class, new Point2D.Double(45, 50));
     }
 
     /**
@@ -76,6 +75,9 @@ public class PlacementManager {
      */
     private boolean secondPaste = false;
 
+    /**
+     * Set to true right after "copying". Allows pastes to grow out from whatever objects were just copied.
+     */
     private boolean newCopy = false;
 
     /**
@@ -103,10 +105,6 @@ public class PlacementManager {
         anchorPoint = model::getLocation;
         return nextLocation;
     }
-
-    //// Place a group of objects using default offsets
-    //Point2D newLocation = SimbrainMath.add(getDefaultOffset(models), anchorPoint.get());
-    //delta = SimbrainMath.subtract(newLocation, modelLocation.get());
 
     /**
      * Paste a list of objects and place it using the delta between the current anchor point and the
@@ -137,6 +135,7 @@ public class PlacementManager {
             anchorPoint = modelLocation;
             secondPaste = false;
         } else if (newCopy) {
+            // Objects were just copied;  update the anchor point so paste trail grows from there.
             delta = SimbrainMath.subtract(anchorPoint.get(), previousAnchorPoint);
             previousAnchorPoint = modelLocation.get();
             anchorPoint = modelLocation;
@@ -175,36 +174,4 @@ public class PlacementManager {
         newCopy = true;
     }
 
-    /**
-     * Get offsets for lists of model objects.  Adds the relevant {@link #defaultOffsets} to the width and height of
-     * the list of objects.
-     */
-    private Point2D getDefaultOffset(List<LocatableModel> models) {
-        Point2D offset = defaultOffsets.getOrDefault(models.get(0).getClass(), DEFAULT_OFFSET);
-        Point2D ret = new Point2D.Double();
-
-        double width = SimnetUtils.getWidth(models);
-        double dx = offset.getX();
-
-        double height = SimnetUtils.getHeight(models);
-        double dy = offset.getY();
-
-        if (offset.getX() < 0) {
-            ret.setLocation(-width + dx, ret.getY());
-        } else if (offset.getX() == 0) {
-            ret.setLocation(0, ret.getY());
-        } else {
-            ret.setLocation(width + dx, ret.getY());
-        }
-
-        if (offset.getY() < 0) {
-            ret.setLocation(ret.getX(), -height + dy);
-        } else if (offset.getY() == 0) {
-            ret.setLocation(ret.getX(), 0);
-        } else {
-            ret.setLocation(ret.getX(), height + dy);
-        }
-
-        return ret;
-    }
 }

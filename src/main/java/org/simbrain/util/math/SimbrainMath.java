@@ -337,7 +337,9 @@ public class SimbrainMath {
     }
 
     /**
-     * Component wise subtraction of provided points.
+     * Component wise subtraction of provided points.  A geometry reminder: you can
+     * think of point1 as the head, and point2 as the tail of a new vector.
+     * See https://en.wikipedia.org/wiki/File:Vector_subtraction.svg
      */
     public static Point2D subtract(Point2D point1, Point2D point2) {
         return new Point2D.Double(point1.getX() - point2.getX(), point1.getY() - point2.getY());

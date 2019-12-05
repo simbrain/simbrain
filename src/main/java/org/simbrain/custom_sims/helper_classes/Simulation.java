@@ -129,7 +129,7 @@ public class Simulation {
     public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
         DocViewerComponent docViewer = new DocViewerComponent(title);
         String html = Utils.readFileContents(
-                new File(ClassLoader.getSystemClassLoader().getResource("customsims"
+                new File(ClassLoader.getSystemClassLoader().getResource("custom_sims"
                 + Utils.FS + fileName).getPath()));
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);

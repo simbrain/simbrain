@@ -48,7 +48,7 @@ import org.simbrain.workspace.*;
     // Make Couplings
     Producer neuronProducer = CouplingUtils.getProducer(ng, "getSubsampledActivations");
     Consumer projectionConsumer = CouplingUtils.getConsumer(chart, "addPoint"); 
-    workspace.getCouplingManager().tryCoupling(neuronProducer, projectionConsumer);
+    workspace.getCouplingManager().createCoupling(neuronProducer, projectionConsumer);
 
 
 }

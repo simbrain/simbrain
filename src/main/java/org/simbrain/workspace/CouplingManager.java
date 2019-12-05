@@ -96,7 +96,8 @@ public class CouplingManager {
         Coupling<T> coupling = null;
         try {
             coupling = Coupling.create(producer, consumer);
-            addCoupling(coupling);
+            getCouplings().add(coupling);
+            fireCouplingAdded(coupling);
         } catch (MismatchedAttributesException e) {
             e.printStackTrace();
             return null;
@@ -214,11 +215,6 @@ public class CouplingManager {
         }
     }
 
-    public void addCoupling(Coupling<?> coupling) {
-        getCouplings().add(coupling);
-        fireCouplingAdded(coupling);
-    }
-
     /**
      * Remove any couplings associated with the "dead" object.
      *
@@ -239,12 +235,20 @@ public class CouplingManager {
         }
     }
 
+    /**
+     * Update all couplings by setting the consumers to take the values of their producers.
+     */
     public void updateCouplings() {
         for (Coupling<?> coupling : getCouplings()) {
             coupling.update();
         }
     }
 
+    /**
+     * Remove a specific coupling
+     *
+     * @param coupling the coupling to remove
+     */
     public void removeCoupling(Coupling<?> coupling) {
         getCouplings().remove(coupling);
         fireCouplingRemoved(coupling);

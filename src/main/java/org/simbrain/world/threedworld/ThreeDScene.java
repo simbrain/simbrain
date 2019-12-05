@@ -1,6 +1,7 @@
 package org.simbrain.world.threedworld;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.light.AmbientLight;
 import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -77,6 +78,7 @@ public class ThreeDScene {
 //            unload(engine);
 //        }
 //        Spatial model = engine.getAssetManager().loadModel(name);
+//        engine.getRootNode().attachChild(model);
 //        if (model instanceof Node) {
 //            node = (Node) model;
 //        } else {
@@ -90,6 +92,10 @@ public class ThreeDScene {
 //            node.removeLight(light);
 //            engine.getRootNode().addLight(light);
 //        }
+
+        AmbientLight ambientLight = new AmbientLight();
+        ambientLight.setColor(ColorRGBA.White);
+        engine.getRootNode().addLight(ambientLight);
     }
 
     /**

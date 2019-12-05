@@ -79,6 +79,7 @@ public class ThreeDEngine extends LegacyApplication {
 
         bulletAppState = new BulletAppState();
         bulletAppState.setEnabled(false);
+        stateManager.attach(bulletAppState);
 
         System.out.println(Thread.currentThread().getContextClassLoader() );
 
@@ -234,10 +235,12 @@ public class ThreeDEngine extends LegacyApplication {
         try {
             super.initialize();
 
-            String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
-            getAssetManager().registerLocator(rootDirectory, FileLocator.class);
-
-            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets" : "src/org/simbrain/world/threedworld/threedassets/assets");
+//            String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
+//            getAssetManager().registerLocator(rootDirectory, FileLocator.class);
+//
+//            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets" : "src/org/simbrain/world/threedworld/threedassets/assets");
+//            getAssetManager().registerLocator(assetDirectory, FileLocator.class);
+            assetDirectory = "src/main/resources/threedworld/assets";
             getAssetManager().registerLocator(assetDirectory, FileLocator.class);
 
             renderSource = new ThreeDRenderSource(getViewPort(), true);

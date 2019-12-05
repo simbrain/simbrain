@@ -2,10 +2,13 @@ package org.simbrain.world.threedworld;
 
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.plugins.FileLocator;
+import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.math.ColorRGBA;
 
@@ -60,6 +63,16 @@ public class TestJME extends SimpleApplication {
         pivot.attachChild(red);
         /** Rotate the pivot node: Note that both boxes have rotated! */
         pivot.rotate(.4f,.4f,0f);
+
+        String assetDirectory = "src/main/resources/threedworld/assets";
+        getAssetManager().registerLocator(assetDirectory, FileLocator.class);
+
+//        Spatial model = getAssetManager().loadModel("Scenes/BlueRoom.j3o");
+//        getRootNode().att
+
+        AmbientLight ambientLight = new AmbientLight();
+        ambientLight.setColor(ColorRGBA.White);
+        rootNode.addLight(ambientLight);
     }
 
     @Override

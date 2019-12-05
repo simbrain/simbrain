@@ -41,6 +41,9 @@ public class SimbrainMath {
 
     public static final double log10of2 = Math.log10(2);
 
+    /**
+     * Convenience function to get log base 2 of a number
+     */
     public static double log2(double val) {
         return Math.log10(val) / log10of2;
     }
@@ -143,7 +146,6 @@ public class SimbrainMath {
         if (one > two) {
             return one;
         }
-
         return two;
     }
 

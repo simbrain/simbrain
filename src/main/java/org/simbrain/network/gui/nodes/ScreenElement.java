@@ -35,28 +35,6 @@ import java.awt.geom.Point2D;
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,
  * and property dialog, and support. Screen elements are automatically support
  * the primary user interactions in the network panel.
- * <p>
- * Subclasses of this class must implement the following methods:
- * <p>
- * <pre>
- * protected abstract boolean isSelectable();
- *
- * protected abstract boolean showNodeHandle();
- *
- * protected abstract boolean isDraggable();
- *
- * protected abstract boolean hasToolTipText();
- *
- * protected abstract String getToolTipText();
- *
- * protected abstract boolean hasContextMenu();
- *
- * protected abstract JPopupMenu getContextMenu();
- *
- * protected abstract boolean hasPropertyDialog();
- *
- * protected abstract JDialog getPropertyDialog();
- * </pre>
  */
 public abstract class ScreenElement extends PPath.Float {
 

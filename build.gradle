@@ -10,8 +10,7 @@ plugins {
 }
 
 def versionName = "Simbrain4Beta"
-def jmonkeyengine_version = '[3.2,)' // ) means it always gets the latest 3.2.X version
-// https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
+def jmonkeyengine_version = '3.2.2-stable'
 def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
@@ -25,7 +24,6 @@ repositories {
 
 dependencies {
 
-
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
 
@@ -34,7 +32,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.ojalgo/ojalgo
     compile group: 'org.ojalgo', name: 'ojalgo', version: '37.1.1'
-
 
     // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
     compile group: 'org.tinylog', name: 'tinylog', version: '1.3.6'
@@ -52,11 +49,10 @@ dependencies {
     // https://mvnrepository.com/artifact/jfree/jfreechart
     compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
 
-    // TODO: Migrate to nd4j
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
 
-    // Dl4j, ND4j.
+    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
     compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
     compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
@@ -72,29 +68,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
 
-    // JME. Only one of bullet or bullet-native should be uncommented
+    // https://mvnrepository.com/artifact/org.jmonkeyengine
     compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-jogl:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-plugins:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-effects:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-networking:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-blender:$jmonkeyengine_version"
-    // compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-bullet-native:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-jogg:$jmonkeyengine_version"
-    compile "org.jmonkeyengine:jme3-niftygui:$jmonkeyengine_version"
-    // compile "com.badlogicgames.gdx:gdx-ai:1.8.0"
-    compile "javax.vecmath:vecmath:1.5.2"
-
-    // TODO: Not sure why the thing below didn't work in the format above...
-    // Maybe try again from command line starting with gradle clean.  Intellij not quite working
-    // https://mvnrepository.com/artifact/org.jmonkeyengine/jme3-jogg/3.2.0-stable
-    compile group: 'org.jmonkeyengine', name: 'jme3-jogg', version: '3.2.0-stable'
+    compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
 
 }
-
 
 // Sample call: gradle runSim -PsimName='Evolve Mouse Pursuer'
 task runSim(type: JavaExec) {

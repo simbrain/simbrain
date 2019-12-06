@@ -5,7 +5,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -163,7 +162,6 @@ public class TileSet {
      * @param gid the global id of the tile
      * @return the tile of the given id.
      */
-    @Nullable
     public Tile getTile(int gid) {
 
         int id = gid - firstgid; // converting global tile id to local tileset id.

@@ -72,6 +72,7 @@ public class ThreeDScene {
         /** Attach the two boxes to the *pivot* node. (And transitively to the root node.) */
         pivot.attachChild(blue);
         pivot.attachChild(red);
+
         /** Rotate the pivot node: Note that both boxes have rotated! */
         pivot.rotate(.4f,.4f,0f);
 //        if (node != null) {

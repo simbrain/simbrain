@@ -17,6 +17,8 @@ public class LoadSceneAction extends AbstractAction {
     private static final long serialVersionUID = -1555371103072097299L;
 
     private ThreeDWorld world;
+
+    // TODO: Use SFileChooser
     private JFileChooser fileChooser;
 
     /**

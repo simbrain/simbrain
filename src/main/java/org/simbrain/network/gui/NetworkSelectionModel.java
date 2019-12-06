@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui;
 
-import com.jogamp.newt.Screen;
 import org.simbrain.network.gui.nodes.ScreenElement;
 
 import javax.swing.event.EventListenerList;

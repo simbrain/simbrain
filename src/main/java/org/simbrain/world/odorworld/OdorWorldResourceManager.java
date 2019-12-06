@@ -19,13 +19,8 @@
 package org.simbrain.world.odorworld;
 
 import org.simbrain.util.Utils;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -33,10 +28,12 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * <b>OdorWorldResourceManager</b> provides resources (stored in the same
- * directory) to the rest of the program.
+ * <b>OdorWorldResourceManager</b> provides resources used by odor world.
  */
 public class OdorWorldResourceManager {
+
+    // TODO: Buffered images have to be retrieved in a special way; but we can't remember the details...
+    //  If it's resolved get rid of this class and just use ResourceManager.java
 
     /**
      * Return an image for a "rotating" entity.
@@ -57,7 +54,6 @@ public class OdorWorldResourceManager {
     public static Image getStaticImage(final String name) {
         return getBufferedImage("static" + Utils.FS + name);
     }
-
 
     /**
      * Retrieve and load an Image into buffer based on its file name.
@@ -91,52 +87,4 @@ public class OdorWorldResourceManager {
         return ClassLoader.getSystemClassLoader().getResource("odorworld" + Utils.FS + path);
     }
 
-    public static Document getDocument(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(name);
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        Document doc = null;
-        try {
-            doc = db.parse(url.openStream());
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        doc.getDocumentElement().normalize();
-        return doc;
-    }
-
-    public static Document getTileMap(final String name) {
-        return getDocument("tilemap" + Utils.FS + name);
-    }
-
-    public static Document getTileMap(final File file) {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        Document doc = null;
-        try {
-            doc = db.parse(file);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        doc.getDocumentElement().normalize();
-        return doc;
-
-    }
 }
